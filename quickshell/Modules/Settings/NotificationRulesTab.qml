@@ -107,7 +107,11 @@ Item {
     }
 
     function matchSummary(rule) {
-        return [getRuleOptionLabel(notificationRuleFieldOptions, rule.field, notificationRuleFieldOptions[0].label), getRuleOptionLabel(notificationRuleMatchTypeOptions, rule.matchType, notificationRuleMatchTypeOptions[0].label)].join(" · ");
+        const parts = [getRuleOptionLabel(notificationRuleFieldOptions, rule.field, notificationRuleFieldOptions[0].label), getRuleOptionLabel(notificationRuleMatchTypeOptions, rule.matchType, notificationRuleMatchTypeOptions[0].label)];
+        const extra = (rule.conditions || []).length;
+        if (extra > 0)
+            parts.push(I18n.tr("+%1 conditions", "notification rule summary, %1 is the number of extra conditions").arg(extra));
+        return parts.join(" · ");
     }
 
     function outcomeBadges(rule) {

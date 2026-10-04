@@ -456,25 +456,27 @@ Singleton {
         if (rule.enabled === false)
             return false;
 
-        const pattern = (rule.pattern || "").toString();
-        if (!pattern.trim())
-            return false;
-
-        const value = (_ruleFieldValue(rule.field, info) || "").toString();
-        const matchType = (rule.matchType || "contains").toString().toLowerCase();
-
-        if (matchType === "exact")
-            return value.toLowerCase() === pattern.toLowerCase();
-        if (matchType === "regex") {
-            try {
-                return new RegExp(pattern, "i").test(value);
-            } catch (e) {
-                log.warn("invalid notification rule regex:", pattern);
+        return [rule, ...(rule.conditions || [])].every(condition => {
+            const pattern = (condition.pattern || "").toString();
+            if (!pattern.trim())
                 return false;
-            }
-        }
 
-        return value.toLowerCase().includes(pattern.toLowerCase());
+            const value = (_ruleFieldValue(condition.field, info) || "").toString();
+            const matchType = (condition.matchType || "contains").toString().toLowerCase();
+
+            if (matchType === "exact")
+                return value.toLowerCase() === pattern.toLowerCase();
+            if (matchType === "regex") {
+                try {
+                    return new RegExp(pattern, "i").test(value);
+                } catch (e) {
+                    log.warn("invalid notification rule regex:", pattern);
+                    return false;
+                }
+            }
+
+            return value.toLowerCase().includes(pattern.toLowerCase());
+        });
     }
 
     function _allowedInDnd(urgency, bypassDnd) {

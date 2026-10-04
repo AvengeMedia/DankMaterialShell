@@ -19,6 +19,7 @@ DankDialog {
     property string ruleAction: ""
     property string ruleUrgency: ""
     property bool ruleBypassDnd: false
+    property var ruleConditions: []
     readonly property bool isEditMode: editingIndex >= 0
 
     signal ruleSubmitted
@@ -53,6 +54,11 @@ DankDialog {
         ruleAction = rule.action || actionOptions[0].value;
         ruleUrgency = rule.urgency || urgencyOptions[0].value;
         ruleBypassDnd = rule.bypassDnd === true;
+        ruleConditions = (rule.conditions || []).map(condition => ({
+                    field: condition.field || fieldOptions[0].value,
+                    matchType: condition.matchType || matchTypeOptions[0].value,
+                    pattern: condition.pattern || ""
+                }));
         patternInput.text = rule.pattern || "";
         fieldDropdown.currentValue = labelOf(fieldOptions, ruleField);
         matchTypeDropdown.currentValue = labelOf(matchTypeOptions, ruleMatchType);
@@ -65,6 +71,7 @@ DankDialog {
             field: ruleField,
             pattern: patternInput.text,
             matchType: ruleMatchType,
+            conditions: ruleConditions.filter(condition => condition.pattern.trim() !== "").map(condition => Object.assign({}, condition)),
             action: ruleAction,
             urgency: ruleUrgency,
             bypassDnd: ruleBypassDnd
@@ -74,6 +81,20 @@ DankDialog {
         else
             SettingsData.addNotificationRule(rule);
         ruleSubmitted();
+    }
+
+    function addCondition() {
+        ruleConditions = ruleConditions.concat([
+            {
+                field: fieldOptions[0].value,
+                matchType: matchTypeOptions[0].value,
+                pattern: ""
+            }
+        ]);
+    }
+
+    function removeCondition(index) {
+        ruleConditions = ruleConditions.filter((_, i) => i !== index);
     }
 
     actions: [
@@ -126,6 +147,77 @@ DankDialog {
                     placeholderText: I18n.tr("Pattern", "noun, text field label for a match or filter pattern")
                     onAccepted: root.submit()
                 }
+            }
+        }
+
+        // Edits go to the array entry in place: modelData is a copy, and reassigning the array would rebuild the rows and drop focus.
+        Repeater {
+            model: root.ruleConditions
+
+            delegate: SettingsRow {
+                id: conditionRow
+
+                required property var modelData
+                required property int index
+
+                body: Row {
+                    width: parent.width
+                    spacing: Theme.spacingS
+
+                    DankDropdown {
+                        id: conditionFieldDropdown
+                        width: Math.round(parent.width / 3)
+                        anchors.verticalCenter: parent.verticalCenter
+                        compactMode: true
+                        Accessible.name: I18n.tr("Field", "notification rule dropdown label, which notification field to match")
+                        options: root.fieldOptions.map(option => option.label)
+                        currentValue: root.labelOf(root.fieldOptions, conditionRow.modelData.field)
+                        onValueChanged: value => root.ruleConditions[conditionRow.index].field = root.valueOf(root.fieldOptions, value)
+                    }
+
+                    DankDropdown {
+                        id: conditionMatchTypeDropdown
+                        width: Math.round(parent.width / 4)
+                        anchors.verticalCenter: parent.verticalCenter
+                        compactMode: true
+                        Accessible.name: I18n.tr("Match type", "notification rule dropdown label, how the pattern is compared")
+                        options: root.matchTypeOptions.map(option => option.label)
+                        currentValue: root.labelOf(root.matchTypeOptions, conditionRow.modelData.matchType)
+                        onValueChanged: value => root.ruleConditions[conditionRow.index].matchType = root.valueOf(root.matchTypeOptions, value)
+                    }
+
+                    DankTextField {
+                        id: conditionPatternInput
+                        width: parent.width - conditionFieldDropdown.width - conditionMatchTypeDropdown.width - removeConditionButton.width - parent.spacing * 3
+                        anchors.verticalCenter: parent.verticalCenter
+                        outlined: true
+                        placeholderText: I18n.tr("Pattern", "noun, text field label for a match or filter pattern")
+                        Component.onCompleted: text = conditionRow.modelData.pattern
+                        onTextEdited: root.ruleConditions[conditionRow.index].pattern = text
+                        onAccepted: root.submit()
+                    }
+
+                    DankActionButton {
+                        id: removeConditionButton
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: "delete"
+                        iconColor: Theme.error
+                        Accessible.name: I18n.tr("Remove condition")
+                        onClicked: root.removeCondition(conditionRow.index)
+                    }
+                }
+            }
+        }
+
+        SettingsRow {
+            subtitle: root.ruleConditions.length > 0 ? I18n.tr("A notification must match every condition") : ""
+
+            DankButton {
+                text: I18n.tr("Add condition")
+                iconName: "add"
+                backgroundColor: "transparent"
+                textColor: Theme.primary
+                onClicked: root.addCondition()
             }
         }
     }
