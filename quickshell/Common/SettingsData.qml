@@ -3229,7 +3229,7 @@ Singleton {
         if (!app && !desktop)
             return -1;
         return rules.findIndex(rule => {
-            if (!predicate(rule) || (rule.matchType || "contains").toString().toLowerCase() !== "exact")
+            if (!predicate(rule) || (rule.matchType || "contains").toString().toLowerCase() !== "exact" || (rule.conditions || []).length > 0)
                 return false;
             const pattern = (rule.pattern || "").toString().toLowerCase();
             const value = !rule.field || rule.field === "appName" ? app : rule.field === "desktopEntry" ? desktop : "";

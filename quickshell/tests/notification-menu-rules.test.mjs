@@ -22,7 +22,7 @@ function settings(rules) {
 }
 
 function policy(rules, notif) {
-    const functions = ["_resolveAppNameForRule", "_ruleFieldValue", "_coerceRuleUrgency", "_matchesNotificationRule", "_evaluateNotificationPolicy"];
+    const functions = ["_resolveAppNameForRule", "_ruleFieldValue", "_coerceRuleUrgency", "_matchesNotificationRule", "_matchesRuleCondition", "_evaluateNotificationPolicy"];
     const context = load(serviceSource, { SettingsData: { notificationRules: rules }, NotificationUrgency: { Low: 0, Normal: 1, Critical: 2 } }, functions);
     return plain(context._evaluateNotificationPolicy(notif));
 }
@@ -127,4 +127,18 @@ test("rules that are not exact app or desktop-entry rules are never read or edit
     const u = settings([desktop]);
     assert.equal(u.isAppMuted("org.mozilla.firefox", "firefox"), false, "a desktopEntry rule is not matched against the app name");
     assert.equal(u.isAppMuted("Firefox", "org.mozilla.firefox"), true);
+});
+
+test("extra conditions must all match", () => {
+    const conditional = [rule({ pattern: "ghostty", action: "no_history", conditions: [{ field: "summary", matchType: "exact", pattern: "Claude Code" }] })];
+    const ghostty = summary => ({ appName: "ghostty", desktopEntry: "", summary, body: "" });
+    assert.equal(policy(conditional, ghostty("Claude Code")).disableHistory, true);
+    assert.equal(policy(conditional, ghostty("Build finished")).disableHistory, false);
+});
+
+test("menu mute leaves conditional rules alone", () => {
+    const s = settings([rule({ action: "mute", conditions: [{ field: "summary", matchType: "contains", pattern: "update" }] })]);
+    assert.equal(s.isAppMuted("Firefox", ""), false);
+    s.addMuteRuleForApp("Firefox", "");
+    assert.equal(s.notificationRules.length, 2);
 });
