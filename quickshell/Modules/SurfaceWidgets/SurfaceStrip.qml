@@ -121,7 +121,7 @@ FocusScope {
     }
     readonly property bool vertical: surfaceContext.isVertical
     readonly property bool magnificationEnabled: (root.surfaceContext.config?.magnification ?? false) && !root.surfaceContext.editMode
-    readonly property bool magnificationExpand: (root.surfaceContext.config?.magnificationExpand ?? false) && root.magnificationEnabled
+    readonly property bool magnificationExpand: (root.surfaceContext.config?.magnificationExpand ?? false) && root.magnificationEnabled && !root.fillAvailable
     readonly property string magnificationProfile: root.surfaceContext.config?.magnificationProfile ?? "parabolic"
     readonly property real maxMagnification: Math.max(1.05, Math.min(2.0, (root.surfaceContext.config?.magnificationScale ?? 130) / 100))
     readonly property real baseSlotSize: {
@@ -205,8 +205,11 @@ FocusScope {
             return 1.0 + (maxMagnification - 1.0) * factor * magnificationProgress;
         });
     }
-    readonly property real totalMagnificationExpansion: magnificationScales.reduce((sum, scale, i) => sum + (scale - 1.0) * (allocatedSizes[i] ?? 0), 0)
-    readonly property real preferredLength: sizes.reduce((sum, size) => sum + size, 0) + gapSpace + totalMagnificationExpansion
+    // Upper bound for the expansion, set by hosts that have a finite amount of room to grow into.
+    property real expansionLimit: Infinity
+    readonly property real totalMagnificationExpansion: Math.min(expansionLimit, magnificationScales.reduce((sum, scale, i) => sum + (scale - 1.0) * (allocatedSizes[i] ?? 0), 0))
+    readonly property real restLength: sizes.reduce((sum, size) => sum + size, 0) + gapSpace
+    readonly property real preferredLength: restLength + totalMagnificationExpansion
     readonly property real baseContentLength: allocatedSizes.reduce((sum, size) => sum + size, 0) + gapSpace
     readonly property real contentLength: baseContentLength + totalMagnificationExpansion
     readonly property bool interactionActive: {

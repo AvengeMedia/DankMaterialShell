@@ -768,7 +768,7 @@ FocusScope {
                     x: !dock.isVertical ? Math.round((parent.width - width + dock.primaryStartInset - dock.primaryEndInset) / 2) : (dock.config.position === SettingsData.Position.Right ? parent.width - width - dockGeometry.bodyEdgeMargin : dockGeometry.bodyEdgeMargin)
                     y: dock.isVertical ? Math.round((parent.height - height + dock.primaryStartInset - dock.primaryEndInset) / 2) : (dock.config.position === SettingsData.Position.Bottom ? parent.height - height - dockGeometry.bodyEdgeMargin : dockGeometry.bodyEdgeMargin)
 
-                    readonly property real targetPrimary: dock.config.mode === "taskbar" ? dock.availablePrimary : Math.min(widgetStrip.preferredLength - widgetStrip.totalMagnificationExpansion + dock.config.spacing * 2, dock.availablePrimary)
+                    readonly property real targetPrimary: dock.config.mode === "taskbar" ? dock.availablePrimary : Math.min(widgetStrip.restLength + dock.config.spacing * 2, dock.availablePrimary)
                     readonly property real targetWidth: dock.isVertical ? dock.effectiveBarThickness + dock.expansionExtent : targetPrimary
                     readonly property real targetHeight: dock.isVertical ? targetPrimary : dock.effectiveBarThickness + dock.expansionExtent
                     // Magnification expansion bypasses the spring so icons and background stay in sync
@@ -861,6 +861,7 @@ FocusScope {
                             isInOverflow: false
                         }) : item), dock.config.order)
                     availableSize: dock.isVertical ? height : width
+                    expansionLimit: Math.max(0, dock.availablePrimary - widgetStrip.restLength - dock.config.spacing * 2)
                     fillAvailable: dock.config.mode === "taskbar"
                     align: dock.config.mode === "taskbar" ? dock.config.taskbarAlign : "start"
                     onReorderRequested: (from, to) => dock.reorderUnits(from, to)
