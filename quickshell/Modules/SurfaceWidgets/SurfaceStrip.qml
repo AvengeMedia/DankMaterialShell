@@ -63,7 +63,7 @@ FocusScope {
         let offset = startOffset ?? alignOffset;
         for (const index of order) {
             const scale = scales?.[index] ?? 1.0;
-            const extra = (scale - 1.0) * allocatedSizes[index];
+            const extra = (scale - 1.0) * allocatedSizes[index] * expansionRatio;
             result[index] = offset + extra / 2;
             if (participating[index])
                 offset += allocatedSizes[index] + extra + spacing;
@@ -207,7 +207,10 @@ FocusScope {
     }
     // Upper bound for the expansion, set by hosts that have a finite amount of room to grow into.
     property real expansionLimit: Infinity
-    readonly property real totalMagnificationExpansion: Math.min(expansionLimit, magnificationScales.reduce((sum, scale, i) => sum + (scale - 1.0) * (allocatedSizes[i] ?? 0), 0))
+    readonly property real uncappedMagnificationExpansion: magnificationScales.reduce((sum, scale, i) => sum + (scale - 1.0) * (allocatedSizes[i] ?? 0), 0)
+    readonly property real totalMagnificationExpansion: Math.min(expansionLimit, uncappedMagnificationExpansion)
+    // Shrinks each slot's extra so the displaced icons fit the capped expansion.
+    readonly property real expansionRatio: uncappedMagnificationExpansion > 0 ? totalMagnificationExpansion / uncappedMagnificationExpansion : 1.0
     readonly property real restLength: sizes.reduce((sum, size) => sum + size, 0) + gapSpace
     readonly property real preferredLength: restLength + totalMagnificationExpansion
     readonly property real baseContentLength: allocatedSizes.reduce((sum, size) => sum + size, 0) + gapSpace
