@@ -68,13 +68,10 @@ Item {
 
         if (appData.type === "window") {
             const toplevel = getToplevelObject();
-            if (!toplevel) {
-                return false;
-            }
-            return toplevel.activated;
+            return isToplevelFocused(toplevel);
         }
         if (appData.type === "grouped")
-            return getGroupedToplevels().some(toplevel => toplevel.activated);
+            return getGroupedToplevels().some(toplevel => isToplevelFocused(toplevel));
 
         return false;
     }
@@ -123,6 +120,14 @@ Item {
         return appData?.allWindows?.map(w => w.toplevel).filter(t => t !== null) || [];
     }
 
+    function isToplevelFocused(toplevel) {
+        if (!toplevel)
+            return false;
+        if (toplevel.activated)
+            return true;
+        return CompositorService.overviewFocusedToplevel([toplevel]) !== null;
+    }
+
     function restoreSpecialWorkspaceWindow(waylandToplevel) {
         if (!root.options.restoreSpecialWorkspaceOnClick || !waylandToplevel)
             return false;
@@ -138,12 +143,11 @@ Item {
 
     function getActiveGroupedToplevelIndex(toplevels) {
         for (let i = 0; i < toplevels.length; i++) {
-            if (toplevels[i].activated)
+            if (isToplevelFocused(toplevels[i]))
                 return i;
         }
 
-        const overviewFocused = CompositorService.overviewFocusedToplevel(toplevels);
-        return overviewFocused ? toplevels.indexOf(overviewFocused) : -1;
+        return -1;
     }
 
     function cycleGroupedToplevels() {
@@ -584,7 +588,7 @@ Item {
                         if (appData.type !== "grouped" || appData.windowCount === 1)
                             return isWindowFocused;
                         const groupToplevels = getGroupedToplevels();
-                        return index < groupToplevels.length && groupToplevels[index].activated;
+                        return index < groupToplevels.length && isToplevelFocused(groupToplevels[index]);
                     }
                     readonly property real baseWidth: {
                         if (root.options.indicatorStyle === "circle")
@@ -641,7 +645,7 @@ Item {
                         if (appData.type !== "grouped" || appData.windowCount === 1)
                             return isWindowFocused;
                         const groupToplevels = getGroupedToplevels();
-                        return index < groupToplevels.length && groupToplevels[index].activated;
+                        return index < groupToplevels.length && isToplevelFocused(groupToplevels[index]);
                     }
                     readonly property real baseHeight: {
                         if (root.options.indicatorStyle === "circle")
