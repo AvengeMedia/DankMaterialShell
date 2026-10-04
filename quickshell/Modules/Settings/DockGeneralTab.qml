@@ -130,13 +130,7 @@ Item {
                     text: I18n.tr("Edit dock")
                     iconName: "edit"
                     buttonHeight: Theme.buttonHeightS
-                    onClicked: {
-                        BarWidgetService.dockEditRequested(dock.selectedDockId);
-                        if (root.parentModal?.hide)
-                            root.parentModal.hide();
-                        else if (root.parentModal?.close)
-                            root.parentModal.close();
-                    }
+                    onClicked: BarWidgetService.dockEditRequested(dock.selectedDockId)
                 }
             }
 
