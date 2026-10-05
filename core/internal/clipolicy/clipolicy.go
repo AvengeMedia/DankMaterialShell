@@ -14,10 +14,11 @@ const (
 )
 
 type File struct {
-	PolicyVersion   int       `json:"policy_version"`
-	ImmutableSystem *bool     `json:"immutable_system"`
-	BlockedCommands *[]string `json:"blocked_commands"`
-	Message         *string   `json:"message"`
+	PolicyVersion     int       `json:"policy_version"`
+	ImmutableSystem   *bool     `json:"immutable_system"`
+	BlockedCommands   *[]string `json:"blocked_commands"`
+	Message           *string   `json:"message"`
+	DisableRegistries *bool     `json:"disable_registries"`
 }
 
 // LoadFile returns nil without an error when the file does not exist.
@@ -36,4 +37,20 @@ func LoadFile(fs afero.Fs, path string) (*File, error) {
 	}
 
 	return &policy, nil
+}
+
+// RegistriesDisabled reports whether the policy turns off the plugin and theme
+// registries. An explicit value in AdminPath overrides PackagedPath.
+func RegistriesDisabled(fs afero.Fs) (bool, error) {
+	disabled := false
+	for _, path := range []string{PackagedPath, AdminPath} {
+		policy, err := LoadFile(fs, path)
+		if err != nil {
+			return false, err
+		}
+		if policy != nil && policy.DisableRegistries != nil {
+			disabled = *policy.DisableRegistries
+		}
+	}
+	return disabled, nil
 }
