@@ -11110,6 +11110,38 @@
     "parentLabel": "Displays"
   },
   {
+    "section": "nightModeExcludeFullscreen",
+    "label": "Fullscreen windows",
+    "tabIndex": 25,
+    "category": "Gamma control",
+    "keywords": [
+      "blue light",
+      "color temperature",
+      "control",
+      "displays",
+      "focus",
+      "fullscreen",
+      "gamma",
+      "mode",
+      "monitor",
+      "monitors",
+      "night",
+      "night light",
+      "output",
+      "outputs",
+      "pause",
+      "redshift",
+      "resolution",
+      "screen",
+      "screens",
+      "while",
+      "window",
+      "windows"
+    ],
+    "parentLabel": "Displays",
+    "description": "Pause night mode while a fullscreen window has focus"
+  },
+  {
     "section": "displayGamma",
     "label": "Gamma control",
     "tabIndex": 25,
@@ -11196,7 +11228,7 @@
   },
   {
     "section": "nightModeExceptions",
-    "label": "Night Mode Exceptions",
+    "label": "Night mode exceptions",
     "tabIndex": 25,
     "category": "Gamma control",
     "keywords": [
@@ -11207,7 +11239,7 @@
       "displays",
       "exceptions",
       "exclude",
-      "focusing",
+      "focus",
       "fullscreen",
       "gamma",
       "ignore",
@@ -11224,11 +11256,12 @@
       "resolution",
       "screen",
       "screens",
-      "specific"
+      "while",
+      "window"
     ],
     "parentLabel": "Displays",
     "icon": "settings_night_sight",
-    "description": "Pause night mode when focusing a specific app or a fullscreen one."
+    "description": "Pause night mode while a fullscreen window has focus"
   },
   {
     "section": "_tab_26",

@@ -3298,11 +3298,6 @@ Singleton {
         return moddedList;
     }
 
-    function setNightModeExcludeFullscreen(enabled) {
-        nightModeExcludeFullscreen = enabled;
-        saveSettings();
-    }
-
     function addNightModeExcludedApp(identity: string) {
         var newList = addAppIdToList(identity, nightModeExcludedApps);
         nightModeExcludedApps = newList;

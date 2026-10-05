@@ -31,16 +31,10 @@ Singleton {
     property int gammaHighTemp: gammaState?.config?.HighTemp ?? 0
     property bool gammaAdjustAvailable: gammaControlAvailable && DMSService.apiVersion >= 34
 
-    function _setNightModeEnabled(enabled, options, onComplete) {
-        const {
-            quiet = false,
-            message
-        } = options || {};
-
+    function _setNightModeEnabled(enabled, quiet, onComplete) {
         if (!gammaControlAvailable) {
-            if (!quiet && enabled) {
-                ToastService.showWarning(I18n.tr("Night mode action failed: DMS gamma control not available"));
-            }
+            if (!quiet && enabled)
+                ToastService.showWarning(I18n.tr("Night mode failed: DMS gamma control not available"));
             if (onComplete)
                 onComplete(false);
             return;
@@ -50,17 +44,18 @@ Singleton {
             "enabled": enabled
         }, response => {
             if (response.error) {
-                log.error(message || `Failed to ${enabled ? "enable" : "disable"} gamma control:`, response.error);
+                log.error(`Failed to ${enabled ? "enable" : "disable"} gamma control:`, response.error);
                 if (!quiet) {
-                    ToastService.showError(I18n.tr("Night mode error"), response.error, "", "night-mode");
+                    const title = enabled ? I18n.tr("Failed to enable night mode") : I18n.tr("Failed to disable night mode");
+                    ToastService.showError(title, response.error, "", "night-mode");
                 }
                 if (onComplete)
                     onComplete(false);
-            } else {
-                ToastService.dismissCategory("night-mode");
-                if (onComplete)
-                    onComplete(true);
+                return;
             }
+            ToastService.dismissCategory("night-mode");
+            if (onComplete)
+                onComplete(true);
         });
     }
 
@@ -68,7 +63,7 @@ Singleton {
         nightModeEnabled = true;
         SessionData.setNightModeEnabled(true);
 
-        _setNightModeEnabled(true, {}, success => {
+        _setNightModeEnabled(true, false, success => {
             if (!success) {
                 nightModeEnabled = false;
                 SessionData.setNightModeEnabled(false);
@@ -86,13 +81,9 @@ Singleton {
 
     function disableNightMode() {
         nightModeEnabled = false;
+        nightModePaused = false;
         SessionData.setNightModeEnabled(false);
-
-        _setNightModeEnabled(false, {}, success => {
-            if (success) {
-                nightModePaused = false;
-            }
-        });
+        _setNightModeEnabled(false, false);
     }
 
     function toggleNightMode() {
@@ -105,71 +96,54 @@ Singleton {
 
     function pauseNightMode() {
         nightModePaused = true;
-        _setNightModeEnabled(false, {
-            quiet: true
-        }, success => {
-            if (!success) {
+        _setNightModeEnabled(false, true, success => {
+            if (!success)
                 nightModePaused = false;
-            }
         });
     }
 
     function resumeNightMode() {
         nightModePaused = false;
-        _setNightModeEnabled(true, {
-            quiet: true
-        }, success => {
-            if (!success) {
+        _setNightModeEnabled(true, true, success => {
+            if (!success)
                 nightModePaused = true;
-            }
         });
     }
 
     function isNightModeExcludedApp(appId: string): bool {
-        const excludedApps = SettingsData.nightModeExcludedApps || "";
-        if (excludedApps.length === 0) {
+        const excludedApps = SettingsData.nightModeExcludedApps || [];
+        if (!excludedApps.length)
             return false;
-        }
 
-        const moddedId = Paths.moddedAppId(appId);
-        const desktopId = DesktopEntries.heuristicLookup(moddedId)?.id ?? "";
-        const isExcludedApp = excludedApps.some(excludedId => Paths.isAppIdMatch(appId, excludedId, desktopId));
-
-        return isExcludedApp;
+        const desktopId = DesktopEntries.heuristicLookup(Paths.moddedAppId(appId))?.id ?? "";
+        return excludedApps.some(excludedId => Paths.isAppIdMatch(appId, excludedId, desktopId));
     }
 
-    function handleNightModeExceptions(retrying: bool) {
-        if (!nightModePaused && !nightModeEnabled) {
+    function handleNightModeExceptions() {
+        if (!nightModeEnabled)
             return;
-        }
 
-        if (nightModePaused && CompositorService.inOverview) {
-            resumeNightMode();
+        if (CompositorService.inOverview) {
+            if (nightModePaused)
+                resumeNightMode();
             return;
         }
 
         const activeApp = ToplevelManager.activeToplevel;
         if (!activeApp) {
-            let toplevelsCount = ToplevelManager.toplevels?.values?.length;
-            if (!retrying && toplevelsCount === 1)
-                Qt.callLater(() => root.handleNightModeExceptions(true));
-            if (toplevelsCount === 0)
+            if (nightModePaused && !ToplevelManager.toplevels.values.length)
                 resumeNightMode();
             return;
         }
 
         const shouldPause = (SettingsData.nightModeExcludeFullscreen && activeApp.fullscreen) || isNightModeExcludedApp(activeApp.appId);
-
-        if (shouldPause) {
-            if (!nightModePaused && nightModeEnabled) {
-                pauseNightMode();
-            }
+        if (shouldPause === nightModePaused)
             return;
-        }
 
-        if (nightModePaused) {
+        if (shouldPause)
+            pauseNightMode();
+        else
             resumeNightMode();
-        }
     }
 
     function applyGammaAdjustments() {
@@ -188,12 +162,10 @@ Singleton {
 
     function setDisplayGamma(gamma) {
         SessionData.setDisplayGamma(gamma);
-        gammaAdjustTimer.restart();
     }
 
     function setDisplayContrast(contrast) {
         SessionData.setDisplayContrast(contrast);
-        gammaAdjustTimer.restart();
     }
 
     function applyNightModeDirectly() {
@@ -406,13 +378,11 @@ Singleton {
                 applyGammaAdjustments();
 
                 if (nightModeEnabled) {
-                    _setNightModeEnabled(true, {
-                        message: "Failed to enable gamma control on startup:"
-                    }, success => {
-                        if (success) {
-                            evaluateNightMode();
-                            handleNightModeExceptions();
-                        }
+                    _setNightModeEnabled(!nightModePaused, true, success => {
+                        if (!success)
+                            return;
+                        evaluateNightMode();
+                        handleNightModeExceptions();
                     });
                 }
             }
@@ -548,6 +518,12 @@ Singleton {
         }
         function onNightModeUseIPLocationChanged() {
             evaluateNightMode();
+        }
+        function onDisplayGammaChanged() {
+            gammaAdjustTimer.restart();
+        }
+        function onDisplayContrastChanged() {
+            gammaAdjustTimer.restart();
         }
     }
 

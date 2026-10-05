@@ -20,6 +20,7 @@ Item {
     }
 
     Component.onCompleted: desktopApps = AppSearchService.getVisibleApplications() || []
+    Component.onDestruction: desktopApps = []
 
     component StatusTile: Rectangle {
         id: tile
@@ -83,13 +84,7 @@ Item {
                 unit: ""
                 decimals: 2
                 value: Math.round(SessionData.displayGamma * 100)
-                onSliderValueChanged: newValue => {
-                    NightModeService.setDisplayGamma(newValue / 100);
-                }
-                onResetRequested: {
-                    SessionData.resetToDefault(["displayGamma"]);
-                    NightModeService.setDisplayGamma(SessionData.displayGamma);
-                }
+                onSliderValueChanged: newValue => NightModeService.setDisplayGamma(newValue / 100)
             }
 
             SettingsSliderRow {
@@ -103,10 +98,6 @@ Item {
                 step: 5
                 value: Math.round(SessionData.displayContrast * 100)
                 onSliderValueChanged: newValue => NightModeService.setDisplayContrast(newValue / 100)
-                onResetRequested: {
-                    SessionData.resetToDefault(["displayContrast"]);
-                    NightModeService.setDisplayContrast(SessionData.displayContrast);
-                }
             }
         }
 
@@ -279,9 +270,8 @@ Item {
         }
 
         SettingsCard {
-            id: exceptionsCard
             iconName: "settings_night_sight"
-            title: I18n.tr("Night Mode Exceptions")
+            title: I18n.tr("Night mode exceptions", "settings card title: windows and apps that pause night mode while focused")
             settingKey: "nightModeExceptions"
             tags: ["gamma", "night", "mode", "fullscreen", "app", "media", "exceptions", "exclude", "ignore"]
             visible: NightModeService.gammaControlAvailable
@@ -289,25 +279,19 @@ Item {
             expanded: false
 
             SettingsToggleRow {
-                text: I18n.tr("Fullscreen Applications")
-                description: I18n.tr("Pause night mode when focusing a specific app or a fullscreen one.")
+                settingKey: "nightModeExcludeFullscreen"
+                text: I18n.tr("Fullscreen windows", "night mode exceptions toggle: pause while a fullscreen window is focused")
+                description: I18n.tr("Pause night mode while a fullscreen window has focus", "night mode exceptions toggle description")
                 checked: SettingsData.nightModeExcludeFullscreen
-                onToggled: checked => {
-                    SettingsData.set("nightModeExcludeFullscreen", checked);
-                }
+                onToggled: checked => SettingsData.set("nightModeExcludeFullscreen", checked)
             }
-        }
-
-        SettingsCard {
-            visible: exceptionsCard.visible && exceptionsCard.expanded
-            settingKey: "nightModeExceptions"
 
             SettingsTextFieldRow {
                 id: excludeEditor
                 leftIconName: "apps"
-                text: I18n.tr("Excluded Applications")
-                description: I18n.tr("Pause night mode when focusing on specific applications (media player, game, ...)")
-                placeholderText: I18n.tr("App name or identity (e.g., GIMP)")
+                text: I18n.tr("Excluded apps", "night mode exceptions: list of apps that pause night mode while focused")
+                description: I18n.tr("Pause night mode while one of these apps has focus", "night mode excluded apps field description")
+                placeholderText: I18n.tr("App name or identity (e.g., firefox)")
                 onAccepted: root.addNightModeExcludedApp()
 
                 actions: [
@@ -348,7 +332,7 @@ Item {
 
             SettingsRow {
                 visible: !SettingsData.nightModeExcludedApps?.length
-                title: I18n.tr("No excluded application configured")
+                title: I18n.tr("No excluded apps configured", "night mode exceptions empty list placeholder")
                 titleColor: Theme.surfaceVariantText
             }
         }
