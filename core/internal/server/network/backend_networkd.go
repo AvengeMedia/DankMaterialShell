@@ -31,9 +31,21 @@ func (l *linkInfo) isWired() bool {
 		return false
 	}
 	if l.linkType != "" {
-		return l.linkType == "ether"
+		return isWiredLinkType(l.linkType)
 	}
 	return !strings.HasPrefix(l.name, "wlan") && !strings.HasPrefix(l.name, "wlp")
+}
+
+// isWiredLinkType reports whether a networkd link Type can carry the wired
+// uplink. Link aggregates and bridges hold the IP configuration while the
+// enslaved member NIC stays in the "enslaved" state, same as #1581 for
+// NetworkManager.
+func isWiredLinkType(t string) bool {
+	switch t {
+	case "ether", "bridge", "bond", "team", "vlan":
+		return true
+	}
+	return false
 }
 
 func (l *linkInfo) isWireless() bool {
@@ -49,7 +61,7 @@ func (l *linkInfo) isWireless() bool {
 func looksVirtual(name string) bool {
 	virtualPrefixes := []string{
 		"lo", "docker", "podman", "veth", "virbr", "br-", "vnet", "tun", "tap",
-		"vboxnet", "vmnet", "kube", "cni", "flannel", "cali",
+		"vboxnet", "vmnet", "kube", "cni", "flannel", "cali", "lxdbr", "incusbr",
 	}
 	for _, prefix := range virtualPrefixes {
 		if strings.HasPrefix(name, prefix) {

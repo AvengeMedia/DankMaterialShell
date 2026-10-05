@@ -166,6 +166,14 @@ func TestLinkInfo_Classify(t *testing.T) {
 		{"veth ether excluded", "veth1234", "ether", false, false},
 		{"podman bridge ether excluded", "podman3", "ether", false, false},
 		{"docker bridge ether excluded", "docker0", "ether", false, false},
+		// The IP lives on the aggregate while the member NIC is "enslaved" (#3463).
+		{"bridge type", "br0", "bridge", true, false},
+		{"bond type", "bond0", "bond", true, false},
+		{"team type", "team0", "team", true, false},
+		{"vlan type", "vlan10", "vlan", true, false},
+		{"container bridge excluded", "lxdbr0", "bridge", false, false},
+		{"docker user bridge excluded", "br-1a2b3c", "bridge", false, false},
+		{"libvirt bridge excluded", "virbr0", "bridge", false, false},
 		// Fallback path: linkType unavailable, name-prefix heuristic applies.
 		{"fallback enp wired", "enp141s0", "", true, false},
 		{"fallback wlan wireless", "wlan0", "", false, true},
@@ -250,11 +258,11 @@ func TestSyncLinks_RefreshesSurvivingLink(t *testing.T) {
 }
 
 func TestLooksVirtual(t *testing.T) {
-	virtual := []string{"lo", "docker0", "veth123", "virbr0", "br-abc", "vnet0", "tun0", "tap0", "vboxnet0", "vmnet1", "kube-ipvs0", "cni0", "flannel.1", "cali-abc", "podman0", "podman3"}
+	virtual := []string{"lo", "docker0", "veth123", "virbr0", "br-abc", "vnet0", "tun0", "tap0", "vboxnet0", "vmnet1", "kube-ipvs0", "cni0", "flannel.1", "cali-abc", "podman0", "podman3", "lxdbr0", "incusbr0"}
 	for _, n := range virtual {
 		assert.True(t, looksVirtual(n), "%s should look virtual", n)
 	}
-	real := []string{"enp141s0", "eno1", "wlan0", "wlp3s0", "wifi", "dock", "nebula.homelab", "wg0"}
+	real := []string{"enp141s0", "eno1", "wlan0", "wlp3s0", "wifi", "dock", "nebula.homelab", "wg0", "br0", "bond0"}
 	for _, n := range real {
 		assert.False(t, looksVirtual(n), "%s should not look virtual", n)
 	}
