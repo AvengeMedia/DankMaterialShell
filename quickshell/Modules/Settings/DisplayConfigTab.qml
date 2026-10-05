@@ -457,7 +457,7 @@ Item {
     readonly property bool identifyConfigured: {
         if (!DisplayConfigState.hasOutputBackend || DisplayConfigState.readOnly)
             return false;
-        if (!["niri", "hyprland", "mango"].includes(CompositorService.compositor))
+        if (!DisplayConfigState.include.compositorSupported)
             return true;
         return DisplayConfigState.includeStatus.included;
     }
