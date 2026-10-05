@@ -2168,7 +2168,7 @@ func (m *Manager) CopyFile(filePath string) error {
 	// paste target read the file itself, and the image probe size-guards
 	// internally.
 	var fileData []byte
-	if fileInfo.Size() <= cfg.MaxEntrySize {
+	if !fileInfo.IsDir() && fileInfo.Size() <= cfg.MaxEntrySize {
 		fileData, err = os.ReadFile(filePath)
 		if err != nil {
 			return fmt.Errorf("read file: %w", err)

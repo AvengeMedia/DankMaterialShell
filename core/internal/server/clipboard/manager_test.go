@@ -1119,6 +1119,24 @@ func TestCopyFile_OversizedEntryRoundTrips(t *testing.T) {
 	}
 }
 
+// A directory's stat size is tiny, so it passes the MaxEntrySize check and
+// must not reach os.ReadFile, which fails with EISDIR.
+func TestCopyFile_DirectoryStoresURI(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	dir := filepath.Join(t.TempDir(), "My Folder")
+	require.NoError(t, os.Mkdir(dir, 0o755))
+
+	require.NoError(t, m.CopyFile(dir))
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	require.Equal(t, "text/uri-list", history[0].MimeType)
+	entry, err := m.GetEntry(history[0].ID)
+	require.NoError(t, err)
+	assert.Equal(t, dir, m.EntryToFile(entry))
+}
+
 // CopyFile hands the image probe a URI the probe then decodes; it must be an
 // encoded one, or a name containing literal %20 probes the wrong path and the
 // copy silently downgrades to a plain uri-list entry.
