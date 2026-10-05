@@ -305,7 +305,7 @@ DankFloatingWindow {
             Item {
                 id: readOnlyBanner
 
-                property bool showBanner: (SettingsData._isReadOnly && SettingsData._hasUnsavedChanges) || (SessionData._isReadOnly && SessionData._hasUnsavedChanges)
+                property bool showBanner: (SettingsData.isReadOnly && SettingsData.unsavedUserChanges) || (SessionData._isReadOnly && SessionData._hasUnsavedChanges)
 
                 width: parent.width
                 height: showBanner ? bannerContent.implicitHeight + Theme.spacingM * 2 : 0
@@ -362,7 +362,7 @@ DankFloatingWindow {
                     DankButton {
                         id: copySettingsButton
 
-                        visible: SettingsData._isReadOnly && SettingsData._hasUnsavedChanges
+                        visible: SettingsData.isReadOnly && SettingsData.unsavedUserChanges
                         text: "settings.json"
                         iconName: "content_copy"
                         backgroundColor: Theme.primary
