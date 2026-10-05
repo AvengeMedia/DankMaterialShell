@@ -125,6 +125,12 @@ function classifyAppSource(app) {
     if (exec.indexOf("/nix/store/") !== -1 || exec.indexOf("/run/current-system/sw/") !== -1 || exec.indexOf("/etc/profiles/per-user/") !== -1)
         return "nix";
 
+    if (exec.indexOf("steam steam://rungameid/") !== -1)
+        return "steam";
+
+    if (exec.indexOf("waydroid app ") !== -1)
+        return "waydroid";
+
     return "system";
 }
 
