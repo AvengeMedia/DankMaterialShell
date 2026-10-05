@@ -479,7 +479,15 @@ Singleton {
                 return;
             }
 
-            HyprlandService.exit();
+            if (CompositorService.isHyprland) {
+                HyprlandService.exit();
+                return;
+            }
+
+            DMSService.sendRequest("loginctl.terminate", null, response => {
+                if (response.error)
+                    log.warn("Failed to terminate session:", response.error);
+            });
         } else {
             Quickshell.execDetached(customActionCommand(SettingsData.customPowerActionLogout));
         }
