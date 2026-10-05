@@ -78,18 +78,18 @@ Item {
             }
 
             SettingsButtonGroupRow {
+                readonly property bool islandOffered: SettingsData.dankIslandEnabled || SettingsData.launcherStyle === "island"
+
                 visible: !SettingsData.connectedFrameModeActive
                 settingKey: "launcherStyleSelector"
                 tags: ["launcher", "style", "default", "spotlight", "full", "minimal", "island", "dankisland"]
                 resetKeys: ["launcherStyle"]
                 text: I18n.tr("Opens", "verb, row label, which launcher style the shortcut opens")
-                model: [I18n.tr("Full", "adjective, full size launcher style option"), I18n.tr("Spotlight", "launcher style option, small centered search bar"), I18n.tr("Island")]
-                currentIndex: SettingsData.launcherStyle === "island" ? 2 : SettingsData.launcherStyle === "spotlight" ? 1 : 0
-                onSelectionChanged: (index, selected) => {
-                    if (!selected)
-                        return;
-                    SettingsData.set("launcherStyle", index === 2 ? "island" : index === 1 ? "spotlight" : "full");
-                }
+                model: [I18n.tr("Full", "adjective, full size launcher style option"), I18n.tr("Spotlight", "launcher style option, small centered search bar")].concat(islandOffered ? [I18n.tr("Island")] : [])
+                values: ["full", "spotlight"].concat(islandOffered ? ["island"] : [])
+                value: SettingsData.launcherStyle
+                fallbackValue: "full"
+                onValueSelected: value => SettingsData.set("launcherStyle", value)
             }
 
             SettingsRow {

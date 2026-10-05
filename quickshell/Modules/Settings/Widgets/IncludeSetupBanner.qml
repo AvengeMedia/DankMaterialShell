@@ -17,7 +17,7 @@ StyledRect {
     color: Theme.withAlpha(Theme.primary, 0.15)
     border.color: Theme.withAlpha(Theme.primary, 0.3)
     border.width: Theme.outlineWidth
-    visible: visibleCondition && (showLegacy || showSetup) && !include.checking
+    visible: visibleCondition && include.compositorSupported && (showLegacy || showSetup) && !include.checking
 
     Row {
         id: content

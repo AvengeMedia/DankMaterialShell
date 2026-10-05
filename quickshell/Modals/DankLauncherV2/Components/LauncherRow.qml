@@ -64,6 +64,8 @@ DankListItem {
 
     width: parent?.width ?? Theme.fieldDefaultWidth
     height: LauncherMetrics.rowHeight
+    opacity: (root.item?.type === "dmenu" && root.item?.data?.nonSelectable) ? 0.5 : 1.0
+
     AppIconRenderer {
         id: iconRenderer
         width: root.iconSize
@@ -71,7 +73,7 @@ DankListItem {
         anchors.left: parent.left
         anchors.leftMargin: LauncherMetrics.rowPadding
         anchors.verticalCenter: parent.verticalCenter
-        visible: true
+        visible: !(root.item?.type === "dmenu" && root.item?.data?.nonSelectable && !root.item?.icon)
         iconValue: root.iconValue
         iconMargins: root.iconMargins
         fallbackLeftMargin: root.iconFallbackLeftMargin
@@ -104,9 +106,9 @@ DankListItem {
             text: root.item?._hName ?? root.item?.name ?? ""
             textFormat: root.item?._hRich ? Text.RichText : Text.PlainText
             font.pixelSize: Theme.fontSizeLarge
-            font.weight: Theme.fontWeightMedium
+            font.weight: (root.item?.type === "dmenu" && root.item?.data?.urgent) ? Theme.fontWeightBold : Theme.fontWeightMedium
             font.family: Theme.fontFamily
-            color: root.contentColor
+            color: (root.item?.type === "dmenu" && root.item?.data?.urgent) ? Theme.error : root.item?.data?.active ? Theme.primary : root.contentColor
             wrapMode: Text.WordWrap
             maximumLineCount: 1
             elide: Text.ElideRight
@@ -159,6 +161,14 @@ DankListItem {
             size: Theme.iconSizeSmall
             color: root.contentColor
             visible: root.item?.pinned === true
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        DankIcon {  // dmenu --multi-select checkbox
+            name: root.item?.data?.checked ? "check_box" : "check_box_outline_blank"
+            size: Theme.iconSizeSmall
+            color: root.item?.data?.checked ? Theme.primary : root.contentColor
+            visible: root.item?.type === "dmenu" && root.controller?.dmenuMultiSelect === true
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -227,7 +237,7 @@ DankListItem {
         }
 
         Rectangle {
-            visible: !!root.item?.type && root.item.type !== "app" && root.item.type !== "plugin_browse" && (!root.controller?.activePluginName || (root.item.badgeLabel ?? "").length > 0)
+            visible: !!root.item?.type && root.item.type !== "app" && root.item.type !== "plugin_browse" && root.item.type !== "dmenu" && (!root.controller?.activePluginName || (root.item.badgeLabel ?? "").length > 0)
             width: typeBadge.implicitWidth + Theme.spacingS * 2
             height: Theme.iconSizeMedium
             radius: Theme.fullRadius(width, height)

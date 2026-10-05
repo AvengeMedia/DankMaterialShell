@@ -13,8 +13,5 @@ MetricCard {
     supportingText: DgopService.cpuModel
     badgeText: options.temperature === true && DgopService.cpuTemperature > 0 ? Math.round(DgopService.cpuTemperature) + "°" : ""
     showTrend: options.trend === true
-    trend: {
-        DgopService.cpuUsage;
-        return DgopService.cpuHistory.slice();
-    }
+    trend: DgopService.cpuHistory
 }

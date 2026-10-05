@@ -475,7 +475,8 @@ Item {
         }
     }
 
-    readonly property bool frameOwnsConnectedChrome: connected && effectivePopoutLayer === WlrLayer.Top && CompositorService.canShareConnectedFrameChromeForScreen(root.screen)
+    property bool _overStackedModal: false
+    readonly property bool frameOwnsConnectedChrome: connected && !_overStackedModal && effectivePopoutLayer === WlrLayer.Top && CompositorService.canShareConnectedFrameChromeForScreen(root.screen)
     readonly property bool usesConnectedSurfaceChrome: connected && Theme.isConnectedEffect
     readonly property bool usesLocalConnectedSurfaceChrome: usesConnectedSurfaceChrome && !frameOwnsConnectedChrome
 
@@ -519,6 +520,8 @@ Item {
     function open() {
         if (!screen)
             return;
+        if (!contentWindow.visible || _openScreen !== screen)
+            _overStackedModal = ModalManager.hasStackedModal(screen.name);
         const preserveMotion = _canPreserveMotion();
         _resetPublishedBody();
         closeTimer.stop();
@@ -1256,6 +1259,54 @@ Item {
     readonly property real alignedX: alignedXFor(popupWidth)
     readonly property real alignedY: Theme.snap(connected ? _connectedAlignedY() : _standaloneAlignedY(), dpr)
 
+    function _maxBodyWidthFor(startGap, endGap, anchorX) {
+        switch (effectiveBarPosition) {
+        case SettingsData.Position.Left:
+            return screenWidth - anchorX - endGap;
+        case SettingsData.Position.Right:
+            return anchorX - startGap;
+        default:
+            return screenWidth - startGap - endGap;
+        }
+    }
+
+    function _maxBodyHeightFor(startGap, endGap, anchorY) {
+        switch (effectiveBarPosition) {
+        case SettingsData.Position.Top:
+            return screenHeight - anchorY - endGap;
+        case SettingsData.Position.Bottom:
+            return anchorY - startGap;
+        default:
+            return screenHeight - startGap - endGap;
+        }
+    }
+
+    readonly property real maxBodyWidth: {
+        if (connected) {
+            const popupGap = _popupGapValue();
+            const startGap = Math.max(_edgeGapFor("left", popupGap), adjacentBarClearance(adjacentBarInfo.leftBar));
+            const endGap = Math.max(_edgeGapFor("right", popupGap), adjacentBarClearance(adjacentBarInfo.rightBar));
+            return Math.max(0, _maxBodyWidthFor(startGap, endGap, usesConnectedSurfaceChrome ? connectedAnchorX : triggerX));
+        }
+        const popupGap = _standalonePopupGap();
+        const startGap = _edgeClearance("left", popupGap, Math.max(0, adjacentBarInfo.leftBar));
+        const endGap = _edgeClearance("right", popupGap, Math.max(0, adjacentBarInfo.rightBar));
+        return Math.max(0, _maxBodyWidthFor(startGap, endGap, triggerX));
+    }
+
+    readonly property real maxBodyHeight: {
+        if (connected) {
+            const popupGap = _popupGapValue();
+            const startGap = Math.max(_edgeGapFor("top", popupGap), adjacentBarClearance(adjacentBarInfo.topBar));
+            const endGap = Math.max(_edgeGapFor("bottom", popupGap), adjacentBarClearance(adjacentBarInfo.bottomBar));
+            return Math.max(0, _maxBodyHeightFor(startGap, endGap, usesConnectedSurfaceChrome ? connectedAnchorY : triggerY));
+        }
+        const popupGap = _standalonePopupGap();
+        const startGap = _edgeClearance("top", popupGap, Math.max(0, adjacentBarInfo.topBar));
+        const endGap = _edgeClearance("bottom", popupGap, Math.max(0, adjacentBarInfo.bottomBar));
+        return Math.max(0, _maxBodyHeightFor(startGap, endGap, triggerY));
+    }
+
     readonly property vector4d surfaceCornerRadii: chromeLoader.item?.surfaceCornerRadii ?? Qt.vector4d(Theme.windowRadius, Theme.windowRadius, Theme.windowRadius, Theme.windowRadius)
     readonly property real maskX: _dismissZone.x
     readonly property real maskY: _dismissZone.y
@@ -1786,12 +1837,13 @@ Item {
                 visible: !root._surfaceSwitching
                 readonly property bool shouldClip: Theme.isDirectionalEffect || root.usesConnectedSurfaceChrome
                 readonly property real clipOversize: 1000
+                // inputMargin is only non-zero while a grid is being edited; let its chrome cross the connected edge instead of clipping it.
                 readonly property real connectedClipAllowance: {
                     if (!root.usesConnectedSurfaceChrome)
                         return 0;
                     if (root.frameOwnsConnectedChrome)
-                        return 0;
-                    return -Theme.connectedCornerRadius;
+                        return root.inputMargin;
+                    return -Theme.connectedCornerRadius + root.inputMargin;
                 }
 
                 clip: shouldClip

@@ -140,6 +140,8 @@ Item {
 
                     DankDropdown {
                         id: profileDropdown
+                        downKeyOpens: false
+                        backgroundColor: SettingsMetrics.controlSurface
                         width: parent.width - newButton.width - editMonitorsButton.width - deleteButton.width - Theme.spacingS * 3
                         compactMode: true
                         dropdownWidth: width
@@ -165,7 +167,7 @@ Item {
                         iconName: "add"
                         text: ""
                         horizontalPadding: Theme.spacingM
-                        backgroundColor: Theme.chipSurface
+                        backgroundColor: SettingsMetrics.controlSurface
                         textColor: Theme.surfaceText
                         enabled: !SettingsData.displayProfileAutoSelect
                         onClicked: {
@@ -180,7 +182,7 @@ Item {
                         iconName: "edit"
                         text: ""
                         horizontalPadding: Theme.spacingM
-                        backgroundColor: Theme.chipSurface
+                        backgroundColor: SettingsMetrics.controlSurface
                         textColor: Theme.surfaceText
                         enabled: root.selectedProfileId !== "" && !SettingsData.displayProfileAutoSelect
                         onClicked: root.openEditMonitorsDialog()
@@ -192,7 +194,7 @@ Item {
                         iconName: "delete"
                         text: ""
                         horizontalPadding: Theme.spacingM
-                        backgroundColor: Theme.chipSurface
+                        backgroundColor: SettingsMetrics.controlSurface
                         textColor: Theme.error
                         enabled: root.selectedProfileId !== "" && !SettingsData.displayProfileAutoSelect
                         onClicked: root.showDeleteConfirmDialog = true
@@ -455,7 +457,7 @@ Item {
     readonly property bool identifyConfigured: {
         if (!DisplayConfigState.hasOutputBackend || DisplayConfigState.readOnly)
             return false;
-        if (!["niri", "hyprland", "mango"].includes(CompositorService.compositor))
+        if (!DisplayConfigState.include.compositorSupported)
             return true;
         return DisplayConfigState.includeStatus.included;
     }

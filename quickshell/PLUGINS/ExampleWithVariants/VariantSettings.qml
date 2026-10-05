@@ -35,7 +35,7 @@ PluginSettings {
         width: parent.width
         height: addVariantColumn.implicitHeight + Theme.spacingL * 2
         radius: Theme.cornerRadius
-        color: Theme.surfaceContainerHigh
+        color: Theme.chipSurface
 
         Column {
             id: addVariantColumn
@@ -135,7 +135,7 @@ PluginSettings {
         width: parent.width
         height: Math.max(200, variantsColumn.implicitHeight + Theme.spacingL * 2)
         radius: Theme.cornerRadius
-        color: Theme.surfaceContainerHigh
+        color: Theme.chipSurface
 
         Column {
             id: variantsColumn
@@ -165,7 +165,7 @@ PluginSettings {
                     width: ListView.view.width
                     height: variantRow.implicitHeight + Theme.spacingM * 2
                     radius: Theme.cornerRadius
-                    color: variantMouseArea.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer
+                    color: variantMouseArea.containsMouse ? Theme.chipSurfaceNested : Theme.chipSurface
 
                     Row {
                         id: variantRow
@@ -264,7 +264,7 @@ PluginSettings {
         width: parent.width
         height: instructionsColumn.implicitHeight + Theme.spacingL * 2
         radius: Theme.cornerRadius
-        color: Theme.surface
+        color: Theme.hostSurface
 
         Column {
             id: instructionsColumn

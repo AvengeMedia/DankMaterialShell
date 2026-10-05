@@ -190,9 +190,9 @@ Item {
             shown: PolkitService.polkitAvailable
 
             DankFab {
-                text: I18n.tr("Create user")
+                text: I18n.tr("Add user", "button and settings page title, creates a new user account")
                 iconName: "person_add"
-                onClicked: root.parentModal?.navigateTo("user_create")
+                onClicked: keyboard => root.parentModal?.navigateTo("user_create", keyboard)
             }
         }
     }

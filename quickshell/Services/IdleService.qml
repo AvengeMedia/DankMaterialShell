@@ -67,6 +67,7 @@ Singleton {
     property var lockComponent: null
     property bool monitorsOff: false
     property bool isShellLocked: false
+    property bool isSessionLockSecure: false
     property bool lockPowerOffRequested: false
 
     function reapplyDpmsIfNeeded() {
@@ -148,14 +149,13 @@ Singleton {
         }
     }
 
-    // Wakes monitors powered off by the "power off monitors on lock" path.
     // Lock.qml's own wake handlers sit outside the session-lock surface and
     // never receive input, so wake on input via seat-level idle-notify instead.
     IdleMonitor {
         id: lockWakeMonitor
         timeout: 1
         respectInhibitors: false
-        enabled: root.enabled && root.isShellLocked && root.monitorsOff && (SettingsData.lockScreenPowerOffMonitorsOnLock || root.lockPowerOffRequested)
+        enabled: root.enabled && root.isShellLocked && root.monitorsOff
         onIsIdleChanged: {
             if (!enabled)
                 return;

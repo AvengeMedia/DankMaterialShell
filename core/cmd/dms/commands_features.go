@@ -18,6 +18,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/netfetch"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/sysupdate"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/version"
 	"github.com/spf13/cobra"
@@ -45,6 +46,16 @@ var updateCheckCmd = &cobra.Command{
 func runUpdateCheck() {
 	fmt.Println("Checking for DankMaterialShell updates...")
 	fmt.Println()
+
+	shell := sysupdate.ProbeShell(context.Background(), Version)
+	switch shell.InstallMethod {
+	case sysupdate.InstallPacman, sysupdate.InstallRPM, sysupdate.InstallDpkg, sysupdate.InstallXbps:
+		fmt.Printf("Installed as package %s (%s); update it with your package manager.\n", shell.PackageName, shell.InstallMethod)
+		os.Exit(0)
+	case sysupdate.InstallNix:
+		fmt.Println("Managed by Nix; update through your flake or channel.")
+		os.Exit(0)
+	}
 
 	versionInfo, err := version.GetDMSVersionInfo()
 	if err != nil {
@@ -182,12 +193,8 @@ func updateOtherDistros() error {
 	}
 
 	dmsPath := filepath.Join(homeDir, ".config", "quickshell", "dms")
-
-	if _, err := os.Stat(dmsPath); os.IsNotExist(err) {
-		return fmt.Errorf("DMS configuration directory not found at %s", dmsPath)
-	}
-
-	fmt.Printf("Found DMS configuration at %s\n", dmsPath)
+	_, statErr := os.Stat(dmsPath)
+	hasClone := statErr == nil
 
 	versionInfo, err := version.GetDMSVersionInfo()
 	if err == nil && !versionInfo.HasUpdate {
@@ -198,6 +205,22 @@ func updateOtherDistros() error {
 		fmt.Println("✓ You are already running the latest version.")
 		return errdefs.ErrNoUpdateNeeded
 	}
+
+	// Release binaries embed the shell; without a clone the binary is the whole install.
+	if !hasClone {
+		fmt.Println("\nThis will update the dms binary from GitHub releases.")
+		if !confirmUpdate() {
+			return errdefs.ErrUpdateCancelled
+		}
+		fmt.Println("\n=== Updating dms binary ===")
+		if err := updateDMSBinary(); err != nil {
+			return fmt.Errorf("failed to update dms binary: %w", err)
+		}
+		fmt.Println("dms binary successfully updated")
+		return nil
+	}
+
+	fmt.Printf("Found DMS configuration at %s\n", dmsPath)
 
 	fmt.Println("\nThis will update:")
 	fmt.Println("  1. The dms binary from GitHub releases")

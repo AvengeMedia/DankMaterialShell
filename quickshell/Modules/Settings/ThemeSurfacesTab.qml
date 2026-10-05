@@ -32,6 +32,7 @@ Column {
         SettingsData.barConfigs;
         SettingsData.dockConfigs;
         const bars = SettingsData.barConfigs.filter(config => !SettingsData.isDotBarConfig(config)).map(config => ({
+                    key: "bar:" + config.id,
                     kind: "bar",
                     id: config.id,
                     name: config.name || config.id,
@@ -40,6 +41,7 @@ Column {
                     transparency: config.transparency ?? 1
                 }));
         const docks = SettingsData.dockConfigs.map(config => ({
+                    key: "dock:" + config.id,
                     kind: "dock",
                     id: config.id,
                     name: config.name,
@@ -212,7 +214,7 @@ Column {
             settingKey: "blurXrayLink"
             visible: CompositorService.isNiri || CompositorService.isHyprland
             title: I18n.tr("Xray options are in Compositor → Layout")
-            onClicked: root.parentModal?.navigateTo("compositor_layout")
+            onClicked: keyboard => root.parentModal?.navigateTo("compositor_layout", keyboard)
         }
 
         SettingsButtonGroupRow {
@@ -257,13 +259,25 @@ Column {
             onSliderValueChanged: newValue => SettingsData.set("fixedRadius", newValue)
         }
 
+        SettingsToggleRow {
+            tab: "theme"
+            tags: ["window", "corner", "radius", "match", "follow", "link", "strength", "compositor"]
+            settingKey: "windowRadiusMatch"
+            text: I18n.tr("Match corner style", "toggle: window radius follows the corner style setting")
+            visible: root.windowRadiusKey !== ""
+            resetKeys: root.windowRadiusKey !== "" ? [root.windowRadiusKey] : []
+            checked: Theme.compositorRadiusOverride < 0
+            onToggled: checked => SettingsData.set(root.windowRadiusKey, checked ? -1 : Math.round(Theme.windowRadius))
+        }
+
         SettingsSliderRow {
             tab: "theme"
             tags: ["window", "corner", "radius", "rounded", "popout", "menu", "modal", "compositor", "niri", "hyprland", "mango"]
             settingKey: "windowRadius"
             text: I18n.tr("Window radius")
             visible: root.windowRadiusKey !== ""
-            resetKeys: root.windowRadiusKey !== "" ? [root.windowRadiusKey] : []
+            enabled: Theme.compositorRadiusOverride >= 0
+            resetKeys: []
             value: Theme.windowRadius
             minimum: 0
             maximum: 64
@@ -279,7 +293,7 @@ Column {
             subtitle: SettingsTabs.page("surface_shadows")?.hint ?? ""
             resetKeys: ["m3ElevationEnabled"]
             checked: SettingsData.m3ElevationEnabled ?? true
-            onNavigated: root.parentModal?.navigateTo("surface_shadows")
+            onNavigated: keyboard => root.parentModal?.navigateTo("surface_shadows", keyboard)
             onToggled: checked => SettingsData.set("m3ElevationEnabled", checked)
         }
     }
@@ -338,6 +352,7 @@ Column {
             tags: ["floating", "window", "tile", "tiling", "compositor", "rule", "niri", "hyprland", "mango"]
             settingKey: "dmsWindowsFloating"
             text: I18n.tr("Open floating")
+            description: I18n.tr("Adds a compositor window rule so DMS windows such as Settings open floating", "theme floating windows section, open floating toggle description")
             visible: windowRulesInclude.compositorSupported
             checked: CompositorService.dmsWindowFloatingActive
             modified: !checked
@@ -360,37 +375,38 @@ Column {
         SettingsToggleRow {
             id: overrideRow
 
-            required property var modelData
+            required property string modelData
+            readonly property var target: root.opacityTargets.find(entry => entry.key === modelData) ?? null
 
             tab: "theme"
             tags: ["surface", "opacity", "transparency", "bar", "dock", "override"]
-            settingKey: "surfaceOpacity_" + modelData.kind + "_" + modelData.id
-            text: modelData.name
+            settingKey: "surfaceOpacity_" + modelData.replace(":", "_")
+            text: target?.name ?? ""
             description: I18n.tr("Override")
-            checked: modelData.override
-            modified: modelData.override
+            checked: target?.override ?? false
+            modified: target?.override ?? false
             resetByKeys: false
-            onResetRequested: root.setOpacityOverride(modelData, {
+            onResetRequested: root.setOpacityOverride(target, {
                 followInterfaceStyle: true,
                 transparency: 1
             })
-            onToggled: checked => root.setOpacityOverride(modelData, {
+            onToggled: checked => root.setOpacityOverride(target, {
                     followInterfaceStyle: !checked
                 })
 
             body: SettingsSliderRow {
                 width: parent.width
-                enabled: overrideRow.modelData.override
+                enabled: overrideRow.target?.override ?? false
                 text: I18n.tr("Opacity")
-                value: Math.round(overrideRow.modelData.transparency * 100)
+                value: Math.round((overrideRow.target?.transparency ?? 1) * 100)
                 minimum: 0
                 maximum: 100
                 modified: value !== 100
                 resetByKeys: false
-                onResetRequested: root.setOpacityOverride(overrideRow.modelData, {
+                onResetRequested: root.setOpacityOverride(overrideRow.target, {
                     transparency: 1
                 })
-                onSliderDragFinished: finalValue => root.setOpacityOverride(overrideRow.modelData, {
+                onSliderDragFinished: finalValue => root.setOpacityOverride(overrideRow.target, {
                         transparency: finalValue / 100
                     })
             }
@@ -418,6 +434,9 @@ Column {
             readonly property var targets: root.opacityTargets.filter(target => target.kind === modelData.kind)
             readonly property var activeTargets: targets.filter(target => target.enabled)
             readonly property var hiddenTargets: targets.filter(target => !target.enabled)
+            // String keys: a config edit must not rebuild the row holding the focused control
+            readonly property string activeKeys: activeTargets.map(target => target.key).join("\n")
+            readonly property string hiddenKeys: hiddenTargets.map(target => target.key).join("\n")
             property bool showHidden: false
 
             tab: "theme"
@@ -427,7 +446,7 @@ Column {
             visible: targets.length > 0
 
             Repeater {
-                model: targetCard.activeTargets
+                model: targetCard.activeKeys ? targetCard.activeKeys.split("\n") : []
                 delegate: opacityTargetRow
             }
 
@@ -449,7 +468,7 @@ Column {
             }
 
             Repeater {
-                model: targetCard.showHidden ? targetCard.hiddenTargets : []
+                model: targetCard.showHidden && targetCard.hiddenKeys ? targetCard.hiddenKeys.split("\n") : []
                 delegate: opacityTargetRow
             }
         }
@@ -519,6 +538,16 @@ Column {
         }
     }
 
+    SettingsToggleCard {
+        tab: "theme"
+        tags: ["scroll", "scrollbar", "scrollbars", "list", "page"]
+        settingKey: "scrollbarsEnabled"
+        iconName: "unfold_more"
+        title: I18n.tr("Scrollbars", "theme settings toggle, show scrollbars on lists and pages")
+        checked: SettingsData.scrollbarsEnabled
+        onToggled: checked => SettingsData.set("scrollbarsEnabled", checked)
+    }
+
     SettingsCard {
         tab: "theme"
         tags: ["button", "color", "accent"]
@@ -564,6 +593,19 @@ Column {
                 SettingsData.set("buttonColorMode", "primary");
             }
         }
+
+        SettingsSliderRow {
+            tab: "theme"
+            tags: ["container", "accent", "color", "saturation", "tint", "pastel", "primary", "card"]
+            settingKey: "containerSaturation"
+            text: I18n.tr("Container saturation", "theme setting, saturation of tinted accent containers")
+            description: I18n.tr("Tinted cards and badges across the shell", "container saturation setting description")
+            value: SettingsData.containerSaturation
+            minimum: 0
+            maximum: 200
+            step: 5
+            onSliderValueChanged: newValue => SettingsData.set("containerSaturation", newValue)
+        }
     }
 
     SettingsCard {
@@ -576,7 +618,7 @@ Column {
             tab: "theme"
             tags: ["control", "center", "tile", "button", "color", "active"]
             settingKey: "controlCenterTileColorMode"
-            text: I18n.tr("Tile color")
+            text: I18n.tr("Tile color", "control center tile color dropdown label")
             options: [I18n.tr("Primary", "tile color option"), I18n.tr("Primary Container", "tile color option"), I18n.tr("Secondary", "tile color option"), I18n.tr("Surface Variant", "tile color option")]
             optionColorMap: ({
                     [I18n.tr("Primary", "tile color option")]: Theme.roleColor("primary"),

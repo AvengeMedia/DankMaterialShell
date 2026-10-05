@@ -28,6 +28,7 @@ import (
 	serverThemes "github.com/AvengeMedia/DankMaterialShell/core/internal/server/themes"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wallpaper"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wellbeing"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
 	"github.com/AvengeMedia/dankgo/ipc"
 )
@@ -213,6 +214,14 @@ func newRequestMux() *ipc.Mux {
 		location.HandleRequest(conn, req, locationManager)
 	}))
 
+	mux.HandlePrefix("wellbeing.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
+		if wellbeingManager == nil {
+			models.RespondError(conn, req.ID, "wellbeing manager not initialized")
+			return
+		}
+		wellbeing.HandleRequest(conn, req, wellbeingManager)
+	}))
+
 	mux.HandlePrefix("notify.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if notifyActionsManager == nil {
 			models.RespondError(conn, req.ID, "notification action manager not initialized")
@@ -221,13 +230,13 @@ func newRequestMux() *ipc.Mux {
 		notifyactions.HandleRequest(conn, req, notifyActionsManager)
 	}))
 
-	mux.HandlePrefix("sysupdate.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
+	mux.HandlePrefix("sysupdate.", func(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request, _ *ipc.Subscriber) {
 		if sysUpdateManager == nil {
 			models.RespondError(conn, req.ID, "sysupdate manager not initialized")
 			return
 		}
-		sysupdate.HandleRequest(conn, req, sysUpdateManager)
-	}))
+		sysupdate.HandleRequest(ctx, conn, req, sysUpdateManager)
+	})
 
 	mux.HandlePrefix("", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))

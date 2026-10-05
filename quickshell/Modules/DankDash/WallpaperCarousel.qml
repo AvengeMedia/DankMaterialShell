@@ -18,13 +18,21 @@ Item {
     signal activated(string path)
 
     readonly property real itemWidth: Math.round(width * DashMetrics.carouselItemRatio)
+    readonly property real pitch: itemWidth + list.spacing
 
     function syncList() {
         if (list.currentIndex !== root.currentIndex)
             list.currentIndex = root.currentIndex;
     }
 
+    function requestStep(step) {
+        const next = Math.max(0, Math.min(paths.length - 1, currentIndex + step));
+        if (next !== currentIndex)
+            indexRequested(next);
+    }
+
     onCurrentIndexChanged: syncList()
+    // ListView resets currentIndex when its model is replaced.
     onPathsChanged: Qt.callLater(syncList)
 
     Loader {
@@ -62,7 +70,8 @@ Item {
         }
     }
 
-    // Dank* wrappers reset contentY on model change and take the wheel; the carousel needs center snapping.
+    // Not a Dank* wrapper: the view only ever follows currentIndex, never the pointer.
+    // Flickable snapping with the negative spacing drifts to the neighbour and desyncs from the host.
     ListView {
         id: list
 
@@ -70,23 +79,17 @@ Item {
         orientation: ListView.Horizontal
         model: root.paths
         spacing: -root.itemWidth * DashMetrics.carouselOverlap
-        snapMode: ListView.SnapOneItem
         highlightRangeMode: ListView.StrictlyEnforceRange
         preferredHighlightBegin: (width - root.itemWidth) / 2
         preferredHighlightEnd: preferredHighlightBegin + root.itemWidth
         highlightMoveDuration: root.animate && DashMetrics.animationsEnabled ? DashMetrics.transitionDuration : 0
+        interactive: false
         clip: true
         keyNavigationEnabled: false
         activeFocusOnTab: false
-        cacheBuffer: (root.itemWidth + spacing) * 2
-        currentIndex: root.currentIndex
+        cacheBuffer: root.pitch * 2
 
-        onCurrentIndexChanged: {
-            if (!moving)
-                return;
-            if (currentIndex >= 0 && currentIndex !== root.currentIndex)
-                root.indexRequested(currentIndex);
-        }
+        Component.onCompleted: currentIndex = root.currentIndex
 
         delegate: Item {
             id: slide
@@ -94,7 +97,7 @@ Item {
             required property int index
             required property string modelData
 
-            readonly property real offset: (x - list.contentX + width / 2 - list.width / 2) / Math.max(1, width + list.spacing)
+            readonly property real offset: (x - list.contentX + width / 2 - list.width / 2) / Math.max(1, root.pitch)
             readonly property real distance: Math.min(1, Math.abs(offset))
             readonly property bool selected: modelData === root.currentWallpaper
 
@@ -184,6 +187,21 @@ Item {
         }
     }
 
+    DragHandler {
+        property int startIndex: 0
+
+        target: null
+        yAxis.enabled: false
+        onActiveChanged: startIndex = root.currentIndex
+        onActiveTranslationChanged: {
+            if (!active)
+                return;
+            const next = Math.max(0, Math.min(root.paths.length - 1, startIndex + Math.round(-activeTranslation.x / root.pitch)));
+            if (next !== root.currentIndex)
+                root.indexRequested(next);
+        }
+    }
+
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.NoButton
@@ -191,9 +209,7 @@ Item {
             const delta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x;
             if (delta === 0)
                 return;
-            const next = Math.max(0, Math.min(root.paths.length - 1, root.currentIndex - Math.sign(delta)));
-            if (next !== root.currentIndex)
-                root.indexRequested(next);
+            root.requestStep(-Math.sign(delta));
             wheel.accepted = true;
         }
     }

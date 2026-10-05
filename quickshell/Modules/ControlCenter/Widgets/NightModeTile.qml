@@ -9,7 +9,7 @@ CcTile {
     iconName: NightModeService.nightModeEnabled ? "nightlight" : "dark_mode"
     title: I18n.tr("Night mode")
     active: NightModeService.nightModeEnabled || false
-    enabled: NightModeService.automationAvailable
+    available: NightModeService.automationAvailable
 
     onClicked: NightModeService.toggleNightMode()
     expandedContent: Component {

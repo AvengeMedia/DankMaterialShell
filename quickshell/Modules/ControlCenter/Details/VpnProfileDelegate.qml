@@ -67,7 +67,7 @@ CcListRow {
     }
 
     iconName: isConnecting ? "" : (isActive ? "vpn_lock" : (hasError ? "error" : "vpn_key_off"))
-    iconColor: hasError ? Theme.error : (isActive ? Theme.primary : Theme.surfaceText)
+    iconColor: hasError ? Theme.error : contentColor
     active: isActive
     title: profile?.name ?? ""
     subtitle: isConnecting ? I18n.tr("Connecting...") : (hasError ? DMSNetworkService.vpnError : VPNService.getVpnTypeFromProfile(profile))
@@ -76,21 +76,24 @@ CcListRow {
     clickable: true
     onClicked: DMSNetworkService.toggle(profile.uuid)
 
-    Behavior on height {
-        enabled: CcMetrics.animationsEnabled
-        NumberAnimation {
-            duration: Theme.expressiveDurations.expressiveFastSpatial
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
-        }
-    }
-
     leading: DankSpinner {
         size: Theme.iconSizeMedium
         strokeWidth: CcMetrics.spinnerStroke
         color: Theme.warning
         visible: root.isConnecting
         running: visible
+    }
+
+    DankActionButton {
+        anchors.verticalCenter: parent.verticalCenter
+        visible: root.isActive
+        buttonSize: Theme.buttonHeightXS
+        iconSize: Theme.iconSizeMedium
+        iconName: "link_off"
+        Accessible.name: I18n.tr("Disconnect")
+        iconColor: root.contentColor
+        enabled: !DMSNetworkService.isBusy
+        onClicked: DMSNetworkService.toggle(root.profile.uuid)
     }
 
     DankActionButton {
@@ -136,34 +139,13 @@ CcListRow {
             Repeater {
                 model: root.configFields
 
-                Rectangle {
+                DankDetailChip {
                     required property var modelData
 
-                    width: fieldContent.width + Theme.spacingM * 2
-                    height: Theme.buttonHeightXS
-                    radius: Theme.cornerRadiusS
+                    label: modelData.label
+                    value: modelData.value
                     color: Theme.chipSurface
-
-                    Row {
-                        id: fieldContent
-                        anchors.centerIn: parent
-                        spacing: Theme.spacingXS
-
-                        StyledText {
-                            text: modelData.label + ":"
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: modelData.value
-                            font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Theme.fontWeightMedium
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
+                    border.width: 0
                 }
             }
         }

@@ -205,7 +205,7 @@ SettingsCard {
         settingKey: "workspaceIcons"
         tags: ["workspace", "icon", "named", "scratchpad", "special"]
         title: I18n.tr("Icons")
-        subtitle: I18n.tr("Named workspaces and scratchpads")
+        subtitle: I18n.tr("Named workspaces and scratchpads", "workspace appearance row subtitle")
     }
 
     Repeater {

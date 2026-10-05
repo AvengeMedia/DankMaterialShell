@@ -2,6 +2,7 @@ pragma Singleton
 
 import Quickshell
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
@@ -41,7 +42,7 @@ Singleton {
     readonly property bool albumArtAccent: stored.albumArtAccent ?? defaults.albumArtAccent
     readonly property bool animatedArt: stored.animatedArt ?? defaults.animatedArt
 
-    readonly property var lyricsProviderCatalog: [
+    readonly property var builtinLyricsProviders: [
         {
             id: "betterlyrics",
             text: "Better Lyrics"
@@ -67,6 +68,23 @@ Singleton {
             text: "YouTube Music"
         }
     ]
+    readonly property var pluginLyricsProviders: {
+        if (!DMSService.capabilities.includes("lyrics.plugins"))
+            return [];
+        const loaded = PluginService.loadedPlugins;
+        const providers = [];
+        for (const pluginId in loaded) {
+            const plugin = loaded[pluginId];
+            if (!plugin.lyrics?.command)
+                continue;
+            providers.push({
+                id: "plugin_" + pluginId,
+                text: I18n.trFor(pluginId, plugin.lyrics.name ?? plugin.name)
+            });
+        }
+        return providers;
+    }
+    readonly property var lyricsProviderCatalog: builtinLyricsProviders.concat(pluginLyricsProviders)
     readonly property var lyricsProviders: {
         const saved = Array.isArray(SettingsData.mediaLyricsProviders) ? SettingsData.mediaLyricsProviders : [];
         const rows = [];

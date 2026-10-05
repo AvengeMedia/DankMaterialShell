@@ -31,6 +31,10 @@ Singleton {
     readonly property bool genericPowerBackend: compositorDetected && !isNiri && !isHyprland && !isMango && !isSway && !isScroll && !isMiracle && !isLabwc && !isUmbriel
     onGenericPowerBackendChanged: probeOutputPower()
 
+    readonly property bool inOverview: (isHyprland && HyprlandService.inOverview) ||
+                                       (isNiri && NiriService.inOverview) ||
+                                       (isMango && MangoService.inOverview)
+
     function probeOutputPower() {
         outputPowerAvailable = false;
         if (!genericPowerBackend)
@@ -149,7 +153,7 @@ Singleton {
     readonly property string displayName: {
         switch (compositor) {
         case "niri":
-            return "Niri";
+            return "niri";
         case "hyprland":
             return "Hyprland";
         case "mango":
@@ -788,6 +792,57 @@ Singleton {
         if (isHyprland)
             return filterHyprlandCurrentWorkspaceSafe(toplevels, screen);
         return toplevels;
+    }
+
+    readonly property string toplevelKey: {
+        switch (compositor) {
+        case "aqueous":
+            return AqueousService.available ? "aqueousKey" : "address";
+        case "niri":
+            return "niriWindowId";
+        case "mango":
+            return "mangoWindowId";
+        default:
+            return "address";
+        }
+    }
+
+    function toplevelPlacement(toplevel) {
+        if (!toplevel)
+            return {
+                "workspace": "",
+                "output": ""
+            };
+        if (isAqueous && AqueousService.available) {
+            const workspace = AqueousService.workspaces.find(w => w.id === toplevel.aqueousWorkspaceId);
+            return {
+                "workspace": String(workspace?.name || workspace?.number || ""),
+                "output": AqueousService.outputs.find(o => o.id === toplevel.aqueousOutputId)?.name ?? ""
+            };
+        }
+        if (useNiriSorting) {
+            const workspace = NiriService.allWorkspaces.find(w => w.id === toplevel.niriWorkspaceId);
+            return {
+                "workspace": String(workspace?.name || workspace?.idx || ""),
+                "output": workspace?.output ?? ""
+            };
+        }
+        if (useMangoSorting)
+            return {
+                "workspace": (toplevel.mangoTags || []).join(", "),
+                "output": toplevel.mangoMonitor ?? ""
+            };
+        if (isHyprland) {
+            const workspace = WindowModel.hyprlandToplevelFor(Array.from(Hyprland.toplevels?.values || []), toplevel)?.workspace;
+            return {
+                "workspace": workspace?.name ?? "",
+                "output": workspace?.monitor?.name ?? ""
+            };
+        }
+        return {
+            "workspace": "",
+            "output": toplevel.screens?.[0]?.name ?? ""
+        };
     }
 
     function fullscreenToplevelOnScreen(screenOrName) {

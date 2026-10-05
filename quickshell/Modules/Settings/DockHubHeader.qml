@@ -10,7 +10,6 @@ Column {
     id: root
 
     property var parentModal: null
-    property string confirmingRemoveId: ""
     property string editingDockId: ""
     property string renameDraft: ""
 
@@ -26,18 +25,12 @@ Column {
     }
 
     function addDock() {
-        confirmingRemoveId = "";
         dock.selectedDockId = SettingsData.createDockConfig();
         if (!dock.config?.enabled)
             ToastService.showWarning(I18n.tr("Every edge of this display is already taken"));
     }
 
     function removeDock(id) {
-        if (confirmingRemoveId !== id) {
-            confirmingRemoveId = id;
-            return;
-        }
-        confirmingRemoveId = "";
         SettingsData.removeDockConfig(id);
     }
 
@@ -47,10 +40,7 @@ Column {
     DockSelectionState {
         id: dock
 
-        onSelectedDockIdChanged: {
-            root.editingDockId = "";
-            root.confirmingRemoveId = "";
-        }
+        onSelectedDockIdChanged: root.editingDockId = ""
     }
 
     SettingsCard {
@@ -77,7 +67,6 @@ Column {
                 selected: dock.selectedDockId === modelData.id
                 checked: modelData.enabled
                 deletable: SettingsData.dockConfigs.length > 1
-                confirmingDelete: root.confirmingRemoveId === modelData.id
                 onClicked: dock.selectedDockId = modelData.id
                 onToggled: checked => {
                     dock.selectedDockId = modelData.id;

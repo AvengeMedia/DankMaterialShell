@@ -40,6 +40,7 @@ Item {
             return false;
         spec.registration = BarWidgetService.registrationForItem(spec.widgetItem);
         surfaceContext.ensureVisible(spec.widgetItem);
+        // A bar widget always opens its own popout where it was clicked; routing is for shortcuts, IPC and the dock.
         if (surfaceContext.kind === "dock" && !surfaceContext.inlineExpansion && spec.islandActivity && PopoutService.routeToIsland(spec.islandActivity, surfaceContext.screen, spec.mode !== "hover", spec.section || ""))
             return true;
         if (!spec.loader)
@@ -98,8 +99,11 @@ Item {
             popout.triggerScreen = surfaceContext.screen;
 
         if (spec.widgetItem) {
-            const visual = spec.useCenterSection && widgetSection === "center" ? surfaceContext.centerSection : spec.visualItem;
-            surfaceContext.positionPopout(popout, spec.widgetItem, widgetSection, visual, spec.triggerWidth, mode !== "hover");
+            // A section the island sits in is not an anchor: the popout would open under the island.
+            const centred = spec.useCenterSection && widgetSection === "center" && !(surfaceContext.host?.hostsIsland && SettingsData.islandWidgetSection(surfaceContext.config) === "center");
+            const visual = centred ? surfaceContext.centerSection : spec.visualItem;
+            const context = spec.registration?.context?.surface ?? surfaceContext;
+            context.positionPopout(popout, spec.widgetItem, widgetSection, visual, spec.triggerWidth, mode !== "hover");
         }
 
         if (typeof popout.prepareForTrigger === "function")
@@ -158,7 +162,8 @@ Item {
             notepadButtonComponent,
             colorPickerComponent,
             systemUpdateComponent,
-            powerMenuButtonComponent
+            powerMenuButtonComponent,
+            islandComponent
         });
 
         let pluginMap = PluginService.getWidgetComponents();
@@ -187,6 +192,7 @@ Item {
                     widgetItem: clipboardWidget,
                     section: root.getWidgetSection(parent) || "right",
                     triggerSource: "clipboard",
+                    islandActivity: "clipboard",
                     mode: mode || "click",
                     prepare: popout => {
                         if (initialTab)
@@ -814,6 +820,32 @@ Item {
                     mode: "click",
                     setTriggerScreen: true
                 });
+            }
+        }
+    }
+
+    // Reserves the compact face's along-axis room; the morph surface is the bar's island overlay, anchored to this slot.
+    Component {
+        id: islandComponent
+
+        Item {
+            id: islandSlot
+
+            readonly property Item body: surfaceContext.kind === "bar" ? surfaceContext.host : null
+            readonly property real alongSize: body?.islandHost?.compactTargetSize ?? 0
+
+            width: surfaceContext.isVertical ? surfaceContext.widgetThickness : alongSize
+            height: surfaceContext.isVertical ? alongSize : surfaceContext.widgetThickness
+            implicitWidth: width
+            implicitHeight: height
+
+            Component.onCompleted: {
+                if (body)
+                    body.islandSlot = islandSlot;
+            }
+            Component.onDestruction: {
+                if (body && body.islandSlot === islandSlot)
+                    body.islandSlot = null;
             }
         }
     }

@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
@@ -47,6 +48,11 @@ Singleton {
         onTriggered: root.sendPasteKeystroke()
     }
 
+    Process {
+        id: pasteCommand
+        onExited: pasteTimer.start()
+    }
+
     Connections {
         target: DMSService
         function onIsConnectedChanged() {
@@ -72,6 +78,11 @@ Singleton {
             return false;
         }
         return terminalAppIds.includes(appId) || appId.endsWith("term") || appId.includes("terminal");
+    }
+
+    function pasteAfterCommand(command) {
+        pasteCommand.command = command;
+        pasteCommand.running = true;
     }
 
     function sendPasteKeystroke() {

@@ -107,7 +107,7 @@ PanelWindow {
         y: shadowBuffer
         width: root.toastWidth
         height: root.toastHeight
-        color: {
+        readonly property color surfaceColor: {
             switch (ToastService.currentLevel) {
             case ToastService.levelError:
                 return Theme.error;
@@ -119,6 +119,7 @@ PanelWindow {
                 return Theme.readableSurface;
             }
         }
+        color: "transparent"
         radius: Theme.windowRadius
         opacity: presented ? 1 : 0
 
@@ -452,7 +453,7 @@ PanelWindow {
             level: Theme.elevationLevel3
             fallbackOffset: 6
             targetRadius: toast.radius
-            targetColor: toast.color
+            targetColor: toast.surfaceColor
             shadowOpacity: Theme.elevationLevel3 && Theme.elevationLevel3.alpha !== undefined ? Theme.elevationLevel3.alpha : 0.3
             shadowEnabled: Theme.elevationEnabled
         }
@@ -480,7 +481,7 @@ PanelWindow {
     WindowBlur {
         targetWindow: root
         blurEnabled: root.presented
-        surfaceColor: toast.color
+        surfaceColor: toast.surfaceColor
         blurX: toast.x
         blurY: toast.y
         blurWidth: root.presented ? toast.width : 0

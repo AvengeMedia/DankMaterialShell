@@ -10,9 +10,15 @@ CcSheetDialog {
     id: root
 
     property string entryId: ""
+    property bool tabScope: false
 
     readonly property var entry: DashRegistry.entry(entryId)
-    readonly property var specs: DashRegistry.sheetOptionSpecs(entryId)
+    readonly property var settingsPages: ({
+            "weather": "weather",
+            "media": "media_player",
+            "wellbeing": "wellbeing"
+        })
+    readonly property var specs: DashRegistry.sheetOptionSpecs(entryId, tabScope)
 
     function presentFor(id) {
         entryId = id;
@@ -23,6 +29,7 @@ CcSheetDialog {
     iconName: entry?.icon ?? "tune"
     title: entry?.text ?? ""
     subtitle: I18n.tr("Options")
+    showScrollBar: false
 
     SettingsGroup {
         width: parent.width
@@ -34,21 +41,22 @@ CcSheetDialog {
             DashOptionRow {
                 required property var modelData
 
-                entryId: root.entryId
                 spec: modelData
+                value: DashRegistry.option(root.entryId, modelData.key)
+                onCommitted: next => DashRegistry.setOption(root.entryId, modelData.key, next)
             }
         }
     }
 
     SettingsNavRow {
-        visible: root.entryId === "weather" || root.entryId === "media"
+        visible: root.entryId in root.settingsPages
         width: parent.width
-        title: root.entryId === "media" ? I18n.tr("Media player") : I18n.tr("Weather")
+        title: root.entryId === "media" ? I18n.tr("Media player") : root.entry?.text ?? ""
         iconName: "settings"
         onClicked: {
             root.dismiss();
             PopoutService.closeDankDash();
-            PopoutService.openSettingsWithTab(root.entryId === "media" ? "media_player" : "weather");
+            PopoutService.openSettingsWithTab(root.settingsPages[root.entryId]);
         }
     }
 

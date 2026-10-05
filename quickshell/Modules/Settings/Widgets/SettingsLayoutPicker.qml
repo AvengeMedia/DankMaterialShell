@@ -12,12 +12,15 @@ GridLayout {
     property bool edgePlacement: false
     property bool widgetStyle: false
     property bool barLength: false
+    property bool indicatorStyle: false
+    property real indicatorRoundness: -1
+    property bool indicatorCompact: false
     property bool vertical: false
     property var choices: barModes
     property string selectedKey: activeBarMode
     signal selected(string key)
     onSelected: key => {
-        if (!edgePlacement && !widgetStyle && !barLength)
+        if (!edgePlacement && !widgetStyle && !barLength && !indicatorStyle)
             applyBarMode(key);
     }
 
@@ -106,25 +109,29 @@ GridLayout {
             implicitWidth: root.minimumCardWidth
             implicitHeight: Math.max(Math.round(Theme.fontSizeMedium * root.cardHeightRatio), cardContent.implicitHeight + Theme.spacingM * 2)
             radius: Theme.cornerRadius
-            color: Theme.floatingWindowNestedSurface
+            color: SettingsMetrics.rowColor
             border.width: isActive ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
             border.color: isActive ? Theme.primary : Theme.outlineMedium
 
             activeFocusOnTab: true
-            Accessible.role: Accessible.RadioButton
+            Accessible.role: Accessible.Button
             Accessible.name: modelData.label
+            Accessible.checkable: true
             Accessible.checked: isActive
             Accessible.onPressAction: root.selected(modelData.key)
             Keys.onSpacePressed: root.selected(modelData.key)
+            Keys.onEnterPressed: root.selected(modelData.key)
             Keys.onReturnPressed: root.selected(modelData.key)
 
-            FocusRing {}
+            FocusRing {
+                id: cardRing
+            }
 
             Rectangle {
                 anchors.fill: parent
                 radius: parent.radius
                 color: Theme.primary
-                opacity: modeMouse.containsMouse ? Theme.stateLayerHover : 0
+                opacity: cardRing.visible ? Theme.stateLayerFocus : modeMouse.containsMouse ? Theme.stateLayerHover : 0
             }
 
             Column {
@@ -142,7 +149,7 @@ GridLayout {
                     width: Math.min(root.previewWidth, cardContent.width)
                     height: Math.round(width * root.previewAspect)
                     radius: Theme.spacingXS
-                    color: Theme.chipSurface
+                    color: SettingsMetrics.controlColor
                     border.width: Theme.outlineWidth
                     border.color: Theme.outline
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -164,6 +171,33 @@ GridLayout {
                                 joinedStart: style === "segments" && index > 0
                                 joinedEnd: style === "segments" && index < 2
                                 color: index === 1 ? Theme.primary : Theme.primaryContainer
+                            }
+                        }
+                    }
+
+                    Row {
+                        id: indicatorPreview
+                        readonly property real thickness: Theme.iconSizeLarge
+                        readonly property string style: modeCard.modelData.key
+                        visible: root.indicatorStyle
+                        anchors.centerIn: parent
+                        spacing: Theme.spacingXS
+                        scale: Math.min(1, (screenPreview.width - screenPreview.edgePad * 2 - Theme.spacingS) / Math.max(1, implicitWidth))
+
+                        Repeater {
+                            model: 3
+                            BarPillSurface {
+                                required property int index
+                                readonly property bool active: index === 1
+                                readonly property bool outlined: indicatorPreview.style === "cards" && !active
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: indicatorPreview.thickness * BarMetrics.indicatorRatio(indicatorPreview.style, active ? "active" : "compact", root.indicatorCompact)
+                                height: indicatorPreview.thickness * BarMetrics.indicatorRatio(indicatorPreview.style, active ? "activeSlim" : "slim", root.indicatorCompact)
+                                thickness: Math.min(width, height)
+                                radiusOverride: BarMetrics.indicatorRadius(indicatorPreview.style, thickness, root.indicatorRoundness)
+                                color: outlined ? "transparent" : active ? Theme.primary : Theme.primaryContainer
+                                border.width: outlined ? Theme.outlineWidth : 0
+                                border.color: Theme.primaryContainer
                             }
                         }
                     }
@@ -252,7 +286,11 @@ GridLayout {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: root.selected(modeCard.modelData.key)
+                onClicked: {
+                    cardRing.pointerFocused = true;
+                    modeCard.forceActiveFocus(Qt.MouseFocusReason);
+                    root.selected(modeCard.modelData.key);
+                }
             }
         }
     }

@@ -13,8 +13,14 @@ Rectangle {
     property real pressProgress: pressed ? 1 : 0
     property real radiusOverride: -1
     readonly property bool mirrored: !vertical && LayoutMirroring.enabled
-    readonly property real startRadius: radiusOverride >= 0 ? radiusOverride : BarMetrics.cornerRadius(thickness, style, mirrored ? joinedEnd : joinedStart, pressProgress)
-    readonly property real endRadius: radiusOverride >= 0 ? radiusOverride : BarMetrics.cornerRadius(thickness, style, mirrored ? joinedStart : joinedEnd, pressProgress)
+    readonly property real startRadius: cornerRadius(mirrored ? joinedEnd : joinedStart)
+    readonly property real endRadius: cornerRadius(mirrored ? joinedStart : joinedEnd)
+
+    function cornerRadius(joined) {
+        if (radiusOverride >= 0 && !joined)
+            return radiusOverride;
+        return BarMetrics.cornerRadius(thickness, style, joined, pressProgress);
+    }
 
     radius: radiusOverride >= 0 ? radiusOverride : BarMetrics.cornerRadius(thickness, style, false, pressProgress)
     topLeftRadius: startRadius

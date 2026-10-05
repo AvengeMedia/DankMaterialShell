@@ -46,6 +46,8 @@ Item {
             return !!AudioService.sink?.audio;
         case "brightness":
             return BrightnessService.brightnessAvailable && !!root.brightnessDevice;
+        case "privacy":
+            return PrivacyService.anyPrivacyActive;
         }
         return true;
     }
@@ -80,6 +82,9 @@ Item {
         case "volume":
         case "brightness":
             root.systemModel.open(groupId);
+            return;
+        case "privacy":
+            root.controller.requestControlCenter("audioInput", false);
             return;
         }
         root.controller.requestControlCenter("", false);
@@ -226,6 +231,15 @@ Item {
         }
     }
 
+    component PrivacyIcon: DankIcon {
+        required property bool active
+
+        visible: active
+        size: root.statusIconSize
+        color: Theme.error
+        filled: true
+    }
+
     component GroupHoverArea: IslandSlotHoverArea {
         required property var group
 
@@ -243,6 +257,10 @@ Item {
             if (event.button === Qt.MiddleButton) {
                 if (group.usesConnectivity)
                     root.toggleConnectivity(connectivityTypeAt(event));
+                if (group.isPrivacy && PrivacyService.microphoneActive && AudioService.source?.audio) {
+                    SessionData.suppressOSDTemporarily();
+                    AudioService.toggleMicMute();
+                }
                 if (group.isMedia && root.controller.mediaAvailable && MprisController.activePlayer?.canTogglePlaying)
                     MprisController.activePlayer.togglePlaying();
                 if (group.isVolume && AudioService.sink?.audio) {
@@ -277,6 +295,7 @@ Item {
         readonly property bool isNotifications: group.groupId === "notifications"
         readonly property bool isVolume: group.groupId === "volume"
         readonly property bool isBrightness: group.groupId === "brightness"
+        readonly property bool isPrivacy: group.groupId === "privacy"
         readonly property bool isSystemLevel: group.isVolume || group.isBrightness
         readonly property bool usesConnectivity: group.isStatus && root.controller.homeStatusContent === "connectivity"
         readonly property bool usesBattery: group.isStatus && !group.usesConnectivity && BatteryService.batteryAvailable
@@ -391,6 +410,27 @@ Item {
 
                 ConnectivityIcon {
                     type: "bluetooth"
+                }
+            }
+
+            Grid {
+                visible: group.isPrivacy
+                columns: group.vertical ? 1 : 3
+                spacing: Theme.spacingXXS
+
+                PrivacyIcon {
+                    name: "mic"
+                    active: PrivacyService.microphoneActive
+                }
+
+                PrivacyIcon {
+                    name: "camera_video"
+                    active: PrivacyService.cameraActive
+                }
+
+                PrivacyIcon {
+                    name: "screen_share"
+                    active: PrivacyService.screensharingActive
                 }
             }
 

@@ -47,11 +47,28 @@ func (m *MiracleProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
 		categorizedBinds[category] = append(categorizedBinds[category], bind)
 	}
 
-	return &keybinds.CheatSheet{
+	sheet := &keybinds.CheatSheet{
 		Title:    "Miracle WM Keybinds",
 		Provider: m.Name(),
 		Binds:    categorizedBinds,
-	}, nil
+	}
+	sheet.SetMod(miracleModKey(config.ActionKey))
+	return sheet, nil
+}
+
+func (m *MiracleProvider) ModKey() keybinds.ModKey {
+	config, err := ParseMiracleConfig(m.configPath)
+	if err != nil {
+		return keybinds.DefaultModKey()
+	}
+	return miracleModKey(config.ActionKey)
+}
+
+func miracleModKey(actionKey string) keybinds.ModKey {
+	if actionKey == "" {
+		return keybinds.DefaultModKey()
+	}
+	return keybinds.ModKey{Resolved: resolveActionKey(actionKey), Source: keybinds.ModSourceConfig}
 }
 
 func (m *MiracleProvider) GetOverridePath() string {

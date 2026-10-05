@@ -9,6 +9,8 @@ import qs.Widgets
 DankOSD {
     id: root
 
+    osdKind: "workspace"
+
     property string workspaceLabel: ""
     property var lastActiveWorkspaceId: null
 

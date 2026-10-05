@@ -8,6 +8,20 @@ import "../../Common/Format.js" as Format
 Item {
     id: root
 
+    property var desktopApps: []
+    property var parentModal: null
+
+    function addNightModeExcludedApp() {
+        const name = excludeEditor.value.trim();
+        if (!name)
+            return;
+        SettingsData.addNightModeExcludedApp(name);
+        excludeEditor.value = "";
+    }
+
+    Component.onCompleted: desktopApps = AppSearchService.getVisibleApplications() || []
+    Component.onDestruction: desktopApps = []
+
     component StatusTile: Rectangle {
         id: tile
 
@@ -19,9 +33,9 @@ Item {
         width: (parent.width - Theme.spacingM) / 2
         height: tileColumn.implicitHeight + Theme.spacingM * 2
         radius: Theme.cornerRadius
-        color: Theme.floatingWindowNestedSurface
-        border.color: Theme.outlineMedium
-        border.width: Theme.layerOutlineWidth
+        color: SettingsMetrics.controlColor
+        border.color: Theme.floatingWindowFieldBorderColor
+        border.width: Theme.outlineWidth
 
         Column {
             id: tileColumn
@@ -253,6 +267,87 @@ Item {
                 title: I18n.tr("Next Transition")
                 subtitle: Format.formatIsoTime(NightModeService.gammaNextTransition)
             }
+        }
+
+        SettingsCard {
+            iconName: "settings_night_sight"
+            title: I18n.tr("Night mode exceptions", "settings card title: windows and apps that pause night mode while focused")
+            settingKey: "nightModeExceptions"
+            tags: ["gamma", "night", "mode", "fullscreen", "app", "media", "exceptions", "exclude", "ignore"]
+            visible: NightModeService.gammaControlAvailable
+            collapsible: true
+            expanded: false
+
+            SettingsToggleRow {
+                settingKey: "nightModeExcludeFullscreen"
+                text: I18n.tr("Fullscreen windows", "night mode exceptions toggle: pause while a fullscreen window is focused")
+                description: I18n.tr("Pause night mode while a fullscreen window has focus", "night mode exceptions toggle description")
+                checked: SettingsData.nightModeExcludeFullscreen
+                onToggled: checked => SettingsData.set("nightModeExcludeFullscreen", checked)
+            }
+
+            SettingsTextFieldRow {
+                id: excludeEditor
+                leftIconName: "apps"
+                text: I18n.tr("Excluded apps", "night mode exceptions: list of apps that pause night mode while focused")
+                description: I18n.tr("Pause night mode while one of these apps has focus", "night mode excluded apps field description")
+                placeholderText: I18n.tr("App name or identity (e.g., firefox)")
+                onAccepted: root.addNightModeExcludedApp()
+
+                actions: [
+                    DankIconButton {
+                        variant: "filled"
+                        iconName: "add"
+                        Accessible.name: I18n.tr("Add")
+                        enabled: excludeEditor.value.trim() !== ""
+                        onClicked: root.addNightModeExcludedApp()
+                    },
+                    DankIconButton {
+                        iconName: "apps"
+                        tooltipText: I18n.tr("Browse")
+                        onClicked: appBrowserPopup.show()
+                    }
+                ]
+            }
+
+            Repeater {
+                model: SettingsData.nightModeExcludedApps
+
+                delegate: SettingsRow {
+                    required property string modelData
+                    required property int index
+
+                    title: modelData
+                    iconName: "bedtime_off"
+
+                    DankActionButton {
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: "delete"
+                        iconColor: Theme.error
+                        Accessible.name: I18n.tr("Remove")
+                        onClicked: SettingsData.removeNightModeExcludedApp(index)
+                    }
+                }
+            }
+
+            SettingsRow {
+                visible: !SettingsData.nightModeExcludedApps?.length
+                title: I18n.tr("No excluded apps configured", "night mode exceptions empty list placeholder")
+                titleColor: Theme.surfaceVariantText
+            }
+        }
+    }
+
+    AppBrowserPopup {
+        id: appBrowserPopup
+        appsModel: root.desktopApps
+        parentModal: root.parentModal
+        onAppSelected: appId => {
+            var name = appId;
+            if (name.endsWith(".desktop")) {
+                name = name.slice(0, -8);
+            }
+            SettingsData.addNightModeExcludedApp(name);
         }
     }
 }

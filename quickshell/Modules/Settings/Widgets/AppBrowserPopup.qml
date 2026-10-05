@@ -72,7 +72,8 @@ DankFloatingWindow {
 
                 Column {
                     anchors.fill: parent
-                    anchors.margins: Theme.spacingL
+                    anchors.margins: Theme.windowInset
+                    anchors.topMargin: 0
                     spacing: Theme.spacingM
 
                     DankSearchField {
@@ -112,7 +113,7 @@ DankFloatingWindow {
 
                             readonly property bool isSelected: root.keyboardNavigationActive && index === root.selectedIndex
 
-                            color: isSelected ? Theme.withAlpha(Theme.primary, 0.16) : appArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.08) : Theme.floatingWindowNestedSurface
+                            color: isSelected ? Theme.selectedContainer : appArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.08) : Theme.floatingWindowNestedSurface
                             border.color: isSelected ? Theme.primary : Theme.outlineMedium
                             border.width: isSelected ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
 
@@ -180,8 +181,9 @@ DankFloatingWindow {
 
                             Behavior on color {
                                 ColorAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Theme.standardEasing
+                                    duration: Theme.expressiveDurations.expressiveFastEffects
+                                    easing.type: Easing.BezierSpline
+                                    easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
                                 }
                             }
                         }

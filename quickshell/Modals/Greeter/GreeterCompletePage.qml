@@ -329,13 +329,13 @@ Item {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                let url = "https://danklinux.com/docs/dankmaterialshell/keybinds-ipc";
+                                let url = Site.docs + "/dankmaterialshell/keybinds-ipc";
                                 if (CompositorService.isNiri)
-                                    url = "https://danklinux.com/docs/dankmaterialshell/compositors#dms-keybindings";
+                                    url = Site.docs + "/dankmaterialshell/compositors#dms-keybindings";
                                 else if (CompositorService.isHyprland)
-                                    url = "https://danklinux.com/docs/dankmaterialshell/compositors#dms-keybindings-1";
+                                    url = Site.docs + "/dankmaterialshell/compositors#dms-keybindings-1";
                                 else if (CompositorService.isMango)
-                                    url = "https://danklinux.com/docs/dankmaterialshell/compositors#dms-keybindings-2";
+                                    url = Site.docs + "/dankmaterialshell/compositors#dms-keybindings-2";
                                 Qt.openUrlExternally(url);
                             }
                         }
@@ -481,7 +481,7 @@ Item {
                         iconName: "menu_book"
                         title: I18n.tr("Docs", "greeter documentation link")
                         isExternal: true
-                        onClicked: Qt.openUrlExternally("https://danklinux.com/docs")
+                        onClicked: Qt.openUrlExternally(Site.docs)
                     }
 
                     GreeterQuickLink {
@@ -489,7 +489,7 @@ Item {
                         iconName: "palette"
                         title: I18n.tr("Themes", "greeter themes link")
                         isExternal: true
-                        onClicked: Qt.openUrlExternally("https://danklinux.com/plugins?tab=themes")
+                        onClicked: Qt.openUrlExternally(Site.web + "/plugins?tab=themes")
                     }
                 }
             }

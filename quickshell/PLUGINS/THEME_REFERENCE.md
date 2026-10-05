@@ -53,16 +53,15 @@ Use `fullRadius()` for pills and round controls so lower strength values reduce 
 ## Colors
 
 ### Surface Colors
+Pick the tier by what the surface sits on: a host floats over the desktop, a card sits in a host, a chip in a card, a nested chip in a chip.
 ```qml
-Theme.surface
-Theme.surfaceContainerLowest
-Theme.surfaceContainerLow
-Theme.surfaceContainer
-Theme.surfaceContainerHigh
-Theme.surfaceContainerHighest
+Theme.hostSurface        // popout, desktop widget or panel background
+Theme.cardSurface        // card inside a host
+Theme.chipSurface        // chip, row or field inside a card
+Theme.chipSurfaceNested  // chip inside a chip
 ```
 
-Use `Theme.foregroundColor(Theme.surfaceContainerHigh, Theme.isFloatingWindow(root))` for a nested fill that follows the foreground toggle and opacity. Outer floating windows use `Theme.floatingWindowSurface`. Pass raw surface colors to shared text fields; those widgets apply foreground opacity themselves.
+Each tier follows the user's surface overrides; the raw `Theme.surfaceContainer*` palette does not, so keep it for swatches and previews. Plugin settings already sit on a card, so their boxes start at `chipSurface`. Wrap fills in `Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))` so they follow the foreground toggle and opacity. Outer floating windows use `Theme.floatingWindowSurface`. Pass raw surface colors to shared text fields; those widgets apply foreground opacity themselves. These roles need DMS 1.7 or newer, so set `"requires_dms": ">=1.7.0"` when you use them.
 
 ### Text Colors
 ```qml
@@ -76,7 +75,8 @@ Theme.outline           // Border/divider color
 Theme.primary
 Theme.onPrimary
 Theme.secondary
-Theme.onSecondary
+Theme.secondaryContainer
+Theme.onSecondaryContainer
 Theme.error
 Theme.warning
 Theme.success
@@ -84,8 +84,8 @@ Theme.success
 
 ### Special Functions
 ```qml
-Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-Theme.foregroundColor(Theme.surfaceContainerHigh, Theme.isFloatingWindow(root))
+Theme.withAlpha(Theme.primary, Theme.stateLayerHover)
+Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
 ```
 
 ## Common Patterns
@@ -108,19 +108,24 @@ StyledText {
 ### Container with Border
 ```qml
 Rectangle {
-    color: Theme.surfaceContainerHigh
+    color: Theme.cardSurface
     radius: Theme.cornerRadius
-    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-    border.width: 1
+    border.color: Theme.outlineVariant
+    border.width: Theme.outlineWidth
 }
 ```
 
 ### Hover Effect
+`StateLayer` draws the hover, press and ripple layers over its parent and takes clicks.
 ```qml
-MouseArea {
-    hoverEnabled: true
-    onEntered: parent.color = Qt.lighter(Theme.surfaceContainerHigh, 1.1)
-    onExited: parent.color = Theme.surfaceContainerHigh
+Rectangle {
+    color: Theme.chipSurface
+    radius: Theme.cornerRadius
+
+    StateLayer {
+        anchors.fill: parent
+        onClicked: root.activate()
+    }
 }
 ```
 

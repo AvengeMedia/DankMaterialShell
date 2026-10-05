@@ -1,12 +1,15 @@
 .pragma library
 
-function indexCenter(sizes, indices, offsets, spacing) {
-    const configuredMiddle = Math.floor(sizes.length / 2);
+function indexCenter(sizes, indices, offsets, spacing, anchor) {
+    const configuredMiddle = anchor?.middle ?? Math.floor(sizes.length / 2);
+    const configuredCount = anchor?.count ?? sizes.length;
+    const configuredPrevious = anchor?.previous ?? (configuredMiddle - 1);
     const middle = indices.indexOf(configuredMiddle);
-    if (sizes.length % 2 === 1 && middle >= 0)
+    if (configuredCount % 2 === 1 && middle >= 0)
         return offsets[middle] + sizes[configuredMiddle] / 2;
-    if (sizes.length % 2 === 0 && middle >= 0 && indices.includes(configuredMiddle - 1))
-        return offsets[middle] - spacing / 2;
+    const previous = indices.indexOf(configuredPrevious);
+    if (configuredCount % 2 === 0 && middle >= 0 && previous >= 0)
+        return (offsets[previous] + sizes[configuredPrevious] + offsets[middle]) / 2;
 
     const visibleMiddle = Math.floor(indices.length / 2);
     if (indices.length % 2 === 1)
@@ -24,7 +27,7 @@ function confine(start, totalSize, bounds) {
     return Math.min(Math.max(start, min), max - totalSize);
 }
 
-function resolve(sizes, length, spacing, mode, bounds) {
+function resolve(sizes, length, spacing, mode, bounds, anchor) {
     const indices = [];
     const offsets = [];
     const positions = sizes.map(() => null);
@@ -45,7 +48,7 @@ function resolve(sizes, length, spacing, mode, bounds) {
             totalSize: 0
         };
 
-    const centerOffset = mode === "geometric" ? totalSize / 2 : indexCenter(sizes, indices, offsets, spacing);
+    const centerOffset = mode === "geometric" ? totalSize / 2 : indexCenter(sizes, indices, offsets, spacing, anchor);
     const start = confine(length / 2 - centerOffset, totalSize, bounds);
     for (let i = 0; i < indices.length; i++)
         positions[indices[i]] = start + offsets[i];

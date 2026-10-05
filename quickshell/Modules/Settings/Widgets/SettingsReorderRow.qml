@@ -41,7 +41,9 @@ SettingsRow {
         DankDragHandle {
             id: handle
 
+            visible: root.reorderEnabled
             coordinateItem: root.reorderList
+            upDownKeysMove: false
             label: root.title
             enabled: root.reorderEnabled && (root.reorderList.externalDrag || root.reorderList.count > 1)
             dragging: root.dragging

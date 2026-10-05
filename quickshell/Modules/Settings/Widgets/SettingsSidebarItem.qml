@@ -12,20 +12,20 @@ Rectangle {
     property bool active: false
     property bool highlighted: false
 
-    signal clicked
+    signal clicked(bool keyboard)
 
     activeFocusOnTab: enabled
     Accessible.role: Accessible.Button
     Accessible.name: title
     Accessible.description: hint
-    Accessible.onPressAction: clicked()
+    Accessible.onPressAction: clicked(true)
 
     Keys.onPressed: event => {
         switch (event.key) {
         case Qt.Key_Space:
         case Qt.Key_Return:
         case Qt.Key_Enter:
-            root.clicked();
+            root.clicked(true);
             event.accepted = true;
             break;
         }
@@ -36,8 +36,26 @@ Rectangle {
     readonly property color glyphColor: accentPair?.onContainer ?? Theme.primary
     property bool isFirstInGroup: true
     property bool isLastInGroup: true
-    readonly property real topRadius: isFirstInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
-    readonly property real bottomRadius: isLastInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
+    property real topRadius: active || isFirstInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
+    property real bottomRadius: active || isLastInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
+
+    Behavior on topRadius {
+        enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+        NumberAnimation {
+            duration: Theme.expressiveDurations.expressiveFastSpatial
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
+        }
+    }
+
+    Behavior on bottomRadius {
+        enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+        NumberAnimation {
+            duration: Theme.expressiveDurations.expressiveFastSpatial
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
+        }
+    }
 
     width: parent?.width ?? 0
     height: Math.max(SettingsMetrics.navItemMinHeight, textColumn.implicitHeight + Theme.spacingS * 2)
@@ -45,7 +63,7 @@ Rectangle {
     topRightRadius: topRadius
     bottomLeftRadius: bottomRadius
     bottomRightRadius: bottomRadius
-    color: active ? SettingsMetrics.selectedRowColor : SettingsMetrics.rowColor
+    color: active ? SettingsMetrics.selectedRowColor : SettingsMetrics.sidebarRowColor
     border.width: Theme.layerOutlineWidth
     border.color: Theme.outlineMedium
 
@@ -65,7 +83,7 @@ Rectangle {
         bottomLeftRadius: root.bottomRadius
         bottomRightRadius: root.bottomRadius
         color: Theme.surfaceText
-        opacity: mouseArea.pressed ? Theme.stateLayerPressed : (mouseArea.containsMouse || root.highlighted ? Theme.stateLayerHover : 0)
+        opacity: mouseArea.pressed ? Theme.stateLayerPressed : focusRing.visible ? Theme.stateLayerFocus : (mouseArea.containsMouse || root.highlighted ? Theme.stateLayerHover : 0)
 
         Behavior on opacity {
             enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
@@ -128,7 +146,7 @@ Rectangle {
             text: root.title
             font.pixelSize: Theme.fontSizeMedium
             font.weight: Theme.fontWeightMedium
-            color: Theme.surfaceText
+            color: root.active ? Theme.onSelectedContainer : Theme.surfaceText
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignLeft
         }
@@ -137,10 +155,8 @@ Rectangle {
             width: parent.width
             text: root.hint
             font.pixelSize: Theme.fontSizeSmall
-            color: Theme.surfaceVariantText
+            color: root.active ? Theme.onSelectedContainer : Theme.surfaceVariantText
             wrapMode: Text.WordWrap
-            maximumLineCount: 2
-            elide: Text.ElideRight
             visible: root.hint !== ""
             horizontalAlignment: Text.AlignLeft
         }
@@ -151,7 +167,20 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onPressed: mouse => ripple.trigger(mouse.x, mouse.y)
-        onClicked: root.clicked()
+        onPressed: mouse => {
+            focusRing.pointerFocused = true;
+            root.forceActiveFocus(Qt.MouseFocusReason);
+            ripple.trigger(mouse.x, mouse.y);
+        }
+        onClicked: root.clicked(false)
+    }
+
+    FocusRing {
+        id: focusRing
+        anchors.margins: Theme.focusRingWidth / 2
+        topLeftRadius: Math.max(0, root.topRadius - Theme.focusRingWidth / 2)
+        topRightRadius: topLeftRadius
+        bottomLeftRadius: Math.max(0, root.bottomRadius - Theme.focusRingWidth / 2)
+        bottomRightRadius: bottomLeftRadius
     }
 }

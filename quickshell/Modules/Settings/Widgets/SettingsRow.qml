@@ -22,19 +22,22 @@ T.Control {
     property string title: ""
     property bool singleLineTitle: false
     property string subtitle: ""
-    property color subtitleColor: Theme.surfaceVariantText
+    property color subtitleColor: supportingContentColor
     property string iconName: ""
     property bool iconBox: false
     property bool clickable: false
     property bool showChevron: false
     property string trailingBadge: ""
-    property color trailingBadgeColor: Theme.surfaceVariantText
+    property color trailingBadgeColor: supportingContentColor
     property bool paintBackground: !(parent?.isSettingsGroupHost ?? false)
     property real paddingH: SettingsMetrics.rowPaddingH
     property real paddingV: SettingsMetrics.rowPaddingV
     property color rowColor: SettingsMetrics.rowColor
-    property color iconColor: Theme.primary
-    property color titleColor: Theme.surfaceText
+    property bool active: false
+    readonly property color contentColor: active ? Theme.onSelectedContainer : Theme.surfaceText
+    readonly property color supportingContentColor: active ? Theme.onSelectedContainer : Theme.surfaceVariantText
+    property color iconColor: active ? Theme.accentOnSelectedContainer : Theme.primary
+    property color titleColor: contentColor
 
     property var resetStore: SettingsData
     property var resetKeys: settingKey !== "" && resetStore === SettingsData && SettingsData.hasSetting(settingKey) ? [settingKey] : []
@@ -49,13 +52,25 @@ T.Control {
     readonly property bool hasBody: bodySlot.height > 0
     readonly property bool hasText: title !== "" || subtitle !== ""
     readonly property bool isHighlighted: settingKey !== "" && SettingsSearchService.highlightSection === settingKey
+    property bool highlighted: isHighlighted
     readonly property bool isFirstInGroup: _edge(true)
     readonly property bool isLastInGroup: _edge(false)
     property real topRadius: isFirstInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
     property real bottomRadius: isLastInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
     property real minHeight: subtitle !== "" ? Theme.listItemTwoLineHeight : Theme.listItemHeight
+    // Keyboard focus on the row or any control inside it tints the row, so navigation reads without a focus ring
+    readonly property Item activeItem: Window.activeFocusItem
+    readonly property bool focusWithin: (activeItem?.visualFocus ?? false) && _contains(activeItem)
 
-    signal clicked
+    function _contains(item) {
+        for (let p = item; p; p = p.parent) {
+            if (p === root)
+                return true;
+        }
+        return false;
+    }
+
+    signal clicked(bool keyboard)
     signal resetRequested
 
     onResetRequested: {
@@ -69,7 +84,7 @@ T.Control {
     Accessible.description: subtitle
     Accessible.onPressAction: {
         if (clickable && enabled)
-            clicked();
+            clicked(true);
     }
 
     Keys.onPressed: event => {
@@ -79,7 +94,7 @@ T.Control {
         case Qt.Key_Space:
         case Qt.Key_Return:
         case Qt.Key_Enter:
-            root.clicked();
+            root.clicked(true);
             event.accepted = true;
             break;
         }
@@ -89,10 +104,10 @@ T.Control {
         const container = groupItem.parent;
         if (container?.isSettingsGroupHost)
             return container.isEdge(groupItem, first);
-        if (!_edgeInContainer(first))
-            return false;
         const host = container?.parent;
-        return host?.isSettingsGroupHost ? host.isEdge(container, first) : true;
+        if (!host?.isSettingsGroupHost)
+            return true;
+        return host.isEdge(container, first) && _edgeInContainer(first);
     }
 
     function _edgeInContainer(first) {
@@ -123,7 +138,7 @@ T.Control {
     Rectangle {
         anchors.fill: parent
         visible: root.paintBackground
-        color: root.isHighlighted ? Theme.blend(root.rowColor, Theme.primary, SettingsMetrics.highlightBlend) : root.rowColor
+        color: root.active ? Theme.selectedContainer : root.highlighted ? Theme.blend(root.rowColor, Theme.primary, SettingsMetrics.highlightBlend) : root.rowColor
         border.width: Theme.layerOutlineWidth
         border.color: Theme.outlineMedium
         topLeftRadius: root.topRadius
@@ -134,8 +149,8 @@ T.Control {
 
     Rectangle {
         anchors.fill: parent
-        visible: !root.paintBackground && root.isHighlighted
-        color: SettingsMetrics.rowHighlightColor
+        visible: !root.paintBackground && (root.active || root.highlighted)
+        color: root.active ? Theme.selectedContainer : SettingsMetrics.rowHighlightColor
         topLeftRadius: root.topRadius
         topRightRadius: root.topRadius
         bottomLeftRadius: root.bottomRadius
@@ -145,9 +160,9 @@ T.Control {
     Rectangle {
         id: stateLayer
         anchors.fill: parent
-        visible: root.clickable
-        color: Theme.surfaceText
-        opacity: !root.enabled ? 0 : (clickControl.down ? Theme.stateLayerPressed : (clickControl.hovered ? Theme.stateLayerHover : 0))
+        visible: root.clickable || root.focusWithin
+        color: root.contentColor
+        opacity: !root.enabled ? 0 : (clickControl.down ? Theme.stateLayerPressed : root.focusWithin ? Theme.stateLayerFocus : (clickControl.hovered ? Theme.stateLayerHover : 0))
         topLeftRadius: root.topRadius
         topRightRadius: root.topRadius
         bottomLeftRadius: root.bottomRadius
@@ -166,7 +181,7 @@ T.Control {
     DankRipple {
         id: ripple
         visible: root.clickable
-        rippleColor: Theme.surfaceText
+        rippleColor: root.contentColor
         topLeftRadius: root.topRadius
         topRightRadius: root.topRadius
         bottomLeftRadius: root.bottomRadius
@@ -191,14 +206,16 @@ T.Control {
         anchors.fill: parent
         enabled: root.clickable && root.enabled
         hoverEnabled: root.clickable
-        focusPolicy: Qt.ClickFocus
+        focusPolicy: Qt.NoFocus
         background: null
         Accessible.ignored: true
         onPressedChanged: {
-            if (pressed)
+            if (pressed) {
+                root.forceActiveFocus(Qt.MouseFocusReason);
                 ripple.trigger(pressX, pressY);
+            }
         }
-        onClicked: root.clicked()
+        onClicked: root.clicked(false)
 
         HoverHandler {
             cursorShape: root.clickable ? Qt.PointingHandCursor : Qt.ArrowCursor
@@ -332,7 +349,7 @@ T.Control {
                 DankIcon {
                     name: "chevron_right"
                     size: Theme.iconSize
-                    color: Theme.surfaceVariantText
+                    color: root.supportingContentColor
                     rotation: I18n.isRtl ? 180 : 0
                     visible: root.showChevron
                     anchors.verticalCenter: parent.verticalCenter

@@ -97,10 +97,12 @@ Item {
         "error": true
     })
 
-    readonly property int baseWidth: LauncherMetrics.sizeWidth(SettingsData.dankLauncherV2Size)
-    readonly property int baseHeight: LauncherMetrics.sizeHeight(SettingsData.dankLauncherV2Size)
+    readonly property string _dmenuSizeOverride: (spotlightContent?.controller?.searchMode === "dmenu") ? (spotlightContent.controller.dmenuSize || "") : ""
+
+    readonly property int baseWidth: LauncherMetrics.sizeWidth(_dmenuSizeOverride || SettingsData.dankLauncherV2Size)
+    readonly property int baseHeight: LauncherMetrics.sizeHeight(_dmenuSizeOverride || SettingsData.dankLauncherV2Size)
     readonly property real _contentImplicitH: launcherContentLoader.item?.implicitHeight ?? LauncherMetrics.pillHeight
-    readonly property int modalWidth: Math.min(spotlight ? LauncherMetrics.spotlightWidth : baseWidth, screenWidth - LauncherMetrics.screenMargin)
+    readonly property int modalWidth: Math.min(spotlight ? (_dmenuSizeOverride ? LauncherMetrics.sizeWidth(_dmenuSizeOverride) : LauncherMetrics.spotlightWidth) : baseWidth, screenWidth - LauncherMetrics.screenMargin)
     readonly property int modalHeight: spotlight ? _contentImplicitH : Math.min(baseHeight, screenHeight - LauncherMetrics.screenMargin)
 
     readonly property string preferredConnectedBarSide: SettingsData.frameLauncherEmergeSide
@@ -110,7 +112,8 @@ Item {
 
     readonly property string resolvedConnectedBarSide: frameConnectedMode ? preferredConnectedBarSide : ""
 
-    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && effectiveLauncherLayer === WlrLayer.Top && CompositorService.canShareConnectedFrameChromeForScreen(effectiveScreen)
+    property bool _overStackedModal: false
+    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && !_overStackedModal && effectiveLauncherLayer === WlrLayer.Top && CompositorService.canShareConnectedFrameChromeForScreen(effectiveScreen)
     readonly property bool launcherArcExtenderActive: frameOwnsConnectedChrome && SettingsData.frameLauncherArcExtender && (resolvedConnectedBarSide === "top" || resolvedConnectedBarSide === "bottom")
 
     function _dockOccupiesSide(side) {
@@ -446,7 +449,7 @@ Item {
         contentVisible = true;
         launcherContentLoader.active = true;
 
-        if (spotlightContent) {
+        if (spotlightContent && _pendingInitialize) {
             _initializeAndShow(_pendingQuery, _pendingMode);
             _pendingInitialize = false;
         }
@@ -508,10 +511,13 @@ Item {
         if (!preserveFluid)
             animationsEnabled = false;
 
+        var focusedScreen = CompositorService.getFocusedScreen();
+        if (!contentWindow.visible)
+            _overStackedModal = ModalManager.hasStackedModal((focusedScreen ?? effectiveScreen)?.name ?? "");
+
         _frozenMotionX = contentContainer ? contentContainer.collapsedMotionX : 0;
         _frozenMotionY = contentContainer ? contentContainer.collapsedMotionY : (Theme.isDirectionalEffect ? Math.max(root.screenHeight - root._ccY + root.shadowPad, Theme.effectAnimOffset * 1.1) : -Theme.effectAnimOffset);
 
-        var focusedScreen = CompositorService.getFocusedScreen();
         if (focusedScreen) {
             contentWindow.screen = focusedScreen;
         }
@@ -574,6 +580,13 @@ Item {
 
     function showWithQuery(query) {
         _openCommon(query, "");
+    }
+
+    function attemptUserCancel() {
+        const controller = spotlightContent?.controller;
+        if (controller && controller.searchMode === "dmenu" && controller.dmenuOnlyMatch)
+            return;
+        hide();
     }
 
     function hide() {
@@ -786,7 +799,7 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     enabled: root.spotlightOpen
-                    onClicked: root.hide()
+                    onClicked: root.attemptUserCancel()
                 }
             }
         }
@@ -950,7 +963,7 @@ Item {
                 anchors.fill: dismissArea
                 enabled: root.spotlightOpen
                 z: -2
-                onClicked: root.hide()
+                onClicked: root.attemptUserCancel()
             }
 
             Item {
@@ -1217,7 +1230,7 @@ Item {
                 anchors.fill: parent
                 enabled: root.useSingleWindow && root.spotlightOpen
                 z: -2
-                onClicked: root.hide()
+                onClicked: root.attemptUserCancel()
             }
 
             Rectangle {

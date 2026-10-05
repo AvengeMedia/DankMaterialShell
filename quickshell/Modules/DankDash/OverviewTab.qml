@@ -111,6 +111,7 @@ FocusScope {
 
     CcMenu {
         id: addMenu
+        transientSurfaceTracker: root.transientSurfaceTracker
 
         items: root.addable.map(candidate => ({
                     "label": candidate.entry.card.text,
@@ -121,11 +122,14 @@ FocusScope {
 
     DashOptionsSheet {
         id: optionsSheet
+        backdrop: grid
         onDismissed: root.navFocusRequested(false)
     }
 
     CcSheetDialog {
         id: detailSheet
+        backdrop: grid
+        showScrollBar: false
 
         property var eventData: null
 
@@ -168,6 +172,8 @@ FocusScope {
 
     CcSheetDialog {
         id: editorSheet
+        backdrop: grid
+        showScrollBar: false
 
         property var eventData: null
         property date initialDate: new Date()
@@ -175,6 +181,8 @@ FocusScope {
         panelWidth: DashMetrics.sheetWidth
         iconName: "edit_calendar"
         title: eventData ? I18n.tr("Edit event") : I18n.tr("New event")
+        statusText: editorLoader.item?.errorText ?? ""
+        statusColor: Theme.error
 
         onDismissed: {
             eventData = null;
@@ -182,6 +190,8 @@ FocusScope {
         }
 
         Loader {
+            id: editorLoader
+
             width: parent.width
             active: editorSheet.visible
 

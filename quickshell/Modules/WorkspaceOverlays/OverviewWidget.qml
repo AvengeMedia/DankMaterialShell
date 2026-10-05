@@ -34,7 +34,7 @@ Item {
         menuItems: CompositorService.specialWorkspaceNames.map(name => ({
                     type: "item",
                     icon: "inbox",
-                    text: name === "special" ? I18n.tr("Move to scratchpad") : I18n.tr("Move to scratchpad: %1", "%1 is the named special workspace").arg(name),
+                    text: name === "special" ? I18n.tr("Move to scratchpad", "window context menu action, sends the window to the unnamed special workspace") : I18n.tr("Move to scratchpad: %1", "%1 is the named special workspace").arg(name),
                     action: () => {
                         CompositorService.moveWindowToSpecial(windowMenu.targetWindow, name);
                         Qt.callLater(() => {

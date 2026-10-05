@@ -13,6 +13,7 @@ Card {
     readonly property bool tall: height >= DashMetrics.gridRowUnit * 2
     readonly property string levelText: Math.round(BatteryService.batteryLevel) + "%"
     readonly property string meterStyle: options.style ?? "solid"
+    readonly property bool levelColors: options.color !== "theme"
     readonly property string healthText: options.health === true && BatteryService.batteryHealth.endsWith("%") ? I18n.tr("Health") + " " + BatteryService.batteryHealth : ""
 
     entryId: "battery"
@@ -30,7 +31,7 @@ Card {
             anchors.verticalCenter: parent.verticalCenter
             thickness: root.tall ? DashMetrics.batteryMeterThicknessHero : DashMetrics.batteryMeterThickness
             meterStyle: root.meterStyle
-            levelColors: true
+            levelColors: root.levelColors
             showNumber: false
         }
 
@@ -81,7 +82,7 @@ Card {
             anchors.horizontalCenter: parent.horizontalCenter
             thickness: DashMetrics.batteryMeterThicknessCompact
             meterStyle: root.meterStyle
-            levelColors: true
+            levelColors: root.levelColors
             showNumber: false
         }
 

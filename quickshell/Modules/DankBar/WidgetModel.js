@@ -45,7 +45,8 @@ var componentNames = {
     "systemUpdate": "systemUpdateComponent",
     "layout": "layoutComponent",
     "powerMenuButton": "powerMenuButtonComponent",
-    "appsDock": "appsDockComponent"
+    "appsDock": "appsDockComponent",
+    "island": "islandComponent"
 };
 
 function builtinComponents(components) {

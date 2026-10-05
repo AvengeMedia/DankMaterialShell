@@ -3,6 +3,22 @@
 .import "../../DankCommon/Common/settings/SpecUtil.js" as Util
 .import "DockConfig.js" as DockConfig
 
+function lockWidgetDefaults() {
+    return Shared.lockWidgetDefaults();
+}
+
+function greeterWidgetsFromLock(lockInstances, previous) {
+    return Shared.greeterWidgetsFromLock(lockInstances, previous);
+}
+
+function greeterSessionDefault() {
+    return Shared.greeterSessionDefault();
+}
+
+function greeterWidgetDefaults() {
+    return Shared.greeterWidgetDefaults();
+}
+
 var LOCAL_SPEC = {
     dockConfigs: {
         def: [DockConfig.create("dock", "Dock")]
@@ -108,6 +124,9 @@ var LOCAL_SPEC = {
     },
     buttonColorMode: {
         def: "primary"
+    },
+    containerSaturation: {
+        def: 100
     },
     niriLayoutGapsOverride: {
         def: -1,
@@ -336,6 +355,9 @@ var LOCAL_SPEC = {
     audioShowStreamDevices: {
         def: false
     },
+    audioMono: {
+        def: false
+    },
     windSpeedUnit: {
         def: "kmh"
     },
@@ -428,16 +450,46 @@ var LOCAL_SPEC = {
     controlCenterIconScale: {
         def: 1.0
     },
+    controlCenterFooterPosition: {
+        def: "bottom"
+    },
     controlCenterWidgets: {
         def: [
             {
-                id: "volumeSlider",
+                id: "user",
+                enabled: true,
+                w: 5,
+                h: 1
+            },
+            {
+                id: "settings",
+                enabled: true,
+                w: 1,
+                h: 1,
+                small: true
+            },
+            {
+                id: "lock",
+                enabled: true,
+                w: 1,
+                h: 1,
+                small: true
+            },
+            {
+                id: "power",
+                enabled: true,
+                w: 1,
+                h: 1,
+                small: true
+            },
+            {
+                id: "brightnessSlider",
                 enabled: true,
                 w: 4,
                 h: 1
             },
             {
-                id: "brightnessSlider",
+                id: "volumeSlider",
                 enabled: true,
                 w: 4,
                 h: 1
@@ -467,16 +519,56 @@ var LOCAL_SPEC = {
                 h: 1
             },
             {
+                id: "darkMode",
+                enabled: true,
+                w: 2,
+                h: 1
+            },
+            {
                 id: "nightMode",
+                enabled: true,
+                w: 2,
+                h: 1
+            },
+            {
+                id: "doNotDisturb",
+                enabled: true,
+                w: 2,
+                h: 1
+            },
+            {
+                id: "idleInhibitor",
+                enabled: true,
+                w: 2,
+                h: 1
+            },
+            {
+                id: "battery",
                 enabled: true,
                 w: 4,
                 h: 1
             },
             {
-                id: "darkMode",
+                id: "diskUsage",
                 enabled: true,
                 w: 4,
                 h: 1
+            },
+            {
+                id: "runningApps",
+                enabled: true,
+                w: 4,
+                h: 1,
+                footer: true
+            },
+            {
+                id: "edit",
+                enabled: true,
+                w: 1,
+                h: 1,
+                small: true,
+                footer: true,
+                footerEnd: true
             }
         ]
     },
@@ -565,6 +657,9 @@ var LOCAL_SPEC = {
         def: false,
         onChange: "scheduleGreeterAutoLoginSync"
     },
+    greeterFollowLockScreen: {
+        def: true
+    },
     greeterPamExternallyManaged: {
         def: false,
         onChange: "markGreeterSyncPending"
@@ -635,6 +730,9 @@ var LOCAL_SPEC = {
     launcherStyle: {
         def: "full"
     },
+    avatarRing: {
+        def: "outline"
+    },
     spotlightBarShowModeChips: {
         def: false
     },
@@ -663,6 +761,10 @@ var LOCAL_SPEC = {
             },
             {
                 id: "weather",
+                enabled: true
+            },
+            {
+                id: "wellbeing",
                 enabled: true
             },
             {
@@ -701,6 +803,15 @@ var LOCAL_SPEC = {
         ]
     },
     dashOptions: {
+        def: {}
+    },
+    wellbeingEnabled: {
+        def: true
+    },
+    wellbeingDailyLimit: {
+        def: 0
+    },
+    wellbeingAppLimits: {
         def: {}
     },
     networkPreference: {
@@ -860,6 +971,9 @@ var LOCAL_SPEC = {
     },
     batteryCriticalThreshold: {
         def: 10
+    },
+    batteryCriticalAnimation: {
+        def: true
     },
     batteryNotifyCritical: {
         def: true
@@ -1048,24 +1162,6 @@ var LOCAL_SPEC = {
     modalDarkenBackground: {
         def: true
     },
-    lockScreenShowSystemIcons: {
-        def: true
-    },
-    lockScreenShowTime: {
-        def: true
-    },
-    lockScreenClockStyle: {
-        def: "horizontal"
-    },
-    lockScreenShowDate: {
-        def: true
-    },
-    lockScreenShowPasswordField: {
-        def: true
-    },
-    lockScreenShowMediaPlayer: {
-        def: true
-    },
     lockScreenPowerOffMonitorsOnLock: {
         def: false
     },
@@ -1108,9 +1204,6 @@ var LOCAL_SPEC = {
     },
     lockScreenInactiveColor: {
         def: "#000000"
-    },
-    lockScreenNotificationMode: {
-        def: 0
     },
     lockScreenVideoEnabled: {
         def: false
@@ -1184,6 +1277,9 @@ var LOCAL_SPEC = {
     osdPosition: {
         def: 5
     },
+    osdPositionOverrides: {
+        def: {}
+    },
     osdVolumeEnabled: {
         def: true
     },
@@ -1238,6 +1334,9 @@ var LOCAL_SPEC = {
     customPowerButtons: {
         def: []
     },
+    powerMenuBootEntries: {
+        def: []
+    },
     updaterCheckOnStart: {
         def: false
     },
@@ -1251,7 +1350,17 @@ var LOCAL_SPEC = {
         def: ""
     },
     updaterIntervalSeconds: {
-        def: 1800
+        def: 86400
+    },
+    updaterNotify: {
+        def: false
+    },
+    updaterPauseOnBattery: {
+        def: false
+    },
+    // 0 = every time the count grows
+    updaterNotifyMinSeconds: {
+        def: 86400
     },
     updaterIncludeFlatpak: {
         def: true
@@ -1262,11 +1371,11 @@ var LOCAL_SPEC = {
     updaterReopenAfterUpgrade: {
         def: true
     },
+    updaterUpgradeInWindow: {
+        def: false
+    },
     updaterIgnoredPackages: {
         def: []
-    },
-    displayNameMode: {
-        def: "system"
     },
     screenPreferences: {
         def: {}
@@ -1447,6 +1556,12 @@ var LOCAL_SPEC = {
     },
     frameBarInsetPadding: {
         def: -1
+    },
+    nightModeExcludeFullscreen: {
+        def: false
+    },
+    nightModeExcludedApps: {
+        def: []
     }
 };
 

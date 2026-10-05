@@ -20,14 +20,24 @@ Item {
         PopoutService.toggleDankLauncherV2();
     }
 
+    function secondaryActivate() {
+        CompositorService.toggleOverview(root.dockApps?.surfaceContext?.screen?.name);
+    }
+
     MouseArea {
         id: mouseArea
 
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton
-        onClicked: root.activate()
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: mouse => {
+            if (mouse.button === Qt.RightButton) {
+                root.secondaryActivate();
+            } else {
+                root.activate();
+            }
+        }
     }
 
     property real indicatorLane: 0
@@ -58,7 +68,7 @@ Item {
             anchors.verticalCenterOffset: root.isVertical ? 0 : root.laneOffset
             width: actualIconSize
             height: actualIconSize
-            scale: root.options.enlargeOnHover && root.isHovered ? (root.options.enlargePercentage ?? 125) / 100 : 1
+            scale: !root.options?.magnification && root.options?.enlargeOnHover && root.isHovered ? (root.options?.enlargePercentage ?? 125) / 100 : 1
 
             LauncherLogo {
                 anchors.centerIn: parent

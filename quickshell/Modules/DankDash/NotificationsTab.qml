@@ -14,6 +14,7 @@ FocusScope {
     property string entryId: "notifications"
     property int currentTab: 0
     property var transientSurfaceTracker: null
+    property real swipeBleed: 0
     readonly property var surfaces: transientSurfaceTracker ?? localSurfaces
     readonly property bool hasNotifications: list.count > 0
     readonly property Item focusTarget: root
@@ -85,7 +86,6 @@ FocusScope {
 
     implicitHeight: DashMetrics.tabMinHeight
     enabled: interactive
-    clip: true
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
@@ -128,9 +128,13 @@ FocusScope {
     KeyboardNavigatedNotificationList {
         id: list
         anchors.fill: parent
+        anchors.leftMargin: -root.swipeBleed
+        anchors.rightMargin: -root.swipeBleed
         nested: root.nested
         anchors.bottomMargin: footer.height + Theme.spacingM
+        swipeBleed: root.swipeBleed
         visible: root.currentTab === 0
+        showScrollBar: false
         keyboardController: keyboard
         focusAllowed: root.activeFocus
         transientSurfaceTracker: root.surfaces
@@ -139,12 +143,15 @@ FocusScope {
 
     Loader {
         id: historyLoader
-        anchors.fill: list
+        anchors.fill: parent
+        anchors.bottomMargin: footer.height + Theme.spacingM
         active: root.currentTab === 1
         visible: active
         sourceComponent: HistoryNotificationList {
             focusAllowed: root.activeFocus
+            showScrollBar: false
             nested: root.nested
+            swipeBleed: root.swipeBleed
         }
     }
 

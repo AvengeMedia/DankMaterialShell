@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import qs.Modals.DankLauncherV2.Components
 import qs.Services
 
 Item {
@@ -24,8 +25,8 @@ Item {
     readonly property real screenWidth: usingFallback ? fallback.screenWidth : Theme.mediumBreakpoint * 2
     readonly property real screenHeight: usingFallback ? fallback.screenHeight : Theme.mediumBreakpoint
     readonly property real dpr: usingFallback ? fallback.dpr : 1
-    readonly property int modalWidth: usingFallback ? fallback.modalWidth : Theme.launcherWidthWide
-    readonly property int modalHeight: usingFallback ? fallback.modalHeight : Theme.launcherHeightDefault
+    readonly property int modalWidth: usingFallback ? fallback.modalWidth : LauncherMetrics.sizeWidth(SettingsData.dankLauncherV2Size)
+    readonly property int modalHeight: usingFallback ? fallback.modalHeight : LauncherMetrics.sizeHeight(SettingsData.dankLauncherV2Size)
     readonly property real modalX: usingFallback ? fallback.modalX : 0
     readonly property real modalY: usingFallback ? fallback.modalY : 0
     readonly property bool frameOwnsConnectedChrome: false
@@ -49,7 +50,6 @@ Item {
             usingFallback = false;
             return true;
         }
-        log.warn("No DankIsland is routed to the focused screen; falling back to Spotlight");
         usingFallback = true;
         return false;
     }
@@ -74,7 +74,7 @@ Item {
             fallback.hide();
             return;
         }
-        router?.closeLauncher?.();
+        PopoutService.closeIslandActivity("launcher");
     }
 
     function toggle() {
@@ -126,8 +126,8 @@ Item {
     DankLauncherV2ModalHost {
         id: fallback
 
-        connected: false
-        spotlight: true
+        connected: root.modalHandle?._resolvedConnected ?? false
+        spotlight: !connected
         modalHandle: root.modalHandle
         triggerUsesOverlayLayer: root.triggerUsesOverlayLayer
     }

@@ -168,8 +168,12 @@ for t in $order; do for b; do d="$b/$t"; [ -d "$d" ] && echo "$d"; done; done`;
             property bool finished: false
 
             function complete() {
-                if (--remaining > 0)
+                if (finished || --remaining > 0)
                     return;
+                for (const name in looseIndex.paths) {
+                    if (!themeIndex.paths[name])
+                        themeIndex.paths[name] = looseIndex.paths[name];
+                }
                 publish();
             }
 
@@ -177,10 +181,6 @@ for t in $order; do for b; do d="$b/$t"; [ -d "$d" ] && echo "$d"; done; done`;
                 if (finished)
                     return;
                 finished = true;
-                for (const name in looseIndex.paths) {
-                    if (!themeIndex.paths[name])
-                        themeIndex.paths[name] = looseIndex.paths[name];
-                }
                 root._publishIndex(theme, themeIndex.paths);
                 destroy();
             }

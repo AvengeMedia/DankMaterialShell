@@ -24,6 +24,39 @@ BasePill {
     readonly property bool showPowerCharging: SettingsData.widgetOption("battery", widgetData, "showBatteryPowerCharging")
     readonly property bool showPowerDischarging: SettingsData.widgetOption("battery", widgetData, "showBatteryPowerDischarging")
     readonly property bool showPower: BatteryService.isCharging ? showPowerCharging : showPowerDischarging
+    readonly property bool critical: SettingsData.batteryCriticalAnimation && BatteryService.isCriticalBattery && !BatteryService.isCharging
+    property real criticalPulse: 0
+    readonly property color criticalForeground: battery.mixColor(Theme.error, Theme.surface, criticalPulse)
+
+    fillColor: critical ? battery.mixColor(defaultFillColor, Theme.error, criticalPulse) : defaultFillColor
+    contentColor: critical ? battery.mixColor(defaultContentColor, Theme.surface, criticalPulse) : defaultContentColor
+
+    function mixColor(from, to, progress) {
+        return Qt.rgba(from.r + (to.r - from.r) * progress, from.g + (to.g - from.g) * progress, from.b + (to.b - from.b) * progress, from.a + (to.a - from.a) * progress);
+    }
+
+    SequentialAnimation on criticalPulse {
+        running: battery.critical && battery.surfaceLive && !SettingsData.reduceMotion
+        loops: Animation.Infinite
+        onRunningChanged: {
+            if (!running)
+                battery.criticalPulse = 0;
+        }
+
+        NumberAnimation {
+            from: 0
+            to: 1
+            duration: 1000
+            easing.type: Easing.Linear
+        }
+
+        NumberAnimation {
+            from: 1
+            to: 0
+            duration: 1000
+            easing.type: Easing.Linear
+        }
+    }
 
     // Signed charge/discharge rate, e.g. "+45W" while charging, "-8.4W" while
     // draining. Empty (and therefore hidden) whenever the battery is idle.
@@ -76,12 +109,15 @@ BasePill {
         return parts.join(" ");
     }
 
-    // Percent always stays inside the pill; time and wattage show beside it.
+    // Percent stays inside the pill unless the duo glyph occupies it; time and wattage show beside it.
     readonly property string horizontalSideText: {
         if (!pillStyle) {
             return horizontalDisplayText;
         }
         const parts = [];
+        if (showPercent && batteryStyle === "duo") {
+            parts.push(`${BatteryService.batteryLevel}%`);
+        }
         if (showTime && batteryTimeText) {
             parts.push(batteryTimeText);
         }
@@ -146,6 +182,10 @@ BasePill {
                             return Theme.widgetIconColor;
                         }
 
+                        if (battery.critical) {
+                            return battery.criticalForeground;
+                        }
+
                         if (battery.levelColors) {
                             return BatteryService.levelColor;
                         }
@@ -169,6 +209,7 @@ BasePill {
                     showNumber: false
                     meterStyle: battery.batteryStyle
                     levelColors: battery.levelColors
+                    colorOverride: battery.critical ? battery.criticalForeground : "transparent"
                     maxDiameter: battery.widgetThickness - Theme.spacingXS
                     thickness: Theme.barIconSize(battery.barThickness, undefined, battery.barConfig?.maximizeWidgetIcons, battery.barConfig?.iconScale)
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -199,6 +240,10 @@ BasePill {
                             return Theme.widgetIconColor;
                         }
 
+                        if (battery.critical) {
+                            return battery.criticalForeground;
+                        }
+
                         if (battery.levelColors) {
                             return BatteryService.levelColor;
                         }
@@ -221,6 +266,7 @@ BasePill {
                     showNumber: battery.showPercent
                     meterStyle: battery.batteryStyle
                     levelColors: battery.levelColors
+                    colorOverride: battery.critical ? battery.criticalForeground : "transparent"
                     maxDiameter: battery.widgetThickness - Theme.spacingXS
                     thickness: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, battery.barConfig?.iconScale)
                     fontSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)

@@ -27,7 +27,7 @@ FocusScope {
                 settingKey: "dashWeatherSettings"
                 title: I18n.tr("Weather")
                 iconName: "partly_cloudy_day"
-                onClicked: root.parentModal?.navigateTo("weather")
+                onClicked: keyboard => root.parentModal?.navigateTo("weather", keyboard)
             }
         }
 
@@ -40,7 +40,20 @@ FocusScope {
                 title: I18n.tr("Media player")
                 hint: I18n.tr("Lyrics providers", "Lyrics source priority settings")
                 iconName: "music_note"
-                onClicked: root.parentModal?.navigateTo("media_player")
+                onClicked: keyboard => root.parentModal?.navigateTo("media_player", keyboard)
+            }
+        }
+
+        SettingsCard {
+            title: I18n.tr("Digital wellbeing", "settings page and dashboard tab title, screen time tracking")
+
+            SettingsNavRow {
+                tab: "dank_dash"
+                settingKey: "dashWellbeingSettings"
+                title: I18n.tr("Digital wellbeing", "settings page and dashboard tab title, screen time tracking")
+                hint: I18n.tr("Screen time and app limits", "settings sidebar hint and dashboard tab description for digital wellbeing")
+                iconName: "digital_wellbeing"
+                onClicked: root.parentModal?.navigateTo("wellbeing")
             }
         }
 
@@ -99,7 +112,7 @@ FocusScope {
                 settingKey: "dashTabsEvenlySpaced"
                 tab: "dank_dash"
                 tags: ["dashboard", "tabs", "spacing", "navigation"]
-                text: I18n.tr("Evenly space tabs")
+                text: I18n.tr("Evenly space tabs", "dashboard tab bar toggle")
                 checked: SettingsData.dashTabsEvenlySpaced
                 onToggled: checked => SettingsData.set("dashTabsEvenlySpaced", checked)
             }
@@ -181,9 +194,10 @@ FocusScope {
                     DashOptionRow {
                         required property int index
 
-                        entryId: optionCard.modelData
                         spec: optionCard.options[index] ?? ({})
-                        settingKey: "dashOptions:" + entryId + ":" + spec.key
+                        value: DashRegistry.option(optionCard.modelData, spec.key)
+                        settingKey: "dashOptions:" + optionCard.modelData + ":" + spec.key
+                        onCommitted: next => DashRegistry.setOption(optionCard.modelData, spec.key, next)
                     }
                 }
             }

@@ -118,7 +118,6 @@ CcSheetDialog {
                     return "";
                 }
                 active: modelData.name === root.currentPort
-                showActiveCheck: true
                 enabled: !unavailable && !root.isLoading
                 clickable: !active
                 onClicked: root.selectPort(modelData.name)

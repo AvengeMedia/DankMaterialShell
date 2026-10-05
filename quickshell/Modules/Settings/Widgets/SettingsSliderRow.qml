@@ -15,8 +15,8 @@ SettingsRow {
     property alias showStops: slider.showStops
     property alias unit: slider.unit
     property alias decimals: slider.decimals
-    property alias thumbOutlineColor: slider.thumbOutlineColor
     property alias size: slider.size
+    property alias trackGradient: slider.trackGradient
 
     readonly property bool atMinimum: minimumLabel !== "" && slider.value === slider.minimum
     readonly property int stepAmount: Math.max(1, step)
@@ -66,6 +66,7 @@ SettingsRow {
 
         DankSlider {
             id: slider
+            upDownKeysStep: false
             Accessible.name: root.text
             Accessible.description: root.description
             size: "s"

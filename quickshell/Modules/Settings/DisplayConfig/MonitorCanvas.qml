@@ -2,6 +2,7 @@ import QtQuick
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 
 Rectangle {
     id: root
@@ -62,7 +63,7 @@ Rectangle {
     width: parent.width
     height: 280
     radius: Theme.cornerRadius
-    color: Theme.floatingWindowNestedSurface
+    color: SettingsMetrics.rowColor
     border.color: Theme.outlineMedium
     border.width: Theme.layerOutlineWidth
 

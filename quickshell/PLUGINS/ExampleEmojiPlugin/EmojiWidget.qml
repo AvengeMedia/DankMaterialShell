@@ -104,7 +104,7 @@ PluginComponent {
                         width: 45
                         height: 45
                         radius: Theme.cornerRadius
-                        color: emojiMouseArea.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
+                        color: emojiMouseArea.containsMouse ? Theme.chipSurface : Theme.cardSurface
                         border.width: 0
 
                         StyledText {

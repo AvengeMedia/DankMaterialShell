@@ -150,7 +150,7 @@ Singleton {
     }
     function cycle(screenName, wallpaperPath, goToPrevious) {
         const currentWallpaper = wallpaperPath || (screenName ? SessionData.getMonitorWallpaper(screenName) : SessionData.wallpaperPath);
-        if (!currentWallpaper)
+        if (!currentWallpaper || currentWallpaper.startsWith("#"))
             return;
         let wallpaperDir;
 
@@ -175,6 +175,7 @@ Singleton {
             process.targetScreenName = screenName;
             process.currentWallpaper = currentWallpaper;
             process.goToPrevious = goToPrevious;
+            process.revision = SessionData.wallpaperRequestRevision(screenName);
             process.running = true;
             return;
         }
@@ -183,6 +184,7 @@ Singleton {
         globalProcess.command = findCommand(wallpaperDir);
         globalProcess.targetScreenName = screenName || "";
         globalProcess.currentWallpaper = currentWallpaper;
+        globalProcess.revision = SessionData.wallpaperRequestRevision(screenName || "");
         globalProcess.running = true;
     }
 
@@ -211,6 +213,7 @@ Singleton {
             process.targetScreenName = screenName;
             process.currentWallpaper = "";
             process.goToPrevious = false;
+            process.revision = SessionData.wallpaperRequestRevision(screenName);
             process.running = true;
             return;
         }
@@ -220,6 +223,7 @@ Singleton {
         globalProcess.targetScreenName = screenName || "";
         globalProcess.currentWallpaper = "";
         globalProcess.goToPrevious = false;
+        globalProcess.revision = SessionData.wallpaperRequestRevision(screenName || "");
         globalProcess.running = true;
     }
 
@@ -263,7 +267,9 @@ Singleton {
         }
     }
 
-    function applyCycledWallpaper(text, currentPath, targetScreenName, goToPrevious) {
+    function applyCycledWallpaper(text, currentPath, targetScreenName, goToPrevious, revision) {
+        if (revision !== SessionData.wallpaperRequestRevision(targetScreenName))
+            return;
         if (!text || !text.trim())
             return;
         const files = text.trim().split('\n').filter(file => file.length > 0);
@@ -317,35 +323,38 @@ Singleton {
     Component {
         id: monitorProcessComponent
         Process {
+            property string revision: ""
             property string targetScreenName: ""
             property string currentWallpaper: ""
             property bool goToPrevious: false
             running: false
             stdout: StdioCollector {
-                onStreamFinished: root.applyCycledWallpaper(text, currentWallpaper, targetScreenName, goToPrevious)
+                onStreamFinished: root.applyCycledWallpaper(text, currentWallpaper, targetScreenName, goToPrevious, revision)
             }
         }
     }
 
     Process {
         id: cyclingProcess
+        property string revision: ""
         property string targetScreenName: ""
         property string currentWallpaper: ""
         property bool goToPrevious: false
         running: false
         stdout: StdioCollector {
-            onStreamFinished: root.applyCycledWallpaper(text, cyclingProcess.currentWallpaper, cyclingProcess.targetScreenName, cyclingProcess.goToPrevious)
+            onStreamFinished: root.applyCycledWallpaper(text, cyclingProcess.currentWallpaper, cyclingProcess.targetScreenName, cyclingProcess.goToPrevious, cyclingProcess.revision)
         }
     }
 
     Process {
         id: prevCyclingProcess
+        property string revision: ""
         property string targetScreenName: ""
         property string currentWallpaper: ""
         property bool goToPrevious: true
         running: false
         stdout: StdioCollector {
-            onStreamFinished: root.applyCycledWallpaper(text, prevCyclingProcess.currentWallpaper, prevCyclingProcess.targetScreenName, prevCyclingProcess.goToPrevious)
+            onStreamFinished: root.applyCycledWallpaper(text, prevCyclingProcess.currentWallpaper, prevCyclingProcess.targetScreenName, prevCyclingProcess.goToPrevious, prevCyclingProcess.revision)
         }
     }
 

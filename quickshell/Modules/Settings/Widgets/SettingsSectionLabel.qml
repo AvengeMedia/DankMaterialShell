@@ -34,8 +34,9 @@ Item {
     }
 
     FocusRing {
+        id: labelRing
         radius: Theme.cornerRadiusS + Theme.focusRingOffset
-        visible: root.activeFocus && root.collapsible
+        visible: parentFocused && !pointerFocused && root.collapsible
     }
 
     signal toggleRequested
@@ -104,7 +105,12 @@ Item {
         StateLayer {
             stateColor: Theme.primary
             cornerRadius: parent.radius
-            onClicked: root.toggleRequested()
+            focused: labelRing.visible
+            onClicked: {
+                labelRing.pointerFocused = true;
+                root.forceActiveFocus(Qt.MouseFocusReason);
+                root.toggleRequested();
+            }
         }
     }
 }

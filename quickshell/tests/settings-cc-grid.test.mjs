@@ -25,3 +25,17 @@ test("sparse settings migrate without inventing grid keys", () => {
     assert.equal(sparse.controlCenterColumns, undefined);
     assert.equal(sparse.controlCenterWidgets, undefined);
 });
+
+test("header entries become a user row and lock, power and settings tiles", () => {
+    const released = store.migrateToVersion({ configVersion: 18, controlCenterWidgets: [{ id: "wifi", width: 50 }] }, 35);
+    assert.deepEqual(JSON.parse(JSON.stringify(released.controlCenterWidgets.map(w => [w.id, w.w, w.h, !!w.footer]))), [["user", 5, 1, false], ["settings", 1, 1, false], ["lock", 1, 1, false], ["power", 1, 1, false], ["wifi", 4, 1, false], ["runningApps", 4, 1, true]]);
+});
+
+test("the edit button joins the footer end once and keeps a placed one", () => {
+    const migrated = store.migrateToVersion({ configVersion: 36, controlCenterWidgets: [{ id: "wifi", w: 4, h: 1 }] }, 37);
+    assert.equal(migrated.configVersion, 37);
+    assert.deepEqual(JSON.parse(JSON.stringify(migrated.controlCenterWidgets)), [{ id: "wifi", w: 4, h: 1 }, { id: "edit", enabled: true, w: 1, h: 1, small: true, footer: true, footerEnd: true }]);
+    const placed = store.migrateToVersion({ configVersion: 36, controlCenterWidgets: [{ id: "edit", w: 1, h: 1, col: 2, row: 0 }] }, 37);
+    assert.deepEqual(JSON.parse(JSON.stringify(placed.controlCenterWidgets)), [{ id: "edit", w: 1, h: 1, col: 2, row: 0 }]);
+    assert.equal(store.migrateToVersion({ configVersion: 36 }, 37).controlCenterWidgets, undefined);
+});

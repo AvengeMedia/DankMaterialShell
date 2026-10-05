@@ -7,15 +7,16 @@ import qs.Modules.DankDash
 SettingsRow {
     id: root
 
-    required property string entryId
     required property var spec
+    property var value
 
-    readonly property var value: DashRegistry.option(entryId, spec.key)
     readonly property var choices: spec.choices ?? []
     readonly property int choiceIndex: choices.findIndex(c => c.value === value)
 
+    signal committed(var next)
+
     function commit(next) {
-        DashRegistry.setOption(entryId, spec.key, next);
+        committed(next);
     }
 
     title: spec.text ?? spec.key

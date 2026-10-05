@@ -7,6 +7,7 @@ import Quickshell.Io
 import Quickshell.I3
 import qs.Common
 import qs.Services
+import "../Common/SleepLock.js" as SleepLock
 
 Singleton {
     id: root
@@ -42,6 +43,8 @@ Singleton {
     signal sessionLocked
     signal sessionUnlocked
     signal sessionResumed
+    signal lockEditorRequested
+    signal greeterEditorRequested
     signal lidOpened
     signal loginctlStateChanged
 
@@ -51,6 +54,7 @@ Singleton {
     property string lidSubscriptionId: ""
     property bool lidSubscriptionPending: false
     property double lastResumeSignalTimestamp: 0
+    property var pendingSleepFn: null
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
 
@@ -76,6 +80,14 @@ Singleton {
                 log.debug("DMS_SOCKET not set");
             }
         }
+    }
+
+    Timer {
+        id: lockBeforeSleepFallback
+        // Custom lockers never set WlSessionLock.secure.
+        interval: 2000
+        repeat: false
+        onTriggered: root.flushPendingSleep()
     }
 
     Process {
@@ -502,26 +514,64 @@ Singleton {
         }
     }
 
-    function suspend() {
-        if (SettingsData.customPowerActionSuspend.length === 0) {
-            Quickshell.execDetached(powerManagerCommand("suspend"));
-        } else {
-            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionSuspend]);
+    function cancelPendingSleep() {
+        lockBeforeSleepFallback.stop();
+        pendingSleepFn = null;
+    }
+
+    function flushPendingSleep() {
+        lockBeforeSleepFallback.stop();
+        const run = pendingSleepFn;
+        pendingSleepFn = null;
+        if (run)
+            run();
+    }
+
+    function onSessionLockSecured() {
+        if (pendingSleepFn)
+            flushPendingSleep();
+    }
+
+    function runSleepAction(run) {
+        cancelPendingSleep();
+        if (!SleepLock.shouldWaitForLock(SettingsData.lockBeforeSuspend, IdleService.isSessionLockSecure)) {
+            run();
+            return;
         }
+        // Custom hibernate skips logind PrepareForSleep; dump RAM only after the lock is up.
+        // Assign before lockRequested: a synchronous secure must see this closure.
+        // A second call before the first runs drops the first (last wins).
+        pendingSleepFn = run;
+        IdleService.lockRequested();
+        lockBeforeSleepFallback.restart();
+    }
+
+    function suspend() {
+        runSleepAction(() => {
+            if (SettingsData.customPowerActionSuspend.length === 0) {
+                Quickshell.execDetached(powerManagerCommand("suspend"));
+            } else {
+                Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionSuspend]);
+            }
+        });
     }
 
     function hibernate() {
-        hibernateProcess.errorOutput = "";
-        if (SettingsData.customPowerActionHibernate.length > 0) {
-            hibernateProcess.command = ["sh", "-c", SettingsData.customPowerActionHibernate];
-        } else {
-            hibernateProcess.command = powerManagerCommand("hibernate");
-        }
-        hibernateProcess.running = true;
+        runSleepAction(() => {
+            hibernateProcess.errorOutput = "";
+            if (SettingsData.customPowerActionHibernate.length > 0) {
+                hibernateProcess.command = ["sh", "-c", SettingsData.customPowerActionHibernate];
+            } else {
+                hibernateProcess.command = powerManagerCommand("hibernate");
+            }
+            hibernateProcess.running = true;
+        });
     }
 
     function suspendThenHibernate() {
-        Quickshell.execDetached(powerManagerCommand("suspend-then-hibernate"));
+        runSleepAction(() => {
+            Quickshell.execDetached(powerManagerCommand("suspend-then-hibernate"));
+        });
     }
 
     function suspendWithBehavior(behavior) {
@@ -554,6 +604,12 @@ Singleton {
         }
     }
 
+    // Actions added in settings, listed after the built-in ones: boot entries, then custom buttons.
+    // Each list lines up index for index with its setting.
+    readonly property var bootEntryActions: (SettingsData.powerMenuBootEntries || []).map(entry => "bootnext:" + entry.id)
+    readonly property var customPowerActions: (SettingsData.customPowerButtons || []).map((button, i) => "custom:" + i)
+    readonly property var extraPowerActions: bootEntryActions.concat(customPowerActions)
+
     function isPowerActionSupported(action) {
         switch (action) {
         case "hibernate":
@@ -566,11 +622,17 @@ Singleton {
     }
 
     function executePowerAction(action) {
-        if (action.startsWith("custom:")) {
-            const button = (SettingsData.customPowerButtons || [])[parseInt(action.slice(7), 10)];
+        const customIndex = customPowerActions.indexOf(action);
+        if (customIndex >= 0) {
+            const button = SettingsData.customPowerButtons[customIndex];
             if (!button?.command)
                 return false;
             Quickshell.execDetached(customActionCommand(button.command));
+            return true;
+        }
+        const bootIndex = bootEntryActions.indexOf(action);
+        if (bootIndex >= 0) {
+            BootEntryService.rebootTo(SettingsData.powerMenuBootEntries[bootIndex]);
             return true;
         }
         switch (action) {
@@ -601,12 +663,22 @@ Singleton {
     }
 
     function getPowerActionData(action) {
-        if (action.startsWith("custom:")) {
-            const button = (SettingsData.customPowerButtons || [])[parseInt(action.slice(7), 10)];
+        const customIndex = customPowerActions.indexOf(action);
+        if (customIndex >= 0) {
+            const button = SettingsData.customPowerButtons[customIndex];
             return {
                 "icon": button?.icon || "terminal",
                 "label": button?.label || button?.command || "",
                 "key": ""
+            };
+        }
+        const bootIndex = bootEntryActions.indexOf(action);
+        if (bootIndex >= 0) {
+            // Boot entries take the digit keys in the order they were added
+            return {
+                "icon": "restart_alt",
+                "label": I18n.tr("Reboot to %1", "power menu action, %1 is a boot entry such as Windows Boot Manager").arg(SettingsData.powerMenuBootEntries[bootIndex].label),
+                "key": bootIndex < 9 ? String(bootIndex + 1) : ""
             };
         }
         switch (action) {

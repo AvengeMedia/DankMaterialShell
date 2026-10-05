@@ -88,8 +88,8 @@ Item {
                 title: I18n.tr("Dashboard")
                 hint: I18n.tr("Media")
                 iconName: "dashboard"
-                onClicked: {
-                    root.parentModal?.navigateTo("dank_dash");
+                onClicked: keyboard => {
+                    root.parentModal?.navigateTo("dank_dash", keyboard);
                     SettingsSearchService.navigateToSection("dashOptions:media");
                 }
             }

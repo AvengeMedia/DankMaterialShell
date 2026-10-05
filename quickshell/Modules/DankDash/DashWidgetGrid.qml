@@ -4,6 +4,7 @@ import QtQuick
 import qs.Common
 import qs.Widgets
 import qs.Modules.ControlCenter.Widgets
+import qs.Modules.Settings.Widgets
 import qs.Modules.DankDash.Overview
 import "../../Common/GridLayout.js" as GridUtils
 import "utils/widgets.js" as WidgetUtils
@@ -18,10 +19,11 @@ Item {
     property bool live: Window.window?.visible ?? false
     property int columns: width < Theme.smallBreakpoint ? 2 : 4
     property real cardRadius: Theme.cornerRadiusXL
+    property var transientSurfaceTracker: null
     readonly property var widgets: WidgetUtils.resolve(definitions, DashRegistry.widgetLayout(entryId))
     readonly property var addable: definitions.filter(d => !widgets.some(w => w.id === d.id))
     readonly property Item focusTarget: grid
-    readonly property bool blocksTabNavigation: editMode || addMenu.open || widgetMenu.open
+    readonly property bool blocksTabNavigation: editMode || addMenu.open || optionsSheet.shown
     readonly property bool cardResizing: grid.sizePreview !== null
 
     implicitHeight: Math.max(DashMetrics.tabMinHeight, grid.implicitHeight)
@@ -105,16 +107,16 @@ Item {
     }
 
     function handleKeyEvent(event) {
-        if (event.key !== Qt.Key_Escape || !(addMenu.open || widgetMenu.open))
+        if (event.key !== Qt.Key_Escape || !(addMenu.open || optionsSheet.shown))
             return false;
         addMenu.close();
-        widgetMenu.close();
+        optionsSheet.dismiss();
         return true;
     }
 
     onEditModeChanged: {
         addMenu.close();
-        widgetMenu.close();
+        optionsSheet.dismiss();
     }
 
     DankEditableGrid {
@@ -174,13 +176,10 @@ Item {
                     cornerRadius: root.cardRadius
                     dragging: slot.dragging
                     resizing: slot.resizing
-                    hasOptions: true
+                    hasOptions: WidgetUtils.optionSpecs(slot.spec).length > 0
                     sizeText: (grid.sizePreview?.index === slot.index ? grid.sizePreview.changes.w : slot.widget.w) + "×" + (grid.sizePreview?.index === slot.index ? grid.sizePreview.changes.h : slot.widget.h)
                     onRemoveRequested: root.save(root.widgets.filter((w, i) => i !== slot.index))
-                    onOptionsRequested: anchor => {
-                        widgetMenu.widgetId = slot.widget.id;
-                        widgetMenu.openAt(anchor);
-                    }
+                    onOptionsRequested: optionsSheet.presentFor(slot.widget.id)
                     onResizeStarted: (px, py) => slot.beginResize(px, py)
                     onResizeMoved: (px, py) => slot.resizeTo(px, py)
                     onResizeEnded: slot.finishResize()
@@ -200,7 +199,7 @@ Item {
 
     CcMenu {
         id: addMenu
-        parent: root.Window.window?.contentItem ?? root
+        transientSurfaceTracker: root.transientSurfaceTracker
         items: root.addable.map(spec => ({
                     label: spec.text,
                     iconName: spec.icon,
@@ -212,71 +211,43 @@ Item {
                 }))
     }
 
-    CcMenu {
-        id: widgetMenu
-        parent: root.Window.window?.contentItem ?? root
+    CcSheetDialog {
+        id: optionsSheet
+
         property string widgetId: ""
         readonly property int widgetIndex: root.widgets.findIndex(w => w.id === widgetId)
         readonly property var widget: root.widgets[widgetIndex] ?? {}
         readonly property var spec: root.specFor(widgetId)
-        readonly property int row: grid.slotLayout.slots[widgetIndex]?.row ?? 0
-        items: [
-            {
-                label: I18n.tr("Move up"),
-                iconName: "arrow_upward",
-                enabled: row > 0,
-                action: () => root.updateWidget(widgetIndex, {
-                        row: row - 1
-                    })
-            },
-            {
-                label: I18n.tr("Move down"),
-                iconName: "arrow_downward",
-                enabled: widgetIndex >= 0,
-                action: () => root.updateWidget(widgetIndex, {
-                        row: row + 1
-                    })
-            },
-            {
-                label: I18n.tr("Width", "noun, size label, also used in widget resize menu") + " +",
-                iconName: "add",
-                enabled: widget.w < (spec?.maxW ?? spec?.w ?? 1),
-                action: () => root.updateWidget(widgetIndex, {
-                        w: widget.w + 1
-                    })
-            },
-            {
-                label: I18n.tr("Width") + " −",
-                iconName: "remove",
-                enabled: widget.w > (spec?.minW ?? 1),
-                action: () => root.updateWidget(widgetIndex, {
-                        w: widget.w - 1
-                    })
-            },
-            {
-                label: I18n.tr("Height", "noun, size label, also used in widget resize menu") + " +",
-                iconName: "add",
-                enabled: widget.h < (spec?.maxH ?? spec?.h ?? 1),
-                action: () => root.updateWidget(widgetIndex, {
-                        h: widget.h + 1
-                    })
-            },
-            {
-                label: I18n.tr("Height") + " −",
-                iconName: "remove",
-                enabled: widget.h > (spec?.minH ?? 1),
-                action: () => root.updateWidget(widgetIndex, {
-                        h: widget.h - 1
-                    })
-            },
-            {
-                label: I18n.tr("Show graphics", "Dashboard widget option for decorative data graphics"),
-                iconName: widget.graphics ? "check_box" : "check_box_outline_blank",
-                visible: spec?.graphics === true,
-                action: () => root.updateWidget(widgetIndex, {
-                        graphics: !widget.graphics
-                    })
+
+        function presentFor(id) {
+            widgetId = id;
+            present();
+        }
+
+        backdrop: grid
+        panelWidth: DashMetrics.optionSheetWidth
+        iconName: spec?.icon ?? "tune"
+        title: spec?.text ?? ""
+        subtitle: I18n.tr("Options")
+        showScrollBar: false
+
+        SettingsGroup {
+            width: parent.width
+            slotColor: Theme.chipSurface
+
+            Repeater {
+                model: WidgetUtils.optionSpecs(optionsSheet.spec)
+
+                DashOptionRow {
+                    required property var modelData
+
+                    spec: modelData
+                    value: optionsSheet.widget[modelData.key]
+                    onCommitted: next => root.updateWidget(optionsSheet.widgetIndex, {
+                            [modelData.key]: next
+                        })
+                }
             }
-        ]
+        }
     }
 }

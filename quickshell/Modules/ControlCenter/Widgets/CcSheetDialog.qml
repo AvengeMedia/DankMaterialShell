@@ -15,8 +15,10 @@ Item {
     property bool shown: false
     property real panelWidth: CcMetrics.dialogWidth
     property vector4d cornerRadii: Qt.vector4d(Theme.windowRadius, Theme.windowRadius, Theme.windowRadius, Theme.windowRadius)
+    property Item backdrop: null
     readonly property real presence: panel.opacity
     default property alias content: contentSlot.data
+    property alias showScrollBar: contentFlickable.showScrollBar
 
     signal dismissed
 
@@ -109,6 +111,17 @@ Item {
                 duration: Theme.expressiveDurations.expressiveEffects
                 easing.type: Easing.BezierSpline
                 easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
+            }
+        }
+
+        // In-window sheets get no compositor blur, so blur the covered content behind the panel only.
+        Loader {
+            anchors.fill: parent
+            z: -1
+            active: root.backdrop !== null && root.visible && CcMetrics.hideCoveredContent
+            sourceComponent: BackdropBlur {
+                radius: panel.radius
+                sourceItem: root.backdrop
             }
         }
 

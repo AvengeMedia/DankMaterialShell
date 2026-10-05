@@ -40,8 +40,9 @@ Variants {
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: Theme.mediumDuration
-                    easing.type: Theme.emphasizedEasing
+                    duration: Theme.expressiveDurations.expressiveEffects
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
                 }
             }
 

@@ -24,7 +24,8 @@ function service({ enabled = true, type = "widget" } = {}) {
         log: { error() {}, warn() {} },
         Paths: { toFileUrl: path => path.startsWith("file://") ? path : "file://" + path },
         SettingsData: { getPluginSetting: () => enabled },
-        DMSService: { update: (id, callback) => requests.push(callback) },
+        DMSService: { update: (id, callback) => requests.push(callback), installedPlugins: [] },
+        ShellVersionService: { checkVersionRequirement: requirement => !requirement.startsWith(">=99"), getParsedShellVersion: () => ({}) },
         Component: { Error: 3, PreferSynchronous: 0 },
         I18n: { tr: text => ({ arg: value => text.replace("%1", value) }) },
         ToastService: { showError() {} },
@@ -65,6 +66,19 @@ test("successful updates replace cached components and reread the manifest", () 
     pending.shift()();
     assert.equal(context.pluginWidgetComponents.fixture.value, 16);
     assert.equal(context.availablePlugins.fixture.version, "2.0.0");
+});
+
+test("an update whose registry entry needs a newer shell is refused before the download", () => {
+    const { context, requests, pending } = service();
+    context.DMSService.installedPlugins = [{ id: "fixture", requires_dms: ">=99.0.0" }];
+    let response;
+    context.updatePlugin("fixture", value => response = value);
+    assert.equal(requests.length, 0);
+    assert.equal(pending.length, 0);
+    assert.match(response.error, /99\.0\.0/);
+    context.DMSService.installedPlugins = [{ id: "fixture", requires_dms: ">=1.0.0" }];
+    context.updatePlugin("fixture");
+    assert.equal(requests.length, 1);
 });
 
 test("failed updates preserve the running plugin and forward the error", () => {
@@ -176,6 +190,33 @@ test("updated startup checks still prevent activation on failure", () => {
     context.forceRescanPlugin("fixture");
     pending.shift()();
     assert.equal(context.isPluginLoaded("fixture"), true);
+    files.set("file:///plugins/fixture/Check.qml", {
+        check: () => "dependency removed",
+        destroy() {}
+    });
+    context.reloadPlugin("fixture");
+    assert.equal(context.isPluginLoaded("fixture"), false);
+    assert.equal(failures.at(-1), "dependency removed");
+});
+
+test("startup checks that cannot run prevent activation", () => {
+    const { context, files, pending, manifest, failures } = service();
+    const createComponent = context.Qt.createComponent;
+    context.Qt.createComponent = url => url.startsWith("file:///plugins/fixture/Broken.qml") ? { status: 3, errorString: () => "module missing" } : createComponent(url);
+    const cases = [
+        ["./Broken.qml", null, "module missing"],
+        ["./Check.qml", { destroy() {} }, "startupCheck has no check function"],
+        ["./Check.qml", { check() { throw new Error("sync throw"); }, destroy() {} }, "sync throw"],
+        ["./Check.qml", { check(done) { throw new Error("async throw"); }, destroy() {} }, "async throw"]
+    ];
+    for (const [path, probe, error] of cases) {
+        manifest.startupCheck = path;
+        files.set("file:///plugins/fixture/Check.qml", probe);
+        context.forceRescanPlugin("fixture");
+        pending.shift()();
+        assert.equal(context.isPluginLoaded("fixture"), false, error);
+        assert.equal(failures.at(-1), error);
+    }
 });
 
 test("composite updates refresh every surface without creating daemons synchronously", () => {

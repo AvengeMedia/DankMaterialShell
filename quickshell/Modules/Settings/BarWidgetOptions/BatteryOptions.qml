@@ -8,14 +8,20 @@ Column {
 
     property var page: null
 
-    readonly property var styleValues: ["icon", "solid", "outline", "ring"]
+    readonly property var styleValues: ["icon", "solid", "outline", "ring", "duo"]
     readonly property var barConfig: {
         SettingsData.barConfigs;
         return SettingsData.getBarConfig(page?.barId ?? "");
     }
     readonly property var barStore: ({
             "isDefault": keys => keys.every(key => (root.barConfig?.[key] ?? SettingsData.barConfigDefault(key)) === SettingsData.barConfigDefault(key)),
-            "resetToDefault": keys => SettingsData.updateBarConfig(root.page.barId, Object.fromEntries(keys.map(key => [key, SettingsData.barConfigDefault(key)])))
+            "resetToDefault": keys => {
+                // QV4 has no Object.fromEntries.
+                const patch = {};
+                for (const key of keys)
+                    patch[key] = SettingsData.barConfigDefault(key);
+                SettingsData.updateBarConfig(root.page.barId, patch);
+            }
         })
 
     width: parent?.width ?? 0
@@ -78,7 +84,7 @@ Column {
             resetStore: root.page
             resetKeys: ["batteryStyle"]
             text: I18n.tr("Battery style")
-            model: [I18n.tr("Icon", "battery widget: system battery glyph"), I18n.tr("Solid", "island settings: filled battery meter style"), I18n.tr("Outline", "island settings: outlined battery meter style"), I18n.tr("Circle", "island settings: circular battery meter style")]
+            model: [I18n.tr("Icon", "battery widget: system battery glyph"), I18n.tr("Solid", "island settings: filled battery meter style"), I18n.tr("Outline", "island settings: outlined battery meter style"), I18n.tr("Circle", "island settings: circular battery meter style"), I18n.tr("Duo", "battery meter style: open battery arc around the network glyph")]
             currentIndex: Math.max(0, root.styleValues.indexOf(root.page.value("batteryStyle")))
             onSelectionChanged: (index, selected) => {
                 if (selected)

@@ -24,6 +24,10 @@ Item {
     required property string activityId
     property bool freeMode: false
     property Component compactFaceOverride: null
+    // Hosted islands fold the slot anchor into every target; the face must pin to the same resolved slot.
+    property var resolveTarget: target => target
+    // Embedded sheets grow by this on the near edge; the face keeps its content size below the fold.
+    property real expandedInset: 0
     required property Component homeCompactComponent
     required property Component homeExpandedComponent
     required property Component mediaCompactComponent
@@ -42,13 +46,23 @@ Item {
     required property Component notificationExpandedComponent
     required property Component notificationCenterCompactComponent
     required property Component notificationCenterExpandedComponent
+    required property Component clipboardCompactComponent
+    required property Component clipboardExpandedComponent
 
     readonly property real compactFade: root.fadeCompact(root.morphProgress)
     readonly property real expandedFade: root.fadeExpanded(root.morphProgress)
     readonly property real outgoingCompactFade: root.fadeCompact(root.outgoingMorph)
     readonly property real outgoingExpandedFade: root.fadeExpanded(root.outgoingMorph)
     readonly property bool mediaSurfaceActive: root.surfaceActive("media")
-    readonly property bool systemSurfaceActive: root.surfaceActive("volume") || root.surfaceActive("brightness")
+    readonly property bool systemSurfaceActive: root.controller.systemActivities.some(id => root.surfaceActive(id))
+
+    function systemCompactOpacity() {
+        return Math.max(0, ...root.controller.systemActivities.map(id => root.compactOpacity(id)));
+    }
+
+    function systemExpandedOpacity() {
+        return Math.max(0, ...root.controller.systemActivities.map(id => root.expandedOpacity(id)));
+    }
 
     property string renderedActivity: "home"
     property string outgoingActivity: ""
@@ -89,6 +103,7 @@ Item {
             "wallpaper": wallpaperExpandedLoader,
             "weather": weatherExpandedLoader,
             "notificationcenter": notificationCenterExpandedLoader,
+            "clipboard": clipboardExpandedLoader,
             "controlcenter": controlCenterExpandedLoader
         })
 
@@ -160,7 +175,7 @@ Item {
     component CompactFace: Loader {
         required property string activity
         required property Component face
-        readonly property var target: root.controller.compactTargetFor(activity)
+        readonly property var target: root.resolveTarget(root.controller.compactTargetFor(activity))
         readonly property bool isVertical: root.controller.isVertical
         readonly property real alongPos: isVertical ? Math.round((root.hostHeight - target.height) / 2 + target.offsetAlong) - Math.round(root.islandY) : Math.round((root.hostWidth - target.width) / 2 + target.offsetAlong) - Math.round(root.islandX)
         readonly property real crossPos: isVertical ? Math.round((parent.width - width) / 2) : Math.round((parent.height - height) / 2)
@@ -178,7 +193,10 @@ Item {
     component ExpandedFace: Loader {
         required property string activity
         readonly property var target: root.controller.expandedTargetFor(activity)
+        readonly property bool isVertical: root.controller.isVertical
 
+        x: isVertical && !root.controller.farEdge ? root.expandedInset : 0
+        y: !isVertical && !root.controller.farEdge ? root.expandedInset : 0
         width: target.width
         height: target.height
         visible: opacity > 0.001
@@ -213,7 +231,6 @@ Item {
         id: mediaExpandedLoader
 
         activity: "media"
-        height: Math.max(target.height, root.height)
         active: root.mediaSurfaceActive && (root.expanded || root.expandedFade > 0)
         asynchronous: false
         sourceComponent: root.mediaExpandedComponent
@@ -313,10 +330,27 @@ Item {
     }
 
     CompactFace {
+        active: root.surfaceActive("clipboard")
+        activity: "clipboard"
+        face: root.clipboardCompactComponent
+        opacity: root.compactOpacity("clipboard")
+    }
+
+    ExpandedFace {
+        id: clipboardExpandedLoader
+
+        activity: "clipboard"
+        active: root.controller.visualsRequested("clipboard")
+        asynchronous: true
+        sourceComponent: root.clipboardExpandedComponent
+        opacity: root.expandedOpacity("clipboard")
+    }
+
+    CompactFace {
         active: root.systemSurfaceActive
         activity: "volume"
         face: root.systemCompactComponent
-        opacity: Math.max(root.compactOpacity("volume"), root.compactOpacity("brightness"))
+        opacity: root.systemCompactOpacity()
     }
 
     ExpandedFace {
@@ -324,7 +358,7 @@ Item {
         active: root.systemSurfaceActive && (root.expanded || root.expandedFade > 0)
         asynchronous: false
         sourceComponent: root.systemExpandedComponent
-        opacity: Math.max(root.expandedOpacity("volume"), root.expandedOpacity("brightness"))
+        opacity: root.systemExpandedOpacity()
     }
 
     CompactFace {

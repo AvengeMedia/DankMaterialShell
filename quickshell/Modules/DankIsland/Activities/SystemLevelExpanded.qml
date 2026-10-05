@@ -33,7 +33,7 @@ Item {
                 }
 
                 StyledText {
-                    text: root.systemModel.volumeActivity ? I18n.tr("Click the icon to mute", "island volume face: hint under the title") : I18n.tr("Display brightness control", "island brightness face: hint under the title")
+                    text: root.systemModel.mutable ? I18n.tr("Click the icon to mute", "island volume face: hint under the title") : I18n.tr("Display brightness control", "island brightness face: hint under the title")
                     color: Theme.surfaceTextSecondary
                     font.pixelSize: Theme.fontSizeSmall
                 }
@@ -56,16 +56,16 @@ Item {
             width: parent.width
             size: "m"
             insetIcon: root.systemModel.iconName
-            insetIconClickable: root.systemModel.volumeActivity
+            insetIconClickable: root.systemModel.mutable
             insetIconLabel: root.systemModel.muted ? I18n.tr("Unmute") : I18n.tr("Mute")
             Accessible.name: root.systemModel.title
             onInsetIconClicked: root.systemModel.toggleMute()
             minimum: root.systemModel.minimum
             maximum: Math.max(root.systemModel.minimum + 1, Math.round(root.systemModel.maximum))
+            visible: root.systemModel.levelActivity
             enabled: root.systemModel.available
             showValue: false
             unit: root.systemModel.unit
-            thumbOutlineColor: Theme.hostSurface
             valueOverride: Math.round(root.systemModel.value)
             onSliderValueChanged: newValue => root.systemModel.setRatio(newValue / maximum)
 

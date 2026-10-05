@@ -2,6 +2,7 @@ import QtQuick
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 
 Rectangle {
     id: root
@@ -29,14 +30,14 @@ Rectangle {
 
     color: {
         if (!isConnected)
-            return Theme.floatingWindowFieldColor;
+            return SettingsMetrics.controlColor;
         if (!isValidPosition)
             return Theme.withAlpha(Theme.error, 0.3);
         if (isDragging)
             return Theme.withAlpha(Theme.primary, 0.4);
         if (dragArea.containsMouse)
             return Theme.withAlpha(Theme.primary, 0.2);
-        return Theme.floatingWindowNestedSurface;
+        return SettingsMetrics.controlColor;
     }
 
     border.color: {

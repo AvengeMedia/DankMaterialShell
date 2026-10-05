@@ -418,7 +418,7 @@ Column {
             wrapText: true
             Layout.alignment: Qt.AlignTop
             Layout.topMargin: (Theme.buttonHeightS - Theme.buttonHeightXS) / 2
-            onClicked: root.parentModal?.navigateTo("plugins_manage")
+            onClicked: keyboard => root.parentModal?.navigateTo("plugins_manage", keyboard)
         }
     }
 
@@ -432,6 +432,7 @@ Column {
 
     DankCard {
         id: storeCard
+        color: SettingsMetrics.rowColor
         width: parent.width
         implicitHeight: storeContent.implicitHeight + pad * 2
         visible: root.plugins.length === 0
@@ -482,7 +483,7 @@ Column {
                     textColor: storeCard.accentColor
                     maximumWidth: parent.width
                     wrapText: true
-                    onClicked: root.parentModal?.navigateTo("plugins_manage")
+                    onClicked: keyboard => root.parentModal?.navigateTo("plugins_manage", keyboard)
                 }
             }
         }
@@ -608,10 +609,10 @@ Column {
                 pad: Theme.spacingL
                 radius: Theme.cornerRadiusM
                 readonly property string highlightKey: "installedPlugin:" + modelData.pluginId
-                color: SettingsSearchService.highlightSection === highlightKey ? Theme.blend(surfaceColor, Theme.primary, SettingsMetrics.highlightBlend) : surfaceColor
+                color: SettingsSearchService.highlightSection === highlightKey ? Theme.blend(SettingsMetrics.rowColor, Theme.primary, SettingsMetrics.highlightBlend) : SettingsMetrics.rowColor
                 clickable: true
                 Accessible.name: modelData.text
-                onClicked: root.parentModal?.navigateTo(modelData.id)
+                onClicked: keyboard => root.parentModal?.navigateTo(modelData.id, keyboard)
 
                 Timer {
                     interval: 0
@@ -750,7 +751,7 @@ Column {
                             iconName: "settings"
                             variant: "tonal"
                             Accessible.name: I18n.tr("Settings")
-                            onClicked: root.parentModal?.navigateTo(installedCard.modelData.id)
+                            onClicked: keyboard => root.parentModal?.navigateTo(installedCard.modelData.id, keyboard)
                         }
                         Row {
                             id: cardActions

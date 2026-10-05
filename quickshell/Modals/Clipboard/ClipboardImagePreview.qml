@@ -103,7 +103,6 @@ ClippingRectangle {
             controls: null
             horizontalPadding: 0
             verticalPadding: 0
-            showDivider: false
             title: I18n.tr("Preview", "noun, clipboard image preview window title")
             onCloseRequested: root.closeRequested()
         }

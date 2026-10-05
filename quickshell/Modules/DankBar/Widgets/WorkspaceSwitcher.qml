@@ -23,15 +23,17 @@ BasePill {
     readonly property string indicatorStyle: root.opt("workspaceIndicatorStyle")
     readonly property bool linesStyle: indicatorStyle === "lines"
     readonly property bool cardsStyle: indicatorStyle === "cards"
-    readonly property bool segmented: !linesStyle && !cardsStyle && surfaceContext?.kind !== "dock" && BarMetrics.widgetStyle(barConfig) === "segments" && !noBackground
-    readonly property real compactRatio: cardsStyle ? 0.75 : 0.7
-    readonly property real slimRatio: 0.5
-    readonly property real activeSlimRatio: 0.6
-    readonly property real activeRatio: linesStyle ? 1.6 : cardsStyle ? 0.9 : 1.05
-    readonly property real activeIconRatio: 1.6
-    readonly property real iconRatio: 1.2
-    readonly property real lineRatio: 0.12
-    readonly property real activeLineRatio: 0.2
+    readonly property bool dotsStyle: indicatorStyle === "dots"
+    readonly property real roundness: root.opt("workspaceIndicatorRoundness")
+    readonly property bool compactIndicators: root.opt("workspaceIndicatorCompact")
+    readonly property bool segmented: !linesStyle && !cardsStyle && !dotsStyle && surfaceContext?.kind !== "dock" && BarMetrics.widgetStyle(barConfig) === "segments" && !noBackground
+    readonly property real compactRatio: BarMetrics.indicatorRatio(indicatorStyle, "compact", compactIndicators)
+    readonly property real slimRatio: BarMetrics.indicatorRatio(indicatorStyle, "slim", compactIndicators)
+    readonly property real activeSlimRatio: BarMetrics.indicatorRatio(indicatorStyle, "activeSlim", compactIndicators)
+    readonly property real activeRatio: BarMetrics.indicatorRatio(indicatorStyle, "active", compactIndicators)
+    readonly property real compactScale: compactIndicators ? BarMetrics.indicatorCompactScale : 1
+    readonly property real activeIconRatio: 1.6 * compactScale
+    readonly property real iconRatio: 1.2 * compactScale
     readonly property real overviewTintAlpha: 0.18
     readonly property real dragOpacity: 0.8
     readonly property real hoverFadeAlpha: 0.7
@@ -609,9 +611,17 @@ BasePill {
                     return (root.opt("groupWorkspaceApps") && (!isActive || root.opt("groupActiveWorkspaceApps"))) ? groupedCount : wins.length;
                 }
 
-                readonly property real lineThickness: Math.max(Theme.spacingXXS, root.widgetThickness * (isActive ? root.activeLineRatio : root.lineRatio))
-                readonly property real primaryBase: isActive ? Math.max(root.widgetThickness * root.activeRatio, root.appIconSize * root.activeIconRatio) : Math.max(root.widgetThickness * root.compactRatio, root.appIconSize * root.iconRatio)
-                readonly property real crossBase: root.opt("showWorkspaceApps") ? Math.max(widgetThickness * root.compactRatio, root.appIconSize + Theme.spacingXS * 2) : widgetThickness * (root.cardsStyle && isActive ? root.activeSlimRatio : root.slimRatio)
+                readonly property real lineThickness: Math.max(Theme.spacingXXS, root.widgetThickness * (isActive ? root.activeSlimRatio : root.slimRatio))
+                // a label scales the whole shape up and itself down to fit, so every style keeps its proportions
+                readonly property bool labeled: !root.linesStyle && !root.opt("showWorkspaceApps") && (root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName") || loadedHasIcon)
+                readonly property real slimBase: widgetThickness * (isActive ? root.activeSlimRatio : root.slimRatio)
+                readonly property real labelScale: labeled ? Math.max(BarMetrics.indicatorLabelScale, BarMetrics.indicatorLabelMin / BarMetrics.indicatorLabelRatio / slimBase) : 1
+                readonly property real crossBase: root.opt("showWorkspaceApps") ? Math.max(widgetThickness * root.compactRatio, root.appIconSize + Theme.spacingXS * 2) : slimBase * labelScale
+                readonly property real primaryBase: root.dotsStyle ? crossBase : labelScale * (isActive ? Math.max(root.widgetThickness * root.activeRatio, root.appIconSize * root.activeIconRatio) : Math.max(root.widgetThickness * root.compactRatio, root.appIconSize * root.iconRatio))
+                readonly property real labelSize: {
+                    const barSize = Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText);
+                    return labeled ? Math.min(barSize, Math.round(crossBase * BarMetrics.indicatorLabelRatio)) : barSize;
+                }
                 readonly property real baseWidth: root.isVertical ? (root.linesStyle ? lineThickness : crossBase) : primaryBase
                 readonly property real baseHeight: root.isVertical ? primaryBase : (root.linesStyle ? lineThickness : crossBase)
                 readonly property bool hasWorkspaceName: root.opt("showWorkspaceName") && record?.name && record.name !== ""
@@ -645,10 +655,13 @@ BasePill {
                     const padding = root.isVertical ? Theme.spacingXS : Theme.spacingS;
                     return Math.max(baseWidth + iconsExtraWidth, contentImplicitWidth + padding);
                 }
+                // the row reserves icon height for each label, so a horizontal label must not set the thickness
                 readonly property real visualHeight: {
+                    if (labeled && !root.isVertical)
+                        return baseHeight;
                     if (contentImplicitHeight <= 0 || (underline && !root.isVertical))
                         return baseHeight + iconsExtraHeight;
-                    const padding = root.isVertical ? Theme.spacingS : Theme.spacingXS;
+                    const padding = root.isVertical && !labeled ? Theme.spacingS : Theme.spacingXS;
                     return Math.max(baseHeight + iconsExtraHeight, contentImplicitHeight + padding);
                 }
 
@@ -713,7 +726,8 @@ BasePill {
                     return colorFromMode(mode, unfocusedColor, effectiveCustomColor(root.opt("workspaceOccupiedCustomColor"), root.opt("workspaceUnfocusedMonitorOccupiedCustomColor")), Theme.secondary);
                 }
 
-                readonly property color urgentColor: colorFromMode(effectiveColorMode(root.opt("workspaceUrgentColorMode"), root.opt("workspaceUnfocusedMonitorUrgentColorMode")), Theme.error, effectiveCustomColor(root.opt("workspaceUrgentCustomColor"), root.opt("workspaceUnfocusedMonitorUrgentCustomColor")), Theme.error)
+                readonly property string urgentColorMode: effectiveColorMode(root.opt("workspaceUrgentColorMode"), root.opt("workspaceUnfocusedMonitorUrgentColorMode"))
+                readonly property color urgentColor: colorFromMode(urgentColorMode, Theme.error, effectiveCustomColor(root.opt("workspaceUrgentCustomColor"), root.opt("workspaceUnfocusedMonitorUrgentCustomColor")), Theme.error)
 
                 readonly property color focusedBorderColor: colorFromMode(effectiveColorMode(root.opt("workspaceFocusedBorderColor"), root.opt("workspaceUnfocusedMonitorBorderColor")), Theme.primary, effectiveCustomColor(root.opt("workspaceFocusedBorderCustomColor"), root.opt("workspaceUnfocusedMonitorBorderCustomColor")), Theme.primary)
 
@@ -726,6 +740,40 @@ BasePill {
 
                 readonly property color quickshellIconActiveColor: getContrastingIconColor(activeColor)
                 readonly property color quickshellIconInactiveColor: getContrastingIconColor(unfocusedColor)
+
+                function inkFromMode(mode, fill, fallbackInk) {
+                    switch (mode) {
+                    case "primary":
+                    case "pri":
+                        return Theme.onPrimary;
+                    case "primaryContainer":
+                        return Theme.onPrimaryContainer;
+                    case "secondaryContainer":
+                        return Theme.onSecondaryContainer;
+                    case "tertiaryContainer":
+                        return Theme.onTertiaryContainer;
+                    case "error":
+                    case "err":
+                        return Theme.onError;
+                    case "s":
+                    case "sc":
+                    case "sch":
+                    case "schh":
+                        return Theme.onSurface;
+                    case "secondary":
+                    case "sec":
+                    case "tertiary":
+                    case "ter":
+                    case "surfaceText":
+                    case "custom":
+                    case "none":
+                        return getContrastingIconColor(fill);
+                    default:
+                        return fallbackInk;
+                    }
+                }
+
+                readonly property color filledInk: isActive ? inkFromMode(activeColorMode, activeColor, Theme.onPrimary) : inkFromMode(urgentColorMode, urgentColor, Theme.onError)
 
                 readonly property color requestedColor: isActive ? activeColor : isUrgent ? urgentColor : isPlaceholder ? Theme.surfaceTextLight : isHovered ? Theme.withAlpha(unfocusedColor, root.hoverFadeAlpha) : isOccupied ? occupiedColor : unfocusedColor
 
@@ -974,7 +1022,7 @@ BasePill {
                     joinedEnd: root.segmented && index < workspaceRepeater.count - 1
                     pressed: mouseArea.pressed
                     color: root.cardsStyle && !isActive ? "transparent" : delegateRoot.displayColor
-                    radiusOverride: root.cardsStyle ? Math.min(Theme.cornerRadiusXS, thickness / 2) : -1
+                    radiusOverride: BarMetrics.indicatorRadius(root.indicatorStyle, thickness, root.roundness)
                     opacity: dragHandler.dragging ? root.dragOpacity : 1.0
 
                     border.width: root.cardsStyle && !isActive ? Math.max(Theme.outlineWidth, delegateRoot.outlineWidth) : delegateRoot.outlineWidth
@@ -1079,8 +1127,8 @@ BasePill {
                                         id: wsIcon
                                         anchors.verticalCenter: parent.verticalCenter
                                         name: loadedIconData?.value ?? ""
-                                        size: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
-                                        color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                        size: labelSize
+                                        color: (isActive || isUrgent) ? filledInk : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                         weight: (isActive && !isPlaceholder) ? 500 : 400
                                     }
                                 }
@@ -1094,8 +1142,8 @@ BasePill {
                                         id: wsText
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: loadedIconData?.value ?? ""
-                                        color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
-                                        font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
+                                        color: (isActive || isUrgent) ? filledInk : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                        font.pixelSize: labelSize
                                         font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
                                     }
                                 }
@@ -1109,8 +1157,8 @@ BasePill {
                                         id: wsIndexText
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: loadedHasIcon ? (record?.name ?? "") : root.getWorkspaceIndex(record, index)
-                                        color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
-                                        font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
+                                        color: (isActive || isUrgent) ? filledInk : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                        font.pixelSize: labelSize
                                         font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
                                     }
                                 }
@@ -1250,8 +1298,8 @@ BasePill {
                                     visible: loadedHasIcon && loadedIconData?.type === "icon"
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     name: loadedIconData?.value ?? ""
-                                    size: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
-                                    color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                    size: labelSize
+                                    color: (isActive || isUrgent) ? filledInk : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                     weight: (isActive && !isPlaceholder) ? 500 : 400
                                 }
 
@@ -1259,8 +1307,8 @@ BasePill {
                                     visible: loadedHasIcon && loadedIconData?.type === "text"
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: loadedIconData?.value ?? ""
-                                    color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
-                                    font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
+                                    color: (isActive || isUrgent) ? filledInk : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                    font.pixelSize: labelSize
                                     font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
                                 }
 
@@ -1268,8 +1316,8 @@ BasePill {
                                     visible: (root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName")) && !loadedHasIcon
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: root.getWorkspaceIndex(record, index)
-                                    color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
-                                    font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
+                                    color: (isActive || isUrgent) ? filledInk : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                    font.pixelSize: labelSize
                                     font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
                                 }
 

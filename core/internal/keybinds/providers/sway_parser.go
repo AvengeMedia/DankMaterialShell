@@ -98,6 +98,10 @@ func (p *SwayParser) parseVariables() {
 	}
 }
 
+func (p *SwayParser) ModVariable() string {
+	return p.variables["mod"]
+}
+
 func (p *SwayParser) expandVariables(text string) string {
 	result := text
 	for varName, varValue := range p.variables {

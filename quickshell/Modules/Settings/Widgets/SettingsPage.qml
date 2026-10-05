@@ -8,7 +8,7 @@ DankFlickable {
     default property alias content: column.data
     property alias spacing: column.spacing
     property alias columnWidth: column.width
-    property int contentMaxWidth: SettingsMetrics.contentMaxWidth
+    property real contentMaxWidth: SettingsMetrics.contentMaxWidth
     property Item fabBar: null
 
     anchors.fill: parent
@@ -19,7 +19,7 @@ DankFlickable {
     Column {
         id: column
         topPadding: Theme.spacingXS
-        width: Math.min(root.contentMaxWidth, parent.width - Theme.spacingL * 2)
+        width: Math.min(root.contentMaxWidth, parent.width)
         bottomPadding: SettingsMetrics.pagePaddingV + (root.fabBar?.reservedHeight ?? 0)
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: Theme.spacingL

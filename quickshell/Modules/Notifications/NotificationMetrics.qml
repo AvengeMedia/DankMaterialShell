@@ -35,7 +35,15 @@ Singleton {
     readonly property real unreadDotSize: Theme.spacingXS + Theme.spacingXXS
     readonly property real swipeThreshold: 0.35
     readonly property real swipeFadeStart: 0.75
-    readonly property real adjacentSwipeInfluence: 0.1
+    readonly property real swipeContentFadeEnd: 0.6
+    readonly property real swipeDetachDistance: 72
+    readonly property real swipeAttachDistance: 56
+    readonly property var swipePull: [0.04, 0.12, 0.5, 0.12, 0.04]
+    readonly property var swipeRoundness: [0.5, 0.7, 0.9, 1, 0.9, 0.7, 0.5]
+    readonly property real swipePullRoundnessMax: 0.8
+    readonly property var swipeDetachSpring: swipeSpring(800, 0.95)
+    readonly property var swipeSnapSpring: swipeSpring(550, 0.6)
+    readonly property var swipeAttachSpring: swipeSpring(850, 0.95)
     readonly property int expandedLimit: 10
     readonly property int collapsedLines: compact ? 1 : 2
     readonly property real summarySize: SettingsData.notificationSummaryFontSize || Theme.fontSizeMedium
@@ -49,4 +57,11 @@ Singleton {
     readonly property var stackSpring: Theme.springPreset("default", Theme.notificationStackShiftDuration)
     readonly property var expandCurve: Theme.expressiveCurves.expressiveDefaultSpatial
     readonly property var dismissCurve: Theme.expressiveCurves.expressiveFastSpatial
+
+    function swipeSpring(stiffness, dampingRatio) {
+        return {
+            "stiffness": stiffness,
+            "damping": 2 * dampingRatio * Math.sqrt(stiffness)
+        };
+    }
 }

@@ -52,7 +52,7 @@ FocusScope {
                     text: PluginService.pluginDirectory
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
-                    font.family: "monospace"
+                    isMonospace: true
                     width: parent.width
                     elide: Text.ElideMiddle
                     horizontalAlignment: Text.AlignLeft

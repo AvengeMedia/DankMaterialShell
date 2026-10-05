@@ -3,14 +3,15 @@ import QtQuick.Effects
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 
 Column {
     id: root
 
     readonly property real logoSize: Math.round(Theme.iconSize * 2.8)
     readonly property real badgeHeight: Math.round(Theme.fontSizeSmall * 1.7)
-    readonly property string releaseNotesUrl: "https://danklinux.com/blog/v1-6-release"
-    readonly property string screenshotDocsUrl: "https://danklinux.com/docs/dankmaterialshell/cli-screenshot"
+    readonly property string releaseNotesUrl: Site.web + "/blog/v1-6-release"
+    readonly property string screenshotDocsUrl: Site.docs + "/dankmaterialshell/cli-screenshot"
 
     topPadding: Theme.spacingL
     spacing: Theme.spacingL
@@ -268,6 +269,41 @@ Column {
                     text: "settings.json only stores what differs from the defaults, and machine-specific state moved to session.json"
                 }
             }
+        }
+    }
+
+    SettingsDivider {
+        visible: ChangelogService.release !== null
+    }
+
+    Column {
+        width: parent.width
+        visible: ChangelogService.release !== null
+        spacing: Theme.spacingS
+
+        Row {
+            spacing: Theme.spacingS
+
+            DankIcon {
+                name: "auto_awesome"
+                size: Theme.iconSizeSmall
+                color: Theme.primary
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            StyledText {
+                text: I18n.tr("What changed", "changelog section heading listing the changes in a release")
+                font.pixelSize: Theme.fontSizeMedium
+                font.weight: Theme.fontWeightMedium
+                color: Theme.surfaceText
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+
+        ReleaseNotesCard {
+            width: parent.width
+            release: ChangelogService.release
+            showTitle: false
         }
     }
 }

@@ -213,7 +213,7 @@ PanelWindow {
     readonly property bool contentAnchorsTop: isTopCenter || SettingsData.notificationPopupPosition === SettingsData.Position.Top || SettingsData.notificationPopupPosition === SettingsData.Position.Left
     readonly property real renderedContentOffsetY: contentAnchorsTop ? 0 : Math.max(0, allocatedAlignedHeight - renderedAlignedHeight)
     readonly property real contentTop: Theme.snap(windowShadowPad + renderedContentOffsetY, dpr)
-    implicitWidth: contentImplicitWidth + (windowShadowPad * 2)
+    implicitWidth: contentImplicitWidth + (windowShadowPad * 2) + edgeBleed
     implicitHeight: allocatedAlignedHeight + (windowShadowPad * 2)
 
     function syncInlineTargetHeight() {
@@ -330,6 +330,14 @@ PanelWindow {
     readonly property real maxPopupShadowOffsetYPx: Math.max(Math.abs(Theme.elevationOffsetY(Theme.elevationLevel3, 6)), Math.abs(Theme.elevationOffsetY(Theme.elevationLevel4, 8)))
     readonly property bool popupWindowShadowActive: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled && !connectedFrameMode
     readonly property real windowShadowPad: popupWindowShadowActive ? Theme.snap(Math.max(16, maxPopupShadowBlurPx + Math.max(maxPopupShadowOffsetXPx, maxPopupShadowOffsetYPx) + 8), dpr) : 0
+    readonly property bool bleedsLeft: _frameEdgeSwipeDirection() < 0
+    readonly property real edgeBleed: {
+        if (isCenterPosition || !CompositorService.frameWindowVisibleForScreen(screen))
+            return 0;
+        const sideMargin = bleedsLeft ? getLeftMargin() : getRightMargin();
+        return Math.max(0, Theme.snap(sideMargin, dpr) - windowShadowPad);
+    }
+    readonly property real contentWindowX: Theme.snap(windowShadowPad + (bleedsLeft ? edgeBleed : 0), dpr)
 
     anchors.top: true
     anchors.left: true
@@ -492,7 +500,7 @@ PanelWindow {
     function getWindowLeftMargin() {
         if (!screen)
             return 0;
-        return Theme.snap(getContentX() - windowShadowPad, dpr);
+        return Theme.snap(getContentX() - contentWindowX, dpr);
     }
 
     function getWindowTopMargin() {
@@ -526,7 +534,7 @@ PanelWindow {
 
     readonly property bool screenValid: win.screen && !_isDestroying
     readonly property real dpr: screenValid ? CompositorService.getScreenScale(win.screen) : 1
-    readonly property real alignedWidth: Theme.px(Math.max(0, implicitWidth - (windowShadowPad * 2)), dpr)
+    readonly property real alignedWidth: Theme.px(Math.max(0, implicitWidth - (windowShadowPad * 2) - edgeBleed), dpr)
     readonly property real alignedHeight: renderedAlignedHeight
     onScreenYChanged: if (connectedFrameMode)
         popupChromeGeometryChanged()
@@ -564,7 +572,7 @@ PanelWindow {
         id: content
         parent: slideClip
 
-        x: Theme.snap(windowShadowPad, dpr)
+        x: win.contentWindowX
         y: win.contentTop - slideClip.y
         width: alignedWidth
         height: alignedHeight
@@ -659,7 +667,7 @@ PanelWindow {
             anchors.fill: parent
             anchors.margins: content.cardInset
             radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : NotificationMetrics.popupRadius
-            color: Theme.notificationFloatingSurface
+            color: "transparent"
 
             HoverHandler {
                 id: cardHoverHandler
@@ -691,7 +699,7 @@ PanelWindow {
                     NotificationCard {
                         id: notificationCard
                         surfaceColor: Theme.notificationFloatingSurface
-                        chipColor: Theme.chipSurface
+                        chipColor: Theme.notificationChipSurface
                         width: parent.width
                         height: win.inlineHeightAnimating ? Math.min(targetHeight, cardSurface.height - win.timeoutRailClearance) : targetHeight
                         notificationData: win.notificationData
@@ -703,7 +711,7 @@ PanelWindow {
                         dismissText: I18n.tr("Clear")
                         animateHeight: false
                         outerRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : NotificationMetrics.popupRadius
-                        color: Theme.notificationFloatingSurface
+                        color: "transparent"
                         onExpandRequested: win.descriptionExpanded = !win.descriptionExpanded
                         onCloseRequested: win.dismissPopupReliably()
                         onDismissRequested: {
@@ -988,6 +996,7 @@ PanelWindow {
             appName: notificationData?.appName ?? ""
             desktopEntry: notificationData?.desktopEntry ?? ""
             dismissText: notificationCard.dismissText
+            notification: notificationData
             onAppMuted: {
                 if (notificationData && !win.exiting)
                     NotificationService.dismissNotification(notificationData);

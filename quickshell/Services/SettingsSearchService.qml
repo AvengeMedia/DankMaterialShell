@@ -48,6 +48,14 @@ Singleton {
         }
     }
 
+    Connections {
+        target: SettingsTabs
+
+        function onPageMapChanged() {
+            root._refreshTranslatedCache();
+        }
+    }
+
     readonly property var conditionMap: ({
             "isNiri": () => CompositorService.isNiri,
             "pointerCapable": () => CompositorService.supportsPointerConfig,
@@ -299,9 +307,20 @@ Singleton {
         return condFn();
     }
 
+    function _itemLabel(item) {
+        switch (item.runtimeType) {
+        case "plugin":
+            return item.label;
+        case "pageLabel":
+            return SettingsTabs.page(SettingsTabs.pageForTabIndex(item.tabIndex))?.text ?? "";
+        default:
+            return I18n.tr(item.label);
+        }
+    }
+
     function translateItem(item) {
         const isRuntimePlugin = item.runtimeType === "plugin";
-        const label = isRuntimePlugin ? item.label : I18n.tr(item.label);
+        const label = _itemLabel(item);
         const description = isRuntimePlugin ? (item.description || "") : I18n.tr(item.description || "");
         const category = I18n.tr(item.category);
         return {

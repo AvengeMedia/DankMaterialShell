@@ -8,9 +8,11 @@ Item {
     id: root
 
     property var keyboardController: null
+    property var historyView: null
     property int currentTab: 0
     property var transientSurfaceTracker: null
     property bool modal: false
+    readonly property var hintsOwner: currentTab === 1 && historyView ? historyView : keyboardController
     readonly property string currentLabel: {
         const count = NotificationService.notifications.length;
         if (count === 0)
@@ -75,11 +77,15 @@ Item {
         }
 
         DankActionButton {
-            visible: root.keyboardController !== null
+            readonly property bool hintsShown: root.hintsOwner?.showKeyboardHints ?? false
+
+            visible: root.hintsOwner !== null
             iconName: "info"
             buttonSize: Theme.buttonHeightXS
+            backgroundColor: hintsShown ? Theme.secondaryContainer : "transparent"
+            iconColor: hintsShown ? Theme.onSecondaryContainer : Theme.onSurfaceVariant
             tooltipText: I18n.tr("Keyboard shortcuts")
-            onClicked: root.keyboardController.showKeyboardHints = !root.keyboardController.showKeyboardHints
+            onClicked: root.hintsOwner.showKeyboardHints = !hintsShown
         }
     }
 

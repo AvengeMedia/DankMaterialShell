@@ -4,6 +4,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Wayland
 import qs.Common
 import qs.Services
 
@@ -11,9 +12,8 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("NightModeService")
 
-    property bool nightModeActive: nightModeEnabled
-
     property bool nightModeEnabled: false
+    property bool nightModePaused: false
     property bool automationAvailable: false
     property bool gammaControlAvailable: false
     property int resumeRecoveryAttempt: 0
@@ -31,53 +31,59 @@ Singleton {
     property int gammaHighTemp: gammaState?.config?.HighTemp ?? 0
     property bool gammaAdjustAvailable: gammaControlAvailable && DMSService.apiVersion >= 34
 
-    function enableNightMode() {
+    function _setNightModeEnabled(enabled, quiet, onComplete) {
         if (!gammaControlAvailable) {
-            ToastService.showWarning(I18n.tr("Night mode failed: DMS gamma control not available"));
+            if (!quiet && enabled)
+                ToastService.showWarning(I18n.tr("Night mode failed: DMS gamma control not available"));
+            if (onComplete)
+                onComplete(false);
             return;
         }
 
+        DMSService.sendRequest("wayland.gamma.setEnabled", {
+            "enabled": enabled
+        }, response => {
+            if (response.error) {
+                log.error(`Failed to ${enabled ? "enable" : "disable"} gamma control:`, response.error);
+                if (!quiet) {
+                    const title = enabled ? I18n.tr("Failed to enable night mode") : I18n.tr("Failed to disable night mode");
+                    ToastService.showError(title, response.error, "", "night-mode");
+                }
+                if (onComplete)
+                    onComplete(false);
+                return;
+            }
+            ToastService.dismissCategory("night-mode");
+            if (onComplete)
+                onComplete(true);
+        });
+    }
+
+    function enableNightMode() {
         nightModeEnabled = true;
         SessionData.setNightModeEnabled(true);
 
-        DMSService.sendRequest("wayland.gamma.setEnabled", {
-            "enabled": true
-        }, response => {
-            if (response.error) {
-                log.error("Failed to enable gamma control:", response.error);
-                ToastService.showError(I18n.tr("Failed to enable night mode"), response.error, "", "night-mode");
+        _setNightModeEnabled(true, false, success => {
+            if (!success) {
                 nightModeEnabled = false;
                 SessionData.setNightModeEnabled(false);
                 return;
             }
-            ToastService.dismissCategory("night-mode");
 
             if (SessionData.nightModeAutoEnabled) {
                 startAutomation();
             } else {
                 applyNightModeDirectly();
             }
+            root.handleNightModeExceptions();
         });
     }
 
     function disableNightMode() {
         nightModeEnabled = false;
+        nightModePaused = false;
         SessionData.setNightModeEnabled(false);
-
-        if (!gammaControlAvailable) {
-            return;
-        }
-
-        DMSService.sendRequest("wayland.gamma.setEnabled", {
-            "enabled": false
-        }, response => {
-            if (response.error) {
-                log.error("Failed to disable gamma control:", response.error);
-                ToastService.showError(I18n.tr("Failed to disable night mode"), response.error, "", "night-mode");
-            } else {
-                ToastService.dismissCategory("night-mode");
-            }
-        });
+        _setNightModeEnabled(false, false);
     }
 
     function toggleNightMode() {
@@ -86,6 +92,58 @@ Singleton {
         } else {
             enableNightMode();
         }
+    }
+
+    function pauseNightMode() {
+        nightModePaused = true;
+        _setNightModeEnabled(false, true, success => {
+            if (!success)
+                nightModePaused = false;
+        });
+    }
+
+    function resumeNightMode() {
+        nightModePaused = false;
+        _setNightModeEnabled(true, true, success => {
+            if (!success)
+                nightModePaused = true;
+        });
+    }
+
+    function isNightModeExcludedApp(appId: string): bool {
+        const excludedApps = SettingsData.nightModeExcludedApps || [];
+        if (!excludedApps.length)
+            return false;
+
+        const desktopId = DesktopEntries.heuristicLookup(Paths.moddedAppId(appId))?.id ?? "";
+        return excludedApps.some(excludedId => Paths.isAppIdMatch(appId, excludedId, desktopId));
+    }
+
+    function handleNightModeExceptions() {
+        if (!nightModeEnabled)
+            return;
+
+        if (CompositorService.inOverview) {
+            if (nightModePaused)
+                resumeNightMode();
+            return;
+        }
+
+        const activeApp = ToplevelManager.activeToplevel;
+        if (!activeApp) {
+            if (nightModePaused && !ToplevelManager.toplevels.values.length)
+                resumeNightMode();
+            return;
+        }
+
+        const shouldPause = (SettingsData.nightModeExcludeFullscreen && activeApp.fullscreen) || isNightModeExcludedApp(activeApp.appId);
+        if (shouldPause === nightModePaused)
+            return;
+
+        if (shouldPause)
+            pauseNightMode();
+        else
+            resumeNightMode();
     }
 
     function applyGammaAdjustments() {
@@ -104,12 +162,10 @@ Singleton {
 
     function setDisplayGamma(gamma) {
         SessionData.setDisplayGamma(gamma);
-        gammaAdjustTimer.restart();
     }
 
     function setDisplayContrast(contrast) {
         SessionData.setDisplayContrast(contrast);
-        gammaAdjustTimer.restart();
     }
 
     function applyNightModeDirectly() {
@@ -322,15 +378,11 @@ Singleton {
                 applyGammaAdjustments();
 
                 if (nightModeEnabled) {
-                    DMSService.sendRequest("wayland.gamma.setEnabled", {
-                        "enabled": true
-                    }, enableResponse => {
-                        if (enableResponse.error) {
-                            log.error("Failed to enable gamma control on startup:", enableResponse.error);
+                    _setNightModeEnabled(!nightModePaused, true, success => {
+                        if (!success)
                             return;
-                        }
-
                         evaluateNightMode();
+                        handleNightModeExceptions();
                     });
                 }
             }
@@ -466,6 +518,45 @@ Singleton {
         }
         function onNightModeUseIPLocationChanged() {
             evaluateNightMode();
+        }
+        function onDisplayGammaChanged() {
+            gammaAdjustTimer.restart();
+        }
+        function onDisplayContrastChanged() {
+            gammaAdjustTimer.restart();
+        }
+    }
+
+    Connections {
+        target: SettingsData
+
+        function onNightModeExcludedAppsChanged() {
+            root.handleNightModeExceptions();
+        }
+
+        function onNightModeExcludeFullscreenChanged() {
+            root.handleNightModeExceptions();
+        }
+    }
+
+    Connections {
+        target: ToplevelManager
+        function onActiveToplevelChanged() {
+            root.handleNightModeExceptions();
+        }
+    }
+
+    Connections {
+        target: ToplevelManager.activeToplevel
+        function onFullscreenChanged() {
+            root.handleNightModeExceptions();
+        }
+    }
+
+    Connections {
+        target: CompositorService
+        function onInOverviewChanged() {
+            root.handleNightModeExceptions();
         }
     }
 

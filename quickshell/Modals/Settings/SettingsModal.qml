@@ -31,6 +31,7 @@ DankFloatingWindow {
     }
     property alias sidebar: sidebar
     readonly property alias modalFocusScope: contentFocusScope
+    readonly property alias focusPane: contentFocusScope.activePane
     property string currentPage: "personalization"
     property var pageHistory: []
     readonly property int currentTabIndex: SettingsTabs.tabIndexForPage(currentPage)
@@ -40,7 +41,8 @@ DankFloatingWindow {
     readonly property bool canGoBack: pageHistory.length > 0 || (currentParentId !== "" && (isPluginPage || SettingsTabs.visibleLeaves(currentParentId).length > 1 || !!SettingsTabs.page(currentParentId)?.hubHeader))
     property bool shouldHaveFocus: visible
     property bool allowFocusOverride: false
-    property alias shouldBeVisible: settingsModal.visible
+    property bool shouldBeVisible: false
+    readonly property bool readyToMap: shouldBeVisible && content.currentPageSettled
     readonly property bool searchFocused: sidebar.searchFocused
     property bool isCompactMode: width < SettingsMetrics.compactBreakpoint
     property bool menuVisible: !isCompactMode
@@ -53,15 +55,23 @@ DankFloatingWindow {
             visible = false;
         }
         CompositorService.closeNiriOverviewOnWindowFocus();
-        visible = true;
+        if (!shouldBeVisible && isCompactMode)
+            menuVisible = true;
+        shouldBeVisible = true;
+        if (readyToMap)
+            visible = true;
+        if (backingWindowVisible)
+            contentFocusScope.Window.window?.requestActivate();
     }
 
     function hide() {
+        shouldBeVisible = false;
         visible = false;
     }
 
     function toggle() {
-        if (visible && backingWindowVisible) {
+        const shown = visible ? backingWindowVisible : shouldBeVisible;
+        if (shown) {
             hide();
             return;
         }
@@ -77,12 +87,15 @@ DankFloatingWindow {
         return true;
     }
 
-    function navigateTo(pageId: string): bool {
+    // Rows report how they were activated; buttons and cards fall back to the focused control's reason
+    function navigateTo(pageId, keyboard = contentFocusScope.keyboardDriven()): bool {
         const resolved = SettingsTabs.resolvePage(pageId);
         if (!resolved || resolved === currentPage)
             return false;
+        content.rememberFocus();
         pageHistory = pageHistory.concat([currentPage]);
         currentPage = resolved;
+        focusCurrentPage(keyboard);
         return true;
     }
 
@@ -90,17 +103,19 @@ DankFloatingWindow {
         return setPage(name);
     }
 
-    function goBack() {
+    function goBack(keyboard = contentFocusScope.keyboardDriven()) {
         if (pageHistory.length > 0) {
             const history = pageHistory.slice();
             const target = history.pop();
             pageHistory = history;
             currentPage = target;
+            focusCurrentPage(keyboard);
             return;
         }
         if (!currentParentId)
             return;
         currentPage = currentParentId;
+        focusCurrentPage(keyboard);
     }
 
     function setTabIndex(tabIndex: int) {
@@ -135,20 +150,22 @@ DankFloatingWindow {
         show();
     }
 
-    function focusCurrentPage() {
-        content._focusPage();
+    function focusCurrentPage(keyboard = true) {
+        contentFocusScope.focusContent(keyboard);
+    }
+
+    function focusSidebar() {
+        contentFocusScope.focusSidebar();
     }
 
     function focusSearch() {
-        if (isCompactMode)
-            menuVisible = true;
-        Qt.callLater(sidebar.focusSearch);
+        contentFocusScope.focusSearch();
     }
 
     function toggleMenu() {
         menuVisible = !menuVisible;
         if (menuVisible)
-            Qt.callLater(sidebar.focusSearch);
+            focusSearch();
     }
 
     objectName: "settingsModal"
@@ -159,6 +176,11 @@ DankFloatingWindow {
     visible: false
 
     onClosed: hide()
+
+    onReadyToMapChanged: {
+        if (readyToMap)
+            visible = true;
+    }
 
     onIsCompactModeChanged: {
         if (!isCompactMode)
@@ -174,9 +196,11 @@ DankFloatingWindow {
         if (!visible) {
             pageHistory = [];
             closingModal();
-        } else if (!isCompactMode || menuVisible) {
+        } else {
+            const revision = contentFocusScope.focusRevision;
             Qt.callLater(() => {
-                sidebar.focusSearch();
+                if (settingsModal.visible && revision === contentFocusScope.focusRevision)
+                    settingsModal.focusSearch();
             });
         }
     }
@@ -195,13 +219,10 @@ DankFloatingWindow {
         }
     }
 
-    Loader {
+    // The printers page is gated on the cups capability, which core only probes once someone subscribes.
+    Ref {
+        service: CupsService
         active: settingsModal.visible
-        sourceComponent: Component {
-            Ref {
-                service: CupsService
-            }
-        }
     }
 
     LazyLoader {
@@ -250,21 +271,18 @@ DankFloatingWindow {
         }
     }
 
-    FocusScope {
+    SettingsPaneNavigation {
         id: contentFocusScope
+
+        sidebar: sidebar
+        content: content
+        parentModal: settingsModal
 
         LayoutMirroring.enabled: I18n.isRtl
         LayoutMirroring.childrenInherit: true
 
         anchors.fill: parent
         focus: true
-
-        Keys.onPressed: event => {
-            if (event.key !== Qt.Key_F || !(event.modifiers & Qt.ControlModifier))
-                return;
-            settingsModal.focusSearch();
-            event.accepted = true;
-        }
 
         Keys.onBackPressed: event => {
             settingsModal.goBack();
@@ -284,18 +302,25 @@ DankFloatingWindow {
                 onCloseRequested: settingsModal.hide()
             }
 
-            Rectangle {
+            Item {
                 id: readOnlyBanner
 
                 property bool showBanner: (SettingsData._isReadOnly && SettingsData._hasUnsavedChanges) || (SessionData._isReadOnly && SessionData._hasUnsavedChanges)
 
                 width: parent.width
                 height: showBanner ? bannerContent.implicitHeight + Theme.spacingM * 2 : 0
-                color: Theme.floatingWindowNestedSurface
-                border.width: Theme.layerOutlineWidth
-                border.color: Theme.outlineMedium
                 visible: showBanner
                 clip: true
+
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.leftMargin: body.paneInset
+                    anchors.rightMargin: body.paneInset
+                    radius: SettingsMetrics.paneRadius
+                    color: SettingsMetrics.paneColor
+                    border.width: Theme.layerOutlineWidth
+                    border.color: Theme.outlineMedium
+                }
 
                 Behavior on height {
                     NumberAnimation {
@@ -310,9 +335,10 @@ DankFloatingWindow {
 
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.leftMargin: Theme.spacingL
-                    anchors.rightMargin: Theme.spacingM
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: Theme.spacingM
+                    anchors.leftMargin: body.paneInset + SettingsMetrics.panePadding
+                    anchors.rightMargin: body.paneInset + SettingsMetrics.panePadding
                     spacing: Theme.spacingM
 
                     DankIcon {
@@ -371,6 +397,10 @@ DankFloatingWindow {
 
             Item {
                 id: body
+
+                readonly property real paneInset: SettingsMetrics.paneMargin
+                readonly property real paneSpace: width - sidebar.width - paneInset
+
                 width: parent.width
                 height: parent.height - titleBar.height - readOnlyBanner.height
                 clip: true
@@ -398,12 +428,16 @@ DankFloatingWindow {
                     x: {
                         const flip = I18n.isRtl ? -1 : 1;
                         if (settingsModal.isCompactMode)
-                            return settingsModal.menuVisible ? body.width * flip : 0;
-                        return I18n.isRtl ? 0 : sidebar.width;
+                            return (settingsModal.menuVisible ? body.width * flip : 0) + body.paneInset;
+                        const slack = (body.paneSpace - width) / 2;
+                        return (I18n.isRtl ? body.paneInset : sidebar.width) + slack;
                     }
-                    width: settingsModal.isCompactMode ? body.width : body.width - sidebar.width
-                    height: body.height
-                    color: settingsModal.isCompactMode ? Theme.floatingWindowSurface : "transparent"
+                    width: settingsModal.isCompactMode ? body.width - body.paneInset * 2 : Math.min(body.paneSpace, SettingsMetrics.paneMaxWidth)
+                    height: body.height - body.paneInset
+                    radius: SettingsMetrics.paneRadius
+                    color: SettingsMetrics.paneColor
+                    border.width: Theme.layerOutlineWidth
+                    border.color: Theme.outlineMedium
                     clip: true
 
                     Behavior on x {

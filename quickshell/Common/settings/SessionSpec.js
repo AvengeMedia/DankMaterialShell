@@ -24,11 +24,17 @@ var LOCAL_SPEC = {
     idleInhibitedUntil: {
         def: 0
     },
-    terminalOverride: {
+    updaterNotifiedUnix: {
+        def: 0
+    },
+    updaterNotifiedCount: {
+        def: 0
+    },
+    changelogSeenVersion: {
         def: ""
     },
-    perModeWallpaper: {
-        def: false
+    terminalOverride: {
+        def: ""
     },
     wallpaperPathLight: {
         def: ""
@@ -241,7 +247,7 @@ var LOCAL_SPEC = {
     desktopWidgetGridSettings: {
         def: {}
     },
-    desktopWidgetInstancePositions: {
+    lockScreenWidgetGridSettings: {
         def: {}
     },
     islandFreePositions: {

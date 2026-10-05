@@ -52,6 +52,7 @@ Card {
     }
 
     entryId: "weather"
+    tone: options.tone ?? ""
     clickable: true
     pad: compact ? Theme.spacingS : Theme.spacingM
 
@@ -228,6 +229,8 @@ Card {
         visible: root.heroLayout
         showCity: root.showCity
         showSunTimes: root.showReadings
+        tone: root.tone
+        flat: true
     }
 
     Row {

@@ -56,7 +56,7 @@ FocusScope {
 
         onEditModeChanged: root.controller.setEditing("controlcenter", editMode)
 
-        readonly property real editGutter: editMode ? PopoutMetrics.editOverflow : 0
+        readonly property vector4d chromeRoom: Qt.vector4d(root.sideInset, Theme.spacingXS, root.sideInset, root.bottomInset)
         readonly property int gridColumnCap: root.controller.controlCenterColumnCap
         readonly property int gridColumns: root.controller.controlCenterColumns
         readonly property real availableHeight: root.controller.controlCenterMaxHeight - Theme.spacingXS - root.bottomInset
@@ -70,6 +70,7 @@ FocusScope {
         readonly property var triggerScreen: root.effectiveScreen
         readonly property var colorPickerModal: PopoutService.colorPickerModal
         readonly property var powerMenuModalLoader: PopoutService.powerMenuModalLoader
+        readonly property var transientSurfaceTracker: root.controller.transientSurfaces
         readonly property real alignedX: root.alignedX
         readonly property real alignedY: root.alignedY
         readonly property real alignedWidth: root.alignedWidth
@@ -85,6 +86,10 @@ FocusScope {
 
         function openSettings() {
             root.windowRequested("settings");
+        }
+
+        function openAccounts() {
+            root.windowRequested("accounts");
         }
 
         function openColorPicker() {

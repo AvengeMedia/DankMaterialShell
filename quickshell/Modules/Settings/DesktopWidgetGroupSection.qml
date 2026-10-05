@@ -85,17 +85,17 @@ Column {
             id: emptyDropZone
             width: parent.width
             height: Theme.listItemHeight
-            radius: Theme.cornerRadius
+            radius: Theme.groupedListOuterRadius
             visible: section.dragActive && section.instances.length === 0
             color: section.isDropTarget ? Theme.selectedContainer : "transparent"
-            border.width: Theme.layerOutlineWidth
+            border.width: Theme.outlineWidth
             border.color: section.isDropTarget ? Theme.primary : Theme.outline
 
             StyledText {
                 anchors.centerIn: parent
                 text: I18n.tr("Drop here")
                 font.pixelSize: Theme.fontSizeSmall
-                color: section.isDropTarget ? Theme.primary : Theme.surfaceVariantText
+                color: section.isDropTarget ? Theme.onSelectedContainer : Theme.surfaceVariantText
             }
         }
     }

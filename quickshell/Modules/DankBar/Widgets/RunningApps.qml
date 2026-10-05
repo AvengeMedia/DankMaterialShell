@@ -74,20 +74,7 @@ BasePill {
     readonly property bool _currentWorkspace: SettingsData.widgetOption("runningApps", widgetData, "runningAppsCurrentWorkspace")
     readonly property bool _currentMonitor: SettingsData.widgetOption("runningApps", widgetData, "runningAppsCurrentMonitor")
     readonly property bool _groupByApp: SettingsData.widgetOption("runningApps", widgetData, "runningAppsGroupByApp")
-    readonly property string windowModelKey: {
-        if (_groupByApp)
-            return "appId";
-        switch (CompositorService.compositor) {
-        case "aqueous":
-            return AqueousService.available ? "aqueousKey" : "address";
-        case "niri":
-            return "niriWindowId";
-        case "mango":
-            return "mangoWindowId";
-        default:
-            return "address";
-        }
-    }
+    readonly property string windowModelKey: _groupByApp ? "appId" : CompositorService.toplevelKey
 
     readonly property var sortedToplevels: {
         _toplevelsUpdateTrigger;
@@ -378,7 +365,7 @@ BasePill {
                         anchors.centerIn: parent
                         text: windowCount > 9 ? "9+" : windowCount
                         font.pixelSize: 9
-                        color: Theme.surface
+                        color: Theme.onPrimary
                     }
                 }
 
@@ -508,14 +495,14 @@ BasePill {
                 items.push({
                     type: "item",
                     icon: "outbox",
-                    text: I18n.tr("Move out of scratchpad"),
+                    text: I18n.tr("Move out of scratchpad", "window context menu action, brings the window back from the special workspace"),
                     action: () => CompositorService.moveWindowOutOfSpecial(windowContextMenu.currentWindow)
                 });
             for (const name of scratchpad ? [] : CompositorService.specialWorkspaceNames) {
                 items.push({
                     type: "item",
                     icon: "inbox",
-                    text: name === "special" ? I18n.tr("Move to scratchpad") : I18n.tr("Move to scratchpad: %1", "%1 is the named special workspace").arg(name),
+                    text: name === "special" ? I18n.tr("Move to scratchpad", "window context menu action, sends the window to the unnamed special workspace") : I18n.tr("Move to scratchpad: %1", "%1 is the named special workspace").arg(name),
                     action: () => CompositorService.moveWindowToSpecial(windowContextMenu.currentWindow, name)
                 });
             }

@@ -29,6 +29,21 @@ Item {
     readonly property bool endAttached: edgeAligned && canonicalRightSide
     readonly property alias body: body
 
+    readonly property real alongStartRadius: edgeAligned && !trailing ? 0 : cornerR
+    readonly property real alongEndRadius: edgeAligned && trailing ? 0 : cornerR
+    readonly property rect startSweepRect: localRect(startAttached ? 0 : -sweepR, startAttached ? crossSize : 0, sweepR, sweepR)
+    readonly property rect startSweepDisc: localRect(startAttached ? 0 : -sweepR * 2, startAttached ? crossSize : 0, sweepR * 2, sweepR * 2)
+    readonly property rect endSweepRect: localRect(endAttached ? chromeAlongSize - sweepR : chromeAlongSize, endAttached ? crossSize : 0, sweepR, sweepR)
+    readonly property rect endSweepDisc: localRect(endAttached ? chromeAlongSize - sweepR * 2 : chromeAlongSize, endAttached ? crossSize : 0, sweepR * 2, sweepR * 2)
+
+    function localRect(cx, cy, cw, ch) {
+        const along = chromeAlongSize;
+        const cross = crossSize;
+        if (!isVertical)
+            return crossFar ? Qt.rect(cx, cross - cy - ch, cw, ch) : Qt.rect(cx, cy, cw, ch);
+        return crossFar ? Qt.rect(cross - cy - ch, cx, ch, cw) : Qt.rect(cy, along - cx - cw, ch, cw);
+    }
+
     visible: chromeAlongSize > 0
     x: isVertical ? 0 : chromeAlongPos
     y: isVertical ? chromeAlongPos : 0

@@ -24,19 +24,22 @@ FocusScope {
     property real maxResultsHeight: 0
     property real resultsInset: LauncherMetrics.spotlightInset
 
-    readonly property bool _hasQuery: root.showResultsWithoutQuery || searchInput.text.length > 0
+    readonly property bool _hasQuery: root.showResultsWithoutQuery || searchInput.text.length > 0 || root.controller.searchMode === "dmenu"
     readonly property real _searchBarH: LauncherMetrics.pillHeight
     readonly property real _searchAreaH: _searchBarH
     readonly property alias searchAreaHeight: root._searchAreaH
     readonly property real actionPanelHeight: actionPanel.height
     readonly property real _statusH: Theme.listItemTwoLineHeight + Theme.spacingXL
-    readonly property real _maxResultsH: root.maxResultsHeight > 0 ? root.maxResultsHeight : Math.max(0, Math.min(LauncherMetrics.maxResultsHeight + resultsInset + resultsList.bottomInset, (parentModal?.screenHeight ?? Theme.mediumBreakpoint) - (parentModal?.modalY ?? 0) - LauncherMetrics.pillHeight - actionPanel.height - Theme.spacingL))
-    readonly property real _resultsContentH: resultsList.contentHeight > 0 ? LauncherMetrics.resultsGap + resultsList.contentHeight + resultsList.bottomInset : _statusH
+    readonly property bool _firstSectionShowsHeader: !!(root.controller.sections?.[0]?.title?.length > 0)
+    readonly property real _resultsTopGap: _firstSectionShowsHeader ? LauncherMetrics.resultsGap : root.resultsInset
+    readonly property real _rowsHeightBudget: (root.controller.searchMode === "dmenu" && root.controller.dmenuLines > 0) ? (root.controller.dmenuLines * (LauncherMetrics.rowHeight + LauncherMetrics.rowGap) + (_firstSectionShowsHeader ? LauncherMetrics.sectionBand : _resultsTopGap)) : LauncherMetrics.maxResultsHeight
+    readonly property real _maxResultsH: root.maxResultsHeight > 0 ? root.maxResultsHeight : Math.max(0, Math.min(_rowsHeightBudget + resultsList.bottomInset, (parentModal?.screenHeight ?? Theme.mediumBreakpoint) - (parentModal?.modalY ?? 0) - LauncherMetrics.pillHeight - actionPanel.height - Theme.spacingL))
+    readonly property real _resultsContentH: resultsList.contentHeight > 0 ? _resultsTopGap + resultsList.contentHeight + resultsList.bottomInset : _statusH
     readonly property real _resultsH: _hasQuery ? Math.min(_resultsContentH, _maxResultsH) : 0
     readonly property int _resizeDuration: Theme.expressiveDurations.expressiveFastSpatial
     readonly property real _frameClipRadius: Math.max(0, (parentModal?.frameBottomRadius ?? 0) - resultsInset)
 
-    implicitHeight: _searchAreaH + resultsContainer.height + actionPanel.height
+    implicitHeight: _searchAreaH + mesgRow.height + resultsContainer.height + actionPanel.height
 
     property bool _animateResize: false
 
@@ -53,6 +56,10 @@ FocusScope {
     }
 
     function resetSearch() {
+        if (root.controller.searchMode === "dmenu") {
+            root.controller.setSearchQuery("");
+            return;
+        }
         root.controller.reset();
         if (root.showResultsWithoutQuery)
             root.controller.performSearch();
@@ -80,6 +87,15 @@ FocusScope {
         const hasCtrl = event.modifiers & Qt.ControlModifier;
         const hasAlt = event.modifiers & Qt.AltModifier;
 
+        if (root.controller.searchMode === "dmenu") {
+            const kbN = root.controller.matchDmenuKeybind(event);
+            if (kbN > 0) {
+                root.controller.acceptDmenuViaKeybind(kbN);
+                event.accepted = true;
+                return;
+            }
+        }
+
         switch (event.key) {
         case Qt.Key_Escape:
             if (actionPanel.expanded) {
@@ -91,7 +107,10 @@ FocusScope {
                 event.accepted = true;
                 return;
             }
-            root.parentModal?.hide();
+            if (root.parentModal?.attemptUserCancel)
+                root.parentModal.attemptUserCancel();
+            else
+                root.parentModal?.hide();
             event.accepted = true;
             return;
         case Qt.Key_Backspace:
@@ -189,7 +208,10 @@ FocusScope {
         case Qt.Key_Return:
         case Qt.Key_Enter:
             if (event.modifiers & Qt.ShiftModifier) {
-                root.controller.pasteSelected();
+                if (root.controller.searchMode === "dmenu" && root.controller.dmenuMultiSelect)
+                    root.controller.toggleDmenuMultiSelectHighlighted();
+                else
+                    root.controller.pasteSelected();
             } else if (actionPanel.expanded && actionPanel.selectedActionIndex > 0) {
                 actionPanel.executeSelectedAction();
             } else {
@@ -307,14 +329,17 @@ FocusScope {
 
         LauncherSearchField {
             id: searchInput
-            pluginName: root.controller.activePluginName
-            pluginIcon: root.controller.activePluginId ? root.controller.getPluginMetadata(root.controller.activePluginId).icon : ""
+            readonly property bool _isDmenu: root.controller.searchMode === "dmenu"
+            pluginName: _isDmenu ? root.controller.dmenuPrompt : root.controller.activePluginName
+            pluginIcon: _isDmenu ? root.controller.dmenuIcon : (root.controller.activePluginId ? root.controller.getPluginMetadata(root.controller.activePluginId).icon : "")
+            pluginIconVisible: _isDmenu ? !!root.controller.dmenuIcon : true
             anchors.fill: parent
             mode: root.controller.searchMode
             showModes: SettingsData.spotlightBarShowModeChips || root._hasQuery
             flat: true
             onModeSelected: mode => root._selectMode(mode)
-            placeholderText: I18n.tr("Spotlight Search")
+            placeholderText: _isDmenu ? root.controller.dmenuPlaceholder : I18n.tr("Spotlight Search")
+            echoMode: (_isDmenu && root.controller.dmenuPassword) ? TextInput.Password : TextInput.Normal
             hidePlaceholderOnFocus: false
             ignoreUpDownKeys: true
             ignoreTabKeys: true
@@ -338,8 +363,32 @@ FocusScope {
         }
     }
 
-    Rectangle {
+    Item {
+        id: mesgRow
+        readonly property bool _visible: root.controller.searchMode === "dmenu" && root.controller.dmenuMesg.length > 0
         anchors.top: searchBarItem.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.leftMargin: root.resultsInset
+        anchors.rightMargin: root.resultsInset
+        height: _visible ? mesgText.implicitHeight + Theme.spacingS * 2 : 0
+        visible: _visible
+
+        StyledText {
+            id: mesgText
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.topMargin: Theme.spacingS
+            text: root.controller.dmenuMesg
+            wrapMode: Text.WordWrap
+            color: Theme.onSurfaceVariant
+            font.pixelSize: Theme.fontSizeSmall
+        }
+    }
+
+    Rectangle {
+        anchors.top: mesgRow.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         height: Theme.outlineWidth
@@ -350,7 +399,7 @@ FocusScope {
 
     ClippingRectangle {
         id: resultsContainer
-        anchors.top: searchBarItem.bottom
+        anchors.top: mesgRow.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.leftMargin: root.resultsInset
@@ -375,7 +424,7 @@ FocusScope {
             keyForwardTargets: [searchKeyHandler]
             readonly property real bottomInset: Theme.spacingS
             anchors.fill: parent
-            anchors.topMargin: LauncherMetrics.resultsGap
+            anchors.topMargin: root._resultsTopGap
             controller: root.controller
             showEmptyState: root._hasQuery
             transientSurfaceTracker: root.transientSurfaceTracker

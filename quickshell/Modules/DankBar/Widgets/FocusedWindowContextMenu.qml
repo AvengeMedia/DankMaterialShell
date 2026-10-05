@@ -275,7 +275,7 @@ DankPopout {
                         }
 
                         StyledText {
-                            text: I18n.tr("Move out of scratchpad")
+                            text: I18n.tr("Move out of scratchpad", "window context menu action, brings the window back from the special workspace")
                             color: Theme.surfaceText
                             font.pixelSize: Theme.fontSizeSmall
                             anchors.verticalCenter: parent.verticalCenter
@@ -313,7 +313,7 @@ DankPopout {
                             }
 
                             StyledText {
-                                text: modelData === "special" ? I18n.tr("Move to scratchpad") : I18n.tr("Move to scratchpad: %1", "%1 is the named special workspace").arg(modelData)
+                                text: modelData === "special" ? I18n.tr("Move to scratchpad", "window context menu action, sends the window to the unnamed special workspace") : I18n.tr("Move to scratchpad: %1", "%1 is the named special workspace").arg(modelData)
                                 color: Theme.surfaceText
                                 font.pixelSize: Theme.fontSizeSmall
                                 anchors.verticalCenter: parent.verticalCenter

@@ -1,0 +1,24 @@
+<!-- Release hero: the danklinux.com blog banner (diagonal bands, top/bottom glow, marble veins), white on transparent so the shell tints it. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="300" viewBox="0 0 800 300" preserveAspectRatio="none">
+  <defs>
+    <radialGradient id="top" cx="50%" cy="-20%" rx="80%" ry="50%"><stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset="0.6" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="bottom" cx="50%" cy="100%" rx="120%" ry="60%"><stop offset="0" stop-color="#fff" stop-opacity="0.25"/><stop offset="0.7" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="vein" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0.3"/><stop offset="0.35" stop-color="#fff" stop-opacity="0.9"/><stop offset="0.65" stop-color="#fff" stop-opacity="0.7"/><stop offset="1" stop-color="#fff" stop-opacity="0.3"/></linearGradient>
+    <pattern id="bands" width="190" height="190" patternUnits="userSpaceOnUse" patternTransform="rotate(22)"><rect width="70" height="190" fill="#fff" fill-opacity="0.16"/></pattern>
+    <radialGradient id="scrim" cx="50%" cy="50%" rx="30%" ry="35%"><stop offset="0" stop-color="#000" stop-opacity="1"/><stop offset="0.5" stop-color="#000" stop-opacity="0.6"/><stop offset="0.78" stop-color="#000" stop-opacity="0"/></radialGradient>
+    <mask id="clear"><rect width="800" height="300" fill="#fff"/><rect width="800" height="300" fill="url(#scrim)"/></mask>
+  </defs>
+  <rect width="800" height="300" fill="url(#bands)"/>
+  <rect width="800" height="300" fill="url(#top)"/>
+  <rect width="800" height="300" fill="url(#bottom)"/>
+  <g fill="none" stroke="url(#vein)" stroke-linecap="round" mask="url(#clear)">
+    <path stroke-width="2.4" d="M -20 34 C 130 60, 250 12, 410 44 S 690 84, 830 58"/>
+    <path stroke-width="1.8" d="M -20 268 C 120 240, 310 286, 510 252 S 740 226, 830 250"/>
+    <path stroke-width="1.1" stroke-opacity="0.55" d="M 92 44 C 122 106, 84 170, 126 232 S 150 290, 144 320"/>
+    <path stroke-width="1.1" stroke-opacity="0.55" d="M 692 66 C 722 126, 706 186, 738 244 S 758 296, 752 320"/>
+    <path stroke-width="0.9" stroke-opacity="0.45" d="M 762 24 C 736 62, 772 100, 752 140"/>
+    <path stroke-width="0.7" stroke-opacity="0.4" d="M 36 88 C 58 128, 44 172, 68 210"/>
+    <path stroke-width="0.6" stroke-opacity="0.35" d="M 330 262 C 358 280, 350 300, 372 318"/>
+    <path stroke-width="0.6" stroke-opacity="0.35" d="M 476 34 C 502 48, 498 72, 522 84"/>
+  </g>
+</svg>

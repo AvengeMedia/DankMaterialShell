@@ -208,7 +208,6 @@ DankFloatingWindow {
             anchors.right: parent.right
             anchors.top: headerRow.bottom
             anchors.bottom: footerRow.top
-            anchors.topMargin: Theme.spacingS
 
             Loader {
                 id: pageLoader
@@ -239,7 +238,7 @@ DankFloatingWindow {
 
             Row {
                 anchors.right: parent.right
-                anchors.rightMargin: Theme.spacingL
+                anchors.rightMargin: Theme.windowInset
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacingM
 

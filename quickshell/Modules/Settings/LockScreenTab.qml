@@ -268,108 +268,79 @@ Item {
         }
     }
 
+    function showWidgetBrowser() {
+        lockWidgetBrowserLoader.active = true;
+        lockWidgetBrowserLoader.item?.show();
+    }
+
+    function showPluginBrowser() {
+        lockPluginBrowserLoader.active = true;
+        lockPluginBrowserLoader.item?.show();
+    }
+
+    LazyLoader {
+        id: lockWidgetBrowserLoader
+        active: false
+
+        DesktopWidgetBrowser {
+            parentModal: root.parentModal
+            listKey: "lockScreenWidgetInstances"
+            title: I18n.tr("Add widget")
+            onWidgetAdded: ToastService.showInfo(I18n.tr("Widget added"))
+        }
+    }
+
+    LazyLoader {
+        id: lockPluginBrowserLoader
+        active: false
+
+        PluginBrowser {
+            parentModal: root.parentModal
+            typeFilter: "desktop-widget"
+        }
+    }
+
     SettingsPage {
         id: mainColumn
 
         SettingsCard {
             width: parent.width
-            iconName: "lock"
-            title: I18n.tr("Layout")
-            settingKey: "lockLayout"
+            iconName: "widgets"
+            title: I18n.tr("Widgets")
+            settingKey: "lockScreenWidgets"
+            tags: ["lock", "screen", "widgets", "clock", "plugins"]
 
-            SettingsToggleRow {
-                settingKey: "lockScreenShowPowerActions"
-                tags: ["lock", "screen", "power", "actions", "shutdown", "reboot"]
-                text: I18n.tr("Show power actions")
-                checked: SettingsData.lockScreenShowPowerActions
-                onToggled: checked => SettingsData.set("lockScreenShowPowerActions", checked)
-            }
+            SettingsReorderList {
+                id: lockWidgetList
 
-            SettingsToggleRow {
-                settingKey: "lockScreenShowSystemIcons"
-                tags: ["lock", "screen", "system", "icons", "status"]
-                text: I18n.tr("Show system icons")
-                checked: SettingsData.lockScreenShowSystemIcons
-                onToggled: checked => SettingsData.set("lockScreenShowSystemIcons", checked)
-            }
+                model: SettingsData.lockScreenWidgetInstances || []
 
-            SettingsToggleRow {
-                settingKey: "lockScreenShowTime"
-                tags: ["lock", "screen", "time", "clock", "display"]
-                text: I18n.tr("Show time")
-                checked: SettingsData.lockScreenShowTime
-                onToggled: checked => SettingsData.set("lockScreenShowTime", checked)
-            }
+                delegate: DesktopWidgetInstanceCard {
+                    required property var modelData
 
-            SettingsButtonGroupRow {
-                settingKey: "lockScreenClockStyle"
-                tags: ["lock", "screen", "time", "clock", "style", "vertical"]
-                text: I18n.tr("Clock style")
-                visible: SettingsData.lockScreenShowTime
-                model: [I18n.tr("Horizontal", "lock screen clock style option"), I18n.tr("Vertical", "lock screen clock style option")]
-                currentIndex: SettingsData.lockScreenClockStyle === "vertical" ? 1 : 0
-                onSelectionChanged: (index, selected) => {
-                    if (!selected)
-                        return;
-                    SettingsData.set("lockScreenClockStyle", index === 1 ? "vertical" : "horizontal");
-                }
-            }
+                    reorderList: lockWidgetList
+                    reorderEnabled: false
+                    instanceData: modelData
+                    fixed: modelData.widgetType === "lockAuth"
 
-            SettingsToggleRow {
-                settingKey: "lockScreenShowDate"
-                tags: ["lock", "screen", "date", "calendar", "display"]
-                text: I18n.tr("Show date")
-                checked: SettingsData.lockScreenShowDate
-                onToggled: checked => SettingsData.set("lockScreenShowDate", checked)
-            }
-
-            SettingsToggleRow {
-                settingKey: "lockScreenShowProfileImage"
-                tags: ["lock", "screen", "profile", "image", "avatar", "picture"]
-                text: I18n.tr("Show profile image")
-                checked: SettingsData.lockScreenShowProfileImage
-                onToggled: checked => SettingsData.set("lockScreenShowProfileImage", checked)
-            }
-
-            SettingsToggleRow {
-                settingKey: "lockScreenShowPasswordField"
-                tags: ["lock", "screen", "password", "field", "input", "visible"]
-                text: I18n.tr("Show password field")
-                description: I18n.tr("A hidden field appears as soon as a key is pressed")
-                checked: SettingsData.lockScreenShowPasswordField
-                onToggled: checked => SettingsData.set("lockScreenShowPasswordField", checked)
-            }
-
-            SettingsToggleRow {
-                settingKey: "lockScreenShowMediaPlayer"
-                tags: ["lock", "screen", "media", "player", "music", "mpris"]
-                text: I18n.tr("Show media player")
-                checked: SettingsData.lockScreenShowMediaPlayer
-                onToggled: checked => SettingsData.set("lockScreenShowMediaPlayer", checked)
-            }
-
-            SettingsSplitRow {
-                settingKey: "lockScreenShowWeather"
-                tab: "lock_screen"
-                tags: ["weather", "temperature"]
-                title: I18n.tr("Weather")
-                checked: SettingsData.lockScreenShowWeather
-                onToggled: checked => SettingsData.set("lockScreenShowWeather", checked)
-                onNavigated: root.parentModal?.navigateTo("weather")
-            }
-
-            SettingsDropdownRow {
-                settingKey: "lockScreenNotificationMode"
-                tags: ["lock", "screen", "notification", "notifications", "privacy"]
-                text: I18n.tr("Notifications")
-                options: [I18n.tr("Disabled", "lock screen notification mode option"), I18n.tr("Count only", "lock screen notification mode option"), I18n.tr("App names", "lock screen notification mode option"), I18n.tr("Full content", "lock screen notification mode option")]
-                currentValue: options[SettingsData.lockScreenNotificationMode] || options[0]
-                onValueChanged: value => {
-                    const idx = options.indexOf(value);
-                    if (idx >= 0) {
-                        SettingsData.set("lockScreenNotificationMode", idx);
+                    onConfigureRequested: {
+                        SettingsUiState.selectedDesktopWidgetId = instanceId;
+                        SettingsUiState.selectedWidgetTitle = widgetName;
+                        root.parentModal?.navigateTo("desktop_widget");
+                    }
+                    onDuplicateRequested: SettingsData.duplicateDesktopWidgetInstance(instanceId)
+                    onDeleteRequested: {
+                        SettingsData.removeDesktopWidgetInstance(instanceId);
+                        ToastService.showInfo(I18n.tr("Widget removed"));
                     }
                 }
+            }
+
+            SettingsRow {
+                iconName: "restart_alt"
+                title: I18n.tr("Reset to default")
+                clickable: true
+                onClicked: SettingsData.resetLockScreenWidgets()
             }
         }
 
@@ -451,7 +422,7 @@ Item {
 
             SettingsToggleRow {
                 settingKey: "lockBeforeSuspend"
-                tags: ["lock", "screen", "suspend", "sleep", "automatic"]
+                tags: ["lock", "screen", "suspend", "hibernate", "sleep", "automatic"]
                 text: I18n.tr("Lock before suspend")
                 checked: SettingsData.lockBeforeSuspend
                 visible: SessionService.loginctlAvailable && SettingsData.loginctlLockIntegration
@@ -605,9 +576,8 @@ Item {
                         id: securityKeyCapture
                         width: 200
                         anchors.verticalCenter: parent.verticalCenter
-                        focus: capturing
                         text: capturing ? I18n.tr("Press key...", "lock screen security key shortcut key combination capture prompt") : SettingsData.lockScreenSecurityKeyShortcut
-                        backgroundColor: capturing ? Theme.selectedContainer : Theme.chipSurface
+                        backgroundColor: capturing ? Theme.selectedContainer : SettingsMetrics.controlColor
                         textColor: Theme.surfaceText
 
                         property bool capturing: false
@@ -631,8 +601,14 @@ Item {
                                 startCapture();
                         }
 
-                        Keys.onPressed: event => {
-                            if (!securityKeyCapture.capturing)
+                        Keys.onPressed: event => captureKey(event)
+                        // Specific Tab handlers stop Qt focus traversal while capturing.
+                        Keys.onTabPressed: event => captureKey(event)
+                        Keys.onBacktabPressed: event => captureKey(event)
+
+                        function captureKey(event) {
+                            event.accepted = capturing;
+                            if (!capturing)
                                 return;
 
                             if (KeyUtils.isModifierKey(event.key))
@@ -640,7 +616,6 @@ Item {
 
                             if (event.key === Qt.Key_Escape) {
                                 securityKeyCapture.stopCapture();
-                                event.accepted = true;
                                 return;
                             }
 
@@ -708,30 +683,23 @@ Item {
                     const prefs = SettingsData.screenPreferences?.lockScreen;
                     return Array.isArray(prefs) && !prefs.includes("all") && prefs.length > 0;
                 }
+                clickable: true
+                onClicked: {
+                    if (!PopoutService.colorPickerModal)
+                        return;
+                    PopoutService.colorPickerModal.selectedColor = SettingsData.lockScreenInactiveColor;
+                    PopoutService.colorPickerModal.pickerTitle = I18n.tr("Inactive display color");
+                    PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
+                        SettingsData.set("lockScreenInactiveColor", selectedColor);
+                    };
+                    PopoutService.colorPickerModal.show();
+                }
 
-                Rectangle {
-                    width: Theme.iconButtonSize
-                    height: Theme.iconButtonSize
-                    radius: Theme.cornerRadius
-                    color: SettingsData.lockScreenInactiveColor
-                    border.color: Theme.outline
-                    border.width: Theme.outlineWidth
+                DankColorSwatch {
+                    width: Theme.iconSizeMedium
+                    height: width
+                    swatchColor: SettingsData.lockScreenInactiveColor
                     anchors.verticalCenter: parent.verticalCenter
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            if (!PopoutService.colorPickerModal)
-                                return;
-                            PopoutService.colorPickerModal.selectedColor = SettingsData.lockScreenInactiveColor;
-                            PopoutService.colorPickerModal.pickerTitle = I18n.tr("Inactive display color");
-                            PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
-                                SettingsData.set("lockScreenInactiveColor", selectedColor);
-                            };
-                            PopoutService.colorPickerModal.show();
-                        }
-                    }
                 }
             }
         }
@@ -805,28 +773,14 @@ Item {
                 }
             }
 
-            SettingsRow {
+            SettingsNoteRow {
                 visible: root.authValidateMessage !== ""
-                body: Rectangle {
-                    width: parent.width
-                    height: Math.min(160, authStatusText.implicitHeight + Theme.spacingM * 2)
-                    radius: Theme.cornerRadius
-                    color: Theme.floatingWindowFieldColor
-                    border.color: Theme.outlineMedium
-                    border.width: Theme.layerOutlineWidth
-
-                    StyledText {
-                        id: authStatusText
-                        anchors.fill: parent
-                        anchors.margins: Theme.spacingM
-                        text: root.authValidateMessage
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.family: "monospace"
-                        color: !root.authValidateOk ? Theme.error : (root.authValidateWarn ? Theme.warning : Theme.surfaceVariantText)
-                        wrapMode: Text.Wrap
-                        verticalAlignment: Text.AlignTop
-                    }
-                }
+                noteIconName: ""
+                monospace: true
+                maxHeight: SettingsMetrics.noteMaxHeight
+                text: root.authValidateMessage
+                tint: !root.authValidateOk ? Theme.error : (root.authValidateWarn ? Theme.warning : Theme.surfaceVariantText)
+                tintBackground: SettingsMetrics.controlColor
             }
 
             SettingsDropdownRow {
@@ -873,28 +827,14 @@ Item {
                 }
             }
 
-            SettingsRow {
+            SettingsNoteRow {
                 visible: !root.lockU2fControlledByPrimary && root.u2fValidateMessage !== ""
-                body: Rectangle {
-                    width: parent.width
-                    height: Math.min(160, u2fStatusText.implicitHeight + Theme.spacingM * 2)
-                    radius: Theme.cornerRadius
-                    color: Theme.floatingWindowFieldColor
-                    border.color: Theme.outlineMedium
-                    border.width: Theme.layerOutlineWidth
-
-                    StyledText {
-                        id: u2fStatusText
-                        anchors.fill: parent
-                        anchors.margins: Theme.spacingM
-                        text: root.u2fValidateMessage
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.family: "monospace"
-                        color: !root.u2fValidateOk ? Theme.error : (root.u2fValidateWarn ? Theme.warning : Theme.surfaceVariantText)
-                        wrapMode: Text.Wrap
-                        verticalAlignment: Text.AlignTop
-                    }
-                }
+                noteIconName: ""
+                monospace: true
+                maxHeight: SettingsMetrics.noteMaxHeight
+                text: root.u2fValidateMessage
+                tint: !root.u2fValidateOk ? Theme.error : (root.u2fValidateWarn ? Theme.warning : Theme.surfaceVariantText)
+                tintBackground: SettingsMetrics.controlColor
             }
 
             SettingsRow {
@@ -920,6 +860,28 @@ Item {
                         return;
                     SettingsData.set("loginctlLockIntegration", checked);
                 }
+            }
+        }
+
+        SettingsFabBar {
+            DankFab {
+                text: I18n.tr("Browse plugins")
+                iconName: "store"
+                colorRole: "secondaryContainer"
+                onClicked: root.showPluginBrowser()
+            }
+
+            DankFab {
+                text: I18n.tr("Edit widgets")
+                iconName: "edit"
+                colorRole: "secondaryContainer"
+                onClicked: SessionService.lockEditorRequested()
+            }
+
+            DankFab {
+                text: I18n.tr("Add widget")
+                iconName: "add"
+                onClicked: root.showWidgetBrowser()
             }
         }
     }

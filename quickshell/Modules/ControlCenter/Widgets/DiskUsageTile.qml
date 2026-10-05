@@ -31,9 +31,15 @@ CcTile {
             return I18n.tr("No disk data available");
         return `${selectedMount.used} / ${selectedMount.size} (${usagePercent.toFixed(0)}%)`;
     }
+    dockedText: {
+        if (!selectedMount)
+            return title;
+        const percent = `${usagePercent.toFixed(0)}%`;
+        return showMountPath ? `${selectedMount.mount} · ${percent}` : percent;
+    }
     active: false
     opensPage: true
-    enabled: DgopService.dgopAvailable
+    available: DgopService.dgopAvailable
     tallContent: Component {
         Item {
             DankRingGauge {

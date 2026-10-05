@@ -37,6 +37,23 @@ Column {
             onToggled: checked => root.page.set("mediaAdaptiveWidthEnabled", checked)
         }
 
+        SettingsToggleRow {
+            resetStore: root.page
+            resetKeys: ["mediaShowLyrics"]
+            text: I18n.tr("Lyrics", "Media player lyrics button")
+            description: I18n.tr("Shows the line being sung instead of the title and artist while synced lyrics are available", "media widget lyrics toggle description")
+            checked: root.page.value("mediaShowLyrics")
+            onToggled: checked => root.page.set("mediaShowLyrics", checked)
+        }
+
+        SettingsToggleRow {
+            resetStore: root.page
+            resetKeys: ["mediaShowCoverArt"]
+            text: I18n.tr("Cover art", "media widget option showing the album cover in the pill")
+            checked: root.page.value("mediaShowCoverArt")
+            onToggled: checked => root.page.set("mediaShowCoverArt", checked)
+        }
+
         SettingsDropdownRow {
             resetStore: root.page
             resetKeys: ["audioScrollMode"]
@@ -57,7 +74,7 @@ Column {
             iconName: "music_note"
             title: I18n.tr("Media player")
             hint: I18n.tr("Visualizer, album art, excluded players")
-            onClicked: root.page.parentModal?.navigateTo("media_player")
+            onClicked: keyboard => root.page.parentModal?.navigateTo("media_player", keyboard)
         }
     }
 }

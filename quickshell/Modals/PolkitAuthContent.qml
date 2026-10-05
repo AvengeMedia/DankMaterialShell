@@ -156,9 +156,6 @@ DankDialog {
         isError: PolkitService.authFailed
         supportingText: isError ? I18n.tr("Authentication failed - try again") : ""
         leftIconName: root.polkitPamHasFprint ? "fingerprint" : "lock"
-        leftIconSize: Theme.iconSizeSmall
-        leftIconColor: Theme.primary
-        leftIconFocusedColor: Theme.primary
         font.pixelSize: Theme.fontSizeMedium
         textColor: Theme.surfaceText
         text: root.passwordInput

@@ -15,7 +15,7 @@ Item {
     property bool live: Window.window?.visible ?? false
     property bool editMode: false
     property bool weatherRefHeld: false
-    readonly property var options: DashRegistry.resolvedOptions(entryId)
+    property var transientSurfaceTracker: null
     readonly property bool available: WeatherService.weather.available
     readonly property var addable: widgets.addable
     readonly property Item focusTarget: available ? widgets.focusTarget : refreshButton
@@ -25,9 +25,28 @@ Item {
             iconName: "refresh",
             enabled: !WeatherService.weather.loading,
             action: () => WeatherService.forceRefresh()
+        },
+        {
+            label: I18n.tr("Settings"),
+            iconName: "settings",
+            action: () => {
+                PopoutService.closeDankDash();
+                PopoutService.openSettingsWithTab("weather");
+            }
         }
     ]
     readonly property bool blocksTabNavigation: widgets.blocksTabNavigation
+    readonly property var forecastOptions: [DashRegistry.choice("forecast", I18n.tr("Forecast", "weather widget option label for forecast display type"), "chart", [
+            {
+                "value": "chart",
+                "text": I18n.tr("Chart", "noun, weather forecast display option")
+            },
+            {
+                "value": "cards",
+                "text": I18n.tr("Cards", "noun, weather forecast display option")
+            }
+        ])]
+    readonly property var metricOptions: [DashRegistry.toggle("graphics", I18n.tr("Show graphics", "Dashboard widget option for decorative data graphics"), true), DashRegistry.toneOption()]
 
     implicitWidth: DashMetrics.contentWidthFor(SettingsData.showWeekNumber, DashMetrics.panelColumnsFor(entryId))
     implicitHeight: widgets.implicitHeight
@@ -69,6 +88,7 @@ Item {
         id: widgets
         anchors.fill: parent
         entryId: root.entryId
+        transientSurfaceTracker: root.transientSurfaceTracker
         live: root.live && root.available
         editMode: root.editMode
         visible: root.available || root.editMode
@@ -83,7 +103,8 @@ Item {
                 minW: 2,
                 minH: 2,
                 maxW: 4,
-                maxH: 3
+                maxH: 3,
+                options: [DashRegistry.toneOption("primary"), DashRegistry.toggle("city", I18n.tr("Show city"), false)]
             },
             {
                 id: "hourly",
@@ -95,7 +116,8 @@ Item {
                 minW: 2,
                 minH: 2,
                 maxW: 4,
-                maxH: 4
+                maxH: 4,
+                options: root.forecastOptions
             },
             {
                 id: "sun",
@@ -106,7 +128,8 @@ Item {
                 h: 2,
                 minH: 2,
                 maxW: 4,
-                maxH: 3
+                maxH: 3,
+                options: [DashRegistry.toneOption()]
             },
             {
                 id: "moon",
@@ -117,7 +140,8 @@ Item {
                 h: 2,
                 minH: 2,
                 maxW: 4,
-                maxH: 3
+                maxH: 3,
+                options: [DashRegistry.toneOption()]
             },
             {
                 id: "humidity",
@@ -129,8 +153,7 @@ Item {
                 minH: 2,
                 maxW: 2,
                 maxH: 3,
-                graphics: true,
-                enabled: root.options.readings !== false
+                options: root.metricOptions
             },
             {
                 id: "wind",
@@ -142,8 +165,7 @@ Item {
                 minH: 2,
                 maxW: 2,
                 maxH: 3,
-                graphics: true,
-                enabled: root.options.readings !== false
+                options: root.metricOptions
             },
             {
                 id: "daily",
@@ -156,6 +178,7 @@ Item {
                 minH: 2,
                 maxW: 4,
                 maxH: 4,
+                options: root.forecastOptions,
                 enabled: false
             },
             {
@@ -168,7 +191,7 @@ Item {
                 minH: 2,
                 maxW: 2,
                 maxH: 3,
-                graphics: true,
+                options: root.metricOptions,
                 enabled: false
             },
             {
@@ -181,7 +204,7 @@ Item {
                 minH: 2,
                 maxW: 2,
                 maxH: 3,
-                graphics: true,
+                options: root.metricOptions,
                 enabled: false
             },
             {
@@ -194,7 +217,7 @@ Item {
                 minH: 2,
                 maxW: 2,
                 maxH: 3,
-                graphics: true,
+                options: root.metricOptions,
                 enabled: false
             },
             {
@@ -207,7 +230,7 @@ Item {
                 minH: 2,
                 maxW: 2,
                 maxH: 3,
-                graphics: true,
+                options: root.metricOptions,
                 enabled: false
             }
         ]
@@ -216,7 +239,7 @@ Item {
     Component {
         id: conditions
         WeatherHero {
-            showCity: root.options.city === true
+            showCity: widgetOptions.city === true
             showSunTimes: true
         }
     }
@@ -229,7 +252,7 @@ Item {
     Component {
         id: hourly
         WeatherForecastWidget {
-            chartMode: root.options.forecast !== "cards"
+            chartMode: widgetOptions.forecast !== "cards"
         }
     }
 
@@ -237,7 +260,7 @@ Item {
         id: daily
         WeatherForecastWidget {
             daily: true
-            chartMode: root.options.forecast !== "cards"
+            chartMode: widgetOptions.forecast !== "cards"
         }
     }
 

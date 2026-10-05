@@ -166,8 +166,8 @@ Item {
                         id: springLane
                         width: motionPreview.laneWidth
                         height: parent.height
-                        radius: Theme.cornerRadiusL
-                        color: Theme.chipSurface
+                        radius: Theme.cornerRadiusM
+                        color: SettingsMetrics.controlColor
 
                         StyledText {
                             x: parent.width - width - Theme.spacingL
@@ -179,8 +179,9 @@ Item {
 
                             Behavior on opacity {
                                 NumberAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Theme.standardEasing
+                                    duration: Theme.expressiveDurations.expressiveFastEffects
+                                    easing.type: Easing.BezierSpline
+                                    easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
                                 }
                             }
                         }

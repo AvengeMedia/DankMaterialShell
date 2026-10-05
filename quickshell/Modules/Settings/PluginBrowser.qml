@@ -615,7 +615,7 @@ RegistryBrowserWindow {
             visible: root.operationMessage !== ""
             tone: "primary"
             pad: Theme.spacingM
-            color: root.operationFailed ? Theme.errorContainer : surfaceColor
+            color: root.operationFailed ? Theme.errorContainer : SettingsMetrics.rowColor
             Accessible.name: root.operationMessage
 
             RowLayout {
@@ -698,6 +698,7 @@ RegistryBrowserWindow {
                 DankDropdown {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Theme.buttonHeightS
+                    backgroundColor: SettingsMetrics.controlSurface
                     compactMode: true
                     dropdownWidth: Math.max(Theme.smallBreakpoint / 2, categoryFiltersRow.width - categoryFilterLabel.implicitWidth - Theme.spacingS * 3)
                     currentValue: root.categoryFilterLabelForKey(root.categoryFilter)
@@ -779,7 +780,7 @@ RegistryBrowserWindow {
                         horizontalPadding: 0
                         buttonHeight: Theme.buttonHeightXS
                         text: modelData
-                        backgroundColor: Theme.chipSurface
+                        backgroundColor: SettingsMetrics.controlSurface
                         textColor: Theme.onSurfaceVariant
                         onClicked: root.scrollToLetter(modelData)
                     }
@@ -839,14 +840,16 @@ RegistryBrowserWindow {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: I18n.tr("Retry", "retry failed action button")
                 iconName: "refresh"
-                backgroundColor: Theme.chipSurface
+                backgroundColor: SettingsMetrics.controlSurface
                 textColor: Theme.surfaceText
                 onClicked: root.refreshPlugins()
             }
         }
     ]
 
-    overlay: Rectangle {
+    overlayActive: detailPluginId !== ""
+
+    overlay: Item {
         id: detailPane
 
         property var plugin: ({})
@@ -859,23 +862,7 @@ RegistryBrowserWindow {
             plugin = livePlugin;
         }
 
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.topMargin: 0
-        anchors.bottom: parent.bottom
-        z: 10
-        color: Theme.floatingWindowSurface
-        opacity: root.detailPluginId !== "" ? 1 : 0
-        visible: opacity > 0
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveEffects
-                easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
-            }
-        }
+        anchors.fill: parent
 
         Connections {
             target: root
@@ -962,10 +949,10 @@ RegistryBrowserWindow {
                 spacing: Theme.spacingL
 
                 Rectangle {
-                    width: Math.min(SettingsMetrics.contentMaxWidth, parent.width)
+                    width: Math.min(SettingsMetrics.mediaMaxWidth, parent.width)
                     height: Math.round(width * SettingsMetrics.choiceCardPreviewRatio)
                     radius: Theme.cornerRadiusM
-                    color: Theme.floatingWindowNestedSurface
+                    color: SettingsMetrics.rowColor
                     border.color: Theme.outlineMedium
                     border.width: Theme.layerOutlineWidth
 

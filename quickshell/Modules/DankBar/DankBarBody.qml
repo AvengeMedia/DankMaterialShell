@@ -3,6 +3,7 @@ import Quickshell
 import qs.Common
 import qs.Modules.DankIsland
 import qs.Services
+import qs.Widgets
 
 Item {
     id: barWindow
@@ -22,6 +23,13 @@ Item {
     readonly property bool barRevealed: inputMask.showing
 
     readonly property bool isIsland: barConfig?.island === true
+    // Resolver-owned so the body, the frame and the dismiss window agree during the frame latch.
+    readonly property var layoutInstance: ShellLayout.forConfig(screen, _barId)
+    readonly property bool hostsIsland: isIsland || (layoutInstance?.hostsIsland ?? false)
+    readonly property string islandChromeMode: isIsland ? "own" : usesConnectedFrameChrome && frameHosted ? "none" : "band"
+    readonly property bool frameHosted: layoutInstance?.kind === "frame"
+    property real hostOffsetX: 0
+    property real hostOffsetY: 0
     // A free island's pill lives in IslandFreeHostWindow; this window only carries its satellites.
     readonly property bool islandFree: isIsland && SettingsData.islandFreePlacement(barConfig)
     readonly property var islandHost: islandLoader.item
@@ -41,6 +49,7 @@ Item {
         const palette = SettingsData.islandSetting(barConfig, "islandPalette");
         return palette === "bright" ? Theme.surfaceBright : palette === "dim" ? Theme.surfaceDim : _hostSurface;
     }
+    readonly property real islandSatelliteOpacity: isIsland ? SettingsData.islandSatelliteTransparency(barConfig) : 1
     readonly property real islandChromePad: isIsland ? Theme.snap((barConfig?.innerPadding ?? 4) + Theme.spacingXS, _dpr) : 0
     readonly property real islandChromeInset: islandSatelliteBackground ? islandChromePad : 0
     readonly property bool islandMotionRunning: islandHost?.motionRunning ?? false
@@ -51,8 +60,8 @@ Item {
         topBarContent.invalidateHoverCandidateCache();
     }
     readonly property bool islandBandInteractive: isIsland && !!islandHost && !islandHost.inputSuspended && ((islandHost.scrollEnabled && !islandHost.floating) || islandHost.satelliteSurfacesOpen)
-    readonly property real islandAlongStart: islandHost ? Math.round(islandHost.currentAlongPos) : 0
-    readonly property real islandAlongEnd: islandHost ? Math.round(islandHost.currentAlongPos + islandHost.currentVisualAlong) : 0
+    readonly property real islandAlongStart: islandSatellitesHugIsland && islandHost ? Math.round(islandHost.currentAlongPos) : 0
+    readonly property real islandAlongEnd: islandSatellitesHugIsland && islandHost ? Math.round(islandHost.currentAlongPos + islandHost.currentVisualAlong) : 0
     readonly property real islandFrozenStart: !islandHost ? 0 : Math.min(isVertical ? islandHost.motionStartBounds.y : islandHost.motionStartBounds.x, islandHost.targetAlongPos)
     readonly property real islandFrozenEnd: !islandHost ? 0 : Math.max((isVertical ? islandHost.motionStartBounds.y + islandHost.motionStartBounds.height : islandHost.motionStartBounds.x + islandHost.motionStartBounds.width), islandHost.targetAlongPos + islandHost.targetVisualAlong)
     readonly property real islandLeadingSpread: islandMotionRunning ? Math.max(0, islandAlongStart - islandFrozenStart) : 0
@@ -65,8 +74,19 @@ Item {
     readonly property real freeSatelliteStart: ((isVertical ? height : width) - leadingSectionSize - freeSatelliteSeparation - trailingSectionSize) / 2
     readonly property real islandLeadingOffset: !islandSatellitesHugIsland ? 0 : Math.max(0, islandFree ? freeSatelliteStart - contentAlongStart : islandAlongStart - islandSatelliteGap - islandChromeInset - leadingSectionSize - contentAlongStart)
     readonly property real islandTrailingOffset: !islandSatellitesHugIsland ? 0 : Math.max(0, contentAlongEnd - (islandFree ? freeSatelliteStart + leadingSectionSize + freeSatelliteSeparation + trailingSectionSize : islandAlongEnd + islandSatelliteGap + islandChromeInset + trailingSectionSize))
-    readonly property var leadingSectionRect: sectionRect(_leftSection, false, _revealProgress + islandLeadingOffset + islandTrailingOffset)
-    readonly property var trailingSectionRect: sectionRect(_rightSection, false, _revealProgress + islandLeadingOffset + islandTrailingOffset)
+    // The band moves inside the window when a far-edge bar grows for the sheet; mapToItem alone would not notice.
+    readonly property real _bandOrigin: topBarMouseArea.x + topBarMouseArea.y
+    // Section rects feed the input masks and the dismiss-window holes; nothing reads them while neither is live.
+    readonly property bool sectionRectsLive: clickThroughEnabled || islandSheetOut || (isIsland && !(islandHost?.inputSuspended ?? false))
+    readonly property var leadingSectionRect: sectionRectsLive ? sectionRect(_leftSection, false, _revealProgress + islandLeadingOffset + islandTrailingOffset + _bandOrigin) : null
+    readonly property var trailingSectionRect: sectionRectsLive ? sectionRect(_rightSection, false, _revealProgress + islandLeadingOffset + islandTrailingOffset + _bandOrigin) : null
+    readonly property var centerSectionRect: sectionRectsLive ? sectionRect(_centerSection, true, _revealProgress + _bandOrigin) : null
+    property Item islandSlot: null
+    readonly property bool configVisible: barConfig?.visible ?? true
+    onConfigVisibleChanged: {
+        if (!configVisible)
+            islandHost?.islandController.requestCollapse();
+    }
 
     function processScrollWheel(wheel) {
         scrollArea.processWheel(wheel);
@@ -194,7 +214,7 @@ Item {
         const explicit = position === "left" || position === "center" || position === "right";
         const section = explicit ? position : (clock?.section || "center");
         const sectionItem = dashSectionItem(section);
-        const anchorClock = clock && (!explicit && section !== "center" || !sectionItem);
+        const anchorClock = clock && (!explicit && (section !== "center" || (hostsIsland && SettingsData.islandWidgetSection(barConfig) === "center")) || !sectionItem);
         const item = anchorClock ? clock : sectionItem;
         if (!item || !topBarContent.surfaceContext.positionPopout(popout, item, section, anchorClock ? undefined : sectionItem))
             popout.triggerScreen = barWindow.screen;
@@ -313,6 +333,64 @@ Item {
     }
 
     Component {
+        id: blurSatelliteRegionComp
+
+        Region {
+            id: satelliteRegion
+
+            property Item surface
+
+            readonly property real sx: topBarMouseArea.x + barUnitInset.x + topBarSlide.x + surface.x
+            readonly property real sy: topBarMouseArea.y + barUnitInset.y + topBarSlide.y + surface.y
+            readonly property bool horizontal: !surface.isVertical
+            readonly property bool far: surface.crossFar
+            readonly property int startR: Math.round(surface.alongStartRadius)
+            readonly property int endR: Math.round(surface.alongEndRadius)
+
+            x: sx
+            y: sy
+            width: surface.width
+            height: surface.height
+            topLeftRadius: far ? startR : 0
+            topRightRadius: horizontal ? (far ? endR : 0) : (far ? 0 : startR)
+            bottomLeftRadius: horizontal ? (far ? 0 : startR) : (far ? endR : 0)
+            bottomRightRadius: far ? 0 : endR
+
+            Region {
+                x: satelliteRegion.sx + satelliteRegion.surface.startSweepRect.x
+                y: satelliteRegion.sy + satelliteRegion.surface.startSweepRect.y
+                width: satelliteRegion.surface.startSweepRect.width
+                height: satelliteRegion.surface.startSweepRect.height
+
+                Region {
+                    intersection: Intersection.Subtract
+                    shape: RegionShape.Ellipse
+                    x: satelliteRegion.sx + satelliteRegion.surface.startSweepDisc.x
+                    y: satelliteRegion.sy + satelliteRegion.surface.startSweepDisc.y
+                    width: satelliteRegion.surface.startSweepDisc.width
+                    height: satelliteRegion.surface.startSweepDisc.height
+                }
+            }
+
+            Region {
+                x: satelliteRegion.sx + satelliteRegion.surface.endSweepRect.x
+                y: satelliteRegion.sy + satelliteRegion.surface.endSweepRect.y
+                width: satelliteRegion.surface.endSweepRect.width
+                height: satelliteRegion.surface.endSweepRect.height
+
+                Region {
+                    intersection: Intersection.Subtract
+                    shape: RegionShape.Ellipse
+                    x: satelliteRegion.sx + satelliteRegion.surface.endSweepDisc.x
+                    y: satelliteRegion.sy + satelliteRegion.surface.endSweepDisc.y
+                    width: satelliteRegion.surface.endSweepDisc.width
+                    height: satelliteRegion.surface.endSweepDisc.height
+                }
+            }
+        }
+    }
+
+    Component {
         id: blurCornerRegionComp
 
         // The surface paints square corners at the attached edge and the wing roots (#2975); re-add what the body radius rounds off
@@ -340,7 +418,8 @@ Item {
         visible: false
 
         readonly property bool barHasTransparency: !barWindow.isIsland && barWindow._backgroundAlpha > 0 && barWindow._backgroundAlpha < 1
-        readonly property bool islandTranslucent: barWindow.isIsland && !!barWindow.islandHost && barWindow.islandHost.surfaceOpacity > 0 && barWindow.islandHost.surfaceOpacity < 1
+        readonly property bool islandTranslucent: !!barWindow.islandHost && barWindow.islandHost.surfaceOpacity > 0 && barWindow.islandHost.surfaceOpacity < 1
+        readonly property bool satelliteTranslucent: barWindow.islandSatelliteBackground && barWindow.islandSatellitesEnabled && barWindow.islandSatelliteOpacity > 0 && barWindow.islandSatelliteOpacity < 1
 
         function rebuild() {
             teardown();
@@ -354,7 +433,7 @@ Item {
 
             const widgets = barWindow._blurWidgetItems.filter(w => w && w.visible && w.width > 0 && w.height > 0);
             const hasBar = barHasTransparency;
-            if (!hasBar && widgets.length === 0 && !islandTranslucent)
+            if (!hasBar && widgets.length === 0 && !islandTranslucent && !satelliteTranslucent)
                 return;
 
             const region = blurRegionComp.createObject(barWindow);
@@ -376,6 +455,15 @@ Item {
                 const islandSub = blurIslandRegionComp.createObject(region);
                 if (islandSub)
                     subRegions.push(islandSub);
+            }
+            if (satelliteTranslucent) {
+                for (const surface of [leadingSatelliteSurface, trailingSatelliteSurface]) {
+                    const sub = blurSatelliteRegionComp.createObject(region, {
+                        surface: surface
+                    });
+                    if (sub)
+                        subRegions.push(sub);
+                }
             }
             for (let i = 0; i < widgets.length; i++) {
                 const sub = blurSubRegionComp.createObject(region, {
@@ -425,6 +513,7 @@ Item {
 
         onBarHasTransparencyChanged: _blurRebuildTimer.restart()
         onIslandTranslucentChanged: _blurRebuildTimer.restart()
+        onSatelliteTranslucentChanged: _blurRebuildTimer.restart()
 
         readonly property bool blurServiceEnabled: BlurService.enabled
         readonly property bool frameEffectiveEnabled: FrameTransitionState.effectiveFrameEnabled
@@ -581,7 +670,9 @@ Item {
     readonly property real taskbarEndInset: SettingsData.taskbarInsetForEdge(screen, isVertical ? "bottom" : "right")
 
     readonly property real barSurfaceThickness: Theme.px(effectiveBarThickness + surfaceSpacing + ((renderBarConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel && spansEdge ? _wingR : 0), _dpr) + _shadowBuffer
-    readonly property real hostThickness: isIsland ? (islandHost?.hostThickness ?? islandStripThickness) : barSurfaceThickness
+    readonly property bool islandSheetOut: islandHost?.sheetOut ?? false
+    readonly property real hostThickness: isIsland ? (islandHost?.hostThickness ?? islandStripThickness) : Math.max(barSurfaceThickness, islandSheetOut ? islandHost.hostThickness : 0)
+    readonly property real hideSlideThickness: isIsland ? hostThickness : barSurfaceThickness
     readonly property real surfaceImplicitHeight: !isVertical ? hostThickness : 0
     readonly property real surfaceImplicitWidth: isVertical ? hostThickness : 0
 
@@ -660,7 +751,7 @@ Item {
 
         readonly property int barThickness: Theme.px(barWindow.isIsland ? barWindow.islandStripThickness : barWindow.effectiveBarThickness + barWindow.surfaceSpacing, barWindow._dpr)
         readonly property bool inOverviewWithShow: CompositorService.overviewActiveOnScreen(barWindow.screenName) && barWindow.effectiveOpenOnOverview
-        readonly property bool effectiveVisible: (barConfig?.visible ?? true) || inOverviewWithShow
+        readonly property bool effectiveVisible: (barConfig?.visible ?? true) || inOverviewWithShow || topBarCore.islandPinsReveal
         readonly property bool showing: effectiveVisible && (topBarCore.reveal || inOverviewWithShow)
 
         readonly property int maskThickness: showing ? barThickness : 1
@@ -710,6 +801,11 @@ Item {
             return false;
         const topLeft = topBarContent.surfaceContext.screenPoint(inputMask, 0, 0);
         return gx >= topLeft.x - pad && gx < topLeft.x + inputMask.width + pad && gy >= topLeft.y - pad && gy < topLeft.y + inputMask.height + pad;
+    }
+
+    // On-demand read for fixtures; the bound rects are null while nothing consumes them.
+    function sectionRectFor(sectionId) {
+        return sectionId === "center" ? sectionRect(_centerSection, true, 0) : sectionRect(sectionId === "left" ? _leftSection : _rightSection, false, 0);
     }
 
     function sectionRect(section, isCenter, _dep) {
@@ -806,7 +902,7 @@ Item {
             interval: barConfig?.autoHideDelay ?? 250
             repeat: false
             onTriggered: {
-                if (!topBarCore.hoverReveal && !topBarCore.popoutPinsReveal)
+                if (!topBarCore.hoverReveal && !topBarCore.popoutPinsReveal && !topBarCore.islandPinsReveal)
                     topBarCore.revealSticky = false;
             }
         }
@@ -814,10 +910,13 @@ Item {
         property bool hasActivePopout: false
 
         readonly property bool popoutPinsReveal: !!(hasActivePopout && !(barConfig?.autoHideStrict ?? false))
+        readonly property bool islandPinsReveal: !!barWindow.islandHost && (barWindow.islandHost.sheetOut || barWindow.islandHost.transientActive)
 
         onHasActivePopoutChanged: evaluateReveal()
 
         onPopoutPinsRevealChanged: evaluateReveal()
+
+        onIslandPinsRevealChanged: evaluateReveal()
 
         function updateActivePopoutState() {
             if (!barWindow.screen)
@@ -856,14 +955,14 @@ Item {
             const showOnWindowsSetting = barConfig?.showOnWindowsOpen ?? false;
             if (showOnWindowsSetting && autoHide && CompositorService.windowOverlapSupported) {
                 if (barWindow.shouldHideForWindows)
-                    return hoverReveal || popoutPinsReveal || revealSticky || ipcReveal;
+                    return hoverReveal || popoutPinsReveal || islandPinsReveal || revealSticky || ipcReveal;
                 return true;
             }
 
             if (CompositorService.overviewActiveOnScreen(barWindow.screenName))
-                return hoverReveal || popoutPinsReveal || revealSticky || ipcReveal;
+                return hoverReveal || popoutPinsReveal || islandPinsReveal || revealSticky || ipcReveal;
 
-            return (barConfig?.visible ?? true) && (!autoHide || hoverReveal || popoutPinsReveal || revealSticky || ipcReveal);
+            return ((barConfig?.visible ?? true) || islandPinsReveal) && (!autoHide || hoverReveal || popoutPinsReveal || islandPinsReveal || revealSticky || ipcReveal);
         }
 
         readonly property var rootWindowBarConfig: rootWindow.barConfig
@@ -886,7 +985,7 @@ Item {
                 return;
             }
 
-            if (popoutPinsReveal) {
+            if (popoutPinsReveal || islandPinsReveal) {
                 revealSticky = true;
                 revealHold.stop();
                 return;
@@ -933,8 +1032,8 @@ Item {
 
                 transform: Translate {
                     id: topBarSlide
-                    x: barWindow.isVertical ? Theme.snap(topBarCore.reveal ? 0 : (barPos === SettingsData.Position.Right ? barWindow.surfaceImplicitWidth : -barWindow.surfaceImplicitWidth), barWindow._dpr) : 0
-                    y: !barWindow.isVertical ? Theme.snap(topBarCore.reveal ? 0 : (barPos === SettingsData.Position.Bottom ? barWindow.surfaceImplicitHeight : -barWindow.surfaceImplicitHeight), barWindow._dpr) : 0
+                    x: barWindow.isVertical ? Theme.snap(topBarCore.reveal ? 0 : (barPos === SettingsData.Position.Right ? barWindow.hideSlideThickness : -barWindow.hideSlideThickness), barWindow._dpr) : 0
+                    y: !barWindow.isVertical ? Theme.snap(topBarCore.reveal ? 0 : (barPos === SettingsData.Position.Bottom ? barWindow.hideSlideThickness : -barWindow.hideSlideThickness), barWindow._dpr) : 0
                     onXChanged: barWindow.refreshBlurRegion()
                     onYChanged: barWindow.refreshBlurRegion()
 
@@ -984,6 +1083,7 @@ Item {
                     }
 
                     SectionSurface {
+                        id: leadingSatelliteSurface
                         visible: barWindow.islandSatelliteBackground && barWindow.islandSatellitesEnabled && alongSize > 0
                         alongPos: barWindow.isVertical ? topBarContent.y + (barWindow._leftSection?.y ?? 0) : topBarContent.x + (barWindow._leftSection?.x ?? 0)
                         alongSize: barWindow.leadingSectionSize
@@ -995,10 +1095,11 @@ Item {
                         pad: barWindow.islandChromePad
                         sweep: barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteSwoopRadius") : 0
                         gothEnabled: barWindow.isIsland && SettingsData.islandSetting(barConfig, "islandSatelliteGothCorners")
-                        fillColor: Theme.withAlpha(barWindow.islandSurfaceColor, barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteTransparency") : 1)
+                        fillColor: Theme.withAlpha(barWindow.islandSurfaceColor, barWindow.islandSatelliteOpacity)
                     }
 
                     SectionSurface {
+                        id: trailingSatelliteSurface
                         visible: barWindow.islandSatelliteBackground && barWindow.islandSatellitesEnabled && alongSize > 0
                         trailing: true
                         alongPos: barWindow.isVertical ? topBarContent.y + (barWindow._rightSection?.y ?? 0) : topBarContent.x + (barWindow._rightSection?.x ?? 0)
@@ -1011,7 +1112,7 @@ Item {
                         pad: barWindow.islandChromePad
                         sweep: barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteSwoopRadius") : 0
                         gothEnabled: barWindow.isIsland && SettingsData.islandSetting(barConfig, "islandSatelliteGothCorners")
-                        fillColor: Theme.withAlpha(barWindow.islandSurfaceColor, barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteTransparency") : 1)
+                        fillColor: Theme.withAlpha(barWindow.islandSurfaceColor, barWindow.islandSatelliteOpacity)
                     }
 
                     MouseArea {
@@ -1076,7 +1177,11 @@ Item {
                 Loader {
                     id: islandLoader
                     anchors.fill: parent
-                    active: barWindow.isIsland && !barWindow.islandFree
+                    active: barWindow.hostsIsland && !barWindow.islandFree
+
+                    // Band-sized and empty until the island loads; Qt's pointer-clip cache is already set by then.
+                    PointerOverflowMarker {}
+
                     sourceComponent: IslandBarHost {
                         barConfig: barWindow.barConfig
                         screen: barWindow.screen
@@ -1084,6 +1189,20 @@ Item {
                         barId: barWindow._barId
                         originOffsetX: topBarMouseArea.x + islandLoader.x
                         originOffsetY: topBarMouseArea.y + islandLoader.y
+                        hostOffsetX: barWindow.hostOffsetX
+                        hostOffsetY: barWindow.hostOffsetY
+                        chrome: barWindow.islandChromeMode
+                        frameHosted: barWindow.frameHosted
+                        anchorItem: topBarContainer
+                        slotItem: barWindow.islandSlot
+                        barBody: barWindow
+                        bandThickness: barWindow.isVertical ? topBarMouseArea.width : topBarMouseArea.height
+                        bandAlongStart: barWindow.isVertical ? barUnitInset.y : barUnitInset.x
+                        bandAlongEnd: barWindow.isVertical ? barUnitInset.y + barUnitInset.height : barUnitInset.x + barUnitInset.width
+                        bandColor: barWindow._bgColor
+                        leadingSectionRect: barWindow.leadingSectionRect
+                        centerSectionRect: barWindow.centerSectionRect
+                        trailingSectionRect: barWindow.trailingSectionRect
                         onScrollWheel: wheel => scrollArea.processWheel(wheel)
                     }
                 }

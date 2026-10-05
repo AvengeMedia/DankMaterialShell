@@ -161,9 +161,7 @@ Item {
         pendingSaveContent = content;
         saveFileView.path = filePath;
 
-        Qt.callLater(() => {
-            saveFileView.setText(pendingSaveContent);
-        });
+        saveFileView.setText(content);
     }
 
     function saveExternalWithFreshnessCheck() {

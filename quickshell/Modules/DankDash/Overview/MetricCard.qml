@@ -86,17 +86,14 @@ Card {
         anchors.left: root.wide ? valueText.right : parent.left
         anchors.leftMargin: root.wide ? Theme.spacingM : -root.pad
         anchors.right: parent.right
-        anchors.rightMargin: -root.pad
-        anchors.top: root.wide ? undefined : (narrowBadge.visible ? narrowBadge.bottom : header.bottom)
-        anchors.topMargin: Theme.spacingS
-        anchors.bottom: root.wide ? parent.bottom : valueText.top
-        anchors.bottomMargin: root.wide ? -root.pad : Theme.spacingXS
-        height: root.height * DashMetrics.tileTrendRatio
+        anchors.rightMargin: root.wide ? 0 : -root.pad
+        y: root.wide ? parent.height + root.pad - height : (narrowBadge.visible ? narrowBadge.y + narrowBadge.height : header.height) + Theme.spacingS
+        height: root.wide ? root.height * DashMetrics.tileTrendRatio : Math.max(0, valueText.y - Theme.spacingXS - y)
         visible: root.trendVisible
         values: root.trend
         secondaryValues: root.secondaryTrend
         maximum: root.trendMaximum
-        historyLength: DashMetrics.historyLength
+        insetBottom: root.wide ? root.pad : lineWidth
         lineColor: root.accentColor
         secondaryLineColor: root.tinted ? root.mutedColor : Theme.tertiary
         lineWidth: Theme.outlineWidthFocused

@@ -6,6 +6,8 @@ import qs.Widgets
 DankOSD {
     id: root
 
+    osdKind: "capsLock"
+
     osdWidth: Theme.osdHeight
     osdHeight: Theme.osdHeight
     autoHideInterval: 2000

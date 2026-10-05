@@ -182,18 +182,17 @@ func (p *NiriRulesParser) handleInclude(node *document.Node, baseDir string) {
 	}
 
 	includePath := strings.Trim(node.Arguments[0].String(), "\"")
-	isDMSInclude := includePath == "dms/windowrules.kdl" || strings.HasSuffix(includePath, "/dms/windowrules.kdl")
+	fullPath := filepath.Join(baseDir, includePath)
+	if filepath.IsAbs(includePath) {
+		fullPath = includePath
+	}
+	isDMSInclude := strings.HasSuffix(fullPath, "/dms/windowrules.kdl")
 
 	p.includeCount++
 	if isDMSInclude {
 		p.dmsRulesIncluded = true
 		p.dmsIncludePos = p.includeCount
 		p.dmsProcessed = true
-	}
-
-	fullPath := filepath.Join(baseDir, includePath)
-	if filepath.IsAbs(includePath) {
-		fullPath = includePath
 	}
 
 	_ = p.parseFile(fullPath)

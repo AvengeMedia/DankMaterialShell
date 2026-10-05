@@ -73,8 +73,8 @@ Item {
 
         SettingsFabBar {
             DankFab {
+                text: I18n.tr("Add substitution", "running apps settings button, adds an app name or icon substitution")
                 iconName: "add"
-                Accessible.name: I18n.tr("Add")
                 onClicked: SettingsData.addAppIdSubstitution("", "", "exact")
             }
         }

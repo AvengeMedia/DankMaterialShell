@@ -263,9 +263,10 @@ FocusScope {
     readonly property rect surfaceBounds: Qt.rect(_dockWindowOriginX() + dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x + dockSlide.x, _dockWindowOriginY() + dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y + dockSlide.y, dockBackground.width, dockBackground.height)
 
     function _syncDockChromeState() {
-        if (dockLease.dockId !== dock.config.id) {
+        const currentDockId = dock.config?.id ?? "";
+        if (dockLease.dockId !== currentDockId) {
             dockLease.release();
-            dockLease.dockId = dock.config.id;
+            dockLease.dockId = currentDockId;
         }
         const presented = dock.geometryReady && (hostWindow?.visible ?? true) && (dock.reveal || slideXSpring.running || slideYSpring.running) && dock.hasApps;
         const phase = !presented ? "hidden" : ((!dock.reveal && (slideXSpring.running || slideYSpring.running)) ? "closing" : ((slideXSpring.running || slideYSpring.running) ? "opening" : "open"));
@@ -311,7 +312,7 @@ FocusScope {
 
     ConnectedSurfaceLease {
         id: dockLease
-        property string dockId: ""
+        property string dockId: dock.config?.id ?? ""
         property bool superseded: false
         claimPrefix: "dock"
         slot: ConnectedModeState.surfaceSlot("dock", dockId)
@@ -767,11 +768,12 @@ FocusScope {
                     x: !dock.isVertical ? Math.round((parent.width - width + dock.primaryStartInset - dock.primaryEndInset) / 2) : (dock.config.position === SettingsData.Position.Right ? parent.width - width - dockGeometry.bodyEdgeMargin : dockGeometry.bodyEdgeMargin)
                     y: dock.isVertical ? Math.round((parent.height - height + dock.primaryStartInset - dock.primaryEndInset) / 2) : (dock.config.position === SettingsData.Position.Bottom ? parent.height - height - dockGeometry.bodyEdgeMargin : dockGeometry.bodyEdgeMargin)
 
-                    readonly property real targetPrimary: dock.config.mode === "taskbar" ? dock.availablePrimary : Math.min(widgetStrip.preferredLength + dock.config.spacing * 2, dock.availablePrimary)
+                    readonly property real targetPrimary: dock.config.mode === "taskbar" ? dock.availablePrimary : Math.min(widgetStrip.restLength + dock.config.spacing * 2, dock.availablePrimary)
                     readonly property real targetWidth: dock.isVertical ? dock.effectiveBarThickness + dock.expansionExtent : targetPrimary
                     readonly property real targetHeight: dock.isVertical ? targetPrimary : dock.effectiveBarThickness + dock.expansionExtent
-                    implicitWidth: surfaceMotion.currentWidth
-                    implicitHeight: surfaceMotion.currentHeight
+                    // Magnification expansion bypasses the spring so icons and background stay in sync
+                    implicitWidth: surfaceMotion.currentWidth + (dock.isVertical ? 0 : widgetStrip.totalMagnificationExpansion)
+                    implicitHeight: surfaceMotion.currentHeight + (dock.isVertical ? widgetStrip.totalMagnificationExpansion : 0)
                     width: implicitWidth
                     height: implicitHeight
 
@@ -859,6 +861,7 @@ FocusScope {
                             isInOverflow: false
                         }) : item), dock.config.order)
                     availableSize: dock.isVertical ? height : width
+                    expansionLimit: Math.max(0, dock.availablePrimary - widgetStrip.restLength - dock.config.spacing * 2)
                     fillAvailable: dock.config.mode === "taskbar"
                     align: dock.config.mode === "taskbar" ? dock.config.taskbarAlign : "start"
                     onReorderRequested: (from, to) => dock.reorderUnits(from, to)
@@ -908,7 +911,7 @@ FocusScope {
                     text: variant.name,
                     icon: variant.icon
                 }));
-        return BarWidgetCatalog.widgets.concat(plugins).filter(widget => widget.id !== "appsDock" || !hasApps);
+        return BarWidgetCatalog.widgets.concat(plugins).filter(widget => !widget.barOnly && (widget.id !== "appsDock" || !hasApps));
     }
 
     MouseArea {

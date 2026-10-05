@@ -10,7 +10,6 @@ Column {
     id: root
 
     property var parentModal: null
-    property string confirmingRemoveId: ""
     property string editingBarId: ""
     property string renameDraft: ""
     readonly property bool dotEnabled: SettingsData.dotBarConfig?.enabled ?? false
@@ -19,10 +18,7 @@ Column {
     BarSelectionState {
         id: bar
 
-        onSelectedBarIdChanged: {
-            root.editingBarId = "";
-            root.confirmingRemoveId = "";
-        }
+        onSelectedBarIdChanged: root.editingBarId = ""
     }
 
     function finishRename(value) {
@@ -55,6 +51,7 @@ Column {
         });
         delete newBar.island;
         delete newBar.dot;
+        SettingsData.stripIslandWidget(newBar);
         SettingsData.addBarConfig(newBar);
         bar.select(newId);
     }
@@ -64,11 +61,6 @@ Column {
     }
 
     function deleteBar(barId) {
-        if (confirmingRemoveId !== barId) {
-            confirmingRemoveId = barId;
-            return;
-        }
-        confirmingRemoveId = "";
         SettingsData.deleteBarConfig(barId);
         bar.select("default");
     }
@@ -94,7 +86,7 @@ Column {
             parts.push(I18n.tr("All displays"));
         else
             parts.push(prefs.length === 1 ? I18n.tr("%1 display", "singular, bar summary of assigned monitors, %1 is 1").arg(prefs.length) : I18n.tr("%1 displays", "plural, bar summary of assigned monitors, %1 is a count").arg(prefs.length));
-        if (SettingsData.isIslandBarConfig(config))
+        if (SettingsData.hostsIsland(config))
             parts.push(I18n.tr("Island"));
         return parts.join(" • ");
     }
@@ -127,7 +119,6 @@ Column {
                 checked: modelData.enabled ?? false
                 toggleVisible: root.canToggleBar(modelData)
                 deletable: root.canDeleteBar(modelData)
-                confirmingDelete: root.confirmingRemoveId === modelData.id
                 onClicked: bar.select(modelData.id)
                 onToggled: checked => {
                     bar.select(modelData.id);
@@ -204,46 +195,21 @@ Column {
                 iconName: modelData.icon
                 title: modelData.text
                 hint: modelData.hint ?? ""
-                onClicked: root.parentModal?.navigateTo(modelData.id)
+                onClicked: keyboard => root.parentModal?.navigateTo(modelData.id, keyboard)
             }
         }
     }
 
-    SettingsRow {
-        id: dotRow
-
+    SettingsSplitRow {
         settingKey: "dotEnabled"
         tags: ["dot", "dankdot", "companion", "floating", "island", "enable"]
         iconName: "blur_on"
         iconColor: root.dotEnabled ? Theme.primary : Theme.onSurfaceVariant
         title: I18n.tr("Dot", "bar layout: free-floating dot that opens island activities")
         subtitle: I18n.tr("A floating companion that works alongside any bar layout", "bar settings: what the dot is")
-        clickable: root.dotEnabled
-        onClicked: root.parentModal?.navigateTo("dankbar_dot")
-
-        DankIcon {
-            name: "chevron_right"
-            size: Theme.iconSize
-            color: Theme.onSurfaceVariant
-            rotation: I18n.isRtl ? 180 : 0
-            visible: root.dotEnabled
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
-        Rectangle {
-            width: Theme.dividerWidth
-            height: SettingsMetrics.splitDividerHeight
-            color: Theme.outlineVariant
-            visible: root.dotEnabled
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
-        DankToggle {
-            hideText: true
-            text: dotRow.title
-            checked: root.dotEnabled
-            anchors.verticalCenter: parent.verticalCenter
-            onToggled: value => SettingsData.setDotEnabled(value, bar.selectedBarId)
-        }
+        navigable: root.dotEnabled
+        checked: root.dotEnabled
+        onNavigated: keyboard => root.parentModal?.navigateTo("dankbar_dot", keyboard)
+        onToggled: value => SettingsData.setDotEnabled(value, bar.selectedBarId)
     }
 }

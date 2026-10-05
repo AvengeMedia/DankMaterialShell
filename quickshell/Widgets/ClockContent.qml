@@ -7,6 +7,7 @@ Item {
     id: root
 
     property bool vertical: false
+    property bool live: visible && enabled
     property string displayMode: "both"
     property bool dateFirst: false
     property real fontSize: Theme.fontSizeMedium
@@ -137,6 +138,7 @@ Item {
 
     SystemClock {
         id: systemClock
+        enabled: root.live
         precision: SettingsData.showSeconds ? SystemClock.Seconds : SystemClock.Minutes
     }
 
@@ -144,7 +146,7 @@ Item {
         target: SessionService
         function onSessionResumed() {
             systemClock.enabled = false;
-            systemClock.enabled = true;
+            systemClock.enabled = Qt.binding(() => root.live);
         }
     }
 }

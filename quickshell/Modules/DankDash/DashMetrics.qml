@@ -18,9 +18,15 @@ Singleton {
     readonly property real popoutWidthWide: popoutWidth + weekColumnWidth + Theme.spacingS
     readonly property real contentPadding: Theme.spacingM
     readonly property real contentGap: Theme.spacingM
-    readonly property real islandHeaderHeight: Theme.minimumTouchTargetSize
-    readonly property real islandHeaderInset: Theme.spacingXS
-    readonly property real islandChromeHeight: islandHeaderHeight + islandHeaderInset * 2 + contentPadding
+    readonly property real editHeaderHeight: Theme.minimumTouchTargetSize
+    readonly property real islandHandleHeight: Theme.spacingXL
+    readonly property real islandHandleChromeHeight: islandHandleHeight + contentPadding
+    readonly property real islandEditHeaderInset: PopoutMetrics.panelChromeInset + contentPadding
+    readonly property real islandEditBottomInset: PopoutMetrics.panelChromeInset + PopoutMetrics.editOverflow
+    // Card pills overhang their card by half their height and must stay inside the pages clip.
+    readonly property real islandPillOverhang: PopoutMetrics.chromeButtonSize / 2
+    readonly property real islandEditChromeHeight: islandEditHeaderInset + editHeaderHeight + contentPadding + islandPillOverhang + islandEditBottomInset
+    readonly property real islandEditRoom: islandEditChromeHeight - islandHandleChromeHeight
     readonly property real spinnerSize: Theme.iconButtonSize
     readonly property real triggerWidth: CcMetrics.triggerWidth
     readonly property int transitionDuration: CcMetrics.transitionDuration
@@ -140,12 +146,7 @@ Singleton {
 
     readonly property real avatarSize: Theme.buttonHeightM
     readonly property real avatarSizeHero: 72
-    readonly property real userBadgeSize: 26
-    readonly property real userBadgeOverhang: 0.2
-    readonly property real userBadgeIconSize: Theme.iconSizeSmall
-    readonly property real userChipHeight: 28
 
-    readonly property int historyLength: 60
     readonly property real tileTrendRatio: 0.45
     readonly property real tileTrendFillAlpha: 0.1
     readonly property real tileValueSizeCompact: Math.round((Theme.fontSizeXXLarge + Theme.fontSizeXLarge) / 2)
@@ -189,7 +190,6 @@ Singleton {
     readonly property real eventActionIconSize: Theme.iconSizeSmall
     readonly property real taskInputHeight: Theme.buttonHeightS
     readonly property real sheetWidth: 400
-    readonly property real sheetFormHeight: 300
 
     readonly property real mediaCardMargin: Theme.spacingL
     readonly property real mediaArtSize: 150
@@ -214,6 +214,9 @@ Singleton {
     readonly property int mediaLyricsRequestTimeout: 16000
     readonly property int mediaLyricsLoadingDelay: 300
     readonly property real mediaLyricsPositionTolerance: 0.05
+    readonly property int mediaLyricsPositionProbeInterval: 5000
+    readonly property real mediaLyricsPositionProbeDrift: 1.5
+    readonly property real mediaLyricsPositionProbeThreshold: 1
     readonly property real lyricsNearOpacity: 0.55
     readonly property real lyricsFarOpacity: 0.3
     readonly property real lyricsLineHeight: 1.25

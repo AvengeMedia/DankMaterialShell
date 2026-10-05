@@ -3,8 +3,13 @@ package configfrag
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
+
+func isDMSBindsConf(path string) bool {
+	return strings.HasSuffix(path, "/dms/binds.conf")
+}
 
 func writeFile(t *testing.T, path, content string) {
 	t.Helper()
@@ -76,7 +81,7 @@ func TestATildeSourceExpandsToHomeAndIsNotJoinedToTheBaseDir(t *testing.T) {
 
 func TestTheDMSFragmentPositionIsItsOrdinalAmongIncludes(t *testing.T) {
 	dir := t.TempDir()
-	walker, _, record := recordingWalker(t, func(path string) bool { return path == "dms/binds.conf" })
+	walker, _, record := recordingWalker(t, isDMSBindsConf)
 
 	walker.Include(dir, "first.conf", record)
 	walker.Include(dir, "dms/binds.conf", record)
@@ -154,7 +159,7 @@ func TestAnAssignmentWithoutAnEqualsIsNotAnInclude(t *testing.T) {
 
 func TestAnAssignmentTrimsSpaceAroundThePath(t *testing.T) {
 	dir := t.TempDir()
-	walker, visited, record := recordingWalker(t, func(path string) bool { return path == "dms/binds.conf" })
+	walker, visited, record := recordingWalker(t, isDMSBindsConf)
 
 	if !walker.IncludeAssignment(dir, "source =  dms/binds.conf  ", record) {
 		t.Error("the spaced mango form must still match the dms fragment")
@@ -190,5 +195,17 @@ func TestRecordCountsAnIncludeTheCallerResolvesItself(t *testing.T) {
 	scan := walker.Scan()
 	if scan.Count != 2 || scan.DMSPosition != 2 || !scan.DMSSeen {
 		t.Errorf("scan = %+v, want count 2, position 2, seen", scan)
+	}
+}
+
+func TestTheMatcherSeesTheSourceResolvedAgainstTheIncludingFile(t *testing.T) {
+	dir := t.TempDir()
+	walker, _, record := recordingWalker(t, isDMSBindsConf)
+
+	if !walker.Include(filepath.Join(dir, "dms"), "binds.conf", record) {
+		t.Error("binds.conf sourced from inside dms/ must match the dms fragment")
+	}
+	if walker.Include(dir, "binds.conf", record) {
+		t.Error("binds.conf sourced from the config root must not match")
 	}
 }

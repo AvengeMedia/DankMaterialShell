@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell.Services.Mpris
+import Quickshell.Widgets
 import qs.Common
 import qs.Modules.DankBar
 import qs.Modules.Plugins
@@ -26,6 +27,24 @@ BasePill {
     property bool compactMode: false
     property var widgetData: null
     readonly property bool adaptiveWidthEnabled: SettingsData.widgetOption("music", widgetData, "mediaAdaptiveWidthEnabled")
+    readonly property bool lyricsEnabled: SettingsData.widgetOption("music", widgetData, "mediaShowLyrics") && LyricsService.allowed
+    readonly property bool coverArtEnabled: SettingsData.widgetOption("music", widgetData, "mediaShowCoverArt")
+    readonly property string coverArtUrl: coverArtEnabled && activePlayer && TrackArtService.artReadyFor(activePlayer) ? TrackArtService.resolvedArtUrl : ""
+    readonly property bool hasCoverArt: coverArtUrl !== ""
+    readonly property bool visualizerEnabled: CavaService.cavaAvailable && SettingsData.audioVisualizerEnabled
+    readonly property bool showIconSlot: visualizerEnabled || !hasCoverArt
+    readonly property real badgeSize: BarMetrics.mediaControlSize * contentScale
+    readonly property real badgeExtent: (hasCoverArt ? badgeSize + Theme.spacingXS : 0) + (showIconSlot ? badgeSize + Theme.spacingXS : 0)
+    readonly property string trackSummary: [MprisController.stableTitle, MprisController.stableArtist, MprisController.stableAlbum].filter(part => part).join(" • ")
+    readonly property bool lyricActive: {
+        if (!lyricsEnabled)
+            return false;
+        const controller = LyricsService.controller;
+        if (!controller.enabled || !controller.synced)
+            return false;
+        const parts = controller.lines[controller.activeIndex]?.parts ?? [];
+        return parts.some(part => part.x.trim() !== "");
+    }
     readonly property int maxTextWidth: {
         const size = SettingsData.widgetOption("music", widgetData, "mediaSize");
         switch (size) {
@@ -49,13 +68,37 @@ BasePill {
         if (!isVerticalOrientation) {
             return contentThickness;
         }
-        const audioVizHeight = BarMetrics.mediaControlSize * root.contentScale;
         const playButtonHeight = 24 * root.contentScale;
-        return audioVizHeight + Theme.spacingXS + playButtonHeight;
+        return badgeExtent + playButtonHeight;
     }
 
     property real scrollAccumulatorY: 0
     property real touchpadThreshold: 100
+
+    LyricsSubscription {
+        active: root.lyricsEnabled && root.playerAvailable
+    }
+
+    Loader {
+        id: tooltipLoader
+        active: false
+        sourceComponent: DankTooltip {}
+    }
+
+    function showTrackTooltip() {
+        if (!root.lyricActive || !root.parentScreen)
+            return;
+        tooltipLoader.active = true;
+        const anchor = root.contextMenuAnchor();
+        tooltipLoader.item.show(root.trackSummary, anchor.x, anchor.y, anchor.screen, anchor.isVertical && anchor.edge === "left", anchor.isVertical && anchor.edge === "right");
+    }
+
+    function hideTrackTooltip() {
+        tooltipLoader.item?.hide();
+        tooltipLoader.active = false;
+    }
+
+    onClicked: hideTrackTooltip()
 
     onWheel: function (wheelEvent) {
         if (SettingsData.widgetOption("music", widgetData, "audioScrollMode") === "nothing")
@@ -121,6 +164,42 @@ BasePill {
         }
     }
 
+    component CoverArt: ClippingRectangle {
+        width: root.badgeSize
+        height: root.badgeSize
+        radius: Theme.cornerRadiusXS
+        color: "transparent"
+        visible: root.hasCoverArt
+
+        Image {
+            anchors.fill: parent
+            source: root.coverArtUrl
+            sourceSize: Qt.size(Math.round(width * root.dpr), Math.round(height * root.dpr))
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+        }
+    }
+
+    component MediaIcon: Item {
+        width: root.badgeSize
+        height: root.badgeSize
+        visible: root.showIconSlot
+
+        AudioVisualization {
+            enabled: root.surfaceLive
+            anchors.fill: parent
+            visible: root.visualizerEnabled
+        }
+
+        DankIcon {
+            anchors.fill: parent
+            name: "music_note"
+            size: parent.width
+            color: Theme.primary
+            visible: !root.visualizerEnabled
+        }
+    }
+
     component PlayButton: Item {
         width: Theme.iconSize * root.contentScale
         height: width
@@ -152,7 +231,7 @@ BasePill {
                 if (!root.playerAvailable || root.maxTextWidth <= 0)
                     return 0;
                 // Preserve the fixed-width text slot even if metadata is briefly empty.
-                if (!root.adaptiveWidthEnabled)
+                if (!root.adaptiveWidthEnabled || root.lyricActive)
                     return root.maxTextWidth;
                 if (textContainer.displayText.length === 0)
                     return 0;
@@ -163,14 +242,17 @@ BasePill {
             }
             readonly property int horizontalContentWidth: {
                 const controlsWidth = 64 * root.contentScale + Theme.spacingXS * 2;
-                const audioVizWidth = BarMetrics.mediaControlSize * root.contentScale;
-                const baseWidth = audioVizWidth + Theme.spacingXS + controlsWidth;
-                return baseWidth + (measuredTextWidth > 0 ? measuredTextWidth + Theme.spacingXS : 0);
+                return root.badgeExtent + controlsWidth + (measuredTextWidth > 0 ? measuredTextWidth + Theme.spacingXS : 0);
             }
 
             implicitWidth: root.playerAvailable ? (root.isVerticalOrientation ? root.currentContentWidth : horizontalContentWidth) : 0
             implicitHeight: root.playerAvailable ? root.currentContentHeight : 0
             opacity: root.playerAvailable ? 1 : 0
+
+            HoverHandler {
+                enabled: root.lyricActive
+                onHoveredChanged: hovered ? root.showTrackTooltip() : root.hideTrackTooltip()
+            }
 
             Behavior on opacity {
                 NumberAnimation {
@@ -201,22 +283,17 @@ BasePill {
                 spacing: Theme.spacingXS
 
                 Item {
-                    width: BarMetrics.mediaControlSize * root.contentScale
-                    height: BarMetrics.mediaControlSize * root.contentScale
                     anchors.horizontalCenter: parent.horizontalCenter
+                    width: root.badgeSize
+                    height: badges.height
 
-                    AudioVisualization {
-                        enabled: root.surfaceLive
-                        anchors.fill: parent
-                        visible: CavaService.cavaAvailable && SettingsData.audioVisualizerEnabled
-                    }
+                    Column {
+                        id: badges
+                        spacing: Theme.spacingXS
 
-                    DankIcon {
-                        anchors.fill: parent
-                        name: "music_note"
-                        size: BarMetrics.mediaControlSize * root.contentScale
-                        color: Theme.primary
-                        visible: !CavaService.cavaAvailable || !SettingsData.audioVisualizerEnabled
+                        CoverArt {}
+
+                        MediaIcon {}
                     }
 
                     MouseArea {
@@ -258,24 +335,12 @@ BasePill {
                     spacing: Theme.spacingXS
                     anchors.verticalCenter: parent.verticalCenter
 
-                    Item {
-                        width: BarMetrics.mediaControlSize * root.contentScale
-                        height: BarMetrics.mediaControlSize * root.contentScale
+                    CoverArt {
                         anchors.verticalCenter: parent.verticalCenter
+                    }
 
-                        AudioVisualization {
-                            enabled: root.surfaceLive
-                            anchors.fill: parent
-                            visible: CavaService.cavaAvailable && SettingsData.audioVisualizerEnabled
-                        }
-
-                        DankIcon {
-                            anchors.fill: parent
-                            name: "music_note"
-                            size: BarMetrics.mediaControlSize * root.contentScale
-                            color: Theme.primary
-                            visible: !CavaService.cavaAvailable || !SettingsData.audioVisualizerEnabled
-                        }
+                    MediaIcon {
+                        anchors.verticalCenter: parent.verticalCenter
                     }
 
                     Rectangle {
@@ -311,11 +376,22 @@ BasePill {
                             id: mediaText
                             width: contentRoot.measuredTextWidth
                             height: parent.height
+                            visible: !root.lyricActive
                             text: textContainer.displayText
                             color: root.contentColor
                             font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                             active: root.surfaceLive && root._isPlaying
                             animateTextChange: true
+                        }
+
+                        MediaLyricLine {
+                            width: contentRoot.measuredTextWidth
+                            height: parent.height
+                            visible: root.lyricActive
+                            controller: LyricsService.controller
+                            color: root.contentColor
+                            font.pixelSize: mediaText.font.pixelSize
+                            live: root.surfaceLive
                         }
 
                         MouseArea {

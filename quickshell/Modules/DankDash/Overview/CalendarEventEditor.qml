@@ -2,7 +2,7 @@ import QtQuick
 import qs.Common
 import qs.Services
 import qs.Widgets
-import qs.Modules.DankDash
+import qs.Modules.Settings.Widgets
 
 Column {
     id: root
@@ -20,8 +20,10 @@ Column {
     property string fTitle: ""
     property bool fAllDay: false
     property date fDate: initialDate
-    property string fStart: "10:00"
-    property string fEnd: "11:00"
+    property int fStartHour: 10
+    property int fStartMinute: 0
+    property int fEndHour: 11
+    property int fEndMinute: 0
     property string fLocation: ""
     property string fDescription: ""
     property string fCalendarId: ""
@@ -34,20 +36,6 @@ Column {
     readonly property var _remMins: [-1, 0, 5, 10, 15, 30, 60, 1440]
 
     spacing: Theme.spacingM
-
-    function _parseTime(value) {
-        const m = value.trim().match(/^(\d{1,2}):(\d{2})$/);
-        if (!m)
-            return null;
-        const h = parseInt(m[1]);
-        const min = parseInt(m[2]);
-        if (h > 23 || min > 59)
-            return null;
-        return {
-            "h": h,
-            "m": min
-        };
-    }
 
     function _isoFromDateTime(dateObj, h, m) {
         const d = new Date(dateObj);
@@ -93,14 +81,8 @@ Column {
             startIso = _allDayIso(fDate, 0);
             endIso = _allDayIso(fDate, 1);
         } else {
-            const s = _parseTime(fStart);
-            const e = _parseTime(fEnd);
-            if (!s || !e) {
-                errorText = I18n.tr("Use HH:MM time format");
-                return;
-            }
-            startIso = _isoFromDateTime(fDate, s.h, s.m);
-            endIso = _isoFromDateTime(fDate, e.h, e.m);
+            startIso = _isoFromDateTime(fDate, fStartHour, fStartMinute);
+            endIso = _isoFromDateTime(fDate, fEndHour, fEndMinute);
             if (new Date(endIso).getTime() <= new Date(startIso).getTime()) {
                 errorText = I18n.tr("End must be after start");
                 return;
@@ -145,8 +127,10 @@ Column {
         fTitle = eventData.title || "";
         fAllDay = !!eventData.allDay;
         fDate = eventData.start;
-        fStart = Qt.formatTime(eventData.start, "HH:mm");
-        fEnd = Qt.formatTime(eventData.end, "HH:mm");
+        fStartHour = eventData.start.getHours();
+        fStartMinute = eventData.start.getMinutes();
+        fEndHour = eventData.end.getHours();
+        fEndMinute = eventData.end.getMinutes();
         fLocation = eventData.location || "";
         fDescription = eventData.description || "";
         fCalendarId = eventData.calendarId || "";
@@ -154,148 +138,101 @@ Column {
             fReminder = eventData.reminders[0].minutes;
     }
 
-    DankFlickable {
+    SettingsGroup {
         width: parent.width
-        height: Math.min(DashMetrics.sheetFormHeight, form.implicitHeight)
-        contentWidth: width
-        contentHeight: form.implicitHeight
-        clip: true
+        slotColor: Theme.chipSurface
 
-        Column {
-            id: form
-            width: parent.width
-            spacing: Theme.spacingS
+        SettingsTextFieldRow {
+            text: I18n.tr("Title")
+            leftIconName: "title"
+            placeholderText: I18n.tr("Event title")
+            value: root.fTitle
+            onValueEdited: value => root.fTitle = value
+            onAccepted: root.save()
+        }
 
-            DankTextField {
-                width: parent.width
-                labelText: I18n.tr("Title")
-                leftIconName: "title"
-                leftIconSize: Theme.iconSizeSmall
-                placeholderText: I18n.tr("Event title")
-                text: root.fTitle
-                onTextChanged: root.fTitle = text
+        SettingsToggleRow {
+            text: I18n.tr("All day")
+            checked: root.fAllDay
+            onToggled: checked => root.fAllDay = checked
+        }
+
+        SettingsRow {
+            title: I18n.tr("Date")
+            subtitle: Qt.formatDate(root.fDate, "ddd, MMM d yyyy")
+            subtitleColor: Theme.surfaceText
+
+            DankActionButton {
+                iconName: I18n.isRtl ? "chevron_right" : "chevron_left"
+                Accessible.name: I18n.tr("Previous")
+                onClicked: root.shiftDate(-1)
             }
 
-            DankToggle {
-                width: parent.width
-                text: I18n.tr("All day")
-                checked: root.fAllDay
-                onToggled: checked => root.fAllDay = checked
-            }
-
-            Row {
-                width: parent.width
-                spacing: Theme.spacingXS
-
-                DankActionButton {
-                    id: prevDay
-                    iconName: I18n.isRtl ? "chevron_right" : "chevron_left"
-                    Accessible.name: I18n.tr("Previous")
-                    iconSize: Theme.iconSizeSmall
-                    onClicked: root.shiftDate(-1)
-                }
-
-                StyledText {
-                    width: parent.width - prevDay.width - nextDay.width - parent.spacing * 2
-                    text: Qt.formatDate(root.fDate, "ddd, MMM d yyyy")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceText
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    height: Theme.buttonHeightXS
-                }
-
-                DankActionButton {
-                    id: nextDay
-                    iconName: I18n.isRtl ? "chevron_left" : "chevron_right"
-                    Accessible.name: I18n.tr("Next")
-                    iconSize: Theme.iconSizeSmall
-                    onClicked: root.shiftDate(1)
-                }
-            }
-
-            Row {
-                width: parent.width
-                spacing: Theme.spacingS
-                visible: !root.fAllDay
-
-                DankTextField {
-                    width: (parent.width - Theme.spacingS) / 2
-                    labelText: I18n.tr("Start")
-                    leftIconName: "schedule"
-                    leftIconSize: Theme.iconSizeSmall
-                    placeholderText: "HH:MM"
-                    text: root.fStart
-                    onTextChanged: root.fStart = text
-                }
-
-                DankTextField {
-                    width: (parent.width - Theme.spacingS) / 2
-                    labelText: I18n.tr("End")
-                    placeholderText: "HH:MM"
-                    text: root.fEnd
-                    onTextChanged: root.fEnd = text
-                }
-            }
-
-            DankDropdown {
-                width: parent.width
-                text: I18n.tr("Calendar")
-                transientSurfaceTracker: root.transientSurfaceTracker
-                options: root._cals.map(c => c.name)
-                currentValue: root._calendarName(root.fCalendarId)
-                onValueChanged: value => {
-                    for (let i = 0; i < root._cals.length; i++) {
-                        if (root._cals[i].name === value) {
-                            root.fCalendarId = root._cals[i].id;
-                            return;
-                        }
-                    }
-                }
-            }
-
-            DankDropdown {
-                width: parent.width
-                text: I18n.tr("Reminder", "noun, calendar event reminder time dropdown label")
-                transientSurfaceTracker: root.transientSurfaceTracker
-                options: root._remLabels
-                currentValue: root._remLabels[Math.max(0, root._remMins.indexOf(root.fReminder))]
-                onValueChanged: value => {
-                    const idx = root._remLabels.indexOf(value);
-                    if (idx >= 0)
-                        root.fReminder = root._remMins[idx];
-                }
-            }
-
-            DankTextField {
-                width: parent.width
-                labelText: I18n.tr("Location", "calendar event venue field label", true)
-                leftIconName: "place"
-                leftIconSize: Theme.iconSizeSmall
-                placeholderText: I18n.tr("Add location")
-                text: root.fLocation
-                onTextChanged: root.fLocation = text
-            }
-
-            DankTextField {
-                width: parent.width
-                labelText: I18n.tr("Notes", "noun, calendar event notes field label")
-                leftIconName: "notes"
-                leftIconSize: Theme.iconSizeSmall
-                placeholderText: I18n.tr("Add notes")
-                text: root.fDescription
-                onTextChanged: root.fDescription = text
+            DankActionButton {
+                iconName: I18n.isRtl ? "chevron_left" : "chevron_right"
+                Accessible.name: I18n.tr("Next")
+                onClicked: root.shiftDate(1)
             }
         }
-    }
 
-    StyledText {
-        width: parent.width
-        text: root.errorText
-        visible: root.errorText !== ""
-        font.pixelSize: Theme.fontSizeSmall
-        color: Theme.error
-        wrapMode: Text.WordWrap
+        SettingsTimeRow {
+            visible: !root.fAllDay
+            is24Hour: SettingsData.use24HourClock
+            startTitle: I18n.tr("Start")
+            startHour: root.fStartHour
+            startMinute: root.fStartMinute
+            endTitle: I18n.tr("End")
+            endHour: root.fEndHour
+            endMinute: root.fEndMinute
+            onStartChanged: (hour, minute) => {
+                root.fStartHour = hour;
+                root.fStartMinute = minute;
+            }
+            onEndChanged: (hour, minute) => {
+                root.fEndHour = hour;
+                root.fEndMinute = minute;
+            }
+        }
+
+        SettingsDropdownRow {
+            text: I18n.tr("Calendar")
+            transientSurfaceTracker: root.transientSurfaceTracker
+            options: root._cals.map(c => c.name)
+            currentValue: root._calendarName(root.fCalendarId)
+            onValueChanged: value => {
+                const cal = root._cals.find(c => c.name === value);
+                if (cal)
+                    root.fCalendarId = cal.id;
+            }
+        }
+
+        SettingsDropdownRow {
+            text: I18n.tr("Reminder", "noun, calendar event reminder time dropdown label")
+            transientSurfaceTracker: root.transientSurfaceTracker
+            options: root._remLabels
+            currentValue: root._remLabels[Math.max(0, root._remMins.indexOf(root.fReminder))]
+            onValueChanged: value => {
+                const idx = root._remLabels.indexOf(value);
+                if (idx >= 0)
+                    root.fReminder = root._remMins[idx];
+            }
+        }
+
+        SettingsTextFieldRow {
+            text: I18n.tr("Location", "calendar event venue field label", true)
+            leftIconName: "place"
+            placeholderText: I18n.tr("Add location")
+            value: root.fLocation
+            onValueEdited: value => root.fLocation = value
+        }
+
+        SettingsTextFieldRow {
+            text: I18n.tr("Notes", "noun, calendar event notes field label")
+            leftIconName: "notes"
+            placeholderText: I18n.tr("Add notes")
+            value: root.fDescription
+            onValueEdited: value => root.fDescription = value
+        }
     }
 
     Row {
@@ -306,16 +243,14 @@ Column {
         DankButton {
             text: root.saving ? I18n.tr("Saving...") : I18n.tr("Save")
             iconName: "check"
-            buttonHeight: Theme.buttonHeightS
-            backgroundColor: Theme.primary
-            textColor: Theme.onPrimary
             enabled: !root.saving
             onClicked: root.save()
         }
 
         DankButton {
             text: I18n.tr("Cancel")
-            buttonHeight: Theme.buttonHeightS
+            backgroundColor: "transparent"
+            textColor: Theme.primary
             onClicked: root.closeRequested()
         }
     }

@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "../utils/widgets.js" as WidgetUtils
 import qs.Modules.ControlCenter
 
 DankGridEditChrome {
@@ -10,7 +11,8 @@ DankGridEditChrome {
 
     signal configRequested(var anchor)
 
-    hasOptions: widgetData.id === "diskUsage" || widgetData.id === "brightnessSlider" || widgetData.id === "idleInhibitor" || String(widgetData.id ?? "").startsWith("plugin_")
+    hasOptions: WidgetUtils.hasOptions(widgetData.id)
+    removable: WidgetUtils.isRemovable(widgetData)
     buttonSize: Theme.iconSize
     hitOverflow: CcMetrics.gridGap / 2
     iconSize: PopoutMetrics.chromeIconSize

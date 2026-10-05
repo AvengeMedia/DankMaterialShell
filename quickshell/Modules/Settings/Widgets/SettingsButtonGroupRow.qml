@@ -21,7 +21,18 @@ SettingsRow {
 
     readonly property bool compact: width - buttonGroup.width - SettingsMetrics.rowPaddingH * 2 - SettingsMetrics.rowContentSpacing < SettingsMetrics.buttonGroupCompactThreshold
 
+    // `values` is index-aligned with `model`.
+    property var values: []
+    property var value: undefined
+    property var fallbackValue: undefined
+
     signal selectionChanged(int index, bool selected)
+    signal valueSelected(var value)
+
+    function indexOfValue(value) {
+        const index = values.indexOf(value);
+        return index >= 0 ? index : Math.max(0, values.indexOf(fallbackValue));
+    }
 
     title: text
     subtitle: description
@@ -43,13 +54,19 @@ SettingsRow {
     }
 
     DankButtonGroup {
+        arrowKeysSelect: false
         id: buttonGroup
         parent: root.compact ? bodyHost : trailingHost
         x: root.compact ? (parent.width - width) / 2 : 0
         selectionMode: "single"
+        currentIndex: root.values.length > 0 ? root.indexOfValue(root.value) : 0
         spacing: root.spacing
         enabled: root.enabled
         maximumWidth: root.compact ? root.width - SettingsMetrics.rowPaddingH * 2 : -1
-        onSelectionChanged: (index, selected) => root.selectionChanged(index, selected)
+        onSelectionChanged: (index, selected) => {
+            root.selectionChanged(index, selected);
+            if (selected && index < root.values.length)
+                root.valueSelected(root.values[index]);
+        }
     }
 }

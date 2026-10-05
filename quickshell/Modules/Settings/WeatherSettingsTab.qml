@@ -19,7 +19,7 @@ Item {
 
     SettingsPage {
         SettingsCard {
-            title: I18n.tr("Weather")
+            title: I18n.tr("General")
             tab: "weather"
             settingKey: "weather"
 
@@ -127,24 +127,29 @@ Item {
             settingKey: "weatherDisplay"
 
             SettingsToggleRow {
+                readonly property var lockStatus: SettingsData.lockWidgetInstance("lockStatus")
+
                 tab: "weather"
-                settingKey: "lockScreenShowWeather"
+                settingKey: "lockStatusWeather"
                 tags: ["weather", "lock", "screen"]
+                visible: lockStatus !== null
                 text: I18n.tr("Lock screen")
-                checked: SettingsData.lockScreenShowWeather
-                onToggled: checked => SettingsData.set("lockScreenShowWeather", checked)
+                checked: lockStatus?.config?.showWeather ?? true
+                onToggled: checked => SettingsData.updateDesktopWidgetInstanceConfig(lockStatus.id, {
+                        showWeather: checked
+                    })
             }
 
             SettingsNavRow {
                 title: I18n.tr("Dashboard")
                 iconName: "space_dashboard"
-                onClicked: root.parentModal?.navigateTo("dank_dash")
+                onClicked: keyboard => root.parentModal?.navigateTo("dank_dash", keyboard)
             }
 
             SettingsNavRow {
                 title: I18n.tr("Bar widgets")
                 iconName: "widgets"
-                onClicked: root.parentModal?.navigateTo("dankbar_widgets")
+                onClicked: keyboard => root.parentModal?.navigateTo("dankbar_widgets", keyboard)
             }
         }
     }

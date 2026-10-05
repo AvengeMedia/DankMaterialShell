@@ -25,7 +25,7 @@ Singleton {
 
     property bool pluginDirectoryExists: false
     property string systemPluginDirectory: "/etc/xdg/quickshell/dms-plugins"
-    readonly property string previewApiBase: "https://api.danklinux.com/previews/"
+    readonly property string previewApiBase: Site.api + "/previews/"
 
     property var knownManifests: ({})
     property var pathToPluginId: ({})
@@ -348,7 +348,7 @@ Singleton {
     }
 
     function _onManifestParsed(absPath, manifest, sourceTag, mtimeEpochMs) {
-        if (!manifest || !manifest.id || !manifest.name || (!manifest.component && !manifest.components)) {
+        if (!manifest || !manifest.id || !manifest.name) {
             log.error("invalid manifest fields:", absPath);
             knownManifests[absPath] = {
                 mtime: mtimeEpochMs,
@@ -368,7 +368,7 @@ Singleton {
 
         const componentPaths = _resolveComponentPaths(manifest, dir);
         const surfaces = Object.keys(componentPaths);
-        if (surfaces.length === 0) {
+        if (surfaces.length === 0 && !manifest.lyrics?.command) {
             log.error("no valid component surfaces in manifest:", absPath);
             knownManifests[absPath] = {
                 mtime: mtimeEpochMs,
@@ -469,6 +469,15 @@ Singleton {
     }
 
     function updatePlugin(pluginId, callback) {
+        // Installed entries carry the registry's requires_dms, i.e. the version an update would fetch
+        const installed = (DMSService.installedPlugins || []).find(plugin => plugin.id === pluginId);
+        if (installed?.requires_dms && !checkPluginCompatibility(installed.requires_dms)) {
+            if (callback)
+                callback({
+                    error: I18n.tr("Requires DMS %1", "plugin incompatibility notice, %1 is the required DMS version").arg(installed.requires_dms)
+                });
+            return;
+        }
         DMSService.update(pluginId, response => {
             if (!response.error)
                 forceRescanPlugin(pluginId);
@@ -491,7 +500,7 @@ Singleton {
 
         const componentPaths = plugin.componentPaths || {};
         const surfaces = Object.keys(componentPaths);
-        if (surfaces.length === 0) {
+        if (surfaces.length === 0 && !plugin.lyrics?.command) {
             log.error("Plugin has no component surfaces:", pluginId);
             pluginLoadFailed(pluginId, "No component surfaces");
             return false;
@@ -893,10 +902,8 @@ Singleton {
 
     function _makeStartupCheckObject(pluginId, plugin) {
         const comp = Qt.createComponent(pluginComponentUrl(pluginId, plugin.startupCheckPath), Component.PreferSynchronous);
-        if (comp.status === Component.Error) {
-            log.error("startupCheck component error", pluginId, comp.errorString());
-            return null;
-        }
+        if (comp.status === Component.Error)
+            throw new Error(comp.errorString());
         return comp.createObject(root);
     }
 
@@ -915,8 +922,12 @@ Singleton {
             return ok;
         }
 
-        const probe = _makeStartupCheckObject(pluginId, plugin);
+        let probe = null;
+        let settled = false;
         const finish = result => {
+            if (settled)
+                return;
+            settled = true;
             if (probe)
                 probe.destroy();
             const err = _normalizeStartupError(result);
@@ -937,28 +948,20 @@ Singleton {
                 onResult(ok);
         };
 
-        const check = probe ? probe.check : null;
-        if (typeof check !== "function") {
-            finish(null);
-            return true;
-        }
-        if (check.length >= 1) {
-            try {
-                check(finish);
-            } catch (e) {
-                log.warn("startupCheck threw for", pluginId, e.message);
-                finish(null);
-            }
-            return true;
-        }
-        let r = null;
         try {
-            r = check();
+            probe = _makeStartupCheckObject(pluginId, plugin);
+            const check = probe?.check;
+            if (typeof check !== "function")
+                throw new Error("startupCheck has no check function");
+            if (check.length >= 1)
+                check(finish);
+            else
+                finish(check());
         } catch (e) {
-            log.warn("startupCheck threw for", pluginId, e.message);
-            r = null;
+            const message = String(e?.message || e);
+            log.warn("startupCheck failed for", pluginId, message);
+            finish(message);
         }
-        finish(r);
         return true;
     }
 
@@ -973,7 +976,7 @@ Singleton {
         const plugin = availablePlugins[pluginId];
         if (plugin)
             _loadPluginTranslations(pluginId, plugin.pluginDirectory);
-        return loadPlugin(pluginId);
+        return runStartupGate(pluginId);
     }
 
     function ensureLauncherInstance(pluginId) {

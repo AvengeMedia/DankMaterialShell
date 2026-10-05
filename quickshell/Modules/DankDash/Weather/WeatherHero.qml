@@ -9,13 +9,24 @@ Rectangle {
 
     property bool showCity: false
     property bool showSunTimes: true
+    property var widgetOptions: ({})
+    property string tone: widgetOptions.tone ?? "primary"
+    property bool flat: false
     readonly property bool wide: width >= Theme.smallBreakpoint
     readonly property var weather: WeatherService.weather
     readonly property string cityText: [weather.city, weather.country].filter(s => !!s).join(", ")
 
     implicitHeight: (wide ? Math.max(details.implicitHeight, temperature.implicitHeight) : details.implicitHeight) + Theme.spacingL * 2
     radius: Theme.cornerRadiusXL
-    color: Theme.foregroundColor(Theme.primaryContainer, Theme.isFloatingWindow(root))
+    color: flat ? "transparent" : toneColors.surfaceColor
+    border.width: flat ? 0 : Theme.layerOutlineWidth
+    border.color: Theme.outlineMedium
+
+    DankTone {
+        id: toneColors
+        tone: root.tone
+        floatingWindow: Theme.isFloatingWindow(root)
+    }
 
     Column {
         id: details
@@ -31,7 +42,7 @@ Rectangle {
             visible: root.showCity && root.cityText !== ""
             width: parent.width
             text: root.cityText
-            color: Theme.onPrimaryContainer
+            color: toneColors.contentColor
             font.pixelSize: Theme.fontSizeMedium
             font.weight: Theme.fontWeightMedium
             elide: Text.ElideRight
@@ -46,7 +57,7 @@ Rectangle {
         StyledText {
             width: parent.width
             text: WeatherService.getWeatherCondition(root.weather.wCode)
-            color: Theme.onPrimaryContainer
+            color: toneColors.contentColor
             font.pixelSize: Theme.fontSizeLarge
             wrapMode: Text.WordWrap
         }
@@ -54,7 +65,7 @@ Rectangle {
         StyledText {
             width: parent.width
             text: I18n.tr("Feels Like %1°").arg(WeatherService.formatTemp(root.weather.feelsLike ?? root.weather.temp, false) ?? "--")
-            color: Theme.onPrimaryContainer
+            color: toneColors.contentColor
             font.pixelSize: Theme.fontSizeSmall
             wrapMode: Text.WordWrap
         }
@@ -89,7 +100,7 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         name: sunTime.modelData.icon
                         size: Theme.iconSizeSmall
-                        color: Theme.onPrimaryContainer
+                        color: toneColors.contentColor
 
                         StateLayer {
                             acceptedButtons: Qt.NoButton
@@ -105,7 +116,7 @@ Rectangle {
                         text: sunTime.modelData.time || "--"
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Theme.fontWeightMedium
-                        color: Theme.onPrimaryContainer
+                        color: toneColors.contentColor
                     }
                 }
             }
@@ -119,7 +130,7 @@ Rectangle {
         y: root.wide ? (root.height - height) / 2 : details.y + (root.showCity && root.cityText !== "" ? city.height + Theme.spacingXS : 0)
         width: root.wide ? Theme.fontSizeDisplay * 3 : details.width - emblem.width - Theme.spacingS
         text: WeatherService.formatTemp(root.weather.temp) ?? "--"
-        color: Theme.onPrimaryContainer
+        color: toneColors.contentColor
         font.pixelSize: Theme.fontSizeDisplay * 1.5
         font.weight: Theme.fontWeightMedium
         minimumPixelSize: Theme.fontSizeXXLarge

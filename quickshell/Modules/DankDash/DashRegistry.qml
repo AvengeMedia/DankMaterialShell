@@ -5,6 +5,7 @@ import Quickshell
 import qs.Common
 import qs.Services
 import qs.Modules.DankDash.Overview
+import "utils/options.js" as Options
 
 Singleton {
     id: root
@@ -66,8 +67,14 @@ Singleton {
         };
     }
 
-    function toneOption() {
-        return choice("tone", I18n.tr("Tone", "noun, dashboard widget color tone option label"), "", toneChoices);
+    function toneOption(def = "") {
+        return choice("tone", I18n.tr("Tone", "noun, dashboard widget color tone option label"), def, toneChoices);
+    }
+
+    function cardOnly(spec) {
+        return Object.assign(spec, {
+            "cardOnly": true
+        });
     }
 
     function panelOptions(tab) {
@@ -163,16 +170,27 @@ Singleton {
                 "minW": 1,
                 "minH": 1
             },
-            "options": [choice("forecast", I18n.tr("Forecast", "weather widget option label for forecast display type"), "chart", [
-                    {
-                        "value": "chart",
-                        "text": I18n.tr("Chart", "noun, weather forecast display option")
-                    },
-                    {
-                        "value": "cards",
-                        "text": I18n.tr("Cards", "noun, weather forecast display option")
-                    }
-                ]), toggle("city", I18n.tr("Show city"), false), toggle("readings", I18n.tr("Show readings"), true)]
+            "options": [cardOnly(toggle("city", I18n.tr("Show city"), false)), cardOnly(toggle("readings", I18n.tr("Show readings"), true)), cardOnly(toneOption())]
+        },
+        {
+            "id": "wellbeing",
+            "text": I18n.tr("Digital wellbeing", "settings page and dashboard tab title, screen time tracking"),
+            "icon": "digital_wellbeing",
+            "description": SettingsData.wellbeingEnabled ? I18n.tr("Screen time and app limits", "settings sidebar hint and dashboard tab description for digital wellbeing") : I18n.tr("Hidden until screen time tracking is enabled", "dashboard tab description while digital wellbeing is off"),
+            "available": SettingsData.wellbeingEnabled,
+            "tab": {
+                "component": wellbeingTab,
+                "async": true,
+                "sizeToContent": true
+            },
+            "card": {
+                "component": wellbeingCard,
+                "w": 2,
+                "h": 1,
+                "minW": 1,
+                "minH": 1,
+                "maxH": 3
+            }
         },
         {
             "id": "notifications",
@@ -335,6 +353,15 @@ Singleton {
                         "value": "ring",
                         "text": I18n.tr("Ring", "noun, battery widget ring gauge style option")
                     }
+                ]), choice("color", I18n.tr("Color"), "level", [
+                    {
+                        "value": "level",
+                        "text": I18n.tr("Level", "battery settings: charge level indicator colors")
+                    },
+                    {
+                        "value": "theme",
+                        "text": I18n.tr("Theme", "battery settings: theme accent indicator colors")
+                    }
                 ]), toggle("health", I18n.tr("Show health"), false), toneOption()]
         }
     ]
@@ -437,6 +464,13 @@ Singleton {
     function pluginOption(pluginId, raw) {
         if (!raw || typeof raw.key !== "string" || raw.key === "" || raw.key === widgetsKey)
             return null;
+        const spec = pluginOptionSpec(pluginId, raw);
+        if (spec && raw.cardOnly === true)
+            return cardOnly(spec);
+        return spec;
+    }
+
+    function pluginOptionSpec(pluginId, raw) {
         const text = I18n.trFor(pluginId, raw.text ?? raw.key);
         switch (raw.type) {
         case "toggle":
@@ -467,12 +501,12 @@ Singleton {
         return entry(id)?.options ?? [];
     }
 
-    function sheetOptionSpecs(id) {
-        return optionSpecs(id).filter(spec => spec.settingsOnly !== true);
+    function sheetOptionSpecs(id, tabScope = false) {
+        return optionSpecs(id).filter(spec => spec.settingsOnly !== true && !(tabScope && spec.cardOnly === true));
     }
 
-    function hasOptions(id) {
-        return sheetOptionSpecs(id).length > 0;
+    function hasOptions(id, tabScope = false) {
+        return sheetOptionSpecs(id, tabScope).length > 0;
     }
 
     function storedOptions(id) {
@@ -488,26 +522,15 @@ Singleton {
         return optionSpecs(id).some(spec => spec.key in stored);
     }
 
-    function resolvedOptions(id) {
+    function resolvedOptions(id, stored = storedOptions(id)) {
         const out = {};
-        const stored = storedOptions(id);
         for (const spec of optionSpecs(id))
             out[spec.key] = optionValue(spec, stored[spec.key]);
         return out;
     }
 
     function optionValue(spec, value) {
-        switch (spec.type) {
-        case "toggle":
-            return typeof value === "boolean" ? value : spec.def;
-        case "choice":
-            return spec.choices.some(c => c.value === value) ? value : spec.def;
-        case "number":
-            if (!Number.isFinite(value))
-                return spec.def;
-            return Math.max(spec.min, Math.min(spec.max, value));
-        }
-        return spec.def;
+        return Options.value(spec, value);
     }
 
     function option(id, key) {
@@ -720,6 +743,16 @@ Singleton {
     Component {
         id: notificationsCard
         NotificationsOverviewCard {}
+    }
+
+    Component {
+        id: wellbeingTab
+        WellbeingTab {}
+    }
+
+    Component {
+        id: wellbeingCard
+        WellbeingOverviewCard {}
     }
 
     Component {

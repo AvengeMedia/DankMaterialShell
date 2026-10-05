@@ -120,6 +120,10 @@ Item {
         return SettingsData.islandSetting(selectedBarConfig, key);
     }
 
+    readonly property IslandSettingsStore islandStore: IslandSettingsStore {
+        barId: root.selectedBarId
+    }
+
     function apply(key, value) {
         if (!selectedBarId)
             return;

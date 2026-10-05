@@ -9,7 +9,9 @@ import qs.Modules.DankDash
 FocusScope {
     id: root
 
-    required property var player
+    property var player: null
+    property var lyrics: null
+    property bool smoothHighlight: root.player?.smoothLyrics ?? MediaOptions.defaults.smoothLyrics
     property real radius: DashMetrics.mediaInnerRadius
     property Item blurSource: null
     property Item backgroundParent: null
@@ -19,7 +21,7 @@ FocusScope {
     property Item followedItem: null
     property real followedY: 0
 
-    readonly property var controller: root.player.lyrics
+    readonly property var controller: root.lyrics ?? LyricsService.controller
     readonly property bool ready: controller.state === "ready"
     readonly property bool unsynced: ready && !controller.synced
     readonly property bool showFollow: ready && controller.synced && !following
@@ -81,8 +83,13 @@ FocusScope {
         transcript.contentY = Math.max(transcript.originY, Math.min(transcript.maximumContentY, transcript.contentY + shift));
     }
 
+    LyricsSubscription {
+        active: root.visible && !root.lyrics
+    }
+
     Binding {
         target: root.player
+        when: root.player !== null
         property: "lyricsFocusTarget"
         value: root
         restoreMode: Binding.RestoreBindingOrValue
@@ -114,8 +121,8 @@ FocusScope {
         let target = transcript.contentY;
         const first = transcript.itemAtIndex(controller.focusedGroups[0] ?? transcript.currentIndex);
         const last = transcript.currentItem;
-        if (first && last && last.y + last.height - first.y <= transcript.height)
-            target = Math.max(transcript.originY, Math.min(transcript.maximumContentY, (first.y + last.y + last.height - transcript.height) / 2));
+        if (first && last && first !== last && first.y < target && last.y + last.height - first.y <= transcript.height)
+            target = Math.max(transcript.originY, Math.min(transcript.maximumContentY, first.y));
         target = Math.round(target);
         transcript.contentY = target;
         followedItem = last;
@@ -228,6 +235,7 @@ FocusScope {
 
         DankListView {
             id: transcript
+            showScrollBar: false
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: heading.visible ? heading.bottom : parent.top
@@ -290,11 +298,13 @@ FocusScope {
                 width: transcript.width
                 height: vocals.implicitHeight
 
+                // Positioners relayout on polish, so the list would measure reused and rescaled rows at their old height.
                 Column {
                     id: vocals
                     width: parent.width
 
                     Repeater {
+                        onItemAdded: vocals.forceLayout()
                         model: root.controller.synced ? lyric.modelData.parts : [
                             {
                                 x: lyric.modelData,
@@ -317,7 +327,8 @@ FocusScope {
                             leadFontSize: root.leadFontSize
                             distance: lyric ? Math.abs(lyric.index - root.activeIndex) : 0
                             animationsEnabled: root.animationsEnabled
-                            smoothHighlight: root.player.smoothLyrics
+                            smoothHighlight: root.smoothHighlight
+                            onImplicitHeightChanged: vocals.forceLayout()
                             inViewport: {
                                 if (!lyric)
                                     return false;

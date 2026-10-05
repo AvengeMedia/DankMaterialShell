@@ -21,7 +21,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 31
+    readonly property int settingsConfigVersion: 38
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -193,6 +193,7 @@ Singleton {
     property string widgetColorMode: Spec.SPEC.widgetColorMode.def
     property string controlCenterTileColorMode: Spec.SPEC.controlCenterTileColorMode.def
     property string buttonColorMode: Spec.SPEC.buttonColorMode.def
+    property int containerSaturation: Spec.SPEC.containerSaturation.def
     property int radiusStrength: Spec.SPEC.radiusStrength.def
     property string radiusMode: Spec.SPEC.radiusMode.def
     property int fixedRadius: Spec.SPEC.fixedRadius.def
@@ -257,6 +258,7 @@ Singleton {
     property string calendarBackend: Spec.SPEC.calendarBackend.def
     property string defaultTaskCalendarId: Spec.SPEC.defaultTaskCalendarId.def
     property bool audioShowStreamDevices: Spec.SPEC.audioShowStreamDevices.def
+    property bool audioMono: Spec.SPEC.audioMono.def
     property string clockFormat: Spec.SPEC.clockFormat.def
     readonly property bool localeUses24Hour: {
         const fmt = Qt.locale().timeFormat(Locale.ShortFormat).replace(/'[^']*'/g, "");
@@ -278,6 +280,8 @@ Singleton {
     onSpringBounceChanged: saveSettings()
     property bool enableRippleEffects: Spec.SPEC.enableRippleEffects.def
     onEnableRippleEffectsChanged: saveSettings()
+    property bool scrollbarsEnabled: Spec.SPEC.scrollbarsEnabled.def
+    onScrollbarsEnabledChanged: saveSettings()
     property int motionEffect: SettingsData.AnimationEffect.Standard
     onMotionEffectChanged: saveSettings()
     property bool m3ElevationEnabled: Spec.SPEC.m3ElevationEnabled.def
@@ -325,6 +329,9 @@ Singleton {
     property string wallpaperBackgroundColorMode: Spec.SPEC.wallpaperBackgroundColorMode.def
     property string wallpaperBackgroundCustomColor: Spec.SPEC.wallpaperBackgroundCustomColor.def
     readonly property color effectiveWallpaperBackgroundColor: wallpaperBackgroundColorFor(wallpaperBackgroundColorMode)
+
+    property bool nightModeExcludeFullscreen: Spec.SPEC.nightModeExcludeFullscreen.def
+    property var nightModeExcludedApps: Spec.SPEC.nightModeExcludedApps.def
 
     function wallpaperBackgroundColorFor(mode) {
         switch (mode) {
@@ -409,6 +416,7 @@ Singleton {
 
     property int controlCenterColumns: Spec.SPEC.controlCenterColumns.def
     property real controlCenterIconScale: Spec.SPEC.controlCenterIconScale.def
+    property string controlCenterFooterPosition: Spec.SPEC.controlCenterFooterPosition.def
     property var controlCenterWidgets: Spec.SPEC.controlCenterWidgets.def
 
     property var workspaceNameIcons: Spec.SPEC.workspaceNameIcons.def
@@ -452,6 +460,7 @@ Singleton {
     property bool dankLauncherV2IncludeFoldersInAll: Spec.SPEC.dankLauncherV2IncludeFoldersInAll.def
     property bool launcherUseOverlayLayer: Spec.SPEC.launcherUseOverlayLayer.def
     property string launcherStyle: Spec.SPEC.launcherStyle.def
+    property string avatarRing: Spec.SPEC.avatarRing.def
     property bool spotlightBarShowModeChips: Spec.SPEC.spotlightBarShowModeChips.def
     property bool keybindsFloatingWindow: Spec.SPEC.keybindsFloatingWindow.def
     onKeybindsFloatingWindowChanged: saveSettings()
@@ -479,6 +488,10 @@ Singleton {
         },
         {
             "id": "weather",
+            "enabled": true
+        },
+        {
+            "id": "wellbeing",
             "enabled": true
         },
         {
@@ -522,6 +535,9 @@ Singleton {
     onDashCardsChanged: saveSettings()
     property var dashOptions: Spec.SPEC.dashOptions.def
     onDashOptionsChanged: saveSettings()
+    property bool wellbeingEnabled: Spec.SPEC.wellbeingEnabled.def
+    property int wellbeingDailyLimit: Spec.SPEC.wellbeingDailyLimit.def
+    property var wellbeingAppLimits: Spec.SPEC.wellbeingAppLimits.def
 
     function getDashTabs() {
         const stored = Array.isArray(dashTabs) ? dashTabs : [];
@@ -693,6 +709,7 @@ Singleton {
     property int batteryChargeLimit: Spec.SPEC.batteryChargeLimit.def
     property bool batteryNotifyChargeLimit: Spec.SPEC.batteryNotifyChargeLimit.def
     property int batteryCriticalThreshold: Spec.SPEC.batteryCriticalThreshold.def
+    property bool batteryCriticalAnimation: Spec.SPEC.batteryCriticalAnimation.def
     property bool batteryNotifyCritical: Spec.SPEC.batteryNotifyCritical.def
     property int batteryLowThreshold: Spec.SPEC.batteryLowThreshold.def
     property bool batteryNotifyLow: Spec.SPEC.batteryNotifyLow.def
@@ -759,13 +776,7 @@ Singleton {
     property bool modalDarkenBackground: Spec.SPEC.modalDarkenBackground.def
 
     property bool lockScreenShowPowerActions: Spec.SPEC.lockScreenShowPowerActions.def
-    property bool lockScreenShowSystemIcons: Spec.SPEC.lockScreenShowSystemIcons.def
-    property bool lockScreenShowTime: Spec.SPEC.lockScreenShowTime.def
-    property string lockScreenClockStyle: Spec.SPEC.lockScreenClockStyle.def
-    property bool lockScreenShowDate: Spec.SPEC.lockScreenShowDate.def
     property bool lockScreenShowProfileImage: Spec.SPEC.lockScreenShowProfileImage.def
-    property bool lockScreenShowPasswordField: Spec.SPEC.lockScreenShowPasswordField.def
-    property bool lockScreenShowMediaPlayer: Spec.SPEC.lockScreenShowMediaPlayer.def
     property bool lockScreenShowWeather: Spec.SPEC.lockScreenShowWeather.def
     property bool lockScreenPowerOffMonitorsOnLock: Spec.SPEC.lockScreenPowerOffMonitorsOnLock.def
     property bool lockAtStartup: Spec.SPEC.lockAtStartup.def
@@ -799,7 +810,6 @@ Singleton {
     property bool lockScreenSecurityKeyShortcutEnabled: Spec.SPEC.lockScreenSecurityKeyShortcutEnabled.def
     property bool greeterPamExternallyManaged: Spec.SPEC.greeterPamExternallyManaged.def
     property string lockScreenInactiveColor: Spec.SPEC.lockScreenInactiveColor.def
-    property int lockScreenNotificationMode: Spec.SPEC.lockScreenNotificationMode.def
     property bool lockScreenVideoEnabled: Spec.SPEC.lockScreenVideoEnabled.def
     property string lockScreenVideoPath: Spec.SPEC.lockScreenVideoPath.def
     property bool lockScreenVideoCycling: Spec.SPEC.lockScreenVideoCycling.def
@@ -830,58 +840,106 @@ Singleton {
         barConfigs;
         return (barConfigs || []).filter(cfg => isIslandBarConfig(cfg));
     }
-    readonly property bool dankIslandEnabled: islandBarConfigs.some(cfg => cfg.enabled ?? false)
+    readonly property bool dankIslandEnabled: (barConfigs || []).some(cfg => (cfg.enabled ?? false) && hostsIsland(cfg))
     // Session-only: which bar, island or dot last-used shared shortcuts follow on each screen.
     property var lastUsedBarByScreen: ({})
     // One slot per edge; a dot floats, so it never takes one.
     readonly property int edgeBarConfigCount: (barConfigs || []).filter(cfg => cfg && !isDotBarConfig(cfg)).length
     readonly property var dotBarConfig: (barConfigs || []).find(cfg => isDotBarConfig(cfg)) ?? null
-    readonly property var islandDefaults: ({
-            "islandFloating": false,
-            "islandPlacement": "edge",
-            "islandFreeSize": 48,
-            "islandFreeIcon": "blur_on",
-            "islandFreeEdgeMargin": 2,
-            "islandFreeIdleDelay": 2500,
-            "islandFreeIdleOpacity": 0.45,
-            "islandFreeIdleScale": 0.4,
-            "islandSharedRouting": "normal",
-            "islandUseOverlayLayer": false,
-            "islandReserveThickness": 40,
-            "islandCompactThickness": 38,
-            "islandOuterGap": 4,
-            "islandAlongOffset": 0,
-            "islandInteractionMode": "hybrid",
-            "islandHoverOpenDelay": 150,
-            "islandHoverCloseDelay": 150,
-            "islandPalette": "default",
-            "islandHighContrast": false,
-            "islandMediaClockVisible": true,
-            "islandNotificationBadgeClearOnOpen": false,
-            "islandNotificationExpand": false,
-            "islandNotificationPopups": false,
-            "islandHomeCompactTight": false,
-            "islandHomeClockDisplay": "both",
-            "islandHomeVolumeDisplay": "both",
-            "islandHomeBrightnessDisplay": "both",
-            "islandHomeStatusContent": "battery",
-            "islandBatteryStyle": "solid",
-            "islandSatellitesEnabled": true,
-            "islandSatellitePosition": "edges",
-            "islandSatelliteGap": 12,
-            "islandSatelliteBackground": false,
-            "islandSatelliteGothCorners": true,
-            "islandSatelliteTransparency": 1,
-            "islandSatelliteSwoopRadius": 24,
-            "islandReducedMotion": false,
-            "islandSpringStiffness": 560,
-            "islandSpringDamping": 37,
-            "islandSpringMass": 1
-        })
+    readonly property var islandDefaults: WidgetDefaults.ISLAND_DEFAULTS
+    readonly property var islandWidgetDefaults: WidgetDefaults.DEFAULTS.island
+
+    function islandSettings(bc) {
+        if (!bc)
+            return {};
+        return isIslandBarConfig(bc) ? bc : (islandWidgetEntry(bc) ?? {});
+    }
+
+    function islandDefaultsFor(bc) {
+        return isIslandBarConfig(bc) ? islandDefaults : islandWidgetDefaults;
+    }
+
+    function _isIslandEntry(entry) {
+        return (typeof entry === "string" ? entry : entry?.id) === "island";
+    }
+
+    // A widget toggled off in the list is still placed, but it owns no screen.
+    function _islandWidgetLocation(cfg, enabledOnly) {
+        for (const sectionId of ["left", "center", "right"]) {
+            const list = cfg?.[sectionId + "Widgets"] ?? [];
+            const index = list.findIndex(entry => _isIslandEntry(entry));
+            if (index < 0)
+                continue;
+            if (enabledOnly && list[index]?.enabled === false)
+                return null;
+            return {
+                sectionId,
+                index
+            };
+        }
+        return null;
+    }
+
+    function islandWidgetSection(cfg) {
+        return _islandWidgetLocation(cfg, true)?.sectionId ?? "";
+    }
+
+    // Mutates cfg in place, so callers pass a clone; a bare string entry is upgraded to carry settings.
+    function _writableIslandSettings(cfg) {
+        if (isIslandBarConfig(cfg))
+            return cfg;
+        const location = _islandWidgetLocation(cfg);
+        if (!location)
+            return {};
+        const list = cfg[location.sectionId + "Widgets"];
+        if (typeof list[location.index] === "string")
+            list[location.index] = {
+                "id": "island",
+                "enabled": true
+            };
+        return list[location.index];
+    }
+
+    function setIslandSettings(barId, patch) {
+        const config = getBarConfig(barId);
+        if (!config)
+            return;
+        if ("islandRouteDash" in patch) {
+            patch = Object.assign({}, patch);
+            const settings = islandSettings(config);
+            for (const activity of islandDashActivities) {
+                const key = islandRouteKey(activity);
+                if (patch[key] === undefined && (settings[key] === undefined || settings[key] === null))
+                    patch[key] = islandSetting(config, key);
+            }
+        }
+        if (isIslandBarConfig(config)) {
+            updateBarConfig(barId, patch);
+            return;
+        }
+        const location = _islandWidgetLocation(config);
+        if (!location)
+            return;
+        updateBarWidget(barId, location.sectionId, location.index, patch);
+    }
 
     function islandSetting(bc, key) {
-        const value = bc?.[key];
-        return value === undefined || value === null ? islandDefaults[key] : value;
+        const value = islandSettings(bc)[key];
+        if (value !== undefined && value !== null)
+            return value;
+        switch (key) {
+        case "islandRouteMedia":
+        case "islandRouteWeather":
+        case "islandRouteWallpaper":
+            return islandSetting(bc, "islandRouteDash");
+        }
+        return islandDefaultsFor(bc)[key];
+    }
+
+    function islandSatelliteTransparency(bc) {
+        if (islandSetting(bc, "islandSatelliteFollowInterfaceStyle"))
+            return barTransparency(bc);
+        return islandSetting(bc, "islandSatelliteTransparency");
     }
 
     function islandLevelDisplay(bc, key) {
@@ -909,9 +967,9 @@ Singleton {
     }
 
     function islandStripThickness(bc) {
-        return LayoutResolver.islandThickness(bc, islandDefaults);
+        return LayoutResolver.islandThickness(islandSettings(bc), islandDefaultsFor(bc));
     }
-    readonly property var _islandHomeGroupIds: ["media", "clock", "weather", "status", "volume", "brightness", "notifications"]
+    readonly property var _islandHomeGroupIds: ["media", "clock", "weather", "status", "volume", "brightness", "notifications", "privacy"]
     readonly property var _islandHomeLayoutDefault: [
         {
             "id": "media",
@@ -940,10 +998,15 @@ Singleton {
         {
             "id": "notifications",
             "enabled": true
+        },
+        {
+            "id": "privacy",
+            "enabled": true
         }
     ]
     function getIslandHomeLayout(bc) {
-        const stored = Array.isArray(bc?.islandHomeLayout) ? bc.islandHomeLayout : [];
+        const layout = islandSettings(bc).islandHomeLayout;
+        const stored = Array.isArray(layout) ? layout : [];
         const result = [];
         const seen = {};
         for (const entry of stored) {
@@ -978,7 +1041,7 @@ Singleton {
             if (ids.indexOf(entry.id) < 0)
                 ordered.push(entry);
         }
-        updateBarConfig(barId, {
+        setIslandSettings(barId, {
             islandHomeLayout: ordered
         });
     }
@@ -986,7 +1049,7 @@ Singleton {
     function setIslandHomeGroupEnabled(barId, id, on) {
         if (id === "clock")
             return;
-        updateBarConfig(barId, {
+        setIslandSettings(barId, {
             islandHomeLayout: getIslandHomeLayout(getBarConfig(barId)).map(g => g.id === id ? {
                     "id": g.id,
                     "enabled": on
@@ -996,6 +1059,7 @@ Singleton {
 
     property bool osdAlwaysShowValue: Spec.SPEC.osdAlwaysShowValue.def
     property int osdPosition: SettingsData.Position.BottomCenter
+    property var osdPositionOverrides: Spec.SPEC.osdPositionOverrides.def
     property bool osdVolumeEnabled: Spec.SPEC.osdVolumeEnabled.def
     property bool osdMediaVolumeEnabled: Spec.SPEC.osdMediaVolumeEnabled.def
     property bool osdMediaPlaybackEnabled: Spec.SPEC.osdMediaPlaybackEnabled.def
@@ -1020,15 +1084,20 @@ Singleton {
     property string customPowerActionReboot: Spec.SPEC.customPowerActionReboot.def
     property string customPowerActionPowerOff: Spec.SPEC.customPowerActionPowerOff.def
     property var customPowerButtons: Spec.SPEC.customPowerButtons.def
+    property var powerMenuBootEntries: Spec.SPEC.powerMenuBootEntries.def
 
     property bool updaterCheckOnStart: Spec.SPEC.updaterCheckOnStart.def
     property bool updaterUseCustomCommand: Spec.SPEC.updaterUseCustomCommand.def
     property string updaterCustomCommand: Spec.SPEC.updaterCustomCommand.def
     property string updaterTerminalAdditionalParams: Spec.SPEC.updaterTerminalAdditionalParams.def
     property int updaterIntervalSeconds: Spec.SPEC.updaterIntervalSeconds.def
+    property bool updaterNotify: Spec.SPEC.updaterNotify.def
+    property bool updaterPauseOnBattery: Spec.SPEC.updaterPauseOnBattery.def
+    property int updaterNotifyMinSeconds: Spec.SPEC.updaterNotifyMinSeconds.def
     property bool updaterIncludeFlatpak: Spec.SPEC.updaterIncludeFlatpak.def
     property bool updaterAllowAUR: Spec.SPEC.updaterAllowAUR.def
     property bool updaterReopenAfterUpgrade: Spec.SPEC.updaterReopenAfterUpgrade.def
+    property bool updaterUpgradeInWindow: Spec.SPEC.updaterUpgradeInWindow.def
     property var updaterIgnoredPackages: Spec.SPEC.updaterIgnoredPackages.def
 
     property string displayNameMode: Spec.SPEC.displayNameMode.def
@@ -1046,6 +1115,94 @@ Singleton {
 
     property var desktopWidgetInstances: Spec.SPEC.desktopWidgetInstances.def
     property var desktopWidgetGroups: Spec.SPEC.desktopWidgetGroups.def
+    property var lockScreenWidgetInstances: Spec.SPEC.lockScreenWidgetInstances.def
+    property var greeterWidgetInstances: Spec.SPEC.greeterWidgetInstances.def
+    property bool greeterFollowLockScreen: Spec.SPEC.greeterFollowLockScreen.def
+    readonly property var widgetInstanceListKeys: ["desktopWidgetInstances", "lockScreenWidgetInstances", "greeterWidgetInstances"]
+
+    // Released greeters still read these three shared keys, so they follow the lock widgets.
+    onLockScreenWidgetInstancesChanged: {
+        const status = widgetInstanceOfType("lockScreenWidgetInstances", "lockStatus");
+        const auth = widgetInstanceOfType("lockScreenWidgetInstances", "lockAuth");
+        const power = widgetInstanceOfType("lockScreenWidgetInstances", "lockPower");
+        const mirror = (key, value) => {
+            if (root[key] !== value)
+                set(key, value);
+        };
+        mirror("lockScreenShowWeather", !!status && status.enabled !== false && (status.config?.showWeather ?? true));
+        mirror("lockScreenShowProfileImage", !!auth && (auth.config?.showProfileImage ?? true));
+        mirror("lockScreenShowPowerActions", !!power && power.enabled !== false);
+        syncGreeterWidgets();
+    }
+
+    function widgetInstanceOfType(listKey, widgetType) {
+        return (root[listKey] || []).find(inst => inst.widgetType === widgetType) ?? null;
+    }
+
+    function lockWidgetInstance(widgetType) {
+        return widgetInstanceOfType("lockScreenWidgetInstances", widgetType);
+    }
+
+    function syncGreeterWidgets() {
+        if (!greeterFollowLockScreen)
+            return;
+        const next = Spec.greeterWidgetsFromLock(lockScreenWidgetInstances, greeterWidgetInstances);
+        if (JSON.stringify(next) === JSON.stringify(greeterWidgetInstances))
+            return;
+        set("greeterWidgetInstances", next);
+    }
+
+    function setGreeterFollowLockScreen(follow) {
+        if (follow === greeterFollowLockScreen)
+            return;
+        if (follow) {
+            for (const inst of greeterWidgetInstances || []) {
+                if (inst.id.startsWith("gw_"))
+                    SessionData.removeDesktopWidgetInstancePositions(inst.id);
+            }
+            set("greeterFollowLockScreen", true);
+            syncGreeterWidgets();
+            return;
+        }
+        const detached = (greeterWidgetInstances || []).map(inst => {
+            if (inst.widgetType === "greeterSession")
+                return inst;
+            const copy = JSON.parse(JSON.stringify(inst));
+            copy.id = "gw_" + inst.id;
+            SessionData.copyDesktopWidgetInstancePositions(inst.id, copy.id);
+            if (inst.widgetType !== "desktopClock" || inst.config?.autoPosition === false)
+                return copy;
+            copy.config.autoPosition = false;
+            SessionData.pinPublishedLockPosition(inst.id, copy.id, inst.config?.syncPositionAcrossScreens ?? false);
+            return copy;
+        });
+        set("greeterWidgetInstances", detached);
+        set("greeterFollowLockScreen", false);
+    }
+
+    function resetLockScreenWidgets() {
+        for (const inst of lockScreenWidgetInstances || [])
+            SessionData.removeDesktopWidgetInstancePositions(inst.id);
+        for (const inst of Spec.SPEC.lockScreenWidgetInstances.def)
+            SessionData.removeDesktopWidgetInstancePositions(inst.id);
+        resetToDefault(["lockScreenWidgetInstances"]);
+    }
+
+    // Following means the lock layout is the greeter layout, so that is what resets.
+    function resetGreeterWidgets() {
+        for (const inst of greeterWidgetInstances || []) {
+            if (!greeterFollowLockScreen || inst.widgetType === "greeterSession")
+                SessionData.removeDesktopWidgetInstancePositions(inst.id);
+        }
+        if (greeterFollowLockScreen) {
+            resetLockScreenWidgets();
+            set("greeterWidgetInstances", Spec.greeterWidgetsFromLock(lockScreenWidgetInstances, []));
+            return;
+        }
+        set("greeterWidgetInstances", Spec.greeterWidgetDefaults().map(inst => inst.widgetType === "greeterSession" ? inst : Object.assign(inst, {
+                id: "gw_" + inst.id
+            })));
+    }
 
     function getDefaultSystemMonitorConfig() {
         return {
@@ -1076,45 +1233,59 @@ Singleton {
         };
     }
 
-    function createDesktopWidgetInstance(widgetType, name, config) {
-        const id = "dw_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+    function widgetInstanceListKey(instanceId) {
+        return widgetInstanceListKeys.find(key => (root[key] || []).some(inst => inst.id === instanceId)) ?? "desktopWidgetInstances";
+    }
+
+    readonly property var widgetInstanceIdPrefixes: ({
+            desktopWidgetInstances: "dw_",
+            lockScreenWidgetInstances: "lw_",
+            greeterWidgetInstances: "gw_"
+        })
+
+    function createDesktopWidgetInstance(widgetType, name, config, listKey = "desktopWidgetInstances") {
+        const lockScreen = listKey !== "desktopWidgetInstances";
         const instance = {
-            id: id,
+            id: widgetInstanceIdPrefixes[listKey] + Date.now() + "_" + Math.random().toString(36).substr(2, 9),
             widgetType: widgetType,
             name: name || widgetType,
             enabled: true,
-            config: config || {}
+            config: Object.assign(lockScreen ? {
+                syncPositionAcrossScreens: true
+            } : {}, config || {})
         };
-        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
+        const instances = JSON.parse(JSON.stringify(root[listKey] || []));
         instances.push(instance);
-        desktopWidgetInstances = instances;
+        root[listKey] = instances;
         saveSettings();
         return instance;
     }
 
     function updateDesktopWidgetInstance(instanceId, updates) {
-        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
+        const listKey = widgetInstanceListKey(instanceId);
+        const instances = JSON.parse(JSON.stringify(root[listKey] || []));
         const idx = instances.findIndex(inst => inst.id === instanceId);
         if (idx === -1)
             return;
         Object.assign(instances[idx], updates);
-        desktopWidgetInstances = instances;
+        root[listKey] = instances;
         saveSettings();
     }
 
     function updateDesktopWidgetInstanceConfig(instanceId, configUpdates) {
-        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
+        const listKey = widgetInstanceListKey(instanceId);
+        const instances = JSON.parse(JSON.stringify(root[listKey] || []));
         const idx = instances.findIndex(inst => inst.id === instanceId);
         if (idx === -1)
             return;
         instances[idx].config = Object.assign({}, instances[idx].config || {}, configUpdates);
-        desktopWidgetInstances = instances;
+        root[listKey] = instances;
         saveSettings();
     }
 
     function removeDesktopWidgetInstance(instanceId) {
-        const instances = (desktopWidgetInstances || []).filter(inst => inst.id !== instanceId);
-        desktopWidgetInstances = instances;
+        const listKey = widgetInstanceListKey(instanceId);
+        root[listKey] = (root[listKey] || []).filter(inst => inst.id !== instanceId);
         SessionData.removeDesktopWidgetInstancePositions(instanceId);
         saveSettings();
     }
@@ -1123,23 +1294,21 @@ Singleton {
         const source = getDesktopWidgetInstance(instanceId);
         if (!source)
             return null;
-        const newId = "dw_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-        const instance = {
-            id: newId,
-            widgetType: source.widgetType,
-            name: source.name + " (Copy)",
-            enabled: source.enabled,
-            config: JSON.parse(JSON.stringify(source.config || {}))
-        };
-        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
-        instances.push(instance);
-        desktopWidgetInstances = instances;
-        saveSettings();
+        const instance = createDesktopWidgetInstance(source.widgetType, source.name + " (Copy)", JSON.parse(JSON.stringify(source.config || {})), widgetInstanceListKey(instanceId));
+        if (!source.enabled)
+            updateDesktopWidgetInstance(instance.id, {
+                enabled: false
+            });
         return instance;
     }
 
     function getDesktopWidgetInstance(instanceId) {
-        return (desktopWidgetInstances || []).find(inst => inst.id === instanceId) || null;
+        for (const key of widgetInstanceListKeys) {
+            const found = (root[key] || []).find(inst => inst.id === instanceId);
+            if (found)
+                return found;
+        }
+        return null;
     }
 
     function moveDesktopWidgetInstanceToGroup(instanceId, groupId, newIndexInGroup) {
@@ -1466,6 +1635,22 @@ Singleton {
         SessionData.saveSettings();
     }
 
+    // Older builds flagged keys the linked slot now serves live; drop them so Apply does not nag forever.
+    function pruneGreeterSyncPending() {
+        const baseline = SessionData.greeterSyncBaseline || {};
+        const keys = Object.keys(baseline);
+        const live = keys.filter(key => Spec.SPEC[key]?.onChange === "markGreeterSyncPending");
+        if (live.length === keys.length)
+            return;
+        const pruned = {};
+        for (const key of live)
+            pruned[key] = baseline[key];
+        SessionData.greeterSyncBaseline = pruned;
+        if (live.length === 0)
+            SessionData.greeterSyncPending = false;
+        SessionData.saveSettings();
+    }
+
     function clearGreeterSyncPending() {
         SessionData.greeterSyncBaseline = {};
         SessionData.greeterSyncPending = false;
@@ -1528,6 +1713,41 @@ Singleton {
         }
     }
 
+    function osdPositionFor(kind) {
+        const override = osdPositionOverrides?.[kind];
+        return typeof override === "number" ? override : osdPosition;
+    }
+
+    function hasOsdPositionOverride(kind) {
+        return typeof osdPositionOverrides?.[kind] === "number";
+    }
+
+    function setOsdPosition(kind, position) {
+        if (!kind) {
+            set("osdPosition", position);
+            return;
+        }
+        if (position === osdPosition) {
+            resetOsdPosition(kind);
+            return;
+        }
+        set("osdPositionOverrides", Object.assign({}, osdPositionOverrides, {
+            [kind]: position
+        }));
+    }
+
+    function resetOsdPosition(kind) {
+        if (!kind) {
+            resetToDefault(["osdPosition"]);
+            return;
+        }
+        if (!hasOsdPositionOverride(kind))
+            return;
+        const next = Object.assign({}, osdPositionOverrides);
+        delete next[kind];
+        set("osdPositionOverrides", next);
+    }
+
     function barConfigDefault(field) {
         return Spec.SPEC.barConfigs.def[0][field];
     }
@@ -1543,8 +1763,7 @@ Singleton {
         const configs = JSON.parse(JSON.stringify(barConfigs));
         for (const cfg of configs)
             delete cfg.island;
-        barConfigs = configs;
-        updateBarConfigs();
+        _commitBarConfigs(configs);
     }
 
     function loadSettings() {
@@ -1644,6 +1863,7 @@ Singleton {
     function _mergeSessionState() {
         if (!_hasLoaded || !SessionData._hasLoaded)
             return;
+        pruneGreeterSyncPending();
 
         const pluginState = SessionData.builtInPluginState || {};
         if (Object.keys(pluginState).length > 0) {
@@ -2268,6 +2488,16 @@ Singleton {
         }
         const listKey = sectionId + "Widgets";
         const list = (config[listKey] ?? []).slice();
+        if (widgetId === "island") {
+            if (isIslandBarConfig(config) || islandWidgetBlocked(config) || _islandWidgetLocation(config))
+                return -1;
+            const configs = JSON.parse(JSON.stringify(barConfigs));
+            const target = configs.find(cfg => cfg.id === barId);
+            list.push(entry);
+            target[listKey] = list;
+            _commitIslandOwner(configs, target);
+            return list.length - 1;
+        }
         list.push(entry);
         const patch = {};
         patch[listKey] = list;
@@ -2321,13 +2551,23 @@ Singleton {
             island: wantIsland,
             dot: wantDot
         };
-        if (on === true) {
-            if (!config.enabled)
-                updates.enabled = true;
-            if ((config.screenPreferences ?? []).length === 0)
-                updates.screenPreferences = ["all"];
+        const configs = JSON.parse(JSON.stringify(barConfigs));
+        const target = Object.assign(configs.find(cfg => cfg.id === barId), updates);
+        if (on !== true) {
+            _commitBarConfigs(configs);
+            return;
         }
-        updateBarConfig(barId, updates);
+        if (!config.enabled)
+            target.enabled = true;
+        // A hidden island would draw but leave routing, with no Visibility card and no `bar reveal` to bring it back.
+        if (config.visible === false)
+            target.visible = true;
+        if ((config.screenPreferences ?? []).length === 0)
+            target.screenPreferences = ["all"];
+        _stashIslandWidget(target);
+        if (wantIsland)
+            _evictIslandWidgets(configs, target);
+        _commitBarConfigs(configs);
     }
 
     function isBarIpcRevealed(barId) {
@@ -2376,8 +2616,7 @@ Singleton {
             setBarIpcReveal(barId, false);
 
         Object.assign(configs[index], updates);
-        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
-        updateBarConfigs();
+        _commitIslandOwner(configs, configs[index]);
 
         if (positionChanged) {
             notificationPopupsInvalidated();
@@ -2474,6 +2713,96 @@ Singleton {
         return !!bc && (bc.island === true || bc.dot === true);
     }
 
+    function islandWidgetEntry(bc) {
+        const location = isIslandBarConfig(bc) ? null : _islandWidgetLocation(bc);
+        if (!location)
+            return null;
+        const entry = bc[location.sectionId + "Widgets"][location.index];
+        return typeof entry === "string" ? {
+            "id": entry
+        } : entry;
+    }
+
+    function hostsIsland(bc) {
+        return isIslandBarConfig(bc) || !!_islandWidgetLocation(bc, true);
+    }
+
+    function _sharesScreen(a, b) {
+        return Quickshell.screens.some(screen => barConfigCoversScreen(a, screen) && barConfigCoversScreen(b, screen));
+    }
+
+    function islandWidgetBlocked(bc) {
+        if (!bc)
+            return true;
+        return (barConfigs || []).some(cfg => cfg.id !== bc.id && cfg.island === true && cfg.enabled !== false && _sharesScreen(cfg, bc));
+    }
+
+    // Clones and dots drop the widget for good; an island-layout switch stashes it first.
+    function stripIslandWidget(cfg) {
+        delete cfg.islandWidgetStash;
+        _stripIslandEntries(cfg);
+    }
+
+    function _stripIslandEntries(cfg) {
+        for (const sectionId of ["left", "center", "right"]) {
+            const key = sectionId + "Widgets";
+            if (Array.isArray(cfg[key]))
+                cfg[key] = cfg[key].filter(entry => !_isIslandEntry(entry));
+        }
+    }
+
+    // An island-layout bar cannot host the widget, but switching back should not cost the user its placement and settings.
+    function _stashIslandWidget(cfg) {
+        const location = _islandWidgetLocation(cfg);
+        if (location)
+            cfg.islandWidgetStash = Object.assign({
+                "entry": cfg[location.sectionId + "Widgets"][location.index]
+            }, location);
+        _stripIslandEntries(cfg);
+    }
+
+    // A restore never evicts: while another island holds the screen the stash waits for a later commit to free it.
+    function _restoreIslandWidget(cfg, configs) {
+        const stash = cfg.islandWidgetStash;
+        if (!stash?.entry) {
+            delete cfg.islandWidgetStash;
+            return;
+        }
+        if (isIslandBarConfig(cfg) || _islandWidgetLocation(cfg) || _islandScreenTaken(configs, cfg))
+            return;
+        delete cfg.islandWidgetStash;
+        const key = stash.sectionId + "Widgets";
+        const list = Array.isArray(cfg[key]) ? cfg[key].slice() : [];
+        list.splice(Math.min(stash.index, list.length), 0, stash.entry);
+        cfg[key] = list;
+    }
+
+    function _islandScreenTaken(configs, bc) {
+        return configs.some(cfg => cfg.id !== bc.id && cfg.enabled !== false && (cfg.island === true || _islandWidgetLocation(cfg, true)) && _sharesScreen(cfg, bc));
+    }
+
+    function _evictIslandWidgets(configs, owner) {
+        for (const cfg of configs) {
+            if (cfg.id !== owner.id && cfg.enabled !== false && _islandWidgetLocation(cfg, true) && _sharesScreen(cfg, owner))
+                _stashIslandWidget(cfg);
+        }
+    }
+
+    // Island-relevant writes must go through here, or a freed screen never gets its stashed widget back.
+    function _commitBarConfigs(configs) {
+        for (const cfg of configs)
+            _restoreIslandWidget(cfg, configs);
+        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
+        updateBarConfigs();
+    }
+
+    // The bar just written wins its screens: enabling a bar or its island entry evicts the previous host.
+    function _commitIslandOwner(configs, cfg) {
+        if (cfg.enabled !== false && !isIslandBarConfig(cfg) && _islandWidgetLocation(cfg, true))
+            _evictIslandWidgets(configs, cfg);
+        _commitBarConfigs(configs);
+    }
+
     function isDotBarConfig(bc) {
         return !!bc && bc.dot === true;
     }
@@ -2507,24 +2836,66 @@ Singleton {
         });
         // An inherited "always here" would make the base island and the dot fight by config order.
         delete config.islandSharedRouting;
+        stripIslandWidget(config);
         addBarConfig(config);
     }
 
     function islandFreePlacement(bc) {
-        return isDotBarConfig(bc) || (islandSetting(bc, "islandFloating") && islandSetting(bc, "islandPlacement") === "free");
+        return isDotBarConfig(bc) || (isIslandBarConfig(bc) && islandSetting(bc, "islandFloating") && islandSetting(bc, "islandPlacement") === "free");
     }
 
+    // A hosted island shares its config id with the bar, so last-used cannot tell them apart and would degenerate into always.
     function islandSharedRoutingMode(bc) {
-        const mode = bc?.islandSharedRouting;
-        return ["always", "last-used"].includes(mode) ? mode : "normal";
+        const mode = islandSetting(bc, "islandSharedRouting");
+        if (mode === "always")
+            return mode;
+        return mode === "last-used" && isIslandBarConfig(bc) ? mode : "normal";
+    }
+
+    // Dashboard activities share an IPC close, but choose their destinations independently.
+    readonly property var islandDashActivities: ["home", "media", "weather", "wallpaper"]
+
+    function islandRouteKey(activity) {
+        switch (activity) {
+        case "controlcenter":
+            return "islandRouteControlCenter";
+        case "notificationcenter":
+            return "islandRouteNotificationCenter";
+        case "launcher":
+            return "islandRouteLauncher";
+        case "home":
+            return "islandRouteDash";
+        case "media":
+            return "islandRouteMedia";
+        case "weather":
+            return "islandRouteWeather";
+        case "wallpaper":
+            return "islandRouteWallpaper";
+        case "clipboard":
+            return "islandRouteClipboard";
+        }
+        return "";
+    }
+
+    function islandActivityRoutingMode(bc, activity) {
+        const key = islandRouteKey(activity);
+        const override = key ? islandSetting(bc, key) : "follow";
+        if (override === "island")
+            return "always";
+        if (override === "bar")
+            return "never";
+        return islandSharedRoutingMode(bc);
     }
 
     function sharedShortcutsFollowLastUsed(screen) {
         return activeIslandConfigsForScreen(screen).some(cfg => islandSharedRoutingMode(cfg) === "last-used");
     }
 
-    function sharedShortcutsOverridden(screen) {
-        return activeIslandConfigsForScreen(screen).some(cfg => islandSharedRoutingMode(cfg) !== "normal");
+    function sharedShortcutsOverridden(screen, activity) {
+        return activeIslandConfigsForScreen(screen).some(cfg => {
+            const mode = islandActivityRoutingMode(cfg, activity);
+            return mode === "always" || mode === "last-used";
+        });
     }
 
     function recordBarInteraction(screen, barId) {
@@ -2536,20 +2907,45 @@ Singleton {
         });
     }
 
-    function sharedTriggerIslandConfig(screen) {
-        const configs = activeIslandConfigsForScreen(screen);
-        if (sharedShortcutsFollowLastUsed(screen)) {
+    // A satellite carrying the activity's own widget is a standard destination on this screen, same as a bar.
+    function islandSatelliteHosts(cfg, activity) {
+        const widgetId = activity === "controlcenter" ? "controlCenterButton" : activity === "notificationcenter" ? "notificationButton" : "";
+        if (!widgetId || !isIslandBarConfig(cfg) || isDotBarConfig(cfg) || !islandSetting(cfg, "islandSatellitesEnabled"))
+            return false;
+        return ["leftWidgets", "centerWidgets", "rightWidgets"].some(key => (cfg[key] ?? []).some(entry => (typeof entry === "string" ? entry : entry?.id) === widgetId && (typeof entry === "string" || entry.enabled !== false)));
+    }
+
+    function sharedTriggerIslandConfig(screen, activity) {
+        const active = activeIslandConfigsForScreen(screen);
+        const configs = active.filter(cfg => islandActivityRoutingMode(cfg, activity) !== "never");
+        const key = islandRouteKey(activity);
+        const pinned = key ? configs.find(cfg => {
+            // Saved choices outrank defaults, including legacy dashboard-family pins.
+            const settings = islandSettings(cfg);
+            const override = settings[key] ?? (islandDashActivities.indexOf(activity) >= 0 ? settings.islandRouteDash : undefined);
+            return override === "island";
+        }) : null;
+        if (pinned)
+            return pinned;
+        if (configs.some(cfg => islandActivityRoutingMode(cfg, activity) === "last-used")) {
             const lastId = lastUsedBarByScreen[screen?.name];
             const lastIsland = configs.find(cfg => cfg.id === lastId);
             if (lastIsland)
                 return lastIsland;
         } else {
-            const fixed = configs.find(cfg => islandSharedRoutingMode(cfg) === "always");
+            const fixed = configs.find(cfg => islandActivityRoutingMode(cfg, activity) === "always");
             if (fixed)
                 return fixed;
         }
-        if (getActiveBarEdgesForScreen(screen).length > 0)
+        if (getActiveBarEdgesForScreen(screen).length > 0 || active.some(cfg => islandSatelliteHosts(cfg, activity)))
             return null;
+        return configs.find(cfg => !isDotBarConfig(cfg)) ?? configs[0] ?? null;
+    }
+    function islandLauncherHostConfig(screen) {
+        const config = sharedTriggerIslandConfig(screen, "launcher");
+        if (config || launcherStyle !== "island")
+            return config;
+        const configs = activeIslandConfigsForScreen(screen).filter(cfg => islandActivityRoutingMode(cfg, "launcher") !== "never");
         return configs.find(cfg => !isDotBarConfig(cfg)) ?? configs[0] ?? null;
     }
 
@@ -2557,34 +2953,33 @@ Singleton {
     function setIslandSharedRouting(barId, mode) {
         const configs = JSON.parse(JSON.stringify(barConfigs));
         const target = configs.find(cfg => cfg.id === barId);
-        if (!target)
+        if (!target || !(isIslandBarConfig(target) || _islandWidgetLocation(target)))
             return;
-        target.islandSharedRouting = mode;
+        _writableIslandSettings(target).islandSharedRouting = mode;
         if (mode === "always") {
-            const screens = Quickshell.screens.filter(screen => barConfigCoversScreen(target, screen));
             for (const cfg of configs) {
-                if (cfg.id !== barId && isIslandBarConfig(cfg) && islandSharedRoutingMode(cfg) === "always" && screens.some(screen => barConfigCoversScreen(cfg, screen)))
-                    delete cfg.islandSharedRouting;
+                if (cfg.id !== barId && hostsIsland(cfg) && islandSharedRoutingMode(cfg) === "always" && _sharesScreen(cfg, target))
+                    delete _writableIslandSettings(cfg).islandSharedRouting;
             }
         }
-        barConfigs = configs;
-        updateBarConfigs();
+        _commitBarConfigs(configs);
     }
 
+    // A hidden bar takes its island with it, so it must not keep swallowing popups and OSDs.
     function activeIslandConfigsForScreen(screen) {
-        return ShellLayout.islandConfigs(screen);
+        return ShellLayout.islandConfigs(screen).filter(cfg => cfg.visible !== false);
     }
 
     function islandConfigForEdge(screen, edge) {
         return ShellLayout.edge(screen, edge)?.island ?? null;
     }
 
-    function dankIslandCoversScreen(screen) {
-        return activeIslandConfigsForScreen(screen).length > 0;
-    }
-
     function dankIslandHandlesNotifications(screen) {
         return activeIslandConfigsForScreen(screen).some(cfg => !islandSetting(cfg, "islandNotificationPopups"));
+    }
+
+    function dankIslandHandlesSystemOsd(screen) {
+        return activeIslandConfigsForScreen(screen).some(cfg => islandSetting(cfg, "islandSystemOsd"));
     }
 
     function dankIslandOwnsEdge(screen, edge) {
@@ -2653,11 +3048,15 @@ Singleton {
     }
 
     function setMatugenSpec(spec) {
-        var normalized = spec === "2025" ? "2025" : "2021";
+        var normalized = spec === "2025" || spec === "dms" ? spec : "2021";
         if (matugenSpec === normalized)
             return;
-        if (normalized === "2025" && matugenContrast < 0)
-            set("matugenContrast", 0);
+        if (normalized !== "2021") {
+            if (matugenContrast < 0)
+                set("matugenContrast", 0);
+            if (typeof Theme !== "undefined" && !Theme.getMatugenScheme(matugenScheme).spec2025)
+                set("matugenScheme", "scheme-tonal-spot");
+        }
         set("matugenSpec", normalized);
     }
 
@@ -2873,34 +3272,57 @@ Singleton {
         saveSettings();
     }
 
-    function addMediaExcludePlayer(identity) {
-        if (identity === undefined || identity === null)
-            return;
-        var normalizedIdentity = identity.toString().trim().toLowerCase();
+    function addAppIdToList(identity: string, appList: list<string>): list<string> {
+        identity = identity ?? "";
+        appList = appList ?? [];
+        if (!identity)
+            return appList;
+
+        var normalizedIdentity = Paths.normalizeAppId(identity);
         if (!normalizedIdentity)
-            return;
-        var list = mediaExcludePlayers ? mediaExcludePlayers.slice() : [];
-        var normalizedList = list.map(function (id) {
-            return id ? id.toString().trim().toLowerCase() : "";
-        });
-        if (normalizedList.indexOf(normalizedIdentity) >= 0)
-            return;
-        list.push(normalizedIdentity);
-        mediaExcludePlayers = list;
+            return appList;
+
+        var cleanList = appList.map(id => id ? Paths.normalizeAppId(id) : "").filter(id => id !== "");
+        if (cleanList.includes(normalizedIdentity))
+            return cleanList;
+
+        cleanList.push(normalizedIdentity);
+        return cleanList;
+    }
+
+    function removeAppIdFromList(index: int, appList: list<string>): list<string> {
+        var moddedList = appList ? appList.slice() : [];
+        if (index < 0 || index >= moddedList.length)
+            return moddedList;
+        moddedList.splice(index, 1);
+        return moddedList;
+    }
+
+    function addNightModeExcludedApp(identity: string) {
+        var newList = addAppIdToList(identity, nightModeExcludedApps);
+        nightModeExcludedApps = newList;
+        saveSettings();
+    }
+
+    function removeNightModeExcludedApp(index: int) {
+        var newList = removeAppIdFromList(index, nightModeExcludedApps);
+        nightModeExcludedApps = newList;
+        saveSettings();
+    }
+
+    function addMediaExcludePlayer(identity) {
+        var newList = addAppIdToList(identity, mediaExcludePlayers);
+        mediaExcludePlayers = newList;
         saveSettings();
     }
 
     function removeMediaExcludePlayer(index) {
-        var list = mediaExcludePlayers ? mediaExcludePlayers.slice() : [];
-        if (index < 0 || index >= list.length)
-            return;
-        list.splice(index, 1);
-        mediaExcludePlayers = list;
+        var newList = removeAppIdFromList(index, mediaExcludePlayers);
+        mediaExcludePlayers = newList;
         saveSettings();
     }
 
-    property bool _pendingExpandNotificationRules: false
-    property int _pendingNotificationRuleIndex: -1
+    property var pendingNotificationRule: null
 
     function _newNotificationRule(overrides) {
         return Object.assign({
@@ -2914,27 +3336,20 @@ Singleton {
         }, overrides || {});
     }
 
-    function addNotificationRule() {
+    function addNotificationRule(ruleData) {
         var rules = JSON.parse(JSON.stringify(notificationRules || []));
-        rules.push(_newNotificationRule());
+        rules.push(_newNotificationRule(ruleData));
         notificationRules = rules;
         saveSettings();
     }
 
-    function addNotificationRuleForNotification(appName, desktopEntry) {
-        var rules = JSON.parse(JSON.stringify(notificationRules || []));
-        var pattern = desktopEntry || appName || "";
-        rules.push(_newNotificationRule(pattern ? {
+    function requestNotificationRuleForNotification(appName, desktopEntry) {
+        const pattern = desktopEntry || appName || "";
+        pendingNotificationRule = _newNotificationRule(pattern ? {
             field: desktopEntry ? "desktopEntry" : "appName",
             pattern: pattern,
             matchType: "exact"
-        } : {}));
-        notificationRules = rules;
-        saveSettings();
-        var index = rules.length - 1;
-        _pendingExpandNotificationRules = true;
-        _pendingNotificationRuleIndex = index;
-        return index;
+        } : {});
     }
 
     function _isMuteRule(rule) {
@@ -2951,10 +3366,11 @@ Singleton {
         if (!app && !desktop)
             return -1;
         return rules.findIndex(rule => {
-            if (!predicate(rule))
+            if (!predicate(rule) || (rule.matchType || "contains").toString().toLowerCase() !== "exact")
                 return false;
             const pattern = (rule.pattern || "").toString().toLowerCase();
-            return pattern !== "" && (pattern === app || pattern === desktop);
+            const value = !rule.field || rule.field === "appName" ? app : rule.field === "desktopEntry" ? desktop : "";
+            return pattern !== "" && pattern === value;
         });
     }
 
@@ -2972,20 +3388,31 @@ Singleton {
         saveSettings();
     }
 
-    function _removeAppRule(appName, desktopEntry, predicate) {
+    function _hasNoAction(rule) {
+        return (rule.action || "default").toString().toLowerCase() === "default";
+    }
+
+    // Edits the first enabled matching rule and drops it once it no longer does anything.
+    function _updateAppRule(appName, desktopEntry, predicate, changes) {
         var rules = JSON.parse(JSON.stringify(notificationRules || []));
-        const index = _appRuleIndex(rules, appName, desktopEntry, predicate);
+        const index = _appRuleIndex(rules, appName, desktopEntry, rule => rule.enabled !== false && predicate(rule));
         if (index === -1)
-            return;
-        rules.splice(index, 1);
+            return false;
+        const rule = Object.assign(rules[index], changes);
+        if (_hasNoAction(rule) && (rule.urgency || "default").toString().toLowerCase() === "default" && !_isDndBypassRule(rule))
+            rules.splice(index, 1);
         notificationRules = rules;
         saveSettings();
+        return true;
     }
 
     function addMuteRuleForApp(appName, desktopEntry) {
-        _addAppRule(appName, desktopEntry, {
+        if (!_updateAppRule(appName, desktopEntry, _hasNoAction, {
             action: "mute"
-        });
+        }))
+            _addAppRule(appName, desktopEntry, {
+                action: "mute"
+            });
     }
 
     function isAppMuted(appName, desktopEntry) {
@@ -2993,7 +3420,9 @@ Singleton {
     }
 
     function removeMuteRuleForApp(appName, desktopEntry) {
-        _removeAppRule(appName, desktopEntry, _isMuteRule);
+        _updateAppRule(appName, desktopEntry, _isMuteRule, {
+            action: "default"
+        });
     }
 
     function isAppDndBypassed(appName, desktopEntry) {
@@ -3002,14 +3431,19 @@ Singleton {
 
     function setAppDndBypass(appName, desktopEntry, enabled) {
         if (!enabled) {
-            _removeAppRule(appName, desktopEntry, _isDndBypassRule);
+            _updateAppRule(appName, desktopEntry, _isDndBypassRule, {
+                bypassDnd: false
+            });
             return;
         }
         if (isAppDndBypassed(appName, desktopEntry))
             return;
-        _addAppRule(appName, desktopEntry, {
+        if (!_updateAppRule(appName, desktopEntry, () => true, {
             bypassDnd: true
-        });
+        }))
+            _addAppRule(appName, desktopEntry, {
+                bypassDnd: true
+            });
     }
 
     function updateNotificationRule(index, ruleData) {

@@ -21,7 +21,11 @@ Item {
             Mail: 7,
             Terminal: 8,
             Calendar: 9,
-            Maps: 10
+            Maps: 10,
+            WordProcessor: 11,
+            Spreadsheet: 12,
+            Presentation: 13,
+            ArchiveManager: 14
         })
 
     property string currentWebBrowserAppId: ""
@@ -35,6 +39,10 @@ Item {
     property string currentTerminalAppId: ""
     property string currentCalendarAppId: ""
     property string currentMapsAppId: ""
+    property string currentWordProcessorAppId: ""
+    property string currentSpreadsheetAppId: ""
+    property string currentPresentationAppId: ""
+    property string currentArchiveManagerAppId: ""
 
     property var categoryModels: ({})
 
@@ -45,13 +53,17 @@ Item {
             [root.appCategory.WebBrowser]: ["x-scheme-handler/https", "x-scheme-handler/http", "text/html", "application/xhtml+xml"],
             [root.appCategory.FileManager]: ["inode/directory", "x-scheme-handler/file", "x-scheme-handler/sftp"],
             [root.appCategory.TextEditor]: ["text/plain", "text/markdown", "application/x-zerosize", "text/x-c++src", "text/x-csrc", "text/x-python", "text/x-shellscript", "application/json"],
-            [root.appCategory.ImageViewer]: ["image/png", "image/jpeg", "image/gif", "image/bmp", "image/webp", "image/avif", "image/svg+xml"],
+            [root.appCategory.ImageViewer]: ["image/png", "image/jpeg", "image/gif", "image/bmp", "image/webp", "image/avif", "image/svg+xml", "image/tiff", "image/heic", "image/heif", "image/jxl"],
             [root.appCategory.VideoPlayer]: ["video/mp4", "video/x-matroska", "video/webm", "video/avi", "video/mpeg", "video/quicktime", "video/x-msvideo"],
             [root.appCategory.MusicPlayer]: ["audio/mpeg", "audio/x-flac", "audio/wav", "audio/ogg", "audio/aac", "audio/webm"],
             [root.appCategory.PDFReader]: ["application/pdf", "application/x-ext-pdf", "application/x-bzpdf", "application/x-gzpdf", "application/vnd.comicbook-rar", "application/vnd.comicbook+zip"],
             [root.appCategory.Mail]: ["x-scheme-handler/mailto"],
-            [root.appCategory.Calendar]: ["x-scheme-handler/calendar"],
+            [root.appCategory.Calendar]: ["text/calendar", "x-scheme-handler/calendar", "x-scheme-handler/webcal", "x-scheme-handler/webcals"],
             [root.appCategory.Maps]: ["x-scheme-handler/geo"],
+            [root.appCategory.WordProcessor]: ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword", "application/vnd.oasis.opendocument.text", "application/rtf"],
+            [root.appCategory.Spreadsheet]: ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel", "application/vnd.oasis.opendocument.spreadsheet", "text/csv"],
+            [root.appCategory.Presentation]: ["application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/vnd.ms-powerpoint", "application/vnd.oasis.opendocument.presentation"],
+            [root.appCategory.ArchiveManager]: ["application/zip", "application/x-tar", "application/x-7z-compressed", "application/x-rar", "application/gzip", "application/x-bzip2", "application/x-xz"],
             [root.appCategory.Terminal]: ["terminal"] // Special
         })
 
@@ -301,7 +313,7 @@ Item {
 
         SettingsCard {
             settingKey: "defaultAppsUtilities"
-            tags: ["file", "manager", "terminal", "editor"]
+            tags: ["file", "manager", "terminal", "editor", "archive", "zip"]
             title: I18n.tr("Utilities", "Utilities")
             iconName: "terminal"
 
@@ -320,11 +332,16 @@ Item {
                 category: root.appCategory.Calendar
                 tags: ["calendar", "events"]
             }
+            AppSelector {
+                text: I18n.tr("Archive manager", "default app selector label for archive manager program for zip and tar files")
+                category: root.appCategory.ArchiveManager
+                tags: ["archive", "zip", "tar", "compress"]
+            }
         }
 
         SettingsCard {
             settingKey: "defaultAppsDocuments"
-            tags: ["pdf", "text", "reader", "office"]
+            tags: ["pdf", "text", "reader", "office", "word", "spreadsheet", "presentation"]
             title: I18n.tr("Documents", "Documents")
             iconName: "edit_document"
 
@@ -337,6 +354,21 @@ Item {
                 text: I18n.tr("PDF reader")
                 category: root.appCategory.PDFReader
                 tags: ["pdf", "reader"]
+            }
+            AppSelector {
+                text: I18n.tr("Word processor", "default app selector label for word processor program")
+                category: root.appCategory.WordProcessor
+                tags: ["word", "document", "docs", "office", "writer"]
+            }
+            AppSelector {
+                text: I18n.tr("Spreadsheet", "default app selector label for spreadsheet program")
+                category: root.appCategory.Spreadsheet
+                tags: ["spreadsheet", "excel", "calc", "csv", "office"]
+            }
+            AppSelector {
+                text: I18n.tr("Presentation", "default app selector label for slide presentation program, not presentation mode")
+                category: root.appCategory.Presentation
+                tags: ["presentation", "powerpoint", "ppt", "slides", "office"]
             }
         }
 

@@ -18,7 +18,7 @@ Item {
     readonly property int launcherResultCount: root.body?.launcherResultCount ?? 0
     readonly property int hostOriginX: root.body?.hostOriginX ?? 0
     readonly property int hostOriginY: root.body?.hostOriginY ?? 0
-    readonly property var islandLayer: root.body?.hostWindow?.dBarLayer ?? WlrLayer.Top
+    readonly property int islandLayer: root.body?.hostLayer ?? WlrLayer.Top
 
     function requestKeyboardFocus() {
         root.body?.requestKeyboardFocus();
@@ -66,6 +66,11 @@ Item {
             }
 
             Region {
+                item: centerSectionHole
+                intersection: Intersection.Subtract
+            }
+
+            Region {
                 item: trailingSectionHole
                 intersection: Intersection.Subtract
             }
@@ -102,9 +107,20 @@ Item {
         Item {
             id: leadingSectionHole
 
-            readonly property var r: root.body?.hostWindow?.leadingSectionRect ?? null
-            x: (r?.x ?? 0) + root.hostOriginX - (root.body?.originOffsetX ?? 0)
-            y: (r?.y ?? 0) + root.hostOriginY - (root.body?.originOffsetY ?? 0)
+            readonly property var r: root.body?.leadingSectionRect ?? null
+            x: (r?.x ?? 0) + (root.body?.sectionOriginX ?? 0)
+            y: (r?.y ?? 0) + (root.body?.sectionOriginY ?? 0)
+            width: r?.w ?? 0
+            height: r?.h ?? 0
+        }
+
+        // A hosted island shares the centre section with other widgets; they stay clickable while the sheet is out.
+        Item {
+            id: centerSectionHole
+
+            readonly property var r: root.body?.centerSectionRect ?? null
+            x: (r?.x ?? 0) + (root.body?.sectionOriginX ?? 0)
+            y: (r?.y ?? 0) + (root.body?.sectionOriginY ?? 0)
             width: r?.w ?? 0
             height: r?.h ?? 0
         }
@@ -112,9 +128,9 @@ Item {
         Item {
             id: trailingSectionHole
 
-            readonly property var r: root.body?.hostWindow?.trailingSectionRect ?? null
-            x: (r?.x ?? 0) + root.hostOriginX - (root.body?.originOffsetX ?? 0)
-            y: (r?.y ?? 0) + root.hostOriginY - (root.body?.originOffsetY ?? 0)
+            readonly property var r: root.body?.trailingSectionRect ?? null
+            x: (r?.x ?? 0) + (root.body?.sectionOriginX ?? 0)
+            y: (r?.y ?? 0) + (root.body?.sectionOriginY ?? 0)
             width: r?.w ?? 0
             height: r?.h ?? 0
         }
@@ -128,7 +144,7 @@ Item {
                 mouse.accepted = true;
             }
 
-            onWheel: wheel => root.body?.hostWindow?.processScrollWheel?.(wheel)
+            onWheel: wheel => root.body?.scrollWheel(wheel)
         }
     }
 }

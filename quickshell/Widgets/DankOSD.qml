@@ -14,6 +14,8 @@ PanelWindow {
     property alias content: contentLoader.sourceComponent
     property alias contentLoader: contentLoader
     property var modelData
+    property string osdKind: ""
+    readonly property int osdPosition: SettingsData.osdPositionFor(osdKind)
     property bool shouldBeVisible: false
     property bool _surfaceFrameReady: false
     readonly property bool presented: shouldBeVisible && _surfaceFrameReady
@@ -25,12 +27,15 @@ PanelWindow {
     property real surfaceRadius: Theme.fullRadius(alignedWidth, alignedHeight)
     property int animationDuration: Theme.mediumDuration
     property var animationEasing: Theme.emphasizedEasing
+    property Component sheet: null
+    property real sheetWidth: 0
+    property bool expanded: false
 
     signal osdShown
     signal osdHidden
 
     function show() {
-        if (SessionData.suppressOSD)
+        if (SessionData.suppressOSD || expanded)
             return;
         if (shouldBeVisible) {
             hideTimer.restart();
@@ -45,8 +50,36 @@ PanelWindow {
     }
 
     function hide() {
+        if (expanded) {
+            closeSheet();
+            return;
+        }
         shouldBeVisible = false;
         closeTimer.restart();
+    }
+
+    function expand() {
+        if (!sheet || !shouldBeVisible || expanded)
+            return;
+        hideTimer.stop();
+        expanded = true;
+    }
+
+    function closeSheet() {
+        if (sheetLoader.item) {
+            sheetLoader.item.close();
+            return;
+        }
+        finishSheet();
+    }
+
+    function finishSheet() {
+        expanded = false;
+        shouldBeVisible = false;
+        hideTimer.stop();
+        closeTimer.stop();
+        visible = false;
+        osdHidden();
     }
 
     function resetHideTimer() {
@@ -101,6 +134,7 @@ PanelWindow {
             if (Quickshell.screens[i].name === currentScreenName)
                 return;
         }
+        expanded = false;
         shouldBeVisible = false;
         visible = false;
         hideTimer.stop();
@@ -135,7 +169,7 @@ PanelWindow {
     readonly property real alignedWidth: Theme.px(osdWidth, dpr)
     readonly property real alignedHeight: Theme.px(osdHeight, dpr)
 
-    readonly property bool isVerticalLayout: SettingsData.osdPosition === SettingsData.Position.LeftCenter || SettingsData.osdPosition === SettingsData.Position.RightCenter
+    readonly property bool isVerticalLayout: osdPosition === SettingsData.Position.LeftCenter || osdPosition === SettingsData.Position.RightCenter
 
     readonly property var barEdgeOffsets: {
         const offsets = {
@@ -187,58 +221,65 @@ PanelWindow {
         return SettingsData.dockReservationForEdge(screen, side);
     }
 
-    readonly property real alignedX: {
-        const margin = Theme.spacingM;
-        const centerX = (screenWidth - alignedWidth) / 2;
+    function edgeInset(side) {
+        return Theme.spacingM + Math.max(barEdgeOffsets[side], dockOffsetForEdge(side));
+    }
 
-        switch (SettingsData.osdPosition) {
-        case SettingsData.Position.Left:
-        case SettingsData.Position.Bottom:
-        case SettingsData.Position.LeftCenter:
-            const leftDockOffset = root.dockOffsetForEdge("left");
-            return Theme.snap(margin + Math.max(barEdgeOffsets.left, leftDockOffset), dpr);
-        case SettingsData.Position.Top:
-        case SettingsData.Position.Right:
-        case SettingsData.Position.RightCenter:
-            const rightDockOffset = root.dockOffsetForEdge("right");
-            return Theme.snap(screenWidth - alignedWidth - margin - Math.max(barEdgeOffsets.right, rightDockOffset), dpr);
-        case SettingsData.Position.TopCenter:
-        case SettingsData.Position.BottomCenter:
+    function placeAlong(align, extent, size, startSide, endSide) {
+        switch (align) {
+        case -1:
+            return Theme.snap(edgeInset(startSide), dpr);
+        case 1:
+            return Theme.snap(extent - size - edgeInset(endSide), dpr);
         default:
-            return Theme.snap(centerX, dpr);
+            return Theme.snap((extent - size) / 2, dpr);
         }
     }
 
-    readonly property real alignedY: {
-        const margin = Theme.spacingM;
-        const centerY = (screenHeight - alignedHeight) / 2;
+    readonly property int alignX: {
+        switch (osdPosition) {
+        case SettingsData.Position.Left:
+        case SettingsData.Position.Bottom:
+        case SettingsData.Position.LeftCenter:
+            return -1;
+        case SettingsData.Position.Top:
+        case SettingsData.Position.Right:
+        case SettingsData.Position.RightCenter:
+            return 1;
+        default:
+            return 0;
+        }
+    }
 
-        switch (SettingsData.osdPosition) {
+    readonly property int alignY: {
+        switch (osdPosition) {
         case SettingsData.Position.Top:
         case SettingsData.Position.Left:
         case SettingsData.Position.TopCenter:
-            const topDockOffset = root.dockOffsetForEdge("top");
-            return Theme.snap(margin + Math.max(barEdgeOffsets.top, topDockOffset), dpr);
+            return -1;
         case SettingsData.Position.Right:
         case SettingsData.Position.Bottom:
         case SettingsData.Position.BottomCenter:
-            const bottomDockOffset = root.dockOffsetForEdge("bottom");
-            return Theme.snap(screenHeight - alignedHeight - margin - Math.max(barEdgeOffsets.bottom, bottomDockOffset), dpr);
-        case SettingsData.Position.LeftCenter:
-        case SettingsData.Position.RightCenter:
+            return 1;
         default:
-            return Theme.snap(centerY, dpr);
+            return 0;
         }
     }
+
+    readonly property real alignedX: placeAlong(alignX, screenWidth, alignedWidth, "left", "right")
+    readonly property real alignedY: placeAlong(alignY, screenHeight, alignedHeight, "top", "bottom")
 
     anchors {
         top: true
         left: true
     }
 
+    readonly property real windowX: Math.max(0, Theme.snap(alignedX - shadowBuffer, dpr))
+    readonly property real windowY: Math.max(0, Theme.snap(alignedY - shadowBuffer, dpr))
+
     WlrLayershell.margins {
-        left: Math.max(0, Theme.snap(alignedX - shadowBuffer, dpr))
-        top: Math.max(0, Theme.snap(alignedY - shadowBuffer, dpr))
+        left: root.windowX
+        top: root.windowY
     }
 
     implicitWidth: alignedWidth + (shadowBuffer * 2)
@@ -266,6 +307,8 @@ PanelWindow {
         interval: autoHideInterval
         repeat: false
         onTriggered: {
+            if (expanded)
+                return;
             if (!enableMouseInteraction || !mouseArea.containsMouse) {
                 hide();
             } else {
@@ -339,5 +382,16 @@ PanelWindow {
 
     mask: Region {
         item: bgShadowLayer
+    }
+
+    LazyLoader {
+        id: sheetLoader
+        active: root.expanded
+
+        DankOSDSheet {
+            host: root
+            onPresented: root.visible = false
+            onDismissed: root.finishSheet()
+        }
     }
 }

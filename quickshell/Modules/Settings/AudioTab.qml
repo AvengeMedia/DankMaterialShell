@@ -8,20 +8,34 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    readonly property var log: Log.scoped("AudioTab")
+
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
     property var outputDevices: []
     property var inputDevices: []
-    property bool showEditDialog: false
+    property var parentModal: null
     property var editingDevice: null
     property string editingDeviceType: ""
-    property string newDeviceName: ""
     property bool isReloadingAudio: false
     property var hiddenOutputDeviceNames: SessionData.hiddenOutputDeviceNames ?? []
     property var hiddenInputDeviceNames: SessionData.hiddenInputDeviceNames ?? []
     property bool showHiddenOutputDevices: false
     property bool showHiddenInputDevices: false
+
+    function openRenameDialog(device, type) {
+        editingDevice = device;
+        editingDeviceType = type;
+        renameDialog.show(AudioService.displayName(device));
+    }
+
+    function saveDeviceName(name) {
+        if (!editingDevice)
+            return;
+        AudioService.setDeviceAlias(editingDevice.name, name);
+        renameDialog.hide();
+    }
 
     function persistHiddenOutputDeviceNames(deviceNames) {
         const uniqueNames = [...new Set(deviceNames)];
@@ -121,6 +135,32 @@ Item {
 
         SettingsCard {
             tab: "audio"
+            tags: ["audio", "accessibility", "mono"]
+            title: I18n.tr("Mono Audio", "Audio settings: mono audio toggle")
+            settingKey: "audioMono"
+            iconName: "a11y"
+
+            SettingsToggleRow {
+                tab: "audio"
+                tags: ["audio", "mono"]
+                settingKey: "audioMono"
+                text: I18n.tr("Mono Audio", "Audio settings: mono audio toggle")
+                description: I18n.tr("Mix all stereo content into a single channel", "Audio settings mono description")
+                enabled: AudioService.monoSettingSupported
+                checked: SettingsData.audioMono
+                onToggled: checked => {
+                    SettingsData.set("audioMono", checked);
+                    AudioService.setMonoSetting(checked, (ok, message) => {
+                        if (!ok) {
+                            SettingsData.set("audioMono", !checked);
+                        }
+                    });
+                }
+            }
+        }
+
+        SettingsCard {
+            tab: "audio"
             tags: ["audio", "device", "output", "speaker"]
             title: I18n.tr("Output devices")
             settingKey: "audioOutputDevices"
@@ -159,12 +199,7 @@ Item {
                         deviceType: "output"
                         showHideButton: true
 
-                        onEditRequested: device => {
-                            root.editingDevice = device;
-                            root.editingDeviceType = "output";
-                            root.newDeviceName = AudioService.displayName(device);
-                            root.showEditDialog = true;
-                        }
+                        onEditRequested: device => root.openRenameDialog(device, "output")
 
                         onHideRequested: device => {
                             root.persistHiddenOutputDeviceNames([...root.hiddenOutputDeviceNames, device.name]);
@@ -188,6 +223,7 @@ Item {
 
                         DankSlider {
                             id: maxVolSlider
+                            upDownKeysStep: false
                             anchors.left: maxVolLabel.right
                             anchors.leftMargin: Theme.spacingS
                             anchors.right: parent.right
@@ -327,12 +363,7 @@ Item {
                             deviceType: "input"
                             showHideButton: true
 
-                            onEditRequested: device => {
-                                root.editingDevice = device;
-                                root.editingDeviceType = "input";
-                                root.newDeviceName = AudioService.displayName(device);
-                                root.showEditDialog = true;
-                            }
+                            onEditRequested: device => root.openRenameDialog(device, "input")
 
                             onHideRequested: device => {
                                 root.persistHiddenInputDeviceNames([...root.hiddenInputDeviceNames, device.name]);
@@ -424,7 +455,7 @@ Item {
     Rectangle {
         id: loadingOverlay
         anchors.fill: parent
-        color: Theme.withAlpha(Theme.surface, 0.9)
+        color: Theme.withAlpha(Theme.hostSurface, 0.9)
         visible: root.isReloadingAudio
         z: 100
 
@@ -432,30 +463,9 @@ Item {
             anchors.centerIn: parent
             spacing: Theme.spacingL
 
-            Rectangle {
-                width: 80
-                height: 80
-                radius: Theme.fullRadius(width, height)
-                color: Theme.primaryContainer
+            DankLoadingIndicator {
+                contained: true
                 anchors.horizontalCenter: parent.horizontalCenter
-
-                DankIcon {
-                    id: spinningIcon
-                    name: "refresh"
-                    size: 40
-                    color: Theme.accentOnPrimaryContainer
-                    anchors.centerIn: parent
-                    smoothTransform: loadingOverlay.visible
-
-                    RotationAnimator {
-                        target: spinningIcon
-                        from: 0
-                        to: 360
-                        duration: 1500
-                        loops: Animation.Infinite
-                        running: loadingOverlay.visible
-                    }
-                }
             }
 
             Column {
@@ -481,221 +491,34 @@ Item {
             }
         }
 
-        Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.shortDuration
-                easing.type: Theme.standardEasing
-            }
-        }
     }
 
-    Rectangle {
-        id: dialogOverlay
-        anchors.fill: parent
-        visible: root.showEditDialog
-        color: Theme.withAlpha(Theme.surface, 0.8)
-        z: 1000
+    SettingsRenameDialog {
+        id: renameDialog
+        parent: root.parentModal?.modalFocusScope ?? root
+        title: I18n.tr("Set custom device name")
+        supportingText: root.editingDevice?.name ?? ""
+        labelText: I18n.tr("Custom name")
+        leftIconName: root.editingDeviceType === "input" ? "mic" : "speaker"
+        onAccepted: name => root.saveDeviceName(name)
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                root.showEditDialog = false;
-            }
+        aboveField: StyledText {
+            visible: AudioService.hasDeviceAlias(root.editingDevice?.name ?? "")
+            text: I18n.tr("Original: %1", "Shows the original device name before renaming").arg(AudioService.originalName(root.editingDevice))
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.surfaceVariantText
+            width: parent.width
+            elide: Text.ElideRight
+            horizontalAlignment: Text.AlignLeft
         }
 
-        Rectangle {
-            id: editDialog
-            anchors.centerIn: parent
-            width: Math.min(500, parent.width - Theme.spacingL * 4)
-            height: dialogContent.implicitHeight + Theme.spacingL * 2
-            radius: Theme.cornerRadius
-            color: Theme.floatingWindowNestedSurface
-            border.width: Theme.layerOutlineWidth
-            border.color: Theme.outlineMedium
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {}
-            }
-
-            Column {
-                id: dialogContent
-                anchors.fill: parent
-                anchors.margins: Theme.spacingL
-                spacing: Theme.spacingL
-
-                Row {
-                    width: parent.width
-                    spacing: Theme.spacingM
-
-                    DankIcon {
-                        name: root.editingDeviceType === "input" ? "mic" : "speaker"
-                        size: Theme.iconSizeLarge
-                        color: Theme.primary
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    Column {
-                        width: parent.width - Theme.iconSize - Theme.spacingM - 8
-                        spacing: Theme.spacingXS
-
-                        StyledText {
-                            text: I18n.tr("Set custom device name")
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.weight: Theme.fontWeightMedium
-                            color: Theme.surfaceText
-                            width: parent.width
-                            wrapMode: Text.Wrap
-                            horizontalAlignment: Text.AlignLeft
-                        }
-
-                        StyledText {
-                            text: root.editingDevice?.name ?? ""
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            width: parent.width
-                            elide: Text.ElideRight
-                            horizontalAlignment: Text.AlignLeft
-                        }
-
-                        StyledText {
-                            visible: AudioService.hasDeviceAlias(root.editingDevice?.name ?? "")
-                            text: I18n.tr("Original: %1", "Shows the original device name before renaming").arg(AudioService.originalName(root.editingDevice))
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            width: parent.width
-                            elide: Text.ElideRight
-                            opacity: 0.7
-                            horizontalAlignment: Text.AlignLeft
-                        }
-                    }
-                }
-
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingM
-
-                    DankTextField {
-                        id: nameInput
-                        outlined: true
-                        leftIconName: "edit"
-                        labelText: I18n.tr("Custom name")
-                        width: parent.width
-                        text: root.newDeviceName
-                        showClearButton: true
-
-                        onTextChanged: {
-                            root.newDeviceName = text;
-                        }
-
-                        Keys.onReturnPressed: {
-                            if (text.trim() !== "") {
-                                saveButtonMouseArea.clicked(null);
-                            }
-                        }
-
-                        Keys.onEscapePressed: {
-                            root.showEditDialog = false;
-                        }
-
-                        Component.onCompleted: {
-                            Qt.callLater(() => {
-                                forceActiveFocus();
-                                selectAll();
-                            });
-                        }
-                    }
-
-                    StyledText {
-                        width: parent.width
-                        text: I18n.tr("Press Enter and the audio system will restart to apply the change", "Audio device rename dialog hint")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        horizontalAlignment: Text.AlignLeft
-                    }
-                }
-
-                Row {
-                    LayoutMirroring.enabled: false
-                    width: parent.width
-                    spacing: Theme.spacingM
-                    layoutDirection: Qt.RightToLeft
-
-                    Rectangle {
-                        id: saveButton
-                        width: saveButtonContent.width + Theme.spacingL * 2
-                        height: Theme.iconButtonSize
-                        radius: Theme.cornerRadius
-                        color: saveButtonMouseArea.containsMouse ? Theme.blend(Theme.primary, Theme.onPrimary, Theme.stateLayerHover) : Theme.primary
-                        enabled: root.newDeviceName.trim() !== ""
-                        opacity: enabled ? 1.0 : 0.5
-
-                        Row {
-                            id: saveButtonContent
-                            anchors.centerIn: parent
-                            spacing: Theme.spacingS
-
-                            DankIcon {
-                                name: "check"
-                                size: Theme.iconSizeMedium
-                                color: Theme.onPrimary
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: I18n.tr("Save")
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Theme.fontWeightMedium
-                                color: Theme.onPrimary
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        MouseArea {
-                            id: saveButtonMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            enabled: parent.enabled
-                            onClicked: {
-                                if (root.editingDevice && root.newDeviceName.trim() !== "") {
-                                    AudioService.setDeviceAlias(root.editingDevice.name, root.newDeviceName);
-                                    root.showEditDialog = false;
-                                }
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        width: cancelButtonText.width + Theme.spacingL * 2
-                        height: Theme.iconButtonSize
-                        radius: Theme.cornerRadius
-                        color: cancelButtonMouseArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0)
-                        border.width: Theme.outlineWidth
-                        border.color: Theme.outline
-
-                        StyledText {
-                            id: cancelButtonText
-                            text: I18n.tr("Cancel")
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Theme.fontWeightMedium
-                            color: Theme.surfaceText
-                            anchors.centerIn: parent
-                        }
-
-                        MouseArea {
-                            id: cancelButtonMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                root.showEditDialog = false;
-                            }
-                        }
-                    }
-                }
-            }
+        belowField: StyledText {
+            width: parent.width
+            text: I18n.tr("Press Enter and the audio system will restart to apply the change", "Audio device rename dialog hint")
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.surfaceVariantText
+            wrapMode: Text.WordWrap
+            horizontalAlignment: Text.AlignLeft
         }
     }
 }

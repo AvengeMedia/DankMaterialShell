@@ -47,6 +47,7 @@ Singleton {
     property bool fixing: false
     property string lastError: ""
     property string modKey: "Super"
+    property string modSymbol: ""
     property bool dmsBindsIncluded: true
 
     property var dmsStatus: ({
@@ -61,6 +62,11 @@ Singleton {
             "configFormat": "",
             "readOnly": false
         })
+
+    // What the active layout puts on the first level of every physical key,
+    // plus the keysym vocabulary that answer is drawn from. See
+    // `dms keybinds keymap`. Empty until something asks for it.
+    property var firstLevelKeymap: ({})
 
     property var _rawData: null
     property var keybinds: ({})
@@ -156,6 +162,27 @@ Singleton {
                 return;
             log.warn("Cheatsheet load failed with code:", exitCode);
             root.cheatsheetLoading = false;
+        }
+    }
+
+    Process {
+        id: keymapProcess
+        running: false
+        command: ["dms", "keybinds", "keymap"]
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    root.firstLevelKeymap = JSON.parse(text);
+                } catch (e) {
+                    log.warn("Failed to parse keymap:", e);
+                }
+            }
+        }
+
+        onExited: exitCode => {
+            if (exitCode !== 0)
+                log.warn("Keymap load failed with code:", exitCode);
         }
     }
 
@@ -395,6 +422,14 @@ Singleton {
         }
 
         return false;
+    }
+
+    // Cheap enough to re-read every time the editor opens, and the layout may
+    // have changed since the last look.
+    function loadFirstLevelKeymap() {
+        if (keymapProcess.running)
+            return;
+        keymapProcess.running = true;
     }
 
     function loadBinds(showLoading) {
@@ -707,7 +742,8 @@ Singleton {
 
     function _processData() {
         keybinds = _rawData || {};
-        modKey = currentProvider === "niri" ? (_rawData?.modKey || "Super") : "Super";
+        modKey = _rawData?.mod?.resolved || _rawData?.modKey || "Super";
+        modSymbol = _rawData?.mod?.symbol || "";
         dmsBindsIncluded = _rawData?.dmsBindsIncluded ?? true;
         const status = _rawData?.dmsStatus;
         if (status) {

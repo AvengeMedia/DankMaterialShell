@@ -19,7 +19,8 @@ DankFloatingWindow {
     property alias aboveSearch: aboveSearchSlot.data
     property alias belowSearch: belowSearchSlot.data
     property alias listContent: listSlot.data
-    property alias overlay: browserContent.data
+    property alias overlay: overlaySlot.data
+    property bool overlayActive: false
     readonly property alias installConfirm: urlInstallConfirm
     readonly property alias listArea: listSlot
 
@@ -184,63 +185,84 @@ DankFloatingWindow {
             anchors.right: parent.right
             anchors.top: headerArea.bottom
             anchors.bottom: parent.bottom
-            anchors.leftMargin: Theme.spacingL
-            anchors.rightMargin: Theme.spacingL
-            anchors.topMargin: Theme.spacingM
-            anchors.bottomMargin: Theme.spacingL
+            anchors.leftMargin: Theme.windowInset
+            anchors.rightMargin: Theme.windowInset
+            anchors.bottomMargin: Theme.windowInset
 
-            Column {
-                id: aboveSearchSlot
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-                spacing: Theme.spacingS
-            }
+            Item {
+                id: browserBody
+                anchors.fill: parent
+                opacity: 1 - overlaySlot.opacity
+                visible: opacity > 0
 
-            DankSearchField {
-                id: browserSearchField
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: aboveSearchSlot.bottom
-                anchors.topMargin: aboveSearchSlot.height > 0 ? Theme.spacingM : 0
-                height: Theme.fieldHeightLarge
-                textColor: Theme.surfaceText
-                font.pixelSize: Theme.fontSizeMedium
-                placeholderText: root.searchPlaceholder
-                text: root.searchQuery
-                focus: true
-                ignoreLeftRightKeys: true
-                keyForwardTargets: [browserKeyHandler]
-                onTextEdited: {
-                    root.searchQuery = text;
-                    root.applySearch();
+                Column {
+                    id: aboveSearchSlot
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    spacing: Theme.spacingS
+                }
+
+                DankSearchField {
+                    id: browserSearchField
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: aboveSearchSlot.bottom
+                    anchors.topMargin: aboveSearchSlot.height > 0 ? Theme.spacingM : 0
+                    height: Theme.fieldHeightLarge
+                    textColor: Theme.surfaceText
+                    font.pixelSize: Theme.fontSizeMedium
+                    placeholderText: root.searchPlaceholder
+                    text: root.searchQuery
+                    focus: true
+                    ignoreLeftRightKeys: true
+                    keyForwardTargets: [browserKeyHandler]
+                    onTextEdited: {
+                        root.searchQuery = text;
+                        root.applySearch();
+                    }
+                }
+
+                Column {
+                    id: belowSearchSlot
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: browserSearchField.bottom
+                    anchors.topMargin: height > 0 ? Theme.spacingM : 0
+                    spacing: Theme.spacingS
+                }
+
+                Item {
+                    id: listSlot
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: belowSearchSlot.bottom
+                    anchors.topMargin: Theme.spacingM
+                    anchors.bottom: parent.bottom
+
+                    Item {
+                        anchors.fill: parent
+                        visible: root.isLoading
+
+                        DankSpinner {
+                            anchors.centerIn: parent
+                            running: root.isLoading
+                        }
+                    }
                 }
             }
 
-            Column {
-                id: belowSearchSlot
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: browserSearchField.bottom
-                anchors.topMargin: height > 0 ? Theme.spacingM : 0
-                spacing: Theme.spacingS
-            }
-
             Item {
-                id: listSlot
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: belowSearchSlot.bottom
-                anchors.topMargin: Theme.spacingM
-                anchors.bottom: parent.bottom
+                id: overlaySlot
+                anchors.fill: parent
+                opacity: root.overlayActive ? 1 : 0
+                visible: opacity > 0
 
-                Item {
-                    anchors.fill: parent
-                    visible: root.isLoading
-
-                    DankSpinner {
-                        anchors.centerIn: parent
-                        running: root.isLoading
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.expressiveDurations.expressiveEffects
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
                     }
                 }
             }

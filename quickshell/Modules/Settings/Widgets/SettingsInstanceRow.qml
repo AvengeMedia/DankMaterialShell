@@ -11,7 +11,6 @@ SettingsRow {
     property bool toggleVisible: true
     property bool toggleEnabled: true
     property bool deletable: true
-    property bool confirmingDelete: false
 
     signal toggled(bool checked)
     signal deleteRequested
@@ -19,8 +18,8 @@ SettingsRow {
     clickable: true
     iconName: selected ? "radio_button_checked" : "radio_button_unchecked"
     iconColor: selected ? Theme.primary : Theme.surfaceVariantText
-    subtitle: confirmingDelete ? I18n.tr("Confirm Delete") : summary
-    subtitleColor: confirmingDelete ? Theme.error : Theme.surfaceVariantText
+    subtitle: deleteButton.confirming ? I18n.tr("Confirm Delete") : summary
+    subtitleColor: deleteButton.confirming ? Theme.error : Theme.surfaceVariantText
 
     DankToggle {
         visible: root.toggleVisible
@@ -32,11 +31,9 @@ SettingsRow {
         onToggled: value => root.toggled(value)
     }
 
-    DankActionButton {
+    SettingsDeleteButton {
+        id: deleteButton
         visible: root.deletable
-        iconName: root.confirmingDelete ? "warning" : "delete"
-        iconColor: root.confirmingDelete ? Theme.error : Theme.surfaceVariantText
-        Accessible.name: root.confirmingDelete ? I18n.tr("Confirm Delete") : I18n.tr("Remove")
-        onClicked: root.deleteRequested()
+        onDeleteRequested: root.deleteRequested()
     }
 }

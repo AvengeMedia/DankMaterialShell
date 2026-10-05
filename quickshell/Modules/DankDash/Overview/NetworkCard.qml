@@ -15,12 +15,6 @@ MetricCard {
     badgeIcon: "upload"
     trendMaximum: 0
     showTrend: options.trend === true
-    trend: {
-        DgopService.networkRxRate;
-        return DgopService.networkHistory.rx.slice();
-    }
-    secondaryTrend: {
-        DgopService.networkTxRate;
-        return DgopService.networkHistory.tx.slice();
-    }
+    trend: DgopService.networkHistory.rx
+    secondaryTrend: DgopService.networkHistory.tx
 }

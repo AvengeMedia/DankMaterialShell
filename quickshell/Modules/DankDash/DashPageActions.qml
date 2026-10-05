@@ -11,7 +11,7 @@ Item {
     id: root
 
     required property string entryId
-    required property Item overlayParent
+    property var transientSurfaceTracker: null
     property var tabItem: null
     property bool vertical: false
     property bool editMode: false
@@ -56,7 +56,7 @@ Item {
 
     CcMenu {
         id: customMenu
-        parent: root.overlayParent
+        transientSurfaceTracker: root.transientSurfaceTracker
         items: root.tabItem?.menuActions ?? []
     }
 
@@ -69,7 +69,7 @@ Item {
         vertical: root.vertical
         canAdd: (root.tabItem?.addable?.length ?? 0) > 0
         hasWidgets: root.hasWidgets
-        hasOptions: DashRegistry.hasOptions(root.entryId)
+        hasOptions: DashRegistry.hasOptions(root.entryId, true)
         hasCustomActions: root.hasCustomActions
         onActionsRequested: anchor => customMenu.openAt(anchor)
         onAddRequested: anchor => root.tabItem?.openAddMenu(anchor)

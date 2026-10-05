@@ -51,6 +51,15 @@ Singleton {
             "section": "left"
         },
         {
+            "id": "island",
+            "text": I18n.tr("Island"),
+            "description": I18n.tr("Live activities that grow out of the bar", "bar widget catalog: island widget description"),
+            "icon": "blur_on",
+            "section": "center",
+            "single": true,
+            "barOnly": true
+        },
+        {
             "id": "clock",
             "text": I18n.tr("Clock"),
             "description": I18n.tr("Current time and date display"),
@@ -252,7 +261,8 @@ Singleton {
             "memUsage": "SystemMonitorOptions.qml",
             "gpuTemp": "SystemMonitorOptions.qml",
             "diskUsage": "SystemMonitorOptions.qml",
-            "systemUpdate": "SystemUpdateOptions.qml"
+            "systemUpdate": "SystemUpdateOptions.qml",
+            "island": "IslandOptions.qml"
         })
 
     function get(id) {
@@ -265,5 +275,10 @@ Singleton {
 
     function hasOptions(id) {
         return optionFiles[id] !== undefined;
+    }
+
+    // Every widget reaches the general options page (placement); spacers and separators configure inline on their row.
+    function configurable(item) {
+        return !!item?.pluginId || !["spacer", "separator"].includes(item?.id);
     }
 }

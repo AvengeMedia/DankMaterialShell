@@ -9,6 +9,8 @@ import Quickshell.Widgets
 DankOSD {
     id: root
 
+    osdKind: "mediaPlayback"
+
     readonly property bool useVertical: isVerticalLayout
     readonly property bool playing: player?.isPlaying ?? false
     readonly property var player: MprisController.activePlayer
@@ -260,7 +262,7 @@ DankOSD {
                 Rectangle {
                     anchors.fill: parent
                     radius: Theme.fullRadius(width, height)
-                    color: Theme.surface
+                    color: Theme.hostSurface
                     opacity: 0.3
                 }
             }

@@ -37,7 +37,7 @@ Item {
         visible: !root.isVertical
         iconName: root.systemModel.iconName
         tonalIcon: false
-        iconInteractive: root.systemModel.volumeActivity
+        iconInteractive: root.systemModel.mutable
         iconLabel: root.systemModel.muted ? I18n.tr("Unmute") : I18n.tr("Mute")
         value: Math.round(root.systemModel.value)
         minimum: root.systemModel.minimum
@@ -45,7 +45,6 @@ Item {
         unit: root.systemModel.unit
         displayText: root.systemModel.displayValue
         sliderEnabled: root.systemModel.available
-        thumbOutlineColor: Theme.hostSurface
         onIconClicked: root.systemModel.toggleMute()
         onSliderValueChanged: newValue => root.systemModel.setRatio(newValue / Math.max(1, root.maximum))
     }
@@ -66,11 +65,11 @@ Item {
             anchors.top: parent.top
             name: root.systemModel.iconName
             size: Math.min(Theme.iconSize, root.iconSize)
-            color: root.systemModel.volumeActivity ? Theme.surfaceText : Theme.primary
+            color: root.systemModel.mutable ? Theme.surfaceText : Theme.primary
 
             MouseArea {
                 anchors.fill: parent
-                enabled: root.systemModel.volumeActivity
+                enabled: root.systemModel.mutable
                 cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                 onClicked: root.systemModel.toggleMute()
             }

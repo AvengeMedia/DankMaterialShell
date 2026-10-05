@@ -14,6 +14,8 @@ Singleton {
     readonly property string _xdgDataHome: Quickshell.env("XDG_DATA_HOME") || (_homeDir + "/.local/share")
     readonly property string trashFilesDir: _xdgDataHome + "/Trash/files"
 
+    readonly property bool monitoring: SettingsData.dockConfigs.some(config => config.showTrash && (config.enabled || config.openOnOverview))
+
     property int count: 0
     readonly property bool isEmpty: count === 0
 
@@ -22,21 +24,26 @@ Singleton {
 
     signal emptyTrashConfirmRequested(int itemCount)
 
-    FolderListModel {
-        id: homeTrashModel
-        folder: "file://" + root.trashFilesDir
-        showDirs: true
-        showFiles: true
-        showHidden: true
-        showDotAndDotDot: false
-        sortField: FolderListModel.Name
-        nameFilters: ["*"]
+    onMonitoringChanged: {
+        if (!monitoring) {
+            count = 0;
+            return;
+        }
+        refreshCount();
     }
 
-    Connections {
-        target: homeTrashModel
-        function onCountChanged() {
-            root.refreshCount();
+    Loader {
+        id: homeTrashWatch
+        active: root.monitoring
+        sourceComponent: FolderListModel {
+            folder: "file://" + root.trashFilesDir
+            showDirs: true
+            showFiles: true
+            showHidden: true
+            showDotAndDotDot: false
+            sortField: FolderListModel.Name
+            nameFilters: ["*"]
+            onCountChanged: root.refreshCount()
         }
     }
 
@@ -59,13 +66,16 @@ Singleton {
     }
 
     function refreshCount() {
+        if (!monitoring)
+            return;
         Proc.runCommand("trash-count", [Proc.dmsBin, "trash", "count"], (output, exitCode) => {
+            const homeCount = homeTrashWatch.item?.count ?? 0;
             if (exitCode !== 0) {
-                root.count = homeTrashModel.count;
+                root.count = homeCount;
                 return;
             }
             const n = parseInt((output || "").trim(), 10);
-            root.count = isNaN(n) ? homeTrashModel.count : n;
+            root.count = isNaN(n) ? homeCount : n;
         });
     }
 

@@ -54,6 +54,10 @@ Item {
         suggestedPPDs = [];
     }
 
+    Ref {
+        service: CupsService
+    }
+
     Connections {
         target: CupsService
         function onPpdsChanged() {
@@ -418,7 +422,7 @@ Item {
         SettingsCard {
             width: parent.width
             iconName: "print"
-            title: I18n.tr("Printers")
+            title: I18n.tr("Installed")
             visible: CupsService.cupsAvailable
 
             headerActions: [
@@ -569,37 +573,11 @@ Item {
                                         return fields;
                                     }
 
-                                    delegate: Rectangle {
+                                    delegate: DankDetailChip {
                                         required property var modelData
-                                        required property int index
 
-                                        width: fieldContent.width + Theme.spacingM * 2
-                                        height: 32
-                                        radius: Theme.cornerRadius - Theme.outlineWidthFocused
-                                        color: Theme.floatingWindowFieldColor
-                                        border.width: Theme.outlineWidth
-                                        border.color: Theme.floatingWindowFieldBorderColor
-
-                                        Row {
-                                            id: fieldContent
-                                            anchors.centerIn: parent
-                                            spacing: Theme.spacingXS
-
-                                            StyledText {
-                                                text: modelData.label + ":"
-                                                font.pixelSize: Theme.fontSizeSmall
-                                                color: Theme.surfaceVariantText
-                                                anchors.verticalCenter: parent.verticalCenter
-                                            }
-
-                                            StyledText {
-                                                text: modelData.value
-                                                font.pixelSize: Theme.fontSizeSmall
-                                                color: Theme.surfaceText
-                                                font.weight: Theme.fontWeightMedium
-                                                anchors.verticalCenter: parent.verticalCenter
-                                            }
-                                        }
+                                        label: modelData.label
+                                        value: modelData.value
                                     }
                                 }
                             }
@@ -612,7 +590,7 @@ Item {
                                     text: printerDelegate.isStopped ? I18n.tr("Resume", "verb, button that resumes a paused printer") : I18n.tr("Pause")
                                     iconName: printerDelegate.isStopped ? "play_arrow" : "pause"
                                     buttonHeight: Theme.buttonHeightXS
-                                    backgroundColor: Theme.chipSurface
+                                    backgroundColor: SettingsMetrics.controlSurface
                                     textColor: Theme.surfaceText
                                     onClicked: {
                                         if (printerDelegate.isStopped) {
@@ -627,7 +605,7 @@ Item {
                                     text: I18n.tr("Test page")
                                     iconName: "description"
                                     buttonHeight: Theme.buttonHeightXS
-                                    backgroundColor: Theme.chipSurface
+                                    backgroundColor: SettingsMetrics.controlSurface
                                     textColor: Theme.surfaceText
                                     onClicked: CupsService.printTestPage(printerDelegate.modelData)
                                 }
@@ -636,7 +614,7 @@ Item {
                                     text: printerDelegate.printerData?.accepting ? I18n.tr("Reject jobs") : I18n.tr("Accept jobs")
                                     iconName: printerDelegate.printerData?.accepting ? "block" : "check_circle"
                                     buttonHeight: Theme.buttonHeightXS
-                                    backgroundColor: Theme.chipSurface
+                                    backgroundColor: SettingsMetrics.controlSurface
                                     textColor: Theme.surfaceText
                                     onClicked: {
                                         if (printerDelegate.printerData?.accepting) {
@@ -665,7 +643,7 @@ Item {
                                     text: I18n.tr("Clear All")
                                     iconName: "delete_sweep"
                                     buttonHeight: Theme.buttonHeightXS
-                                    backgroundColor: Theme.chipSurface
+                                    backgroundColor: SettingsMetrics.controlSurface
                                     textColor: Theme.surfaceText
                                     onClicked: {
                                         purgeJobsConfirm.showWithOptions({

@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import "../../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
+import "../../Common/WindowRuleSize.js" as WindowRuleSize
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
@@ -65,6 +66,18 @@ Item {
         if (m && m.length > 0)
             return m;
         return [rule.matchCriteria || {}];
+    }
+
+    function actionChips(actions) {
+        const a = actions || {};
+        return Object.keys(a).filter(k => a[k] !== undefined && a[k] !== null && a[k] !== "").map(k => {
+            const label = root.actionLabels[k] || k;
+            if (typeof a[k] === "boolean")
+                return a[k] ? label : label + ": " + I18n.tr("Off");
+            if (k === "defaultColumnWidth" || k === "defaultWindowHeight")
+                return label + ": " + WindowRuleSize.label(a[k]);
+            return label + ": " + a[k];
+        });
     }
 
     function formatCriteria(obj, labels) {
@@ -243,46 +256,62 @@ Item {
         });
     }
 
+    property bool editorOpen: false
+    property bool editorMounted: false
+    property var editorRequest: null
+
     function openRuleModal(window) {
-        if (readOnly) {
-            showHyprlandReadOnlyWarning();
-            return;
-        }
-        if (!PopoutService.windowRuleModalLoader)
-            return;
-        PopoutService.windowRuleModalLoader.active = true;
-        if (PopoutService.windowRuleModalLoader.item) {
-            PopoutService.windowRuleModalLoader.item.onRuleSubmitted.connect(loadWindowRules);
-            PopoutService.windowRuleModalLoader.item.show(window || null);
-        }
+        openEditor("new", window || null);
     }
 
     function editRule(rule) {
-        if (readOnly) {
-            showHyprlandReadOnlyWarning();
-            return;
-        }
-        if (!PopoutService.windowRuleModalLoader)
-            return;
-        PopoutService.windowRuleModalLoader.active = true;
-        if (PopoutService.windowRuleModalLoader.item) {
-            PopoutService.windowRuleModalLoader.item.onRuleSubmitted.connect(loadWindowRules);
-            PopoutService.windowRuleModalLoader.item.showEdit(rule);
-        }
+        openEditor("edit", rule);
     }
 
     function copyRuleToDms(rule) {
+        openEditor("copy", rule);
+    }
+
+    function openEditor(mode, payload) {
         if (readOnly) {
             showHyprlandReadOnlyWarning();
             return;
         }
-        if (!PopoutService.windowRuleModalLoader)
+        if (editorOpen)
             return;
-        PopoutService.windowRuleModalLoader.active = true;
-        if (PopoutService.windowRuleModalLoader.item) {
-            PopoutService.windowRuleModalLoader.item.onRuleSubmitted.connect(loadWindowRules);
-            PopoutService.windowRuleModalLoader.item.showCopy(rule);
+        editorRequest = {
+            mode,
+            payload
+        };
+        editorOpen = true;
+        editorMounted = true;
+        if (editorLoader.item)
+            presentEditor();
+    }
+
+    function presentEditor() {
+        const request = editorRequest;
+        if (!request)
+            return;
+        switch (request.mode) {
+        case "edit":
+            editorLoader.item.showEdit(request.payload);
+            return;
+        case "copy":
+            editorLoader.item.showCopy(request.payload);
+            return;
+        default:
+            editorLoader.item.show(request.payload);
         }
+    }
+
+    function closeEditor() {
+        if (!editorOpen)
+            return;
+        editorOpen = false;
+        editorRequest = null;
+        if (editorLoader.item)
+            editorLoader.item.opened = false;
     }
 
     function showHyprlandReadOnlyWarning() {
@@ -305,7 +334,6 @@ Item {
             id: headerSection
             width: parent.width
             iconName: "select_window"
-            title: I18n.tr("Window rules")
 
             SettingsRow {
                 subtitle: I18n.tr("Define rules for window behavior. Saves to %1", "window rules settings description, %1 is a config file name").arg(root.dmsRulesFileName)
@@ -318,6 +346,8 @@ Item {
 
                 DankDropdown {
                     id: windowSelector
+                    downKeyOpens: false
+                    backgroundColor: SettingsMetrics.controlSurface
                     anchors.verticalCenter: parent.verticalCenter
                     dropdownWidth: Math.min(400, createRuleRow.width - SettingsMetrics.rowPaddingH * 2)
                     compactMode: true
@@ -358,10 +388,9 @@ Item {
 
                     DankIcon {
                         name: "select_window"
-                        size: 40
+                        size: Theme.iconSizeLarge
                         color: Theme.surfaceVariantText
                         anchors.horizontalCenter: parent.horizontalCenter
-                        opacity: 0.5
                     }
 
                     StyledText {
@@ -427,35 +456,15 @@ Item {
 
                         Repeater {
                             id: actionRepeater
-                            model: {
-                                const actions = ruleRow.liveRuleData.actions || {};
-                                const labels = root.actionLabels;
-                                return Object.keys(actions).filter(key => actions[key] !== undefined && actions[key] !== null && actions[key] !== "").map(key => {
-                                    const value = actions[key];
-                                    if (typeof value === "boolean")
-                                        return value ? (labels[key] || key) : (labels[key] || key) + ": " + I18n.tr("Off");
-                                    return (labels[key] || key) + ": " + value;
-                                });
-                            }
+                            model: root.actionChips(ruleRow.liveRuleData.actions)
 
-                            delegate: Rectangle {
+                            delegate: DankBadge {
                                 required property string modelData
-
-                                width: Math.min(parent?.width ?? 0, chipText.implicitWidth + Theme.spacingS * 2)
-                                height: chipText.height + Theme.spacingXS * 2
-                                radius: Theme.cornerRadiusS
+                                maximumWidth: parent?.width ?? 0
+                                text: modelData
                                 color: Theme.primaryContainer
-
-                                StyledText {
-                                    id: chipText
-                                    anchors.centerIn: parent
-                                    width: Math.min(implicitWidth, parent.width - Theme.spacingS * 2)
-                                    text: modelData
-                                    font.weight: Theme.fontWeightMedium
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.onPrimaryContainer
-                                    wrapMode: Text.Wrap
-                                }
+                                textColor: Theme.onPrimaryContainer
+                                tooltipText: truncated ? modelData : null
                             }
                         }
                     }
@@ -521,25 +530,21 @@ Item {
                         visible: externalCard.sourceFile.length > 0
                         anchors.verticalCenter: parent.verticalCenter
                         text: externalCard.sourceFile
-                        color: Theme.withAlpha(Theme.surfaceVariantText, 0.15)
+                        color: SettingsMetrics.controlColor
                         textColor: Theme.surfaceVariantText
                     }
 
                     DankIcon {
                         name: externalCard.expanded ? "expand_less" : "expand_more"
-                        size: 20
+                        size: Theme.iconSize
                         color: Theme.surfaceVariantText
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     DankActionButton {
-                        buttonSize: 28
                         iconName: "content_copy"
-                        iconSize: 16
-                        backgroundColor: "transparent"
                         iconColor: Theme.surfaceVariantText
                         enabled: !root.readOnly
-                        opacity: enabled ? 1 : 0.5
                         anchors.verticalCenter: parent.verticalCenter
                         tooltipText: I18n.tr("Convert to DMS")
                         tooltipSide: "left"
@@ -557,22 +562,15 @@ Item {
                             visible: externalCard.hasActions
 
                             Repeater {
-                                model: {
-                                    const a = externalCard.modelData.actions || {};
-                                    const labels = root.actionLabels;
-                                    return Object.keys(a).filter(k => a[k] !== undefined && a[k] !== null && a[k] !== "").map(k => {
-                                        const val = a[k];
-                                        if (typeof val === "boolean")
-                                            return val ? (labels[k] || k) : (labels[k] || k) + ": " + I18n.tr("Off");
-                                        return (labels[k] || k) + ": " + val;
-                                    });
-                                }
+                                model: root.actionChips(externalCard.modelData.actions)
 
                                 delegate: DankBadge {
                                     required property string modelData
+                                    maximumWidth: parent?.width ?? 0
                                     text: modelData
-                                    color: Theme.withAlpha(Theme.primary, 0.15)
-                                    textColor: Theme.primary
+                                    color: Theme.primaryContainer
+                                    textColor: Theme.onPrimaryContainer
+                                    tooltipText: truncated ? modelData : null
                                 }
                             }
                         }
@@ -647,6 +645,28 @@ Item {
                 text: I18n.tr("Add window rule")
                 iconName: "add"
                 onClicked: root.openRuleModal()
+            }
+        }
+    }
+
+    Loader {
+        id: editorLoader
+        parent: root.parentModal?.modalFocusScope ?? root
+        anchors.fill: parent
+        z: 100
+        active: root.editorMounted
+        onLoaded: root.presentEditor()
+
+        sourceComponent: WindowRuleEditorDialog {
+            supportingText: I18n.tr("Changes save to %1", "hint under the keybind and window rule editors, %1 is the config file the changes are written to").arg(root.dmsRulesFileName)
+            onRejected: root.closeEditor()
+            onRuleSubmitted: {
+                root.loadWindowRules();
+                root.closeEditor();
+            }
+            onActiveChanged: {
+                if (!active && !root.editorOpen)
+                    root.editorMounted = false;
             }
         }
     }

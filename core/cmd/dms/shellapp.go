@@ -4,12 +4,14 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/gpu"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/shellembed"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/dankgo/shellapp"
 )
 
@@ -85,5 +87,12 @@ func dmsExtraEnv(string) []string {
 		env = append(env, "MALLOC_CONF=thp:never,narenas:4,dirty_decay_ms:3000")
 	}
 	env = append(env, gpu.EGLVendorEnv()...)
+	// systemd user services miss the login shell PATH, so tools in ~/.local/bin
+	// (herdr, pip/cargo installs) would be invisible to the shell and its children.
+	for _, entry := range utils.EnvWithUserBinPath(nil) {
+		if strings.HasPrefix(entry, "PATH=") {
+			env = append(env, entry)
+		}
+	}
 	return env
 }

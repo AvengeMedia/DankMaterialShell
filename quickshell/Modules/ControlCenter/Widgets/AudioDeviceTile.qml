@@ -31,7 +31,7 @@ CcTile {
     }
     active: !!audio && !audio.muted
     showExpand: true
-    enabled: widgetDef?.enabled ?? true
+    available: widgetDef?.enabled ?? true
     tallContent: Component {
         Item {
             DankRingGauge {

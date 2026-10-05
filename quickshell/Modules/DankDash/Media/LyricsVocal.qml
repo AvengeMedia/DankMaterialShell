@@ -38,7 +38,7 @@ Item {
     property real wordProgress: 1
 
     implicitHeight: Math.ceil(line.implicitHeight * textScale) + Theme.spacingS
-    opacity: reach === 0 || !emphasize ? 1 : reach === 1 ? DashMetrics.lyricsNearOpacity : reach === 2 ? DashMetrics.lyricsFarOpacity : 0
+    opacity: reach === 0 || !emphasize ? 1 : reach === 1 ? DashMetrics.lyricsNearOpacity : DashMetrics.lyricsFarOpacity
     onWordRevisionChanged: updateWordProgress()
     onAnimateWordsChanged: updateWordProgress()
     onSweepChanged: updateWordProgress()

@@ -38,6 +38,113 @@ Item {
     property bool forceLinearNavigation: false
     property bool explicitQuerySession: false
 
+    // dmenu mode items
+    // come from a socket opened by `dms dmenu`, not from AppSearchService
+    property string dmenuSocketPath: ""
+    property var dmenuItems: []
+    property string dmenuPrompt: "dmenu"
+    property string dmenuPlaceholder: ""
+    property int dmenuLines: 0
+    property bool dmenuPromptOnly: false
+    property string dmenuSelect: ""
+    property string dmenuMesg: ""
+    property bool dmenuPassword: false
+    property bool dmenuMarkupRows: false
+    property bool dmenuOnlyMatch: false
+    property bool dmenuNoCustom: false
+    property bool dmenuMultiSelect: false
+    property var dmenuActiveRanges: []
+    property var dmenuUrgentRanges: []
+    property var dmenuMultiSelected: []
+    property var dmenuKeybinds: []
+    property string dmenuView: ""
+    property string dmenuSize: ""
+    property string dmenuIcon: ""
+    property bool dmenuDisableHistory: false
+    property bool _dmenuSelectApplied: false
+
+    readonly property var _dmenuKeyNameMap: (function () {
+        var m = ({});
+        for (var c = 0; c < 26; c++)
+            m[String.fromCharCode(97 + c)] = Qt.Key_A + c;
+        for (var d = 0; d <= 9; d++)
+            m[String(d)] = Qt.Key_0 + d;
+        for (var f = 1; f <= 12; f++)
+            m["f" + f] = Qt.Key_F1 + (f - 1);
+        m["return"] = Qt.Key_Return;
+        m["enter"] = Qt.Key_Enter;
+        m["tab"] = Qt.Key_Tab;
+        m["space"] = Qt.Key_Space;
+        m["escape"] = Qt.Key_Escape;
+        m["esc"] = Qt.Key_Escape;
+        m["delete"] = Qt.Key_Delete;
+        m["backspace"] = Qt.Key_Backspace;
+        m["insert"] = Qt.Key_Insert;
+        m["home"] = Qt.Key_Home;
+        m["end"] = Qt.Key_End;
+        m["pageup"] = Qt.Key_PageUp;
+        m["pagedown"] = Qt.Key_PageDown;
+        m["up"] = Qt.Key_Up;
+        m["down"] = Qt.Key_Down;
+        m["left"] = Qt.Key_Left;
+        m["right"] = Qt.Key_Right;
+        m["minus"] = Qt.Key_Minus;
+        m["equal"] = Qt.Key_Equal;
+        m["comma"] = Qt.Key_Comma;
+        m["period"] = Qt.Key_Period;
+        m["slash"] = Qt.Key_Slash;
+        return m;
+    })()
+
+    function _parseDmenuKeySpec(spec) {
+        var parts = spec.toLowerCase().split("+").map(function (s) {
+            return s.trim();
+        }).filter(function (s) {
+            return s.length > 0;
+        });
+        if (parts.length === 0)
+            return null;
+        var keyToken = parts[parts.length - 1];
+        var mods = Qt.NoModifier;
+        for (var i = 0; i < parts.length - 1; i++) {
+            switch (parts[i]) {
+            case "ctrl":
+            case "control":
+                mods |= Qt.ControlModifier;
+                break;
+            case "alt":
+                mods |= Qt.AltModifier;
+                break;
+            case "shift":
+                mods |= Qt.ShiftModifier;
+                break;
+            case "meta":
+            case "super":
+                mods |= Qt.MetaModifier;
+                break;
+            default:
+                return null;
+            }
+        }
+        var key = _dmenuKeyNameMap[keyToken];
+        if (key === undefined)
+            return null;
+        return {
+            modifiers: mods,
+            key: key
+        };
+    }
+
+    function matchDmenuKeybind(event) {
+        var mods = event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.ShiftModifier | Qt.MetaModifier);
+        for (var i = 0; i < dmenuKeybinds.length; i++) {
+            var kb = dmenuKeybinds[i];
+            if (kb.key === event.key && kb.modifiers === mods)
+                return kb.n;
+        }
+        return 0;
+    }
+
     signal itemExecuted
     signal searchCompleted
     signal modeChanged(string mode, bool userInitiated)
@@ -50,12 +157,32 @@ Item {
         service: AppSearchService
     }
 
+    Loader {
+        id: dmenuSocketLoader
+        active: false
+        onLoaded: item.connected = true
+
+        sourceComponent: Socket {
+            path: root.dmenuSocketPath
+
+            parser: SplitParser {
+                onRead: line => root._onDmenuSocketLine(line)
+            }
+        }
+    }
+
     onActiveChanged: {
         ClipboardService.invalidateLauncherSearchCache();
         if (active)
             return;
 
-        SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
+        if (searchMode === "dmenu") {
+            _endDmenuSession();
+            if (!dmenuDisableHistory)
+                SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
+        } else {
+            SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
+        }
         sections = [];
         flatModel = [];
         selectedItem = null;
@@ -150,19 +277,6 @@ Item {
         }
     }
 
-    Process {
-        id: copyProcess
-        running: false
-        onExited: pasteTimer.start()
-    }
-
-    Timer {
-        id: pasteTimer
-        interval: 200
-        repeat: false
-        onTriggered: ClipboardService.sendPasteKeystroke()
-    }
-
     function pasteSelected() {
         if (!selectedItem)
             return;
@@ -185,12 +299,18 @@ Item {
         const pasteArgs = AppSearchService.getPluginPasteArgs(pluginId, selectedItem.data);
         if (!pasteArgs)
             return;
-        copyProcess.command = pasteArgs;
-        copyProcess.running = true;
+        ClipboardService.pasteAfterCommand(pasteArgs);
         itemExecuted();
     }
 
     readonly property var sectionDefinitions: [
+        {
+            id: "dmenu",
+            title: "",
+            icon: "list",
+            priority: 1,
+            defaultViewMode: "list"
+        },
         {
             id: "favorites",
             title: I18n.tr("Pinned"),
@@ -294,9 +414,15 @@ Item {
         }
     }
 
+    function _isDmenuSectionId(sectionId) {
+        return sectionId === "dmenu" || (sectionId?.indexOf("dmenu:") === 0);
+    }
+
     function getSectionViewMode(sectionId) {
         if (sectionId === "browse_plugins")
             return "list";
+        if (dmenuView && _isDmenuSectionId(sectionId))
+            return dmenuView;
         var sectionPref = sectionViewPreference(sectionId);
         if (sectionPref?.enforced)
             return sectionPref.mode;
@@ -346,7 +472,7 @@ Item {
     }
 
     function canChangeSectionViewMode(sectionId) {
-        if (sectionId === "browse_plugins")
+        if (sectionId === "browse_plugins" || _isDmenuSectionId(sectionId))
             return false;
         if (sectionViewPreference(sectionId)?.enforced)
             return false;
@@ -497,6 +623,9 @@ Item {
     }
 
     function setMode(mode, isAutoSwitch, fileTypeOverride, notPersist) {
+        if (searchMode === "dmenu") {
+            return;
+        }
         if (searchMode === mode) {
             if (mode === "files" && fileTypeOverride !== undefined && fileSearchType !== fileTypeOverride) {
                 fileSearchType = fileTypeOverride;
@@ -532,6 +661,8 @@ Item {
     }
 
     function cycleMode(reverse = false) {
+        if (searchMode === "dmenu")
+            return;
         var modes = ["all", "apps", "files", "plugins"];
         var currentIndex = modes.indexOf(searchMode);
         if (!reverse)
@@ -572,6 +703,10 @@ Item {
     }
 
     function openSession(query, explicitQuery, mode, searchWhenEmpty) {
+        if (mode && mode.indexOf("dmenu:") === 0) {
+            _startDmenuSession(mode.slice("dmenu:".length));
+            return;
+        }
         if (appCategory !== "" || Object.keys(collapsedSections).length > 0)
             _clearModeCache();
         appCategory = "";
@@ -608,6 +743,252 @@ Item {
         }
         sections = [];
         flatModel = [];
+    }
+
+    function _startDmenuSession(socketPath) {
+        _endDmenuSession();
+        searchMode = "dmenu";
+        searchQuery = "";
+        explicitQuerySession = false;
+        selectedFlatIndex = 0;
+        selectedItem = null;
+        dmenuItems = [];
+        dmenuPrompt = "dmenu";
+        dmenuPlaceholder = "";
+        dmenuPromptOnly = false;
+        dmenuLines = 0;
+        dmenuSelect = "";
+        dmenuMesg = "";
+        dmenuPassword = false;
+        dmenuMarkupRows = false;
+        dmenuOnlyMatch = false;
+        dmenuNoCustom = false;
+        dmenuMultiSelect = false;
+        dmenuActiveRanges = [];
+        dmenuUrgentRanges = [];
+        dmenuMultiSelected = [];
+        dmenuKeybinds = [];
+        dmenuView = "";
+        dmenuSize = "";
+        dmenuIcon = "";
+        dmenuDisableHistory = false;
+        _dmenuSelectApplied = false;
+        sections = [];
+        flatModel = [];
+        dmenuSocketPath = socketPath;
+        dmenuSocketLoader.active = true;
+    }
+
+    function _endDmenuSession() {
+        dmenuSocketLoader.active = false;
+        dmenuSocketPath = "";
+    }
+
+    function _onDmenuSocketLine(line) {
+        if (!line)
+            return;
+        var msg;
+        try {
+            msg = JSON.parse(line);
+        } catch (e) {
+            return;
+        }
+        switch (msg.type) {
+        case "header":
+            dmenuPrompt = msg.prompt || "dmenu";
+            dmenuPlaceholder = msg.placeholder || "";
+            dmenuPromptOnly = !!msg.promptOnly;
+            dmenuLines = msg.lines || 0;
+            dmenuSelect = msg.select || "";
+            dmenuMesg = msg.mesg || "";
+            dmenuPassword = !!msg.password;
+            dmenuMarkupRows = !!msg.markupRows;
+            dmenuOnlyMatch = !!msg.onlyMatch;
+            dmenuNoCustom = !!msg.noCustom;
+            dmenuMultiSelect = !!msg.multiSelect;
+            dmenuActiveRanges = msg.active || [];
+            dmenuUrgentRanges = msg.urgent || [];
+            dmenuKeybinds = (msg.keybinds || []).map(function (kb) {
+                var parsed = root._parseDmenuKeySpec(kb.key);
+                return parsed ? {
+                    n: kb.n,
+                    modifiers: parsed.modifiers,
+                    key: parsed.key
+                } : null;
+            }).filter(function (kb) {
+                return kb !== null;
+            });
+            dmenuSize = msg.size || "";
+            dmenuIcon = msg.icon || "";
+            dmenuDisableHistory = !!msg.disableHistory;
+            dmenuView = msg.view || "";
+            if (dmenuView)
+                viewModeVersion++;
+            break;
+        case "item":
+            dmenuItems.push(Transform.transformDmenuItem(msg.text, dmenuItems.length, {
+                markup: dmenuMarkupRows,
+                row: msg.row || null
+            }));
+            Qt.callLater(performSearch);
+            break;
+        case "end":
+            performSearch();
+            _applyDmenuSelect();
+            break;
+        }
+    }
+
+    function _applyDmenuSelect() {
+        if (!dmenuSelect || _dmenuSelectApplied)
+            return;
+        _dmenuSelectApplied = true;
+        var lower = dmenuSelect.toLowerCase();
+        for (var i = 0; i < flatModel.length; i++) {
+            var it = flatModel[i].item;
+            if (it && !it.data.nonSelectable && (it.name || "").toLowerCase() === lower) {
+                selectedFlatIndex = i;
+                updateSelectedItem();
+                return;
+            }
+        }
+        for (var i = 0; i < flatModel.length; i++) {
+            var it = flatModel[i].item;
+            if (it && !it.data.nonSelectable && (it.name || "").toLowerCase().indexOf(lower) !== -1) {
+                selectedFlatIndex = i;
+                updateSelectedItem();
+                return;
+            }
+        }
+    }
+
+    function _resolveDmenuRanges(ranges, length) {
+        var set = ({});
+        if (!ranges)
+            return set;
+        for (var i = 0; i < ranges.length; i++) {
+            var r = ranges[i];
+            var start = r.start;
+            var end = r.end;
+            if (start < 0)
+                start = Math.max(0, length + start);
+            if (end === -1)
+                end = length;
+            else if (end < 0)
+                end = Math.max(0, length + end);
+            start = Math.max(0, start);
+            end = Math.min(length, end);
+            for (var j = start; j < end; j++)
+                set[j] = true;
+        }
+        return set;
+    }
+
+    function _writeDmenuSelection(payload) {
+        var socket = dmenuSocketLoader.item;
+        if (socket && socket.connected) {
+            socket.write(JSON.stringify(Object.assign({
+                type: "select",
+                filterText: searchQuery
+            }, payload)) + "\n");
+            socket.flush();
+        }
+        _endDmenuSession();
+    }
+
+    function _sendDmenuRowSelection(item, keybindN) {
+        _writeDmenuSelection({
+            kind: "row",
+            index: item.data.index,
+            text: item.data.text,
+            info: item.data.info || "",
+            keybindN: keybindN || 0
+        });
+    }
+
+    function _sendDmenuFreeText(text, keybindN) {
+        _writeDmenuSelection({
+            kind: "freetext",
+            text: text,
+            keybindN: keybindN || 0
+        });
+    }
+
+    function _sendDmenuMultiSelection(items) {
+        _writeDmenuSelection({
+            kind: "multi",
+            items: items
+        });
+    }
+
+    function _toggleDmenuMultiSelect(item) {
+        if (!item || item.type !== "dmenu")
+            return;
+        var idx = item.data.index;
+        var pos = dmenuMultiSelected.indexOf(idx);
+        var newSel = dmenuMultiSelected.slice();
+        if (pos === -1)
+            newSel.push(idx);
+        else
+            newSel.splice(pos, 1);
+        dmenuMultiSelected = newSel;
+        performSearch();  // re-render to update the checkbox
+    }
+
+    function toggleDmenuMultiSelectHighlighted() {
+        if (selectedItem && selectedItem.type === "dmenu" && !selectedItem.data.nonSelectable)
+            _toggleDmenuMultiSelect(selectedItem);
+    }
+
+    function confirmDmenuMultiSelection() {
+        var chosen = dmenuMultiSelected.slice();
+        if (chosen.length > 0) {
+            chosen.sort(function (a, b) {
+                return a - b;
+            });
+            var byIndex = ({});
+            for (var i = 0; i < dmenuItems.length; i++)
+                byIndex[dmenuItems[i].data.index] = dmenuItems[i];
+            var items = [];
+            for (var i = 0; i < chosen.length; i++) {
+                var it = byIndex[chosen[i]];
+                if (it)
+                    items.push({
+                        index: it.data.index,
+                        text: it.data.text,
+                        info: it.data.info || ""
+                    });
+            }
+            if (items.length > 0) {
+                _sendDmenuMultiSelection(items);
+                itemExecuted();
+                return;
+            }
+        }
+        // Nothing checked: fall back to the normal single-accept path.
+        if (selectedItem && selectedItem.type === "dmenu" && !selectedItem.data.nonSelectable) {
+            _sendDmenuRowSelection(selectedItem);
+            itemExecuted();
+            return;
+        }
+        if (searchQuery && !dmenuOnlyMatch && !dmenuNoCustom) {
+            _sendDmenuFreeText(searchQuery);
+            itemExecuted();
+        }
+    }
+
+    function acceptDmenuViaKeybind(n) {
+        if (searchMode !== "dmenu")
+            return;
+        if (selectedItem && selectedItem.type === "dmenu" && !selectedItem.data.nonSelectable) {
+            _sendDmenuRowSelection(selectedItem, n);
+            itemExecuted();
+            return;
+        }
+        if (searchQuery && !dmenuOnlyMatch && !dmenuNoCustom) {
+            _sendDmenuFreeText(searchQuery, n);
+            itemExecuted();
+        }
     }
 
     function loadPluginCategories(pluginId) {
@@ -780,7 +1161,7 @@ Item {
 
         var allItems = [];
 
-        var triggerMatch = searchMode === "files" ? {
+        var triggerMatch = (searchMode === "files" || searchMode === "dmenu") ? {
             pluginId: null
         } : detectTrigger(searchQuery);
         if (triggerMatch.pluginId) {
@@ -833,6 +1214,108 @@ Item {
         activePluginCategories = [];
         activePluginCategory = "";
         clearActivePluginViewPreference();
+
+        if (searchMode === "dmenu") {
+            var dmenuGroups = [{
+                title: "",
+                icon: "",
+                items: []
+            }];
+            for (var gi = 0; gi < dmenuItems.length; gi++) {
+                var gitem = dmenuItems[gi];
+                if (gitem.data.header) {
+                    var headerIcon = gitem.icon || "";
+                    dmenuGroups.push({
+                        title: gitem.name || "",
+                        icon: headerIcon,
+                        iconType: "image",
+                        iconVisible: headerIcon !== "",
+                        items: []
+                    });
+                    continue;
+                }
+                dmenuGroups[dmenuGroups.length - 1].items.push(gitem);
+            }
+
+            var activeSet = _resolveDmenuRanges(dmenuActiveRanges, dmenuItems.length);
+            var urgentSet = _resolveDmenuRanges(dmenuUrgentRanges, dmenuItems.length);
+            var checkedSet = ({});
+            for (var ci = 0; ci < dmenuMultiSelected.length; ci++)
+                checkedSet[dmenuMultiSelected[ci]] = true;
+
+            var newDmenuSections = [];
+            var flat = [];
+            var sectionBoundsMap = ({});
+            for (var grpIdx = 0; grpIdx < dmenuGroups.length; grpIdx++) {
+                var grp = dmenuGroups[grpIdx];
+                if (grp.items.length === 0)
+                    continue;
+
+                var scoredItems = Scorer.scoreItems(grp.items, searchQuery, null);
+                if (searchQuery) {
+                    var scoredIdx = ({});
+                    for (var si = 0; si < scoredItems.length; si++)
+                        scoredIdx[scoredItems[si].item.data.index] = true;
+                    for (var pi = 0; pi < grp.items.length; pi++) {
+                        var pitem = grp.items[pi];
+                        if (pitem.data.permanent && !scoredIdx[pitem.data.index])
+                            scoredItems.push({
+                                item: pitem,
+                                score: 0,
+                                order: scoredItems.length
+                            });
+                    }
+                }
+                if (scoredItems.length === 0)
+                    continue;
+
+                var sectionId = grpIdx === 0 ? "dmenu" : "dmenu:" + grpIdx;
+                var dmenuSection = {
+                    id: sectionId,
+                    title: grp.title,
+                    icon: grp.icon,
+                    iconType: grp.iconType,
+                    iconVisible: grp.iconVisible,
+                    priority: 1,
+                    items: scoredItems.map(function (s) {
+                        s.item.data.active = !!activeSet[s.item.data.index] || s.item.data.rowActive;
+                        s.item.data.urgent = !!urgentSet[s.item.data.index] || s.item.data.rowUrgent;
+                        s.item.data.checked = !!checkedSet[s.item.data.index];
+                        return s.item;
+                    }),
+                    collapsed: false,
+                    flatStartIndex: flat.length
+                };
+                if (!dmenuMarkupRows)
+                    _applyHighlights([dmenuSection], searchQuery);
+
+                var sectionStart = flat.length;
+                for (var ii = 0; ii < dmenuSection.items.length; ii++) {
+                    flat.push({
+                        isHeader: false,
+                        item: dmenuSection.items[ii],
+                        sectionId: sectionId,
+                        sectionIndex: newDmenuSections.length,
+                        indexInSection: ii
+                    });
+                }
+                sectionBoundsMap[sectionId] = {
+                    start: sectionStart,
+                    end: flat.length - 1,
+                    count: dmenuSection.items.length
+                };
+                newDmenuSections.push(dmenuSection);
+            }
+
+            flat._sectionBounds = sectionBoundsMap;
+            flatModel = flat;
+            sections = newDmenuSections;
+            selectedFlatIndex = restoreSelection(flatModel);
+            updateSelectedItem();
+            isSearching = false;
+            searchCompleted();
+            return;
+        }
 
         if (searchMode === "files") {
             var prefixInfo = Utils.parseFileSearchPrefix(searchQuery);
@@ -2148,8 +2631,19 @@ Item {
             searchDebounce.stop();
             performSearch();
         }
-        if (!selectedItem)
+        if (searchMode === "dmenu" && dmenuMultiSelect) {
+            confirmDmenuMultiSelection();
             return;
+        }
+        if (!selectedItem) {
+            if (searchMode === "dmenu" && searchQuery) {
+                if (dmenuOnlyMatch || dmenuNoCustom)
+                    return;
+                _sendDmenuFreeText(searchQuery);
+                itemExecuted();
+            }
+            return;
+        }
         executeItem(selectedItem, true);
     }
 
@@ -2157,7 +2651,8 @@ Item {
         if (!item)
             return;
 
-        SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
+        if (searchMode !== "dmenu" || !dmenuDisableHistory)
+            SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
 
         if (item.type === "plugin_browse") {
             var browsePluginId = item.data?.pluginId;
@@ -2209,6 +2704,15 @@ Item {
             return;
         case "file":
             openFile(item.data?.path);
+            break;
+        case "dmenu":
+            if (item.data.nonSelectable)
+                return;
+            if (dmenuMultiSelect) {
+                _toggleDmenuMultiSelect(item);
+                return;
+            }
+            _sendDmenuRowSelection(item);
             break;
         default:
             return;

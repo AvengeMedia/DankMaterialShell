@@ -8,6 +8,7 @@ master commit so point releases credit the right PR and author.
 
 Usage:
   release-notes.py v1.4.6..v1.5.0 --format github     # GH release "What's Changed"
+  release-notes.py v1.4.6..v1.5.0 --format changelog  # danklinux-docs changelog.mdx entry
   release-notes.py v1.4.6..v1.5.0 --format blog       # MDX contributor tables for danklinux-docs
   release-notes.py v1.4.6..v1.5.0 --format checklist  # flat PR/author review list
 
@@ -38,7 +39,7 @@ CATEGORIES = OrderedDict([
     ("other", "Other Changes"),
 ])
 SUBJECT_HINTS = [
-    (re.compile(r"^feat", re.I), "feature"),
+    (re.compile(r"^(feat|add)\b", re.I), "feature"),
     (re.compile(r"^(fix|hotfix|bugfix)", re.I), "fix"),
     (re.compile(r"^[\w./-]+: *fix", re.I), "fix"),
     (re.compile(r"^docs?\b", re.I), "docs"),
@@ -110,13 +111,30 @@ def fetch_pr_data(repo, shas):
     return result
 
 
+INTERNAL_PREFIX_RE = re.compile(
+    r"^(?:refactor|chore|ci|build|test|style|perf|imp|revert|cleanup|bump|sync|release)\b", re.I)
+FEATURE_CUE_RE = re.compile(
+    r"^(?:add(?:s|ed)?|introduce|implement|support|new|allow|enable|expose)\b"
+    r"|\b(?:add|added|adds) support\b|\bnew (?:option|setting|widget|command|backend)\b", re.I)
+FIX_CUE_RE = re.compile(
+    r"\b(?:fix(?:es|ed)?|regression|crash(?:es|ing)?|leak|broken|no longer|stop(?:s|ped)? (?:\w+ )?(?:crash|leak|spam)\w*)\b", re.I)
+
+
 def categorize(labels, subject):
     for key in CATEGORIES:
         if key in labels:
             return key
+    subject = subject or ""
     for rx, key in SUBJECT_HINTS:
-        if rx.search(subject or ""):
+        if rx.search(subject):
             return key
+    body = AREA_PREFIX_RE.sub("", TYPE_PREFIX_RE.sub("", subject, count=1), count=1)
+    if INTERNAL_PREFIX_RE.search(subject):
+        return "other"
+    if FEATURE_CUE_RE.search(body):
+        return "feature"
+    if FIX_CUE_RE.search(body):
+        return "fix"
     return "other"
 
 
@@ -183,10 +201,8 @@ def author_md(e):
     return e["author_name"]
 
 
-def format_github(repo, entries, rng, bare=False):
-    prev = rng.split("..")[0]
-    tag = rng.split("..")[1] if ".." in rng else "HEAD"
-    out = [] if bare else ["## What's Changed", ""]
+def format_sections(entries, escape=lambda t: t):
+    out = []
     for key, heading in CATEGORIES.items():
         group = [e for e in entries if e["category"] == key]
         if not group:
@@ -194,10 +210,34 @@ def format_github(repo, entries, rng, bare=False):
         out.append(f"### {heading}")
         for e in group:
             ref = f" in #{e['number']}" if e["number"] else f" ({e['sha'][:7]})"
-            out.append(f"- {e['title']} by {author_md(e)}{ref}")
+            out.append(f"- {escape(e['title'])} by {author_md(e)}{ref}")
         out.append("")
+    return out
+
+
+def format_github(repo, entries, rng, bare=False):
+    prev = rng.split("..")[0]
+    tag = rng.split("..")[1] if ".." in rng else "HEAD"
+    out = [] if bare else ["## What's Changed", ""]
+    out += format_sections(entries)
     if not bare:
         out.append(f"**Full Changelog**: https://github.com/{repo}/compare/{prev}...{tag}")
+    return "\n".join(out)
+
+
+def mdx_safe(text):
+    # titles land in MDX: escape JSX/expression/table chars
+    return (text.replace("{", "&#123;").replace("<", "&lt;")
+            .replace("|", "\\|"))
+
+
+# Same sections as the GitHub body the release feed parses, so docs and shell never disagree.
+def format_changelog(repo, entries, rng):
+    tag = rng.split("..")[1] if ".." in rng else "HEAD"
+    date = run(["git", "log", "-1", "--format=%cs", tag]).strip()
+    out = [f"## {tag}", "", f"**Released**: {date}", ""]
+    out += format_sections(entries, mdx_safe)
+    out += [f"**GitHub Release**: https://github.com/{repo}/releases/tag/{tag}", "", "---"]
     return "\n".join(out)
 
 
@@ -221,11 +261,6 @@ def clean_title(title):
 
 
 def format_blog(repo, entries, rng, exclude=frozenset()):
-    def mdx_safe(text):
-        # titles land in MDX table cells: escape JSX/expression/table chars
-        return (text.replace("{", "&#123;").replace("<", "&lt;")
-                .replace("|", "\\|"))
-
     def is_excluded(e):
         return ((e["login"] or "").lower() in exclude
                 or e["author_name"].lower() in exclude)
@@ -302,7 +337,7 @@ def format_checklist(entries):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("range", help="git range, e.g. v1.4.6..v1.5.0")
-    ap.add_argument("--format", choices=["github", "blog", "checklist"], default="github")
+    ap.add_argument("--format", choices=["github", "changelog", "blog", "checklist"], default="github")
     ap.add_argument("--repo", default=None, help="owner/name (default: from origin)")
     ap.add_argument("--exclude", action="append", default=None, metavar="LOGIN",
                     help="drop this author (repeatable). Blog format defaults "
@@ -345,6 +380,8 @@ def main():
                        and e["author_name"].lower() not in drop]
         if args.format == "github":
             text = format_github(repo, entries, args.range, bare=args.bare)
+        elif args.format == "changelog":
+            text = format_changelog(repo, entries, args.range)
         else:
             text = format_checklist(entries)
 

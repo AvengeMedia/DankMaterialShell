@@ -57,7 +57,6 @@ DankFloatingWindow {
             anchors.right: parent.right
             anchors.top: headerRow.bottom
             anchors.bottom: footerRow.top
-            anchors.topMargin: Theme.spacingS
             clip: true
             contentHeight: mainColumn.height + Theme.spacingL * 2
             contentWidth: width
@@ -92,11 +91,14 @@ DankFloatingWindow {
                 spacing: Theme.spacingM
 
                 DankButton {
-                    text: I18n.tr("Open in Browser")
-                    iconName: "open_in_new"
+                    text: I18n.tr("Release notes", "settings page and card title, notes for a DMS release")
+                    iconName: "auto_awesome"
                     backgroundColor: Theme.chipSurface
                     textColor: Theme.surfaceText
-                    onClicked: Qt.openUrlExternally("https://danklinux.com/blog/v1-6-release")
+                    onClicked: {
+                        root.dismiss();
+                        PopoutService.openSettingsWithTab("updater_changelog");
+                    }
                 }
 
                 DankButton {

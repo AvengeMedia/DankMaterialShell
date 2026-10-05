@@ -118,7 +118,7 @@ Column {
                         width: overridesList.width
                         height: 48
                         radius: Theme.cornerRadius
-                        color: Theme.floatingWindowFieldColor
+                        color: SettingsMetrics.controlColor
                         border.width: 0
 
                         StyledText {

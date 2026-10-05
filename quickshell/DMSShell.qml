@@ -40,19 +40,17 @@ Item {
 
     property bool osdSurfacesLoaded: false
     property int pendingOsdResumeReloads: 0
-    readonly property var dankIslandScreens: Quickshell.screens.filter(screen => SettingsData.dankIslandCoversScreen(screen))
     readonly property var notificationPopupScreens: {
         const screens = SettingsData.notificationFocusedMonitor ? Quickshell.screens : SettingsData.getFilteredScreens("notifications");
         if (!SettingsData.dankIslandEnabled)
             return screens;
         return screens.filter(screen => !SettingsData.dankIslandHandlesNotifications(screen));
     }
-    readonly property var legacySystemLevelOsdScreens: root.withoutDankIslandScreens(SettingsData.getFilteredScreens("osd"))
-
-    function withoutDankIslandScreens(screens) {
+    readonly property var legacySystemLevelOsdScreens: {
+        const screens = SettingsData.getFilteredScreens("osd");
         if (!SettingsData.dankIslandEnabled)
             return screens;
-        return screens.filter(screen => root.dankIslandScreens.indexOf(screen) === -1);
+        return screens.filter(screen => !SettingsData.dankIslandHandlesSystemOsd(screen));
     }
 
     function recreateOsdSurfaces() {
@@ -62,6 +60,8 @@ Item {
     }
 
     DesktopWidgetLayer {}
+
+    DesktopWidgetEditor {}
 
     Lock {
         id: lock
@@ -248,6 +248,8 @@ Item {
         osdStartupTimer.start();
         if (SettingsData.controlCenterWidgets.some(widget => widget.id === "diskUsage" && widget.enabled !== false))
             DgopService.initializeDiskMounts();
+        if (SettingsData.controlCenterWidgets.some(widget => widget.id === "user" && widget.enabled !== false && widget.uptime !== false))
+            DgopService.dgopAvailable;
 
         // These are dummy references just to trigger the singletons onCompleted to trigger
         PolkitService.polkitAvailable;
@@ -257,6 +259,7 @@ Item {
         TrashService.count;
         WallpaperCyclingService.cyclingActive;
         ThemeAutoService.active;
+        WellbeingService.tracking;
     }
 
     Loader {
@@ -1000,6 +1003,29 @@ Item {
     }
 
     LazyLoader {
+        id: systemUpdateModalLoader
+
+        active: false
+
+        Component.onCompleted: PopoutService.systemUpdateModalLoader = systemUpdateModalLoader
+
+        SystemUpdateModal {
+            id: systemUpdateModal
+            property bool wasShown: false
+
+            Component.onCompleted: PopoutService.systemUpdateModal = systemUpdateModal
+
+            onVisibleChanged: {
+                if (systemUpdateModal.visible) {
+                    wasShown = true;
+                } else if (wasShown) {
+                    PopoutService.unloadSystemUpdateModal();
+                }
+            }
+        }
+    }
+
+    LazyLoader {
         id: systemUpdateLoader
 
         active: false
@@ -1256,7 +1282,7 @@ Item {
                 }
 
                 Variants {
-                    model: SettingsData.getFilteredScreens("osd")
+                    model: root.legacySystemLevelOsdScreens
 
                     delegate: MicVolumeOSD {}
                 }
@@ -1268,19 +1294,19 @@ Item {
                 }
 
                 Variants {
-                    model: SettingsData.getFilteredScreens("osd")
+                    model: root.legacySystemLevelOsdScreens
 
                     delegate: IdleInhibitorOSD {}
                 }
 
                 Variants {
-                    model: SettingsData.osdPowerProfileEnabled ? SettingsData.getFilteredScreens("osd") : []
+                    model: SettingsData.osdPowerProfileEnabled ? root.legacySystemLevelOsdScreens : []
 
                     delegate: PowerProfileOSD {}
                 }
 
                 Variants {
-                    model: SettingsData.getFilteredScreens("osd")
+                    model: root.legacySystemLevelOsdScreens
 
                     delegate: CapsLockOSD {}
                 }
@@ -1341,11 +1367,6 @@ Item {
         sourceComponent: ChangelogModal {
             onChangelogDismissed: changelogLoader.active = false
             Component.onCompleted: show()
-        }
-
-        Component.onCompleted: {
-            if (ChangelogService.shouldShowChangelog)
-                active = true;
         }
 
         Connections {

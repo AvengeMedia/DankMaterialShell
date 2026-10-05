@@ -15,6 +15,9 @@ var SESSION_BACKED_PLUGIN_IDS = ["dankNotepadModule"];
 var STALE_WIDGET_KEYS = ["desktopClockEnabled", "desktopClockStyle", "desktopClockTransparency", "desktopClockColorMode", "desktopClockCustomColor", "desktopClockShowDate", "desktopClockShowAnalogNumbers", "desktopClockShowAnalogSeconds", "desktopClockX", "desktopClockY", "desktopClockWidth", "desktopClockHeight", "desktopClockDisplayPreferences", "systemMonitorEnabled", "systemMonitorShowHeader", "systemMonitorTransparency", "systemMonitorColorMode", "systemMonitorCustomColor", "systemMonitorShowCpu", "systemMonitorShowCpuGraph", "systemMonitorShowCpuTemp", "systemMonitorShowGpuTemp", "systemMonitorGpuPciId", "systemMonitorShowMemory", "systemMonitorShowMemoryGraph", "systemMonitorShowNetwork", "systemMonitorShowNetworkGraph", "systemMonitorShowDisk", "systemMonitorShowTopProcesses", "systemMonitorTopProcessCount", "systemMonitorTopProcessSortBy", "systemMonitorGraphInterval", "systemMonitorLayoutMode", "systemMonitorX", "systemMonitorY", "systemMonitorWidth", "systemMonitorHeight", "systemMonitorDisplayPreferences", "systemMonitorVariants", "desktopWidgetPositions"];
 
 var BAR_WIDGET_LIST_KEYS = ["leftWidgets", "centerWidgets", "rightWidgets"];
+var CC_HEADER_IDS = ["userCard", "quickActions", "header"];
+var CC_ACTION_TILE_IDS = ["settings", "lock", "power"];
+var CC_USER_KEYS = ["w", "h", "col", "row", "hostname", "compositor", "uptime", "badge", "background"];
 
 var REMOVED_KEYS_V21 = ["showBattery", "showCapsLockIndicator", "showClipboard", "showClock", "showControlCenterButton", "showCpuUsage", "showFocusedWindow", "showLauncherButton", "showMemUsage", "showMusic", "showNotificationButton", "showPrivacyButton", "showSystemTray", "showWeather", "showWorkspaceSwitcher", "hideBrightnessSlider", "updaterHideWidget", "workspaceScrolling", "appLauncherViewMode", "spotlightModalViewMode", "audioDeviceScrollVolumeEnabled", "desktopClockX", "desktopClockY", "desktopClockWidth", "desktopClockHeight", "desktopClockDisplayPreferences", "systemMonitorX", "systemMonitorY", "systemMonitorWidth", "systemMonitorHeight", "systemMonitorDisplayPreferences", "systemMonitorVariants"];
 
@@ -698,7 +701,101 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 31;
     }
 
+    if (currentVersion < 35 && targetVersion >= 35) {
+        if (Array.isArray(settings.controlCenterWidgets))
+            settings.controlCenterWidgets = migrateControlCenterHeader(settings.controlCenterWidgets, currentVersion < 33, settings.controlCenterColumns ?? 8);
+        settings.configVersion = 35;
+    }
+
+    if (currentVersion < 37 && targetVersion >= 37) {
+        if (Array.isArray(settings.controlCenterWidgets) && !settings.controlCenterWidgets.some(widget => widget?.id === "edit"))
+            settings.controlCenterWidgets = settings.controlCenterWidgets.concat([Object.assign({}, SpecModule.SPEC.controlCenterWidgets.def.find(widget => widget.id === "edit"))]);
+        settings.configVersion = 37;
+    }
+
+    if (currentVersion < 38 && targetVersion >= 38) {
+        migrateLockScreenWidgets(settings);
+        settings.configVersion = 38;
+    }
+
     return settings;
+}
+
+var LOCK_WIDGET_MOVED_KEYS = ["lockScreenShowSystemIcons", "lockScreenShowTime", "lockScreenClockStyle", "lockScreenShowDate", "lockScreenShowPasswordField", "lockScreenShowMediaPlayer", "lockScreenNotificationMode"];
+var LOCK_WIDGET_GREETER_KEYS = ["lockScreenShowPowerActions", "lockScreenShowProfileImage", "lockScreenShowWeather"];
+
+function migrateLockScreenWidgets(settings) {
+    if (Array.isArray(settings.lockScreenWidgetInstances))
+        return;
+    const present = key => key in settings;
+    if (!LOCK_WIDGET_MOVED_KEYS.concat(LOCK_WIDGET_GREETER_KEYS).some(present))
+        return;
+    const instances = SpecModule.lockWidgetDefaults();
+    const byId = id => instances.find(inst => inst.id === id);
+    if (present("lockScreenShowTime"))
+        byId("lock_clock").enabled = !!settings.lockScreenShowTime;
+    if (present("lockScreenClockStyle"))
+        byId("lock_clock").config.style = settings.lockScreenClockStyle === "vertical" ? "overlap" : "digital";
+    if (present("lockScreenShowDate"))
+        byId("lock_date").enabled = !!settings.lockScreenShowDate;
+    byId("lock_auth").config.profileVisibility = settings.lockScreenShowProfileImage === false ? "never" : "always";
+    byId("lock_auth").config.passwordVisibility = settings.lockScreenShowPasswordField === false ? "typing" : "always";
+    if (present("lockScreenNotificationMode")) {
+        const mode = Number(settings.lockScreenNotificationMode) || 0;
+        byId("lock_notifications").enabled = mode > 0;
+        if (mode > 0)
+            byId("lock_notifications").config.mode = mode;
+    }
+    if (present("lockScreenShowSystemIcons"))
+        byId("lock_status").enabled = !!settings.lockScreenShowSystemIcons;
+    if (present("lockScreenShowMediaPlayer"))
+        byId("lock_status").config.showMediaPlayer = !!settings.lockScreenShowMediaPlayer;
+    if (present("lockScreenShowWeather"))
+        byId("lock_status").config.showWeather = !!settings.lockScreenShowWeather;
+    if (present("lockScreenShowPowerActions"))
+        byId("lock_power").enabled = !!settings.lockScreenShowPowerActions;
+    settings.lockScreenWidgetInstances = instances;
+    for (const key of LOCK_WIDGET_MOVED_KEYS)
+        delete settings[key];
+}
+
+function migrateControlCenterHeader(widgets, fixedHeader, columns) {
+    const header = widgets.filter(widget => CC_HEADER_IDS.includes(widget?.id));
+    if (!fixedHeader && header.length === 0)
+        return widgets;
+    const rest = widgets.filter(widget => !CC_HEADER_IDS.includes(widget?.id));
+    const actions = header.find(widget => Array.isArray(widget?.actions))?.actions ?? [];
+    const wanted = id => !rest.some(widget => widget?.id === id) && actions.find(action => action?.id === id)?.enabled !== false;
+    const tiles = CC_ACTION_TILE_IDS.filter(wanted).map(id => ({
+                id: id,
+                enabled: true,
+                w: 1,
+                h: 1,
+                small: true
+            }));
+    const footer = rest.some(widget => widget?.id === "runningApps") ? [] : [
+        {
+            id: "runningApps",
+            enabled: true,
+            w: 4,
+            h: 1,
+            footer: true
+        }
+    ];
+    const identity = header.length === 0 ? {} : header.find(widget => widget.id === "userCard" || (widget.id === "header" && widget.showUser !== false));
+    if (!identity || rest.some(widget => widget?.id === "user"))
+        return tiles.concat(rest, footer);
+    const user = {
+        id: "user",
+        enabled: true,
+        w: Math.max(1, columns - tiles.length),
+        h: 1
+    };
+    for (const key of CC_USER_KEYS) {
+        if (key in identity)
+            user[key] = identity[key];
+    }
+    return [user].concat(tiles, rest, footer);
 }
 
 function migrateBarWidgetGlobals(settings) {

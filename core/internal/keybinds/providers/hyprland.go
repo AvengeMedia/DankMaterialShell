@@ -58,6 +58,7 @@ func (h *HyprlandProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
 		Binds:            categorizedBinds,
 		DMSBindsIncluded: result.DMSBindsIncluded,
 	}
+	sheet.SetMod(keybinds.ConfiguredModKey("", result.MainMod))
 
 	if result.DMSStatus != nil {
 		sheet.DMSStatus = keybinds.DMSBindsStatusFrom(*result.DMSStatus)
@@ -188,6 +189,14 @@ func (h *HyprlandProvider) formatKey(kb *HyprlandKeyBinding) string {
 	parts = append(parts, kb.Mods...)
 	parts = append(parts, key)
 	return strings.Join(parts, "+")
+}
+
+func (h *HyprlandProvider) ModKey() keybinds.ModKey {
+	result, err := ParseHyprlandKeysWithDMS(h.configPath)
+	if err != nil {
+		return keybinds.DefaultModKey()
+	}
+	return keybinds.ConfiguredModKey("", result.MainMod)
 }
 
 func (h *HyprlandProvider) GetOverridePath() string {

@@ -49,12 +49,12 @@ func (w *Walker) Record(sourcePath string) bool {
 }
 
 func (w *Walker) Include(baseDir, sourcePath string, visit func(absPath string) error) bool {
-	matched := w.Record(sourcePath)
-
 	resolved, err := Resolve(baseDir, sourcePath)
 	if err != nil {
-		return matched
+		return w.Record(sourcePath)
 	}
+
+	matched := w.Record(resolved)
 	if visit == nil {
 		return matched
 	}

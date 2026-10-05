@@ -10,6 +10,7 @@ Item {
     required property var controller
     required property string activityId
     required property string label
+    property string value: ""
     property string iconName: ""
     property color iconColor: Theme.primary
     property Component leading: null
@@ -54,6 +55,14 @@ Item {
             font.pixelSize: Theme.fontSizeMedium
             font.weight: Theme.fontWeightMedium
         }
+
+        StyledText {
+            anchors.verticalCenter: parent.verticalCenter
+            visible: root.value !== ""
+            text: root.value
+            color: Theme.surfaceTextSecondary
+            font.pixelSize: Theme.fontSizeMedium
+        }
     }
 
     // The pill is only as wide as the strip on a side edge, so the label is dropped.
@@ -79,6 +88,14 @@ Item {
             name: root.iconName
             size: Theme.iconSizeSmall
             color: root.iconColor
+        }
+
+        StyledText {
+            anchors.horizontalCenter: parent.horizontalCenter
+            visible: root.value !== ""
+            text: root.value
+            color: Theme.surfaceTextSecondary
+            font.pixelSize: Theme.fontSizeSmall
         }
     }
 }

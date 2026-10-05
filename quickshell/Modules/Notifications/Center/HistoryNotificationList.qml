@@ -16,6 +16,8 @@ Item {
     property int selectedIndex: -1
     property bool showKeyboardHints: false
     property bool nested: false
+    property real swipeBleed: 0
+    property alias showScrollBar: historyListView.showScrollBar
 
     function getStartOfDay(date) {
         const d = new Date(date);
@@ -236,9 +238,12 @@ Item {
 
         DankListView {
             id: historyListView
-            width: parent.width
+            x: -root.swipeBleed
+            width: parent.width + root.swipeBleed * 2
             height: parent.height - filterChips.height - Theme.spacingS
             clip: true
+            leftMargin: root.swipeBleed
+            rightMargin: root.swipeBleed
             spacing: Theme.groupedListGap
 
             add: NotificationMetrics.animationsEnabled ? DC.ListViewTransitions.add : null
@@ -256,90 +261,33 @@ Item {
                 visible: historyListView.count === 0
             }
 
-            delegate: Item {
+            NotificationSwipeGroup {
+                id: historySwipe
+            }
+
+            delegate: NotificationSwipeRow {
                 id: delegateRoot
                 required property var modelData
-                required property int index
 
-                property real swipeOffset: 0
-                property bool isDismissing: false
-                readonly property real dismissThreshold: width * NotificationMetrics.swipeThreshold
-                property bool __delegateInitialized: false
-
-                Timer {
-                    interval: 0
-                    running: true
-                    onTriggered: delegateRoot.__delegateInitialized = true
-                }
-
-                width: ListView.view.width
+                group: historySwipe
+                bleed: root.swipeBleed
+                width: ListView.view.width - root.swipeBleed * 2
                 height: historyCard.height
-                clip: true
+                onDismissed: root.removeWithScrollPreserve(modelData?.id || "")
 
                 HistoryNotificationCard {
                     id: historyCard
                     width: parent.width
-                    x: delegateRoot.swipeOffset
+                    x: delegateRoot.offset
                     historyItem: modelData
                     nested: root.nested
                     firstInGroup: index === 0
                     lastInGroup: index === historyListView.count - 1
+                    topRoundness: delegateRoot.topRoundness
+                    bottomRoundness: delegateRoot.bottomRoundness
+                    contentOpacity: delegateRoot.contentOpacity
                     isSelected: root.keyboardActive && root.focusAllowed && root.selectedIndex === index
                     keyboardNavigationActive: root.keyboardActive && root.focusAllowed
-                    opacity: Math.max(0, 1 - Math.abs(delegateRoot.swipeOffset) / delegateRoot.width)
-
-                    Behavior on x {
-                        enabled: !swipeDragHandler.active && !delegateRoot.isDismissing && delegateRoot.__delegateInitialized && NotificationMetrics.animationsEnabled
-                        NumberAnimation {
-                            duration: Theme.notificationExitDuration
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: NotificationMetrics.dismissCurve
-                        }
-                    }
-
-                    Behavior on opacity {
-                        enabled: delegateRoot.__delegateInitialized && NotificationMetrics.animationsEnabled
-                        NumberAnimation {
-                            duration: delegateRoot.__delegateInitialized ? Theme.notificationExitDuration : 0
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
-                        }
-                    }
-                }
-
-                NumberAnimation {
-                    id: swipeDismissAnimation
-                    target: delegateRoot
-                    property: "swipeOffset"
-                    to: delegateRoot.swipeOffset > 0 ? delegateRoot.width : -delegateRoot.width
-                    duration: NotificationMetrics.animationsEnabled ? Theme.notificationExitDuration : 0
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: NotificationMetrics.dismissCurve
-                    onFinished: root.removeWithScrollPreserve(delegateRoot.modelData?.id || "")
-                }
-
-                DragHandler {
-                    id: swipeDragHandler
-                    target: null
-                    yAxis.enabled: false
-                    xAxis.enabled: true
-
-                    onActiveChanged: {
-                        if (active || delegateRoot.isDismissing)
-                            return;
-                        if (Math.abs(delegateRoot.swipeOffset) <= delegateRoot.dismissThreshold) {
-                            delegateRoot.swipeOffset = 0;
-                            return;
-                        }
-                        delegateRoot.isDismissing = true;
-                        swipeDismissAnimation.restart();
-                    }
-
-                    onTranslationChanged: {
-                        if (delegateRoot.isDismissing)
-                            return;
-                        delegateRoot.swipeOffset = translation.x;
-                    }
                 }
             }
         }

@@ -13,6 +13,8 @@ import "../../../Common/QmlUtils.js" as QmlUtils
 Item {
     id: root
 
+    implicitHeight: column.height
+
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
@@ -88,7 +90,6 @@ Item {
                         title: AudioService.displayName(modelData)
                         subtitle: active ? I18n.tr("Active") : I18n.tr("Available")
                         active: modelData === AudioService.source
-                        showActiveCheck: true
                         clickable: true
                         onClicked: {
                             if (modelData?.name)

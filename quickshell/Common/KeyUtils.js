@@ -1,5 +1,6 @@
 .pragma library
 
+// qmlformat off
 const KEY_MAP = {
     16777234: "Left",
     16777236: "Right",
@@ -104,6 +105,7 @@ const KEY_MAP = {
     191: "questiondown",
     161: "exclamdown"
 };
+// qmlformat on
 
 // Preserve unshifted symbols from the active layout
 const SYMBOL_KEYSYM = {
@@ -162,6 +164,7 @@ const SHIFTED_US_FALLBACK = {
 // navigation keysyms (KP_Home, KP_End, ...); with NumLock on it sends KP_0..KP_9
 // (handled by the digit range in xkbKeyFromQtKey). Operators/Enter are the same
 // in both states.
+// qmlformat off
 const KP_MAP = {
     16777232: "KP_Home",
     16777235: "KP_Up",
@@ -181,6 +184,7 @@ const KP_MAP = {
     47: "KP_Divide",
     46: "KP_Decimal"
 };
+// qmlformat on
 
 // Shift+digit arrives as the layout's shifted symbol (latam Shift+0 is "="),
 // but compositors match binds on the unshifted keysym, so resolve the digit
@@ -222,6 +226,39 @@ function xkbKeyFromQtKey(qk, isKeypad, hasShift, scanCode) {
     return KEY_MAP[qk] || "";
 }
 
+function keyFromToken(token) {
+    const parts = String(token || "").split("+");
+    return parts[parts.length - 1];
+}
+
+// A compositor resolves a bind's keysym on the first level of the active layout,
+// so a keysym that lives only above it can never match: de:neo puts every
+// bracket on layer 4, which is how "Mod+bracketleft" gets stored and then never
+// fires (#3585). keymap is what `dms keybinds keymap` reports, and a key outside
+// its `named` vocabulary is one we could not name, so it counts as fine.
+function keysymUnreachable(key, keymap) {
+    if (!key || !keymap)
+        return false;
+    const vocabulary = keymap.named ?? [];
+    const byKeycode = keymap.keysyms ?? {};
+    if (vocabulary.length === 0)
+        return false;
+
+    const wanted = String(key).toLowerCase();
+    if (!vocabulary.some(name => String(name).toLowerCase() === wanted))
+        return false;
+
+    const keycodes = Object.keys(byKeycode);
+    for (let i = 0; i < keycodes.length; i++) {
+        const syms = byKeycode[keycodes[i]] ?? [];
+        for (let j = 0; j < syms.length; j++) {
+            if (String(syms[j]).toLowerCase() === wanted)
+                return false;
+        }
+    }
+    return true;
+}
+
 function modsFromEvent(mods) {
     var result = [];
     if (mods & 0x10000000)
@@ -239,42 +276,51 @@ function formatToken(mods, key) {
     return (mods.length ? mods.join("+") + "+" : "") + key;
 }
 
+const MODIFIER_ALIASES = {
+    "control": "ctrl",
+    "win": "super",
+    "meta": "super",
+    "logo": "super",
+    "mod4": "super",
+    "mod1": "alt"
+};
+
 function canonicalModifier(modifier) {
     var normalized = (modifier || "").toLowerCase();
-    if (normalized === "control")
-        return "ctrl";
-    if (normalized === "win")
-        return "super";
-    return normalized;
+    return MODIFIER_ALIASES[normalized] || normalized;
 }
 
-function withSymbolicMod(mods, modKey) {
+function withSymbolicMod(mods, modKey, modSymbol) {
     var configuredMod = canonicalModifier(modKey);
-    if (!configuredMod)
+    if (!configuredMod || !modSymbol)
         return mods;
     return mods.map(function (modifier) {
-        return canonicalModifier(modifier) === configuredMod ? "Mod" : modifier;
+        return canonicalModifier(modifier) === configuredMod ? modSymbol : modifier;
     });
 }
 
-function normalizeKeyCombo(keyCombo, modKey) {
+function normalizeKeyCombo(keyCombo, modKey, modSymbol) {
     if (!keyCombo)
         return "";
     var configuredMod = canonicalModifier(modKey) || "super";
-    return keyCombo.toLowerCase().replace(/\bmod\b/g, configuredMod).replace(/\bcontrol\b/g, "ctrl").replace(/\bwin\b/g, "super");
+    var symbol = (modSymbol || "mod").toLowerCase();
+    return keyCombo.toLowerCase().split("+").map(function (part) {
+        var token = part.trim();
+        return token === symbol ? configuredMod : canonicalModifier(token);
+    }).join("+");
 }
 
-function getConflictingBinds(keyCombo, currentAction, allBinds, modKey) {
+function getConflictingBinds(keyCombo, currentAction, allBinds, modKey, modSymbol) {
     if (!keyCombo)
         return [];
     var conflicts = [];
-    var normalizedKey = normalizeKeyCombo(keyCombo, modKey);
+    var normalizedKey = normalizeKeyCombo(keyCombo, modKey, modSymbol);
     for (var i = 0; i < allBinds.length; i++) {
         var bind = allBinds[i];
         if (bind.action === currentAction)
             continue;
         for (var k = 0; k < bind.keys.length; k++) {
-            if (normalizeKeyCombo(bind.keys[k].key, modKey) === normalizedKey) {
+            if (normalizeKeyCombo(bind.keys[k].key, modKey, modSymbol) === normalizedKey) {
                 conflicts.push({
                     action: bind.action,
                     desc: bind.desc || bind.action
@@ -315,8 +361,7 @@ function qtKeyFromName(name) {
 }
 
 function isModifierKey(qk) {
-    return qk === Qt.Key_Control || qk === Qt.Key_Shift || qk === Qt.Key_Alt || qk === Qt.Key_Meta
-        || qk === Qt.Key_NumLock || qk === Qt.Key_CapsLock || qk === Qt.Key_ScrollLock;
+    return qk === Qt.Key_Control || qk === Qt.Key_Shift || qk === Qt.Key_Alt || qk === Qt.Key_Meta || qk === Qt.Key_NumLock || qk === Qt.Key_CapsLock || qk === Qt.Key_ScrollLock;
 }
 
 function eventMatchesCombo(event, combo) {
@@ -349,7 +394,6 @@ const KEY_GLYPH_MAP = {
     "ctrl": "⌃",
     "control": "⌃",
     "alt": "⌥",
-    "mod": "⌘",
     "super": "⌘",
     "meta": "⌘",
     "win": "⌘",
@@ -456,9 +500,11 @@ const KEY_GLYPH_MAP = {
     "launch1": "PrtSc"
 };
 
-function formatKeyTokens(keyString) {
+function formatKeyTokens(keyString, modKey, modSymbol) {
     if (!keyString)
         return [];
+    var symbol = (modSymbol || "mod").toLowerCase();
+    var resolvedMod = canonicalModifier(modKey) || "super";
     var str = keyString;
     var plusEnds = false;
     if (str.endsWith("++")) {
@@ -472,6 +518,8 @@ function formatKeyTokens(keyString) {
         if (!part)
             continue;
         var lower = part.toLowerCase();
+        if (lower === symbol)
+            lower = resolvedMod;
         if (KEY_GLYPH_MAP[lower] !== undefined) {
             tokens.push(KEY_GLYPH_MAP[lower]);
         } else if (part.length === 1) {

@@ -367,8 +367,7 @@ Singleton {
 
     function getPowerLauncherActions() {
         const ids = ["lock", "logout", "suspend", "hibernate", "reboot", "softreboot", "poweroff", "restart"];
-        const customIds = (SettingsData.customPowerButtons || []).map((button, i) => "custom:" + i);
-        return ids.filter(a => SessionService.isPowerActionSupported(a)).concat(customIds).map(a => {
+        return ids.filter(a => SessionService.isPowerActionSupported(a)).concat(SessionService.extraPowerActions).map(a => {
             const data = SessionService.getPowerActionData(a);
             return {
                 action: a,

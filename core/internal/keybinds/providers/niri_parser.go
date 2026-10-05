@@ -35,6 +35,7 @@ type NiriSection struct {
 type NiriParser struct {
 	configDir          string
 	modKey             string
+	modKeyNested       string
 	processedFiles     map[string]bool
 	bindMap            map[string]*NiriKeyBinding
 	bindOrder          []string
@@ -239,7 +240,6 @@ func isBraceAdjacentSpace(b byte) bool {
 func NewNiriParser(configDir string) *NiriParser {
 	return &NiriParser{
 		configDir:          configDir,
-		modKey:             "Super",
 		processedFiles:     make(map[string]bool),
 		bindMap:            make(map[string]*NiriKeyBinding),
 		bindOrder:          []string{},
@@ -392,13 +392,18 @@ func (p *NiriParser) processNodes(nodes []*document.Node, section *NiriSection, 
 
 func (p *NiriParser) handleInput(node *document.Node) {
 	for _, child := range node.Children {
-		if child.Name.String() != "mod-key" || len(child.Arguments) == 0 {
+		if len(child.Arguments) == 0 {
 			continue
 		}
-
-		modKey := strings.Trim(strings.TrimSpace(child.Arguments[0].String()), "\"")
-		if modKey != "" {
-			p.modKey = modKey
+		value := strings.Trim(strings.TrimSpace(child.Arguments[0].String()), "\"")
+		if value == "" {
+			continue
+		}
+		switch child.Name.String() {
+		case "mod-key":
+			p.modKey = value
+		case "mod-key-nested":
+			p.modKeyNested = value
 		}
 	}
 }
@@ -409,21 +414,17 @@ func (p *NiriParser) handleInclude(node *document.Node, section *NiriSection, ba
 	}
 
 	includePath := strings.Trim(node.Arguments[0].String(), "\"")
-	isDMSInclude := includePath == "dms/binds.kdl" || strings.HasSuffix(includePath, "/dms/binds.kdl")
+	fullPath := filepath.Join(baseDir, includePath)
+	if filepath.IsAbs(includePath) {
+		fullPath = includePath
+	}
+	isDMSInclude := strings.HasSuffix(fullPath, "/dms/binds.kdl")
 
 	p.includeCount++
 	if isDMSInclude {
 		p.dmsBindsIncluded = true
 		p.dmsIncludePos = p.includeCount
 		p.bindsBeforeDMS = len(p.bindMap)
-	}
-
-	fullPath := filepath.Join(baseDir, includePath)
-	if filepath.IsAbs(includePath) {
-		fullPath = includePath
-	}
-
-	if isDMSInclude {
 		p.dmsProcessed = true
 	}
 
@@ -553,6 +554,7 @@ func (p *NiriParser) parseKeyCombo(combo string) ([]string, string) {
 type NiriParseResult struct {
 	Section            *NiriSection
 	ModKey             string
+	ModKeyNested       string
 	DMSBindsIncluded   bool
 	DMSStatus          *configfrag.Status
 	ConflictingConfigs map[string]*NiriKeyBinding
@@ -580,6 +582,7 @@ func ParseNiriKeys(configDir string) (*NiriParseResult, error) {
 	return &NiriParseResult{
 		Section:            section,
 		ModKey:             parser.modKey,
+		ModKeyNested:       parser.modKeyNested,
 		DMSBindsIncluded:   parser.HasDMSBindsIncluded(),
 		DMSStatus:          parser.buildDMSStatus(),
 		ConflictingConfigs: parser.conflictingConfigs,

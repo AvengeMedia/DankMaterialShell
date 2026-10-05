@@ -68,13 +68,10 @@ Item {
 
         if (appData.type === "window") {
             const toplevel = getToplevelObject();
-            if (!toplevel) {
-                return false;
-            }
-            return toplevel.activated;
+            return isToplevelFocused(toplevel);
         }
         if (appData.type === "grouped")
-            return getGroupedToplevels().some(toplevel => toplevel.activated);
+            return getGroupedToplevels().some(toplevel => isToplevelFocused(toplevel));
 
         return false;
     }
@@ -123,6 +120,14 @@ Item {
         return appData?.allWindows?.map(w => w.toplevel).filter(t => t !== null) || [];
     }
 
+    function isToplevelFocused(toplevel) {
+        if (!toplevel)
+            return false;
+        if (toplevel.activated)
+            return true;
+        return CompositorService.overviewFocusedToplevel([toplevel]) !== null;
+    }
+
     function restoreSpecialWorkspaceWindow(waylandToplevel) {
         if (!root.options.restoreSpecialWorkspaceOnClick || !waylandToplevel)
             return false;
@@ -138,12 +143,23 @@ Item {
 
     function getActiveGroupedToplevelIndex(toplevels) {
         for (let i = 0; i < toplevels.length; i++) {
-            if (toplevels[i].activated)
+            if (isToplevelFocused(toplevels[i]))
                 return i;
         }
 
-        const overviewFocused = CompositorService.overviewFocusedToplevel(toplevels);
-        return overviewFocused ? toplevels.indexOf(overviewFocused) : -1;
+        return -1;
+    }
+
+    function cycleGroupedToplevels() {
+        const toplevels = getGroupedToplevels();
+        if (toplevels.length === 0)
+            return;
+
+        const currentIndex = getActiveGroupedToplevelIndex(toplevels);
+        const nextToplevel = toplevels[(currentIndex + 1) % toplevels.length];
+        if (restoreSpecialWorkspaceWindow(nextToplevel))
+            return;
+        CompositorService.activateToplevel(nextToplevel);
     }
 
     function showContextMenu() {
@@ -309,7 +325,7 @@ Item {
                         CompositorService.toggleToplevel(groupedToplevel);
                     }
                 } else {
-                    root.showContextMenu();
+                    root.cycleGroupedToplevels();
                 }
                 break;
             }
@@ -435,7 +451,7 @@ Item {
             y: !root.isVertical && !root.indicatorAtFarEdge ? root.indicatorLane : 0
             width: parent.width - (root.isVertical ? root.indicatorLane : 0)
             height: parent.height - (root.isVertical ? 0 : root.indicatorLane)
-            scale: root.options.enlargeOnHover && root.isHovered ? (root.options.enlargePercentage ?? 125) / 100 : 1
+            scale: !root.options?.magnification && root.options?.enlargeOnHover && root.isHovered ? (root.options?.enlargePercentage ?? 125) / 100 : 1
 
             AppIconRenderer {
                 id: coreIcon
@@ -567,39 +583,36 @@ Item {
                 }
 
                 Rectangle {
-                    width: {
-                        if (root.options.indicatorStyle === "circle") {
+                    readonly property bool dotFocused: {
+                        if (!appData) return false;
+                        if (appData.type !== "grouped" || appData.windowCount === 1)
+                            return isWindowFocused;
+                        const groupToplevels = getGroupedToplevels();
+                        return index < groupToplevels.length && isToplevelFocused(groupToplevels[index]);
+                    }
+                    readonly property real baseWidth: {
+                        if (root.options.indicatorStyle === "circle")
                             return Math.max(4, actualIconSize * 0.1);
-                        }
                         return appData && appData.type === "grouped" && appData.windowCount > 1 ? Math.max(3, actualIconSize * 0.1) : Math.max(6, actualIconSize * 0.2);
                     }
+                    width: dotFocused ? baseWidth * 3 : baseWidth
                     height: {
                         if (root.options.indicatorStyle === "circle") {
                             return Math.max(4, actualIconSize * 0.1);
                         }
                         return Math.max(2, actualIconSize * 0.05);
                     }
-                    radius: root.options.indicatorStyle === "circle" ? width / 2 : Theme.cornerRadius
-                    color: {
-                        if (!appData) {
-                            return "transparent";
-                        }
+                    radius: height / 2
+                    color: !appData ? "transparent" : (dotFocused ? Theme.primary : Theme.surfaceTextSecondary)
 
-                        if (appData.type !== "grouped" || appData.windowCount === 1) {
-                            if (isWindowFocused) {
-                                return Theme.primary;
-                            }
-                            return Theme.surfaceTextSecondary;
+                    Behavior on width {
+                        NumberAnimation {
+                            duration: Theme.shortDuration
+                            easing.type: Easing.OutCubic
                         }
-
-                        if (appData.type === "grouped" && appData.windowCount > 1) {
-                            const groupToplevels = getGroupedToplevels();
-                            if (index < groupToplevels.length && groupToplevels[index].activated) {
-                                return Theme.primary;
-                            }
-                        }
-
-                        return Theme.surfaceTextSecondary;
+                    }
+                    Behavior on color {
+                        ColorAnimation { duration: Theme.shortDuration }
                     }
                 }
             }
@@ -627,39 +640,36 @@ Item {
                 }
 
                 Rectangle {
+                    readonly property bool dotFocused: {
+                        if (!appData) return false;
+                        if (appData.type !== "grouped" || appData.windowCount === 1)
+                            return isWindowFocused;
+                        const groupToplevels = getGroupedToplevels();
+                        return index < groupToplevels.length && isToplevelFocused(groupToplevels[index]);
+                    }
+                    readonly property real baseHeight: {
+                        if (root.options.indicatorStyle === "circle")
+                            return Math.max(4, actualIconSize * 0.1);
+                        return appData && appData.type === "grouped" && appData.windowCount > 1 ? Math.max(3, actualIconSize * 0.1) : Math.max(6, actualIconSize * 0.2);
+                    }
                     width: {
                         if (root.options.indicatorStyle === "circle") {
                             return Math.max(4, actualIconSize * 0.1);
                         }
                         return Math.max(2, actualIconSize * 0.05);
                     }
-                    height: {
-                        if (root.options.indicatorStyle === "circle") {
-                            return Math.max(4, actualIconSize * 0.1);
+                    height: dotFocused ? baseHeight * 3 : baseHeight
+                    radius: width / 2
+                    color: !appData ? "transparent" : (dotFocused ? Theme.primary : Theme.surfaceTextSecondary)
+
+                    Behavior on height {
+                        NumberAnimation {
+                            duration: Theme.shortDuration
+                            easing.type: Easing.OutCubic
                         }
-                        return appData && appData.type === "grouped" && appData.windowCount > 1 ? Math.max(3, actualIconSize * 0.1) : Math.max(6, actualIconSize * 0.2);
                     }
-                    radius: root.options.indicatorStyle === "circle" ? width / 2 : Theme.cornerRadius
-                    color: {
-                        if (!appData) {
-                            return "transparent";
-                        }
-
-                        if (appData.type !== "grouped" || appData.windowCount === 1) {
-                            if (isWindowFocused) {
-                                return Theme.primary;
-                            }
-                            return Theme.surfaceTextSecondary;
-                        }
-
-                        if (appData.type === "grouped" && appData.windowCount > 1) {
-                            const groupToplevels = getGroupedToplevels();
-                            if (index < groupToplevels.length && groupToplevels[index].activated) {
-                                return Theme.primary;
-                            }
-                        }
-
-                        return Theme.surfaceTextSecondary;
+                    Behavior on color {
+                        ColorAnimation { duration: Theme.shortDuration }
                     }
                 }
             }

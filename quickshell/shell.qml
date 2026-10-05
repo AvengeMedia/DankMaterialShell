@@ -12,6 +12,7 @@ import Quickshell
 import qs.Common
 import qs.DankCommon.Common as DC
 import qs.Modules
+import qs.Modules.Lock
 import qs.Services
 
 ShellRoot {
@@ -49,6 +50,7 @@ ShellRoot {
 
         sourceComponent: Scope {
             WallpaperBackground {}
+            LockPlacementPreparer {}
 
             Loader {
                 active: SettingsData.blurredWallpaperLayer && CompositorService.isNiri

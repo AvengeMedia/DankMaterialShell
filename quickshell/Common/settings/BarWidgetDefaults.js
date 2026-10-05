@@ -2,7 +2,69 @@
 
 var CONTROL_CENTER_GROUP_ORDER = ["network", "vpn", "bluetooth", "audio", "microphone", "brightness", "battery", "printer", "screenSharing", "idleInhibitor", "doNotDisturb"];
 
+// Island-layout bars and dots keep these keys on the bar config; the island widget carries them on its entry.
+var ISLAND_DEFAULTS = {
+    islandFloating: false,
+    islandPlacement: "edge",
+    islandFreeSize: 48,
+    islandFreeIcon: "blur_on",
+    islandFreeEdgeMargin: 2,
+    islandFreeIdleDelay: 2500,
+    islandFreeIdleOpacity: 0.45,
+    islandFreeIdleScale: 0.4,
+    islandSharedRouting: "normal",
+    islandRouteLauncher: "follow",
+    islandRouteControlCenter: "follow",
+    islandRouteNotificationCenter: "follow",
+    islandRouteClipboard: "follow",
+    islandRouteDash: "island",
+    islandRouteMedia: "island",
+    islandRouteWeather: "island",
+    islandRouteWallpaper: "island",
+    islandUseOverlayLayer: false,
+    islandReserveThickness: 40,
+    islandCompactThickness: 38,
+    islandOuterGap: 4,
+    islandAlongOffset: 0,
+    islandInteractionMode: "hybrid",
+    islandHoverOpenDelay: 150,
+    islandHoverCloseDelay: 150,
+    islandPalette: "default",
+    islandHighContrast: false,
+    islandMediaClockVisible: true,
+    islandNotificationBadgeClearOnOpen: false,
+    islandNotificationExpand: false,
+    islandNotificationPopups: false,
+    islandSystemOsd: true,
+    islandChargingPulse: true,
+    islandHomeCompactTight: false,
+    islandHomeClockDisplay: "both",
+    islandHomeVolumeDisplay: "both",
+    islandHomeBrightnessDisplay: "both",
+    islandHomeStatusContent: "battery",
+    islandBatteryStyle: "solid",
+    islandSatellitesEnabled: true,
+    islandSatellitePosition: "edges",
+    islandSatelliteGap: 12,
+    islandSatelliteBackground: false,
+    islandSatelliteGothCorners: true,
+    islandSatelliteFollowInterfaceStyle: true,
+    islandSatelliteTransparency: 1,
+    islandSatelliteSwoopRadius: 24,
+    islandReducedMotion: false,
+    islandSpringStiffness: 560,
+    islandSpringDamping: 37,
+    islandSpringMass: 1
+};
+
 var DEFAULTS = {
+    // A hosted island starts with popups, OSDs and hover left to the bar; island-layout bars take them by default.
+    island: Object.assign({}, ISLAND_DEFAULTS, {
+        islandNotificationPopups: true,
+        islandSystemOsd: false,
+        islandInteractionMode: "click",
+        islandWidgetBackground: true
+    }),
     spacer: {
         size: 20
     },
@@ -16,6 +78,8 @@ var DEFAULTS = {
     },
     workspaceSwitcher: {
         workspaceIndicatorStyle: "pills",
+        workspaceIndicatorRoundness: -1,
+        workspaceIndicatorCompact: false,
         showWorkspaceIndex: false,
         showWorkspaceName: false,
         showWorkspacePadding: false,
@@ -66,6 +130,8 @@ var DEFAULTS = {
     music: {
         mediaSize: 1,
         mediaAdaptiveWidthEnabled: true,
+        mediaShowLyrics: true,
+        mediaShowCoverArt: true,
         audioScrollMode: "volume"
     },
     focusedWindow: {

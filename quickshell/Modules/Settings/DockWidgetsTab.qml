@@ -11,7 +11,6 @@ Item {
 
     property var parentModal: null
     property int catalogRevision: 0
-    property string confirmingRemoveId: ""
 
     readonly property bool dockHosted: true
     readonly property var appsEntry: dock.config?.widgets.find(item => item.widgetId === "appsDock") ?? null
@@ -61,8 +60,6 @@ Item {
 
     DockSelectionState {
         id: dock
-
-        onSelectedDockIdChanged: root.confirmingRemoveId = ""
     }
 
     Connections {
@@ -84,7 +81,7 @@ Item {
 
     readonly property var widgetChoices: {
         catalogRevision;
-        return BarWidgetCatalog.widgets.concat(PluginService.getAllPluginVariants().filter(variant => variant.loaded).map(variant => ({
+        return BarWidgetCatalog.widgets.filter(widget => !widget.barOnly).concat(PluginService.getAllPluginVariants().filter(variant => variant.loaded).map(variant => ({
                     id: variant.fullId,
                     text: variant.name,
                     icon: variant.icon
@@ -126,7 +123,6 @@ Item {
     }
 
     function updateWidgets(widgets) {
-        root.confirmingRemoveId = "";
         if (!dock.hasConfig)
             return;
         SettingsData.updateDockConfig(dock.selectedDockId, {
@@ -148,7 +144,6 @@ Item {
             width: parent.width
             visible: dock.hasConfig
             iconName: "widgets"
-            title: I18n.tr("Apps & widgets")
             settingKey: "dockWidgets"
             tags: ["dock", "widgets", "apps", "add", "remove", "order"]
 
@@ -174,13 +169,12 @@ Item {
                     id: widgetRow
 
                     required property var modelData
-                    readonly property bool confirmingRemove: root.confirmingRemoveId === modelData.id
                     readonly property string slotOption: root.slotOptions[modelData.widgetId] ?? ""
                     readonly property bool shown: slotOption ? dock.config[slotOption] === true : modelData.enabled !== false
 
                     title: root.widgetName(modelData.widgetId)
                     iconName: root.widgetIcon(modelData.widgetId)
-                    subtitle: confirmingRemove ? I18n.tr("Confirm Delete") : ""
+                    subtitle: removeButton.confirming ? I18n.tr("Confirm Delete") : ""
                     subtitleColor: Theme.error
                     body: SettingsSliderRow {
                         width: parent.width
@@ -219,18 +213,10 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        SettingsDeleteButton {
+                            id: removeButton
                             visible: !widgetRow.slotOption
-                            iconName: widgetRow.confirmingRemove ? "warning" : "delete"
-                            iconColor: widgetRow.confirmingRemove ? Theme.error : Theme.surfaceVariantText
-                            Accessible.name: widgetRow.confirmingRemove ? I18n.tr("Confirm Delete") : I18n.tr("Remove")
-                            onClicked: {
-                                if (!widgetRow.confirmingRemove) {
-                                    root.confirmingRemoveId = widgetRow.modelData.id;
-                                    return;
-                                }
-                                root.updateWidgets(dock.config.widgets.filter(item => item.id !== widgetRow.modelData.id));
-                            }
+                            onDeleteRequested: root.updateWidgets(dock.config.widgets.filter(item => item.id !== widgetRow.modelData.id))
                         }
                     }
                 }

@@ -10,49 +10,10 @@ Item {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    readonly property var routingValues: ["normal", "always", "last-used"]
     readonly property var paletteValues: ["default", "bright", "dim"]
 
-    function valueIndex(values, value, fallback) {
-        const index = values.indexOf(value);
-        return index >= 0 ? index : Math.max(0, values.indexOf(fallback));
-    }
-
-    QtObject {
-        id: dot
-
-        readonly property var config: SettingsData.dotBarConfig
-
-        function setting(key) {
-            return SettingsData.islandSetting(config, key);
-        }
-
-        function apply(key, value) {
-            if (!config)
-                return;
-            SettingsData.updateBarConfig(config.id, {
-                [key]: value
-            });
-        }
-
-        function defaultFor(key) {
-            return key in SettingsData.islandDefaults ? SettingsData.islandDefaults[key] : SettingsData.barConfigDefault(key);
-        }
-
-        function isDefault(keys) {
-            if (!config)
-                return true;
-            return keys.every(key => config[key] === undefined || JSON.stringify(config[key]) === JSON.stringify(defaultFor(key)));
-        }
-
-        function resetToDefault(keys) {
-            if (!config)
-                return;
-            const patch = {};
-            for (const key of keys)
-                patch[key] = defaultFor(key);
-            SettingsData.updateBarConfig(config.id, patch);
-        }
+    readonly property IslandSettingsStore dot: IslandSettingsStore {
+        barId: SettingsData.dotBarConfig?.id ?? ""
     }
 
     SettingsPage {
@@ -60,7 +21,7 @@ Item {
             settingKey: "dotSize"
             tags: ["dot", "dankdot", "size", "diameter", "idle", "fade"]
             iconName: "blur_on"
-            title: I18n.tr("Dot", "bar layout: free-floating dot that opens island activities")
+            title: I18n.tr("General")
 
             SettingsSliderRow {
                 settingKey: "islandFreeSize"
@@ -178,11 +139,10 @@ Item {
                 resetKeys: ["islandPalette"]
                 text: I18n.tr("Palette", "island settings: surface tone choice")
                 model: [I18n.tr("Default", "island settings: default surface tone"), I18n.tr("Bright", "island settings: bright surface tone"), I18n.tr("Dim", "island settings: dim surface tone")]
-                currentIndex: root.valueIndex(root.paletteValues, dot.setting("islandPalette"), "default")
-                onSelectionChanged: (index, selected) => {
-                    if (selected)
-                        dot.apply("islandPalette", root.paletteValues[index] ?? "default");
-                }
+                values: root.paletteValues
+                value: dot.setting("islandPalette")
+                fallbackValue: "default"
+                onValueSelected: value => dot.apply("islandPalette", value)
             }
 
             SettingsToggleRow {
@@ -213,118 +173,22 @@ Item {
             }
         }
 
-        SettingsCard {
-            iconName: "touch_app"
-            title: I18n.tr("Behavior", "island settings: behavior card title")
-            settingKey: "dotBehavior"
-            tags: ["dot", "routing", "shortcuts", "motion", "spring", "animation"]
-
-            SettingsDropdownRow {
-                settingKey: "dotSharedRouting"
-                tags: ["dot", "routing", "launcher", "dash", "control center", "ipc", "last used"]
-                resetStore: dot
-                resetKeys: ["islandSharedRouting"]
-                text: I18n.tr("Shared shortcuts")
-                description: I18n.tr("Routes launcher, dash, control center and notification shortcuts")
-                options: [I18n.tr("Normal routing"), I18n.tr("Always here"), I18n.tr("Last used on this screen")]
-                dropdownWidth: Theme.smallBreakpoint / 2
-                currentValue: options[root.valueIndex(root.routingValues, SettingsData.islandSharedRoutingMode(dot.config), "normal")]
-                onValueChanged: value => SettingsData.setIslandSharedRouting(dot.config.id, root.routingValues[options.indexOf(value)] ?? "normal")
-            }
-
-            SettingsToggleRow {
-                settingKey: "dotReducedMotion"
-                tags: ["dot", "motion", "animation", "reduce", "accessibility", "spring"]
-                resetStore: dot
-                resetKeys: ["islandReducedMotion"]
-                text: I18n.tr("Reduce motion")
-                checked: dot.setting("islandReducedMotion")
-                onToggled: checked => dot.apply("islandReducedMotion", checked)
-            }
-
-            SettingsSliderRow {
-                settingKey: "dotSpringStiffness"
-                tags: ["dot", "motion", "spring", "stiffness", "animation"]
-                resetStore: dot
-                resetKeys: ["islandSpringStiffness"]
-                text: I18n.tr("Spring stiffness", "island settings: spring stiffness slider")
-                unit: ""
-                minimum: 100
-                maximum: 1200
-                step: 10
-                value: Math.round(dot.setting("islandSpringStiffness"))
-                enabled: !dot.setting("islandReducedMotion")
-                onSliderValueChanged: value => dot.apply("islandSpringStiffness", value)
-            }
-
-            SettingsSliderRow {
-                settingKey: "dotSpringDamping"
-                tags: ["dot", "motion", "spring", "damping", "bounce", "animation"]
-                resetStore: dot
-                resetKeys: ["islandSpringDamping"]
-                text: I18n.tr("Spring damping", "island settings: spring damping slider")
-                unit: ""
-                minimum: 10
-                maximum: 100
-                step: 1
-                value: Math.round(dot.setting("islandSpringDamping"))
-                enabled: !dot.setting("islandReducedMotion")
-                onSliderValueChanged: value => dot.apply("islandSpringDamping", value)
-            }
-
-            SettingsSliderRow {
-                settingKey: "dotSpringMass"
-                tags: ["dot", "motion", "spring", "mass", "inertia", "animation"]
-                resetStore: dot
-                resetKeys: ["islandSpringMass"]
-                text: I18n.tr("Spring mass", "island settings: spring mass slider")
-                minimum: 25
-                maximum: 300
-                step: 5
-                unit: ""
-                decimals: 2
-                value: Math.round(dot.setting("islandSpringMass") * 100)
-                enabled: !dot.setting("islandReducedMotion")
-                onSliderValueChanged: value => dot.apply("islandSpringMass", value / 100)
-            }
+        IslandBehaviorCard {
+            store: dot
+            keyPrefix: "dot"
+            docked: false
+            isDot: true
         }
 
-        SettingsCard {
-            iconName: "notifications"
-            title: I18n.tr("Notifications", "island settings: notifications card title")
-            settingKey: "dotNotifications"
-            tags: ["dot", "notifications", "popup", "badge", "expand"]
+        IslandNotificationsCard {
+            store: dot
+            keyPrefix: "dot"
+            badgeGated: false
+        }
 
-            SettingsToggleRow {
-                settingKey: "dotNotificationPopups"
-                tags: ["dot", "notifications", "popup", "standard", "stack", "arrival"]
-                resetStore: dot
-                resetKeys: ["islandNotificationPopups"]
-                text: I18n.tr("Use standard popups", "island settings: show arriving notifications as stacked popups instead of in the island")
-                description: I18n.tr("New notifications show as regular popups", "island standard popups toggle description")
-                checked: dot.setting("islandNotificationPopups")
-                onToggled: checked => dot.apply("islandNotificationPopups", checked)
-            }
-
-            SettingsToggleRow {
-                settingKey: "dotNotificationExpand"
-                tags: ["dot", "notifications", "expand", "arrival", "size"]
-                resetStore: dot
-                resetKeys: ["islandNotificationExpand"]
-                text: I18n.tr("Expand by default", "island settings: expanded notification toggle")
-                checked: dot.setting("islandNotificationExpand")
-                onToggled: checked => dot.apply("islandNotificationExpand", checked)
-            }
-
-            SettingsToggleRow {
-                settingKey: "dotNotificationBadgeClearOnOpen"
-                tags: ["dot", "notifications", "badge", "unread", "clear", "dismiss", "open"]
-                resetStore: dot
-                resetKeys: ["islandNotificationBadgeClearOnOpen"]
-                text: I18n.tr("Clear badge on open", "island settings: clear the notification badge when the center opens")
-                checked: dot.setting("islandNotificationBadgeClearOnOpen")
-                onToggled: checked => dot.apply("islandNotificationBadgeClearOnOpen", checked)
-            }
+        IslandMotionCard {
+            store: dot
+            keyPrefix: "dot"
         }
     }
 }
