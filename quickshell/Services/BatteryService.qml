@@ -26,6 +26,12 @@ Singleton {
     property real freebsdDesignCapacityWh: 0
     property string freebsdBatteryState: ""
 
+	readonly property bool freeBsdPollingRequested:
+		BarWidgetService.hasWidget("battery")
+		|| (PopoutService.controlCenterPopout?.shouldBeVisible ?? false)
+		|| (PopoutService.batteryPopout?.shouldBeVisible ?? false)
+		|| (PopoutService.settingsModal?.visible ?? false)
+
     function parseFreeBsdCapacity(value, unit) {
         const n = parseFloat(value || "0");
         if (!isFinite(n) || n <= 0)
@@ -93,7 +99,7 @@ Singleton {
 
 		const script = 'units=$(sysctl -n hw.acpi.battery.units 2>/dev/null || echo 0); i=0; while [ "$i" -lt "$units" ]; do echo "__DMS_BATTERY_${i}__"; acpiconf -i "$i" 2>/dev/null; i=$((i+1)); done; printf "__DMS_AC__:"; sysctl -n hw.acpi.acline 2>/dev/null || echo 1';
 
-		Proc.runCommand("battery-freebsd-acpi", ["sh", "-c", script], (output, exitCode) => {
+		Proc.runCommand("battery-freebsd-acpi", ["nice", "-n", "10", "sh", "-c", script], (output, exitCode) => {
 			root.freebsdBatteryProbeComplete = true;
 
 			if (exitCode === 0)
@@ -119,12 +125,18 @@ Singleton {
 
 	onBatteriesChanged: root.updateFreeBsdBatteryFallback()
 
+	onFreeBsdPollingRequestedChanged: {
+		if (root.freeBsdPollingRequested)
+			root.refreshFreeBsdBattery();
+	}
+
 	Timer {
 		interval: 15000
 		repeat: true
 		running: root.isBSD
 			&& root.batteries.length === 0
 			&& root.freebsdBatteryAvailable
+			&& root.freeBsdPollingRequested
 
 		onTriggered: root.refreshFreeBsdBattery()
 	}
