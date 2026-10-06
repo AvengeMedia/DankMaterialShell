@@ -2,10 +2,10 @@ import QtQuick
 import qs.Common
 import qs.Modals.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import Quickshell.Services.UPower
 
-DankModal {
+DModal {
     id: root
 
     layerNamespace: "dms:power-profiles"
@@ -156,7 +156,7 @@ DankModal {
                         }
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         iconName: "close"
                         Accessible.name: I18n.tr("Close")
                         iconSize: Theme.iconSize - 4
@@ -222,7 +222,7 @@ DankModal {
                                 anchors.centerIn: parent
                                 spacing: Theme.spacingS
 
-                                DankIcon {
+                                DIcon {
                                     name: Theme.getPowerProfileIcon(modelData)
                                     size: Theme.iconSize + 16
                                     color: isActive ? Theme.accentOnSelectedContainer : Theme.surfaceText
@@ -272,7 +272,7 @@ DankModal {
                     spacing: Theme.spacingXS
                     opacity: 0.5
 
-                    DankIcon {
+                    DIcon {
                         name: "keyboard"
                         size: Theme.fontSizeSmall
                         color: Theme.surfaceText

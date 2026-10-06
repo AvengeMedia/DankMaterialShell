@@ -76,7 +76,7 @@ Provides native DBus bindings, NetworkManager integration, and system utilities.
 {{{ git_repo_setup_macro }}}
 rm -rf dank-qml-common
 tar -xzf %{SOURCE3}
-test -e quickshell/DankCommon/Widgets/DankIcon.qml || { echo "DankCommon missing after submodule unpack"; exit 1; }
+test -e quickshell/DCommon/Widgets/DIcon.qml || { echo "DCommon missing after submodule unpack"; exit 1; }
 
 %build
 # Build DMS CLI from source (core/subdirectory)

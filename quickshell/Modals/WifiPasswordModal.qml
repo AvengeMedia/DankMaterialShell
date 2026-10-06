@@ -2,9 +2,10 @@ import QtQuick
 import qs.Common
 import qs.Modals.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
-DankModal {
+DModal {
     id: root
 
     layerNamespace: "dms:wifi-password"
@@ -293,7 +294,7 @@ DankModal {
         }
     }
 
-    DankDialog {
+    DDialog {
         id: contentFocusScope
 
         anchors.fill: parent
@@ -365,7 +366,7 @@ DankModal {
             }
         }
 
-        DankTextField {
+        DTextField {
             id: ssidInput
             visible: isHiddenNetwork
             outlined: true
@@ -385,7 +386,7 @@ DankModal {
             id: dynamicFieldsRepeater
             model: fieldsInfo
 
-            delegate: DankTextField {
+            delegate: DTextField {
                 id: fieldInput
                 required property var modelData
                 required property int index
@@ -437,7 +438,7 @@ DankModal {
                     color: Theme.surfaceVariantText
                 }
 
-                DankDropdown {
+                DDropdown {
                     width: parent.width
                     dropdownWidth: parent.width
                     compactMode: true
@@ -461,7 +462,7 @@ DankModal {
                     color: Theme.surfaceVariantText
                 }
 
-                DankDropdown {
+                DDropdown {
                     width: parent.width
                     dropdownWidth: parent.width
                     compactMode: true
@@ -472,7 +473,7 @@ DankModal {
             }
         }
 
-        DankTextField {
+        DTextField {
             id: usernameInput
             visible: showUsernameField
             outlined: true
@@ -490,7 +491,7 @@ DankModal {
             onAccepted: passwordInput.forceActiveFocus()
         }
 
-        DankTextField {
+        DTextField {
             id: passwordInput
             visible: showPasswordField
             outlined: true
@@ -518,7 +519,7 @@ DankModal {
             }
         }
 
-        DankTextField {
+        DTextField {
             id: anonInput
             visible: showAnonField
             outlined: true
@@ -536,7 +537,7 @@ DankModal {
             onAccepted: domainMatchInput.forceActiveFocus()
         }
 
-        DankTextField {
+        DTextField {
             id: domainMatchInput
             visible: showDomainField
             outlined: true
@@ -554,7 +555,7 @@ DankModal {
             onAccepted: submitCredentialsAndClose()
         }
 
-        DankToggle {
+        DToggle {
             id: savePasswordCheckbox
 
             width: parent.width
@@ -565,7 +566,7 @@ DankModal {
         }
 
         actions: [
-            DankButton {
+            DButton {
                 maximumWidth: contentFocusScope.actionWidth
                 wrapText: true
                 text: I18n.tr("Cancel")
@@ -573,7 +574,7 @@ DankModal {
                 textColor: Theme.primary
                 onClicked: clearAndClose()
             },
-            DankButton {
+            DButton {
                 id: connectButton
                 maximumWidth: contentFocusScope.actionWidth
                 wrapText: true

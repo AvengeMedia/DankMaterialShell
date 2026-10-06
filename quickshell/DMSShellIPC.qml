@@ -4,7 +4,7 @@ import Quickshell.Wayland
 import Quickshell.Services.SystemTray
 import Quickshell.Services.UPower
 import qs.Common
-import qs.Modules.DankDash
+import qs.Modules.DDash
 import qs.Services
 import qs.Modules.Settings.DisplayConfig
 
@@ -1872,6 +1872,11 @@ Item {
                 syncPositionAcrossScreens: enabledBool
             });
             return enabledBool ? `DESKTOP_WIDGET_SYNC_POSITION_ENABLED: ${instanceId}` : `DESKTOP_WIDGET_SYNC_POSITION_DISABLED: ${instanceId}`;
+        }
+
+        function edit(): string {
+            DesktopWidgetRegistry.editing = true;
+            return "DESKTOP_WIDGET_EDITOR_OPENED";
         }
 
         target: "desktopWidget"

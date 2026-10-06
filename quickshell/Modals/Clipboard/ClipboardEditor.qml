@@ -5,7 +5,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -263,7 +263,7 @@ Item {
             width: parent.width
             height: ClipboardConstants.headerHeight
 
-            DankActionButton {
+            DActionButton {
                 iconName: "arrow_back"
                 Accessible.name: I18n.tr("Back")
                 iconSize: Theme.iconSize - 4
@@ -281,7 +281,7 @@ Item {
                 anchors.centerIn: parent
             }
 
-            DankActionButton {
+            DActionButton {
                 iconName: "close"
                 Accessible.name: I18n.tr("Close")
                 iconSize: Theme.iconSize - 4
@@ -292,7 +292,7 @@ Item {
             }
         }
 
-        DankTextEdit {
+        DTextEdit {
             id: editField
             width: parent.width
             height: Math.max(Theme.fontSizeMedium * 8, parent.height - editorHeader.height - editorActions.height - PopoutMetrics.contentGap * 2)
@@ -335,7 +335,7 @@ Item {
                 Layout.fillWidth: true
             }
 
-            DankButton {
+            DButton {
                 id: cancelButton
                 text: I18n.tr("Cancel")
                 backgroundColor: Theme.chipSurface
@@ -348,14 +348,14 @@ Item {
                 spacing: Theme.spacingS
                 opacity: root.textLoaded ? 1 : 0.6
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Save")
                     backgroundColor: Theme.primary
                     textColor: Theme.onPrimary
                     onClicked: root.saveEntry("history")
                 }
 
-                DankIconButton {
+                DIconButton {
                     variant: "filled"
                     iconName: saveMenu.visible ? "expand_less" : "expand_more"
                     tooltipText: I18n.tr("Save")
@@ -397,7 +397,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingS
 
-                        DankIcon {
+                        DIcon {
                             name: "save"
                             size: Theme.iconSizeSmall
                             color: Theme.surfaceText
@@ -435,7 +435,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingS
 
-                        DankIcon {
+                        DIcon {
                             name: "close"
                             size: Theme.iconSizeSmall
                             color: Theme.surfaceText
@@ -474,7 +474,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingS
 
-                        DankIcon {
+                        DIcon {
                             name: "content_paste"
                             size: Theme.iconSizeSmall
                             color: Theme.surfaceText

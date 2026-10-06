@@ -30,6 +30,7 @@ DMS is an open-source desktop shell for Wayland compositors on linux, built to w
 - A test must fail on the broken code. Otherwise do not write it.
 - No useless tests: "main.go contains func main()", defaults, "it instantiates", behavior the change didn't touch.
 - QML tests must be fast. Call logic directly, load the smallest component, no fixed delays or animation waits, few meaningful assertions over a matrix.
+- Tests cover `.js` modules, functions of `Services/` and `Common/` singletons, and IPC handlers. Never load, slice or mock anything under `Modules/`, `Modals/` or `Widgets/`, and never spawn a compositor, display server or shell. Those tests only ever broke on UI tweaks.
 
 ## Connections vs bound properties
 

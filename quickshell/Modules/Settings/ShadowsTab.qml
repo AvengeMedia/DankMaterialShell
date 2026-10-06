@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -119,7 +119,7 @@ Item {
                 clickable: true
                 onClicked: root.openShadowColorPicker()
 
-                DankColorSwatch {
+                DColorSwatch {
                     width: Theme.iconSizeMedium
                     height: width
                     swatchColor: SettingsData.m3ElevationCustomColor ?? "#000000"

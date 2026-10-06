@@ -5,7 +5,7 @@ import QtQuick.Effects
 import Quickshell.Widgets
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modals.Common
 import qs.Modules.Settings.Widgets
 import "../../Common/Format.js" as Format
@@ -80,7 +80,7 @@ Item {
 
     readonly property var notifyOptions: [
         {
-            label: I18n.tr("Every check"),
+            label: I18n.tr("Every check", "update notification frequency option, notify on every check"),
             seconds: 0
         },
         {
@@ -96,7 +96,7 @@ Item {
             seconds: 86400
         },
         {
-            label: I18n.tr("Once a week"),
+            label: I18n.tr("Once a week", "update notification frequency option"),
             seconds: 7 * 86400
         }
     ]
@@ -227,7 +227,7 @@ Item {
             return;
         case root.anythingToInstall:
             installConfirm.showWithOptions({
-                title: I18n.tr("Install system updates?"),
+                title: I18n.tr("Install system updates?", "confirmation dialog title before running the system upgrade"),
                 message: root.installSummary(),
                 confirmText: I18n.tr("Install", "install action button"),
                 onConfirm: () => root.runUpdateAll()
@@ -272,7 +272,7 @@ Item {
     SettingsPage {
         id: mainColumn
 
-        DankCard {
+        DCard {
             id: hero
             width: parent.width
             height: heroColumn.implicitHeight + SettingsMetrics.pagePaddingV * 2
@@ -368,7 +368,7 @@ Item {
                 iconName: failed ? "error_outline" : SystemUpdateService.restartPending ? "restart_alt" : "system_update_alt"
                 iconColor: failed ? Theme.error : SystemUpdateService.restartPending ? Theme.warning : Theme.primary
 
-                DankActionButton {
+                DActionButton {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: SystemUpdateService.sysupdateAvailable && !root.primaryIsCheck
                     enabled: !root.busy
@@ -380,7 +380,7 @@ Item {
                     onClicked: SystemUpdateService.checkForUpdates()
                 }
 
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: SystemUpdateService.sysupdateAvailable
                     buttonHeight: Theme.buttonHeightS
@@ -411,7 +411,7 @@ Item {
                 title: I18n.tr("Channel")
                 iconName: "alt_route"
                 subtitle: root.channelLabel()
-                trailingBadge: SystemUpdateService.shellManagedExternally ? I18n.tr("Managed by Nix") : ""
+                trailingBadge: SystemUpdateService.shellManagedExternally ? I18n.tr("Managed by Nix", "badge on the DMS update row when the shell is installed through Nix") : ""
             }
 
             SettingsRow {
@@ -433,20 +433,20 @@ Item {
                     color: SystemUpdateService.commitsBehind === 0 ? Theme.surfaceVariantText : Theme.primary
                 }
 
-                DankActionButton {
+                DActionButton {
                     anchors.verticalCenter: parent.verticalCenter
                     buttonSize: Theme.buttonHeightS
                     iconName: "open_in_browser"
                     iconColor: Theme.primary
                     backgroundColor: SettingsMetrics.controlSurface
-                    tooltipText: I18n.tr("View on GitHub")
+                    tooltipText: I18n.tr("View on GitHub", "link to the release on GitHub")
                     onClicked: Qt.openUrlExternally("https://github.com/AvengeMedia/DankMaterialShell/commits/master")
                 }
             }
 
             SettingsNavRow {
                 visible: root.notesRelease !== null
-                title: I18n.tr("Release notes")
+                title: I18n.tr("Release notes", "settings page and card title, notes for a DMS release")
                 iconName: "auto_awesome"
                 hint: root.notesRelease?.codename ? "v" + root.notesRelease.version + " · " + root.notesRelease.codename : "v" + (root.notesRelease?.version ?? "")
                 onClicked: keyboard => root.parentModal?.navigateTo("updater_changelog", keyboard)
@@ -457,14 +457,14 @@ Item {
                 title: I18n.tr("Requires restart")
                 iconName: "restart_alt"
                 iconColor: Theme.warning
-                subtitle: SystemUpdateService.shellInstalled ? I18n.tr("Installed %1, still running %2", "%1 is the installed version, %2 the running one").arg(SystemUpdateService.shellInstalled).arg(SystemUpdateService.shellRunning) : I18n.tr("A newer dms binary is installed.")
+                subtitle: SystemUpdateService.shellInstalled ? I18n.tr("Installed %1, still running %2", "%1 is the installed version, %2 the running one").arg(SystemUpdateService.shellInstalled).arg(SystemUpdateService.shellRunning) : I18n.tr("A newer dms binary is installed.", "software updates row subtitle, the running shell is older than the installed binary")
             }
         }
 
         SettingsCard {
             width: parent.width
             visible: SystemUpdateService.sysupdateAvailable
-            title: I18n.tr("System packages")
+            title: I18n.tr("System packages", "software updates card title, package manager updates")
             iconName: "inventory_2"
             settingKey: "softwareUpdatesSystem"
             tags: ["system", "packages", "flatpak", "aur"]
@@ -488,7 +488,7 @@ Item {
                 clickable: root.systemCount > 0
                 onClicked: root.packagesExpanded = !root.packagesExpanded
 
-                DankIcon {
+                DIcon {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: root.systemCount > 0
                     name: "expand_more"
@@ -527,7 +527,7 @@ Item {
                             return repo && version ? repo + " · " + version : repo || version;
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             anchors.verticalCenter: parent.verticalCenter
                             iconName: "visibility_off"
                             visible: SystemUpdateService.canIgnorePackage(packageRow.modelData)
@@ -549,7 +549,7 @@ Item {
                 title: I18n.tr("Upgrading...", "system update popout status while packages upgrade")
                 iconName: "open_in_new"
 
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
                     buttonHeight: Theme.buttonHeightS
                     text: I18n.tr("Show window", "button, brings back the floating system update window")
@@ -590,7 +590,7 @@ Item {
                 iconName: "error_outline"
                 iconColor: Theme.error
 
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: root.upgradeFailed && !root.upgradeRunsInTerminal
                     text: I18n.tr("Open in terminal")
@@ -669,7 +669,7 @@ Item {
                 tags: ["battery", "power", "pause"]
                 resetKeys: ["updaterPauseOnBattery"]
                 visible: BatteryService.batteryAvailable
-                text: I18n.tr("Pause checks on battery")
+                text: I18n.tr("Pause checks on battery", "software updates toggle, skip background checks on battery power")
                 checked: SettingsData.updaterPauseOnBattery
                 onToggled: checked => SettingsData.set("updaterPauseOnBattery", checked)
             }
@@ -678,8 +678,8 @@ Item {
                 settingKey: "systemUpdaterNotify"
                 tags: ["notify", "notification", "alert"]
                 resetKeys: ["updaterNotify"]
-                text: I18n.tr("Notify me on new updates")
-                description: I18n.tr("Checks in the background at the check interval. Notifies only when the count grows.")
+                text: I18n.tr("Notify me on new updates", "software updates toggle")
+                description: I18n.tr("Checks in the background at the check interval. Notifies only when the count grows.", "notify on new updates toggle description")
                 checked: SettingsData.updaterNotify
                 onToggled: checked => SettingsData.set("updaterNotify", checked)
             }
@@ -689,7 +689,7 @@ Item {
                 tags: ["notify", "notification", "frequency", "throttle"]
                 resetKeys: ["updaterNotifyMinSeconds"]
                 visible: SettingsData.updaterNotify
-                text: I18n.tr("Notify at most")
+                text: I18n.tr("Notify at most", "software updates dropdown label, how often update notifications may repeat")
                 options: root.notifyOptions.map(o => o.label)
                 currentValue: (root.notifyOptions.find(o => o.seconds === SettingsData.updaterNotifyMinSeconds) ?? root.notifyOptions[root.notifyOptions.length - 1]).label
                 onValueChanged: label => {
@@ -733,8 +733,8 @@ Item {
                 settingKey: "systemUpdaterUpgradeInWindow"
                 tags: ["window", "popout", "floating", "log", "output"]
                 resetKeys: ["updaterUpgradeInWindow"]
-                text: I18n.tr("Show upgrade in a window")
-                description: I18n.tr("Opens a floating window with the live output")
+                text: I18n.tr("Show upgrade in a window", "software updates toggle")
+                description: I18n.tr("Opens a floating window with the live output", "show upgrade in a window toggle description")
                 visible: !root.upgradeRunsInTerminal
                 checked: SettingsData.updaterUpgradeInWindow
                 onToggled: checked => SettingsData.set("updaterUpgradeInWindow", checked)
@@ -759,7 +759,7 @@ Item {
                 const name = newIgnoredPackageField.value.trim();
                 if (name === "")
                     return;
-                errorIsInvalidName = !/^[A-Za-z0-9@._+:-]+$/.test(name);
+                errorIsInvalidName = !SystemUpdateService.isValidIgnoredName(name);
                 if (errorIsInvalidName) {
                     ignoredPackageError.visible = true;
                     return;
@@ -785,7 +785,7 @@ Item {
                 onAccepted: ignoredPackagesCard.addIgnoredPackage()
                 onValueEdited: ignoredPackageError.visible = false
 
-                actions: DankIconButton {
+                actions: DIconButton {
                     variant: "filled"
                     iconName: "add"
                     tooltipText: I18n.tr("Ignore package", "tooltip, exclude a package from system updates")
@@ -797,7 +797,7 @@ Item {
             SettingsRow {
                 id: ignoredPackageError
                 visible: false
-                title: ignoredPackagesCard.errorIsInvalidName ? I18n.tr("Invalid package name — letters, digits and @._+:- only.") : I18n.tr("With Shelly, only Flatpak packages in the current update list can be ignored.")
+                title: ignoredPackagesCard.errorIsInvalidName ? I18n.tr("Invalid package name — letters, digits and @._+:/- only.", "ignored packages validation error") : I18n.tr("With Shelly, only Flatpak packages in the current update list can be ignored.")
                 titleColor: Theme.error
             }
 
@@ -812,7 +812,7 @@ Item {
                     title: modelData
                     iconName: "visibility_off"
 
-                    DankActionButton {
+                    DActionButton {
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "delete"
                         iconColor: Theme.error

@@ -8,9 +8,9 @@ import Quickshell.Io
 import qs.Common
 import qs.Services
 import "settings/SessionSpec.js" as Spec
-import "../DankCommon/Common/MaterialWallpaper.js" as MaterialWallpaper
+import "../DCommon/Common/MaterialWallpaper.js" as MaterialWallpaper
 import "settings/SessionStore.js" as Store
-import "../DankCommon/Common/settings/SpecUtil.js" as SpecUtil
+import "../DCommon/Common/settings/SpecUtil.js" as SpecUtil
 
 Singleton {
     id: root
@@ -291,7 +291,10 @@ Singleton {
     property var activeDisplayProfile: ({})
     property var activeDisplayProfileModes: ({})
     property var desktopWidgetGridSettings: ({})
+    property var lockScreenWidgetGridSettings: ({})
     property var desktopWidgetInstancePositions: ({})
+    property var lockScreenAutoPositions: ({})
+    property var greeterAutoPositions: ({})
     property var islandFreePositions: ({})
     property var builtInPluginState: ({})
     property bool greeterSyncPending: false
@@ -587,17 +590,21 @@ Singleton {
         saveSettings();
     }
 
-    function getDesktopWidgetGridSetting(screenKey, property, defaultValue) {
-        const val = desktopWidgetGridSettings?.[screenKey]?.[property];
+    function getWidgetGridSetting(lockScreen, screenKey, property, defaultValue) {
+        const store = lockScreen ? lockScreenWidgetGridSettings : desktopWidgetGridSettings;
+        const val = store?.[screenKey]?.[property];
         return val !== undefined ? val : defaultValue;
     }
 
-    function setDesktopWidgetGridSetting(screenKey, property, value) {
-        const allSettings = JSON.parse(JSON.stringify(desktopWidgetGridSettings || {}));
+    function setWidgetGridSetting(lockScreen, screenKey, property, value) {
+        const allSettings = JSON.parse(JSON.stringify((lockScreen ? lockScreenWidgetGridSettings : desktopWidgetGridSettings) || {}));
         if (!allSettings[screenKey])
             allSettings[screenKey] = {};
         allSettings[screenKey][property] = value;
-        desktopWidgetGridSettings = allSettings;
+        if (lockScreen)
+            lockScreenWidgetGridSettings = allSettings;
+        else
+            desktopWidgetGridSettings = allSettings;
         saveSettings();
     }
 
@@ -651,6 +658,60 @@ Singleton {
         saveSettings();
     }
 
+    function setGreeterAutoPositions(screenKey, placement) {
+        if (JSON.stringify(greeterAutoPositions[screenKey] ?? null) === JSON.stringify(placement))
+            return;
+        const updated = Object.assign({}, greeterAutoPositions);
+        updated[screenKey] = placement;
+        greeterAutoPositions = updated;
+        saveSettings();
+    }
+    function setLockScreenAutoPositions(screenKey, placement) {
+        if (JSON.stringify(lockScreenAutoPositions[screenKey] ?? null) === JSON.stringify(placement))
+            return;
+        const updated = Object.assign({}, lockScreenAutoPositions);
+        updated[screenKey] = placement;
+        lockScreenAutoPositions = updated;
+        saveSettings();
+    }
+
+    function copyDesktopWidgetInstancePositions(fromId, toId) {
+        const source = desktopWidgetInstancePositions[fromId];
+        if (!source)
+            return;
+        const updated = JSON.parse(JSON.stringify(desktopWidgetInstancePositions));
+        updated[toId] = JSON.parse(JSON.stringify(source));
+        desktopWidgetInstancePositions = updated;
+        saveSettings();
+    }
+    // Detached greeter clocks keep the spot the lock screen picked for them.
+    function pinPublishedLockPosition(fromId, toId, synced) {
+        const updated = JSON.parse(JSON.stringify(desktopWidgetInstancePositions));
+        let pinned = false;
+        for (const screenKey in lockScreenAutoPositions) {
+            const entry = lockScreenAutoPositions[screenKey];
+            const position = entry?.positions?.[fromId];
+            if (!position || !(entry.width > 0) || !(entry.height > 0))
+                continue;
+            const key = synced ? "_synced" : screenKey;
+            if (!updated[toId])
+                updated[toId] = {};
+            updated[toId][key] = Object.assign({}, updated[toId][key] || {}, synced ? {
+                x: position.x / entry.width,
+                y: position.y / entry.height
+            } : {
+                x: position.x,
+                y: position.y
+            });
+            pinned = true;
+            if (synced)
+                break;
+        }
+        if (!pinned)
+            return;
+        desktopWidgetInstancePositions = updated;
+        saveSettings();
+    }
     function removeDesktopWidgetInstancePositions(instanceId) {
         if (!(instanceId in desktopWidgetInstancePositions))
             return;
@@ -1597,7 +1658,15 @@ Singleton {
         saveSettings();
     }
 
+    function clearLauncherHistory() {
+        launcherLastQuery = "";
+        launcherQueryHistory = [];
+        saveSettings();
+    }
+
     function addLauncherHistory(query, skipLastQuery) {
+        if (!SettingsData.launcherHistoryEnabled)
+            return;
         let q = query.trim();
 
         if (!skipLastQuery)

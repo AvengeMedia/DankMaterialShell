@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Item {
@@ -67,7 +68,7 @@ Item {
         spacing: Theme.spacingXS
     }
 
-    DankIcon {
+    DIcon {
         id: caret
         anchors.right: parent.right
         anchors.verticalCenter: label.verticalCenter

@@ -3,8 +3,8 @@ import QtQuick
 import Quickshell.Services.SystemTray
 import qs.Common
 import qs.Services
-import qs.Modules.DankBar.Widgets
-import "../DankBar/WidgetModel.js" as WidgetModel
+import qs.Modules.DBar.Widgets
+import "../DBar/WidgetModel.js" as WidgetModel
 
 Item {
     id: root

@@ -43,6 +43,8 @@ Singleton {
     signal sessionLocked
     signal sessionUnlocked
     signal sessionResumed
+    signal lockEditorRequested
+    signal greeterEditorRequested
     signal lidOpened
     signal loginctlStateChanged
 

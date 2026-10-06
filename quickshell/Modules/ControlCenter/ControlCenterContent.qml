@@ -6,6 +6,7 @@ import qs.Services
 import qs.Modules.ControlCenter.Components
 import qs.Modules.ControlCenter.Models
 import qs.Modules.ControlCenter.Details
+import qs.DCommon.Widgets
 import qs.Widgets
 import "./utils/sections.js" as Sections
 import "./utils/widgets.js" as WidgetUtils
@@ -56,7 +57,7 @@ FocusScope {
     readonly property int gridColumns: host.gridColumns ?? Math.min(CcMetrics.gridColumns, gridColumnCap)
     readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - chromeHeight
     readonly property vector4d chromeRoom: host.chromeRoom ?? Qt.vector4d(Infinity, Infinity, Infinity, Infinity)
-    readonly property DankPanelResizer panelResizer: DankPanelResizer {
+    readonly property DPanelResizer panelResizer: DPanelResizer {
         popout: root.host
         stepWidth: CcMetrics.columnWidth + CcMetrics.gridGap
         widthFor: columns => CcMetrics.sheetWidthFor(columns) + root.sheetContentWidth - CcMetrics.sheetWidthFor(root.gridColumns)
@@ -73,6 +74,9 @@ FocusScope {
 
     implicitHeight: targetImplicitHeight
     focus: true
+
+    Component.onCompleted: WidgetUtils.ensureEditButton()
+    onPlacedWidgetIdsChanged: WidgetUtils.ensureEditButton()
 
     function navigateTo(section) {
         if (section === host.expandedSection)
@@ -279,6 +283,13 @@ FocusScope {
         event.accepted = true;
     }
 
+    Shortcut {
+        sequences: ["F2", "Ctrl+E"]
+        enabled: root.host.shouldBeVisible && !root.host.editMode && !root.pageOpen
+        context: Qt.WindowShortcut
+        onActivated: root.host.editMode = true
+    }
+
     readonly property string expandedSection: host.expandedSection ?? ""
     readonly property bool editMode: host.editMode
 
@@ -305,7 +316,7 @@ FocusScope {
             forceActiveFocus();
     }
 
-    DankGridEditChrome {
+    DGridEditChrome {
         id: panelChrome
 
         readonly property real screenWidth: root.host.triggerScreen?.width ?? Infinity
@@ -366,7 +377,7 @@ FocusScope {
         }
     }
 
-    DankFlickable {
+    DFlickable {
         id: contentFlickable
 
         anchors.left: parent.left
@@ -416,6 +427,7 @@ FocusScope {
                     onColorPickerRequested: root.host.openColorPicker()
                     onCloseRequested: root.host.close()
                     onSettingsRequested: root.host.openSettings()
+                    onEditRequested: root.host.editMode = true
                     onAccountsRequested: root.host.openAccounts()
                     onLockRequested: {
                         root.host.close();
@@ -449,6 +461,7 @@ FocusScope {
         items: root.footerItems
         gridDragging: root.gridDragWidget !== null
         gridDragPoint: widgetGrid.dragScenePoint
+        incomingRemovable: WidgetUtils.isRemovable(root.gridDragWidget)
         incoming: root.gridDragWidget !== null && widgetGrid.heldOutside && !footer.overTrash ? Object.assign({
             "cells": Math.min(WidgetUtils.footerCells(root.gridDragWidget), footer.freeCells())
         }, footer.gridSlot) : null
@@ -463,7 +476,7 @@ FocusScope {
         onConfigRequested: (index, widgetData, anchor) => root.openConfigOverlay(index, widgetData, anchor)
         onItemMoved: (index, sceneRect, leaving) => root.previewFooterDrag(index, sceneRect, leaving)
         onResized: (index, cells, fill) => WidgetUtils.setFooterSize(index, cells, fill)
-        onEditToggled: root.host.editMode = !root.host.editMode
+        onFinishRequested: root.host.editMode = false
         onCancelRequested: root.cancelEdit()
     }
 

@@ -9,7 +9,7 @@ import (
 )
 
 func TestLockScreenPasswordFieldBypassesTextInputIME(t *testing.T) {
-	data, err := os.ReadFile("../../../quickshell/Modules/Lock/LockScreenContent.qml")
+	data, err := os.ReadFile("../../../quickshell/Modules/Lock/Widgets/LockAuthWidget.qml")
 	if err != nil {
 		t.Fatalf("read lock screen QML: %v", err)
 	}

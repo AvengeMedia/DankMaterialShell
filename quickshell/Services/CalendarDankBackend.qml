@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import qs.DCommon.Common as DCommon
 
 Item {
     id: root
@@ -132,7 +133,7 @@ Item {
         Qt.callLater(() => requestSocket.connected = true);
     }
 
-    DankSocket {
+    DCommon.DSocket {
         id: requestSocket
         path: root.socketPath
         connected: false
@@ -173,7 +174,7 @@ Item {
         }
     }
 
-    DankSocket {
+    DCommon.DSocket {
         id: subscribeSocket
         path: root.socketPath
         connected: false

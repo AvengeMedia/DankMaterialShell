@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtCore
 import QtQuick
-import "../DankCommon/Common/Shape.js" as Shape
+import "../DCommon/Common/Shape.js" as Shape
 import Quickshell
 import Quickshell.Io
 import qs.Common
@@ -13,7 +13,7 @@ import "GSettings.js" as GSettings
 import "LayoutResolver.js" as LayoutResolver
 import "settings/SettingsSpec.js" as Spec
 import "settings/SettingsStore.js" as Store
-import "../DankCommon/Common/settings/SpecUtil.js" as SpecUtil
+import "../DCommon/Common/settings/SpecUtil.js" as SpecUtil
 import "settings/BarWidgetDefaults.js" as WidgetDefaults
 import "settings/DockConfig.js" as DockConfig
 
@@ -21,7 +21,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 36
+    readonly property int settingsConfigVersion: 38
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -330,6 +330,9 @@ Singleton {
     property string wallpaperBackgroundCustomColor: Spec.SPEC.wallpaperBackgroundCustomColor.def
     readonly property color effectiveWallpaperBackgroundColor: wallpaperBackgroundColorFor(wallpaperBackgroundColorMode)
 
+    property bool nightModeExcludeFullscreen: Spec.SPEC.nightModeExcludeFullscreen.def
+    property var nightModeExcludedApps: Spec.SPEC.nightModeExcludedApps.def
+
     function wallpaperBackgroundColorFor(mode) {
         switch (mode) {
         case "white":
@@ -439,6 +442,7 @@ Singleton {
     property int appLauncherGridColumns: Spec.SPEC.appLauncherGridColumns.def
     property bool closeNiriOverviewOnWindowFocus: Spec.SPEC.closeNiriOverviewOnWindowFocus.def
     property bool rememberLastQuery: Spec.SPEC.rememberLastQuery.def
+    property bool launcherHistoryEnabled: Spec.SPEC.launcherHistoryEnabled.def
     property bool rememberLastMode: Spec.SPEC.rememberLastMode.def
     property var spotlightSectionViewModes: Spec.SPEC.spotlightSectionViewModes.def
     onSpotlightSectionViewModesChanged: saveSettings()
@@ -773,13 +777,7 @@ Singleton {
     property bool modalDarkenBackground: Spec.SPEC.modalDarkenBackground.def
 
     property bool lockScreenShowPowerActions: Spec.SPEC.lockScreenShowPowerActions.def
-    property bool lockScreenShowSystemIcons: Spec.SPEC.lockScreenShowSystemIcons.def
-    property bool lockScreenShowTime: Spec.SPEC.lockScreenShowTime.def
-    property string lockScreenClockStyle: Spec.SPEC.lockScreenClockStyle.def
-    property bool lockScreenShowDate: Spec.SPEC.lockScreenShowDate.def
     property bool lockScreenShowProfileImage: Spec.SPEC.lockScreenShowProfileImage.def
-    property bool lockScreenShowPasswordField: Spec.SPEC.lockScreenShowPasswordField.def
-    property bool lockScreenShowMediaPlayer: Spec.SPEC.lockScreenShowMediaPlayer.def
     property bool lockScreenShowWeather: Spec.SPEC.lockScreenShowWeather.def
     property bool lockScreenPowerOffMonitorsOnLock: Spec.SPEC.lockScreenPowerOffMonitorsOnLock.def
     property bool lockAtStartup: Spec.SPEC.lockAtStartup.def
@@ -813,7 +811,6 @@ Singleton {
     property bool lockScreenSecurityKeyShortcutEnabled: Spec.SPEC.lockScreenSecurityKeyShortcutEnabled.def
     property bool greeterPamExternallyManaged: Spec.SPEC.greeterPamExternallyManaged.def
     property string lockScreenInactiveColor: Spec.SPEC.lockScreenInactiveColor.def
-    property int lockScreenNotificationMode: Spec.SPEC.lockScreenNotificationMode.def
     property bool lockScreenVideoEnabled: Spec.SPEC.lockScreenVideoEnabled.def
     property string lockScreenVideoPath: Spec.SPEC.lockScreenVideoPath.def
     property bool lockScreenVideoCycling: Spec.SPEC.lockScreenVideoCycling.def
@@ -973,7 +970,7 @@ Singleton {
     function islandStripThickness(bc) {
         return LayoutResolver.islandThickness(islandSettings(bc), islandDefaultsFor(bc));
     }
-    readonly property var _islandHomeGroupIds: ["media", "clock", "weather", "status", "volume", "brightness", "notifications"]
+    readonly property var _islandHomeGroupIds: ["media", "clock", "weather", "status", "volume", "brightness", "notifications", "privacy"]
     readonly property var _islandHomeLayoutDefault: [
         {
             "id": "media",
@@ -1001,6 +998,10 @@ Singleton {
         },
         {
             "id": "notifications",
+            "enabled": true
+        },
+        {
+            "id": "privacy",
             "enabled": true
         }
     ]
@@ -1115,6 +1116,94 @@ Singleton {
 
     property var desktopWidgetInstances: Spec.SPEC.desktopWidgetInstances.def
     property var desktopWidgetGroups: Spec.SPEC.desktopWidgetGroups.def
+    property var lockScreenWidgetInstances: Spec.SPEC.lockScreenWidgetInstances.def
+    property var greeterWidgetInstances: Spec.SPEC.greeterWidgetInstances.def
+    property bool greeterFollowLockScreen: Spec.SPEC.greeterFollowLockScreen.def
+    readonly property var widgetInstanceListKeys: ["desktopWidgetInstances", "lockScreenWidgetInstances", "greeterWidgetInstances"]
+
+    // Released greeters still read these three shared keys, so they follow the lock widgets.
+    onLockScreenWidgetInstancesChanged: {
+        const status = widgetInstanceOfType("lockScreenWidgetInstances", "lockStatus");
+        const auth = widgetInstanceOfType("lockScreenWidgetInstances", "lockAuth");
+        const power = widgetInstanceOfType("lockScreenWidgetInstances", "lockPower");
+        const mirror = (key, value) => {
+            if (root[key] !== value)
+                set(key, value);
+        };
+        mirror("lockScreenShowWeather", !!status && status.enabled !== false && (status.config?.showWeather ?? true));
+        mirror("lockScreenShowProfileImage", !!auth && (auth.config?.showProfileImage ?? true));
+        mirror("lockScreenShowPowerActions", !!power && power.enabled !== false);
+        syncGreeterWidgets();
+    }
+
+    function widgetInstanceOfType(listKey, widgetType) {
+        return (root[listKey] || []).find(inst => inst.widgetType === widgetType) ?? null;
+    }
+
+    function lockWidgetInstance(widgetType) {
+        return widgetInstanceOfType("lockScreenWidgetInstances", widgetType);
+    }
+
+    function syncGreeterWidgets() {
+        if (!greeterFollowLockScreen)
+            return;
+        const next = Spec.greeterWidgetsFromLock(lockScreenWidgetInstances, greeterWidgetInstances);
+        if (JSON.stringify(next) === JSON.stringify(greeterWidgetInstances))
+            return;
+        set("greeterWidgetInstances", next);
+    }
+
+    function setGreeterFollowLockScreen(follow) {
+        if (follow === greeterFollowLockScreen)
+            return;
+        if (follow) {
+            for (const inst of greeterWidgetInstances || []) {
+                if (inst.id.startsWith("gw_"))
+                    SessionData.removeDesktopWidgetInstancePositions(inst.id);
+            }
+            set("greeterFollowLockScreen", true);
+            syncGreeterWidgets();
+            return;
+        }
+        const detached = (greeterWidgetInstances || []).map(inst => {
+            if (inst.widgetType === "greeterSession")
+                return inst;
+            const copy = JSON.parse(JSON.stringify(inst));
+            copy.id = "gw_" + inst.id;
+            SessionData.copyDesktopWidgetInstancePositions(inst.id, copy.id);
+            if (inst.widgetType !== "desktopClock" || inst.config?.autoPosition === false)
+                return copy;
+            copy.config.autoPosition = false;
+            SessionData.pinPublishedLockPosition(inst.id, copy.id, inst.config?.syncPositionAcrossScreens ?? false);
+            return copy;
+        });
+        set("greeterWidgetInstances", detached);
+        set("greeterFollowLockScreen", false);
+    }
+
+    function resetLockScreenWidgets() {
+        for (const inst of lockScreenWidgetInstances || [])
+            SessionData.removeDesktopWidgetInstancePositions(inst.id);
+        for (const inst of Spec.SPEC.lockScreenWidgetInstances.def)
+            SessionData.removeDesktopWidgetInstancePositions(inst.id);
+        resetToDefault(["lockScreenWidgetInstances"]);
+    }
+
+    // Following means the lock layout is the greeter layout, so that is what resets.
+    function resetGreeterWidgets() {
+        for (const inst of greeterWidgetInstances || []) {
+            if (!greeterFollowLockScreen || inst.widgetType === "greeterSession")
+                SessionData.removeDesktopWidgetInstancePositions(inst.id);
+        }
+        if (greeterFollowLockScreen) {
+            resetLockScreenWidgets();
+            set("greeterWidgetInstances", Spec.greeterWidgetsFromLock(lockScreenWidgetInstances, []));
+            return;
+        }
+        set("greeterWidgetInstances", Spec.greeterWidgetDefaults().map(inst => inst.widgetType === "greeterSession" ? inst : Object.assign(inst, {
+                id: "gw_" + inst.id
+            })));
+    }
 
     function getDefaultSystemMonitorConfig() {
         return {
@@ -1145,45 +1234,59 @@ Singleton {
         };
     }
 
-    function createDesktopWidgetInstance(widgetType, name, config) {
-        const id = "dw_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+    function widgetInstanceListKey(instanceId) {
+        return widgetInstanceListKeys.find(key => (root[key] || []).some(inst => inst.id === instanceId)) ?? "desktopWidgetInstances";
+    }
+
+    readonly property var widgetInstanceIdPrefixes: ({
+            desktopWidgetInstances: "dw_",
+            lockScreenWidgetInstances: "lw_",
+            greeterWidgetInstances: "gw_"
+        })
+
+    function createDesktopWidgetInstance(widgetType, name, config, listKey = "desktopWidgetInstances") {
+        const lockScreen = listKey !== "desktopWidgetInstances";
         const instance = {
-            id: id,
+            id: widgetInstanceIdPrefixes[listKey] + Date.now() + "_" + Math.random().toString(36).substr(2, 9),
             widgetType: widgetType,
             name: name || widgetType,
             enabled: true,
-            config: config || {}
+            config: Object.assign(lockScreen ? {
+                syncPositionAcrossScreens: true
+            } : {}, config || {})
         };
-        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
+        const instances = JSON.parse(JSON.stringify(root[listKey] || []));
         instances.push(instance);
-        desktopWidgetInstances = instances;
+        root[listKey] = instances;
         saveSettings();
         return instance;
     }
 
     function updateDesktopWidgetInstance(instanceId, updates) {
-        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
+        const listKey = widgetInstanceListKey(instanceId);
+        const instances = JSON.parse(JSON.stringify(root[listKey] || []));
         const idx = instances.findIndex(inst => inst.id === instanceId);
         if (idx === -1)
             return;
         Object.assign(instances[idx], updates);
-        desktopWidgetInstances = instances;
+        root[listKey] = instances;
         saveSettings();
     }
 
     function updateDesktopWidgetInstanceConfig(instanceId, configUpdates) {
-        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
+        const listKey = widgetInstanceListKey(instanceId);
+        const instances = JSON.parse(JSON.stringify(root[listKey] || []));
         const idx = instances.findIndex(inst => inst.id === instanceId);
         if (idx === -1)
             return;
         instances[idx].config = Object.assign({}, instances[idx].config || {}, configUpdates);
-        desktopWidgetInstances = instances;
+        root[listKey] = instances;
         saveSettings();
     }
 
     function removeDesktopWidgetInstance(instanceId) {
-        const instances = (desktopWidgetInstances || []).filter(inst => inst.id !== instanceId);
-        desktopWidgetInstances = instances;
+        const listKey = widgetInstanceListKey(instanceId);
+        root[listKey] = (root[listKey] || []).filter(inst => inst.id !== instanceId);
         SessionData.removeDesktopWidgetInstancePositions(instanceId);
         saveSettings();
     }
@@ -1192,23 +1295,21 @@ Singleton {
         const source = getDesktopWidgetInstance(instanceId);
         if (!source)
             return null;
-        const newId = "dw_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-        const instance = {
-            id: newId,
-            widgetType: source.widgetType,
-            name: source.name + " (Copy)",
-            enabled: source.enabled,
-            config: JSON.parse(JSON.stringify(source.config || {}))
-        };
-        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
-        instances.push(instance);
-        desktopWidgetInstances = instances;
-        saveSettings();
+        const instance = createDesktopWidgetInstance(source.widgetType, source.name + " (Copy)", JSON.parse(JSON.stringify(source.config || {})), widgetInstanceListKey(instanceId));
+        if (!source.enabled)
+            updateDesktopWidgetInstance(instance.id, {
+                enabled: false
+            });
         return instance;
     }
 
     function getDesktopWidgetInstance(instanceId) {
-        return (desktopWidgetInstances || []).find(inst => inst.id === instanceId) || null;
+        for (const key of widgetInstanceListKeys) {
+            const found = (root[key] || []).find(inst => inst.id === instanceId);
+            if (found)
+                return found;
+        }
+        return null;
     }
 
     function moveDesktopWidgetInstanceToGroup(instanceId, groupId, newIndexInGroup) {
@@ -1523,6 +1624,13 @@ Singleton {
         });
     }
 
+    function syncLauncherHistory(who, key) {
+        if (who[key])
+            return;
+        AppUsageHistoryData.clear();
+        SessionData.clearLauncherHistory();
+    }
+
     function markGreeterSyncPending(who, key, oldValue) {
         if (isGreeterMode)
             return;
@@ -1532,6 +1640,22 @@ Singleton {
             SessionData.greeterSyncBaseline = baseline;
         }
         SessionData.greeterSyncPending = true;
+        SessionData.saveSettings();
+    }
+
+    // Older builds flagged keys the linked slot now serves live; drop them so Apply does not nag forever.
+    function pruneGreeterSyncPending() {
+        const baseline = SessionData.greeterSyncBaseline || {};
+        const keys = Object.keys(baseline);
+        const live = keys.filter(key => Spec.SPEC[key]?.onChange === "markGreeterSyncPending");
+        if (live.length === keys.length)
+            return;
+        const pruned = {};
+        for (const key of live)
+            pruned[key] = baseline[key];
+        SessionData.greeterSyncBaseline = pruned;
+        if (live.length === 0)
+            SessionData.greeterSyncPending = false;
         SessionData.saveSettings();
     }
 
@@ -1563,7 +1687,8 @@ Singleton {
             "updateCompositorCursor": updateCompositorCursor,
             "scheduleAuthApply": scheduleAuthApply,
             "scheduleGreeterAutoLoginSync": scheduleGreeterAutoLoginSync,
-            "markGreeterSyncPending": markGreeterSyncPending
+            "markGreeterSyncPending": markGreeterSyncPending,
+            "syncLauncherHistory": syncLauncherHistory
         })
 
     function set(key, value) {
@@ -1747,6 +1872,7 @@ Singleton {
     function _mergeSessionState() {
         if (!_hasLoaded || !SessionData._hasLoaded)
             return;
+        pruneGreeterSyncPending();
 
         const pluginState = SessionData.builtInPluginState || {};
         if (Object.keys(pluginState).length > 0) {
@@ -2931,11 +3057,15 @@ Singleton {
     }
 
     function setMatugenSpec(spec) {
-        var normalized = spec === "2025" ? "2025" : "2021";
+        var normalized = spec === "2025" || spec === "dms" ? spec : "2021";
         if (matugenSpec === normalized)
             return;
-        if (normalized === "2025" && matugenContrast < 0)
-            set("matugenContrast", 0);
+        if (normalized !== "2021") {
+            if (matugenContrast < 0)
+                set("matugenContrast", 0);
+            if (typeof Theme !== "undefined" && !Theme.getMatugenScheme(matugenScheme).spec2025)
+                set("matugenScheme", "scheme-tonal-spot");
+        }
         set("matugenSpec", normalized);
     }
 
@@ -3151,29 +3281,53 @@ Singleton {
         saveSettings();
     }
 
-    function addMediaExcludePlayer(identity) {
-        if (identity === undefined || identity === null)
-            return;
-        var normalizedIdentity = identity.toString().trim().toLowerCase();
+    function addAppIdToList(identity: string, appList: list<string>): list<string> {
+        identity = identity ?? "";
+        appList = appList ?? [];
+        if (!identity)
+            return appList;
+
+        var normalizedIdentity = Paths.normalizeAppId(identity);
         if (!normalizedIdentity)
-            return;
-        var list = mediaExcludePlayers ? mediaExcludePlayers.slice() : [];
-        var normalizedList = list.map(function (id) {
-            return id ? id.toString().trim().toLowerCase() : "";
-        });
-        if (normalizedList.indexOf(normalizedIdentity) >= 0)
-            return;
-        list.push(normalizedIdentity);
-        mediaExcludePlayers = list;
+            return appList;
+
+        var cleanList = appList.map(id => id ? Paths.normalizeAppId(id) : "").filter(id => id !== "");
+        if (cleanList.includes(normalizedIdentity))
+            return cleanList;
+
+        cleanList.push(normalizedIdentity);
+        return cleanList;
+    }
+
+    function removeAppIdFromList(index: int, appList: list<string>): list<string> {
+        var moddedList = appList ? appList.slice() : [];
+        if (index < 0 || index >= moddedList.length)
+            return moddedList;
+        moddedList.splice(index, 1);
+        return moddedList;
+    }
+
+    function addNightModeExcludedApp(identity: string) {
+        var newList = addAppIdToList(identity, nightModeExcludedApps);
+        nightModeExcludedApps = newList;
+        saveSettings();
+    }
+
+    function removeNightModeExcludedApp(index: int) {
+        var newList = removeAppIdFromList(index, nightModeExcludedApps);
+        nightModeExcludedApps = newList;
+        saveSettings();
+    }
+
+    function addMediaExcludePlayer(identity) {
+        var newList = addAppIdToList(identity, mediaExcludePlayers);
+        mediaExcludePlayers = newList;
         saveSettings();
     }
 
     function removeMediaExcludePlayer(index) {
-        var list = mediaExcludePlayers ? mediaExcludePlayers.slice() : [];
-        if (index < 0 || index >= list.length)
-            return;
-        list.splice(index, 1);
-        mediaExcludePlayers = list;
+        var newList = removeAppIdFromList(index, mediaExcludePlayers);
+        mediaExcludePlayers = newList;
         saveSettings();
     }
 
@@ -3221,10 +3375,11 @@ Singleton {
         if (!app && !desktop)
             return -1;
         return rules.findIndex(rule => {
-            if (!predicate(rule))
+            if (!predicate(rule) || (rule.matchType || "contains").toString().toLowerCase() !== "exact")
                 return false;
             const pattern = (rule.pattern || "").toString().toLowerCase();
-            return pattern !== "" && (pattern === app || pattern === desktop);
+            const value = !rule.field || rule.field === "appName" ? app : rule.field === "desktopEntry" ? desktop : "";
+            return pattern !== "" && pattern === value;
         });
     }
 
@@ -3242,20 +3397,31 @@ Singleton {
         saveSettings();
     }
 
-    function _removeAppRule(appName, desktopEntry, predicate) {
+    function _hasNoAction(rule) {
+        return (rule.action || "default").toString().toLowerCase() === "default";
+    }
+
+    // Edits the first enabled matching rule and drops it once it no longer does anything.
+    function _updateAppRule(appName, desktopEntry, predicate, changes) {
         var rules = JSON.parse(JSON.stringify(notificationRules || []));
-        const index = _appRuleIndex(rules, appName, desktopEntry, predicate);
+        const index = _appRuleIndex(rules, appName, desktopEntry, rule => rule.enabled !== false && predicate(rule));
         if (index === -1)
-            return;
-        rules.splice(index, 1);
+            return false;
+        const rule = Object.assign(rules[index], changes);
+        if (_hasNoAction(rule) && (rule.urgency || "default").toString().toLowerCase() === "default" && !_isDndBypassRule(rule))
+            rules.splice(index, 1);
         notificationRules = rules;
         saveSettings();
+        return true;
     }
 
     function addMuteRuleForApp(appName, desktopEntry) {
-        _addAppRule(appName, desktopEntry, {
+        if (!_updateAppRule(appName, desktopEntry, _hasNoAction, {
             action: "mute"
-        });
+        }))
+            _addAppRule(appName, desktopEntry, {
+                action: "mute"
+            });
     }
 
     function isAppMuted(appName, desktopEntry) {
@@ -3263,7 +3429,9 @@ Singleton {
     }
 
     function removeMuteRuleForApp(appName, desktopEntry) {
-        _removeAppRule(appName, desktopEntry, _isMuteRule);
+        _updateAppRule(appName, desktopEntry, _isMuteRule, {
+            action: "default"
+        });
     }
 
     function isAppDndBypassed(appName, desktopEntry) {
@@ -3272,14 +3440,19 @@ Singleton {
 
     function setAppDndBypass(appName, desktopEntry, enabled) {
         if (!enabled) {
-            _removeAppRule(appName, desktopEntry, _isDndBypassRule);
+            _updateAppRule(appName, desktopEntry, _isDndBypassRule, {
+                bypassDnd: false
+            });
             return;
         }
         if (isAppDndBypassed(appName, desktopEntry))
             return;
-        _addAppRule(appName, desktopEntry, {
+        if (!_updateAppRule(appName, desktopEntry, () => true, {
             bypassDnd: true
-        });
+        }))
+            _addAppRule(appName, desktopEntry, {
+                bypassDnd: true
+            });
     }
 
     function updateNotificationRule(index, ruleData) {

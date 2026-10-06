@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Column {
     id: root
@@ -55,6 +55,11 @@ Column {
                 "icon": "notifications",
                 "text": I18n.tr("Notifications", "island settings: notification badge slot row"),
                 "description": ""
+            },
+            "privacy": {
+                "icon": "privacy_tip",
+                "text": I18n.tr("Privacy", "island settings: microphone, camera and screen share indicator slot row"),
+                "description": I18n.tr("Shown only while the microphone, camera or screen sharing is in use", "island settings: privacy slot hint")
             }
         })
 
@@ -106,7 +111,7 @@ Column {
             subtitle: root.presentation[modelData.id].description
             iconName: root.presentation[modelData.id].icon
 
-            DankIcon {
+            DIcon {
                 anchors.verticalCenter: parent.verticalCenter
                 name: "lock"
                 size: Theme.iconSizeMedium
@@ -114,7 +119,7 @@ Column {
                 visible: groupRow.modelData.id === "clock"
             }
 
-            DankActionButton {
+            DActionButton {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: groupRow.modelData.id !== "clock"
                 iconName: "visibility"
@@ -133,7 +138,7 @@ Column {
         clickable: true
         onClicked: root.showHidden = !root.showHidden
 
-        DankIcon {
+        DIcon {
             anchors.verticalCenter: parent.verticalCenter
             name: root.showHidden ? "expand_less" : "expand_more"
             size: Theme.iconSize
@@ -162,7 +167,7 @@ Column {
                 iconName: root.presentation[modelData.id].icon
                 iconColor: Theme.onSurfaceVariant
 
-                DankActionButton {
+                DActionButton {
                     anchors.verticalCenter: parent.verticalCenter
                     iconName: "visibility_off"
                     tooltipText: I18n.tr("Show", "island settings: show home group")

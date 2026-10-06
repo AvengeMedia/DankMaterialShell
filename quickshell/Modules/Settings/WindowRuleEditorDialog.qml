@@ -2,11 +2,13 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import "../../Common/WindowRuleSize.js" as WindowRuleSize
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
-DankDialog {
+DDialog {
     id: root
 
     property var editingRule: null
@@ -36,6 +38,8 @@ DankDialog {
     property string blockOutValue: ""
     property string columnDisplayValue: ""
     property string floatingRelativeValue: "top-left"
+    property string columnWidthUnit: WindowRuleSize.PIXELS
+    property string windowHeightUnit: WindowRuleSize.PIXELS
 
     readonly property var triLabels: [I18n.tr("Default"), I18n.tr("On"), I18n.tr("Off")]
     readonly property var blockOutOptions: ["", "screencast", "screen-capture"]
@@ -263,6 +267,8 @@ DankDialog {
         blockOutValue = "";
         columnDisplayValue = "";
         floatingRelativeValue = "top-left";
+        columnWidthUnit = WindowRuleSize.PIXELS;
+        windowHeightUnit = WindowRuleSize.PIXELS;
         blurCond.triState = 0;
         xrayCond.triState = 0;
         for (const field of [outputInput, workspaceInput, columnWidthInput, windowHeightInput, floatingXInput, floatingYInput, minWidthInput, maxWidthInput, minHeightInput, maxHeightInput, moveXInput, moveYInput, sizeWInput, sizeHInput, monitorInput, hyprWorkspaceInput, mangoTagsInput, mangoMonitorInput, mangoSizeInput])
@@ -326,8 +332,12 @@ DankDialog {
 
         outputInput.text = actions.openOnOutput || "";
         workspaceInput.text = actions.openOnWorkspace || "";
-        columnWidthInput.text = actions.defaultColumnWidth || "";
-        windowHeightInput.text = actions.defaultWindowHeight || "";
+        const columnWidth = WindowRuleSize.parse(actions.defaultColumnWidth);
+        const windowHeight = WindowRuleSize.parse(actions.defaultWindowHeight);
+        columnWidthUnit = columnWidth.unit;
+        windowHeightUnit = windowHeight.unit;
+        columnWidthInput.text = columnWidth.amount;
+        windowHeightInput.text = windowHeight.amount;
         floatingXInput.text = (actions.defaultFloatingX !== undefined && actions.defaultFloatingX !== null) ? String(actions.defaultFloatingX) : "";
         floatingYInput.text = (actions.defaultFloatingY !== undefined && actions.defaultFloatingY !== null) ? String(actions.defaultFloatingY) : "";
         floatingRelativeValue = actions.defaultFloatingRelativeTo || "top-left";
@@ -422,10 +432,12 @@ DankDialog {
             actions.maxHeight = maxH;
 
         if (isNiri) {
-            if (columnWidthInput.text.trim())
-                actions.defaultColumnWidth = columnWidthInput.text.trim();
-            if (windowHeightInput.text.trim())
-                actions.defaultWindowHeight = windowHeightInput.text.trim();
+            const columnWidth = WindowRuleSize.format(columnWidthUnit, columnWidthInput.text);
+            const windowHeight = WindowRuleSize.format(windowHeightUnit, windowHeightInput.text);
+            if (columnWidth)
+                actions.defaultColumnWidth = columnWidth;
+            if (windowHeight)
+                actions.defaultWindowHeight = windowHeight;
             if (dynamicFlags.includes("vrr"))
                 actions.variableRefreshRate = true;
             if (dynamicFlags.includes("clip"))
@@ -596,7 +608,7 @@ DankDialog {
         }
     }
 
-    component Field: DankTextField {
+    component Field: DTextField {
         property int share: 1
         property int shares: 2
 
@@ -606,17 +618,46 @@ DankDialog {
         onAccepted: root.submit()
     }
 
+    component SizeField: Field {
+        id: sizeField
+
+        property string unit: WindowRuleSize.PIXELS
+        property string pixelsPlaceholder: ""
+
+        signal unitSelected(string unit)
+
+        placeholderText: unit === WindowRuleSize.PERCENT ? "50" : pixelsPlaceholder
+        rightAccessoryWidth: unitPicker.width + Theme.spacingS
+
+        DButtonGroup {
+            id: unitPicker
+            anchors.right: parent.right
+            anchors.rightMargin: Theme.spacingS
+            y: sizeField.containerTop + (sizeField.containerHeight - height) / 2
+            size: "small"
+            checkEnabled: false
+            arrowKeysSelect: false
+            enabled: sizeField.enabled
+            model: [I18n.tr("px"), WindowRuleSize.PERCENT]
+            currentIndex: sizeField.unit === WindowRuleSize.PERCENT ? 1 : 0
+            onSelectionChanged: (index, selected) => {
+                if (selected)
+                    sizeField.unitSelected(index === 1 ? WindowRuleSize.PERCENT : WindowRuleSize.PIXELS);
+            }
+        }
+    }
+
     readonly property var matchConditions: [condFloating, condActive, condFocused, condActiveInColumn, condCastTarget, condUrgent, condAtStartup, condXwayland, condFullscreen, condPinned, condInitialised]
 
     actions: [
-        DankButton {
+        DButton {
             text: I18n.tr("Cancel")
             enabled: root.closeEnabled
             backgroundColor: "transparent"
             textColor: Theme.primary
             onClicked: root.rejected()
         },
-        DankButton {
+        DButton {
             text: root.isEditMode ? I18n.tr("Save") : I18n.tr("Add")
             enabled: root.acceptEnabled
             busy: root.submitting
@@ -626,7 +667,7 @@ DankDialog {
 
     SettingsGroup {
         SettingsRow {
-            body: DankTextField {
+            body: DTextField {
                 id: nameInput
                 width: parent.width
                 outlined: true
@@ -640,7 +681,7 @@ DankDialog {
 
     SettingsCard {
         title: I18n.tr("Match Criteria")
-        headerActions: DankButton {
+        headerActions: DButton {
             visible: root.isNiri
             text: I18n.tr("Add match")
             iconName: "add"
@@ -660,7 +701,7 @@ DankDialog {
         }
 
         SettingsRow {
-            body: DankTextField {
+            body: DTextField {
                 id: appIdInput
                 width: parent.width
                 outlined: true
@@ -679,7 +720,7 @@ DankDialog {
                 labelText: root.isMango ? I18n.tr("Title (optional)") : I18n.tr("Title regex (optional)")
             }
 
-            DankActionButton {
+            DActionButton {
                 id: addTitle
                 anchors.verticalCenter: parent.verticalCenter
                 iconName: "add"
@@ -715,7 +756,7 @@ DankDialog {
                     onTextEdited: extraMatchModel.setProperty(extraRow.index, "rowTitle", text)
                 }
 
-                DankActionButton {
+                DActionButton {
                     id: removeMatch
                     anchors.verticalCenter: parent.verticalCenter
                     iconName: "close"
@@ -814,6 +855,7 @@ DankDialog {
         SettingsButtonGroupRow {
             visible: root.isNiri
             text: I18n.tr("Float")
+            description: I18n.tr("Default leaves it to niri, which floats dialogs and fixed-size windows and tiles the rest", "window rule float option, explains the Default choice")
             model: root.triLabels
             currentIndex: root.floatingTri
             enabled: root.fieldsEnabled
@@ -824,7 +866,7 @@ DankDialog {
         }
 
         SettingsRow {
-            body: DankFilterChips {
+            body: DFilterChips {
                 width: parent.width
                 multiSelect: true
                 showCounts: false
@@ -856,18 +898,22 @@ DankDialog {
         FieldRow {
             visible: root.isNiri
 
-            Field {
+            SizeField {
                 id: columnWidthInput
                 leftIconName: "width"
                 labelText: I18n.tr("Column Width")
-                placeholderText: "800"
+                pixelsPlaceholder: "800"
+                unit: root.columnWidthUnit
+                onUnitSelected: unit => root.columnWidthUnit = unit
             }
 
-            Field {
+            SizeField {
                 id: windowHeightInput
                 leftIconName: "height"
                 labelText: I18n.tr("Window Height")
-                placeholderText: "600"
+                pixelsPlaceholder: "600"
+                unit: root.windowHeightUnit
+                onUnitSelected: unit => root.windowHeightUnit = unit
             }
         }
     }
@@ -932,7 +978,7 @@ DankDialog {
         SettingsRow {
             visible: root.isNiri
 
-            body: DankFilterChips {
+            body: DFilterChips {
                 width: parent.width
                 multiSelect: true
                 showCounts: false
@@ -1098,7 +1144,7 @@ DankDialog {
         visible: root.isHyprland
 
         SettingsRow {
-            body: DankFilterChips {
+            body: DFilterChips {
                 width: parent.width
                 multiSelect: true
                 showCounts: false
@@ -1163,7 +1209,7 @@ DankDialog {
         visible: root.isMango
 
         SettingsRow {
-            body: DankFilterChips {
+            body: DFilterChips {
                 width: parent.width
                 multiSelect: true
                 showCounts: false

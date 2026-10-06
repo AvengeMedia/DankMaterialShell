@@ -268,7 +268,7 @@ Variants {
             onSessionMonitorWallpaperFillModesChanged: regenerate()
             onSessionPerMonitorWallpaperChanged: regenerate()
 
-            // Theme changes repaint DankBackdrop but nothing else wakes the render loop
+            // Theme changes repaint DBackdrop but nothing else wakes the render loop
             readonly property color themePrimary: Theme.primary
             readonly property color themeBackground: Theme.background
 
@@ -725,7 +725,7 @@ Variants {
                 active: root.showsBackdrop
                 asynchronous: true
 
-                sourceComponent: DankBackdrop {
+                sourceComponent: DBackdrop {
                     screenName: modelData.name
                     blur: root.overviewBlurActive ? Theme.wallpaperBlur : 0
                     onInvalidated: root.invalidate()

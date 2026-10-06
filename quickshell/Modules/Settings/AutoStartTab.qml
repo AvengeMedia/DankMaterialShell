@@ -5,7 +5,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -353,7 +353,7 @@ Item {
         desktopApps = [];
     }
 
-    DankFlickable {
+    DFlickable {
         anchors.fill: parent
         clip: true
         contentHeight: mainColumn.height + Theme.spacingXL
@@ -413,7 +413,7 @@ Item {
 
                 SettingsRow {
                     visible: root.newEntryType === "desktop"
-                    body: DankTextField {
+                    body: DTextField {
                         outlined: true
                         leftIconName: "terminal"
                         labelText: I18n.tr("Command")
@@ -431,7 +431,7 @@ Item {
                         width: parent.width
                         spacing: Theme.spacingM
 
-                        DankTextField {
+                        DTextField {
                             outlined: true
                             leftIconName: "badge"
                             labelText: I18n.tr("Name")
@@ -441,7 +441,7 @@ Item {
                             onTextChanged: root.newEntryName = text
                         }
 
-                        DankTextField {
+                        DTextField {
                             outlined: true
                             leftIconName: "terminal"
                             labelText: I18n.tr("Command", "noun, text field label for a shell command")
@@ -464,7 +464,7 @@ Item {
                     }
                 }
 
-                DankButton {
+                DButton {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: I18n.tr("Add to autostart")
                     iconName: "add"
@@ -500,7 +500,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             id: clearAllButton
                             iconName: "delete_sweep"
                             tooltipText: I18n.tr("Clear All")
@@ -536,14 +536,14 @@ Item {
                             fallbackText: (entryRow.modelData.name || "?").charAt(0).toUpperCase()
                         }
 
-                        DankToggle {
+                        DToggle {
                             hideText: true
                             text: entryRow.title
                             checked: !entryRow.modelData.hidden
                             onToggled: checked => root.setHidden(entryRow.modelData, !checked)
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             iconName: "delete"
                             iconColor: Theme.error
                             tooltipText: I18n.tr("Remove")
@@ -579,7 +579,7 @@ Item {
                             wrapMode: Text.WordWrap
                         }
 
-                        DankButton {
+                        DButton {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: I18n.tr("Generate override")
                             iconName: "build"

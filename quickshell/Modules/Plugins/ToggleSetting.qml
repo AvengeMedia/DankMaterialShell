@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../../Common/QmlUtils.js" as QmlUtils
 
 Row {
@@ -61,7 +61,7 @@ Row {
         }
     }
 
-    DankToggle {
+    DToggle {
         id: toggle
         anchors.verticalCenter: parent.verticalCenter
         checked: root.value

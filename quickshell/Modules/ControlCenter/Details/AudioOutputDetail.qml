@@ -6,7 +6,7 @@ import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../../../Common/QmlUtils.js" as QmlUtils
 
 Item {
@@ -35,7 +35,7 @@ Item {
         CacheData.set("audioOutputDevicePins", QmlUtils.togglePinEntry(CacheData.audioOutputDevicePins, "preferredOutput", name, CcMetrics.maxPins));
     }
 
-    DankFlickable {
+    DFlickable {
         anchors.fill: parent
         contentHeight: column.height
         clip: true
@@ -98,7 +98,7 @@ Item {
                                 AudioService.setDefaultSinkByName(modelData.name);
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             anchors.verticalCenter: parent.verticalCenter
                             visible: AudioService.sinkHasMultiplePorts(deviceRow.modelData)
                             buttonSize: Theme.buttonHeightXS

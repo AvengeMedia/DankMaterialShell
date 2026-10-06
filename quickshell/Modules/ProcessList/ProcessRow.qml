@@ -3,10 +3,10 @@ import QtQuick.Layouts
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../../Common/Format.js" as Format
 
-DankListItem {
+DListItem {
     id: root
 
     required property var process
@@ -50,7 +50,7 @@ DankListItem {
         height: root.rowHeight
         spacing: Theme.spacingS
 
-        DankIcon {
+        DIcon {
             name: root.processIcon(root.command)
             size: Theme.iconSize
             color: root.contentColor
@@ -131,7 +131,7 @@ DankListItem {
             Layout.maximumWidth: ProcessListMetrics.actionColumnWidth
             Layout.preferredHeight: Theme.iconButtonSize
 
-            DankActionButton {
+            DActionButton {
                 anchors.centerIn: parent
                 iconName: "close"
                 iconColor: root.contentColor
@@ -167,7 +167,7 @@ DankListItem {
                 wrapMode: Text.WrapAnywhere
             }
 
-            DankActionButton {
+            DActionButton {
                 iconName: "content_copy"
                 iconColor: root.contentColor
                 tooltipText: I18n.tr("Copy Full Command")

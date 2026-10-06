@@ -4,8 +4,8 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.Modules.SurfaceWidgets
-import qs.Modules.DankBar
-import qs.Modules.DankBar.Widgets as BarWidgets
+import qs.Modules.DBar
+import qs.Modules.DBar.Widgets as BarWidgets
 import qs.Modules.ControlCenter.Widgets
 import "../../Common/settings/DockConfig.js" as DockConfig
 
@@ -579,7 +579,7 @@ FocusScope {
 
     readonly property var hoveredButton: widgetStrip.hoveredButton
 
-    DankTooltip {
+    DTooltip {
         id: dockTooltip
         targetScreen: dock.screen
     }
@@ -768,11 +768,12 @@ FocusScope {
                     x: !dock.isVertical ? Math.round((parent.width - width + dock.primaryStartInset - dock.primaryEndInset) / 2) : (dock.config.position === SettingsData.Position.Right ? parent.width - width - dockGeometry.bodyEdgeMargin : dockGeometry.bodyEdgeMargin)
                     y: dock.isVertical ? Math.round((parent.height - height + dock.primaryStartInset - dock.primaryEndInset) / 2) : (dock.config.position === SettingsData.Position.Bottom ? parent.height - height - dockGeometry.bodyEdgeMargin : dockGeometry.bodyEdgeMargin)
 
-                    readonly property real targetPrimary: dock.config.mode === "taskbar" ? dock.availablePrimary : Math.min(widgetStrip.preferredLength + dock.config.spacing * 2, dock.availablePrimary)
+                    readonly property real targetPrimary: dock.config.mode === "taskbar" ? dock.availablePrimary : Math.min(widgetStrip.restLength + dock.config.spacing * 2, dock.availablePrimary)
                     readonly property real targetWidth: dock.isVertical ? dock.effectiveBarThickness + dock.expansionExtent : targetPrimary
                     readonly property real targetHeight: dock.isVertical ? targetPrimary : dock.effectiveBarThickness + dock.expansionExtent
-                    implicitWidth: surfaceMotion.currentWidth
-                    implicitHeight: surfaceMotion.currentHeight
+                    // Magnification expansion bypasses the spring so icons and background stay in sync
+                    implicitWidth: surfaceMotion.currentWidth + (dock.isVertical ? 0 : widgetStrip.totalMagnificationExpansion)
+                    implicitHeight: surfaceMotion.currentHeight + (dock.isVertical ? widgetStrip.totalMagnificationExpansion : 0)
                     width: implicitWidth
                     height: implicitHeight
 
@@ -860,6 +861,7 @@ FocusScope {
                             isInOverflow: false
                         }) : item), dock.config.order)
                     availableSize: dock.isVertical ? height : width
+                    expansionLimit: Math.max(0, dock.availablePrimary - widgetStrip.restLength - dock.config.spacing * 2)
                     fillAvailable: dock.config.mode === "taskbar"
                     align: dock.config.mode === "taskbar" ? dock.config.taskbarAlign : "start"
                     onReorderRequested: (from, to) => dock.reorderUnits(from, to)

@@ -80,3 +80,19 @@ test("panel step follows the pointer and holds on a pinned edge", () => {
     assert.equal(grid.nearestStep(rightEdge, 8, 6, 30, rightEdge(8) + 50), 9);
     assert.equal(grid.nearestStep(rightEdge, 20, 6, 30, 1400), 20);
 });
+
+test("a tile dragged down lands past the tile it covers instead of back above it", () => {
+    const items = [{ id: "a" }, { id: "b" }, { id: "c" }];
+    const cells = [{ col: 0, row: 0, cols: 1, rows: 1 }, { col: 0, row: 1, cols: 1, rows: 1 }, { col: 0, row: 2, cols: 1, rows: 2 }];
+    assert.deepEqual(plain(grid.dropInto(items, cells, 0, { col: 0, row: 1 })), [{ id: "a", row: 2 }, { id: "b" }, { id: "c" }]);
+    assert.deepEqual(plain(grid.dropInto(items, cells, 0, { col: 0, row: 2 })), [{ id: "a", row: 4 }, { id: "b" }, { id: "c" }]);
+    assert.deepEqual(plain(grid.dropInto(items, cells, 2, { col: 0, row: 0 })), items);
+    assert.deepEqual(plain(grid.dropInto(items, cells, 1, { col: 0, row: 2 })), [{ id: "a" }, { id: "b", row: 4 }, { id: "c" }]);
+});
+
+test("a tile dropped sideways or up onto a same-size tile trades places with it", () => {
+    const items = [{ id: "a" }, { id: "b" }, { id: "c" }];
+    const cells = [{ col: 0, row: 0, cols: 1, rows: 1 }, { col: 1, row: 0, cols: 1, rows: 1 }, { col: 1, row: 1, cols: 1, rows: 1 }];
+    assert.deepEqual(plain(grid.dropInto(items, cells, 0, { col: 1, row: 0 })), [{ id: "a" }, { id: "b", col: 0, row: 0 }, { id: "c" }]);
+    assert.deepEqual(plain(grid.dropInto(items, cells, 2, { col: 1, row: 0 })), [{ id: "a" }, { id: "b", col: 1, row: 1 }, { id: "c" }]);
+});

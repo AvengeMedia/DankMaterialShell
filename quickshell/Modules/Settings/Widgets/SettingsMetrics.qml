@@ -5,7 +5,7 @@ import Quickshell
 import qs.Common
 
 Singleton {
-    readonly property real sidebarWidth: 320
+    readonly property real sidebarWidth: 336
     readonly property real compactBreakpoint: 700
     readonly property real contentMaxWidth: 920
     readonly property real paneMaxWidth: contentMaxWidth + panePadding * 2

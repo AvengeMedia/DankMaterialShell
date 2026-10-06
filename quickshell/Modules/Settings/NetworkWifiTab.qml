@@ -6,7 +6,7 @@ import qs.Modules.Network
 import qs.Modules.Settings.Widgets
 import qs.Modals.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../../Common/QmlUtils.js" as QmlUtils
 
 Item {
@@ -193,7 +193,7 @@ Item {
                     return I18n.tr("Not connected");
                 }
 
-                DankToggle {
+                DToggle {
                     anchors.verticalCenter: parent.verticalCenter
                     checked: NetworkService.wifiEnabled
                     enabled: !NetworkService.wifiToggling
@@ -236,7 +236,7 @@ Item {
                 title: I18n.tr("Signal", "noun, wifi signal strength label") + ":"
                 trailingBadge: NetworkService.wifiSignalStrength + "%"
 
-                DankIcon {
+                DIcon {
                     name: {
                         const s = NetworkService.wifiSignalStrength;
                         if (s >= 50)
@@ -298,14 +298,14 @@ Item {
                     color: Theme.surfaceVariantText
                     anchors.verticalCenter: parent.verticalCenter
                 },
-                DankActionButton {
+                DActionButton {
                     iconName: "wifi_find"
                     tooltipText: I18n.tr("Connect to Hidden Network")
                     buttonSize: Theme.buttonHeightXS
                     visible: NetworkService.backend === "networkmanager"
                     onClicked: PopoutService.showHiddenNetworkModal()
                 },
-                DankRefreshButton {
+                DRefreshButton {
                     tooltipText: I18n.tr("Scan")
                     buttonSize: Theme.buttonHeightXS
                     busy: NetworkService.isScanning
@@ -319,7 +319,7 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingS
 
-                    DankLoadingIndicator {
+                    DLoadingIndicator {
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
 
@@ -370,7 +370,7 @@ Item {
                         }
 
                         leading: [
-                            DankSpinner {
+                            DSpinner {
                                 size: Theme.iconSizeMedium
                                 strokeWidth: 2
                                 color: Theme.warning
@@ -378,7 +378,7 @@ Item {
                                 visible: wifiNetworkDelegate.isConnecting
                                 anchors.verticalCenter: parent.verticalCenter
                             },
-                            DankIcon {
+                            DIcon {
                                 visible: !wifiNetworkDelegate.isConnecting
                                 name: {
                                     const s = wifiNetworkDelegate.modelData.signal || 0;
@@ -394,7 +394,7 @@ Item {
                             }
                         ]
 
-                        DankActionButton {
+                        DActionButton {
                             iconName: wifiNetworkDelegate.isExpanded ? "expand_less" : "expand_more"
                             Accessible.name: wifiNetworkDelegate.isExpanded ? I18n.tr("Collapse") : I18n.tr("Expand")
                             iconSize: Theme.iconSizeSmall
@@ -409,7 +409,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             iconName: "qr_code"
                             tooltipText: I18n.tr("Show QR Code")
                             visible: wifiNetworkDelegate.modelData.secured && wifiNetworkDelegate.modelData.saved && !(wifiNetworkDelegate.modelData.enterprise || false)
@@ -418,7 +418,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             iconName: "push_pin"
                             Accessible.name: wifiNetworkDelegate.isPinned ? I18n.tr("Unpin") : I18n.tr("Pin", "verb, keep an item pinned in place")
                             iconColor: wifiNetworkDelegate.isPinned ? Theme.primary : Theme.surfaceVariantText
@@ -427,7 +427,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             iconName: "delete"
                             tooltipText: I18n.tr("Forget", "verb, remove a saved wifi network, button")
                             iconColor: Theme.error
@@ -449,7 +449,7 @@ Item {
                                 height: NetworkService.networkInfoLoading ? 40 : 0
                                 visible: NetworkService.networkInfoLoading
 
-                                DankSpinner {
+                                DSpinner {
                                     anchors.centerIn: parent
                                     size: Theme.iconSizeMedium
                                 }
@@ -463,7 +463,7 @@ Item {
                                 Repeater {
                                     model: wifiNetworkDelegate.isExpanded ? networkWifiTab.wifiDetailFields(wifiNetworkDelegate.modelData) : []
 
-                                    delegate: DankDetailChip {
+                                    delegate: DDetailChip {
                                         required property var modelData
 
                                         label: modelData.label
@@ -550,7 +550,7 @@ Item {
                         }
 
                         leading: [
-                            DankSpinner {
+                            DSpinner {
                                 size: Theme.iconSizeMedium
                                 strokeWidth: 2
                                 color: Theme.warning
@@ -558,7 +558,7 @@ Item {
                                 visible: savedWifiDelegate.isConnecting
                                 anchors.verticalCenter: parent.verticalCenter
                             },
-                            DankIcon {
+                            DIcon {
                                 visible: !savedWifiDelegate.isConnecting
                                 name: {
                                     if (savedWifiDelegate.isOutOfRange)
@@ -576,7 +576,7 @@ Item {
                             }
                         ]
 
-                        DankActionButton {
+                        DActionButton {
                             iconName: savedWifiDelegate.isExpanded ? "expand_less" : "expand_more"
                             Accessible.name: savedWifiDelegate.isExpanded ? I18n.tr("Collapse") : I18n.tr("Expand")
                             iconSize: Theme.iconSizeSmall
@@ -589,7 +589,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             iconName: "qr_code"
                             tooltipText: I18n.tr("Show QR Code")
                             visible: savedWifiDelegate.modelData.secured && !(savedWifiDelegate.modelData.enterprise || false)
@@ -598,7 +598,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             iconName: "push_pin"
                             Accessible.name: savedWifiDelegate.isPinned ? I18n.tr("Unpin") : I18n.tr("Pin", "verb, keep an item pinned in place")
                             iconColor: savedWifiDelegate.isPinned ? Theme.primary : Theme.surfaceVariantText
@@ -607,7 +607,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             iconName: "delete"
                             tooltipText: I18n.tr("Forget", "verb, remove a saved wifi network, button")
                             iconColor: Theme.error
@@ -624,7 +624,7 @@ Item {
                             Repeater {
                                 model: savedWifiDelegate.isExpanded ? savedWifiDelegate.detailFields : []
 
-                                delegate: DankDetailChip {
+                                delegate: DDetailChip {
                                     required property var modelData
 
                                     label: modelData.label
@@ -851,7 +851,7 @@ Item {
 
             SettingsRow {
                 visible: hotspotCard.showForm
-                body: DankTextField {
+                body: DTextField {
                     outlined: true
                     width: parent.width
                     labelText: I18n.tr("Hotspot name", "hotspot SSID field label")
@@ -866,7 +866,7 @@ Item {
 
             SettingsRow {
                 visible: hotspotCard.showForm
-                body: DankTextField {
+                body: DTextField {
                     outlined: true
                     width: parent.width
                     labelText: I18n.tr("Password", "hotspot password field label")
@@ -916,7 +916,7 @@ Item {
             }
 
             SettingsRow {
-                DankButton {
+                DButton {
                     visible: hotspotCard.editing
                     text: I18n.tr("Cancel", "cancel hotspot editing action")
                     buttonHeight: 36
@@ -925,7 +925,7 @@ Item {
                     onClicked: hotspotCard.stopEditing()
                 }
 
-                DankButton {
+                DButton {
                     visible: !hotspotCard.showForm
                     text: I18n.tr("Edit", "edit hotspot action")
                     iconName: "edit"
@@ -936,7 +936,7 @@ Item {
                     onClicked: hotspotCard.beginEditing()
                 }
 
-                DankButton {
+                DButton {
                     visible: hotspotCard.showForm
                     text: hotspotCard.passwordLoading ? I18n.tr("Loading...", "hotspot password loading status") : (NetworkService.hotspotBusy ? I18n.tr("Saving...", "hotspot configuration saving status") : I18n.tr("Save", "save hotspot configuration action"))
                     iconName: "save"
@@ -947,7 +947,7 @@ Item {
                     onClicked: hotspotCard.saveOnly()
                 }
 
-                DankButton {
+                DButton {
                     text: {
                         if (NetworkService.hotspotEnabled)
                             return I18n.tr("Stop", "stop hotspot action");

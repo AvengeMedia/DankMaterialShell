@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell.Widgets
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Rectangle {
@@ -53,7 +54,7 @@ Rectangle {
         }
     }
 
-    DankIcon {
+    DIcon {
         anchors.centerIn: parent
         name: root.placeholderIcon
         size: Theme.iconSizeLarge
@@ -86,7 +87,7 @@ Rectangle {
             anchors.centerIn: parent
             spacing: Theme.spacingS
 
-            DankActionButton {
+            DActionButton {
                 buttonSize: Theme.iconButtonSize
                 iconName: "folder_open"
                 iconSize: Theme.iconSizeMedium
@@ -96,7 +97,7 @@ Rectangle {
                 onClicked: root.browse()
             }
 
-            DankActionButton {
+            DActionButton {
                 buttonSize: Theme.iconButtonSize
                 iconName: "palette"
                 iconSize: Theme.iconSizeMedium
@@ -107,7 +108,7 @@ Rectangle {
                 onClicked: root.pickColor()
             }
 
-            DankActionButton {
+            DActionButton {
                 buttonSize: Theme.iconButtonSize
                 iconName: "close"
                 iconSize: Theme.iconSizeMedium

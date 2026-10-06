@@ -6,7 +6,7 @@ import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -126,7 +126,7 @@ Item {
 
     Component.onCompleted: currentDeviceName = resolveCurrentDevice()
 
-    DankFlickable {
+    DFlickable {
         anchors.fill: parent
         contentHeight: column.height
         clip: true
@@ -202,7 +202,7 @@ Item {
                             visible: deviceItem.active && deviceItem.exponential
                             title: I18n.tr("Curve")
 
-                            DankNumberStepper {
+                            DNumberStepper {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: deviceItem.exponent.toFixed(1)
                                 decrementEnabled: deviceItem.exponent > CcMetrics.brightnessExponentMin

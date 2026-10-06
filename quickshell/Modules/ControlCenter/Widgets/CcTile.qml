@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Item {
@@ -49,6 +50,8 @@ Item {
     property bool opensPage: false
     property color restIconColor: CcMetrics.tileInactiveIcon
     property Component tallContent: null
+    // The tile's own state. The island disables a face while it fades in, and that must not restyle the tile.
+    property bool available: true
     property bool interactive: true
     property bool iconBlinking: false
     property real iconRotation: 0
@@ -68,29 +71,29 @@ Item {
     property bool acceptsInput: interactive && enabled
     readonly property bool bodyActive: showsActive && !hasIconBox
     readonly property color bodyColor: {
-        if (!enabled)
+        if (!available)
             return Theme.onSurface_12;
         return bodyActive ? CcMetrics.tileActiveColor : CcMetrics.tileInactiveColor;
     }
     readonly property color contentColor: {
-        if (!enabled)
+        if (!available)
             return Theme.onSurface_38;
         return bodyActive ? CcMetrics.tileActiveContent : CcMetrics.tileInactiveContent;
     }
     readonly property color subtitleColor: {
-        if (!enabled)
+        if (!available)
             return Theme.onSurface_38;
         return bodyActive ? CcMetrics.tileActiveContent : CcMetrics.tileInactiveSubtitle;
     }
     readonly property color iconColor: {
-        if (!enabled)
+        if (!available)
             return Theme.onSurface_38;
         if (hasIconBox)
             return showsActive ? CcMetrics.tileActiveContent : CcMetrics.tileInactiveContent;
         return bodyActive ? CcMetrics.tileActiveContent : root.restIconColor;
     }
     readonly property color iconBoxColor: {
-        if (!enabled)
+        if (!available)
             return Theme.onSurface_12;
         return showsActive ? CcMetrics.tileActiveColor : CcMetrics.iconBoxInactiveColor;
     }
@@ -106,6 +109,7 @@ Item {
 
     width: parent?.width ?? 0
     height: CcMetrics.tileHeight
+    enabled: available
     activeFocusOnTab: acceptsInput
     Accessible.role: toggle && (!showExpand || compact) && !opensPage ? Accessible.CheckBox : Accessible.Button
     Accessible.checkable: toggle && (!showExpand || compact) && !opensPage
@@ -207,7 +211,7 @@ Item {
             visible: root.activeFocus
         }
 
-        DankIcon {
+        DIcon {
             id: compactIcon
             anchors.centerIn: parent
             name: root.iconName
@@ -217,7 +221,7 @@ Item {
             rotation: root.iconRotation
             visible: root.compact && root.bodyContent === null && root.iconContent === null
 
-            DankBlink {
+            DBlink {
                 target: compactIcon
                 running: root.iconBlinking && root.compact && root.visible && root.live
             }
@@ -282,7 +286,7 @@ Item {
                     }
                 }
 
-                DankIcon {
+                DIcon {
                     id: tileIcon
                     anchors.centerIn: parent
                     name: root.iconName
@@ -292,7 +296,7 @@ Item {
                     rotation: root.iconRotation
                     visible: root.iconContent === null
 
-                    DankBlink {
+                    DBlink {
                         target: tileIcon
                         running: root.iconBlinking && !root.compact && root.visible && root.live
                     }
@@ -368,7 +372,7 @@ Item {
                 }
             }
 
-            DankIcon {
+            DIcon {
                 id: chevron
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.spacingXS

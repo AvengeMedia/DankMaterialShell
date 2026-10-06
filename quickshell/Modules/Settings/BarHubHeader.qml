@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Column {
@@ -99,7 +99,7 @@ Column {
         title: I18n.tr("Bars", "plural noun, the shell bars or panels, settings title")
         settingKey: "barConfigurations"
         tags: ["bar", "configuration", "add", "remove", "enable", "multiple", "name"]
-        headerActions: DankButton {
+        headerActions: DButton {
             text: I18n.tr("Add")
             iconName: "add"
             buttonHeight: Theme.buttonHeightXS
@@ -140,7 +140,7 @@ Column {
             title: I18n.tr("Name")
             subtitle: root.editingBarId ? "" : bar.selectedBarName
 
-            DankActionButton {
+            DActionButton {
                 iconName: root.editingBarId ? "check" : "edit"
                 Accessible.name: root.editingBarId ? I18n.tr("Save") : I18n.tr("Rename")
                 onClicked: {
@@ -152,7 +152,7 @@ Column {
                     root.editingBarId = bar.selectedBarId;
                 }
             }
-            DankActionButton {
+            DActionButton {
                 visible: root.editingBarId !== ""
                 iconName: "close"
                 Accessible.name: I18n.tr("Cancel")
@@ -163,7 +163,7 @@ Column {
                 width: parent.width
                 active: root.editingBarId !== ""
                 visible: active
-                sourceComponent: DankTextField {
+                sourceComponent: DTextField {
                     id: renameField
                     width: parent.width
                     outlined: true

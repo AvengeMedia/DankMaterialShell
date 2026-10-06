@@ -6,7 +6,7 @@ import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../../../Common/QmlUtils.js" as QmlUtils
 
 Item {
@@ -33,7 +33,7 @@ Item {
         return name.includes("bluez") || name.includes("usb") ? "headset" : "mic";
     }
 
-    DankFlickable {
+    DFlickable {
         anchors.fill: parent
         contentHeight: column.height
         clip: true

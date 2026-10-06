@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import Quickshell
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import "../../Common/QmlUtils.js" as QmlUtils
 import qs.Modals.Common
@@ -378,7 +379,7 @@ Column {
             Layout.preferredHeight: implicitHeight
             spacing: Theme.spacingS
 
-            DankButton {
+            DButton {
                 text: root.pluginsWithUpdates.length ? I18n.tr("Update All") + " (" + root.pluginsWithUpdates.length + ")" : I18n.tr("Check for updates")
                 iconName: root.pluginsWithUpdates.length ? "download" : "refresh"
                 busy: root.checkingUpdates || pluginUpdatesDialogItem.isUpdating
@@ -398,7 +399,7 @@ Column {
                     root.checkUpdates();
                 }
             }
-            DankIconButton {
+            DIconButton {
                 iconName: "refresh"
                 widthMode: "narrow"
                 tooltipText: I18n.tr("Check for updates")
@@ -408,7 +409,7 @@ Column {
             }
         }
 
-        DankButton {
+        DButton {
             text: I18n.tr("Manage Registries", "plugin registry management")
             buttonHeight: Theme.buttonHeightXS
             horizontalPadding: Theme.spacingS
@@ -430,7 +431,7 @@ Column {
         wrapMode: Text.Wrap
     }
 
-    DankCard {
+    DCard {
         id: storeCard
         color: SettingsMetrics.rowColor
         width: parent.width
@@ -443,7 +444,7 @@ Column {
             width: parent.width
             spacing: Theme.spacingM
 
-            DankIcon {
+            DIcon {
                 name: "store"
                 size: Theme.iconSizeLarge
                 color: storeCard.accentColor
@@ -467,7 +468,7 @@ Column {
                 Layout.preferredHeight: implicitHeight
                 spacing: Theme.spacingS
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Browse")
                     iconName: "store"
                     backgroundColor: Theme.primary
@@ -477,7 +478,7 @@ Column {
                     enabled: DMSService.dmsAvailable
                     onClicked: root.showPluginBrowser()
                 }
-                DankButton {
+                DButton {
                     text: I18n.tr("Manage Registries", "plugin registry management")
                     backgroundColor: "transparent"
                     textColor: storeCard.accentColor
@@ -494,7 +495,7 @@ Column {
         spacing: Theme.spacingS
         visible: root.plugins.length > 0
 
-        DankSearchField {
+        DSearchField {
             width: parent.width
             text: root.searchQuery
             placeholderText: I18n.tr("Search plugins...", "plugin search placeholder")
@@ -504,7 +505,7 @@ Column {
             width: parent.width
             spacing: Theme.spacingS
 
-            DankSplitButton {
+            DSplitButton {
                 id: filterButton
                 text: I18n.tr("Filter") + ": " + root.filterOptions[root.filterIndex]
                 iconName: "filter_list"
@@ -520,7 +521,7 @@ Column {
                     filterMenu.openDropdownMenu();
                 }
 
-                DankDropdown {
+                DDropdown {
                     id: filterMenu
                     showTrigger: false
                     popupAnchorItem: filterButton.trailingButton
@@ -531,7 +532,7 @@ Column {
                     onValueChanged: value => root.setFilter(options.indexOf(value))
                 }
             }
-            DankSplitButton {
+            DSplitButton {
                 id: sortButton
                 text: I18n.tr("Sort by") + ": " + root.sortOptions[root.sortIndex]
                 iconName: root.descending ? "arrow_downward" : "arrow_upward"
@@ -548,7 +549,7 @@ Column {
                     sortMenu.openDropdownMenu();
                 }
 
-                DankDropdown {
+                DDropdown {
                     id: sortMenu
                     showTrigger: false
                     popupAnchorItem: sortButton.trailingButton
@@ -593,7 +594,7 @@ Column {
         Repeater {
             model: root.filteredPlugins
 
-            DankCard {
+            DCard {
                 id: installedCard
                 required property var modelData
                 readonly property bool loaded: PluginService.loadedPlugins[modelData.pluginId] !== undefined
@@ -638,7 +639,7 @@ Column {
                         Layout.minimumHeight: Math.ceil(pluginTitleMetrics.height) * 2 + Theme.spacingXXS + pluginMetadata.implicitHeight
                         Layout.maximumHeight: Layout.minimumHeight
                         spacing: Theme.spacingS
-                        DankIcon {
+                        DIcon {
                             id: pluginIcon
                             Layout.alignment: Qt.AlignTop
                             Layout.topMargin: Math.max(0, (pluginTitle.implicitHeight - height) / 2)
@@ -670,7 +671,7 @@ Column {
                                 Layout.minimumWidth: 0
                                 implicitHeight: Math.max(Theme.spacingL, Math.ceil(pluginDescriptionMetrics.height), versionBadge.implicitHeight)
 
-                                DankBadge {
+                                DBadge {
                                     id: versionBadge
                                     anchors.left: parent.left
                                     anchors.top: parent.top
@@ -696,7 +697,7 @@ Column {
                                 }
                             }
                         }
-                        DankToggle {
+                        DToggle {
                             Layout.alignment: Qt.AlignTop
                             enabled: !root.updatingPluginId && !pluginUpdatesDialogItem.isUpdating && !root.uninstalling[installedCard.modelData.pluginId]
                             checked: installedCard.loaded
@@ -721,7 +722,7 @@ Column {
                         Layout.fillHeight: false
                         visible: installedCard.problem !== "" || !!root.uninstalling[installedCard.modelData.pluginId]
                         spacing: Theme.spacingS
-                        DankActionButton {
+                        DActionButton {
                             visible: installedCard.problem !== ""
                             buttonSize: Theme.buttonHeightXS
                             iconName: "error"
@@ -744,7 +745,7 @@ Column {
                         Layout.fillWidth: true
                         implicitHeight: Math.max(settingsButton.implicitHeight, cardActions.implicitHeight)
 
-                        DankIconButton {
+                        DIconButton {
                             id: settingsButton
                             anchors.left: parent.left
                             anchors.verticalCenter: parent.verticalCenter
@@ -759,7 +760,7 @@ Column {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: Theme.spacingXS
 
-                            DankIconButton {
+                            DIconButton {
                                 iconName: "download"
                                 variant: "tonal"
                                 tooltipText: root.updatingPluginId === installedCard.modelData.pluginId ? I18n.tr("Updating...", "plugin update button tooltip while the update runs") : I18n.tr("Update available", "plugin row badge")
@@ -767,7 +768,7 @@ Column {
                                 enabled: DMSService.dmsAvailable && !root.checkingUpdates && !pluginUpdatesDialogItem.isUpdating && !root.updatingPluginId && !root.uninstalling[installedCard.modelData.pluginId]
                                 onClicked: root.requestUpdate(installedCard.modelData)
                             }
-                            DankIconButton {
+                            DIconButton {
                                 iconName: "delete"
                                 Accessible.name: I18n.tr("Uninstall")
                                 visible: installedCard.plugin.source !== "system"
@@ -784,7 +785,7 @@ Column {
     SettingsFabBar {
         shown: root.plugins.length > 0 && DMSService.dmsAvailable
 
-        DankFab {
+        DFab {
             text: I18n.tr("Browse")
             iconName: "store"
             onClicked: root.showPluginBrowser()

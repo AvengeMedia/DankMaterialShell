@@ -7,7 +7,7 @@ import Quickshell.I3
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.Common
-import qs.DankCommon.Common as DankCommon
+import qs.DCommon.Common as DCommon
 import qs.Services
 import "../Common/WorkspaceModel.js" as WorkspaceModel
 import "../Common/WindowModel.js" as WindowModel
@@ -30,6 +30,8 @@ Singleton {
     property bool outputPowerAvailable: false
     readonly property bool genericPowerBackend: compositorDetected && !isNiri && !isHyprland && !isMango && !isSway && !isScroll && !isMiracle && !isLabwc && !isUmbriel
     onGenericPowerBackendChanged: probeOutputPower()
+
+    readonly property bool inOverview: (isHyprland && HyprlandService.inOverview) || (isNiri && NiriService.inOverview) || (isMango && MangoService.inOverview)
 
     function probeOutputPower() {
         outputPowerAvailable = false;
@@ -97,7 +99,7 @@ Singleton {
             right: SettingsData.Position.Right
         })
 
-    readonly property bool supportsMinimize: isAqueous && AqueousService.available ? AqueousService.capabilities.commands && !AqueousService.locked : DankCommon.Compositor.supportsMinimize
+    readonly property bool supportsMinimize: isAqueous && AqueousService.available ? AqueousService.capabilities.commands && !AqueousService.locked : DCommon.Compositor.supportsMinimize
 
     readonly property bool hasWorkspaceIpc: {
         switch (compositor) {
@@ -149,7 +151,7 @@ Singleton {
     readonly property string displayName: {
         switch (compositor) {
         case "niri":
-            return "Niri";
+            return "niri";
         case "hyprland":
             return "Hyprland";
         case "mango":

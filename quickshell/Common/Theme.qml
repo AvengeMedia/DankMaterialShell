@@ -3,15 +3,15 @@ pragma ComponentBehavior: Bound
 
 import QtCore
 import QtQuick
-import "../DankCommon/Common/Shape.js" as Shape
-import "../DankCommon/Common/Surface.js" as Surface
-import "../DankCommon/Common/Contrast.js" as Contrast
-import "../DankCommon/Common/Accents.js" as Accents
-import "../DankCommon/Common/Tonal.js" as Tonal
+import "../DCommon/Common/Shape.js" as Shape
+import "../DCommon/Common/Surface.js" as Surface
+import "../DCommon/Common/Contrast.js" as Contrast
+import "../DCommon/Common/Accents.js" as Accents
+import "../DCommon/Common/Tonal.js" as Tonal
 import Quickshell
 import Quickshell.Io
 import qs.Common
-import qs.DankCommon.Common as DankCommon
+import qs.DCommon.Common as DCommon
 import qs.Services
 import qs.Modules.Greetd
 import "StockThemes.js" as StockThemes
@@ -69,6 +69,10 @@ Singleton {
     property int _colorsRetryCount: 0
     property double _lastGenerateMs: 0
     property string _matugenRunKey: ""
+    property var _workerStderr: []
+    property bool _workerStderrUsage: false
+    readonly property int _workerStderrKeep: 8
+    readonly property string themeTroubleshootingUrl: "https://danklinux.com/docs/dankmaterialshell/application-themes#troubleshooting"
 
     property bool blurLayersActive: false
     property bool matugenToastSuppressed: false
@@ -1190,14 +1194,14 @@ Singleton {
 
     property string fontFamily: {
         if (typeof SettingsData === "undefined")
-            return DankCommon.Fonts.sans;
+            return DCommon.Fonts.sans;
         if (SettingsData.isGreeterMode && SettingsData.lockScreenFontFamily !== "")
             return resolvedFontFamily(SettingsData.lockScreenFontFamily);
         return resolvedFontFamily(SettingsData.fontFamily);
     }
 
-    property string monoFontFamily: typeof SettingsData !== "undefined" ? resolvedMonoFontFamily(SettingsData.monoFontFamily) : DankCommon.Fonts.mono
-    property string displayFontFamily: typeof SettingsData !== "undefined" ? resolvedDisplayFontFamily(SettingsData.displayFontFamily) : DankCommon.Fonts.display
+    property string monoFontFamily: typeof SettingsData !== "undefined" ? resolvedMonoFontFamily(SettingsData.monoFontFamily) : DCommon.Fonts.mono
+    property string displayFontFamily: typeof SettingsData !== "undefined" ? resolvedDisplayFontFamily(SettingsData.displayFontFamily) : DCommon.Fonts.display
 
     readonly property var fontChoices: [
         {
@@ -1208,26 +1212,26 @@ Singleton {
             "value": "display",
             "text": I18n.tr("Display", "Display font role option")
         }
-    ].concat(DankCommon.Fonts.bundledFamilies.map(family => ({
+    ].concat(DCommon.Fonts.bundledFamilies.map(family => ({
                 "value": family,
                 "text": family
             })))
 
     function resolvedFontFamily(family) {
         if (family === defaultFontFamily)
-            return DankCommon.Fonts.sans;
+            return DCommon.Fonts.sans;
         return family;
     }
 
     function resolvedMonoFontFamily(family) {
         if (family === defaultMonoFontFamily)
-            return DankCommon.Fonts.mono;
+            return DCommon.Fonts.mono;
         return family;
     }
 
     function resolvedDisplayFontFamily(family) {
         if (family === defaultDisplayFontFamily)
-            return DankCommon.Fonts.display;
+            return DCommon.Fonts.display;
         return family;
     }
 
@@ -1367,8 +1371,8 @@ Singleton {
     readonly property int scrollbarHideDelay: 1200
     readonly property real menuMaxHeight: 400
     readonly property real clockFaceSize: 250
-    readonly property real clockOuterRingRatio: 0.34
-    readonly property real clockInnerRingRatio: 0.2
+    readonly property real clockOuterRingRatio: 101 / clockFaceSize
+    readonly property real clockInnerRingRatio: 69 / clockFaceSize
     readonly property real clockHandWidth: 2
     readonly property real clockHandleSize: 40
     readonly property real clockCenterSize: 8
@@ -1801,8 +1805,8 @@ Singleton {
         } else if (typeof SettingsData !== "undefined" && SettingsData.matugenSourceMode && SettingsData.matugenSourceMode !== "dominant") {
             args.push("--source-mode", SettingsData.matugenSourceMode);
         }
-        if (typeof SettingsData !== "undefined" && !stockColors && SettingsData.matugenSpec === "2025") {
-            args.push("--spec", "2025");
+        if (typeof SettingsData !== "undefined" && !stockColors && SettingsData.matugenSpec !== "2021") {
+            args.push("--spec", SettingsData.matugenSpec);
         }
 
         if (typeof SettingsData !== "undefined") {
@@ -1880,8 +1884,52 @@ Singleton {
         workerRunning = true;
         _matugenRunKey = runKey;
         _lastGenerateMs = Date.now();
+        _workerStderr = [];
+        _workerStderrUsage = false;
         systemThemeGenerator.command = args;
         systemThemeGenerator.running = true;
+    }
+
+    // an older dms rejecting a newer flag prints cobra usage after the error line, which must stay in view
+    function _recordWorkerStderr(line) {
+        const text = line.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, "").replace(/^\s*(FATAL|ERROR|WARN|INFO|DEBUG)\s+\S+:\s*/, "").replace(/^Theme generation failed:\s*/, "").trim();
+        if (!text || _workerStderrUsage || /^(Backtrace omitted|Run with RUST_BACKTRACE)/.test(text))
+            return;
+        if (text === "Usage:") {
+            _workerStderrUsage = true;
+            return;
+        }
+        _workerStderr = _workerStderr.concat(text).slice(-_workerStderrKeep);
+    }
+
+    function _shellQuote(arg) {
+        return /^[\w@%+=:,.\/-]+$/.test(arg) ? arg : "'" + arg.replace(/'/g, "'\\''") + "'";
+    }
+
+    function _workerReproduceCommand() {
+        const args = systemThemeGenerator.command.slice();
+        const queueAt = args.indexOf("queue");
+        if (queueAt > 0)
+            args[queueAt] = "generate";
+        return args.map(_shellQuote).join(" ");
+    }
+
+    function _reportWorkerFailure(message) {
+        const details = _workerStderr.concat(themeTroubleshootingUrl).join("\n");
+        if (typeof ToastService !== "undefined")
+            ToastService.showError(message, details, _workerReproduceCommand(), "theme-worker");
+        log.warn(message);
+    }
+
+    function _workerStartFailed() {
+        if (!workerRunning || systemThemeGenerator.running)
+            return;
+        workerRunning = false;
+        pendingThemeRequest = null;
+        if (CacheData.matugenAppliedKey !== "")
+            CacheData.set("matugenAppliedKey", "");
+        _reportWorkerFailure(I18n.tr("Theme worker failed to start", "error toast, the dms binary could not be launched"));
+        root.matugenCompleted((typeof SessionData !== "undefined" && SessionData.isLightMode) ? "light" : "dark", "error");
     }
 
     function generateSystemThemesFromCurrentTheme() {
@@ -2268,7 +2316,16 @@ Singleton {
             onRead: data => log.info("Theme worker:", data)
         }
         stderr: SplitParser {
-            onRead: data => log.warn("Theme worker:", data)
+            onRead: data => {
+                log.warn("Theme worker:", data);
+                _recordWorkerStderr(data);
+            }
+        }
+
+        // FailedToStart only flips running, it never emits exited
+        onRunningChanged: {
+            if (!running)
+                Qt.callLater(root._workerStartFailed);
         }
 
         onExited: exitCode => {
@@ -2285,10 +2342,7 @@ Singleton {
                 root.matugenCompleted(currentMode, "no-changes");
                 break;
             default:
-                if (typeof ToastService !== "undefined") {
-                    ToastService.showError(I18n.tr("Theme worker failed (%1)", "error toast, %1 is a process exit code").arg(exitCode));
-                }
-                log.warn("Matugen worker failed with exit code:", exitCode);
+                _reportWorkerFailure(I18n.tr("Theme worker failed (%1)", "error toast, %1 is a process exit code").arg(exitCode));
                 root.matugenCompleted(currentMode, "error");
             }
 

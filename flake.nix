@@ -111,7 +111,7 @@
               inherit version;
               pname = "dms-shell";
               src = ./core;
-              vendorHash = "sha256-WFufeGR21sidUJVGQTygubcaBB/aOIkKcBKf5dtwwVk=";
+              vendorHash = "sha256-D3tYFfi0oubXEwrQqxeHLEyk4PXl6b7Gp1nGyVwC5KA=";
 
               subPackages = [ "cmd/dms" ];
 
@@ -131,8 +131,8 @@
                 tar -C ${rootSrc}/quickshell --mode=u+w --exclude-from=${rootSrc}/scripts/shell-test-excludes.txt -cf - . \
                   | tar -C $out/share/quickshell/dms -xf -
 
-                rm -f $out/share/quickshell/dms/DankCommon
-                tar -C ${dank-qml-common} --mode=u+w --exclude-from=${rootSrc}/scripts/shell-test-excludes.txt -cf - DankCommon \
+                rm -f $out/share/quickshell/dms/DCommon
+                tar -C ${dank-qml-common} --mode=u+w --exclude-from=${rootSrc}/scripts/shell-test-excludes.txt -cf - DCommon \
                   | tar -C $out/share/quickshell/dms -xf -
 
                 echo "${version}" > $out/share/quickshell/dms/VERSION
@@ -235,22 +235,6 @@
             kdePackages.qtdeclarative
           ]
           ++ (qmlPkgs pkgs);
-          # the surface fixtures run niri on winit/X11, which dlopens these
-          niriForTests = pkgs.symlinkJoin {
-            name = "niri-x11";
-            paths = [ pkgs.niri ];
-            nativeBuildInputs = [ pkgs.makeWrapper ];
-            postBuild = ''
-              wrapProgram $out/bin/niri --prefix LD_LIBRARY_PATH : ${
-                pkgs.lib.makeLibraryPath [
-                  (pkgs.libx11 or pkgs.xorg.libX11)
-                  (pkgs.libxcb or pkgs.xorg.libxcb)
-                  (pkgs.libxcursor or pkgs.xorg.libXcursor)
-                  (pkgs.libxi or pkgs.xorg.libXi)
-                ]
-              }
-            '';
-          };
         in
         {
           default = pkgs.mkShell {
@@ -265,7 +249,7 @@
                 gnumake
                 nodejs
                 lua
-                (python3.withPackages (ps: [ ps.dbus-next ]))
+                python3
                 matugen
 
                 prek
@@ -276,8 +260,7 @@
                 nixd
                 nil
               ]
-              ++ devQmlPkgs
-              ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [ niriForTests pkgs.xvfb pkgs.dbus ];
+              ++ devQmlPkgs;
 
             shellHook = ''
               touch quickshell/.qmlls.ini 2>/dev/null

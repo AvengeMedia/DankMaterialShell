@@ -4,10 +4,11 @@ import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import "../utils/widgets.js" as WidgetUtils
 
-DankBottomSheet {
+DBottomSheet {
     id: root
 
     property var widgets: []
@@ -99,7 +100,7 @@ DankBottomSheet {
                     radius: item.modelData.id === "user" ? Theme.fullRadius(width, height) : Theme.cornerRadiusLIncreased
                     color: CcMetrics.iconBoxInactiveColor
 
-                    DankIcon {
+                    DIcon {
                         anchors.centerIn: parent
                         name: item.modelData.icon
                         size: Theme.iconSizeLarge
@@ -107,7 +108,7 @@ DankBottomSheet {
                         visible: item.modelData.id !== "user" || PortalService.profileImageUrl === ""
                     }
 
-                    DankCircularImage {
+                    DCircularImage {
                         anchors.fill: parent
                         imageSource: PortalService.profileImageUrl
                         fallbackIcon: "material:person"
@@ -186,7 +187,7 @@ DankBottomSheet {
                 radius: Theme.fullRadius(width, height)
                 color: CcMetrics.iconBoxInactiveColor
 
-                DankIcon {
+                DIcon {
                     anchors.centerIn: parent
                     name: card.category.icon
                     size: Theme.iconSize
@@ -207,7 +208,7 @@ DankBottomSheet {
                 elide: Text.ElideRight
             }
 
-            DankIcon {
+            DIcon {
                 id: chevron
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.spacingL
@@ -248,7 +249,7 @@ DankBottomSheet {
         }
     }
 
-    DankSearchField {
+    DSearchField {
         id: searchField
         width: parent.width
         height: Theme.fieldHeightLarge

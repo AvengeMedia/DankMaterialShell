@@ -5,6 +5,7 @@ import QtQuick.Shapes
 import Quickshell.Widgets
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Item {
@@ -22,6 +23,12 @@ Item {
 
     readonly property bool outlined: root.meterStyle === "outline"
     readonly property bool ring: root.meterStyle === "ring"
+    // Duo: an open arc around the network glyph, signal dots in the gap.
+    readonly property bool duo: root.meterStyle === "duo"
+    readonly property bool circular: root.ring || root.duo
+    readonly property real arcStart: root.duo ? 150 : -90
+    readonly property real arcSpan: root.duo ? 240 : 360
+    readonly property real chargeTarget: Math.max(root.level, Math.min(100, SettingsData.batteryChargeLimit))
     readonly property real unit: root.thickness / 14
     readonly property real level: Math.max(0, Math.min(100, BatteryService.batteryLevel))
     readonly property bool charging: BatteryService.batteryAvailable && BatteryService.isCharging
@@ -39,6 +46,8 @@ Item {
     }
     readonly property color dimColor: Theme.withAlpha(root.fillColor, root.hovered ? 0.6 : 0.48)
     readonly property color trackColor: {
+        if (root.duo)
+            return Theme.withAlpha(root.fillColor, root.hovered ? 0.3 : 0.16);
         if (root.ring)
             return Theme.withAlpha(root.fillColor, root.hovered ? 0.4 : 0.26);
         if (root.outlined)
@@ -52,7 +61,7 @@ Item {
     }
     readonly property int glyphWeight: Theme.fontWeight
     readonly property string numberText: Math.round(root.level).toString()
-    readonly property bool boltVisible: root.charging && root.showBolt
+    readonly property bool boltVisible: root.charging && root.showBolt && !root.duo
     readonly property bool numberInside: !root.vertical && root.showNumber && BatteryService.batteryAvailable
     readonly property bool ringNumberVisible: root.ring && root.showNumber && !root.boltVisible && BatteryService.batteryAvailable
     readonly property real strokeWidth: root.outlined ? 1.5 * root.unit : 0
@@ -72,9 +81,9 @@ Item {
     readonly property real ringInnerRadius: Math.max(1, (root.ringDiameter - 2 * root.ringStroke) / 2)
     readonly property real ringChordWidth: 2 * Math.sqrt(Math.max(1, Math.pow(root.ringInnerRadius, 2) - Math.pow(fitMetrics.tightBoundingRect.height / 2, 2)))
     readonly property real ringTextSize: root.textNeed > 0 ? Math.min(root.baseTextSize, root.baseTextSize * root.ringChordWidth / root.textNeed) : root.baseTextSize
-    readonly property real textSize: root.ring ? root.ringTextSize : root.baseTextSize
+    readonly property real textSize: root.circular ? root.ringTextSize : root.baseTextSize
     readonly property real textBaseline: root.height / 2 - digitInk.tightBoundingRect.y - digitInk.tightBoundingRect.height / 2
-    readonly property real boltBadgeSize: Math.round((root.ring ? 12 : 9) * root.unit)
+    readonly property real boltBadgeSize: Math.round((root.circular ? 12 : 9) * root.unit)
     readonly property real boltBadgeWidth: Math.round(root.boltBadgeSize * (8 / 13))
     readonly property real bodyLength: Math.max(Math.round(25 * root.unit), Math.ceil(root.numberInside ? root.textNeed + root.textCanvasLeft + 1.5 * root.unit : 0))
     readonly property real capGap: Math.max(1, Math.round(root.unit))
@@ -82,8 +91,8 @@ Item {
     readonly property real capBreadth: Math.max(1, Math.round(1.25 * root.unit))
     readonly property real capSpan: Math.round(6 * root.unit)
 
-    implicitWidth: root.ring ? root.ringDiameter : root.vertical ? Math.round(14 * root.unit) : root.capOffset + (root.boltVisible ? root.boltBadgeWidth : root.capBreadth)
-    implicitHeight: root.ring ? root.ringDiameter : root.vertical ? root.capOffset + root.capBreadth : Math.round(14 * root.unit)
+    implicitWidth: root.circular ? root.ringDiameter : root.vertical ? Math.round(14 * root.unit) : root.capOffset + (root.boltVisible ? root.boltBadgeWidth : root.capBreadth)
+    implicitHeight: root.circular ? root.ringDiameter : root.vertical ? root.capOffset + root.capBreadth : Math.round(14 * root.unit)
 
     StyledTextMetrics {
         id: fitMetrics
@@ -151,7 +160,7 @@ Item {
         Shape {
             id: gauge
 
-            property real sweep: root.level * 3.6
+            property real sweep: root.level / 100 * root.arcSpan
 
             anchors.fill: parent
             preferredRendererType: Shape.CurveRenderer
@@ -174,8 +183,24 @@ Item {
                     centerY: root.ringDiameter / 2
                     radiusX: root.ringRadius
                     radiusY: root.ringRadius
-                    startAngle: -90
-                    sweepAngle: 360
+                    startAngle: root.arcStart
+                    sweepAngle: root.arcSpan
+                }
+            }
+
+            ShapePath {
+                fillColor: "transparent"
+                strokeColor: root.duo && root.charging ? Theme.withAlpha(root.fillColor, 0.45) : "transparent"
+                strokeWidth: root.ringStroke
+                capStyle: ShapePath.RoundCap
+
+                PathAngleArc {
+                    centerX: root.ringDiameter / 2
+                    centerY: root.ringDiameter / 2
+                    radiusX: root.ringRadius
+                    radiusY: root.ringRadius
+                    startAngle: root.arcStart + gauge.sweep
+                    sweepAngle: Math.max(0, (root.chargeTarget - root.level) / 100 * root.arcSpan)
                 }
             }
 
@@ -190,7 +215,7 @@ Item {
                     centerY: root.ringDiameter / 2
                     radiusX: root.ringRadius
                     radiusY: root.ringRadius
-                    startAngle: -90
+                    startAngle: root.arcStart
                     sweepAngle: gauge.sweep
                 }
             }
@@ -198,11 +223,79 @@ Item {
     }
 
     Loader {
-        active: root.ring
+        active: root.circular
         anchors.centerIn: parent
         width: root.ringDiameter
         height: root.ringDiameter
         sourceComponent: ringGauge
+    }
+
+    Loader {
+        active: root.duo
+        anchors.centerIn: parent
+        width: root.ringDiameter
+        height: root.ringDiameter
+        sourceComponent: duoFace
+    }
+
+    Component {
+        id: duoFace
+
+        Item {
+            id: face
+
+            readonly property string networkIcon: {
+                if (NetworkService.wifiToggling)
+                    return "sync";
+                switch (NetworkService.networkStatus) {
+                case "ethernet":
+                    return "lan";
+                case "cellular":
+                    return "network_cell";
+                case "vpn":
+                    return NetworkService.ethernetConnected ? "lan" : (NetworkService.cellularConnected ? "network_cell" : NetworkService.wifiSignalIcon);
+                }
+                return NetworkService.wifiEnabled && NetworkService.wifiAvailable ? NetworkService.wifiSignalIcon : "wifi_off";
+            }
+            // Inner pair first so a partial signal stays symmetric.
+            readonly property int litDots: NetworkService.wifiConnected ? (NetworkService.wifiSignalStrength > 50 ? 4 : 2) : 0
+            readonly property real dotSize: Math.max(2, Math.round(root.ringStroke * 1.25))
+            readonly property int glyphInset: Math.round(root.ringDiameter * 0.2)
+
+            DIcon {
+                id: glyph
+
+                x: face.glyphInset
+                y: face.glyphInset
+                name: face.networkIcon
+                size: root.ringDiameter - 2 * face.glyphInset
+                color: NetworkService.networkStatus !== "disconnected" ? Theme.surfaceText : Theme.surfaceTextMedium
+
+                DBlink {
+                    target: glyph
+                    running: face.visible && (NetworkService.wifiToggling || NetworkService.isWifiConnecting)
+                }
+            }
+
+            Repeater {
+                model: 4
+
+                Rectangle {
+                    id: dot
+
+                    required property int index
+                    readonly property real angle: (54 + dot.index * 24) * Math.PI / 180
+                    readonly property bool lit: dot.index === 1 || dot.index === 2 ? face.litDots >= 2 : face.litDots >= 4
+
+                    x: root.ringDiameter / 2 + Math.cos(dot.angle) * root.ringRadius - width / 2
+                    y: root.ringDiameter / 2 + Math.sin(dot.angle) * root.ringRadius - height / 2
+                    width: face.dotSize
+                    height: face.dotSize
+                    radius: width / 2
+                    color: dot.lit ? Theme.surfaceText : Theme.withAlpha(Theme.surfaceText, 0.16)
+                }
+            }
+        }
     }
 
     NumericText {
@@ -224,7 +317,7 @@ Item {
         width: root.vertical ? root.capSpan : root.capBreadth
         height: root.vertical ? root.capBreadth : root.capSpan
         radius: root.capBreadth / 2
-        visible: !root.ring && (root.vertical || !root.boltVisible)
+        visible: !root.circular && (root.vertical || !root.boltVisible)
         color: root.outlined ? root.fillColor : root.dimColor
     }
 
@@ -236,7 +329,7 @@ Item {
         width: root.vertical ? root.width : root.bodyLength
         height: root.vertical ? root.bodyLength : root.height
         radius: 4 * root.unit
-        visible: !root.ring
+        visible: !root.circular
         color: root.trackColor
         border.width: root.strokeWidth
         border.color: root.fillColor
@@ -250,7 +343,7 @@ Item {
         width: frame.width - root.strokeWidth * 2
         height: frame.height - root.strokeWidth * 2
         radius: Math.max(0, frame.radius - root.strokeWidth)
-        visible: !root.ring
+        visible: !root.circular
         color: "transparent"
 
         Rectangle {
@@ -301,7 +394,7 @@ Item {
     }
 
     Glyphs {
-        visible: root.numberInside && !root.ring
+        visible: root.numberInside && !root.circular
         ink: Theme.surfaceText
     }
 
@@ -311,7 +404,7 @@ Item {
         width: fill.width
         height: fill.height
         clip: true
-        visible: root.numberInside && !root.outlined && !root.ring
+        visible: root.numberInside && !root.outlined && !root.circular
 
         Glyphs {
             x: -parent.x
@@ -322,8 +415,8 @@ Item {
 
     Bolt {
         visible: root.boltVisible
-        x: root.ring || root.vertical ? (root.width - width) / 2 : root.capOffset
-        y: !root.ring && root.vertical ? frame.y + (frame.height - height) / 2 : (root.height - height) / 2
+        x: root.circular || root.vertical ? (root.width - width) / 2 : root.capOffset
+        y: !root.circular && root.vertical ? frame.y + (frame.height - height) / 2 : (root.height - height) / 2
         fillColor: Theme.surfaceText
     }
 }

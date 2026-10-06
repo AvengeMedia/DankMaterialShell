@@ -1,9 +1,9 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Plugins
-import qs.Modules.DankDash
-import qs.Modules.DankDash.Overview
+import qs.Modules.DDash
+import qs.Modules.DDash.Overview
 
 DashTabComponent {
     id: root
@@ -96,7 +96,7 @@ DashTabComponent {
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: Theme.spacingS
 
-                    DankActionButton {
+                    DActionButton {
                         buttonSize: Theme.buttonHeightM
                         iconSize: Theme.iconSize
                         iconName: "remove"
@@ -105,7 +105,7 @@ DashTabComponent {
                         onClicked: root.bump(-1)
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         buttonSize: Theme.buttonHeightM
                         iconSize: Theme.iconSize
                         iconName: "add"
@@ -123,7 +123,7 @@ DashTabComponent {
         id: resetWidget
 
         Card {
-            DankButton {
+            DButton {
                 anchors.centerIn: parent
                 text: I18n.trFor("dashCounterExample", "Reset")
                 iconName: "restart_alt"

@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Services
 import qs.Modules.Settings.Widgets
 
@@ -194,7 +194,7 @@ Item {
                             radius: Theme.fullRadius(width, height)
                             color: Theme.primary
 
-                            DankIcon {
+                            DIcon {
                                 anchors.centerIn: parent
                                 name: motionPreview.atEnd ? "arrow_back" : "arrow_forward"
                                 size: Theme.iconSizeMedium

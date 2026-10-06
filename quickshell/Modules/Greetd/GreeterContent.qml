@@ -8,8 +8,9 @@ import Quickshell.Services.Greetd
 import qs.Common
 import qs.Modules.Lock
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
-import qs.DankCommon.Session
+import qs.DCommon.Session
 import "../../Common/PamStack.js" as PamStack
 
 Item {
@@ -624,7 +625,7 @@ Item {
         return hasCustomWallpaper ? "Fill" : SessionData.getMonitorWallpaperFillMode(screenName);
     }
 
-    DankBackdrop {
+    DBackdrop {
         anchors.fill: parent
         screenName: root.screenName
         blur: Theme.lockScreenBlur
@@ -833,7 +834,7 @@ Item {
                         Layout.preferredHeight: 60
                         visible: SettingsData.lockScreenShowProfileImage || root.pickerAvailable
 
-                        DankCircularImage {
+                        DCircularImage {
                             anchors.fill: parent
                             ringWidth: Theme.avatarRingWidth
                             ringColor: Theme.avatarRingColor
@@ -883,7 +884,7 @@ Item {
                                 }
                             }
 
-                            DankIcon {
+                            DIcon {
                                 anchors.centerIn: parent
                                 name: "switch_account"
                                 size: 24
@@ -941,7 +942,7 @@ Item {
                             onManualEntryRequested: root.enterManualUsernameEntry()
                         }
 
-                        DankIcon {
+                        DIcon {
                             id: lockIcon
 
                             anchors.left: parent.left
@@ -1095,7 +1096,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             id: revealButton
 
                             anchors.right: externalAuthButton.visible ? externalAuthButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right))
@@ -1108,7 +1109,7 @@ Item {
                             enabled: visible
                             onClicked: parent.showPassword = !parent.showPassword
                         }
-                        DankActionButton {
+                        DActionButton {
                             id: externalAuthButton
 
                             anchors.right: virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right)
@@ -1121,7 +1122,7 @@ Item {
                             enabled: visible
                             onClicked: root.startAuthSession(false)
                         }
-                        DankActionButton {
+                        DActionButton {
                             id: virtualKeyboardButton
 
                             anchors.right: enterButton.visible ? enterButton.left : parent.right
@@ -1141,7 +1142,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             id: enterButton
 
                             anchors.right: parent.right
@@ -1243,7 +1244,7 @@ Item {
             useFahrenheit: SettingsData.useFahrenheit
         }
 
-        DankActionButton {
+        DActionButton {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.margins: Theme.spacingXL
@@ -1286,7 +1287,7 @@ Item {
                 }
             }
 
-            DankDropdown {
+            DDropdown {
                 id: sessionDropdown
                 anchors.fill: parent
                 text: ""

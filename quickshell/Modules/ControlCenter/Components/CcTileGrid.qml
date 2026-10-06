@@ -7,7 +7,7 @@ import qs.Modules.ControlCenter
 import "../utils/widgets.js" as WidgetUtils
 import "../../../Common/GridLayout.js" as GridUtils
 
-DankEditableGrid {
+DEditableGrid {
     id: root
 
     property var model: null
@@ -24,6 +24,7 @@ DankEditableGrid {
     signal lockRequested
     signal powerRequested
     signal settingsRequested
+    signal editRequested
     signal accountsRequested
     signal closeRequested
     property bool tapToClose: false

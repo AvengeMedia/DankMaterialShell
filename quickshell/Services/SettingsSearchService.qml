@@ -6,7 +6,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
-import qs.Modules.DankDash
+import qs.Modules.DDash
 
 Singleton {
     id: root

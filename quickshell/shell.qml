@@ -10,8 +10,9 @@
 import QtQuick
 import Quickshell
 import qs.Common
-import qs.DankCommon.Common as DC
+import qs.DCommon.Common as DC
 import qs.Modules
+import qs.Modules.Lock
 import qs.Services
 
 ShellRoot {
@@ -35,6 +36,7 @@ ShellRoot {
         DC.Host.session = SessionService;
         DC.Host.cache = CacheData;
         DC.Host.files = FilesService;
+        DC.Host.hyprlandFocusGrab = Qt.binding(() => CompositorService.useHyprlandFocusGrab);
         void IconThemeService.ready;
         if (entrypoint.runGreeter)
             return;
@@ -49,6 +51,7 @@ ShellRoot {
 
         sourceComponent: Scope {
             WallpaperBackground {}
+            LockPlacementPreparer {}
 
             Loader {
                 active: SettingsData.blurredWallpaperLayer && CompositorService.isNiri

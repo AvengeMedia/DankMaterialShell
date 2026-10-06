@@ -2,9 +2,9 @@ import QtQuick
 import Quickshell.Io
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
-import qs.Modules.DankBar.Popouts
+import qs.Modules.DBar.Popouts
 
 Item {
     id: root
@@ -86,7 +86,7 @@ done
                         width: parent.width
                         spacing: Theme.spacingM
 
-                        DankIcon {
+                        DIcon {
                             name: BatteryService.getBatteryIcon()
                             size: Theme.iconSizeLarge
                             color: root.batteryStatusColor
@@ -273,7 +273,7 @@ done
                         height: 1
                     }
 
-                    DankButton {
+                    DButton {
                         id: applyButton
                         text: I18n.tr("Apply to hardware")
                         iconName: "lock"

@@ -2,7 +2,7 @@ import QtQuick
 import qs.Common
 import qs.Modals.FileBrowser
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings
 import qs.Modules.Settings.Widgets
 
@@ -165,7 +165,7 @@ Column {
             value: root.apps.get("launcherLogoCustomPath")
             onEditingFinished: value => root.apps.set("launcherLogoCustomPath", value.trim())
 
-            actions: DankActionButton {
+            actions: DActionButton {
                 iconName: "folder_open"
                 Accessible.name: I18n.tr("Select Dock Launcher Logo")
                 onClicked: logoFileBrowser.open()

@@ -8,6 +8,9 @@
   "%1 DMS binds may be overridden by config binds that come after the include.": {
     "%1 DMS binds may be overridden by config binds that come after the include.": ""
   },
+  "%1 Flatpak": {
+    "%1 Flatpak": ""
+  },
   "%1 KB": {
     "%1 KB": ""
   },
@@ -34,6 +37,12 @@
   },
   "%1 before": {
     "%1 before": ""
+  },
+  "%1 behind": {
+    "%1 behind": ""
+  },
+  "%1 breaking": {
+    "%1 breaking": ""
   },
   "%1 character": {
     "%1 character": "%1 teken"
@@ -68,8 +77,14 @@
   "%1 displays": {
     "%1 displays": "%1 schermen"
   },
+  "%1 features": {
+    "%1 features": ""
+  },
   "%1 filtered": {
     "%1 filtered": "%1 gefilterd"
+  },
+  "%1 fixes": {
+    "%1 fixes": ""
   },
   "%1 h %2 m left": {
     "%1 h %2 m left": "%1 u %2 m resterend"
@@ -104,6 +119,9 @@
   "%1 jobs": {
     "%1 jobs": ""
   },
+  "%1 limit reached": {
+    "%1 limit reached": ""
+  },
   "%1 min": {
     "%1 min": ""
   },
@@ -124,6 +142,15 @@
   },
   "%1 online": {
     "%1 online": "%1 online"
+  },
+  "%1 other": {
+    "%1 other": ""
+  },
+  "%1 package will be installed via %2.": {
+    "%1 package will be installed via %2.": ""
+  },
+  "%1 packages will be installed via %2.": {
+    "%1 packages will be installed via %2.": ""
   },
   "%1 position": {
     "%1 position": ""
@@ -158,6 +185,9 @@
   "%1 wallpapers  •  %2 / %3": {
     "%1 wallpapers  •  %2 / %3": "%1 achtergronden  •  %2 / %3"
   },
+  "%1 will be downloaded and installed via %2.": {
+    "%1 will be downloaded and installed via %2.": ""
+  },
   "%1 will be removed from your system.": {
     "%1 will be removed from your system.": ""
   },
@@ -169,6 +199,9 @@
   },
   "%1: %2": {
     "%1: %2": "%1: %2"
+  },
+  "%1h": {
+    "%1h": ""
   },
   "%1h %2m": {
     "%1h %2m": ""
@@ -200,9 +233,6 @@
   "2.4 GHz": {
     "2.4 GHz": "2,4 GHz"
   },
-  "2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder": {
-    "2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder": ""
-  },
   "3rd party": {
     "3rd party": "Derden"
   },
@@ -212,14 +242,17 @@
   "50 uses Material shapes. Lower values reduce rounding; higher values increase it.": {
     "50 uses Material shapes. Lower values reduce rounding; higher values increase it.": ""
   },
+  "A custom seed color overrides this": {
+    "A custom seed color overrides this": ""
+  },
   "A floating companion that works alongside any bar layout": {
     "A floating companion that works alongside any bar layout": ""
   },
-  "A hidden field appears as soon as a key is pressed": {
-    "A hidden field appears as soon as a key is pressed": ""
-  },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "Een moderne desktop-shell voor Wayland-compositors"
+  },
+  "A newer dms binary is installed.": {
+    "A newer dms binary is installed.": ""
   },
   "A user with that name already exists.": {
     "A user with that name already exists.": "Er bestaat al een gebruiker met die naam."
@@ -229,9 +262,6 @@
   },
   "AC power": {
     "AC power": ""
-  },
-  "AM": {
-    "AM": ""
   },
   "API": {
     "API": "API"
@@ -247,6 +277,9 @@
   },
   "Acceleration profile": {
     "Acceleration profile": ""
+  },
+  "Accent minutes": {
+    "Accent minutes": ""
   },
   "Accept jobs": {
     "Accept jobs": ""
@@ -353,11 +386,26 @@
   "Add notes": {
     "Add notes": "Notities toevoegen"
   },
+  "Add palette": {
+    "Add palette": ""
+  },
   "Add printer": {
     "Add printer": ""
   },
+  "Add rule": {
+    "Add rule": ""
+  },
+  "Add shortcut": {
+    "Add shortcut": ""
+  },
+  "Add substitution": {
+    "Add substitution": ""
+  },
   "Add to autostart": {
     "Add to autostart": ""
+  },
+  "Add user": {
+    "Add user": ""
   },
   "Add widget": {
     "Add widget": ""
@@ -371,11 +419,14 @@
   "Add, remove and configure dock items": {
     "Add, remove and configure dock items": ""
   },
-  "Add, remove, reorder and configure": {
-    "Add, remove, reorder and configure": ""
+  "Add, reorder, configure": {
+    "Add, reorder, configure": ""
   },
   "Added in front of every app launch command": {
     "Added in front of every app launch command": ""
+  },
+  "Adds a compositor window rule so DMS windows such as Settings open floating": {
+    "Adds a compositor window rule so DMS windows such as Settings open floating": ""
   },
   "Adds concave curves where the bar meets the screen edge": {
     "Adds concave curves where the bar meets the screen edge": ""
@@ -386,14 +437,17 @@
   "Adds them to the %1 group so they can use sudo": {
     "Adds them to the %1 group so they can use sudo": ""
   },
-  "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": {
-    "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": "Beheerdersrechten vereist. Gebruik de knop 'Sync' bij Instellingen → Aanmeldbeheer om toe te passen."
+  "Administrator access is required. Press Apply changes in Settings → Greeter.": {
+    "Administrator access is required. Press Apply changes in Settings → Greeter.": ""
   },
   "Advanced": {
     "Advanced": "Geavanceerd"
   },
   "Advanced comma-separated libxkbcommon options.": {
     "Advanced comma-separated libxkbcommon options.": "Geavanceerde door komma's gescheiden libxkbcommon-opties."
+  },
+  "After %1": {
+    "After %1": ""
   },
   "Afternoon": {
     "Afternoon": "Middag"
@@ -449,6 +503,12 @@
   "Also runs the templates in your matugen config.toml": {
     "Also runs the templates in your matugen config.toml": ""
   },
+  "Also saves the screenshot to disk": {
+    "Also saves the screenshot to disk": ""
+  },
+  "Also works on the lock screen": {
+    "Also works on the lock screen": ""
+  },
   "Alt + Shift": {
     "Alt + Shift": "Alt + Shift"
   },
@@ -458,8 +518,17 @@
   "Always here": {
     "Always here": ""
   },
+  "Always in overflow": {
+    "Always in overflow": ""
+  },
   "Always on icons": {
     "Always on icons": "Altijd-aan pictogrammen"
+  },
+  "Always open here": {
+    "Always open here": ""
+  },
+  "Always show": {
+    "Always show": ""
   },
   "Always show percentage": {
     "Always show percentage": ""
@@ -470,6 +539,9 @@
   "Amount": {
     "Amount": "Hoeveelheid"
   },
+  "An Island bar already covers a display this bar is on": {
+    "An Island bar already covers a display this bar is on": ""
+  },
   "An uninstallation is already in progress": {
     "An uninstallation is already in progress": ""
   },
@@ -479,8 +551,8 @@
   "Analog": {
     "Analog": "Analoog"
   },
-  "Analog, digital, or stacked clock display": {
-    "Analog, digital, or stacked clock display": "Analoge, digitale of gestapelde klokweergave"
+  "Analog, digital, stacked, expressive, or overlapping clock": {
+    "Analog, digital, stacked, expressive, or overlapping clock": ""
   },
   "Analyzing configuration...": {
     "Analyzing configuration...": "Configuratie analyseren..."
@@ -490,6 +562,9 @@
   },
   "Animation duration": {
     "Animation duration": ""
+  },
+  "Animation style": {
+    "Animation style": ""
   },
   "Animations": {
     "Animations": ""
@@ -533,6 +608,12 @@
   "App launcher": {
     "App launcher": ""
   },
+  "App limits": {
+    "App limits": ""
+  },
+  "App name": {
+    "App name": ""
+  },
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": "App-naam of identiteit (bijv. firefox)"
   },
@@ -553,9 +634,6 @@
   },
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "Applicaties en commando's die automatisch starten wanneer je inlogt"
-  },
-  "Applies on the next greeter sync": {
-    "Applies on the next greeter sync": "Wordt toegepast bij de volgende greeter-synchronisatie"
   },
   "Applies the saved profile that matches the connected displays": {
     "Applies the saved profile that matches the connected displays": ""
@@ -602,6 +680,9 @@
   "Apps dock": {
     "Apps dock": ""
   },
+  "Apps that capture the keyboard can block it": {
+    "Apps that capture the keyboard can block it": ""
+  },
   "Apps with notification popups muted. Unmute or delete to remove.": {
     "Apps with notification popups muted. Unmute or delete to remove.": "Apps met gedempte meldingspop-ups. Dempen opheffen of verwijderen om te wissen."
   },
@@ -616,6 +697,9 @@
   },
   "Architecture": {
     "Architecture": "Architectuur"
+  },
+  "Archive manager": {
+    "Archive manager": ""
   },
   "Are you sure you want to kill session \"%1\"?": {
     "Are you sure you want to kill session \"%1\"?": "Weet u zeker dat u sessie \"%1\" wilt beëindigen?"
@@ -743,6 +827,9 @@
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": "Automatische modus staat aan. Handmatige profielselectie is uitgeschakeld."
   },
+  "Auto moves this widget into overflow when the bar runs out of space": {
+    "Auto moves this widget into overflow when the bar runs out of space": ""
+  },
   "Auto overflow": {
     "Auto overflow": ""
   },
@@ -794,6 +881,9 @@
   "Automatic cycling": {
     "Automatic cycling": ""
   },
+  "Automatic placement": {
+    "Automatic placement": ""
+  },
   "Automatically enable while screen sharing": {
     "Automatically enable while screen sharing": ""
   },
@@ -824,8 +914,8 @@
   "Available networks": {
     "Available networks": ""
   },
-  "Back": {
-    "Back": "Terug"
+  "Avatar ring": {
+    "Avatar ring": ""
   },
   "Backend": {
     "Backend": "Backend"
@@ -884,11 +974,11 @@
   "Bar size": {
     "Bar size": ""
   },
-  "Bar surface and spacing": {
-    "Bar surface and spacing": ""
-  },
   "Bar visibility": {
     "Bar visibility": ""
+  },
+  "Bar widget background behind the compact face": {
+    "Bar widget background behind the compact face": ""
   },
   "Bar widgets": {
     "Bar widgets": ""
@@ -926,9 +1016,6 @@
   "Behavior": {
     "Behavior": "Gedrag"
   },
-  "Better Lyrics": {
-    "Better Lyrics": ""
-  },
   "Bind the %1 IPC action in your compositor config.": {
     "Bind the %1 IPC action in your compositor config.": "Bind de %1 IPC-actie in je compositor-configuratie."
   },
@@ -956,6 +1043,12 @@
   "Blocked": {
     "Blocked": "Geblokkeerd"
   },
+  "Bloom": {
+    "Bloom": ""
+  },
+  "Blue": {
+    "Blue": ""
+  },
   "Blue light filter": {
     "Blue light filter": "Blauwlichtfilter"
   },
@@ -980,6 +1073,9 @@
   "Blur on overview": {
     "Blur on overview": ""
   },
+  "Blur, shadows, corners": {
+    "Blur, shadows, corners": ""
+  },
   "Blurred surfaces show the wallpaper, not the windows beneath": {
     "Blurred surfaces show the wallpaper, not the windows beneath": ""
   },
@@ -991,6 +1087,9 @@
   },
   "Body font size": {
     "Body font size": ""
+  },
+  "Boot entry changed. Remove it and add it again.": {
+    "Boot entry changed. Remove it and add it again.": ""
   },
   "Border": {
     "Border": "Rand"
@@ -1012,9 +1111,6 @@
   },
   "Border with Background": {
     "Border with Background": "Rand met achtergrond"
-  },
-  "Border, connected mode, arcs": {
-    "Border, connected mode, arcs": ""
   },
   "Both": {
     "Both": ""
@@ -1084,6 +1180,9 @@
   },
   "Built-in plugins": {
     "Built-in plugins": ""
+  },
+  "Bundled greeter active": {
+    "Bundled greeter active": ""
   },
   "Button areas": {
     "Button areas": ""
@@ -1220,6 +1319,9 @@
   "Change Volume": {
     "Change Volume": "Volume wijzigen"
   },
+  "Changes save to %1": {
+    "Changes save to %1": ""
+  },
   "Channel": {
     "Channel": "Kanaal"
   },
@@ -1253,11 +1355,11 @@
   "Check interval": {
     "Check interval": "Controle-interval"
   },
-  "Check interval, ignored packages, custom command": {
-    "Check interval, ignored packages, custom command": ""
-  },
   "Check on startup": {
     "Check on startup": "Controleren bij opstarten"
+  },
+  "Check status": {
+    "Check status": ""
   },
   "Check your custom command in Settings → Dock → Trash.": {
     "Check your custom command in Settings → Dock → Trash.": "Controleer je aangepaste opdracht in Instellingen → Dock → Prullenbak."
@@ -1271,20 +1373,20 @@
   "Checking...": {
     "Checking...": "Controleren..."
   },
+  "Checks in the background at the check interval. Notifies only when the count grows.": {
+    "Checks in the background at the check interval. Notifies only when the count grows.": ""
+  },
   "Chip": {
     "Chip": ""
-  },
-  "Choose Dark Mode Color": {
-    "Choose Dark Mode Color": "Kleur donkere modus kiezen"
   },
   "Choose Launcher Logo Color": {
     "Choose Launcher Logo Color": "Kleur startpictogram kiezen"
   },
-  "Choose Light Mode Color": {
-    "Choose Light Mode Color": "Kleur lichte modus kiezen"
-  },
   "Choose Wallpaper Color": {
     "Choose Wallpaper Color": "Achtergrondkleur kiezen"
+  },
+  "Choose a clear area of the background. Drag the clock to place it yourself.": {
+    "Choose a clear area of the background. Drag the clock to place it yourself.": ""
   },
   "Choose a power profile": {
     "Choose a power profile": "Kies een energieprofiel"
@@ -1310,17 +1412,11 @@
   "Class": {
     "Class": ""
   },
-  "Class regex": {
-    "Class regex": "Class-regex"
-  },
   "Class regex (e.g. ^firefox$)": {
     "Class regex (e.g. ^firefox$)": "Klasse-regex (bijv. ^firefox$)"
   },
   "Classes": {
     "Classes": ""
-  },
-  "Clear": {
-    "Clear": "Wissen"
   },
   "Clear All": {
     "Clear All": "Alles wissen"
@@ -1351,15 +1447,6 @@
   },
   "Click Import to add a .ovpn or .conf": {
     "Click Import to add a .ovpn or .conf": "Klik op Importeren om een .ovpn of .conf toe te voegen"
-  },
-  "Click Refresh to check status.": {
-    "Click Refresh to check status.": "Klik op Vernieuwen om de status te controleren."
-  },
-  "Click any shortcut to edit Aqueous configuration": {
-    "Click any shortcut to edit Aqueous configuration": ""
-  },
-  "Click any shortcut to edit. Changes save to %1": {
-    "Click any shortcut to edit. Changes save to %1": "Klik op een sneltoets om te bewerken. Wijzigingen worden opgeslagen in %1"
   },
   "Click method": {
     "Click method": ""
@@ -1421,11 +1508,11 @@
   "Clock, calendar, system info and profile": {
     "Clock, calendar, system info and profile": "Klok, agenda, systeeminformatie en profiel"
   },
-  "Clocks, system monitors, plugins": {
-    "Clocks, system monitors, plugins": ""
+  "Clock, weather, locale": {
+    "Clock, weather, locale": ""
   },
-  "Close": {
-    "Close": "Sluiten"
+  "Clocks, monitors, plugins": {
+    "Clocks, monitors, plugins": ""
   },
   "Close All Windows": {
     "Close All Windows": "Alle vensters sluiten"
@@ -1444,9 +1531,6 @@
   },
   "Collapse": {
     "Collapse": ""
-  },
-  "Color": {
-    "Color": "Kleur"
   },
   "Color %1 copied": {
     "Color %1 copied": "Kleur %1 gekopieerd"
@@ -1469,11 +1553,11 @@
   "Color gamut": {
     "Color gamut": ""
   },
-  "Color mode": {
-    "Color mode": ""
-  },
   "Color override": {
     "Color override": ""
+  },
+  "Color previews unavailable": {
+    "Color previews unavailable": ""
   },
   "Color space": {
     "Color space": ""
@@ -1583,14 +1667,8 @@
   "Configure a new printer": {
     "Configure a new printer": "Een nieuwe printer configureren"
   },
-  "Configure match criteria and actions": {
-    "Configure match criteria and actions": "Criteria en acties configureren"
-  },
   "Configure one in Settings → Dock → Trash.": {
     "Configure one in Settings → Dock → Trash.": "Stel er een in bij Instellingen → Dock → Prullenbak."
-  },
-  "Confirm": {
-    "Confirm": "Bevestigen"
   },
   "Confirm Delete": {
     "Confirm Delete": "Verwijderen bevestigen"
@@ -1631,9 +1709,6 @@
   "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": {
     "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": "Connected Frame Mode gebruikt de verbonden launcher voor standaard launcher-sneltoetsen."
   },
-  "Connected displays": {
-    "Connected displays": ""
-  },
   "Connected to %1": {
     "Connected to %1": "Verbonden met %1"
   },
@@ -1652,6 +1727,9 @@
   "Connections and autoconnect": {
     "Connections and autoconnect": ""
   },
+  "Container saturation": {
+    "Container saturation": ""
+  },
   "Contains": {
     "Contains": "Bevat"
   },
@@ -1667,9 +1745,6 @@
   "Control Center": {
     "Control Center": "Bedieningspaneel"
   },
-  "Control Center tile color": {
-    "Control Center tile color": ""
-  },
   "Control currently playing media": {
     "Control currently playing media": "Huidige media bedienen"
   },
@@ -1684,6 +1759,9 @@
   },
   "Copied!": {
     "Copied!": "Gekopieerd!"
+  },
+  "Copies the screenshot to the clipboard": {
+    "Copies the screenshot to the clipboard": ""
   },
   "Copy": {
     "Copy": "Kopiëren"
@@ -1712,6 +1790,9 @@
   "Corner style": {
     "Corner style": ""
   },
+  "Cosine": {
+    "Cosine": ""
+  },
   "Couldn't load hotspot password": {
     "Couldn't load hotspot password": "Kon hotspot-wachtwoord niet laden"
   },
@@ -1721,14 +1802,14 @@
   "Count only": {
     "Count only": ""
   },
+  "Counts time in the focused app while the session is active. Stays on this device.": {
+    "Counts time in the focused app while the session is active. Stays on this device.": ""
+  },
   "Cover Open": {
     "Cover Open": "Klep open"
   },
-  "Create": {
-    "Create": "Aanmaken"
-  },
-  "Create Window Rule": {
-    "Create Window Rule": "Vensterregel aanmaken"
+  "Cover art": {
+    "Cover art": ""
   },
   "Create a new %1 session (^N)": {
     "Create a new %1 session (^N)": "Maak een nieuwe %1-sessie (^N)"
@@ -1741,9 +1822,6 @@
   },
   "Create rule for:": {
     "Create rule for:": "Regel aanmaken voor:"
-  },
-  "Create user": {
-    "Create user": ""
   },
   "Creating...": {
     "Creating...": "Aanmaken..."
@@ -1774,21 +1852,6 @@
   },
   "Ctrl+%1 is used for password editing": {
     "Ctrl+%1 is used for password editing": "Ctrl+%1 wordt gebruikt voor het bewerken van wachtwoorden"
-  },
-  "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
-    "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A: Alles selecteren • Ctrl+P: Voorbeeld • Enter/Shift+Enter: Volgende/Vorige zoeken • Esc: Sluiten"
-  },
-  "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": {
-    "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": "Ctrl+S: Opslaan • Ctrl+O: Openen • Ctrl+N: Nieuw • Ctrl+F: Zoeken"
-  },
-  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
-    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab: Wissel tabblad • Ctrl+S: Vastzetten/losmaken • Shift+Del: Alles wissen • Esc: Sluiten"
-  },
-  "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": {
-    "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": "Ctrl+Tab: Wissel tabbladen • Ctrl+S: Vastpinnen/Losmaken • Shift+Enter: Kopiëren • Shift+Del: Alles wissen • F10: Help • Esc: Sluiten"
-  },
-  "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close": {
-    "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close": "Ctrl+Tab: Wissel tabbladen • Ctrl+S: Vastpinnen/Losmaken • Shift+Enter: Plakken • Shift+Del: Alles wissen • F10: Help • Esc: Sluiten"
   },
   "Current": {
     "Current": "Huidig"
@@ -1898,8 +1961,8 @@
   "DDC/CI monitor": {
     "DDC/CI monitor": "DDC/CI-monitor"
   },
-  "DEMO MODE - Click anywhere to exit": {
-    "DEMO MODE - Click anywhere to exit": "DEMOMODUS - Klik ergens om te sluiten"
+  "DMS %1 available": {
+    "DMS %1 available": ""
   },
   "DMS Settings": {
     "DMS Settings": "DMS-instellingen"
@@ -1909,6 +1972,9 @@
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "DMS-sneltoetsen"
+  },
+  "DMS and system updates": {
+    "DMS and system updates": ""
   },
   "DMS chooser": {
     "DMS chooser": ""
@@ -1943,8 +2009,14 @@
   "Daily": {
     "Daily": "Dagelijks"
   },
-  "Dank Island instance": {
-    "Dank Island instance": ""
+  "Daily limit": {
+    "Daily limit": ""
+  },
+  "Daily screen time limit reached": {
+    "Daily screen time limit reached": ""
+  },
+  "Dank": {
+    "Dank": ""
   },
   "DankBar": {
     "DankBar": "DankBar"
@@ -1991,6 +2063,9 @@
   "Date first": {
     "Date first": ""
   },
+  "Date format": {
+    "Date format": ""
+  },
   "Date, time & region": {
     "Date, time & region": ""
   },
@@ -2002,6 +2077,9 @@
   },
   "Dawn (Nautical Twilight)": {
     "Dawn (Nautical Twilight)": "Dageraad (Nautische schemering)"
+  },
+  "Day": {
+    "Day": ""
   },
   "Day date": {
     "Day date": ""
@@ -2017,9 +2095,6 @@
   },
   "Deck": {
     "Deck": "Deck"
-  },
-  "Decrease": {
-    "Decrease": ""
   },
   "Default": {
     "Default": "Standaard"
@@ -2039,6 +2114,9 @@
   "Default apps": {
     "Default apps": ""
   },
+  "Default leaves it to niri, which floats dialogs and fixed-size windows and tiles the rest": {
+    "Default leaves it to niri, which floats dialogs and fixed-size windows and tiles the rest": ""
+  },
   "Default selected action": {
     "Default selected action": "Standaard geselecteerde actie"
   },
@@ -2048,14 +2126,11 @@
   "Default width (%)": {
     "Default width (%)": ""
   },
-  "Defaults": {
-    "Defaults": "Standaardwaarden"
+  "Defaults, autostart, rules": {
+    "Defaults, autostart, rules": ""
   },
   "Define rules for window behavior. Saves to %1": {
     "Define rules for window behavior. Saves to %1": "Definieer regels voor venstergedrag. Wordt opgeslagen in %1"
-  },
-  "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
-    "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: Wissen • Shift+Del: Alles wissen • 1-9: Acties • F10: Hulp • Esc: Sluiten"
   },
   "Delete": {
     "Delete": "Verwijderen"
@@ -2093,6 +2168,9 @@
   "Delete user": {
     "Delete user": "Gebruiker verwijderen"
   },
+  "Deletes all stored screen time": {
+    "Deletes all stored screen time": ""
+  },
   "Dependencies & documentation": {
     "Dependencies & documentation": "Afhankelijkheden & documentatie"
   },
@@ -2108,9 +2186,6 @@
   "Description": {
     "Description": "Beschrijving"
   },
-  "Desktop Clock": {
-    "Desktop Clock": "Bureaubladklok"
-  },
   "Desktop Entry": {
     "Desktop Entry": "Desktop-item"
   },
@@ -2125,9 +2200,6 @@
   },
   "Details for \"%1": {
     "Details for \"%1\"": "Details voor \"%1\""
-  },
-  "Detected backends: %1": {
-    "Detected backends: %1": "Gedetecteerde backends: %1"
   },
   "Device": {
     "Device": "Apparaat"
@@ -2152,6 +2224,9 @@
   },
   "Digital": {
     "Digital": "Digitaal"
+  },
+  "Digital wellbeing": {
+    "Digital wellbeing": ""
   },
   "Dim": {
     "Dim": ""
@@ -2342,6 +2417,9 @@
   "Docs": {
     "Docs": "Documentatie"
   },
+  "Documents": {
+    "Documents": "Documenten"
+  },
   "Domain (optional)": {
     "Domain (optional)": "Domein (optioneel)"
   },
@@ -2359,6 +2437,9 @@
   },
   "Dot": {
     "Dot": ""
+  },
+  "Dots": {
+    "Dots": ""
   },
   "Down": {
     "Down": ""
@@ -2378,9 +2459,6 @@
   "Drag to move, click to open activities": {
     "Drag to move, click to open activities": ""
   },
-  "Drag to reorder": {
-    "Drag to reorder": ""
-  },
   "Dragged displays line up with neighboring edges without overlapping": {
     "Dragged displays line up with neighboring edges without overlapping": ""
   },
@@ -2398,6 +2476,12 @@
   },
   "Drops bar gaps and rounding while a window is maximized": {
     "Drops bar gaps and rounding while a window is maximized": ""
+  },
+  "Dune": {
+    "Dune": ""
+  },
+  "Duo": {
+    "Duo": ""
   },
   "Duplicate": {
     "Duplicate": "Dupliceren"
@@ -2435,6 +2519,9 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "Dynamische kleuren, voorinstellingen"
   },
+  "Dynamic theme is off": {
+    "Dynamic theme is off": ""
+  },
   "Dynamic width": {
     "Dynamic width": ""
   },
@@ -2455,9 +2542,6 @@
   },
   "Edge to edge": {
     "Edge to edge": ""
-  },
-  "Edit": {
-    "Edit": "Bewerken"
   },
   "Edit App": {
     "Edit App": "App bewerken"
@@ -2483,8 +2567,23 @@
   "Edit rule": {
     "Edit rule": ""
   },
+  "Edit shortcut": {
+    "Edit shortcut": ""
+  },
   "Edit widgets": {
     "Edit widgets": ""
+  },
+  "Editing the lock screen": {
+    "Editing the lock screen": ""
+  },
+  "Editing the lock screen, the login screen follows it": {
+    "Editing the lock screen, the login screen follows it": ""
+  },
+  "Editing the login screen": {
+    "Editing the login screen": ""
+  },
+  "Editing the login screen, shared with the lock screen": {
+    "Editing the login screen, shared with the lock screen": ""
   },
   "Education": {
     "Education": "Onderwijs"
@@ -2615,6 +2714,9 @@
   "Every %1": {
     "Every %1": ""
   },
+  "Every check": {
+    "Every check": ""
+  },
   "Every edge of this display is already taken": {
     "Every edge of this display is already taken": ""
   },
@@ -2623,6 +2725,9 @@
   },
   "Exact": {
     "Exact": "Exact"
+  },
+  "Excluded apps": {
+    "Excluded apps": ""
   },
   "Excluded players": {
     "Excluded players": ""
@@ -2879,6 +2984,9 @@
   "Failed to set brightness": {
     "Failed to set brightness": "Instellen van helderheid mislukt"
   },
+  "Failed to set next boot entry": {
+    "Failed to set next boot entry": ""
+  },
   "Failed to set night mode location": {
     "Failed to set night mode location": "Instellen van nachtmodus-locatie mislukt"
   },
@@ -2948,9 +3056,6 @@
   "Family": {
     "Family": ""
   },
-  "Family, weight, scale, animation speed": {
-    "Family, weight, scale, animation speed": ""
-  },
   "Features": {
     "Features": "Functies"
   },
@@ -2962,9 +3067,6 @@
   },
   "Field": {
     "Field": "Veld"
-  },
-  "File": {
-    "File": "Bestand"
   },
   "File changed on disk": {
     "File changed on disk": "Bestand gewijzigd op schijf"
@@ -3005,6 +3107,9 @@
   "Find in note...": {
     "Find in note...": "Zoeken in notitie..."
   },
+  "Fine-tune the seed around the color wheel": {
+    "Fine-tune the seed around the color wheel": ""
+  },
   "Fingerprint": {
     "Fingerprint": ""
   },
@@ -3043,9 +3148,6 @@
   },
   "Fixed": {
     "Fixed": ""
-  },
-  "Flags": {
-    "Flags": "Vlaggen"
   },
   "Flat": {
     "Flat": "Vlak"
@@ -3128,9 +3230,6 @@
   "Fog": {
     "Fog": "Mist"
   },
-  "Folder": {
-    "Folder": "Map"
-  },
   "Folder, interval, daily time": {
     "Folder, interval, daily time": ""
   },
@@ -3146,11 +3245,17 @@
   "Follow focus": {
     "Follow focus": "Focus volgen"
   },
+  "Follow lock screen": {
+    "Follow lock screen": ""
+  },
   "Follow mouse": {
     "Follow mouse": ""
   },
   "Follow playback": {
     "Follow playback": ""
+  },
+  "Follows the theme radius strength until overridden": {
+    "Follows the theme radius strength until overridden": ""
   },
   "Font": {
     "Font": "Lettertype"
@@ -3166,6 +3271,9 @@
   },
   "Fonts & motion": {
     "Fonts & motion": ""
+  },
+  "Fonts, scale, animations": {
+    "Fonts, scale, animations": ""
   },
   "For %1": {
     "For %1": ""
@@ -3233,9 +3341,6 @@
   "Frame Blur follows Background Blur in Theme & Colors": {
     "Frame Blur follows Background Blur in Theme & Colors": "Framevervaging volgt Achtergrondvervaging in Thema & Kleuren"
   },
-  "Frame Border Color": {
-    "Frame Border Color": "Kleur van framerand"
-  },
   "Frame xray": {
     "Frame xray": ""
   },
@@ -3277,6 +3382,9 @@
   },
   "Fullscreen single column": {
     "Fullscreen single column": ""
+  },
+  "Fullscreen windows": {
+    "Fullscreen windows": ""
   },
   "Fully Charged": {
     "Fully Charged": "Volledig opgeladen"
@@ -3332,6 +3440,12 @@
   "Gaps, window borders, corner radius": {
     "Gaps, window borders, corner radius": ""
   },
+  "Garden": {
+    "Garden": ""
+  },
+  "Gaussian": {
+    "Gaussian": ""
+  },
   "General": {
     "General": "Algemeen"
   },
@@ -3352,6 +3466,9 @@
   },
   "Get Started": {
     "Get Started": "Aan de slag"
+  },
+  "Git": {
+    "Git": ""
   },
   "Global fonts can be configured in Settings → Personalization": {
     "Global fonts can be configured in Settings → Personalization": "Globale lettertypen kunnen worden geconfigureerd in Instellingen → Personalisatie"
@@ -3385,6 +3502,9 @@
   },
   "Graphics": {
     "Graphics": "Grafisch"
+  },
+  "Green": {
+    "Green": ""
   },
   "Greeter": {
     "Greeter": "Greeter"
@@ -3485,6 +3605,9 @@
   "Hidden icons expand in place instead of in a popup": {
     "Hidden icons expand in place instead of in a popup": ""
   },
+  "Hidden until screen time tracking is enabled": {
+    "Hidden until screen time tracking is enabled": ""
+  },
   "Hidden until weather is enabled": {
     "Hidden until weather is enabled": "Verborgen totdat weer is ingeschakeld"
   },
@@ -3509,8 +3632,8 @@
   "Hide installed": {
     "Hide installed": "Geïnstalleerde verbergen"
   },
-  "Hide password": {
-    "Hide password": ""
+  "Hide until typing": {
+    "Hide until typing": ""
   },
   "Hide when no updates": {
     "Hide when no updates": ""
@@ -3565,9 +3688,6 @@
   },
   "Home compact": {
     "Home compact": ""
-  },
-  "Home layout, notifications, satellites": {
-    "Home layout, notifications, satellites": ""
   },
   "Horizontal": {
     "Horizontal": ""
@@ -3767,6 +3887,9 @@
   "Include transitions": {
     "Include transitions": ""
   },
+  "Includes the mouse pointer": {
+    "Includes the mouse pointer": ""
+  },
   "Incompatible plugins loaded": {
     "Incompatible plugins loaded": ""
   },
@@ -3775,9 +3898,6 @@
   },
   "Incorrect password - try again": {
     "Incorrect password - try again": "Onjuist wachtwoord - probeer het opnieuw"
-  },
-  "Increase": {
-    "Increase": ""
   },
   "Index centering": {
     "Index centering": ""
@@ -3793,9 +3913,6 @@
   },
   "Individual Batteries": {
     "Individual Batteries": "Individuele batterijen"
-  },
-  "Individual bar configuration": {
-    "Individual bar configuration": "Individuele balkconfiguratie"
   },
   "Info": {
     "Info": "Info"
@@ -3869,6 +3986,9 @@
   "Install plugin '%1' from the DMS registry?": {
     "Install plugin '%1' from the DMS registry?": "Plug-in '%1' installeren uit het DMS-register?"
   },
+  "Install system updates?": {
+    "Install system updates?": ""
+  },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "Thema '%1' installeren uit het DMS-register?"
   },
@@ -3877,6 +3997,9 @@
   },
   "Installed": {
     "Installed": "Geïnstalleerd"
+  },
+  "Installed %1, still running %2": {
+    "Installed %1, still running %2": ""
   },
   "Installed first": {
     "Installed first": "Geïnstalleerde eerst"
@@ -3920,8 +4043,8 @@
   "Invalid configuration": {
     "Invalid configuration": "Ongeldige configuratie"
   },
-  "Invalid package name — letters, digits and @._+:- only.": {
-    "Invalid package name — letters, digits and @._+:- only.": "Ongeldige pakketnaam — alleen letters, cijfers en @._+:- toegestaan."
+  "Invalid package name — letters, digits and @._+:/- only.": {
+    "Invalid package name — letters, digits and @._+:/- only.": ""
   },
   "Invalid username": {
     "Invalid username": "Ongeldige gebruikersnaam"
@@ -3934,6 +4057,9 @@
   },
   "Isolate displays": {
     "Isolate displays": ""
+  },
+  "Italic": {
+    "Italic": ""
   },
   "JSON output path": {
     "JSON output path": ""
@@ -3971,6 +4097,9 @@
   "Keeps the widget above windows instead of below them": {
     "Keeps the widget above windows instead of below them": ""
   },
+  "Kept for %1 days on this device": {
+    "Kept for %1 days on this device": ""
+  },
   "Kernel": {
     "Kernel": "Kernel"
   },
@@ -3998,9 +4127,6 @@
   "Keymap file": {
     "Keymap file": ""
   },
-  "Keys": {
-    "Keys": "Toetsen"
-  },
   "Kill": {
     "Kill": "Beëindigen"
   },
@@ -4012,9 +4138,6 @@
   },
   "LED device": {
     "LED device": "LED-apparaat"
-  },
-  "LRCLIB": {
-    "LRCLIB": ""
   },
   "LabWC IRC channel": {
     "LabWC IRC channel": ""
@@ -4039,6 +4162,9 @@
   },
   "Largest": {
     "Largest": "Grootst"
+  },
+  "Last commit %1": {
+    "Last commit %1": ""
   },
   "Last hour": {
     "Last hour": "Afgelopen uur"
@@ -4121,6 +4247,9 @@
   "Layout, position, appearance": {
     "Layout, position, appearance": ""
   },
+  "Layout, scale, night mode": {
+    "Layout, scale, night mode": ""
+  },
   "Layouts": {
     "Layouts": ""
   },
@@ -4187,6 +4316,9 @@
   "Lightest": {
     "Lightest": ""
   },
+  "Limit": {
+    "Limit": ""
+  },
   "Limit set to %1%": {
     "Limit set to %1%": "Limiet ingesteld op %1%"
   },
@@ -4202,6 +4334,18 @@
   "Lines: %1": {
     "Lines: %1": "Regels: %1"
   },
+  "Link your DMS settings so the login screen follows them.": {
+    "Link your DMS settings so the login screen follows them.": ""
+  },
+  "Link your DMS settings so the login screen follows them. Administrator access is required.": {
+    "Link your DMS settings so the login screen follows them. Administrator access is required.": ""
+  },
+  "Linked": {
+    "Linked": ""
+  },
+  "Linked as a snapshot": {
+    "Linked as a snapshot": ""
+  },
   "List": {
     "List": "Lijst"
   },
@@ -4210,6 +4354,9 @@
   },
   "Lists workspaces from whichever display has focus": {
     "Lists workspaces from whichever display has focus": ""
+  },
+  "Live activities that grow out of the bar": {
+    "Live activities that grow out of the bar": ""
   },
   "Lively palette with saturated accents.": {
     "Lively palette with saturated accents.": "Levendig palet met verzadigde accenten."
@@ -4240,9 +4387,6 @@
   },
   "Locale": {
     "Locale": "Locale"
-  },
-  "Location": {
-    "Location": "Locatie"
   },
   "Location search": {
     "Location search": ""
@@ -4280,6 +4424,12 @@
   "Login screen appearance and authentication": {
     "Login screen appearance and authentication": ""
   },
+  "Login screen unlinked.": {
+    "Login screen unlinked.": ""
+  },
+  "Long": {
+    "Long": ""
+  },
   "Long Text": {
     "Long Text": "Lange tekst"
   },
@@ -4313,11 +4463,11 @@
   "Lyrics providers": {
     "Lyrics providers": ""
   },
-  "LyricsPlus": {
-    "LyricsPlus": ""
-  },
   "MIT License": {
     "MIT License": "MIT-licentie"
+  },
+  "Magnification": {
+    "Magnification": ""
   },
   "Mail": {
     "Mail": "E-mail"
@@ -4328,11 +4478,11 @@
   "Manage Registries": {
     "Manage Registries": ""
   },
-  "Managed by Frame": {
-    "Managed by Frame": "Beheerd door Frame"
-  },
   "Managed by Frame in Connected Mode": {
     "Managed by Frame in Connected Mode": "Beheerd door Frame in Verbonden Modus"
+  },
+  "Managed by Nix": {
+    "Managed by Nix": ""
   },
   "Managed by the primary PAM source": {
     "Managed by the primary PAM source": "Beheerd door de primaire PAM-bron"
@@ -4388,6 +4538,9 @@
   "Master": {
     "Master": ""
   },
+  "Master branch": {
+    "Master branch": ""
+  },
   "Master position": {
     "Master position": ""
   },
@@ -4403,8 +4556,17 @@
   "Match Criteria": {
     "Match Criteria": "Overeenkomstcriteria"
   },
+  "Match corner style": {
+    "Match corner style": ""
+  },
+  "Match type": {
+    "Match type": ""
+  },
   "Matches player identity or desktop file name, case-insensitive": {
     "Matches player identity or desktop file name, case-insensitive": ""
+  },
+  "Material": {
+    "Material": ""
   },
   "Material Design inspired color themes": {
     "Material Design inspired color themes": "Op Material Design geïnspireerde kleurthema's"
@@ -4453,9 +4615,6 @@
   },
   "Max volume": {
     "Max volume": ""
-  },
-  "Maximize": {
-    "Maximize": "Maximaliseren"
   },
   "Maximize detection": {
     "Maximize detection": ""
@@ -4556,11 +4715,11 @@
   "Min W": {
     "Min W": "Min. B"
   },
+  "Minimal": {
+    "Minimal": ""
+  },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "Minimalistisch palet gebaseerd op één enkele tint."
-  },
-  "Minimize": {
-    "Minimize": ""
   },
   "Minimum workspaces": {
     "Minimum workspaces": ""
@@ -4570,6 +4729,9 @@
   },
   "Missing Environment Variables": {
     "Missing Environment Variables": "Ontbrekende omgevingsvariabelen"
+  },
+  "Mix all stereo content into a single channel": {
+    "Mix all stereo content into a single channel": ""
   },
   "Mixed": {
     "Mixed": ""
@@ -4595,6 +4757,9 @@
   "Monitor": {
     "Monitor": "Monitor"
   },
+  "Mono Audio": {
+    "Mono Audio": ""
+  },
   "Monochrome": {
     "Monochrome": "Monochroom"
   },
@@ -4603,6 +4768,9 @@
   },
   "Monospace family": {
     "Monospace family": ""
+  },
+  "Month": {
+    "Month": ""
   },
   "Month date": {
     "Month date": ""
@@ -4619,6 +4787,9 @@
   "More": {
     "More": ""
   },
+  "More widgets": {
+    "More widgets": ""
+  },
   "Morning": {
     "Morning": "Ochtend"
   },
@@ -4627,6 +4798,12 @@
   },
   "Most Vivid": {
     "Most Vivid": ""
+  },
+  "Most used apps": {
+    "Most used apps": ""
+  },
+  "Motion": {
+    "Motion": ""
   },
   "Mount": {
     "Mount": ""
@@ -4640,14 +4817,14 @@
   "Mouse & touchpad": {
     "Mouse & touchpad": ""
   },
-  "Move": {
-    "Move": ""
-  },
-  "Move down": {
-    "Move down": ""
-  },
   "Move out of scratchpad": {
     "Move out of scratchpad": ""
+  },
+  "Move row to footer": {
+    "Move row to footer": ""
+  },
+  "Move row to header": {
+    "Move row to header": ""
   },
   "Move to scratchpad": {
     "Move to scratchpad": ""
@@ -4655,8 +4832,8 @@
   "Move to scratchpad: %1": {
     "Move to scratchpad: %1": ""
   },
-  "Move up": {
-    "Move up": ""
+  "Moves focus along with the column": {
+    "Moves focus along with the column": ""
   },
   "Moving to Paused": {
     "Moving to Paused": "Overschakelen naar gepauzeerd"
@@ -4772,9 +4949,6 @@
   "New": {
     "New": "Nieuw"
   },
-  "New Keybind": {
-    "New Keybind": "Nieuwe sneltoets"
-  },
   "New Session": {
     "New Session": "Nieuwe sessie"
   },
@@ -4798,9 +4972,6 @@
   },
   "New profile": {
     "New profile": ""
-  },
-  "New shortcut": {
-    "New shortcut": ""
   },
   "New tab": {
     "New tab": ""
@@ -4828,6 +4999,9 @@
   },
   "Night mode & gamma": {
     "Night mode & gamma": "Nachtmodus & gamma"
+  },
+  "Night mode exceptions": {
+    "Night mode exceptions": ""
   },
   "Night mode failed: DMS gamma control not available": {
     "Night mode failed: DMS gamma control not available": "Nachtmodus mislukt: DMS-gammabeheer niet beschikbaar"
@@ -4889,6 +5063,9 @@
   "No app customizations.": {
     "No app customizations.": "Geen app-aanpassingen."
   },
+  "No app limits": {
+    "No app limits": ""
+  },
   "No application selected": {
     "No application selected": "Geen applicatie geselecteerd"
   },
@@ -4915,9 +5092,6 @@
   },
   "No brightness devices available": {
     "No brightness devices available": "Geen helderheidsapparaten beschikbaar"
-  },
-  "No changes": {
-    "No changes": "Geen wijzigingen"
   },
   "No checks passed": {
     "No checks passed": "Geen controles geslaagd"
@@ -4957,6 +5131,9 @@
   },
   "No errors": {
     "No errors": "Geen fouten"
+  },
+  "No excluded apps configured": {
+    "No excluded apps configured": ""
   },
   "No excluded players configured": {
     "No excluded players configured": "Geen uitgesloten spelers geconfigureerd"
@@ -5177,6 +5354,9 @@
   "Normal routing": {
     "Normal routing": ""
   },
+  "Not active": {
+    "Not active": ""
+  },
   "Not available": {
     "Not available": "Niet beschikbaar"
   },
@@ -5201,6 +5381,12 @@
   "Not detected": {
     "Not detected": "Niet gedetecteerd"
   },
+  "Not installed": {
+    "Not installed": ""
+  },
+  "Not linked": {
+    "Not linked": ""
+  },
   "Not set": {
     "Not set": "Niet ingesteld"
   },
@@ -5219,8 +5405,8 @@
   "Nothing": {
     "Nothing": "Niets"
   },
-  "Nothing to see here": {
-    "Nothing to see here": "Hier is niets te zien"
+  "Nothing tracked yet": {
+    "Nothing tracked yet": ""
   },
   "Notification": {
     "Notification": "Melding"
@@ -5234,8 +5420,23 @@
   "Notification popups": {
     "Notification popups": ""
   },
+  "Notification rules": {
+    "Notification rules": ""
+  },
   "Notifications": {
     "Notifications": "Meldingen"
+  },
+  "Notifies when today's screen time passes the limit": {
+    "Notifies when today's screen time passes the limit": ""
+  },
+  "Notifies when today's use of this app passes the limit": {
+    "Notifies when today's use of this app passes the limit": ""
+  },
+  "Notify at most": {
+    "Notify at most": ""
+  },
+  "Notify me on new updates": {
+    "Notify me on new updates": ""
   },
   "Notify when limit is reached": {
     "Notify when limit is reached": "Melden wanneer limiet is bereikt"
@@ -5251,9 +5452,6 @@
   },
   "Numeric (M/D)": {
     "Numeric (M/D)": "Numeriek (M/D)"
-  },
-  "OK": {
-    "OK": "OK"
   },
   "OS Logo": {
     "OS Logo": "OS-logo"
@@ -5300,6 +5498,9 @@
   "Once a day": {
     "Once a day": "Eenmaal per dag"
   },
+  "Once a week": {
+    "Once a week": ""
+  },
   "Online": {
     "Online": "Online"
   },
@@ -5312,23 +5513,14 @@
   "Opacity": {
     "Opacity": "Dekking"
   },
-  "Opacity, borders, blur, shadows, corners": {
-    "Opacity, borders, blur, shadows, corners": ""
-  },
   "Opaque": {
     "Opaque": "Ondoorzichtig"
-  },
-  "Open": {
-    "Open": "Openen"
   },
   "Open Frame": {
     "Open Frame": "Frame openen"
   },
   "Open From": {
     "Open From": "Openen vanuit"
-  },
-  "Open Island": {
-    "Open Island": ""
   },
   "Open Notepad File": {
     "Open Notepad File": "Kladblok-bestand openen"
@@ -5351,11 +5543,11 @@
   "Open folder": {
     "Open folder": "Map openen"
   },
-  "Open in Browser": {
-    "Open in Browser": "Openen in browser"
-  },
   "Open in terminal": {
     "Open in terminal": "Openen in terminal"
+  },
+  "Open in the Island": {
+    "Open in the Island": ""
   },
   "Open large file?": {
     "Open large file?": ""
@@ -5378,6 +5570,12 @@
   "Opens": {
     "Opens": ""
   },
+  "Opens %1": {
+    "Opens %1": ""
+  },
+  "Opens a floating window with the live output": {
+    "Opens a floating window with the live output": ""
+  },
   "Optional description": {
     "Optional description": "Optionele beschrijving"
   },
@@ -5395,6 +5593,15 @@
   },
   "Options of one widget instance": {
     "Options of one widget instance": ""
+  },
+  "Orange": {
+    "Orange": ""
+  },
+  "Orbit": {
+    "Orbit": ""
+  },
+  "Order": {
+    "Order": ""
   },
   "Orientation": {
     "Orientation": ""
@@ -5450,6 +5657,12 @@
   "Overflow": {
     "Overflow": "Overloop"
   },
+  "Overflow button position": {
+    "Overflow button position": ""
+  },
+  "Overlapping": {
+    "Overlapping": ""
+  },
   "Overlay": {
     "Overlay": "Overlay"
   },
@@ -5489,9 +5702,6 @@
   "PIN": {
     "PIN": "PIN"
   },
-  "PM": {
-    "PM": ""
-  },
   "Package name (e.g., docker)": {
     "Package name (e.g., docker)": "Pakketnaam (bijv. docker)"
   },
@@ -5525,6 +5735,9 @@
   "Palette name": {
     "Palette name": ""
   },
+  "Palette style": {
+    "Palette style": ""
+  },
   "Panel height (rows)": {
     "Panel height (rows)": ""
   },
@@ -5533,6 +5746,9 @@
   },
   "Panel width (columns)": {
     "Panel width (columns)": ""
+  },
+  "Parabolic": {
+    "Parabolic": ""
   },
   "Partially synchronized": {
     "Partially synchronized": ""
@@ -5551,6 +5767,9 @@
   },
   "Password change failed (exit %1)": {
     "Password change failed (exit %1)": "Wachtwoord wijzigen mislukt (exit %1)"
+  },
+  "Password field": {
+    "Password field": ""
   },
   "Password must be 8 to 63 characters, or a 64-digit hex key.": {
     "Password must be 8 to 63 characters, or a 64-digit hex key.": ""
@@ -5582,6 +5801,15 @@
   "Pause": {
     "Pause": "Pauzeren"
   },
+  "Pause checks on battery": {
+    "Pause checks on battery": ""
+  },
+  "Pause night mode while a fullscreen window has focus": {
+    "Pause night mode while a fullscreen window has focus": ""
+  },
+  "Pause night mode while one of these apps has focus": {
+    "Pause night mode while one of these apps has focus": ""
+  },
   "Paused": {
     "Paused": "Gepauzeerd"
   },
@@ -5612,17 +5840,26 @@
   "Permission denied to set profile image.": {
     "Permission denied to set profile image.": "Toegang geweigerd om profielafbeelding in te stellen."
   },
+  "Petal": {
+    "Petal": ""
+  },
   "Pick Color": {
     "Pick Color": ""
   },
   "Pick a different file manager in Settings → Dock → Trash.": {
     "Pick a different file manager in Settings → Dock → Trash.": "Kies een andere bestandsbeheerder in Instellingen → Dock → Prullenbak."
   },
+  "Pick an app from the list above or the dashboard tab": {
+    "Pick an app from the list above or the dashboard tab": ""
+  },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": "Kies hoe lang meldingen moeten worden gepauzeerd"
   },
   "Pick how long to stay awake": {
     "Pick how long to stay awake": ""
+  },
+  "Pill": {
+    "Pill": ""
   },
   "Pills": {
     "Pills": ""
@@ -5632,6 +5869,9 @@
   },
   "Pin to Dock": {
     "Pin to Dock": "Aan dock vastmaken"
+  },
+  "Pink": {
+    "Pink": ""
   },
   "Pinned": {
     "Pinned": "Vastgemaakt"
@@ -5689,6 +5929,9 @@
   },
   "Plugin": {
     "Plugin": "Plug-in"
+  },
+  "Plugin Source Code": {
+    "Plugin Source Code": ""
   },
   "Plugin dependency missing": {
     "Plugin dependency missing": "Plugin-afhankelijkheid ontbreekt"
@@ -5780,14 +6023,14 @@
   "Position": {
     "Position": "Positie"
   },
-  "Position, appearance, island": {
-    "Position, appearance, island": ""
-  },
   "Position, displays, auto-hide, behavior": {
     "Position, displays, auto-hide, behavior": ""
   },
   "Position, pinned apps": {
     "Position, pinned apps": "Positie, vastgemaakte apps"
+  },
+  "Position, pinned apps, trash": {
+    "Position, pinned apps, trash": ""
   },
   "Possible override conflicts": {
     "Possible override conflicts": ""
@@ -5831,11 +6074,17 @@
   "Power source": {
     "Power source": "Voedingsbron"
   },
+  "Pre-release": {
+    "Pre-release": ""
+  },
   "Precipitation": {
     "Precipitation": "Neerslag"
   },
   "Preference": {
     "Preference": "Voorkeur"
+  },
+  "Presentation": {
+    "Presentation": ""
   },
   "Preserve split": {
     "Preserve split": ""
@@ -5843,8 +6092,8 @@
   "Preset widths (%)": {
     "Preset widths (%)": ""
   },
-  "Presets": {
-    "Presets": ""
+  "Press Apply changes to update the login screen": {
+    "Press Apply changes to update the login screen": ""
   },
   "Press Ctrl+N or click 'New Session' to create one": {
     "Press Ctrl+N or click 'New Session' to create one": "Druk op Ctrl+N of klik op 'Nieuwe sessie' om er een aan te maken"
@@ -5954,6 +6203,9 @@
   "Profile error": {
     "Profile error": "Profiel-fout"
   },
+  "Profile image": {
+    "Profile image": ""
+  },
   "Profile image is too large. Please use a smaller image.": {
     "Profile image is too large. Please use a smaller image.": "Profielafbeelding is te groot. Gebruik een kleinere afbeelding."
   },
@@ -5975,6 +6227,9 @@
   "Profile saved: %1": {
     "Profile saved: %1": "Profiel opgeslagen: %1"
   },
+  "Profile sync failed.": {
+    "Profile sync failed.": ""
+  },
   "Profiles": {
     "Profiles": ""
   },
@@ -5983,6 +6238,15 @@
   },
   "Protocol": {
     "Protocol": "Protocol"
+  },
+  "Pulse animation": {
+    "Pulse animation": ""
+  },
+  "Purple": {
+    "Purple": ""
+  },
+  "Push neighboring icons": {
+    "Push neighboring icons": ""
   },
   "QR Generator": {
     "QR Generator": "QR-generator"
@@ -6032,14 +6296,17 @@
   "Rate": {
     "Rate": "Snelheid"
   },
+  "Re-applies the greetd command, permissions and PAM authentication. Needs administrator access.": {
+    "Re-applies the greetd command, permissions and PAM authentication. Needs administrator access.": ""
+  },
   "Re-enter the password before saving.": {
     "Re-enter the password before saving.": "Voer het wachtwoord opnieuw in voor het opslaan."
   },
   "Reach local network devices while using an exit node": {
     "Reach local network devices while using an exit node": "Toegang tot lokale netwerkapparaten bij gebruik van een exit-node"
   },
-  "Read-only legacy config": {
-    "Read-only legacy config": "Alleen-lezen legacy-config"
+  "Read the blog post": {
+    "Read the blog post": ""
   },
   "Read:": {
     "Read:": "Lezen:"
@@ -6049,6 +6316,15 @@
   },
   "Reason": {
     "Reason": "Reden"
+  },
+  "Reboot recommended": {
+    "Reboot recommended": ""
+  },
+  "Reboot to %1": {
+    "Reboot to %1": ""
+  },
+  "Reboot to another OS": {
+    "Reboot to another OS": ""
   },
   "Recent": {
     "Recent": "Recent"
@@ -6065,11 +6341,11 @@
   "Record": {
     "Record": ""
   },
+  "Red": {
+    "Red": ""
+  },
   "Reduce motion": {
     "Reduce motion": ""
-  },
-  "Refresh": {
-    "Refresh": "Verversen"
   },
   "Refresh Weather": {
     "Refresh Weather": "Weer verversen"
@@ -6094,6 +6370,12 @@
   },
   "Release": {
     "Release": "Loslaten"
+  },
+  "Release notes": {
+    "Release notes": ""
+  },
+  "Release notes are unavailable": {
+    "Release notes are unavailable": ""
   },
   "Release to confirm": {
     "Release to confirm": "Loslaten om te bevestigen"
@@ -6152,6 +6434,9 @@
   "Remove match": {
     "Remove match": "Match verwijderen"
   },
+  "Remove override": {
+    "Remove override": ""
+  },
   "Remove the shortcut %1?": {
     "Remove the shortcut %1?": "De sneltoets %1 verwijderen?"
   },
@@ -6163,9 +6448,6 @@
   },
   "Removed greeter login access": {
     "Removed greeter login access": "Greeter-login-toegang ontnomen"
-  },
-  "Rename": {
-    "Rename": "Hernoemen"
   },
   "Rename Session": {
     "Rename Session": "Sessie hernoemen"
@@ -6190,6 +6472,9 @@
   },
   "Repeat rate": {
     "Repeat rate": ""
+  },
+  "Repeats while the key is held": {
+    "Repeats while the key is held": ""
   },
   "Replace a displayed layout label with custom text, e.g. \"am-phonetic-alt\" → \"am": {
     "Replace a displayed layout label with custom text, e.g. \"am-phonetic-alt\" → \"am\"": ""
@@ -6251,9 +6536,6 @@
   "Reset to default": {
     "Reset to default": "Terugzetten naar standaard"
   },
-  "Resize": {
-    "Resize": ""
-  },
   "Resize on border": {
     "Resize on border": ""
   },
@@ -6268,9 +6550,6 @@
   },
   "Restarting audio system...": {
     "Restarting audio system...": "Audiosysteem herstarten..."
-  },
-  "Restore": {
-    "Restore": ""
   },
   "Restore special workspace": {
     "Restore special workspace": ""
@@ -6314,12 +6593,6 @@
   "Right-click an app in the launcher and choose 'Hide App'": {
     "Right-click an app in the launcher and choose 'Hide App'": ""
   },
-  "Right-click and drag anywhere on the widget": {
-    "Right-click and drag anywhere on the widget": "Rechtsklikken en slepen ergens op de widget"
-  },
-  "Right-click and drag the bottom-right corner": {
-    "Right-click and drag the bottom-right corner": "Rechtsklikken en slepen aan de rechteronderhoek"
-  },
   "Right-click bar widget to cycle": {
     "Right-click bar widget to cycle": "Klik rechts op de widget in de balk om te wisselen"
   },
@@ -6337,6 +6610,9 @@
   },
   "Rounded": {
     "Rounded": ""
+  },
+  "Roundness": {
+    "Roundness": ""
   },
   "Route Bluetooth headset controls to the active DMS media player": {
     "Route Bluetooth headset controls to the active DMS media player": ""
@@ -6380,6 +6656,9 @@
   "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": {
     "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": ""
   },
+  "Run full sync": {
+    "Run full sync": ""
+  },
   "Run user templates": {
     "Run user templates": ""
   },
@@ -6394,6 +6673,9 @@
   },
   "Running in terminal": {
     "Running in terminal": "Wordt uitgevoerd in terminal"
+  },
+  "Runs in a terminal.": {
+    "Runs in a terminal.": ""
   },
   "S": {
     "S": ""
@@ -6488,6 +6770,15 @@
   "Screen sharing": {
     "Screen sharing": "Schermdelen"
   },
+  "Screen time": {
+    "Screen time": ""
+  },
+  "Screen time and app limits": {
+    "Screen time and app limits": ""
+  },
+  "Screen time history": {
+    "Screen time history": ""
+  },
   "Screenshot unavailable": {
     "Screenshot unavailable": "Schermafdruk niet beschikbaar"
   },
@@ -6511,6 +6802,9 @@
   },
   "Scroll wheel": {
     "Scroll wheel": ""
+  },
+  "Scrollbars": {
+    "Scrollbars": ""
   },
   "Scrolling": {
     "Scrolling": "Scrollen"
@@ -6641,9 +6935,6 @@
   "Select an image file...": {
     "Select an image file...": "Selecteer een afbeeldingsbestand..."
   },
-  "Select background image": {
-    "Select background image": "Achtergrondafbeelding selecteren"
-  },
   "Select device": {
     "Select device": "Selecteer apparaat"
   },
@@ -6692,6 +6983,9 @@
   "Server": {
     "Server": "Server"
   },
+  "Session": {
+    "Session": ""
+  },
   "Session filter": {
     "Session filter": ""
   },
@@ -6707,20 +7001,20 @@
   "Set custom names for your audio output devices": {
     "Set custom names for your audio output devices": "Stel aangepaste namen in voor uw audio-uitvoerapparaten"
   },
-  "Set key and action to save": {
-    "Set key and action to save": "Stel toets en actie in om op te slaan"
+  "Set limit": {
+    "Set limit": ""
   },
   "Set notification rules": {
     "Set notification rules": "Meldingsregels instellen"
   },
+  "Set under Theme & colors, Derived color": {
+    "Set under Theme & colors, Derived color": ""
+  },
+  "Set up": {
+    "Set up": ""
+  },
   "Set up a Wi-Fi hotspot for sharing this connection.": {
     "Set up a Wi-Fi hotspot for sharing this connection.": ""
-  },
-  "Set up hotspot": {
-    "Set up hotspot": "Hotspot instellen"
-  },
-  "Set up hotspot in Settings": {
-    "Set up hotspot in Settings": "Hotspot instellen in Instellingen"
   },
   "Setting": {
     "Setting": "Instelling"
@@ -6746,6 +7040,9 @@
   "Shadows": {
     "Shadows": "Schaduwen"
   },
+  "Shapes use the %1 theme's colors": {
+    "Shapes use the %1 theme's colors": ""
+  },
   "Share gamma control settings": {
     "Share gamma control settings": ""
   },
@@ -6761,6 +7058,9 @@
   "Shift+Enter to paste": {
     "Shift+Enter to paste": "Shift+Enter om te plakken"
   },
+  "Short": {
+    "Short": ""
+  },
   "Shortcut": {
     "Shortcut": ""
   },
@@ -6772,6 +7072,9 @@
   },
   "Shortcuts (%1)": {
     "Shortcuts (%1)": "Sneltoetsen (%1)"
+  },
+  "Shortcuts, keyboard, mouse": {
+    "Shortcuts, keyboard, mouse": ""
   },
   "Shortens the bar at both ends": {
     "Shortens the bar at both ends": ""
@@ -6881,9 +7184,6 @@
   "Show occupied only": {
     "Show occupied only": ""
   },
-  "Show on displays": {
-    "Show on displays": ""
-  },
   "Show on last display": {
     "Show on last display": ""
   },
@@ -6899,23 +7199,11 @@
   "Show package source badges": {
     "Show package source badges": ""
   },
-  "Show password": {
-    "Show password": ""
-  },
-  "Show password field": {
-    "Show password field": ""
-  },
   "Show percentage": {
     "Show percentage": ""
   },
-  "Show power actions": {
-    "Show power actions": ""
-  },
   "Show power off": {
     "Show power off": ""
-  },
-  "Show profile image": {
-    "Show profile image": ""
   },
   "Show readings": {
     "Show readings": ""
@@ -6950,20 +7238,20 @@
   "Show switch user": {
     "Show switch user": ""
   },
-  "Show system icons": {
-    "Show system icons": ""
-  },
   "Show temperature": {
     "Show temperature": ""
+  },
+  "Show the battery briefly when power is connected or removed": {
+    "Show the battery briefly when power is connected or removed": ""
   },
   "Show the current media activity": {
     "Show the current media activity": ""
   },
-  "Show time": {
-    "Show time": ""
-  },
   "Show trend": {
     "Show trend": ""
+  },
+  "Show upgrade in a window": {
+    "Show upgrade in a window": ""
   },
   "Show uptime": {
     "Show uptime": ""
@@ -6977,6 +7265,15 @@
   "Show welcome": {
     "Show welcome": ""
   },
+  "Show window": {
+    "Show window": ""
+  },
+  "Shown only while the microphone, camera or screen sharing is in use": {
+    "Shown only while the microphone, camera or screen sharing is in use": ""
+  },
+  "Shown while no image or color is set": {
+    "Shown while no image or color is set": ""
+  },
   "Shows all running applications with focus indication": {
     "Shows all running applications with focus indication": "Toont alle actieve applicaties met focusindicatie"
   },
@@ -6985,6 +7282,9 @@
   },
   "Shows only windows from the dock's own display": {
     "Shows only windows from the dock's own display": ""
+  },
+  "Shows the line being sung instead of the title and artist while synced lyrics are available": {
+    "Shows the line being sung instead of the title and artist while synced lyrics are available": ""
   },
   "Shows when caps lock is active": {
     "Shows when caps lock is active": "Toont wanneer Caps Lock actief is"
@@ -7070,6 +7370,12 @@
   "Soft square": {
     "Soft square": ""
   },
+  "Software updates": {
+    "Software updates": ""
+  },
+  "Software updates are ready to install.": {
+    "Software updates are ready to install.": ""
+  },
   "Solid": {
     "Solid": ""
   },
@@ -7142,6 +7448,9 @@
   "Spotlight bar": {
     "Spotlight bar": ""
   },
+  "Spreadsheet": {
+    "Spreadsheet": ""
+  },
   "Spring": {
     "Spring": ""
   },
@@ -7156,6 +7465,9 @@
   },
   "Square": {
     "Square": ""
+  },
+  "Stable": {
+    "Stable": ""
   },
   "Stack": {
     "Stack": ""
@@ -7208,6 +7520,9 @@
   "Stopping": {
     "Stopping": "Stoppen"
   },
+  "Stops syncing your DMS settings to the greeter. Set up links them again.": {
+    "Stops syncing your DMS settings to the greeter. Set up links them again.": ""
+  },
   "Stretch": {
     "Stretch": "Uitrekken"
   },
@@ -7220,8 +7535,8 @@
   "Style": {
     "Style": ""
   },
-  "Style, shortcuts, search, hidden apps": {
-    "Style, shortcuts, search, hidden apps": ""
+  "Style, search, hidden apps": {
+    "Style, search, hidden apps": ""
   },
   "Success": {
     "Success": ""
@@ -7231,6 +7546,9 @@
   },
   "Summary font size": {
     "Summary font size": ""
+  },
+  "Summary, highlights, links": {
+    "Summary, highlights, links": ""
   },
   "Sun": {
     "Sun": ""
@@ -7286,6 +7604,9 @@
   "Swap": {
     "Swap": ""
   },
+  "Swatches show the seed color itself": {
+    "Swatches show the seed color itself": ""
+  },
   "Sway website": {
     "Sway website": ""
   },
@@ -7300,9 +7621,6 @@
   },
   "Sync": {
     "Sync": "Sync"
-  },
-  "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "Synchronisatie past je thema en instellingen toe op het aanmeldscherm. Andere gebruikers moeten 'dms-greeter sync --profile' uitvoeren in plaats van een synchronisatie voor de hoofdgebruiker."
   },
   "Sync completed successfully.": {
     "Sync completed successfully.": "Sync is succesvol voltooid."
@@ -7324,9 +7642,6 @@
   },
   "Sync position across displays": {
     "Sync position across displays": ""
-  },
-  "Sync to apply": {
-    "Sync to apply": "Synchroniseer om toe te passen"
   },
   "Sync with portal": {
     "Sync with portal": ""
@@ -7358,6 +7673,9 @@
   "System notification area icons": {
     "System notification area icons": "Pictogrammen systeemmeldingengebied"
   },
+  "System packages": {
+    "System packages": ""
+  },
   "System sound theme and events": {
     "System sound theme and events": ""
   },
@@ -7375,9 +7693,6 @@
   },
   "System update": {
     "System update": ""
-  },
-  "System updater": {
-    "System updater": ""
   },
   "Systemd override generated": {
     "Systemd override generated": ""
@@ -7424,6 +7739,9 @@
   "Taskbar": {
     "Taskbar": ""
   },
+  "Teal": {
+    "Teal": ""
+  },
   "Temperature": {
     "Temperature": ""
   },
@@ -7438,6 +7756,9 @@
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "Terminal-fallback mislukt. Installeer een van de ondersteunde terminal-emulators of voer 'dms-greeter sync' handmatig uit."
+  },
+  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.": ""
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": "Terminal-terugval geopend. Voltooi daar de authenticatie; deze sluit automatisch zodra voltooid."
@@ -7523,6 +7844,15 @@
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "De wachtrij van deze printer is leeg"
   },
+  "The login screen follows your theme, wallpaper, widgets and behavior live. Only authentication changes need applying.": {
+    "The login screen follows your theme, wallpaper, widgets and behavior live. Only authentication changes need applying.": ""
+  },
+  "The login screen shows the lock screen widgets it supports and its own session picker. Turn off to arrange it separately.": {
+    "The login screen shows the lock screen widgets it supports and its own session picker. Turn off to arrange it separately.": ""
+  },
+  "The login screen stops following your DMS theme, wallpaper, widgets and settings. greetd, authentication and other users are not affected.": {
+    "The login screen stops following your DMS theme, wallpaper, widgets and settings. greetd, authentication and other users are not affected.": ""
+  },
   "The new shortcut is already in use. Choose another shortcut.": {
     "The new shortcut is already in use. Choose another shortcut.": ""
   },
@@ -7534,6 +7864,12 @@
   },
   "The quick brown fox jumps over the lazy dog": {
     "The quick brown fox jumps over the lazy dog": ""
+  },
+  "The rest follow the shared rule": {
+    "The rest follow the shared rule": ""
+  },
+  "The rest open the bar's own popouts": {
+    "The rest open the bar's own popouts": ""
   },
   "The result is unknown. Refresh before trying again.": {
     "The result is unknown. Refresh before trying again.": ""
@@ -7550,11 +7886,17 @@
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
     "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "Het servercertificaat is gewijzigd sinds het voor het laatst werd vertrouwd. Ga alleen verder als je de nieuwe vingerafdruk herkent."
   },
+  "The shell palette is built from this color. Shapes take their colors from that palette.": {
+    "The shell palette is built from this color. Shapes take their colors from that palette.": ""
+  },
   "Theme": {
     "Theme": ""
   },
   "Theme & colors": {
     "Theme & colors": ""
+  },
+  "Theme color": {
+    "Theme color": ""
   },
   "Theme colors come from this display's wallpaper": {
     "Theme colors come from this display's wallpaper": ""
@@ -7568,11 +7910,17 @@
   "Theme, light and dark, matugen": {
     "Theme, light and dark, matugen": ""
   },
+  "Theme, palette, dark mode": {
+    "Theme, palette, dark mode": ""
+  },
   "Themes": {
     "Themes": "Thema's"
   },
   "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": {
     "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": "Deze voegen items toe aan de XDG-autostartmap (~/.config/autostart/*.desktop)"
+  },
+  "They load with the next update check. Release notes are also published on GitHub.": {
+    "They load with the next update check. Release notes are also published on GitHub.": ""
   },
   "Thickness": {
     "Thickness": "Dikte"
@@ -7585,6 +7933,9 @@
   },
   "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": {
     "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "Plugins van derden zijn gemaakt door de gemeenschap en worden niet officieel ondersteund door DankMaterialShell.\n\nDeze plugins kunnen veiligheids- en privacyrisico's met zich meebrengen - installatie is op eigen risico."
+  },
+  "This bar is the Island": {
+    "This bar is the Island": ""
   },
   "This bind is overridden by config.kdl": {
     "This bind is overridden by config.kdl": "Deze bind wordt overschreven door config.kdl"
@@ -7606,6 +7957,12 @@
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Deze plugin heeft geen 'settings_write' rechten.\n\nVoeg \"permissions\": [\"settings_read\", \"settings_write\"] toe aan plugin.json"
+  },
+  "This system cannot link settings live. Sync again after changing them.": {
+    "This system cannot link settings live. Sync again after changing them.": ""
+  },
+  "This system was not started in UEFI mode": {
+    "This system was not started in UEFI mode": ""
   },
   "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": {
     "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "Deze widget voorkomt dat de GPU wordt uitgeschakeld, wat de batterijduur op laptops aanzienlijk kan beïnvloeden. Het wordt niet aanbevolen dit te gebruiken op laptops met hybride graphics."
@@ -7679,6 +8036,9 @@
   "Tint strength": {
     "Tint strength": ""
   },
+  "Tinted cards and badges across the shell": {
+    "Tinted cards and badges across the shell": ""
+  },
   "Title": {
     "Title": "Titel"
   },
@@ -7699,9 +8059,6 @@
   },
   "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": {
     "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": "Om als een andere gebruiker in te loggen, log je uit en kies je het account in het inlogscherm. Het parallel openen van een nieuwe sessie vereist een multi-sessie greeter (greetd-flexiserver / GDM / LightDM)."
-  },
-  "To update, run the following command:": {
-    "To update, run the following command:": "Voer de volgende opdracht uit om bij te werken:"
   },
   "To use this DMS bind, remove or change the keybind in your config.kdl": {
     "To use this DMS bind, remove or change the keybind in your config.kdl": "Om deze DMS-bind te gebruiken, verwijder of wijzig de keybind in uw config.kdl"
@@ -7781,6 +8138,9 @@
   "Touchpad": {
     "Touchpad": ""
   },
+  "Track screen time": {
+    "Track screen time": ""
+  },
   "Transform": {
     "Transform": "Transformatie"
   },
@@ -7808,6 +8168,12 @@
   "Trigger: %1": {
     "Trigger: %1": "Trigger: %1"
   },
+  "Triggers after holding the key": {
+    "Triggers after holding the key": ""
+  },
+  "Triggers when the key is released": {
+    "Triggers when the key is released": ""
+  },
   "Trust": {
     "Trust": "Vertrouwen"
   },
@@ -7834,6 +8200,9 @@
   },
   "Typing in the overview opens the launcher": {
     "Typing in the overview opens the launcher": ""
+  },
+  "Typing reveals the field. Escape hides it again. The editor always shows it.": {
+    "Typing reveals the field. Escape hides it again. The editor always shows it.": ""
   },
   "URL": {
     "URL": ""
@@ -7874,12 +8243,6 @@
   "Uninstalling: %1": {
     "Uninstalling: %1": "Verwijderen: %1"
   },
-  "Unison": {
-    "Unison": ""
-  },
-  "Unknown": {
-    "Unknown": "Onbekend"
-  },
   "Unknown App": {
     "Unknown App": "Onbekende app"
   },
@@ -7898,9 +8261,6 @@
   "Unknown Model": {
     "Unknown Model": "Onbekend model"
   },
-  "Unknown Monitor": {
-    "Unknown Monitor": "Onbekende monitor"
-  },
   "Unknown Network": {
     "Unknown Network": "Onbekend netwerk"
   },
@@ -7909,6 +8269,18 @@
   },
   "Unknown Track": {
     "Unknown Track": "Onbekend nummer"
+  },
+  "Unlink": {
+    "Unlink": ""
+  },
+  "Unlink login screen": {
+    "Unlink login screen": ""
+  },
+  "Unlink needs sudo authentication. Opening terminal so you can use password or fingerprint.": {
+    "Unlink needs sudo authentication. Opening terminal so you can use password or fingerprint.": ""
+  },
+  "Unlink now?": {
+    "Unlink now?": ""
   },
   "Unload on close": {
     "Unload on close": ""
@@ -7988,6 +8360,12 @@
   "Update plugin": {
     "Update plugin": ""
   },
+  "Update the dms package with your package manager, then restart the shell.": {
+    "Update the dms package with your package manager, then restart the shell.": ""
+  },
+  "Updates, clipboard, %1": {
+    "Updates, clipboard, %1": ""
+  },
   "Updating %1...": {
     "Updating %1...": "Bezig met bijwerken van %1..."
   },
@@ -8009,17 +8387,14 @@
   "Urgent color": {
     "Urgent color": ""
   },
-  "Use HH:MM time format": {
-    "Use HH:MM time format": "Gebruik UU:MM tijdnotatie"
+  "Use Dynamic": {
+    "Use Dynamic": ""
   },
   "Use IP Location": {
     "Use IP Location": "IP-locatie gebruiken"
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Monospace-lettertype gebruiken"
-  },
-  "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "Gebruik een aangepaste afbeelding voor het vergrendelscherm, of laat leeg om je bureaubladachtergrond te gebruiken."
   },
   "Use a security key for lock screen authentication": {
     "Use a security key for lock screen authentication": "Een beveiligingssleutel gebruiken voor vergrendelschermverificatie"
@@ -8029,6 +8404,9 @@
   },
   "Use custom command": {
     "Use custom command": ""
+  },
+  "Use default wallpaper": {
+    "Use default wallpaper": ""
   },
   "Use desktop wallpaper": {
     "Use desktop wallpaper": "Bureaubladachtergrond gebruiken"
@@ -8048,14 +8426,14 @@
   "Use overlay layer": {
     "Use overlay layer": ""
   },
+  "Use standard OSDs": {
+    "Use standard OSDs": ""
+  },
   "Use standard popups": {
     "Use standard popups": ""
   },
   "Use system PAM authentication": {
     "Use system PAM authentication": "Systeem-PAM-authenticatie gebruiken"
-  },
-  "Use system theme": {
-    "Use system theme": ""
   },
   "User": {
     "User": "Gebruiker"
@@ -8195,11 +8573,11 @@
   "View Changes": {
     "View Changes": ""
   },
+  "View on GitHub": {
+    "View on GitHub": ""
+  },
   "Visibility": {
     "Visibility": "Zichtbaarheid"
-  },
-  "Visibility, position, pinned apps, trash": {
-    "Visibility, position, pinned apps, trash": ""
   },
   "Visible entry actions": {
     "Visible entry actions": ""
@@ -8228,8 +8606,8 @@
   "Volume style": {
     "Volume style": ""
   },
-  "Volume, brightness, caps lock, position": {
-    "Volume, brightness, caps lock, position": ""
+  "Volume, brightness, caps lock": {
+    "Volume, brightness, caps lock": ""
   },
   "Votes": {
     "Votes": "Stemmen"
@@ -8276,6 +8654,12 @@
   "Web browser": {
     "Web browser": ""
   },
+  "Week": {
+    "Week": ""
+  },
+  "Weekly screen time": {
+    "Weekly screen time": ""
+  },
   "Weight": {
     "Weight": ""
   },
@@ -8284,6 +8668,9 @@
   },
   "Welcome to DankMaterialShell": {
     "Welcome to DankMaterialShell": "Welkom bij DankMaterialShell"
+  },
+  "What changed": {
+    "What changed": ""
   },
   "When locked": {
     "When locked": "Indien vergrendeld"
@@ -8321,8 +8708,8 @@
   "Wi-Fi not available": {
     "Wi-Fi not available": "Wifi niet beschikbaar"
   },
-  "WiFi": {
-    "WiFi": "Wifi"
+  "Wi-Fi, Ethernet, VPN": {
+    "Wi-Fi, Ethernet, VPN": ""
   },
   "WiFi QR code for ": {
     "WiFi QR code for ": "Wifi-QR-code voor "
@@ -8338,6 +8725,9 @@
   },
   "Wide (BT2020)": {
     "Wide (BT2020)": "Breed (BT2020)"
+  },
+  "Widget": {
+    "Widget": ""
   },
   "Widget Background Color": {
     "Widget Background Color": "Achtergrondkleur widget"
@@ -8362,6 +8752,9 @@
   },
   "Widgets": {
     "Widgets": "Widgets"
+  },
+  "Widgets in this section move into overflow when space runs out": {
+    "Widgets in this section move into overflow when space runs out": ""
   },
   "Widgets, layout, style": {
     "Widgets, layout, style": "Widgets, indeling, stijl"
@@ -8404,6 +8797,9 @@
   },
   "With background blur on, cards and tiles keep their own backing": {
     "With background blur on, cards and tiles keep their own backing": ""
+  },
+  "Word processor": {
+    "Word processor": ""
   },
   "Working...": {
     "Working...": "Bezig..."
@@ -8456,6 +8852,9 @@
   "Y axis": {
     "Y axis": ""
   },
+  "Yellow": {
+    "Yellow": ""
+  },
   "Yes": {
     "Yes": "Ja"
   },
@@ -8483,11 +8882,17 @@
   "Your compositor does not support background blur (ext-background-effect-v1)": {
     "Your compositor does not support background blur (ext-background-effect-v1)": "Je compositor ondersteunt geen achtergrondvervaging (ext-background-effect-v1)"
   },
+  "Your greeter slot and any cache links to your home are removed. Administrator access may be required. Set up links them again.": {
+    "Your greeter slot and any cache links to your home are removed. Administrator access may be required. Set up links them again.": ""
+  },
   "Your hotspot is running.": {
     "Your hotspot is running.": "Je hotspot is actief."
   },
   "Your hotspot profile is saved and ready to start.": {
     "Your hotspot profile is saved and ready to start.": "Je hotspotprofiel is opgeslagen en klaar om te starten."
+  },
+  "Your keyboard layout puts %1 above the first level, so this bind will never fire. Pick a key the layout types without an extra layer.": {
+    "Your keyboard layout puts %1 above the first level, so this bind will never fire. Pick a key the layout types without an extra layer.": ""
   },
   "Your system is up to date!": {
     "Your system is up to date!": "Uw systeem is bijgewerkt!"
@@ -8500,6 +8905,9 @@
   },
   "adverb, wallpaper changes every day at a set time": {
     "Daily": ""
+  },
+  "and %1 more": {
+    "and %1 more": ""
   },
   "attached": {
     "attached": "gekoppeld"
@@ -8573,11 +8981,17 @@
   "e.g., scratch, /^tmp_.*/, build": {
     "e.g., scratch, /^tmp_.*/, build": "bijv. scratch, /^tmp_.*/, build"
   },
+  "efibootmgr failed": {
+    "efibootmgr failed": ""
+  },
   "ext": {
     "ext": "ext"
   },
   "featured": {
     "featured": "uitgelicht"
+  },
+  "greetd is not using the DMS greeter yet.": {
+    "greetd is not using the DMS greeter yet.": ""
   },
   "keyboard tab key name": {
     "Tab": ""
@@ -8618,6 +9032,9 @@
   "matugen not found - install matugen package for dynamic theming": {
     "matugen not found - install matugen package for dynamic theming": "matugen niet gevonden - installeer matugen-pakket voor dynamische thema's"
   },
+  "missing program": {
+    "Requires %1": ""
+  },
   "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": {
     "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": ""
   },
@@ -8653,6 +9070,9 @@
   },
   "noun, badge on a keybind that overrides the default": {
     "Override": ""
+  },
+  "noun, overflow button position before the first widget": {
+    "Start": ""
   },
   "now": {
     "now": "nu"
@@ -8698,9 +9118,6 @@
   },
   "this app": {
     "this app": "deze app"
-  },
-  "tmux and zellij sessions": {
-    "tmux and zellij sessions": ""
   },
   "tmux, zellij, and herdr sessions": {
     "tmux, zellij, and herdr sessions": ""
@@ -8764,14 +9181,5 @@
   },
   "• yyyy - Year (2024)": {
     "• yyyy - Year (2024)": "• yyyy - Jaar (2024)"
-  },
-  "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
-    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": "↑/↓: Nav • Spatie: Uitvouwen • Enter: Actie/Uitvouwen • E: Tekst"
-  },
-  "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
-    "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": "↑/↓: Navigeren • Enter/Ctrl+C: Kopiëren • Del: Verwijderen • Ctrl+E: Bewerken • Ctrl+S: Vastpinnen/Losmaken • F10: Help"
-  },
-  "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
-    "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": "↑/↓: Navigeren • Enter: Plakken • Ctrl+C: Kopiëren • Del: Verwijderen • Ctrl+E: Bewerken • Ctrl+S: Vastpinnen/Losmaken • F10: Help"
   }
 }

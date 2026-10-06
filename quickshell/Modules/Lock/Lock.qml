@@ -13,6 +13,7 @@ Scope {
     readonly property var log: Log.scoped("Lock")
 
     property string sharedPasswordBuffer: ""
+    property bool inputRevealed: false
     property bool shouldLock: false
 
     onSharedPasswordBufferChanged: {
@@ -22,6 +23,7 @@ Scope {
     }
 
     onShouldLockChanged: {
+        inputRevealed = false;
         IdleService.isShellLocked = shouldLock;
     }
 
@@ -77,8 +79,15 @@ Scope {
     Component.onCompleted: {
         IdleService.lockComponent = this;
         IdleService.isSessionLockSecure = sessionLock.secure;
-        if (SettingsData.lockAtStartup && !freshGreeterLogin())
+        if (SettingsData.lockAtStartup && !freshGreeterLogin()) {
             lock();
+            return;
+        }
+        // A shell restarted into a locked session: after a logind Unlock
+        // ignored for a lock it started, only lockedHint still says locked,
+        // and the state can arrive before this module's Connections exist.
+        if (SessionService.locked || SessionService.lockedHint)
+            followLoginctlLock();
     }
 
     function notifyLockedHint(locked: bool) {
@@ -112,6 +121,21 @@ Scope {
         if (!customLockerSpawned)
             spawnCustomLocker();
         return true;
+    }
+
+    function followLoginctlLock() {
+        if (shouldLock || pendingLock)
+            return;
+        if (handleLoginctlCustomLock())
+            return;
+        if (!SessionService.active && SessionService.loginctlAvailable && SettingsData.loginctlLockIntegration) {
+            pendingLock = true;
+            lockInitiatedLocally = false;
+            return;
+        }
+        lockInitiatedLocally = false;
+        lockPowerOffArmed = powerOffOnLock;
+        shouldLock = true;
     }
 
     function resetLockRetry() {
@@ -191,18 +215,7 @@ Scope {
         target: SessionService
 
         function onSessionLocked() {
-            if (shouldLock || pendingLock)
-                return;
-            if (handleLoginctlCustomLock())
-                return;
-            if (!SessionService.active && SessionService.loginctlAvailable && SettingsData.loginctlLockIntegration) {
-                pendingLock = true;
-                lockInitiatedLocally = false;
-                return;
-            }
-            lockInitiatedLocally = false;
-            lockPowerOffArmed = powerOffOnLock;
-            shouldLock = true;
+            root.followLoginctlLock();
         }
 
         function onSessionUnlocked() {
@@ -221,6 +234,18 @@ Scope {
             if (!shouldLock || sessionLock.locked)
                 return;
             resumeRelockTimer.restart();
+        }
+
+        function onLockEditorRequested() {
+            if (shouldLock)
+                return;
+            demoWindow.showDemo();
+        }
+
+        function onGreeterEditorRequested() {
+            if (shouldLock)
+                return;
+            demoWindow.showDemo(true);
         }
 
         function onLoginctlStateChanged() {
@@ -285,6 +310,8 @@ Scope {
                 lock: sessionLock
                 pam: sharedPam
                 sharedPasswordBuffer: root.sharedPasswordBuffer
+                inputRevealed: root.inputRevealed
+                onInputRevealRequested: revealed => root.inputRevealed = revealed
                 screenName: lockSurface.currentScreenName
                 isLocked: shouldLock
                 onUnlockRequested: root.unlock()

@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 // Parent to the modal focus scope so it covers the window; focus returns to the opener on close
 Loader {
@@ -49,7 +49,7 @@ Loader {
             focusItem.forceActiveFocus(Qt.OtherFocusReason);
     }
 
-    sourceComponent: DankDialog {
+    sourceComponent: DDialog {
         id: dialog
 
         embedded: nativeWindow
@@ -75,13 +75,13 @@ Loader {
         }
 
         actions: [
-            DankButton {
+            DButton {
                 text: I18n.tr("Cancel")
                 backgroundColor: "transparent"
                 textColor: Theme.primary
                 onClicked: dialog.rejected()
             },
-            DankButton {
+            DButton {
                 text: I18n.tr("Save")
                 iconName: "check"
                 enabled: dialog.acceptEnabled
@@ -95,7 +95,7 @@ Loader {
             sourceComponent: root.aboveField
         }
 
-        DankTextField {
+        DTextField {
             id: nameInput
             outlined: true
             leftIconName: root.leftIconName

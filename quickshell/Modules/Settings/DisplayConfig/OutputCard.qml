@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
@@ -58,7 +59,7 @@ Column {
                 return "";
             }
 
-            DankActionButton {
+            DActionButton {
                 visible: !root.isConnected
                 buttonSize: Theme.iconButtonSize
                 iconName: "delete"
@@ -154,7 +155,7 @@ Column {
             title: I18n.tr("Scale")
             onCurrentLabelChanged: scaleDropdown.currentValue = currentLabel
 
-            DankDropdown {
+            DDropdown {
                 id: scaleDropdown
                 downKeyOpens: false
                 backgroundColor: SettingsMetrics.controlSurface
@@ -175,7 +176,7 @@ Column {
                 }
             }
 
-            DankTextField {
+            DTextField {
                 id: scaleInput
                 visible: scaleRow.customMode
                 outlined: true
@@ -265,7 +266,7 @@ Column {
             }
             subtitleColor: hasProfile ? Theme.success : Theme.surfaceVariantText
 
-            DankActionButton {
+            DActionButton {
                 visible: colorProfileRow.hasProfile
                 buttonSize: Theme.iconButtonSize
                 iconName: "info"
@@ -275,7 +276,7 @@ Column {
                 onClicked: root.requestICCInfo(root.outputName)
             }
 
-            DankActionButton {
+            DActionButton {
                 visible: colorProfileRow.hasProfile
                 buttonSize: Theme.iconButtonSize
                 iconName: "close"
@@ -286,7 +287,7 @@ Column {
                 onClicked: ICCService.removeICC(root.outputName)
             }
 
-            DankButton {
+            DButton {
                 text: I18n.tr("Browse", "Browse")
                 iconName: "folder_open"
                 anchors.verticalCenter: parent.verticalCenter

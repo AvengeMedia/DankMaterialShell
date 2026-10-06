@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -220,7 +220,7 @@ Item {
                             horizontalAlignment: Text.AlignLeft
                         }
 
-                        DankSlider {
+                        DSlider {
                             id: maxVolSlider
                             upDownKeysStep: false
                             anchors.left: maxVolLabel.right
@@ -276,7 +276,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: Theme.spacingS
 
-                            DankIcon {
+                            DIcon {
                                 name: "visibility_off"
                                 size: Theme.iconSizeMedium
                                 color: Theme.surfaceVariantText
@@ -291,7 +291,7 @@ Item {
                             }
                         }
 
-                        DankIcon {
+                        DIcon {
                             name: root.showHiddenOutputDevices ? "expand_less" : "expand_more"
                             size: Theme.iconSizeMedium
                             color: Theme.surfaceVariantText
@@ -394,7 +394,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 spacing: Theme.spacingS
 
-                                DankIcon {
+                                DIcon {
                                     name: "visibility_off"
                                     size: Theme.iconSizeMedium
                                     color: Theme.surfaceVariantText
@@ -409,7 +409,7 @@ Item {
                                 }
                             }
 
-                            DankIcon {
+                            DIcon {
                                 name: root.showHiddenInputDevices ? "expand_less" : "expand_more"
                                 size: Theme.iconSizeMedium
                                 color: Theme.surfaceVariantText
@@ -462,7 +462,7 @@ Item {
             anchors.centerIn: parent
             spacing: Theme.spacingL
 
-            DankLoadingIndicator {
+            DLoadingIndicator {
                 contained: true
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -489,7 +489,6 @@ Item {
                 }
             }
         }
-
     }
 
     SettingsRenameDialog {

@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 
 SettingsRow {
@@ -39,7 +40,7 @@ SettingsRow {
     subtitle: description
     onCurrentValueChanged: dropdown.currentValue = currentValue
 
-    DankDropdown {
+    DDropdown {
         id: dropdown
         downKeyOpens: false
         backgroundColor: SettingsMetrics.controlSurface

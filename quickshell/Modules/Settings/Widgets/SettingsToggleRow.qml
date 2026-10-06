@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 SettingsRow {
     id: root
@@ -32,7 +32,7 @@ SettingsRow {
         toggled(!checked);
     }
 
-    DankToggle {
+    DToggle {
         hideText: true
         text: root.text
         description: root.description
