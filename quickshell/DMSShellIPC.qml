@@ -1888,8 +1888,7 @@ Item {
             if (root.workspaceRenameModalLoader.item) {
                 if (CompositorService.isAqueous)
                     return root.workspaceRenameModalLoader.item.show("") ? "WORKSPACE_RENAME_MODAL_OPENED" : "WORKSPACE_RENAME_UNAVAILABLE";
-                const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
-                root.workspaceRenameModalLoader.item.show(ws?.name || "");
+                root.workspaceRenameModalLoader.item.show(root.workspaceRenameModalLoader.item.focusedWorkspaceName());
                 return "WORKSPACE_RENAME_MODAL_OPENED";
             }
             return "WORKSPACE_RENAME_MODAL_NOT_FOUND";
@@ -1912,8 +1911,7 @@ Item {
                 }
                 if (CompositorService.isAqueous)
                     return root.workspaceRenameModalLoader.item.show("") ? "WORKSPACE_RENAME_MODAL_OPENED" : "WORKSPACE_RENAME_UNAVAILABLE";
-                const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
-                root.workspaceRenameModalLoader.item.show(ws?.name || "");
+                root.workspaceRenameModalLoader.item.show(root.workspaceRenameModalLoader.item.focusedWorkspaceName());
                 return "WORKSPACE_RENAME_MODAL_OPENED";
             }
             return "WORKSPACE_RENAME_MODAL_NOT_FOUND";

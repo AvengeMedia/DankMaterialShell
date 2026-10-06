@@ -581,6 +581,17 @@ hl.layer_rule({
         });
     }
 
+    // renameWorkspace stores "<id> <name>"; hand back only the part the user typed.
+    function focusedWorkspaceName() {
+        const ws = Hyprland.focusedWorkspace;
+        if (!ws?.id)
+            return "";
+        const prefix = ws.id + " ";
+        if (ws.name.startsWith(prefix))
+            return ws.name.slice(prefix.length);
+        return ws.name === String(ws.id) ? "" : ws.name;
+    }
+
     function renameWorkspace(newName) {
         if (!Hyprland.focusedWorkspace)
             return;

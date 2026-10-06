@@ -69,6 +69,14 @@ DFloatingWindow {
         hide();
     }
 
+    function focusedWorkspaceName() {
+        if (CompositorService.isNiri)
+            return NiriService.workspaces[NiriService.focusedWorkspaceId]?.name ?? "";
+        if (CompositorService.isHyprland)
+            return HyprlandService.focusedWorkspaceName();
+        return "";
+    }
+
     function renameWorkspace(name) {
         if (CompositorService.isNiri) {
             NiriService.renameWorkspace(name);
