@@ -34,6 +34,11 @@ Singleton {
 	readonly property var sink: freebsdAudio ? nativeSink : (pipewireBackend?.defaultSink ?? null)
 	readonly property var source: freebsdAudio ? nativeSource : (pipewireBackend?.defaultSource ?? null)
 
+	readonly property bool freeBsdPollingRequested:
+		(PopoutService.controlCenterPopout?.shouldBeVisible ?? false)
+		|| (PopoutService.dankDashPopout?.shouldBeVisible ?? false)
+		|| (PopoutService.settingsModal?.visible ?? false)
+
 	function isPipewireVideoSource(node) {
 		return !freebsdAudio
 			&& (pipewireBackend?.isVideoSource(node) ?? false);
@@ -1512,7 +1517,7 @@ EOFCONFIG
             return;
         if (Date.now() - lastFreeBsdLocalChangeMs < 800)
             return;
-        Proc.runCommand("audio-freebsd-devices", ["env", "LC_ALL=C", "mixer", "-a"], (output, exitCode) => {
+        Proc.runCommand("audio-freebsd-devices", ["nice", "-n", "10", "env", "LC_ALL=C", "mixer", "-a"], (output, exitCode) => {
             if (exitCode === 0)
                 root.applyFreeBsdDeviceList(output);
             else
@@ -1763,12 +1768,17 @@ EOFCONFIG
         return `Microphone volume decreased to ${newVolume}%`;
     }
 
-    Timer {
-        interval: 5000
-        repeat: true
-        running: root.freebsdAudio
-        onTriggered: root.refreshFreeBsdDevices()
-    }
+	onFreeBsdPollingRequestedChanged: {
+		if (root.freebsdAudio && root.freeBsdPollingRequested)
+			root.refreshFreeBsdDevices();
+	}
+
+	Timer {
+		interval: 5000
+		repeat: true
+		running: root.freebsdAudio && root.freeBsdPollingRequested
+		onTriggered: root.refreshFreeBsdDevices()
+	}
 
     IpcHandler {
         target: "audio"
