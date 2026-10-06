@@ -152,7 +152,8 @@ DModal {
             const normId = _normAppId(rawId);
             if (normId === "dms-open" || listedIds.has(normId))
                 continue;
-            const entry = DesktopEntries.byId(rawId) || DesktopEntries.heuristicLookup(rawId);
+            const desktopId = rawId.replace(/\.desktop$/, "");
+            const entry = DesktopEntries.byId(desktopId) || DesktopEntries.heuristicLookup(desktopId);
             if (!entry)
                 continue;
             const name = entry.name || "";
