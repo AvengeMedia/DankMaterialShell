@@ -456,12 +456,16 @@ Singleton {
         if (rule.enabled === false)
             return false;
 
-        const pattern = (rule.pattern || "").toString();
+        return [rule, ...(rule.conditions || [])].every(condition => _matchesRuleCondition(condition, info));
+    }
+
+    function _matchesRuleCondition(condition, info) {
+        const pattern = (condition.pattern || "").toString();
         if (!pattern.trim())
             return false;
 
-        const value = (_ruleFieldValue(rule.field, info) || "").toString();
-        const matchType = (rule.matchType || "contains").toString().toLowerCase();
+        const value = (_ruleFieldValue(condition.field, info) || "").toString();
+        const matchType = (condition.matchType || "contains").toString().toLowerCase();
 
         if (matchType === "exact")
             return value.toLowerCase() === pattern.toLowerCase();
