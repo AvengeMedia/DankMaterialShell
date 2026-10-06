@@ -28,9 +28,6 @@ Singleton {
 
 	readonly property bool freeBsdPollingRequested:
 		BarWidgetService.hasWidget("battery")
-		|| (PopoutService.controlCenterPopout?.shouldBeVisible ?? false)
-		|| (PopoutService.batteryPopout?.shouldBeVisible ?? false)
-		|| (PopoutService.settingsModal?.visible ?? false)
 
     function parseFreeBsdCapacity(value, unit) {
         const n = parseFloat(value || "0");
