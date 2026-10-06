@@ -85,10 +85,13 @@ Item {
     }
 
     Component.onCompleted: {
+        AudioService.addRef();
         hiddenOutputDeviceNames = SessionData.hiddenOutputDeviceNames ?? [];
         hiddenInputDeviceNames = SessionData.hiddenInputDeviceNames ?? [];
         updateDeviceList();
     }
+
+    Component.onDestruction: AudioService.removeRef()
 
     Connections {
         target: AudioService
