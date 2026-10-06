@@ -9,6 +9,9 @@ import qs.Modules.DBar.Popouts
 Item {
     id: root
 
+    Component.onCompleted: BatteryService.addRef()
+    Component.onDestruction: BatteryService.removeRef()
+
     readonly property color batteryStatusColor: {
         if (BatteryService.isLowBattery && !BatteryService.isCharging)
             return Theme.error;
