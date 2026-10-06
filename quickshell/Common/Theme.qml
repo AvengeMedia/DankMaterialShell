@@ -3,15 +3,15 @@ pragma ComponentBehavior: Bound
 
 import QtCore
 import QtQuick
-import "../DankCommon/Common/Shape.js" as Shape
-import "../DankCommon/Common/Surface.js" as Surface
-import "../DankCommon/Common/Contrast.js" as Contrast
-import "../DankCommon/Common/Accents.js" as Accents
-import "../DankCommon/Common/Tonal.js" as Tonal
+import "../DCommon/Common/Shape.js" as Shape
+import "../DCommon/Common/Surface.js" as Surface
+import "../DCommon/Common/Contrast.js" as Contrast
+import "../DCommon/Common/Accents.js" as Accents
+import "../DCommon/Common/Tonal.js" as Tonal
 import Quickshell
 import Quickshell.Io
 import qs.Common
-import qs.DankCommon.Common as DankCommon
+import qs.DCommon.Common as DCommon
 import qs.Services
 import qs.Modules.Greetd
 import "StockThemes.js" as StockThemes
@@ -1194,14 +1194,14 @@ Singleton {
 
     property string fontFamily: {
         if (typeof SettingsData === "undefined")
-            return DankCommon.Fonts.sans;
+            return DCommon.Fonts.sans;
         if (SettingsData.isGreeterMode && SettingsData.lockScreenFontFamily !== "")
             return resolvedFontFamily(SettingsData.lockScreenFontFamily);
         return resolvedFontFamily(SettingsData.fontFamily);
     }
 
-    property string monoFontFamily: typeof SettingsData !== "undefined" ? resolvedMonoFontFamily(SettingsData.monoFontFamily) : DankCommon.Fonts.mono
-    property string displayFontFamily: typeof SettingsData !== "undefined" ? resolvedDisplayFontFamily(SettingsData.displayFontFamily) : DankCommon.Fonts.display
+    property string monoFontFamily: typeof SettingsData !== "undefined" ? resolvedMonoFontFamily(SettingsData.monoFontFamily) : DCommon.Fonts.mono
+    property string displayFontFamily: typeof SettingsData !== "undefined" ? resolvedDisplayFontFamily(SettingsData.displayFontFamily) : DCommon.Fonts.display
 
     readonly property var fontChoices: [
         {
@@ -1212,26 +1212,26 @@ Singleton {
             "value": "display",
             "text": I18n.tr("Display", "Display font role option")
         }
-    ].concat(DankCommon.Fonts.bundledFamilies.map(family => ({
+    ].concat(DCommon.Fonts.bundledFamilies.map(family => ({
                 "value": family,
                 "text": family
             })))
 
     function resolvedFontFamily(family) {
         if (family === defaultFontFamily)
-            return DankCommon.Fonts.sans;
+            return DCommon.Fonts.sans;
         return family;
     }
 
     function resolvedMonoFontFamily(family) {
         if (family === defaultMonoFontFamily)
-            return DankCommon.Fonts.mono;
+            return DCommon.Fonts.mono;
         return family;
     }
 
     function resolvedDisplayFontFamily(family) {
         if (family === defaultDisplayFontFamily)
-            return DankCommon.Fonts.display;
+            return DCommon.Fonts.display;
         return family;
     }
 

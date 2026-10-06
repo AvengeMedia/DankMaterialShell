@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Item {
@@ -210,7 +211,7 @@ Item {
             visible: root.activeFocus
         }
 
-        DankIcon {
+        DIcon {
             id: compactIcon
             anchors.centerIn: parent
             name: root.iconName
@@ -220,7 +221,7 @@ Item {
             rotation: root.iconRotation
             visible: root.compact && root.bodyContent === null && root.iconContent === null
 
-            DankBlink {
+            DBlink {
                 target: compactIcon
                 running: root.iconBlinking && root.compact && root.visible && root.live
             }
@@ -285,7 +286,7 @@ Item {
                     }
                 }
 
-                DankIcon {
+                DIcon {
                     id: tileIcon
                     anchors.centerIn: parent
                     name: root.iconName
@@ -295,7 +296,7 @@ Item {
                     rotation: root.iconRotation
                     visible: root.iconContent === null
 
-                    DankBlink {
+                    DBlink {
                         target: tileIcon
                         running: root.iconBlinking && !root.compact && root.visible && root.live
                     }
@@ -371,7 +372,7 @@ Item {
                 }
             }
 
-            DankIcon {
+            DIcon {
                 id: chevron
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.spacingXS

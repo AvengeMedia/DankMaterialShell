@@ -3,10 +3,12 @@ package main
 import (
 	"encoding/json"
 	"testing"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipolicy"
 )
 
 func TestDefaultImmutablePolicyAllowsSyncButBlocksEnable(t *testing.T) {
-	var policyFile cliPolicyFile
+	var policyFile clipolicy.File
 	if err := json.Unmarshal(defaultCLIPolicyJSON, &policyFile); err != nil {
 		t.Fatalf("failed to parse embedded CLI policy: %v", err)
 	}

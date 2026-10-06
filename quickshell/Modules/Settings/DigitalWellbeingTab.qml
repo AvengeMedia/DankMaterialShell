@@ -3,12 +3,12 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modals.Common
 import qs.Modules.Settings.Widgets
 import qs.Modules.ControlCenter.Widgets
-import qs.Modules.DankDash.Wellbeing
-import "../DankDash/Wellbeing/Wellbeing.js" as Wellbeing
+import qs.Modules.DDash.Wellbeing
+import "../DDash/Wellbeing/Wellbeing.js" as Wellbeing
 
 Item {
     id: root
@@ -158,7 +158,7 @@ Item {
                         onCommitted: next => WellbeingService.setAppLimit(limitRow.modelData, next)
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "close"
                         iconColor: Theme.surfaceVariantText
@@ -181,7 +181,7 @@ Item {
                 title: I18n.tr("Screen time history", "settings row title, stored screen time data")
                 subtitle: I18n.tr("Kept for %1 days on this device", "screen time history description, %1 is a number of days").arg(WellbeingMetrics.retentionDays)
 
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
                     buttonHeight: Theme.buttonHeightXS
                     text: I18n.tr("Clear")

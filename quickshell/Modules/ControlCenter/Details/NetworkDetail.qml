@@ -9,6 +9,7 @@ import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
 import qs.Modules.Network
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import "../../../Common/QmlUtils.js" as QmlUtils
 
@@ -82,7 +83,7 @@ Item {
     readonly property Item headerActions: Row {
         spacing: Theme.spacingS
 
-        DankDropdown {
+        DDropdown {
             anchors.verticalCenter: parent.verticalCenter
             visible: root.wifiMode && (NetworkService.wifiDevices?.length ?? 0) > 1
             compactMode: true
@@ -94,7 +95,7 @@ Item {
             onValueChanged: value => NetworkService.setWifiDeviceOverride(value === I18n.tr("Auto") ? "" : value)
         }
 
-        DankRefreshButton {
+        DRefreshButton {
             Accessible.name: I18n.tr("Scan")
             anchors.verticalCenter: parent.verticalCenter
             buttonSize: CcMetrics.headerActionSize
@@ -299,7 +300,7 @@ Item {
         }
     }
 
-    DankListView {
+    DListView {
         id: pageList
         objectName: "networkList"
 
@@ -316,7 +317,7 @@ Item {
             spacing: CcMetrics.detailContentGap
             bottomPadding: pageList.count > 0 ? CcMetrics.detailContentGap : 0
 
-            DankButtonGroup {
+            DButtonGroup {
                 readonly property var labelsByType: ({
                         "ethernet": I18n.tr("Ethernet"),
                         "wifi": I18n.tr("Wi-Fi", "wireless network, page and section title"),
@@ -378,7 +379,7 @@ Item {
                     }
                     subtitleColor: warnsWifiDrop ? Theme.warning : Theme.surfaceVariantText
 
-                    DankSpinner {
+                    DSpinner {
                         anchors.verticalCenter: parent.verticalCenter
                         size: Theme.iconSizeMedium
                         strokeWidth: CcMetrics.spinnerStroke
@@ -387,7 +388,7 @@ Item {
                         running: visible
                     }
 
-                    DankToggle {
+                    DToggle {
                         anchors.verticalCenter: parent.verticalCenter
                         hideText: true
                         visible: !root.hotspotWorking
@@ -452,7 +453,7 @@ Item {
                             NetworkService.connectToSpecificWiredConfig(modelData.uuid);
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             id: wiredOptionsButton
                             anchors.verticalCenter: parent.verticalCenter
                             buttonSize: Theme.buttonHeightXS
@@ -512,7 +513,7 @@ Item {
                         clickable: true
                         onClicked: NetworkService.toggleNetworkConnection("cellular")
 
-                        DankActionButton {
+                        DActionButton {
                             anchors.verticalCenter: parent.verticalCenter
                             buttonSize: Theme.buttonHeightXS
                             iconSize: Theme.iconSizeMedium
@@ -540,7 +541,7 @@ Item {
                         clickable: !active
                         onClicked: NetworkService.connectToSpecificCellularConfig(modelData.uuid)
 
-                        DankActionButton {
+                        DActionButton {
                             anchors.verticalCenter: parent.verticalCenter
                             buttonSize: Theme.buttonHeightXS
                             iconSize: Theme.iconSizeMedium
@@ -614,7 +615,7 @@ Item {
 
             leading: Loader {
                 active: wifiRow.isConnecting
-                sourceComponent: DankSpinner {
+                sourceComponent: DSpinner {
                     size: Theme.iconSizeMedium
                     strokeWidth: CcMetrics.spinnerStroke
                     color: Theme.warning
@@ -624,7 +625,7 @@ Item {
             Loader {
                 anchors.verticalCenter: parent.verticalCenter
                 active: wifiRow.sharesQrCode
-                sourceComponent: DankActionButton {
+                sourceComponent: DActionButton {
                     buttonSize: Theme.buttonHeightXS
                     iconSize: Theme.iconSizeMedium
                     iconName: "qr_code"
@@ -640,7 +641,7 @@ Item {
                 onToggled: root.togglePin(wifiRow.modelData.ssid)
             }
 
-            DankActionButton {
+            DActionButton {
                 id: wifiOptionsButton
                 anchors.verticalCenter: parent.verticalCenter
                 buttonSize: Theme.buttonHeightXS

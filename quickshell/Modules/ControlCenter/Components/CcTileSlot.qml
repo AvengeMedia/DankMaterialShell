@@ -5,7 +5,7 @@ import qs.Modules.ControlCenter
 import "../utils/widgets.js" as WidgetUtils
 import "../../../Common/GridLayout.js" as GridUtils
 
-DankEditableGridSlot {
+DEditableGridSlot {
     id: root
 
     readonly property var widgetData: JSON.parse(json)

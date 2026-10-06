@@ -5,8 +5,8 @@ import QtQuick.Layouts
 import QtQuick.Shapes
 import qs.Common
 import qs.Services
-import qs.Widgets
-import qs.DankCommon.Session
+import qs.DCommon.Widgets
+import qs.DCommon.Session
 import "../../../Common/KeyUtils.js" as KeyUtils
 
 Item {
@@ -291,7 +291,7 @@ Item {
                 }
             }
 
-            DankCircularImage {
+            DCircularImage {
                 anchors.centerIn: parent
                 width: root.ringSize - root.ringStroke * 4
                 height: width
@@ -306,7 +306,7 @@ Item {
                 fallbackIcon: "material:person"
             }
 
-            DankIcon {
+            DIcon {
                 anchors.centerIn: parent
                 visible: !root.showProfileImage
                 name: root.unlocking ? "lock_open" : "lock"
@@ -327,7 +327,7 @@ Item {
             spacing: Theme.spacingM
             Layout.fillWidth: true
 
-            DankCircularImage {
+            DCircularImage {
                 Layout.preferredWidth: LockMetrics.avatarSize
                 ringWidth: Theme.avatarRingWidth
                 ringColor: Theme.avatarRingColor
@@ -454,7 +454,7 @@ Item {
                     width: !visible ? 0 : (root.morph ? LockMetrics.fieldHeight - Theme.spacingS * 2 : Theme.iconSizeSmall)
                     height: root.morph ? width : Theme.iconSizeSmall
 
-                    DankMaterialShape {
+                    DMaterialShape {
                         id: morphContainer
                         anchors.fill: parent
                         visible: root.morph
@@ -490,7 +490,7 @@ Item {
                         }
                     }
 
-                    DankLoadingIndicator {
+                    DLoadingIndicator {
                         anchors.centerIn: parent
                         size: parent.width
                         contained: true
@@ -498,7 +498,7 @@ Item {
                         running: visible
                     }
 
-                    DankIcon {
+                    DIcon {
                         id: lockIcon
 
                         anchors.centerIn: parent
@@ -957,7 +957,7 @@ Item {
                         }
                     }
 
-                    DankTextCursor {
+                    DTextCursor {
                         id: passwordCursor
 
                         x: passwordDisplay.x + passwordDisplay.cursorRectangle.x
@@ -1045,7 +1045,7 @@ Item {
                     height: Theme.iconSize
                     visible: !root.demoMode && !root.ring && !root.morph && ((root.pam?.passwd.active ?? false) || root.unlocking)
 
-                    DankIcon {
+                    DIcon {
                         anchors.centerIn: parent
                         name: "check_circle"
                         size: Theme.iconSizeSmall
@@ -1062,7 +1062,7 @@ Item {
                         }
                     }
 
-                    DankLoadingIndicator {
+                    DLoadingIndicator {
                         anchors.centerIn: parent
                         size: Theme.iconSize
                         contained: root.style === "expressive"
@@ -1147,7 +1147,7 @@ Item {
             spacing: Theme.spacingXS
             opacity: DMSService.capsLockState ? 1 : 0
 
-            DankIcon {
+            DIcon {
                 name: "shift_lock"
                 size: Theme.iconSizeSmall
                 color: Theme.error

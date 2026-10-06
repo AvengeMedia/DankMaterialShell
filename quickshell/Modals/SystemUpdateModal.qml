@@ -3,9 +3,10 @@ import qs.Common
 import qs.Modules.Settings.Widgets
 import qs.Modules.SystemUpdate
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
-DankFloatingWindow {
+DFloatingWindow {
     id: root
 
     function show() {
@@ -35,7 +36,7 @@ DankFloatingWindow {
         anchors.fill: parent
         spacing: 0
 
-        DankWindowHeader {
+        DWindowHeader {
             id: titleBar
             width: parent.width
             controls: windowControls

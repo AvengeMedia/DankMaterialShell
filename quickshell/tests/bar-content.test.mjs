@@ -5,7 +5,7 @@ import test from "node:test";
 
 const read = path => readFileSync(new URL("../" + path, import.meta.url), "utf8");
 const model = vm.createContext({});
-vm.runInContext(read("Modules/DankBar/WidgetModel.js").replace(/^\.pragma.*$/m, ""), model);
+vm.runInContext(read("Modules/DBar/WidgetModel.js").replace(/^\.pragma.*$/m, ""), model);
 const plain = value => JSON.parse(JSON.stringify(value));
 
 function method(source, name) {
@@ -59,7 +59,7 @@ test("focus discovery keeps compositor names separate from first-screen fallback
 
 test("center placement preserves configured anchors, visible fallbacks and geometric extents", () => {
     const layout = vm.createContext({});
-    vm.runInContext(read("Modules/DankBar/CenterLayout.js").replace(/^\.pragma.*$/m, ""), layout);
+    vm.runInContext(read("Modules/DBar/CenterLayout.js").replace(/^\.pragma.*$/m, ""), layout);
     const cases = [
         [[], 600, 4, "index", [], 0],
         [[null, null], 600, 4, "geometric", [null, null], 0],
@@ -81,7 +81,7 @@ test("center placement preserves configured anchors, visible fallbacks and geome
 
 test("center placement yields to side sections without overlapping them", () => {
     const layout = vm.createContext({});
-    vm.runInContext(read("Modules/DankBar/CenterLayout.js").replace(/^\.pragma.*$/m, ""), layout);
+    vm.runInContext(read("Modules/DBar/CenterLayout.js").replace(/^\.pragma.*$/m, ""), layout);
     const cases = [
         [{ min: 250 }, [250, 284, 368]],
         [{ max: 300 }, [122, 156, 240]],

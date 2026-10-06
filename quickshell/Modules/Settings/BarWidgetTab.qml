@@ -3,10 +3,10 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import "../../Common/settings/DockConfig.js" as DockConfig
-import "../DankBar/OverflowLayout.js" as OverflowLayout
+import "../DBar/OverflowLayout.js" as OverflowLayout
 
 Item {
     id: root
@@ -191,7 +191,7 @@ Item {
             height: optionsLoader.status === Loader.Loading ? Theme.iconButtonSize * 2 : 0
             visible: optionsLoader.status === Loader.Loading
 
-            DankSpinner {
+            DSpinner {
                 anchors.centerIn: parent
             }
         }

@@ -4,7 +4,7 @@ import QtQuick
 import qs.Common
 import qs.Modules.Settings.Widgets
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: networkStatusTab
@@ -136,9 +136,9 @@ Item {
                             height: 1
                         }
 
-                        DankButtonGroup {
-                            arrowKeysSelect: false
+                        DButtonGroup {
                             id: preferenceButtons
+                            arrowKeysSelect: false
 
                             readonly property var preferenceValues: {
                                 const values = ["auto", "ethernet", "wifi"];

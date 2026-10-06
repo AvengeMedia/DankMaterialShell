@@ -6240,6 +6240,36 @@
     "icon": "visibility_off"
   },
   {
+    "section": "launcherHistoryEnabled",
+    "label": "History",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "clears",
+      "drawer",
+      "history",
+      "launcher",
+      "menu",
+      "past",
+      "persist",
+      "privacy",
+      "queries",
+      "recent",
+      "record",
+      "save",
+      "start",
+      "start menu",
+      "stored",
+      "turning",
+      "usage",
+      "what"
+    ],
+    "description": "Record app usage and past queries. Turning this off clears what is stored."
+  },
+  {
     "section": "dankLauncherV2IncludeFilesInAll",
     "label": "Include files in All tab",
     "tabIndex": 9,

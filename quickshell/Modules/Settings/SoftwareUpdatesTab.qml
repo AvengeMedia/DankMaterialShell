@@ -5,7 +5,7 @@ import QtQuick.Effects
 import Quickshell.Widgets
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modals.Common
 import qs.Modules.Settings.Widgets
 import "../../Common/Format.js" as Format
@@ -272,7 +272,7 @@ Item {
     SettingsPage {
         id: mainColumn
 
-        DankCard {
+        DCard {
             id: hero
             width: parent.width
             height: heroColumn.implicitHeight + SettingsMetrics.pagePaddingV * 2
@@ -368,7 +368,7 @@ Item {
                 iconName: failed ? "error_outline" : SystemUpdateService.restartPending ? "restart_alt" : "system_update_alt"
                 iconColor: failed ? Theme.error : SystemUpdateService.restartPending ? Theme.warning : Theme.primary
 
-                DankActionButton {
+                DActionButton {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: SystemUpdateService.sysupdateAvailable && !root.primaryIsCheck
                     enabled: !root.busy
@@ -380,7 +380,7 @@ Item {
                     onClicked: SystemUpdateService.checkForUpdates()
                 }
 
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: SystemUpdateService.sysupdateAvailable
                     buttonHeight: Theme.buttonHeightS
@@ -433,7 +433,7 @@ Item {
                     color: SystemUpdateService.commitsBehind === 0 ? Theme.surfaceVariantText : Theme.primary
                 }
 
-                DankActionButton {
+                DActionButton {
                     anchors.verticalCenter: parent.verticalCenter
                     buttonSize: Theme.buttonHeightS
                     iconName: "open_in_browser"
@@ -488,7 +488,7 @@ Item {
                 clickable: root.systemCount > 0
                 onClicked: root.packagesExpanded = !root.packagesExpanded
 
-                DankIcon {
+                DIcon {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: root.systemCount > 0
                     name: "expand_more"
@@ -527,7 +527,7 @@ Item {
                             return repo && version ? repo + " · " + version : repo || version;
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             anchors.verticalCenter: parent.verticalCenter
                             iconName: "visibility_off"
                             visible: SystemUpdateService.canIgnorePackage(packageRow.modelData)
@@ -549,7 +549,7 @@ Item {
                 title: I18n.tr("Upgrading...", "system update popout status while packages upgrade")
                 iconName: "open_in_new"
 
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
                     buttonHeight: Theme.buttonHeightS
                     text: I18n.tr("Show window", "button, brings back the floating system update window")
@@ -590,7 +590,7 @@ Item {
                 iconName: "error_outline"
                 iconColor: Theme.error
 
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: root.upgradeFailed && !root.upgradeRunsInTerminal
                     text: I18n.tr("Open in terminal")
@@ -785,7 +785,7 @@ Item {
                 onAccepted: ignoredPackagesCard.addIgnoredPackage()
                 onValueEdited: ignoredPackageError.visible = false
 
-                actions: DankIconButton {
+                actions: DIconButton {
                     variant: "filled"
                     iconName: "add"
                     tooltipText: I18n.tr("Ignore package", "tooltip, exclude a package from system updates")
@@ -812,7 +812,7 @@ Item {
                     title: modelData
                     iconName: "visibility_off"
 
-                    DankActionButton {
+                    DActionButton {
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "delete"
                         iconColor: Theme.error

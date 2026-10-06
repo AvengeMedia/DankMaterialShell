@@ -5,8 +5,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.Mpris
 import qs.Services
-import qs.Modules.DankDash
-import qs.Modules.DankDash.Media
+import qs.Modules.DDash
+import qs.Modules.DDash.Media
 
 Singleton {
     id: root

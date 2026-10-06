@@ -4,7 +4,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -218,7 +218,7 @@ Item {
 
     Component.onCompleted: GreeterService.refresh()
 
-    DankSearchField {
+    DSearchField {
         id: searchField
 
         property real sideInset: root.searchActive ? Theme.spacingS : SettingsMetrics.paneMargin
@@ -318,7 +318,7 @@ Item {
             }
         }
 
-        DankActionButton {
+        DActionButton {
             id: avatarButton
 
             anchors.right: parent.right
@@ -335,7 +335,7 @@ Item {
             }
 
             // Below the state layer so hover, press and focus tint the avatar
-            DankCircularImage {
+            DCircularImage {
                 z: -1
                 anchors.fill: parent
                 ringWidth: Theme.avatarRingWidth
@@ -347,7 +347,7 @@ Item {
         }
     }
 
-    DankFlickable {
+    DFlickable {
         id: sidebarFlickable
         anchors.left: parent.left
         anchors.right: parent.right

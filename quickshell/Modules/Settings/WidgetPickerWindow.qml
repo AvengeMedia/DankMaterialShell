@@ -1,9 +1,10 @@
 import QtQuick
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
-DankFloatingWindow {
+DFloatingWindow {
     id: root
 
     property var widgets: []
@@ -164,7 +165,7 @@ DankFloatingWindow {
             anchors.fill: parent
             spacing: 0
 
-            DankWindowHeader {
+            DWindowHeader {
                 id: titleBar
                 width: parent.width
                 controls: windowControls
@@ -191,7 +192,7 @@ DankFloatingWindow {
                         wrapMode: Text.WordWrap
                     }
 
-                    DankSearchField {
+                    DSearchField {
                         id: searchField
                         width: parent.width
                         height: Theme.fieldHeightLarge
@@ -217,7 +218,7 @@ DankFloatingWindow {
                         }
                     }
 
-                    DankListView {
+                    DListView {
                         id: widgetList
 
                         width: parent.width

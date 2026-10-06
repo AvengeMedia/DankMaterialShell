@@ -1,6 +1,5 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -118,11 +117,7 @@ Item {
                         return I18n.tr("Parabolic", "magnification animation profile");
                     }
                 }
-                options: [
-                    I18n.tr("Parabolic", "magnification animation profile"),
-                    I18n.tr("Cosine", "magnification animation profile"),
-                    I18n.tr("Gaussian", "magnification animation profile")
-                ]
+                options: [I18n.tr("Parabolic", "magnification animation profile"), I18n.tr("Cosine", "magnification animation profile"), I18n.tr("Gaussian", "magnification animation profile")]
                 onValueChanged: value => {
                     if (value === I18n.tr("Cosine", "magnification animation profile"))
                         dock.setOption("magnificationProfile", "cosine");

@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Hyprland
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Item {
@@ -25,7 +26,7 @@ Item {
     }
 
     // scratchpad windows are not in the grid, so the menu only ever offers a move in
-    DankContextMenu {
+    DContextMenu {
         id: windowMenu
 
         property string targetWindow: ""

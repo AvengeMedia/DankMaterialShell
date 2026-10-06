@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
-import qs.DankCommon.Session
+import qs.DCommon.Widgets
+import qs.DCommon.Session
 
 Item {
     id: root
@@ -18,7 +18,7 @@ Item {
     implicitWidth: powerButton.width
     implicitHeight: powerButton.height
 
-    DankMaterialShape {
+    DMaterialShape {
         anchors.fill: powerButton
         visible: !root.round
         shape: root.shape

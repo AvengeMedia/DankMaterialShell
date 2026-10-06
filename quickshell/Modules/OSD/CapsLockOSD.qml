@@ -3,7 +3,7 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 
-DankOSD {
+DOSD {
     id: root
 
     osdKind: "capsLock"

@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Column {
@@ -459,7 +459,7 @@ Column {
                 clickable: true
                 onClicked: targetCard.showHidden = !targetCard.showHidden
 
-                DankIcon {
+                DIcon {
                     anchors.verticalCenter: parent.verticalCenter
                     name: targetCard.showHidden ? "expand_less" : "expand_more"
                     size: Theme.iconSize

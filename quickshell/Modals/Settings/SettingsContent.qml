@@ -3,7 +3,7 @@ import QtQuick.Controls
 import qs.Common
 import qs.Modules.Settings.Widgets
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 FocusScope {
     id: root
@@ -373,9 +373,9 @@ FocusScope {
             "keybinds": "KeybindsTab.qml",
             "dankbar_widgets": "WidgetsTab.qml",
             "window_rules": "WindowRulesTab.qml",
-            "dankbar_settings": "DankBarTab.qml",
-            "dankbar_appearance": "DankBarAppearanceTab.qml",
-            "dankbar_dot": "DankDotTab.qml",
+            "dankbar_settings": "DBarTab.qml",
+            "dankbar_appearance": "DBarAppearanceTab.qml",
+            "dankbar_dot": "DDotTab.qml",
             "bar_widget": "BarWidgetTab.qml",
             "compositor_layout": "CompositorLayoutTab.qml",
             "dock_general": "DockGeneralTab.qml",
@@ -419,7 +419,7 @@ FocusScope {
             "greeter_auth": "GreeterAuthTab.qml",
             "autostart": "AutoStartTab.qml",
             "battery": "BatteryTab.qml",
-            "dank_dash": "DankDashTab.qml",
+            "dank_dash": "DDashTab.qml",
             "wellbeing": "DigitalWellbeingTab.qml",
             "mouse_touchpad": "MouseTouchpadTab.qml",
             "keyboard": "KeyboardTab.qml",
@@ -451,7 +451,7 @@ FocusScope {
                 width: root.showBack ? Theme.iconButtonSize + Theme.spacingM - glyphInset : 0
                 height: Theme.iconButtonSize
 
-                DankActionButton {
+                DActionButton {
                     buttonSize: Theme.iconButtonSize
                     iconName: I18n.isRtl ? "arrow_forward" : "arrow_back"
                     Accessible.name: I18n.tr("Back")
@@ -496,7 +496,7 @@ FocusScope {
                 toX: pageStack.slideOffscreen
             }
 
-            DankSpinner {
+            DSpinner {
                 id: pageSpinner
 
                 readonly property bool loading: pageStack.currentItem?.presented === false

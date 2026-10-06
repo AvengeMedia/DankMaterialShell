@@ -5,7 +5,7 @@ import Quickshell.Io
 import qs.Common
 import qs.Services
 import qs.Modules.Notepad
-import qs.DankCommon.Common as DC
+import qs.DCommon.Common as DC
 
 ShellRoot {
     id: root
@@ -86,13 +86,15 @@ ShellRoot {
                 file.setText(JSON.stringify({
                     version: 1,
                     currentTabIndex: 0,
-                    tabs: [{
+                    tabs: [
+                        {
                             id: 1,
                             title: "first.txt",
                             filePath: firstPath,
                             isTemporary: false,
                             lastSavedContent: original
-                        }]
+                        }
+                    ]
                 }));
 
                 const notepad = notepadComponent.createObject(root);

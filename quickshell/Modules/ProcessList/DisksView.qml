@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../../Common/Format.js" as Format
 
 Item {
@@ -38,7 +38,7 @@ Item {
                     Row {
                         spacing: Theme.spacingS
 
-                        DankIcon {
+                        DIcon {
                             name: "storage"
                             size: Theme.iconSize
                             color: Theme.primary
@@ -113,7 +113,7 @@ Item {
                 Row {
                     spacing: Theme.spacingS
 
-                    DankIcon {
+                    DIcon {
                         name: "folder"
                         size: Theme.iconSize - 2
                         color: Theme.secondary
@@ -135,7 +135,7 @@ Item {
                     color: Theme.outlineLight
                 }
 
-                DankListView {
+                DListView {
                     id: mountListView
 
                     Layout.fillWidth: true
@@ -177,7 +177,7 @@ Item {
                                 Row {
                                     spacing: Theme.spacingS
 
-                                    DankIcon {
+                                    DIcon {
                                         name: {
                                             const mp = modelData?.mount ?? "";
                                             if (mp === "/")
@@ -317,7 +317,7 @@ Item {
                             anchors.centerIn: parent
                             spacing: Theme.spacingM
 
-                            DankIcon {
+                            DIcon {
                                 name: "storage"
                                 size: 32
                                 color: Theme.surfaceVariantText

@@ -4,7 +4,7 @@ import Quickshell.Io
 import qs.Common
 import qs.Modals.FileBrowser
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import "../../Common/KeyUtils.js" as KeyUtils
 
@@ -465,7 +465,7 @@ Item {
                 placeholderText: "/path/to/videos"
                 onValueEdited: value => SettingsData.set("lockScreenVideoPath", value)
 
-                actions: DankButton {
+                actions: DButton {
                     text: I18n.tr("Browse")
                     onClicked: videoBrowserModal.open()
                 }
@@ -572,7 +572,7 @@ Item {
                         }
                     }
 
-                    DankButton {
+                    DButton {
                         id: securityKeyCapture
                         width: 200
                         anchors.verticalCenter: parent.verticalCenter
@@ -695,7 +695,7 @@ Item {
                     PopoutService.colorPickerModal.show();
                 }
 
-                DankColorSwatch {
+                DColorSwatch {
                     width: Theme.iconSizeMedium
                     height: width
                     swatchColor: SettingsData.lockScreenInactiveColor
@@ -754,7 +754,7 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingS
 
-                    DankTextField {
+                    DTextField {
                         id: customPamField
                         outlined: true
                         leftIconName: "lock"
@@ -764,7 +764,7 @@ Item {
                         text: SettingsData.lockPamPath
                     }
 
-                    DankButton {
+                    DButton {
                         id: validatePamButton
                         text: I18n.tr("Apply changes")
                         enabled: !root.authValidateRunning && customPamField.text.trim() !== ""
@@ -808,7 +808,7 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingS
 
-                    DankTextField {
+                    DTextField {
                         id: customU2fPamField
                         outlined: true
                         leftIconName: "key"
@@ -818,7 +818,7 @@ Item {
                         text: SettingsData.lockU2fPamPath
                     }
 
-                    DankButton {
+                    DButton {
                         id: validateU2fPamButton
                         text: I18n.tr("Apply changes")
                         enabled: !root.u2fValidateRunning && customU2fPamField.text.trim() !== ""
@@ -864,21 +864,21 @@ Item {
         }
 
         SettingsFabBar {
-            DankFab {
+            DFab {
                 text: I18n.tr("Browse plugins")
                 iconName: "store"
                 colorRole: "secondaryContainer"
                 onClicked: root.showPluginBrowser()
             }
 
-            DankFab {
+            DFab {
                 text: I18n.tr("Edit widgets")
                 iconName: "edit"
                 colorRole: "secondaryContainer"
                 onClicked: SessionService.lockEditorRequested()
             }
 
-            DankFab {
+            DFab {
                 text: I18n.tr("Add widget")
                 iconName: "add"
                 onClicked: root.showWidgetBrowser()

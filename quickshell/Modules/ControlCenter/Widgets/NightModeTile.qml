@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 CcTile {
     id: root
@@ -24,7 +24,7 @@ CcTile {
                 elide: Text.ElideRight
             }
 
-            DankSlider {
+            DSlider {
                 width: parent.width
                 minimum: 1000
                 maximum: 6000

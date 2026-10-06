@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Item {
@@ -106,7 +107,7 @@ Item {
             z: parent.z - 1
         }
 
-        DankFlickable {
+        DFlickable {
             id: settingsFlickable
             anchors.fill: parent
             clip: true
@@ -142,7 +143,7 @@ Item {
                     color: Theme.outlineHeavy
                 }
 
-                DankToggle {
+                DToggle {
                     anchors.left: parent.left
                     anchors.leftMargin: -Theme.spacingM
                     width: parent.width + Theme.spacingM
@@ -154,7 +155,7 @@ Item {
                     }
                 }
 
-                DankToggle {
+                DToggle {
                     anchors.left: parent.left
                     anchors.leftMargin: -Theme.spacingM
                     width: parent.width + Theme.spacingM
@@ -166,7 +167,7 @@ Item {
                     }
                 }
 
-                DankToggle {
+                DToggle {
                     anchors.left: parent.left
                     anchors.leftMargin: -Theme.spacingM
                     width: parent.width + Theme.spacingM
@@ -201,7 +202,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingM
 
-                        DankIcon {
+                        DIcon {
                             name: "search"
                             size: Theme.iconSize - 2
                             color: Theme.primary
@@ -234,7 +235,7 @@ Item {
                     color: "transparent"
                     visible: !SettingsData.notepadUseMonospace
 
-                    DankDropdown {
+                    DDropdown {
                         id: fontDropdown
                         anchors.left: parent.left
                         anchors.leftMargin: -Theme.spacingM
@@ -292,7 +293,7 @@ Item {
                             spacing: Theme.spacingS
                             anchors.verticalCenter: parent.verticalCenter
 
-                            DankActionButton {
+                            DActionButton {
                                 buttonSize: 32
                                 iconName: "remove"
                                 Accessible.name: I18n.tr("Decrease")
@@ -323,7 +324,7 @@ Item {
                                 }
                             }
 
-                            DankActionButton {
+                            DActionButton {
                                 buttonSize: 32
                                 iconName: "add"
                                 Accessible.name: I18n.tr("Increase")
@@ -350,7 +351,7 @@ Item {
                         width: parent.width
                         spacing: Theme.spacingS
 
-                        DankToggle {
+                        DToggle {
                             anchors.left: parent.left
                             anchors.leftMargin: -Theme.spacingM
                             width: parent.width + Theme.spacingM
@@ -366,7 +367,7 @@ Item {
                             }
                         }
 
-                        DankSlider {
+                        DSlider {
                             anchors.left: parent.left
                             anchors.leftMargin: -Theme.spacingM
                             width: parent.width + Theme.spacingM
@@ -407,7 +408,7 @@ Item {
                                 color: Theme.surfaceText
                             }
 
-                            DankButtonGroup {
+                            DButtonGroup {
                                 model: [I18n.tr("Slideout", "noun, notepad default mode option, side panel"), I18n.tr("Popout", "noun, option to open in a popout window")]
                                 size: "small"
                                 currentIndex: SettingsData.notepadDefaultMode === "popout" ? 1 : 0
@@ -431,7 +432,7 @@ Item {
                                 color: Theme.surfaceText
                             }
 
-                            DankButtonGroup {
+                            DButtonGroup {
                                 model: [I18n.tr("Right"), I18n.tr("Left")]
                                 size: "small"
                                 currentIndex: SettingsData.notepadSlideoutSide === "left" ? 1 : 0
@@ -443,7 +444,7 @@ Item {
                             }
                         }
 
-                        DankToggle {
+                        DToggle {
                             anchors.left: parent.left
                             anchors.leftMargin: -Theme.spacingM
                             width: parent.width + Theme.spacingM
@@ -463,7 +464,7 @@ Item {
                             color: Theme.surfaceText
                         }
 
-                        DankSlider {
+                        DSlider {
                             anchors.left: parent.left
                             anchors.leftMargin: Theme.spacingXS
                             width: parent.width - Theme.spacingXS * 2
@@ -515,7 +516,7 @@ Item {
                         height: 36
                         spacing: Theme.spacingS
 
-                        DankIcon {
+                        DIcon {
                             name: root.shortcutsExpanded ? "expand_less" : "expand_more"
                             size: Theme.iconSizeSmall
                             color: Theme.surfaceText
@@ -538,7 +539,7 @@ Item {
                         anchors.top: shortcutsHeader.bottom
                         anchors.horizontalCenter: parent.horizontalCenter
 
-                        sourceComponent: DankKeyHints {
+                        sourceComponent: DKeyHints {
                             hints: [
                                 {
                                     keys: ["Ctrl+S"],

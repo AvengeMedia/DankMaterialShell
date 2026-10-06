@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 SettingsRow {
     id: root
@@ -53,7 +53,7 @@ SettingsRow {
         width: parent.width
         spacing: Theme.spacingS
 
-        DankActionButton {
+        DActionButton {
             buttonSize: Theme.iconButtonSize
             iconName: "remove"
             Accessible.name: I18n.tr("Decrease", "verb, minus button next to a settings slider")
@@ -64,7 +64,7 @@ SettingsRow {
             onClicked: root.nudge(-1)
         }
 
-        DankSlider {
+        DSlider {
             id: slider
             upDownKeysStep: false
             Accessible.name: root.text
@@ -80,7 +80,7 @@ SettingsRow {
             onSliderDragFinished: finalValue => root.sliderDragFinished(finalValue)
         }
 
-        DankActionButton {
+        DActionButton {
             buttonSize: Theme.iconButtonSize
             iconName: "add"
             Accessible.name: I18n.tr("Increase", "verb, plus button next to a settings slider")

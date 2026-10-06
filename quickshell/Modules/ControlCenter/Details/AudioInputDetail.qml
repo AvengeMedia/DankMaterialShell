@@ -2,12 +2,11 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import Quickshell.Services.Pipewire
 import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../../../Common/QmlUtils.js" as QmlUtils
 
 Item {
@@ -34,7 +33,7 @@ Item {
         return name.includes("bluez") || name.includes("usb") ? "headset" : "mic";
     }
 
-    DankFlickable {
+    DFlickable {
         anchors.fill: parent
         contentHeight: column.height
         clip: true
@@ -60,7 +59,7 @@ Item {
                     model: ScriptModel {
                         values: {
                             const hidden = SessionData.hiddenInputDeviceNames ?? [];
-                            const nodes = Pipewire.nodes.values.filter(node => node.audio && !node.isSink && !node.isStream && !hidden.includes(node.name));
+                            const nodes = AudioService.allNodes.filter(node => node.audio && !node.isSink && !node.isStream && !hidden.includes(node.name));
                             const pinnedList = root.pinnedInputs;
                             return nodes.sort((a, b) => {
                                 const aPinned = pinnedList.indexOf(a.name);

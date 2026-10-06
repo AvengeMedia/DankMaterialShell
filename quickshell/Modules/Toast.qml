@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import "../Common/Format.js" as Format
 
@@ -138,7 +139,7 @@ PanelWindow {
                 width: parent.width
                 height: Math.max(Theme.iconSize + 8, messageText.implicitHeight)
 
-                DankIcon {
+                DIcon {
                     id: statusIcon
                     name: {
                         switch (ToastService.currentLevel) {
@@ -188,7 +189,7 @@ PanelWindow {
                     wrapMode: Text.NoWrap
                 }
 
-                DankActionButton {
+                DActionButton {
                     id: expandButton
                     iconName: toast.expanded ? "expand_less" : "expand_more"
                     Accessible.name: toast.expanded ? I18n.tr("Collapse", "verb, button that collapses an expanded item or section") : I18n.tr("Expand", "verb, button that expands a collapsed item or section")
@@ -218,7 +219,7 @@ PanelWindow {
                     }
                 }
 
-                DankActionButton {
+                DActionButton {
                     id: closeButton
                     iconName: "close"
                     Accessible.name: I18n.tr("Close")
@@ -302,7 +303,7 @@ PanelWindow {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             id: copyDetailsButton
                             iconName: "content_copy"
                             Accessible.name: I18n.tr("Copy")
@@ -384,7 +385,7 @@ PanelWindow {
                             wrapMode: Text.Wrap
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             id: copyButton
                             iconName: "content_copy"
                             Accessible.name: I18n.tr("Copy Full Command")

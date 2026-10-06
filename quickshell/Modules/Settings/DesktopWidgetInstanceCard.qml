@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 SettingsReorderRow {
@@ -29,7 +29,7 @@ SettingsReorderRow {
     onClicked: configureRequested()
 
     trailing: [
-        DankIcon {
+        DIcon {
             anchors.verticalCenter: parent.verticalCenter
             name: "chevron_right"
             size: Theme.iconSize
@@ -39,7 +39,7 @@ SettingsReorderRow {
         SettingsDivider {
             vertical: true
         },
-        DankToggle {
+        DToggle {
             anchors.verticalCenter: parent.verticalCenter
             visible: !root.fixed
             hideText: true
@@ -51,7 +51,7 @@ SettingsReorderRow {
                 });
             }
         },
-        DankActionButton {
+        DActionButton {
             anchors.verticalCenter: parent.verticalCenter
             visible: !root.fixed
             iconName: "content_copy"

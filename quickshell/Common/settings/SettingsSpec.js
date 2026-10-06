@@ -1,6 +1,6 @@
 .pragma library
-.import "../../DankCommon/Common/settings/SharedSettingsSpec.js" as Shared
-.import "../../DankCommon/Common/settings/SpecUtil.js" as Util
+.import "../../DCommon/Common/settings/SharedSettingsSpec.js" as Shared
+.import "../../DCommon/Common/settings/SpecUtil.js" as Util
 .import "DockConfig.js" as DockConfig
 
 function lockWidgetDefaults() {
@@ -681,6 +681,10 @@ var LOCAL_SPEC = {
     },
     rememberLastQuery: {
         def: false
+    },
+    launcherHistoryEnabled: {
+        def: true,
+        onChange: "syncLauncherHistory"
     },
     rememberLastMode: {
         def: true

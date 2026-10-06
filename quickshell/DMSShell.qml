@@ -9,10 +9,10 @@ import qs.Modals.Clipboard
 import qs.Modals.Common
 import qs.Modals.Greeter
 import qs.Modals.Settings
-import qs.Modals.DankLauncherV2
+import qs.Modals.DLauncherV2
 import qs.Modules
 import qs.Modules.AppDrawer
-import qs.Modules.DankDash
+import qs.Modules.DDash
 import qs.Modules.ControlCenter
 import qs.Modules.Dock
 import qs.Modules.Lock
@@ -22,7 +22,7 @@ import qs.Widgets
 import qs.Modules.Notifications.Popup
 import qs.Modules.OSD
 import qs.Modules.ProcessList
-import qs.Modules.DankBar.Popouts
+import qs.Modules.DBar.Popouts
 import qs.Modules.WorkspaceOverlays
 import qs.Modules.Settings.DisplayConfig
 import qs.Services
@@ -300,7 +300,7 @@ Item {
         }
 
         sourceComponent: Component {
-            DankDashPopout {
+            DDashPopout {
                 id: dankDashPopout
 
                 onPopoutClosed: PopoutService._scheduleUnload("dankDash")
@@ -746,7 +746,7 @@ Item {
             PopoutService.dankLauncherV2ModalLoader = dankLauncherV2ModalLoader;
         }
 
-        DankLauncherV2Modal {
+        DLauncherV2Modal {
             id: dankLauncherV2Modal
 
             Component.onCompleted: {
@@ -765,7 +765,7 @@ Item {
             PopoutService.spotlightBarModalLoader = spotlightBarModalLoader;
         }
 
-        DankLauncherV2ModalHost {
+        DLauncherV2ModalHost {
             id: spotlightBarModal
             connected: false
             spotlight: true
@@ -1053,7 +1053,7 @@ Item {
         id: notepadSlideoutVariants
         model: SettingsData.getFilteredScreens("notepad")
 
-        delegate: DankSlideout {
+        delegate: DSlideout {
             id: notepadSlideout
             title: I18n.tr("Notepad")
             slideoutWidth: 480

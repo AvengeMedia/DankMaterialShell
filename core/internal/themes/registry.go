@@ -211,10 +211,14 @@ func NewRegistry() (*Registry, error) {
 }
 
 func NewRegistryWithFs(fs afero.Fs) (*Registry, error) {
+	sources, err := registries.Active(fs)
+	if err != nil {
+		return nil, err
+	}
 	return &Registry{
 		fs:         fs,
 		cacheDir:   getCacheDir(),
-		registries: registries.Load(fs),
+		registries: sources,
 		git:        &realGitClient{},
 	}, nil
 }
@@ -405,6 +409,9 @@ func (r *Registry) GetThemeSourcePath(themeID string) string {
 			return candidate
 		}
 	}
+	if len(r.registries) == 0 {
+		return ""
+	}
 	// Fallback to first registry (legacy path semantics).
 	return filepath.Join(r.cacheDirFor(r.registries[0]), "themes", themeID, "theme.json")
 }
@@ -415,6 +422,9 @@ func (r *Registry) GetThemeDir(themeID string) string {
 		if exists, _ := afero.DirExists(r.fs, candidate); exists {
 			return candidate
 		}
+	}
+	if len(r.registries) == 0 {
+		return ""
 	}
 	return filepath.Join(r.cacheDirFor(r.registries[0]), "themes", themeID)
 }

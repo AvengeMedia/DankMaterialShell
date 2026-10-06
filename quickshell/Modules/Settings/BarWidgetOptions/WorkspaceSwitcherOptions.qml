@@ -4,7 +4,6 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
 import qs.Modules.Settings
 import qs.Modules.Settings.Widgets
 

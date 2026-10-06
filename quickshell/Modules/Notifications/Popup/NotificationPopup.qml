@@ -6,7 +6,9 @@ import Quickshell.Services.Notifications
 import qs.Common
 import qs.Modules.Notifications
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
+import qs.DCommon.Common as DCommon
 
 PanelWindow {
     id: win
@@ -690,7 +692,7 @@ PanelWindow {
                 radius: cardSurface.radius
                 color: "transparent"
 
-                DankFlickable {
+                DFlickable {
                     anchors.fill: parent
                     anchors.bottomMargin: win.timeoutRailClearance
                     contentHeight: notificationCard.targetHeight
@@ -890,7 +892,7 @@ PanelWindow {
         ]
     }
 
-    DankAnim {
+    DCommon.DAnim {
         id: enterAnimation
         target: win
         property: "presentationProgress"
@@ -906,7 +908,7 @@ PanelWindow {
     SequentialAnimation {
         id: exitAnim
 
-        DankAnim {
+        DCommon.DAnim {
             target: win
             property: "presentationProgress"
             to: 0
@@ -914,7 +916,7 @@ PanelWindow {
             easing.bezierCurve: NotificationMetrics.exitCurve
         }
 
-        DankAnim {
+        DCommon.DAnim {
             target: win
             property: "chromeRelease"
             to: 1

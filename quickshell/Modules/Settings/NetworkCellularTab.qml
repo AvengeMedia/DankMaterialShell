@@ -4,7 +4,7 @@ import QtQuick
 import qs.Common
 import qs.Modules.Settings.Widgets
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: networkCellularTab
@@ -62,7 +62,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: Theme.spacingS
 
-                            DankToggle {
+                            DToggle {
                                 checked: NetworkService.cellularEnabled
                                 enabled: NetworkService.cellularHardwareEnabled && !NetworkService.cellularToggling
                                 onToggled: NetworkService.toggleCellularRadio()
@@ -108,7 +108,7 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     spacing: Theme.spacingS
 
-                                    DankIcon {
+                                    DIcon {
                                         name: "network_cell"
                                         size: 20
                                         color: modemDelegate.isConnected ? Theme.accentOnSelectedContainer : Theme.surfaceText
@@ -152,7 +152,7 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     spacing: Theme.spacingXS
 
-                                    DankActionButton {
+                                    DActionButton {
                                         buttonSize: Theme.buttonHeightXXS
                                         iconName: modemDelegate.isConnected ? "link_off" : "link"
                                         iconColor: Theme.surfaceVariantText
@@ -224,7 +224,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 spacing: Theme.spacingS
 
-                                DankIcon {
+                                DIcon {
                                     name: "sim_card"
                                     size: 20
                                     color: profileDelegate.isActive ? Theme.accentOnSelectedContainer : Theme.surfaceText
@@ -256,7 +256,7 @@ Item {
                                 }
                             }
 
-                            DankActionButton {
+                            DActionButton {
                                 id: profileAction
                                 anchors.right: parent.right
                                 anchors.rightMargin: Theme.spacingS

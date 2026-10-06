@@ -6,6 +6,7 @@ import qs.Services
 import qs.Modules.ControlCenter.Components
 import qs.Modules.ControlCenter.Models
 import qs.Modules.ControlCenter.Details
+import qs.DCommon.Widgets
 import qs.Widgets
 import "./utils/sections.js" as Sections
 import "./utils/widgets.js" as WidgetUtils
@@ -14,6 +15,9 @@ FocusScope {
     id: root
 
     required property var host
+
+    property bool live: Window.window?.visible ?? false
+    property bool audioRefHeld: false
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
@@ -56,7 +60,7 @@ FocusScope {
     readonly property int gridColumns: host.gridColumns ?? Math.min(CcMetrics.gridColumns, gridColumnCap)
     readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - chromeHeight
     readonly property vector4d chromeRoom: host.chromeRoom ?? Qt.vector4d(Infinity, Infinity, Infinity, Infinity)
-    readonly property DankPanelResizer panelResizer: DankPanelResizer {
+    readonly property DPanelResizer panelResizer: DPanelResizer {
         popout: root.host
         stepWidth: CcMetrics.columnWidth + CcMetrics.gridGap
         widthFor: columns => CcMetrics.sheetWidthFor(columns) + root.sheetContentWidth - CcMetrics.sheetWidthFor(root.gridColumns)
@@ -74,7 +78,23 @@ FocusScope {
     implicitHeight: targetImplicitHeight
     focus: true
 
-    Component.onCompleted: WidgetUtils.ensureEditButton()
+    function syncAudioRef(wanted) {
+        if (wanted === audioRefHeld)
+            return;
+        audioRefHeld = wanted;
+        if (wanted) {
+            AudioService.addRef();
+            return;
+        }
+        AudioService.removeRef();
+    }
+
+    onLiveChanged: syncAudioRef(live)
+    Component.onCompleted: {
+        WidgetUtils.ensureEditButton();
+        syncAudioRef(live);
+    }
+    Component.onDestruction: syncAudioRef(false)
     onPlacedWidgetIdsChanged: WidgetUtils.ensureEditButton()
 
     function navigateTo(section) {
@@ -315,7 +335,7 @@ FocusScope {
             forceActiveFocus();
     }
 
-    DankGridEditChrome {
+    DGridEditChrome {
         id: panelChrome
 
         readonly property real screenWidth: root.host.triggerScreen?.width ?? Infinity
@@ -376,7 +396,7 @@ FocusScope {
         }
     }
 
-    DankFlickable {
+    DFlickable {
         id: contentFlickable
 
         anchors.left: parent.left

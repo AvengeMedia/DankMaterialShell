@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 SettingsCard {
     id: root
@@ -17,7 +17,6 @@ SettingsCard {
     readonly property var batteryStyleValues: ["solid", "outline", "ring", "duo"]
     readonly property bool batteryShown: SettingsData.islandHomeGroupEnabled(root.store.config, "status") && BatteryService.batteryAvailable && SettingsData.islandHomeStatusContent(root.store.config) === "battery"
 
-
     iconName: "home"
     title: I18n.tr("Home compact", "island settings: home face card title")
     settingKey: root.keyPrefix + "Activities"
@@ -28,7 +27,7 @@ SettingsCard {
         title: I18n.tr("Layout", "noun, settings section title for arrangement options")
         visible: !root.hosted
 
-        DankButton {
+        DButton {
             text: I18n.tr("Bar widgets")
             iconName: "widgets"
             onClicked: {

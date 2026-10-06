@@ -1,8 +1,8 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
-DankFlickable {
+DFlickable {
     id: root
 
     default property alias content: column.data

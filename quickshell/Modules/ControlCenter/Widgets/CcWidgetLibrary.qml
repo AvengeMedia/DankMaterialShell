@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../utils/widgets.js" as WidgetUtils
 
 Rectangle {
@@ -43,7 +43,7 @@ Rectangle {
             anchors.right: parent.right
             spacing: Theme.spacingM
 
-            DankIcon {
+            DIcon {
                 name: "add_circle"
                 size: Theme.iconSize
                 color: Theme.primary
@@ -59,7 +59,7 @@ Rectangle {
             }
         }
 
-        DankSearchField {
+        DSearchField {
             id: searchField
             anchors.top: headerRow.bottom
             anchors.topMargin: Theme.spacingM
@@ -81,7 +81,7 @@ Rectangle {
             }
         }
 
-        DankListView {
+        DListView {
             id: widgetList
 
             anchors.top: searchField.bottom
@@ -106,7 +106,7 @@ Rectangle {
                 bottomRadius: index === widgetList.count - 1 ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
                 onClicked: root.chosen(modelData.id)
 
-                DankIcon {
+                DIcon {
                     name: "add"
                     size: Theme.iconSize
                     color: Theme.primary

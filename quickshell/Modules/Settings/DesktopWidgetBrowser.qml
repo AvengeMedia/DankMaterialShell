@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 WidgetPickerWindow {
     id: root
@@ -33,7 +33,7 @@ WidgetPickerWindow {
     Component {
         id: tileDelegate
 
-        DankListItem {
+        DListItem {
             id: delegateRoot
 
             required property var modelData
@@ -57,7 +57,7 @@ WidgetPickerWindow {
                     color: Theme.withAlpha(Theme.primary, Theme.tonalTintAlpha)
                     anchors.verticalCenter: parent.verticalCenter
 
-                    DankIcon {
+                    DIcon {
                         anchors.centerIn: parent
                         name: delegateRoot.modelData.icon || "widgets"
                         size: Theme.iconSize
@@ -108,7 +108,7 @@ WidgetPickerWindow {
                     }
                 }
 
-                DankIcon {
+                DIcon {
                     name: "add"
                     size: Theme.iconSizeMedium
                     color: Theme.primary

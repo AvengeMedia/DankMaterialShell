@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Notifications
 import qs.Modules.Notifications as Notifications
@@ -146,7 +147,7 @@ Item {
                 anchors.rightMargin: NotificationMetrics.cardPadding
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacingXS
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
                     text: I18n.tr("Dismiss")
                     buttonHeight: NotificationMetrics.controlSize
@@ -155,7 +156,7 @@ Item {
                     textColor: Theme.primary
                     onClicked: NotificationService.dismissGroup(root.notificationGroup?.key || "")
                 }
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
                     text: (root.notificationGroup?.count || 0).toString()
                     iconName: "expand_less"
@@ -246,7 +247,7 @@ Item {
         onAppMuted: NotificationService.dismissGroup(root.notificationGroup?.key || "")
     }
 
-    DankDropdown {
+    DDropdown {
         id: notificationCardContextMenu
         showTrigger: false
         popupWidth: NotificationMetrics.menuWidth

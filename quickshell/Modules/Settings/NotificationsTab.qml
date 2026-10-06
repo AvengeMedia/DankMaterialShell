@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Column {
@@ -95,7 +95,7 @@ Column {
         title: I18n.tr("Popups", "notification settings card title, popup notifications")
         settingKey: "notificationPopups"
 
-        headerActions: DankButton {
+        headerActions: DButton {
             text: I18n.tr("Preview")
             buttonHeight: Theme.buttonHeightXS
             onClicked: NotificationService.sendTestNotifications()
@@ -282,7 +282,7 @@ Column {
                 title: modelData.rule?.pattern || I18n.tr("Unknown")
                 singleLineTitle: true
 
-                DankActionButton {
+                DActionButton {
                     iconName: "delete"
                     iconColor: Theme.error
                     tooltipText: I18n.tr("Remove")

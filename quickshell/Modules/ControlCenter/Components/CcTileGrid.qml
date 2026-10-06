@@ -7,7 +7,7 @@ import qs.Modules.ControlCenter
 import "../utils/widgets.js" as WidgetUtils
 import "../../../Common/GridLayout.js" as GridUtils
 
-DankEditableGrid {
+DEditableGrid {
     id: root
 
     property var model: null

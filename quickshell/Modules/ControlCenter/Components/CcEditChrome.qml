@@ -4,7 +4,7 @@ import qs.Widgets
 import "../utils/widgets.js" as WidgetUtils
 import qs.Modules.ControlCenter
 
-DankGridEditChrome {
+DGridEditChrome {
     id: root
 
     property var widgetData: ({})

@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtCore
 import QtQuick
-import "../DankCommon/Common/Shape.js" as Shape
+import "../DCommon/Common/Shape.js" as Shape
 import Quickshell
 import Quickshell.Io
 import qs.Common
@@ -13,7 +13,7 @@ import "GSettings.js" as GSettings
 import "LayoutResolver.js" as LayoutResolver
 import "settings/SettingsSpec.js" as Spec
 import "settings/SettingsStore.js" as Store
-import "../DankCommon/Common/settings/SpecUtil.js" as SpecUtil
+import "../DCommon/Common/settings/SpecUtil.js" as SpecUtil
 import "settings/BarWidgetDefaults.js" as WidgetDefaults
 import "settings/DockConfig.js" as DockConfig
 
@@ -442,6 +442,7 @@ Singleton {
     property int appLauncherGridColumns: Spec.SPEC.appLauncherGridColumns.def
     property bool closeNiriOverviewOnWindowFocus: Spec.SPEC.closeNiriOverviewOnWindowFocus.def
     property bool rememberLastQuery: Spec.SPEC.rememberLastQuery.def
+    property bool launcherHistoryEnabled: Spec.SPEC.launcherHistoryEnabled.def
     property bool rememberLastMode: Spec.SPEC.rememberLastMode.def
     property var spotlightSectionViewModes: Spec.SPEC.spotlightSectionViewModes.def
     onSpotlightSectionViewModesChanged: saveSettings()
@@ -1623,6 +1624,13 @@ Singleton {
         });
     }
 
+    function syncLauncherHistory(who, key) {
+        if (who[key])
+            return;
+        AppUsageHistoryData.clear();
+        SessionData.clearLauncherHistory();
+    }
+
     function markGreeterSyncPending(who, key, oldValue) {
         if (isGreeterMode)
             return;
@@ -1679,7 +1687,8 @@ Singleton {
             "updateCompositorCursor": updateCompositorCursor,
             "scheduleAuthApply": scheduleAuthApply,
             "scheduleGreeterAutoLoginSync": scheduleGreeterAutoLoginSync,
-            "markGreeterSyncPending": markGreeterSyncPending
+            "markGreeterSyncPending": markGreeterSyncPending,
+            "syncLauncherHistory": syncLauncherHistory
         })
 
     function set(key, value) {

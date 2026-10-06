@@ -3,6 +3,7 @@ package registries
 import (
 	"testing"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipolicy"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -76,4 +77,24 @@ func TestLoadIgnoresInvalidConfig(t *testing.T) {
 	require.Len(t, sources, 2, "invalid entries dropped")
 	assert.Equal(t, "ok", sources[1].Name)
 	assert.Equal(t, officialURL, sources[0].URL, "official cannot be spoofed from config")
+}
+
+func TestActive(t *testing.T) {
+	fs := setupFs(t)
+	require.NoError(t, Add(fs, "extra", "https://example.com/extra.git"))
+
+	sources, err := Active(fs)
+	require.NoError(t, err)
+	require.Len(t, sources, 2)
+	assert.Equal(t, Load(fs), sources, "registries are on without a policy")
+
+	require.NoError(t, afero.WriteFile(fs, clipolicy.AdminPath, []byte(`{"disable_registries": true}`), 0o644))
+	sources, err = Active(fs)
+	require.NoError(t, err)
+	assert.Empty(t, sources, "the extra registry is off too")
+	assert.Len(t, Load(fs), 2, "Load still reports the configured registries")
+
+	require.NoError(t, afero.WriteFile(fs, clipolicy.AdminPath, []byte("{not json"), 0o644))
+	_, err = Active(fs)
+	assert.Error(t, err, "a malformed policy is not ignored")
 }

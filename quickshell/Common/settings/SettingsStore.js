@@ -1,7 +1,7 @@
 .pragma library
 .import "./SettingsSpec.js" as SpecModule
-.import "../../DankCommon/Common/settings/SpecUtil.js" as Util
-.import "../../DankCommon/Common/Shape.js" as Shape
+.import "../../DCommon/Common/settings/SpecUtil.js" as Util
+.import "../../DCommon/Common/Shape.js" as Shape
 .import "./BarWidgetDefaults.js" as WidgetDefaults
 .import "./DockConfig.js" as DockConfig
 

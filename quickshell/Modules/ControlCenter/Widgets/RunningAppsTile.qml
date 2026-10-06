@@ -4,7 +4,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Modules.ControlCenter
-import qs.Widgets
+import qs.DCommon.Widgets
 
 CcTile {
     id: root
@@ -121,7 +121,7 @@ CcTile {
                 visible: body.label !== ""
             }
 
-            DankIcon {
+            DIcon {
                 id: chevron
 
                 anchors.right: parent.right

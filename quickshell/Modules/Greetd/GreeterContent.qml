@@ -8,8 +8,9 @@ import Quickshell.Services.Greetd
 import qs.Common
 import qs.Modules.Lock
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
-import qs.DankCommon.Session
+import qs.DCommon.Session
 import "../../Common/PamStack.js" as PamStack
 
 Item {
@@ -352,7 +353,6 @@ Item {
         GreeterState.username = "";
         GreeterState.usernameInput = "";
         GreeterState.selectedUserIndex = -1;
-        inputField.text = "";
         root.applyPickerPreviewTheme();
         Qt.callLater(() => inputField.forceActiveFocus());
     }
@@ -364,7 +364,6 @@ Item {
         root.userListOpen = true;
         GreeterState.username = "";
         GreeterState.usernameInput = "";
-        inputField.text = "";
         root.applyPickerPreviewTheme();
     }
 
@@ -386,7 +385,7 @@ Item {
             Greetd.cancelSession();
         const previousUser = GreeterState.username;
         GreeterState.reset();
-        inputField.text = "";
+        inputField.passwordVisible = false;
         PortalService.profileImage = "";
         if (previousUser)
             root.pickerThemeUsername = previousUser;
@@ -437,7 +436,6 @@ Item {
         // Some PAM stacks expect an explicit empty response to advance U2F/fprint or fail normally.
         Greetd.respond(GreeterState.passwordBuffer || "");
         GreeterState.passwordBuffer = "";
-        inputField.text = "";
         return true;
     }
 
@@ -624,7 +622,7 @@ Item {
         return hasCustomWallpaper ? "Fill" : SessionData.getMonitorWallpaperFillMode(screenName);
     }
 
-    DankBackdrop {
+    DBackdrop {
         anchors.fill: parent
         screenName: root.screenName
         blur: Theme.lockScreenBlur
@@ -833,7 +831,7 @@ Item {
                         Layout.preferredHeight: 60
                         visible: SettingsData.lockScreenShowProfileImage || root.pickerAvailable
 
-                        DankCircularImage {
+                        DCircularImage {
                             anchors.fill: parent
                             ringWidth: Theme.avatarRingWidth
                             ringColor: Theme.avatarRingColor
@@ -883,7 +881,7 @@ Item {
                                 }
                             }
 
-                            DankIcon {
+                            DIcon {
                                 anchors.centerIn: parent
                                 name: "switch_account"
                                 size: 24
@@ -910,16 +908,14 @@ Item {
                     }
 
                     Rectangle {
-                        property bool showPassword: false
-
                         Layout.fillWidth: true
-                        Layout.preferredHeight: root.showUserPicker && root.userListOpen ? Math.max(60, userPicker.implicitHeight + Theme.spacingM * 2) : 60
-
+                        Layout.preferredHeight: root.userListOpen ? Math.max(Theme.buttonHeightM, userPicker.implicitHeight + Theme.spacingM * 2) : Theme.buttonHeightM
+                        visible: root.showUserPicker
                         clip: true
-                        radius: Theme.cornerRadius
-                        color: Theme.withAlpha(Theme.cardSurface, 0.9)
-                        border.color: inputField.activeFocus ? Theme.primary : Theme.outlineMedium
-                        border.width: inputField.activeFocus ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
+                        radius: Theme.cornerRadiusXL
+                        color: Theme.surfaceContainerHigh
+                        border.color: Theme.outlineMedium
+                        border.width: Theme.layerOutlineWidth
 
                         GreeterUserPicker {
                             id: userPicker
@@ -930,7 +926,6 @@ Item {
                             anchors.top: root.userListOpen ? parent.top : undefined
                             anchors.margins: Theme.spacingM
                             maxExpandedHeight: root.userPickerMaxHeight
-                            visible: root.showUserPicker && !GreeterState.showPasswordInput
                             expanded: root.userListOpen
                             autoLoginVisible: root.autoLoginAvailable
                             autoLoginChecked: root.autoLoginOnSuccess
@@ -941,248 +936,95 @@ Item {
                             onManualEntryRequested: root.enterManualUsernameEntry()
                         }
 
-                        DankIcon {
-                            id: lockIcon
-
-                            anchors.left: parent.left
-                            anchors.leftMargin: Theme.spacingM
-                            anchors.verticalCenter: parent.verticalCenter
-                            name: GreeterState.showPasswordInput ? "lock" : "person"
-                            size: 20
-                            color: inputField.activeFocus ? Theme.primary : Theme.surfaceVariantText
-                            visible: !root.showUserPicker
+                        Behavior on Layout.preferredHeight {
+                            NumberAnimation {
+                                duration: Theme.mediumDuration
+                                easing.type: Theme.standardEasing
+                            }
                         }
+                    }
 
-                        TextInput {
-                            id: inputField
+                    DTextField {
+                        id: inputField
 
-                            property bool syncingFromState: false
+                        readonly property bool inputIdle: (Greetd.state === GreetdState.Inactive || root.awaitingExternalAuth || root.pendingPasswordResponse) && !GreeterState.unlocking
 
-                            anchors.fill: parent
-                            anchors.leftMargin: lockIcon.width + Theme.spacingM * 2
-                            anchors.rightMargin: {
-                                let margin = Theme.spacingM;
-                                if (GreeterState.showPasswordInput && revealButton.visible) {
-                                    margin += revealButton.width;
-                                }
-                                if (externalAuthButton.visible) {
-                                    margin += externalAuthButton.width;
-                                }
-                                if (virtualKeyboardButton.visible) {
-                                    margin += virtualKeyboardButton.width;
-                                }
-                                if (enterButton.visible) {
-                                    margin += enterButton.width + 2;
-                                }
-                                return margin;
-                            }
-                            enabled: !root.showUserPicker || GreeterState.showPasswordInput
-                            opacity: 0
-                            focus: !root.showUserPicker || GreeterState.showPasswordInput
-                            echoMode: GreeterState.showPasswordInput ? (parent.showPassword ? TextInput.Normal : TextInput.Password) : TextInput.Normal
-                            onTextChanged: {
-                                if (syncingFromState)
-                                    return;
-                                if (GreeterState.showPasswordInput) {
-                                    GreeterState.passwordBuffer = text;
-                                    if (!text || text.length === 0)
-                                        root.passwordSubmitRequested = false;
-                                } else {
-                                    GreeterState.usernameInput = text;
-                                }
-                            }
-                            onAccepted: {
-                                if (GreeterState.showPasswordInput) {
-                                    root.startAuthSession(true);
-                                } else {
-                                    if (text.trim()) {
-                                        root.submitUsername(text);
-                                        syncingFromState = true;
-                                        text = "";
-                                        syncingFromState = false;
-                                    }
-                                }
+                        Layout.fillWidth: true
+                        visible: !root.showUserPicker
+                        focus: visible
+                        expressive: true
+                        morph: GreeterState.showPasswordInput
+                        busy: !inputIdle
+                        isError: GreeterState.pamState !== ""
+                        leftIconName: GreeterState.showPasswordInput ? "lock" : "person"
+                        labelText: {
+                            if (GreeterState.unlocking)
+                                return I18n.tr("Logging in...");
+                            if (!inputIdle)
+                                return I18n.tr("Authenticating...");
+                            if (GreeterState.showPasswordInput)
+                                return I18n.tr("Password...");
+                            return I18n.tr("Username...");
+                        }
+                        placeholderColor: inputIdle ? Theme.outline : Theme.primary
+                        showPasswordToggle: GreeterState.showPasswordInput && inputIdle
+                        echoMode: GreeterState.showPasswordInput ? TextInput.Password : TextInput.Normal
+                        showAcceptButton: inputIdle
+                        acceptButtonName: I18n.tr("Login")
+                        text: GreeterState.showPasswordInput ? GreeterState.passwordBuffer : GreeterState.usernameInput
+                        trailingContent: Row {
+                            DActionButton {
+                                iconName: root.greeterPamHasFprint ? "fingerprint" : "key"
+                                tooltipText: root.greeterPamHasFprint ? I18n.tr("Fingerprint") : I18n.tr("Security key")
+                                buttonSize: inputField.accessorySize
+                                visible: GreeterState.showPasswordInput && root.greeterExternalAuthAvailable && GreeterState.passwordBuffer.length === 0 && inputField.inputIdle
+                                onClicked: root.startAuthSession(false)
                             }
 
-                            Component.onCompleted: {
-                                syncingFromState = true;
-                                text = GreeterState.showPasswordInput ? GreeterState.passwordBuffer : GreeterState.usernameInput;
-                                syncingFromState = false;
-                                if (isPrimaryScreen && !powerMenu.isVisible)
-                                    forceActiveFocus();
+                            DActionButton {
+                                iconName: "keyboard"
+                                Accessible.name: I18n.tr("Keyboard")
+                                buttonSize: inputField.accessorySize
+                                visible: inputField.inputIdle
+                                onClicked: {
+                                    if (keyboard_controller.isKeyboardActive)
+                                        keyboard_controller.hide();
+                                    else
+                                        keyboard_controller.show();
+                                }
                             }
-                            onVisibleChanged: {
-                                if (visible && isPrimaryScreen && !powerMenu.isVisible)
-                                    forceActiveFocus();
+                        }
+                        onTextEdited: {
+                            if (!GreeterState.showPasswordInput) {
+                                GreeterState.usernameInput = text;
+                                return;
                             }
+                            GreeterState.passwordBuffer = text;
+                            if (text.length === 0)
+                                root.passwordSubmitRequested = false;
+                        }
+                        onAccepted: {
+                            if (GreeterState.showPasswordInput) {
+                                root.startAuthSession(true);
+                                return;
+                            }
+                            if (text.trim())
+                                root.submitUsername(text);
+                        }
+                        Component.onCompleted: {
+                            if (isPrimaryScreen && !powerMenu.isVisible)
+                                forceActiveFocus();
+                        }
+                        onVisibleChanged: {
+                            if (visible && isPrimaryScreen && !powerMenu.isVisible)
+                                forceActiveFocus();
                         }
 
                         KeyboardController {
                             id: keyboard_controller
                             target: inputField
                             rootObject: root
-                        }
-
-                        StyledText {
-                            id: placeholder
-
-                            anchors.left: lockIcon.right
-                            anchors.leftMargin: Theme.spacingM
-                            anchors.right: (GreeterState.showPasswordInput && revealButton.visible ? revealButton.left : (externalAuthButton.visible ? externalAuthButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right))))
-                            anchors.rightMargin: 2
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: {
-                                if (GreeterState.unlocking) {
-                                    return I18n.tr("Logging in...");
-                                }
-                                if (Greetd.state !== GreetdState.Inactive && !awaitingExternalAuth && !pendingPasswordResponse) {
-                                    return I18n.tr("Authenticating...");
-                                }
-                                if (GreeterState.showPasswordInput) {
-                                    return I18n.tr("Password...");
-                                }
-                                if (root.showUserPicker) {
-                                    return "";
-                                }
-                                return I18n.tr("Username...");
-                            }
-                            color: (GreeterState.unlocking || (Greetd.state !== GreetdState.Inactive && !awaitingExternalAuth && !pendingPasswordResponse)) ? Theme.primary : Theme.outline
-                            font.pixelSize: Theme.fontSizeMedium
-                            opacity: (GreeterState.showPasswordInput ? GreeterState.passwordBuffer.length === 0 : (root.showUserPicker ? false : GreeterState.usernameInput.length === 0)) ? 1 : 0
-
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: Theme.mediumDuration
-                                    easing.type: Theme.standardEasing
-                                }
-                            }
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Theme.standardEasing
-                                }
-                            }
-                        }
-
-                        StyledText {
-                            anchors.left: lockIcon.right
-                            anchors.leftMargin: Theme.spacingM
-                            anchors.right: (GreeterState.showPasswordInput && revealButton.visible ? revealButton.left : (externalAuthButton.visible ? externalAuthButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right))))
-                            anchors.rightMargin: 2
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: {
-                                if (GreeterState.showPasswordInput) {
-                                    if (parent.showPassword) {
-                                        return GreeterState.passwordBuffer;
-                                    }
-                                    return "•".repeat(GreeterState.passwordBuffer.length);
-                                }
-                                return GreeterState.usernameInput;
-                            }
-                            color: Theme.surfaceText
-                            font.pixelSize: (GreeterState.showPasswordInput && !parent.showPassword) ? Theme.fontSizeLarge : Theme.fontSizeMedium
-                            opacity: (GreeterState.showPasswordInput ? GreeterState.passwordBuffer.length > 0 : (root.showUserPicker ? false : GreeterState.usernameInput.length > 0)) ? 1 : 0
-                            clip: true
-                            elide: Text.ElideNone
-                            horizontalAlignment: implicitWidth > width ? Text.AlignRight : Text.AlignLeft
-
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: Theme.mediumDuration
-                                    easing.type: Theme.standardEasing
-                                }
-                            }
-                        }
-
-                        DankActionButton {
-                            id: revealButton
-
-                            anchors.right: externalAuthButton.visible ? externalAuthButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right))
-                            anchors.rightMargin: 0
-                            anchors.verticalCenter: parent.verticalCenter
-                            iconName: parent.showPassword ? "visibility_off" : "visibility"
-                            Accessible.name: parent.showPassword ? I18n.tr("Hide password") : I18n.tr("Show password")
-                            buttonSize: 32
-                            visible: GreeterState.showPasswordInput && GreeterState.passwordBuffer.length > 0 && (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking
-                            enabled: visible
-                            onClicked: parent.showPassword = !parent.showPassword
-                        }
-                        DankActionButton {
-                            id: externalAuthButton
-
-                            anchors.right: virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right)
-                            anchors.rightMargin: 0
-                            anchors.verticalCenter: parent.verticalCenter
-                            iconName: root.greeterPamHasFprint ? "fingerprint" : "key"
-                            tooltipText: root.greeterPamHasFprint ? I18n.tr("Fingerprint") : I18n.tr("Security key")
-                            buttonSize: 32
-                            visible: GreeterState.showPasswordInput && root.greeterExternalAuthAvailable && GreeterState.passwordBuffer.length === 0 && (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking
-                            enabled: visible
-                            onClicked: root.startAuthSession(false)
-                        }
-                        DankActionButton {
-                            id: virtualKeyboardButton
-
-                            anchors.right: enterButton.visible ? enterButton.left : parent.right
-                            anchors.rightMargin: enterButton.visible ? 0 : Theme.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-                            iconName: "keyboard"
-                            Accessible.name: I18n.tr("Keyboard")
-                            buttonSize: 32
-                            visible: (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking && (!root.showUserPicker || GreeterState.showPasswordInput)
-                            enabled: visible
-                            onClicked: {
-                                if (keyboard_controller.isKeyboardActive) {
-                                    keyboard_controller.hide();
-                                } else {
-                                    keyboard_controller.show();
-                                }
-                            }
-                        }
-
-                        DankActionButton {
-                            id: enterButton
-
-                            anchors.right: parent.right
-                            anchors.rightMargin: 2
-                            anchors.verticalCenter: parent.verticalCenter
-                            iconName: "keyboard_return"
-                            Accessible.name: I18n.tr("Login")
-                            buttonSize: 36
-                            visible: (Greetd.state === GreetdState.Inactive || awaitingExternalAuth || pendingPasswordResponse) && !GreeterState.unlocking && (!root.showUserPicker || GreeterState.showPasswordInput)
-                            enabled: true
-                            onClicked: {
-                                if (GreeterState.showPasswordInput) {
-                                    root.startAuthSession(true);
-                                } else {
-                                    if (inputField.text.trim()) {
-                                        root.submitUsername(inputField.text);
-                                        inputField.text = "";
-                                    }
-                                }
-                            }
-
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Theme.standardEasing
-                                }
-                            }
-                        }
-
-                        Behavior on border.color {
-                            ColorAnimation {
-                                duration: Theme.shortDuration
-                                easing.type: Theme.standardEasing
-                            }
-                        }
-
-                        Behavior on Layout.preferredHeight {
-                            NumberAnimation {
-                                duration: Theme.mediumDuration
-                                easing.type: Theme.standardEasing
-                            }
+                            expressive: true
                         }
                     }
                 }
@@ -1243,7 +1085,7 @@ Item {
             useFahrenheit: SettingsData.useFahrenheit
         }
 
-        DankActionButton {
+        DActionButton {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.margins: Theme.spacingXL
@@ -1286,7 +1128,7 @@ Item {
                 }
             }
 
-            DankDropdown {
+            DDropdown {
                 id: sessionDropdown
                 anchors.fill: parent
                 text: ""
@@ -1568,8 +1410,8 @@ Item {
                 passwordFailureCount = passwordFailureCount + 1;
             }
             authFeedbackMessage = currentAuthMessage();
+            inputField.shake();
             GreeterState.passwordBuffer = "";
-            inputField.text = "";
             placeholderDelay.restart();
             Greetd.cancelSession();
         }
@@ -1584,8 +1426,8 @@ Item {
             GreeterState.unlocking = false;
             GreeterState.pamState = "error";
             authFeedbackMessage = currentAuthMessage();
+            inputField.shake();
             GreeterState.passwordBuffer = "";
-            inputField.text = "";
             placeholderDelay.restart();
             Greetd.cancelSession();
         }
@@ -1621,7 +1463,6 @@ Item {
             GreeterState.pamState = "error";
             authFeedbackMessage = currentAuthMessage();
             GreeterState.passwordBuffer = "";
-            inputField.text = "";
             placeholderDelay.restart();
             Greetd.cancelSession();
         }

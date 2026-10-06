@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -70,9 +70,9 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingXS
 
-                    DankTextField {
+                    DTextField {
                         id: usernameField
-                        outlined: true
+                        expressive: true
                         leftIconName: "person"
                         labelText: I18n.tr("Username")
                         width: parent.width
@@ -111,9 +111,9 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingXS
 
-                    DankTextField {
+                    DTextField {
                         id: passwordField
-                        outlined: true
+                        expressive: true
                         leftIconName: "lock"
                         labelText: I18n.tr("Password")
                         width: parent.width
@@ -129,9 +129,9 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingXS
 
-                    DankTextField {
+                    DTextField {
                         id: confirmField
-                        outlined: true
+                        expressive: true
                         leftIconName: "lock"
                         labelText: I18n.tr("Confirm password")
                         width: parent.width
@@ -177,7 +177,7 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingM
 
-                    DankButton {
+                    DButton {
                         text: root.operationPending ? I18n.tr("Working...", "create user button text while the operation runs") : I18n.tr("Add user", "button and settings page title, creates a new user account")
                         iconName: "person_add"
                         backgroundColor: Theme.primary

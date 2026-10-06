@@ -6,7 +6,7 @@ import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
-import qs.DankCommon.Session
+import qs.DCommon.Session
 
 Item {
     id: root
@@ -37,7 +37,7 @@ Item {
         }
         asynchronous: false
 
-        sourceComponent: DankBackdrop {
+        sourceComponent: DBackdrop {
             screenName: root.screenName
             blur: Theme.lockScreenBlur
             blurMax: Theme.lockScreenBlurMax

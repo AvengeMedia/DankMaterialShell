@@ -4,7 +4,7 @@ import qs.Common
 import qs.Modals.Common
 import qs.Modules.ColorPicker
 
-DankModal {
+DModal {
     id: root
 
     layerNamespace: "dms:color-picker"

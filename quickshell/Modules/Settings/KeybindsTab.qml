@@ -7,7 +7,7 @@ import qs.Common
 import qs.Modals.Common
 import qs.Modules.Settings.Widgets
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: keybindsTab
@@ -512,7 +512,7 @@ Item {
                 spacing: Theme.spacingS
                 layoutDirection: Qt.RightToLeft
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Accept reviewed changes", "Aqueous keyboard shortcut editor, retaining an unsaved edit while reviewing current bindings")
                     iconName: "check"
                     visible: reviewPanel.host.reviewingEdit && !!reviewPanel.host.reviewSnapshot
@@ -520,7 +520,7 @@ Item {
                     onClicked: reviewPanel.host.acceptReview()
                 }
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Remove", "verb, button that removes an item from a list")
                     iconName: "delete"
                     visible: reviewPanel.host.hasEditDraft && reviewPanel.host.editDraft.operation !== "set"
@@ -528,7 +528,7 @@ Item {
                     onClicked: reviewPanel.host.confirmEditRemoval()
                 }
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Discard")
                     backgroundColor: "transparent"
                     textColor: Theme.surfaceText
@@ -536,7 +536,7 @@ Item {
                     onClicked: reviewPanel.host.discardEdit()
                 }
 
-                DankActionButton {
+                DActionButton {
                     iconName: "refresh"
                     iconColor: Theme.surfaceVariantText
                     Accessible.name: I18n.tr("Refresh")
@@ -585,7 +585,7 @@ Item {
         }
     }
 
-    DankListView {
+    DListView {
         id: flickable
         keyNavigationEnabled: false
         // ListView hands focus to every new current row; cleared, filtering can't steal it from the header search
@@ -642,7 +642,7 @@ Item {
                 topPadding: Theme.spacingXS
                 spacing: Theme.spacingL
 
-                DankSearchField {
+                DSearchField {
                     id: searchInput
                     width: parent.width
                     placeholderText: I18n.tr("Search shortcuts...")
@@ -652,7 +652,7 @@ Item {
                     }
                 }
 
-                DankFilterChips {
+                DFilterChips {
                     id: categoryFilter
                     width: parent.width
                     showCounts: false
@@ -685,7 +685,7 @@ Item {
                         anchors.margins: Theme.spacingL
                         spacing: Theme.spacingM
 
-                        DankIcon {
+                        DIcon {
                             name: warningBox.showWarning ? "info" : "warning"
                             size: Theme.iconSize
                             color: Theme.primary
@@ -734,7 +734,7 @@ Item {
                             }
                         }
 
-                        DankButton {
+                        DButton {
                             id: fixButton
                             visible: warningBox.showSetup
                             text: KeybindsService.fixing ? I18n.tr("Setting up...") : I18n.tr("Setup", "verb, button that creates the dms include config file")
@@ -771,7 +771,7 @@ Item {
 
                             leading: Loader {
                                 active: keybindsTab.initialLoading
-                                sourceComponent: DankSpinner {
+                                sourceComponent: DSpinner {
                                     size: Theme.iconSize
                                 }
                             }
@@ -787,7 +787,7 @@ Item {
                 SettingsFabBar {
                     shown: !KeybindsService.readOnly
 
-                    DankFab {
+                    DFab {
                         text: I18n.tr("Add shortcut", "keybind editor dialog title and button")
                         iconName: "add"
                         onClicked: keybindsTab.openNewEditor()

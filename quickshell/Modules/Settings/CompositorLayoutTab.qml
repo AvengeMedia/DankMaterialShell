@@ -2,7 +2,7 @@ import QtCore
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -63,7 +63,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 anchors.margins: Theme.spacingL
                 spacing: Theme.spacingM
 
-                DankIcon {
+                DIcon {
                     name: "warning"
                     size: Theme.iconSize
                     color: Theme.primary

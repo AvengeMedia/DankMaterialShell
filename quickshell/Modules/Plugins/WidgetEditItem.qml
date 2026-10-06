@@ -200,7 +200,7 @@ Item {
                 }
             }
 
-            DankGridEditChrome {
+            DGridEditChrome {
                 id: chrome
 
                 property real startWidth

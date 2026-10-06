@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import qs.DCommon.Common as DCommon
 import "../Common/AqueousIpc.js" as Ipc
 
 Singleton {
@@ -567,7 +568,7 @@ Singleton {
         onTriggered: root.reconnecting = false
     }
 
-    component IpcConnection: DankSocket {
+    component IpcConnection: DCommon.DSocket {
         id: connection
         property bool events: false
         property var handshake: null

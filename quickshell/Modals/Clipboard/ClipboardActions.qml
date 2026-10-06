@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: actions
@@ -17,7 +17,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.spacingXS
 
-        DankActionButton {
+        DActionButton {
             Keys.forwardTo: [actions.modal.modalFocusScope]
             iconName: "push_pin"
             iconColor: actions.modal.activeTab === "saved" ? Theme.onPrimary : Theme.onSurfaceVariant
@@ -27,7 +27,7 @@ Item {
             onClicked: actions.modal.activeTab = actions.modal.activeTab === "saved" ? "recents" : "saved"
         }
 
-        DankActionButton {
+        DActionButton {
             Keys.forwardTo: [actions.modal.modalFocusScope]
             objectName: "keyboardHints"
             iconName: "info"
@@ -44,14 +44,14 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.spacingXS
 
-        DankActionButton {
+        DActionButton {
             Keys.forwardTo: [actions.modal.modalFocusScope]
             iconName: "settings"
             tooltipText: I18n.tr("Settings")
             onClicked: actions.modal.openSettings()
         }
 
-        DankActionButton {
+        DActionButton {
             Keys.forwardTo: [actions.modal.modalFocusScope]
             iconName: "delete_sweep"
             iconColor: Theme.onSecondaryContainer
@@ -60,7 +60,7 @@ Item {
             onClicked: actions.modal.confirmClearAll()
         }
 
-        DankActionButton {
+        DActionButton {
             Keys.forwardTo: [actions.modal.modalFocusScope]
             visible: !actions.modal.popout
             iconName: "close"

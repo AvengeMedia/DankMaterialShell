@@ -6,7 +6,7 @@ import Quickshell.Io
 import qs.Common
 import qs.Modals.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -182,6 +182,12 @@ Item {
         Qt.callLater(checkGreeterInstallState);
     }
 
+    Process {
+        id: greetdEnabledCheckProcess
+        command: ["sh", "-c", "if [ \"$(uname -s)\" = FreeBSD ]; then service -e 2>/dev/null | grep -Eq \"/greetd$\" && echo enabled || echo disabled; else systemctl is-enabled greetd 2>/dev/null; fi"]
+        running: false
+    }
+
     function showWidgetBrowser() {
         greeterWidgetBrowserLoader.active = true;
         greeterWidgetBrowserLoader.item?.show();
@@ -284,7 +290,7 @@ Item {
                 title: root.greeterStateTitle
                 subtitle: root.greeterStateSubtitle
 
-                DankButton {
+                DButton {
                     visible: root.greeterStateAction !== ""
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.greeterStateAction
@@ -509,7 +515,7 @@ Item {
 
             readonly property bool syncPending: SessionData.greeterSyncPending && GreeterService.binaryExists
 
-            DankFab {
+            DFab {
                 visible: greeterFabs.syncPending
                 text: I18n.tr("Revert")
                 iconName: "undo"
@@ -518,7 +524,7 @@ Item {
                 onClicked: SettingsData.revertGreeterSyncPending()
             }
 
-            DankFab {
+            DFab {
                 visible: greeterFabs.syncPending
                 text: GreeterService.syncing ? I18n.tr("Syncing...", "greeter settings status while sync is running") : I18n.tr("Apply changes")
                 iconName: "check"
@@ -528,7 +534,7 @@ Item {
                 onClicked: GreeterService.sync()
             }
 
-            DankFab {
+            DFab {
                 visible: !greeterFabs.syncPending
                 text: I18n.tr("Edit widgets")
                 iconName: "edit"
@@ -536,7 +542,7 @@ Item {
                 onClicked: SessionService.greeterEditorRequested()
             }
 
-            DankFab {
+            DFab {
                 visible: !greeterFabs.syncPending && !SettingsData.greeterFollowLockScreen
                 text: I18n.tr("Add widget")
                 iconName: "add"
