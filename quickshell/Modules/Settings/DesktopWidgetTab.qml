@@ -4,7 +4,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import qs.Modules.Settings.DesktopWidgetSettings as DWS
 
@@ -153,7 +153,7 @@ Item {
                         elide: Text.ElideMiddle
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         id: copyButton
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "content_copy"

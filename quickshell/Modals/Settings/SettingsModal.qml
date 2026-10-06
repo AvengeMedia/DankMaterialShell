@@ -3,10 +3,11 @@ import Quickshell
 import qs.Common
 import qs.Modals.FileBrowser
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
-DankFloatingWindow {
+DFloatingWindow {
     id: settingsModal
 
     property var profileBrowser: profileBrowserLoader.item
@@ -293,7 +294,7 @@ DankFloatingWindow {
             anchors.fill: parent
             spacing: 0
 
-            DankWindowHeader {
+            DWindowHeader {
                 id: titleBar
                 width: parent.width
                 z: 10
@@ -341,7 +342,7 @@ DankFloatingWindow {
                     anchors.rightMargin: body.paneInset + SettingsMetrics.panePadding
                     spacing: Theme.spacingM
 
-                    DankIcon {
+                    DIcon {
                         name: "info"
                         size: Theme.iconSize
                         color: Theme.warning
@@ -359,7 +360,7 @@ DankFloatingWindow {
                         wrapMode: Text.WordWrap
                     }
 
-                    DankButton {
+                    DButton {
                         id: copySettingsButton
 
                         visible: SettingsData.isReadOnly && SettingsData.unsavedUserChanges
@@ -376,7 +377,7 @@ DankFloatingWindow {
                         }
                     }
 
-                    DankButton {
+                    DButton {
                         id: copySessionButton
 
                         visible: SessionData._isReadOnly && SessionData._hasUnsavedChanges

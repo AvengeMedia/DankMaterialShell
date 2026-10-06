@@ -5,8 +5,8 @@ import Quickshell.Widgets
 import qs.Common
 import qs.Modules.Notifications as Notifications
 import qs.Services
-import qs.Widgets
-import qs.DankCommon.Session
+import qs.DCommon.Widgets
+import qs.DCommon.Session
 
 Item {
     id: root
@@ -245,7 +245,7 @@ Item {
                     anchors.centerIn: parent
                     spacing: Theme.spacingS
 
-                    DankIcon {
+                    DIcon {
                         name: "notifications"
                         size: Theme.iconSizeSmall + Theme.spacingXXS
                         color: Theme.onSurfaceVariant
@@ -279,7 +279,7 @@ Item {
                 radius: Theme.groupedListOuterRadius
                 color: "transparent"
 
-                DankFlickable {
+                DFlickable {
                     anchors.fill: parent
                     contentHeight: notificationColumn.implicitHeight
                     clip: true

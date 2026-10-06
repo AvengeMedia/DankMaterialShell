@@ -6,7 +6,7 @@ import qs.Common
 import qs.Modals.Common
 import qs.Modals.FileBrowser
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import "../../Common/ThemePalette.js" as ThemePalette
 
@@ -125,7 +125,7 @@ Item {
                         height: themeCategoryGroup.implicitHeight
                         clip: true
 
-                        DankButtonGroup {
+                        DButtonGroup {
                             id: themeCategoryGroup
                             arrowKeysSelect: false
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -247,7 +247,7 @@ Item {
                             visible: Theme.wallpaperPath && Theme.wallpaperPath.startsWith("#")
                         }
 
-                        DankIcon {
+                        DIcon {
                             anchors.centerIn: parent
                             name: (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing") ? "error" : "palette"
                             size: Theme.iconSizeLarge
@@ -298,7 +298,7 @@ Item {
                         }
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         buttonSize: 36
                         iconName: "download"
                         iconSize: Theme.iconSize
@@ -365,7 +365,7 @@ Item {
                         }
                     }
 
-                    DankSpinner {
+                    DSpinner {
                         anchors.centerIn: parent
                         running: !MatugenPreviewService.ready
                         visible: running
@@ -457,7 +457,7 @@ Item {
                         width: parent.width
                         spacing: Theme.spacingM
 
-                        DankActionButton {
+                        DActionButton {
                             buttonSize: Theme.minimumTouchTargetSize
                             iconName: "folder_open"
                             Accessible.name: I18n.tr("Browse Files")
@@ -467,7 +467,7 @@ Item {
                             onClicked: fileBrowserModal.open()
                         }
 
-                        DankPaletteSwatch {
+                        DPaletteSwatch {
                             id: customSwatch
                             width: Theme.minimumTouchTargetSize
                             height: Theme.minimumTouchTargetSize
@@ -567,7 +567,7 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                     }
 
-                    DankButton {
+                    DButton {
                         text: I18n.tr("Browse Themes", "browse themes button")
                         iconName: "store"
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -664,7 +664,7 @@ Item {
                         clip: true
                         visible: variantSelector.isMultiVariant && variantSelector.flavorOptions.length > 1
 
-                        DankButtonGroup {
+                        DButtonGroup {
                             id: flavorButtonGroup
                             arrowKeysSelect: false
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -714,7 +714,7 @@ Item {
                             Repeater {
                                 model: variantSelector.activeThemeVariants?.accents || []
 
-                                DankColorButton {
+                                DColorButton {
                                     required property var modelData
                                     required property int index
                                     readonly property string accentId: modelData.id
@@ -741,7 +741,7 @@ Item {
                         clip: true
                         visible: !variantSelector.isMultiVariant && variantSelector.variantNames.length > 0
 
-                        DankButtonGroup {
+                        DButtonGroup {
                             id: variantButtonGroup
                             arrowKeysSelect: false
                             anchors.horizontalCenter: parent.horizontalCenter

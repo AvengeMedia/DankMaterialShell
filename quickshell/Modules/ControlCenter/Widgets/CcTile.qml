@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Item {
@@ -131,6 +132,12 @@ Item {
         clicked();
     }
 
+    function expand() {
+        if (!showExpand && !opensPage)
+            return;
+        expandClicked();
+    }
+
     Keys.onPressed: event => {
         if (!acceptsInput)
             return;
@@ -189,16 +196,9 @@ Item {
             anchors.bottomMargin: root.expanded ? root.height - root.headerHeight - root.tilePadding * 2 : 0
             stateColor: root.contentColor
             cornerRadius: root.bodyRadius
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
             tooltipText: root.compact || root.docked ? [root.title, root.subtitle].filter(text => text !== "").join(" · ") : ""
-            onClicked: mouse => {
-                if (mouse.button === Qt.RightButton) {
-                    if (root.showExpand || root.opensPage)
-                        root.expandClicked();
-                    return;
-                }
-                root.activate();
-            }
+            onClicked: root.activate()
+            onPressAndHold: root.expand()
             onWheel: wheelEvent => {
                 wheelEvent.accepted = false;
                 root.wheel(wheelEvent);
@@ -210,7 +210,7 @@ Item {
             visible: root.activeFocus
         }
 
-        DankIcon {
+        DIcon {
             id: compactIcon
             anchors.centerIn: parent
             name: root.iconName
@@ -220,7 +220,7 @@ Item {
             rotation: root.iconRotation
             visible: root.compact && root.bodyContent === null && root.iconContent === null
 
-            DankBlink {
+            DBlink {
                 target: compactIcon
                 running: root.iconBlinking && root.compact && root.visible && root.live
             }
@@ -285,7 +285,7 @@ Item {
                     }
                 }
 
-                DankIcon {
+                DIcon {
                     id: tileIcon
                     anchors.centerIn: parent
                     name: root.iconName
@@ -295,7 +295,7 @@ Item {
                     rotation: root.iconRotation
                     visible: root.iconContent === null
 
-                    DankBlink {
+                    DBlink {
                         target: tileIcon
                         running: root.iconBlinking && !root.compact && root.visible && root.live
                     }
@@ -371,7 +371,7 @@ Item {
                 }
             }
 
-            DankIcon {
+            DIcon {
                 id: chevron
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.spacingXS

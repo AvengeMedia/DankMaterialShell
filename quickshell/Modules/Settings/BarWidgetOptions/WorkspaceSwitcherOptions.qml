@@ -4,7 +4,6 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
 import qs.Modules.Settings
 import qs.Modules.Settings.Widgets
 
@@ -116,38 +115,36 @@ Column {
             onToggled: checked => root.page.set("showWorkspaceName", checked)
         }
 
-        SettingsToggleRow {
+        SettingsToggleCard {
             resetStore: root.page
             resetKeys: ["showWorkspaceApps"]
-            text: I18n.tr("Show apps")
+            title: I18n.tr("Show apps")
             visible: CompositorService.supportsWorkspaces
             enabled: !CompositorService.isAqueous || (AqueousService.available && Quickshell.env("DMS_FORCE_EXTWS") !== "1")
             checked: root.showApps
             onToggled: checked => root.page.set("showWorkspaceApps", checked)
-        }
 
-        SettingsSliderRow {
-            resetStore: root.page
-            resetKeys: ["maxWorkspaceIcons"]
-            enabled: root.showApps
-            text: I18n.tr("Max apps to show")
-            unit: ""
-            value: root.page.value("maxWorkspaceIcons")
-            minimum: 1
-            maximum: 10
-            onSliderValueChanged: newValue => root.page.set("maxWorkspaceIcons", newValue)
-        }
+            SettingsSliderRow {
+                resetStore: root.page
+                resetKeys: ["maxWorkspaceIcons"]
+                text: I18n.tr("Max apps to show")
+                unit: ""
+                value: root.page.value("maxWorkspaceIcons")
+                minimum: 1
+                maximum: 10
+                onSliderValueChanged: newValue => root.page.set("maxWorkspaceIcons", newValue)
+            }
 
-        SettingsSliderRow {
-            resetStore: root.page
-            resetKeys: ["workspaceAppIconSizeOffset"]
-            enabled: root.showApps
-            text: I18n.tr("Icon size")
-            value: root.page.value("workspaceAppIconSizeOffset")
-            minimum: 0
-            maximum: 10
-            unit: "px"
-            onSliderValueChanged: newValue => root.page.set("workspaceAppIconSizeOffset", newValue)
+            SettingsSliderRow {
+                resetStore: root.page
+                resetKeys: ["workspaceAppIconSizeOffset"]
+                text: I18n.tr("Icon size")
+                value: root.page.value("workspaceAppIconSizeOffset")
+                minimum: 0
+                maximum: 10
+                unit: "px"
+                onSliderValueChanged: newValue => root.page.set("workspaceAppIconSizeOffset", newValue)
+            }
         }
 
         SettingsToggleRow {
@@ -181,24 +178,18 @@ Column {
         collapsible: true
         expanded: false
 
-        SettingsToggleRow {
+        SettingsToggleSliderRow {
             resetStore: root.page
             resetKeys: ["showWorkspacePadding"]
+            valueKeys: ["workspacePaddingCount"]
             text: I18n.tr("Minimum workspaces", "workspace switcher slider label")
             description: CompositorService.supportsPersistentWorkspaces ? I18n.tr("Workspaces up to the count are always shown and can be opened", "workspace switcher minimum workspaces description on compositors with persistent workspaces") : I18n.tr("Empty placeholders fill the switcher up to the count", "workspace switcher minimum workspaces description")
             checked: root.page.value("showWorkspacePadding")
-            onToggled: checked => root.page.set("showWorkspacePadding", checked)
-        }
-
-        SettingsSliderRow {
-            resetStore: root.page
-            resetKeys: ["workspacePaddingCount"]
-            enabled: root.page.value("showWorkspacePadding")
-            text: I18n.tr("Workspace count", "workspace switcher slider label, number of workspaces to show")
             unit: ""
             value: root.page.value("workspacePaddingCount")
             minimum: 2
             maximum: 10
+            onToggled: checked => root.page.set("showWorkspacePadding", checked)
             onSliderValueChanged: newValue => root.page.set("workspacePaddingCount", newValue)
         }
 

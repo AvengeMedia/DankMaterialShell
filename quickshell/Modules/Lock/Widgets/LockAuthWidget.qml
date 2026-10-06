@@ -3,10 +3,11 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Shapes
+import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
-import qs.DankCommon.Session
+import qs.DCommon.Widgets
+import qs.DCommon.Session
 import "../../../Common/KeyUtils.js" as KeyUtils
 
 Item {
@@ -291,7 +292,7 @@ Item {
                 }
             }
 
-            DankCircularImage {
+            DCircularImage {
                 anchors.centerIn: parent
                 width: root.ringSize - root.ringStroke * 4
                 height: width
@@ -306,7 +307,7 @@ Item {
                 fallbackIcon: "material:person"
             }
 
-            DankIcon {
+            DIcon {
                 anchors.centerIn: parent
                 visible: !root.showProfileImage
                 name: root.unlocking ? "lock_open" : "lock"
@@ -327,7 +328,7 @@ Item {
             spacing: Theme.spacingM
             Layout.fillWidth: true
 
-            DankCircularImage {
+            DCircularImage {
                 Layout.preferredWidth: LockMetrics.avatarSize
                 ringWidth: Theme.avatarRingWidth
                 ringColor: Theme.avatarRingColor
@@ -454,7 +455,7 @@ Item {
                     width: !visible ? 0 : (root.morph ? LockMetrics.fieldHeight - Theme.spacingS * 2 : Theme.iconSizeSmall)
                     height: root.morph ? width : Theme.iconSizeSmall
 
-                    DankMaterialShape {
+                    DMaterialShape {
                         id: morphContainer
                         anchors.fill: parent
                         visible: root.morph
@@ -490,7 +491,7 @@ Item {
                         }
                     }
 
-                    DankLoadingIndicator {
+                    DLoadingIndicator {
                         anchors.centerIn: parent
                         size: parent.width
                         contained: true
@@ -498,7 +499,7 @@ Item {
                         running: visible
                     }
 
-                    DankIcon {
+                    DIcon {
                         id: lockIcon
 
                         anchors.centerIn: parent
@@ -782,31 +783,36 @@ Item {
                     }
 
                     // IME commits use a hidden password input: https://github.com/AvengeMedia/DankMaterialShell/issues/2950
-                    TextInput {
-                        id: imeCommitSink
-
+                    // An in-process module like fcitx5-qt draws its popup as an xdg_popup, which the lock surface cannot parent: https://github.com/AvengeMedia/DankMaterialShell/issues/3669
+                    Loader {
                         focus: true
-                        width: Theme.dividerWidth
-                        height: 1
-                        opacity: 0
-                        cursorDelegate: Item {}
-                        echoMode: TextInput.Password
-                        inputMethodHints: Qt.ImhHiddenText | Qt.ImhSensitiveData | Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
-                        KeyNavigation.tab: passwordField.KeyNavigation.tab
-                        KeyNavigation.backtab: passwordField.KeyNavigation.backtab
-                        Keys.onPressed: event => {
-                            passwordField.handleKey(event);
-                            if (!event.accepted && (event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier)))
-                                event.accepted = true;
-                        }
-                        onTextChanged: {
-                            if (text.length === 0)
-                                return;
-                            const committed = text;
-                            text = "";
-                            if (root.demoMode || root.unlocking || root.pam.passwd.active)
-                                return;
-                            passwordField.insertText(committed);
+                        active: KeyUtils.compositorTextInputSelected(Quickshell.env("QT_IM_MODULES"), Quickshell.env("QT_IM_MODULE"))
+                        sourceComponent: TextInput {
+                            id: imeCommitSink
+
+                            focus: true
+                            width: Theme.dividerWidth
+                            height: 1
+                            opacity: 0
+                            cursorDelegate: Item {}
+                            echoMode: TextInput.Password
+                            inputMethodHints: Qt.ImhHiddenText | Qt.ImhSensitiveData | Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
+                            KeyNavigation.tab: passwordField.KeyNavigation.tab
+                            KeyNavigation.backtab: passwordField.KeyNavigation.backtab
+                            Keys.onPressed: event => {
+                                passwordField.handleKey(event);
+                                if (!event.accepted && (event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier)))
+                                    event.accepted = true;
+                            }
+                            onTextChanged: {
+                                if (text.length === 0)
+                                    return;
+                                const committed = text;
+                                text = "";
+                                if (root.demoMode || root.unlocking || root.pam.passwd.active)
+                                    return;
+                                passwordField.insertText(committed);
+                            }
                         }
                     }
 
@@ -957,7 +963,7 @@ Item {
                         }
                     }
 
-                    DankTextCursor {
+                    DTextCursor {
                         id: passwordCursor
 
                         x: passwordDisplay.x + passwordDisplay.cursorRectangle.x
@@ -1045,7 +1051,7 @@ Item {
                     height: Theme.iconSize
                     visible: !root.demoMode && !root.ring && !root.morph && ((root.pam?.passwd.active ?? false) || root.unlocking)
 
-                    DankIcon {
+                    DIcon {
                         anchors.centerIn: parent
                         name: "check_circle"
                         size: Theme.iconSizeSmall
@@ -1062,7 +1068,7 @@ Item {
                         }
                     }
 
-                    DankLoadingIndicator {
+                    DLoadingIndicator {
                         anchors.centerIn: parent
                         size: Theme.iconSize
                         contained: root.style === "expressive"
@@ -1147,7 +1153,7 @@ Item {
             spacing: Theme.spacingXS
             opacity: DMSService.capsLockState ? 1 : 0
 
-            DankIcon {
+            DIcon {
                 name: "shift_lock"
                 size: Theme.iconSizeSmall
                 color: Theme.error

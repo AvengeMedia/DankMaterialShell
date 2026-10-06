@@ -1,8 +1,9 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
-import qs.DankCommon.Session
+import qs.DCommon.Session
 
 // Settings preview of the greeter session picker. The greeter renders the real dropdown.
 Item {
@@ -23,7 +24,7 @@ Item {
         text: root.sessionName
     }
 
-    DankDropdown {
+    DDropdown {
         anchors.fill: parent
         text: ""
         description: ""

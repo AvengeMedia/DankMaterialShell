@@ -2,7 +2,7 @@ import QtCore
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -63,7 +63,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 anchors.margins: Theme.spacingL
                 spacing: Theme.spacingM
 
-                DankIcon {
+                DIcon {
                     name: "warning"
                     size: Theme.iconSize
                     color: Theme.primary
@@ -138,31 +138,17 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 reason: Math.round(Theme.windowRadius) + "px"
             }
 
-            SettingsToggleRow {
+            SettingsToggleSliderRow {
                 tags: ["niri", "border", "override", "focus-ring"]
                 settingKey: "niriLayoutBorderSizeEnabled"
                 resetKeys: ["niriLayoutBorderSize"]
                 text: I18n.tr("Override border size")
                 checked: SettingsData.niriLayoutBorderSize >= 0
-                onToggled: checked => {
-                    if (checked) {
-                        SettingsData.set("niriLayoutBorderSize", 2);
-                        return;
-                    }
-                    SettingsData.set("niriLayoutBorderSize", -1);
-                }
-            }
-
-            SettingsSliderRow {
-                tags: ["niri", "border", "override", "focus-ring"]
-                settingKey: "niriLayoutBorderSize"
-                resetKeys: []
-                text: I18n.tr("Border size")
-                visible: SettingsData.niriLayoutBorderSize >= 0
                 value: Math.max(0, SettingsData.niriLayoutBorderSize)
                 minimum: 0
                 maximum: 10
                 unit: "px"
+                onToggled: checked => SettingsData.set("niriLayoutBorderSize", checked ? 2 : -1)
                 onSliderValueChanged: newValue => SettingsData.set("niriLayoutBorderSize", newValue)
             }
 
@@ -439,31 +425,17 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 reason: Math.round(Theme.windowRadius) + "px"
             }
 
-            SettingsToggleRow {
-                tags: ["hyprland", "border", "override"]
+            SettingsToggleSliderRow {
+                tags: ["hyprland", "border", "override", "border_size"]
                 settingKey: "hyprlandLayoutBorderSizeEnabled"
                 resetKeys: ["hyprlandLayoutBorderSize"]
                 text: I18n.tr("Override border size")
                 checked: SettingsData.hyprlandLayoutBorderSize >= 0
-                onToggled: checked => {
-                    if (checked) {
-                        SettingsData.set("hyprlandLayoutBorderSize", 2);
-                        return;
-                    }
-                    SettingsData.set("hyprlandLayoutBorderSize", -1);
-                }
-            }
-
-            SettingsSliderRow {
-                tags: ["hyprland", "border", "override", "border_size"]
-                settingKey: "hyprlandLayoutBorderSize"
-                resetKeys: []
-                text: I18n.tr("Border size")
-                visible: SettingsData.hyprlandLayoutBorderSize >= 0
                 value: Math.max(0, SettingsData.hyprlandLayoutBorderSize)
                 minimum: 0
                 maximum: 10
                 unit: "px"
+                onToggled: checked => SettingsData.set("hyprlandLayoutBorderSize", checked ? 2 : -1)
                 onSliderValueChanged: newValue => SettingsData.set("hyprlandLayoutBorderSize", newValue)
             }
 
@@ -565,31 +537,17 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 reason: Math.round(Theme.windowRadius) + "px"
             }
 
-            SettingsToggleRow {
-                tags: ["mangowc", "mango", "border", "override"]
+            SettingsToggleSliderRow {
+                tags: ["mangowc", "mango", "border", "override", "borderpx"]
                 settingKey: "mangoLayoutBorderSizeEnabled"
                 resetKeys: ["mangoLayoutBorderSize"]
                 text: I18n.tr("Override border size")
                 checked: SettingsData.mangoLayoutBorderSize >= 0
-                onToggled: checked => {
-                    if (checked) {
-                        SettingsData.set("mangoLayoutBorderSize", 2);
-                        return;
-                    }
-                    SettingsData.set("mangoLayoutBorderSize", -1);
-                }
-            }
-
-            SettingsSliderRow {
-                tags: ["mangowc", "mango", "border", "override", "borderpx"]
-                settingKey: "mangoLayoutBorderSize"
-                resetKeys: []
-                text: I18n.tr("Border size")
-                visible: SettingsData.mangoLayoutBorderSize >= 0
                 value: Math.max(0, SettingsData.mangoLayoutBorderSize)
                 minimum: 0
                 maximum: 10
                 unit: "px"
+                onToggled: checked => SettingsData.set("mangoLayoutBorderSize", checked ? 2 : -1)
                 onSliderValueChanged: newValue => SettingsData.set("mangoLayoutBorderSize", newValue)
             }
         }

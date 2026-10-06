@@ -2,10 +2,11 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
-DankDialog {
+DDialog {
     id: root
 
     required property var fieldOptions
@@ -77,13 +78,13 @@ DankDialog {
     }
 
     actions: [
-        DankButton {
+        DButton {
             text: I18n.tr("Cancel")
             backgroundColor: "transparent"
             textColor: Theme.primary
             onClicked: root.rejected()
         },
-        DankButton {
+        DButton {
             text: root.isEditMode ? I18n.tr("Save") : I18n.tr("Add")
             enabled: root.acceptEnabled
             onClicked: root.submit()
@@ -98,7 +99,7 @@ DankDialog {
                 width: parent.width
                 spacing: Theme.spacingS
 
-                DankDropdown {
+                DDropdown {
                     id: fieldDropdown
                     width: Math.round(parent.width / 3)
                     anchors.verticalCenter: parent.verticalCenter
@@ -108,7 +109,7 @@ DankDialog {
                     onValueChanged: value => root.ruleField = root.valueOf(root.fieldOptions, value)
                 }
 
-                DankDropdown {
+                DDropdown {
                     id: matchTypeDropdown
                     width: Math.round(parent.width / 4)
                     anchors.verticalCenter: parent.verticalCenter
@@ -118,7 +119,7 @@ DankDialog {
                     onValueChanged: value => root.ruleMatchType = root.valueOf(root.matchTypeOptions, value)
                 }
 
-                DankTextField {
+                DTextField {
                     id: patternInput
                     width: parent.width - fieldDropdown.width - matchTypeDropdown.width - parent.spacing * 2
                     anchors.verticalCenter: parent.verticalCenter

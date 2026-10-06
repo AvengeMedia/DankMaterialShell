@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { loadScript } from "./qml-script.mjs";
 
-const layout = loadScript(new URL("../Modules/DankBar/OverflowLayout.js", import.meta.url));
+const layout = loadScript(new URL("../Modules/DBar/OverflowLayout.js", import.meta.url));
 const entry = (size, mode = "bar") => ({ size, mode });
 const options = { length: 400, spacing: 4, triggerSize: 30, restoreMargin: 8 };
 const plain = value => JSON.parse(JSON.stringify(value));

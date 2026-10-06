@@ -2,7 +2,7 @@ import QtQuick
 import qs.Common
 import qs.Modals.FileBrowser
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings
 import qs.Modules.Settings.Widgets
 
@@ -165,7 +165,7 @@ Column {
             value: root.apps.get("launcherLogoCustomPath")
             onEditingFinished: value => root.apps.set("launcherLogoCustomPath", value.trim())
 
-            actions: DankActionButton {
+            actions: DActionButton {
                 iconName: "folder_open"
                 Accessible.name: I18n.tr("Select Dock Launcher Logo")
                 onClicked: logoFileBrowser.open()
@@ -323,23 +323,18 @@ Column {
             onModeSelected: mode => root.page.set("appsDockActiveColorMode", mode)
         }
 
-        SettingsToggleRow {
+        SettingsToggleSliderRow {
             resetStore: root.page
             resetKeys: ["appsDockEnlargeOnHover"]
+            valueKeys: ["appsDockEnlargePercentage"]
             text: I18n.tr("Enlarge on hover")
             checked: root.page.value("appsDockEnlargeOnHover")
-            onToggled: checked => root.page.set("appsDockEnlargeOnHover", checked)
-        }
-
-        SettingsSliderRow {
-            resetStore: root.page
-            resetKeys: ["appsDockEnlargePercentage"]
-            text: I18n.tr("Enlargement", "slider label, icon enlargement percent on hover")
-            enabled: root.page.value("appsDockEnlargeOnHover")
             value: root.page.value("appsDockEnlargePercentage")
             minimum: 100
             maximum: 150
             step: 5
+            unit: "%"
+            onToggled: checked => root.page.set("appsDockEnlargeOnHover", checked)
             onSliderValueChanged: newValue => root.page.set("appsDockEnlargePercentage", newValue)
         }
 

@@ -7,6 +7,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import qs.DCommon.Common as DCommon
 import "../Common/OutputModel.js" as OutputModel
 
 // Native MangoWM IPC client. mango advertises a JSON-over-Unix-socket protocol
@@ -101,7 +102,7 @@ Singleton {
         onFileChanged: root.handleWatchedConfigChanged()
     }
 
-    DankSocket {
+    DCommon.DSocket {
         id: monitorsSocket
         path: root.socketPath
         connected: root.available
@@ -118,7 +119,7 @@ Singleton {
         }
     }
 
-    DankSocket {
+    DCommon.DSocket {
         id: clientsSocket
         path: root.socketPath
         connected: root.available
@@ -135,7 +136,7 @@ Singleton {
 
     // mango closes the connection after each non-watch command; queued
     // dispatches drain one per reconnect cycle.
-    DankSocket {
+    DCommon.DSocket {
         id: dispatchSocket
         path: root.socketPath
         connected: root.available

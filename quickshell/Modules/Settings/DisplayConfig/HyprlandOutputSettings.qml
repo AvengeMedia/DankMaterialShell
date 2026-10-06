@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 SettingsCard {
@@ -125,7 +125,7 @@ SettingsCard {
             width: parent.width
             spacing: Theme.spacingM
 
-            DankTextField {
+            DTextField {
                 outlined: true
                 leftIconName: "brightness_6"
                 labelText: I18n.tr("SDR brightness")
@@ -149,7 +149,7 @@ SettingsCard {
                 }
             }
 
-            DankTextField {
+            DTextField {
                 outlined: true
                 leftIconName: "palette"
                 labelText: I18n.tr("SDR saturation")

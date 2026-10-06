@@ -3,9 +3,10 @@ import QtQuick.Window
 import qs.Common
 import qs.Modules.Settings
 import qs.Modules.Settings.Widgets
+import qs.DCommon.Widgets
 import qs.Widgets
 
-DankFloatingWindow {
+DFloatingWindow {
     id: root
 
     signal ruleSubmitted

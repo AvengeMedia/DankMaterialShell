@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Rectangle {
     id: card
@@ -129,7 +129,7 @@ Rectangle {
             Layout.fillWidth: true
             spacing: Theme.spacingS
 
-            DankIcon {
+            DIcon {
                 name: card.icon
                 size: Theme.iconSize
                 color: card.accentColor

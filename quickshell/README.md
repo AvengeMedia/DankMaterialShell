@@ -36,7 +36,7 @@ make lint-qml  # Run from repo root; requires quickshell/.qmlls.ini (generated b
 
 **Panels & Bars**
 - `Modules/TopBar/` - Multi-monitor status bars with workspace switching
-- `Modules/DankBar/` - Customizable widget bar with plugin support
+- `Modules/DBar/` - Customizable widget bar with plugin support
 - `Modules/Dock/` - Application dock with window management
 
 **System Controls**
@@ -91,8 +91,8 @@ Reusable Material Design 3 components in `Widgets/`:
 - `DankGridView` - Grid layout with adaptive columns
 - `DankListView` - Scrollable list view
 - `DankTextField` - Text input with validation
-- `DankDropdown` - Dropdown selection
-- `DankPopout` - Base for overlay components
+- `DDropdown` - Dropdown selection
+- `DPopout` - Base for overlay components
 - `StateLayer` - Material interaction states
 
 ## Theming

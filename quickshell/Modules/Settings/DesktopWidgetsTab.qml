@@ -4,7 +4,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -111,7 +111,7 @@ Item {
                     spacing: Theme.spacingS
                     width: parent.width
 
-                    DankTextField {
+                    DTextField {
                         id: newGroupField
                         outlined: true
                         leftIconName: "folder"
@@ -128,7 +128,7 @@ Item {
                         }
                     }
 
-                    DankButton {
+                    DButton {
                         id: addGroupBtn
                         iconName: "add"
                         text: I18n.tr("Add")
@@ -154,13 +154,13 @@ Item {
                     title: modelData.name
                     singleLineTitle: true
 
-                    DankActionButton {
+                    DActionButton {
                         iconName: "edit"
                         tooltipText: I18n.tr("Rename")
                         onClicked: root.openRenameDialog(groupRow.modelData)
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         iconName: "delete"
                         iconColor: Theme.error
                         tooltipText: I18n.tr("Delete")
@@ -253,21 +253,21 @@ Item {
         }
 
         SettingsFabBar {
-            DankFab {
+            DFab {
                 text: I18n.tr("Browse plugins")
                 iconName: "store"
                 colorRole: "secondaryContainer"
                 onClicked: root.showDesktopPluginBrowser()
             }
 
-            DankFab {
+            DFab {
                 text: I18n.tr("Edit widgets")
                 iconName: "edit"
                 colorRole: "secondaryContainer"
                 onClicked: DesktopWidgetRegistry.editing = true
             }
 
-            DankFab {
+            DFab {
                 text: I18n.tr("Add widget")
                 iconName: "add"
                 onClicked: root.showWidgetBrowser()

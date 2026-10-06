@@ -7,7 +7,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
-import "../Modules/DankDash/Wellbeing/Wellbeing.js" as Wellbeing
+import "../Modules/DDash/Wellbeing/Wellbeing.js" as Wellbeing
 
 Singleton {
     id: root

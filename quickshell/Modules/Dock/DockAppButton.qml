@@ -3,7 +3,7 @@ import QtQuick.Effects
 import Quickshell.Widgets
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -527,7 +527,7 @@ Item {
                 }
             }
 
-            DankIcon {
+            DIcon {
                 anchors.centerIn: parent
                 size: actualIconSize
                 name: "sports_esports"
@@ -584,7 +584,8 @@ Item {
 
                 Rectangle {
                     readonly property bool dotFocused: {
-                        if (!appData) return false;
+                        if (!appData)
+                            return false;
                         if (appData.type !== "grouped" || appData.windowCount === 1)
                             return isWindowFocused;
                         const groupToplevels = getGroupedToplevels();
@@ -612,7 +613,9 @@ Item {
                         }
                     }
                     Behavior on color {
-                        ColorAnimation { duration: Theme.shortDuration }
+                        ColorAnimation {
+                            duration: Theme.shortDuration
+                        }
                     }
                 }
             }
@@ -641,7 +644,8 @@ Item {
 
                 Rectangle {
                     readonly property bool dotFocused: {
-                        if (!appData) return false;
+                        if (!appData)
+                            return false;
                         if (appData.type !== "grouped" || appData.windowCount === 1)
                             return isWindowFocused;
                         const groupToplevels = getGroupedToplevels();
@@ -669,7 +673,9 @@ Item {
                         }
                     }
                     Behavior on color {
-                        ColorAnimation { duration: Theme.shortDuration }
+                        ColorAnimation {
+                            duration: Theme.shortDuration
+                        }
                     }
                 }
             }

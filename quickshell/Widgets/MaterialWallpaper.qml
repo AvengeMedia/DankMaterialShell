@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
-import qs.DankCommon.Widgets as Shared
+import qs.DCommon.Widgets as Shared
 
-Shared.DankMaterialWallpaper {
+Shared.DMaterialWallpaper {
     palette: Theme.wallpaperPalette()
 }

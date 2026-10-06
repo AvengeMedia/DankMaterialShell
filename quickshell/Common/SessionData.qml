@@ -8,9 +8,9 @@ import Quickshell.Io
 import qs.Common
 import qs.Services
 import "settings/SessionSpec.js" as Spec
-import "../DankCommon/Common/MaterialWallpaper.js" as MaterialWallpaper
+import "../DCommon/Common/MaterialWallpaper.js" as MaterialWallpaper
 import "settings/SessionStore.js" as Store
-import "../DankCommon/Common/settings/SpecUtil.js" as SpecUtil
+import "../DCommon/Common/settings/SpecUtil.js" as SpecUtil
 
 Singleton {
     id: root
@@ -608,11 +608,25 @@ Singleton {
         saveSettings();
     }
 
+    readonly property var widgetAnchorKeys: ({
+            x: "anchorX",
+            y: "anchorY"
+        })
+
+    function mergedWidgetPosition(current, updates) {
+        const merged = Object.assign({}, current || {}, updates);
+        for (const key in merged) {
+            if (merged[key] === undefined)
+                delete merged[key];
+        }
+        return merged;
+    }
+
     function updateDesktopWidgetInstancePosition(instanceId, screenKey, positionUpdates) {
         const updated = JSON.parse(JSON.stringify(desktopWidgetInstancePositions));
         if (!updated[instanceId])
             updated[instanceId] = {};
-        updated[instanceId][screenKey] = Object.assign({}, updated[instanceId][screenKey] || {}, positionUpdates);
+        updated[instanceId][screenKey] = mergedWidgetPosition(updated[instanceId][screenKey], positionUpdates);
         desktopWidgetInstancePositions = updated;
         saveSettings();
     }
@@ -652,6 +666,10 @@ Singleton {
             synced.width = sourcePos.width;
         if (sourcePos.height !== undefined)
             synced.height = sourcePos.height;
+        if (sourcePos.anchorX !== undefined)
+            synced.anchorX = sourcePos.anchorX;
+        if (sourcePos.anchorY !== undefined)
+            synced.anchorY = sourcePos.anchorY;
         const updated = JSON.parse(JSON.stringify(desktopWidgetInstancePositions));
         updated[instanceId]["_synced"] = synced;
         desktopWidgetInstancePositions = updated;
@@ -696,12 +714,11 @@ Singleton {
             const key = synced ? "_synced" : screenKey;
             if (!updated[toId])
                 updated[toId] = {};
-            updated[toId][key] = Object.assign({}, updated[toId][key] || {}, synced ? {
-                x: position.x / entry.width,
-                y: position.y / entry.height
-            } : {
-                x: position.x,
-                y: position.y
+            updated[toId][key] = mergedWidgetPosition(updated[toId][key], {
+                x: synced ? position.x / entry.width : position.x,
+                y: synced ? position.y / entry.height : position.y,
+                anchorX: undefined,
+                anchorY: undefined
             });
             pinned = true;
             if (synced)
@@ -726,8 +743,11 @@ Singleton {
             return;
         const updated = JSON.parse(JSON.stringify(desktopWidgetInstancePositions));
         for (const screenKey in updated[instanceId]) {
-            for (const key of keys)
+            for (const key of keys) {
                 delete updated[instanceId][screenKey][key];
+                if (key in widgetAnchorKeys)
+                    delete updated[instanceId][screenKey][widgetAnchorKeys[key]];
+            }
         }
         desktopWidgetInstancePositions = updated;
         saveSettings();
@@ -1658,7 +1678,15 @@ Singleton {
         saveSettings();
     }
 
+    function clearLauncherHistory() {
+        launcherLastQuery = "";
+        launcherQueryHistory = [];
+        saveSettings();
+    }
+
     function addLauncherHistory(query, skipLastQuery) {
+        if (!SettingsData.launcherHistoryEnabled)
+            return;
         let q = query.trim();
 
         if (!skipLastQuery)

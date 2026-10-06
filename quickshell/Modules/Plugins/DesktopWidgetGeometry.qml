@@ -17,6 +17,10 @@ QtObject {
     readonly property string screenKey: SettingsData.getScreenDisplayName(screen)
     readonly property string positionKey: syncPositionAcrossScreens ? "_synced" : screenKey
     readonly property var storedPositions: SessionData.desktopWidgetInstancePositions[instanceId] ?? null
+    readonly property var anchorKeys: ({
+            x: "anchorX",
+            y: "anchorY"
+        })
 
     readonly property int screenWidth: screen?.width ?? 1920
     readonly property int screenHeight: screen?.height ?? 1080
@@ -27,11 +31,21 @@ QtObject {
         return storedPositions?.[positionKey]?.[key];
     }
 
-    function storedCoordinate(key, extent, fallback) {
-        const val = storedGeometry(key);
-        if (val === undefined)
+    function anchoredPosition(anchor, offset, extent, size) {
+        switch (anchor) {
+        case "center":
+            return (extent - size) / 2 + offset;
+        case "end":
+            return extent - size - offset;
+        }
+        return offset;
+    }
+
+    function storedCoordinate(key, extent, size, fallback) {
+        const offset = storedGeometry(key);
+        if (offset === undefined)
             return fallback;
-        return syncPositionAcrossScreens ? val * extent : val;
+        return anchoredPosition(storedGeometry(anchorKeys[key]), syncPositionAcrossScreens ? offset * extent : offset, extent, size);
     }
 
     readonly property bool hasSavedPosition: storedGeometry("x") !== undefined
@@ -42,8 +56,8 @@ QtObject {
     property real defaultX: screenWidth / 2 - savedWidth / 2
     property real defaultY: screenHeight / 2 - savedHeight / 2
 
-    readonly property real savedX: storedCoordinate("x", screenWidth, defaultX)
-    readonly property real savedY: storedCoordinate("y", screenHeight, defaultY)
+    readonly property real savedX: storedCoordinate("x", screenWidth, widgetWidth, defaultX)
+    readonly property real savedY: storedCoordinate("y", screenHeight, widgetHeight, defaultY)
     readonly property real savedWidth: storedGeometry("width") ?? defaultWidth
     readonly property real savedHeight: forceSquare ? savedWidth : (storedGeometry("height") ?? defaultHeight)
 
@@ -105,10 +119,36 @@ QtObject {
         SessionData.updateDesktopWidgetInstancePosition(instanceId, positionKey, updates);
     }
 
+    // Nearest of start edge, center and end edge wins, so a widget dropped near the right grows leftward.
+    function anchorFor(position, extent, size) {
+        const toStart = position;
+        const toCenter = Math.abs(position - (extent - size) / 2);
+        const toEnd = extent - size - position;
+        if (toCenter <= toStart && toCenter <= toEnd)
+            return "center";
+        return toEnd < toStart ? "end" : "start";
+    }
+
+    function anchoredOffset(anchor, position, extent, size) {
+        switch (anchor) {
+        case "center":
+            return position - (extent - size) / 2;
+        case "end":
+            return extent - size - position;
+        }
+        return position;
+    }
+
     function savePosition(finalX, finalY) {
+        const anchorX = anchorFor(finalX, screenWidth, widgetWidth);
+        const anchorY = anchorFor(finalY, screenHeight, widgetHeight);
+        const offsetX = anchoredOffset(anchorX, finalX, screenWidth, widgetWidth);
+        const offsetY = anchoredOffset(anchorY, finalY, screenHeight, widgetHeight);
         saveGeometry({
-            x: syncPositionAcrossScreens ? finalX / screenWidth : finalX,
-            y: syncPositionAcrossScreens ? finalY / screenHeight : finalY
+            x: syncPositionAcrossScreens ? offsetX / screenWidth : offsetX,
+            y: syncPositionAcrossScreens ? offsetY / screenHeight : offsetY,
+            anchorX: anchorX === "start" ? undefined : anchorX,
+            anchorY: anchorY === "start" ? undefined : anchorY
         });
     }
 

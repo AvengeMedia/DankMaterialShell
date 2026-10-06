@@ -1,8 +1,9 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
-import qs.Modules.DankBar
+import qs.Modules.DBar
 
 Item {
     id: root
@@ -279,7 +280,7 @@ Item {
             }
         }
 
-        DankRipple {
+        DRipple {
             id: rippleLayer
             rippleColor: Theme.surfaceText
             topLeftRadius: root.topLeftRadius

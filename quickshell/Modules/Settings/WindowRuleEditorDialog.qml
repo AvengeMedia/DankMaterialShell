@@ -4,10 +4,11 @@ import QtQuick
 import qs.Common
 import "../../Common/WindowRuleSize.js" as WindowRuleSize
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
-DankDialog {
+DDialog {
     id: root
 
     property var editingRule: null
@@ -607,7 +608,7 @@ DankDialog {
         }
     }
 
-    component Field: DankTextField {
+    component Field: DTextField {
         property int share: 1
         property int shares: 2
 
@@ -628,7 +629,7 @@ DankDialog {
         placeholderText: unit === WindowRuleSize.PERCENT ? "50" : pixelsPlaceholder
         rightAccessoryWidth: unitPicker.width + Theme.spacingS
 
-        DankButtonGroup {
+        DButtonGroup {
             id: unitPicker
             anchors.right: parent.right
             anchors.rightMargin: Theme.spacingS
@@ -649,14 +650,14 @@ DankDialog {
     readonly property var matchConditions: [condFloating, condActive, condFocused, condActiveInColumn, condCastTarget, condUrgent, condAtStartup, condXwayland, condFullscreen, condPinned, condInitialised]
 
     actions: [
-        DankButton {
+        DButton {
             text: I18n.tr("Cancel")
             enabled: root.closeEnabled
             backgroundColor: "transparent"
             textColor: Theme.primary
             onClicked: root.rejected()
         },
-        DankButton {
+        DButton {
             text: root.isEditMode ? I18n.tr("Save") : I18n.tr("Add")
             enabled: root.acceptEnabled
             busy: root.submitting
@@ -666,7 +667,7 @@ DankDialog {
 
     SettingsGroup {
         SettingsRow {
-            body: DankTextField {
+            body: DTextField {
                 id: nameInput
                 width: parent.width
                 outlined: true
@@ -680,7 +681,7 @@ DankDialog {
 
     SettingsCard {
         title: I18n.tr("Match Criteria")
-        headerActions: DankButton {
+        headerActions: DButton {
             visible: root.isNiri
             text: I18n.tr("Add match")
             iconName: "add"
@@ -700,7 +701,7 @@ DankDialog {
         }
 
         SettingsRow {
-            body: DankTextField {
+            body: DTextField {
                 id: appIdInput
                 width: parent.width
                 outlined: true
@@ -719,7 +720,7 @@ DankDialog {
                 labelText: root.isMango ? I18n.tr("Title (optional)") : I18n.tr("Title regex (optional)")
             }
 
-            DankActionButton {
+            DActionButton {
                 id: addTitle
                 anchors.verticalCenter: parent.verticalCenter
                 iconName: "add"
@@ -755,7 +756,7 @@ DankDialog {
                     onTextEdited: extraMatchModel.setProperty(extraRow.index, "rowTitle", text)
                 }
 
-                DankActionButton {
+                DActionButton {
                     id: removeMatch
                     anchors.verticalCenter: parent.verticalCenter
                     iconName: "close"
@@ -865,7 +866,7 @@ DankDialog {
         }
 
         SettingsRow {
-            body: DankFilterChips {
+            body: DFilterChips {
                 width: parent.width
                 multiSelect: true
                 showCounts: false
@@ -921,63 +922,45 @@ DankDialog {
         title: I18n.tr("Dynamic Properties")
         visible: root.isNiri || root.isHyprland
 
-        SettingsToggleRow {
+        SettingsToggleSliderRow {
             text: I18n.tr("Opacity")
             checked: root.opacityOn
-            enabled: root.fieldsEnabled
-            onToggled: checked => root.opacityOn = checked
-        }
-
-        SettingsSliderRow {
-            visible: root.opacityOn
-            text: I18n.tr("Opacity")
             value: root.opacityValue
             minimum: 10
             unit: "%"
             enabled: root.fieldsEnabled
+            onToggled: checked => root.opacityOn = checked
             onSliderValueChanged: newValue => root.opacityValue = newValue
         }
 
-        SettingsToggleRow {
+        SettingsToggleSliderRow {
             text: I18n.tr("Corner radius")
             checked: root.cornerRadiusOn
-            enabled: root.fieldsEnabled
-            onToggled: checked => root.cornerRadiusOn = checked
-        }
-
-        SettingsSliderRow {
-            visible: root.cornerRadiusOn
-            text: I18n.tr("Corner radius")
             value: root.cornerRadiusValue
             maximum: 24
             unit: "px"
             enabled: root.fieldsEnabled
+            onToggled: checked => root.cornerRadiusOn = checked
             onSliderValueChanged: newValue => root.cornerRadiusValue = newValue
         }
 
-        SettingsToggleRow {
+        SettingsToggleSliderRow {
             visible: root.isNiri
             text: I18n.tr("Scroll Factor")
             checked: root.scrollFactorOn
-            enabled: root.fieldsEnabled
-            onToggled: checked => root.scrollFactorOn = checked
-        }
-
-        SettingsSliderRow {
-            visible: root.isNiri && root.scrollFactorOn
-            text: I18n.tr("Scroll Factor")
             value: root.scrollFactorValue
             minimum: 10
             maximum: 200
             unit: "%"
             enabled: root.fieldsEnabled
+            onToggled: checked => root.scrollFactorOn = checked
             onSliderValueChanged: newValue => root.scrollFactorValue = newValue
         }
 
         SettingsRow {
             visible: root.isNiri
 
-            body: DankFilterChips {
+            body: DFilterChips {
                 width: parent.width
                 multiSelect: true
                 showCounts: false
@@ -1034,36 +1017,24 @@ DankDialog {
             }
         }
 
-        SettingsToggleRow {
+        SettingsToggleSliderRow {
             text: I18n.tr("Noise", "window rule background noise effect checkbox")
             checked: root.noiseOn
-            enabled: root.fieldsEnabled
-            onToggled: checked => root.noiseOn = checked
-        }
-
-        SettingsSliderRow {
-            visible: root.noiseOn
-            text: I18n.tr("Noise", "window rule background noise effect checkbox")
             value: root.noiseValue
             unit: "%"
             enabled: root.fieldsEnabled
+            onToggled: checked => root.noiseOn = checked
             onSliderValueChanged: newValue => root.noiseValue = newValue
         }
 
-        SettingsToggleRow {
+        SettingsToggleSliderRow {
             text: I18n.tr("Saturation", "window rule background color saturation checkbox")
             checked: root.saturationOn
-            enabled: root.fieldsEnabled
-            onToggled: checked => root.saturationOn = checked
-        }
-
-        SettingsSliderRow {
-            visible: root.saturationOn
-            text: I18n.tr("Saturation", "window rule background color saturation checkbox")
             value: root.saturationValue
             maximum: 200
             unit: "%"
             enabled: root.fieldsEnabled
+            onToggled: checked => root.saturationOn = checked
             onSliderValueChanged: newValue => root.saturationValue = newValue
         }
     }
@@ -1143,7 +1114,7 @@ DankDialog {
         visible: root.isHyprland
 
         SettingsRow {
-            body: DankFilterChips {
+            body: DFilterChips {
                 width: parent.width
                 multiSelect: true
                 showCounts: false
@@ -1208,7 +1179,7 @@ DankDialog {
         visible: root.isMango
 
         SettingsRow {
-            body: DankFilterChips {
+            body: DFilterChips {
                 width: parent.width
                 multiSelect: true
                 showCounts: false

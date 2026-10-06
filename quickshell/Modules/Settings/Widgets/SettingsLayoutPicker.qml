@@ -3,7 +3,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import qs.Common
-import qs.Modules.DankBar
+import qs.Modules.DBar
+import qs.DCommon.Widgets
 import qs.Widgets
 
 GridLayout {

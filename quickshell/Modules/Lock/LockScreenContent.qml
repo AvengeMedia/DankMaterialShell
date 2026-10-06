@@ -6,8 +6,7 @@ import qs.Common
 import qs.Modals
 import qs.Modules.Plugins
 import qs.Services
-import qs.Widgets
-import qs.DankCommon.Session
+import qs.DCommon.Session
 
 FocusScope {
     id: root

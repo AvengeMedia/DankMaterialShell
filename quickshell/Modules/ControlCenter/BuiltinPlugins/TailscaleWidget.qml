@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
@@ -69,7 +70,7 @@ PluginComponent {
                 return base;
             }
 
-            readonly property Item headerActions: DankActionButton {
+            readonly property Item headerActions: DActionButton {
                 buttonSize: Theme.iconButtonSize
                 iconSize: Theme.iconSize
                 iconName: "sync"
@@ -78,7 +79,7 @@ PluginComponent {
                 onClicked: TailscaleService.refresh(null)
             }
 
-            DankFlickable {
+            DFlickable {
                 anchors.fill: parent
                 contentHeight: detailColumn.height
                 clip: true
@@ -116,7 +117,7 @@ PluginComponent {
                             iconName: "alt_route"
                             title: I18n.tr("Exit node", "Tailscale exit node selector label")
 
-                            DankDropdown {
+                            DDropdown {
                                 anchors.verticalCenter: parent.verticalCenter
                                 compactMode: true
                                 dropdownWidth: CcMetrics.rowDropdownWidth
@@ -145,7 +146,7 @@ PluginComponent {
                         }
                     }
 
-                    DankSearchField {
+                    DSearchField {
                         width: parent.width
                         visible: TailscaleService.available
                         placeholderText: I18n.tr("Search devices...", "Tailscale device search placeholder")
@@ -153,7 +154,7 @@ PluginComponent {
                         onTextEdited: detailRoot.searchQuery = text
                     }
 
-                    DankFilterChips {
+                    DFilterChips {
                         width: parent.width
                         visible: TailscaleService.available
                         currentIndex: detailRoot.filterIndex
@@ -218,7 +219,7 @@ PluginComponent {
                                     color: peerRow.modelData.online ? Theme.success : Theme.surfaceVariantText
                                 }
 
-                                DankActionButton {
+                                DActionButton {
                                     anchors.verticalCenter: parent.verticalCenter
                                     buttonSize: Theme.buttonHeightXS
                                     iconSize: Theme.iconSizeSmall
@@ -247,7 +248,7 @@ PluginComponent {
                                             elide: Text.ElideRight
                                         }
 
-                                        DankActionButton {
+                                        DActionButton {
                                             id: copyDnsButton
                                             anchors.verticalCenter: parent.verticalCenter
                                             buttonSize: Theme.buttonHeightXS

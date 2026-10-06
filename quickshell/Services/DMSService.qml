@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import qs.DCommon.Common as DCommon
 
 Singleton {
     id: root
@@ -90,7 +91,7 @@ Singleton {
         requestSocket.connected = true;
     }
 
-    DankSocket {
+    DCommon.DSocket {
         id: requestSocket
         path: root.socketPath
         connected: false
@@ -132,7 +133,7 @@ Singleton {
         }
     }
 
-    DankSocket {
+    DCommon.DSocket {
         id: subscribeSocket
         path: root.socketPath
         connected: false

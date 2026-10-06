@@ -75,8 +75,8 @@ Item {
         const snapped = geometry.dragMoveTo(startX, startY, dx, dy);
         const centerX = (hostLayer.width - width) / 2;
         const centerY = (hostLayer.height - height) / 2;
-        const guidesX = [centerX];
-        const guidesY = [centerY];
+        const guidesX = [centerX, Theme.spacingXL, hostLayer.width - Theme.spacingXL - width];
+        const guidesY = [centerY, Theme.spacingXL, hostLayer.height - Theme.spacingXL - height];
         if (stock) {
             guidesX.push(stock.x);
             guidesY.push(stock.y);
@@ -200,7 +200,7 @@ Item {
                 }
             }
 
-            DankGridEditChrome {
+            DGridEditChrome {
                 id: chrome
 
                 property real startWidth

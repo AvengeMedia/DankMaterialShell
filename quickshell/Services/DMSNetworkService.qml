@@ -537,8 +537,8 @@ Singleton {
                 log.info("Successfully connected to", pendingConnectionSSID, "in", elapsed, "ms");
                 ToastService.showInfo(I18n.tr("Connected to %1", "wifi toast, %1 is the network name").arg(pendingConnectionSSID));
 
-                if (userPreference === "wifi" || userPreference === "auto") {
-                    setConnectionPriority("wifi");
+                if (userPreference === "wifi") {
+                    applyNetworkPreference("wifi");
                 }
 
                 pendingConnectionSSID = "";
@@ -864,10 +864,13 @@ Singleton {
     function setNetworkPreference(preference) {
         if (!networkAvailable)
             return;
+        SettingsData.set("networkPreference", preference);
+        applyNetworkPreference(preference);
+    }
+
+    function applyNetworkPreference(preference) {
         changingPreference = true;
         targetPreference = preference;
-        SettingsData.set("networkPreference", preference);
-
         DMSService.sendRequest("network.preference.set", {
             preference: preference
         }, response => {
@@ -878,21 +881,6 @@ Singleton {
                 log.warn("Failed to set network preference:", response.error);
             }
         });
-    }
-
-    function setConnectionPriority(type) {
-        if (type === "wifi") {
-            setNetworkPreference("wifi");
-        } else if (type === "ethernet") {
-            setNetworkPreference("ethernet");
-        } else if (type === "cellular") {
-            setNetworkPreference("cellular");
-        }
-    }
-
-    function connectToWifiAndSetPreference(ssid, password, username = "", anonymousIdentity = "", domainSuffixMatch = "", hidden = false, eapMethod = "", phase2Auth = "") {
-        connectToWifi(ssid, password, username, anonymousIdentity, domainSuffixMatch, hidden, eapMethod, phase2Auth);
-        setNetworkPreference("wifi");
     }
 
     function toggleNetworkConnection(type) {

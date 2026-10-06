@@ -4,7 +4,7 @@ import Quickshell.Wayland
 import Quickshell.Services.SystemTray
 import Quickshell.Services.UPower
 import qs.Common
-import qs.Modules.DankDash
+import qs.Modules.DDash
 import qs.Services
 import qs.Modules.Settings.DisplayConfig
 

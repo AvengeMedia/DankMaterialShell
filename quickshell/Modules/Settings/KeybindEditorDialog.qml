@@ -4,12 +4,13 @@ import QtQuick
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 import "../../Common/KeyUtils.js" as KeyUtils
 import "../../Common/KeybindActions.js" as Actions
 
-DankDialog {
+DDialog {
     id: root
 
     readonly property var log: Log.scoped("KeybindEditorDialog")
@@ -678,7 +679,7 @@ DankDialog {
     }
 
     actions: [
-        DankButton {
+        DButton {
             text: I18n.tr("Reset to default")
             visible: root.canReset
             enabled: !root.busy && !root.locked
@@ -686,14 +687,14 @@ DankDialog {
             textColor: Theme.primary
             onClicked: root.resetRequested(root.originalKey)
         },
-        DankButton {
+        DButton {
             text: I18n.tr("Cancel")
             enabled: root.closeEnabled
             backgroundColor: "transparent"
             textColor: Theme.primary
             onClicked: root.rejected()
         },
-        DankButton {
+        DButton {
             text: root.isNew ? I18n.tr("Add") : I18n.tr("Save")
             visible: !root.readOnly
             enabled: root.canSubmit
@@ -721,7 +722,7 @@ DankDialog {
     SettingsCard {
         title: I18n.tr("Key", "noun, keybind editor row label for the key combination")
         enabled: root.formEnabled
-        headerActions: DankButton {
+        headerActions: DButton {
             visible: !root.isNew && !root.readOnly && !root.addingNewKey
             text: I18n.tr("New key")
             iconName: "add"
@@ -734,7 +735,7 @@ DankDialog {
         SettingsRow {
             visible: !root.isNew && (root.keys.length > 1 || root.addingNewKey)
 
-            body: DankFilterChips {
+            body: DFilterChips {
                 id: keyChips
                 width: parent.width
                 showCounts: false
@@ -812,14 +813,14 @@ DankDialog {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingM
 
-                        DankIcon {
+                        DIcon {
                             name: "keyboard"
                             size: Theme.iconSize
                             color: Theme.surfaceVariantText
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
-                        DankKeycap {
+                        DKeycap {
                             text: root.editKey
                             visible: root.editKey !== "" && !root.recording
                             anchors.verticalCenter: parent.verticalCenter
@@ -835,7 +836,7 @@ DankDialog {
                         }
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         id: recordButton
                         anchors.right: parent.right
                         anchors.rightMargin: Theme.spacingXS
@@ -853,7 +854,7 @@ DankDialog {
                     spacing: Theme.spacingS
                     visible: root.conflicts.length > 0
 
-                    DankIcon {
+                    DIcon {
                         id: conflictIcon
                         name: "warning"
                         size: Theme.iconSizeSmall
@@ -875,7 +876,7 @@ DankDialog {
                     spacing: Theme.spacingS
                     visible: root.keysymUnreachable
 
-                    DankIcon {
+                    DIcon {
                         id: unreachableIcon
                         name: "warning"
                         size: Theme.iconSizeSmall
@@ -900,7 +901,7 @@ DankDialog {
         enabled: root.formEnabled
 
         SettingsRow {
-            body: DankButtonGroup {
+            body: DButtonGroup {
                 arrowKeysSelect: false
                 width: parent.width
                 fillWidth: true
@@ -924,7 +925,7 @@ DankDialog {
         SettingsRow {
             visible: root.actionType === "dms"
 
-            body: DankDropdown {
+            body: DDropdown {
                 id: dmsActionDropdown
                 width: parent.width
                 compactMode: true
@@ -949,7 +950,7 @@ DankDialog {
                 width: parent.width
                 spacing: Theme.spacingS
 
-                DankDropdown {
+                DDropdown {
                     id: compositorCategoryDropdown
                     width: Math.round((parent.width - parent.spacing) / 3)
                     compactMode: true
@@ -957,7 +958,7 @@ DankDialog {
                     onValueChanged: value => root.selectCompositorCategory(value)
                 }
 
-                DankDropdown {
+                DDropdown {
                     id: compositorActionDropdown
                     visible: !root.useCustomCompositor
                     width: parent.width - compositorCategoryDropdown.width - parent.spacing
@@ -975,7 +976,7 @@ DankDialog {
                     }
                 }
 
-                DankTextField {
+                DTextField {
                     visible: root.useCustomCompositor
                     width: parent.width - compositorCategoryDropdown.width - parent.spacing
                     outlined: true
@@ -995,7 +996,7 @@ DankDialog {
         SettingsRow {
             visible: root.actionType === "spawn"
 
-            body: DankTextField {
+            body: DTextField {
                 readonly property var parsedCommand: root.actionType === "spawn" ? Actions.parseSpawnCommand(root.editAction) : null
 
                 width: parent.width
@@ -1018,7 +1019,7 @@ DankDialog {
         SettingsRow {
             visible: root.actionType === "shell"
 
-            body: DankTextField {
+            body: DTextField {
                 width: parent.width
                 outlined: true
                 leftIconName: "terminal"
@@ -1038,7 +1039,7 @@ DankDialog {
         SettingsRow {
             visible: root.showDmsArgs && root.dmsArgDefs.some(arg => arg.name === "amount")
 
-            body: DankTextField {
+            body: DTextField {
                 id: amountField
 
                 readonly property string amount: root.dmsParsedArgs?.args?.amount || ""
@@ -1067,7 +1068,7 @@ DankDialog {
         SettingsRow {
             visible: root.showDmsArgs && root.dmsArgDefs.some(arg => arg.name === "device")
 
-            body: DankTextField {
+            body: DTextField {
                 readonly property string device: root.dmsParsedArgs?.args?.device || ""
 
                 width: parent.width
@@ -1090,7 +1091,7 @@ DankDialog {
             visible: root.showDmsArgs && root.dmsArgDefs.some(arg => arg.name === "tab")
             title: I18n.tr("Tab", "noun, keybind argument label for a dashboard tab")
 
-            DankDropdown {
+            DDropdown {
                 id: dashTabDropdown
                 compactMode: true
                 options: [I18n.tr("Overview"), I18n.tr("Media"), I18n.tr("Wallpaper"), I18n.tr("Weather")]
@@ -1103,7 +1104,7 @@ DankDialog {
         SettingsRow {
             visible: root.showDmsArgs && root.dmsFlagArgs.length > 0
 
-            body: DankFilterChips {
+            body: DFilterChips {
                 width: parent.width
                 multiSelect: true
                 showCounts: false
@@ -1128,7 +1129,7 @@ DankDialog {
 
                 visible: root.showArgEditor(index, argDef)
 
-                body: DankTextField {
+                body: DTextField {
                     id: argField
 
                     property bool syncing: false
@@ -1160,7 +1161,7 @@ DankDialog {
         SettingsRow {
             visible: root.showCompositorPicker && root.compositorFlags.length > 0
 
-            body: DankFilterChips {
+            body: DFilterChips {
                 width: parent.width
                 multiSelect: true
                 showCounts: false
@@ -1173,7 +1174,7 @@ DankDialog {
         SettingsRow {
             visible: KeybindsService.currentProvider !== "aqueous"
 
-            body: DankTextField {
+            body: DTextField {
                 width: parent.width
                 outlined: true
                 leftIconName: "title"
@@ -1193,7 +1194,7 @@ DankDialog {
         visible: KeybindsService.currentProvider === "niri" || KeybindsService.currentProvider === "hyprland"
 
         SettingsRow {
-            body: DankFilterChips {
+            body: DFilterChips {
                 width: parent.width
                 multiSelect: true
                 showCounts: false
@@ -1206,7 +1207,7 @@ DankDialog {
         SettingsRow {
             visible: KeybindsService.currentProvider === "niri"
 
-            body: DankTextField {
+            body: DTextField {
                 id: cooldownField
 
                 readonly property int cooldownMs: root.editCooldownMs
@@ -1241,7 +1242,7 @@ DankDialog {
     }
 
     component FieldUnit: StyledText {
-        required property DankTextField field
+        required property DTextField field
 
         anchors.right: parent.right
         anchors.rightMargin: field.contentPadding

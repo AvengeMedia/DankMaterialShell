@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -57,7 +57,7 @@ Item {
         anchors.fill: parent
         anchors.margins: root.contentPadding
 
-        DankActionButton {
+        DActionButton {
             id: action
             objectName: "sliderAction"
             x: root.vertical ? (parent.width - width) / 2 : root.LayoutMirroring.enabled ? parent.width - width : 0
@@ -113,7 +113,7 @@ Item {
             y: root.vertical ? (root.showNumber ? labels.height + Theme.spacingS : 0) : root.tall ? action.height + Theme.spacingM : 0
             height: Math.max(0, (root.vertical ? action.y - Theme.spacingS : parent.height) - y)
 
-            DankSlider {
+            DSlider {
                 id: slider
                 anchors.centerIn: parent
                 width: root.vertical ? parent.height : parent.width

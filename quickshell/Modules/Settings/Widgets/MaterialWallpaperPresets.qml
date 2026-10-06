@@ -3,8 +3,9 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell.Widgets
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
-import "../../../DankCommon/Common/MaterialWallpaper.js" as Art
+import "../../../DCommon/Common/MaterialWallpaper.js" as Art
 
 Flow {
     id: root

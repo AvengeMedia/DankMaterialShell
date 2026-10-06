@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
@@ -30,7 +31,7 @@ Item {
                 title: I18n.tr("Release notes are unavailable", "empty state title when no release notes are loaded")
                 subtitle: I18n.tr("They load with the next update check. Release notes are also published on GitHub.", "release notes empty state description")
 
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
                     text: I18n.tr("Retry")
                     iconName: "refresh"
@@ -41,7 +42,7 @@ Item {
                     onClicked: SystemUpdateService.loadReleases(true)
                 }
 
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
                     text: I18n.tr("View on GitHub", "link to the release on GitHub")
                     iconName: "open_in_new"
@@ -53,7 +54,7 @@ Item {
 
             SettingsRow {
                 visible: !root.feedMissing
-                body: DankFilterChips {
+                body: DFilterChips {
                     width: parent.width
                     model: root.releases.map(r => "v" + r.version)
                     currentIndex: root.selectedIndex

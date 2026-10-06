@@ -2,9 +2,9 @@ import QtQuick
 import qs.Common
 import qs.Modals.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
-DankModal {
+DModal {
     id: root
 
     layerNamespace: "dms:icc-profile-info"
@@ -151,7 +151,7 @@ DankModal {
                         }
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         iconName: "close"
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.surfaceText
@@ -168,7 +168,7 @@ DankModal {
                     border.width: Theme.layerOutlineWidth
                     clip: true
 
-                    DankFlickable {
+                    DFlickable {
                         anchors.fill: parent
                         anchors.margins: Theme.spacingM
                         contentHeight: detailColumn.implicitHeight
@@ -236,7 +236,7 @@ DankModal {
                     width: parent.width
                     height: 40
 
-                    DankButton {
+                    DButton {
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
                         text: I18n.tr("Close", "Close")

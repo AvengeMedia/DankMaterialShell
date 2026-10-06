@@ -1,9 +1,10 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
-DankFloatingWindow {
+DFloatingWindow {
     id: root
     readonly property var log: Log.scoped("WorkspaceRenameModal")
 
@@ -88,7 +89,7 @@ DankFloatingWindow {
         renaming = false;
     }
 
-    DankDialog {
+    DDialog {
         id: renameDialog
 
         anchors.fill: parent
@@ -99,7 +100,7 @@ DankFloatingWindow {
         onAccepted: root.submitAndClose()
         onRejected: root.hide()
 
-        DankTextField {
+        DTextField {
             id: nameInput
 
             width: parent.width
@@ -112,7 +113,7 @@ DankFloatingWindow {
         }
 
         actions: [
-            DankButton {
+            DButton {
                 maximumWidth: renameDialog.actionWidth
                 wrapText: true
                 text: I18n.tr("Cancel")
@@ -120,7 +121,7 @@ DankFloatingWindow {
                 textColor: Theme.primary
                 onClicked: root.hide()
             },
-            DankButton {
+            DButton {
                 maximumWidth: renameDialog.actionWidth
                 wrapText: true
                 text: I18n.tr("Rename", "verb, rename button")

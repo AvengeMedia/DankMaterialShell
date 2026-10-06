@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../Common/KeyUtils.js" as KeyUtils
 import "../Common/KeybindActions.js" as Actions
 
@@ -41,7 +41,7 @@ FocusScope {
     Component {
         id: keybindItemDelegate
 
-        DankListItem {
+        DListItem {
             id: keybindRow
             required property var modelData
             readonly property bool canExecute: !keybindRow.modelData.isRange && KeybindsService.canExecuteAction(keybindRow.modelData.action)
@@ -79,7 +79,7 @@ FocusScope {
                     wrapMode: Text.NoWrap
                 }
 
-                // DankKeycap items (Trailing - stacked vertically if multiple combos)
+                // DKeycap items (Trailing - stacked vertically if multiple combos)
                 Column {
                     id: keycapsCol
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
@@ -95,7 +95,7 @@ FocusScope {
                             Repeater {
                                 model: modelData
 
-                                DankKeycap {
+                                DKeycap {
                                     text: modelData
                                     textColor: Theme.primary
                                 }
@@ -113,7 +113,7 @@ FocusScope {
                 cursorShape: keybindRow.canExecute ? Qt.PointingHandCursor : Qt.ArrowCursor
             }
 
-            DankTooltipHost {
+            DTooltipHost {
                 text: keybindRow.canExecute ? ((keybindRow.modelData.action || keybindRow.modelData.desc || "") + " • " + I18n.tr("Click to run", "cheatsheet action tooltip suffix")) : (keybindRow.modelData.label || keybindRow.modelData.action || keybindRow.modelData.desc || "")
                 target: keybindRow
                 hoverArea: rowHoverArea
@@ -500,7 +500,7 @@ FocusScope {
                 anchors.top: parent.top
                 spacing: Theme.spacingS
 
-                DankSearchField {
+                DSearchField {
                     id: searchField
                     Layout.fillWidth: true
                     placeholderText: I18n.tr("Search keybinds...", "keybinds cheatsheet search placeholder")
@@ -520,7 +520,7 @@ FocusScope {
                     }
                 }
 
-                DankActionButton {
+                DActionButton {
                     visible: content.showFloatingToggle
                     buttonSize: Theme.iconButtonSize
                     iconName: content.floating ? "close_fullscreen" : "open_in_new"
@@ -530,7 +530,7 @@ FocusScope {
                 }
             }
 
-            DankFlickable {
+            DFlickable {
                 id: sidebarFlickable
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -547,7 +547,7 @@ FocusScope {
                     spacing: Theme.spacingXXS
 
                     // "All" Category Tab
-                    DankListItem {
+                    DListItem {
                         id: allTab
                         width: sidebarCol.width
                         implicitHeight: Theme.menuItemHeight
@@ -568,7 +568,7 @@ FocusScope {
                             anchors.rightMargin: Theme.spacingL
                             spacing: Theme.spacingS
 
-                            DankIcon {
+                            DIcon {
                                 name: "apps"
                                 size: Theme.iconSizeSmall
                                 color: allTab.contentColor
@@ -582,7 +582,7 @@ FocusScope {
                                 elide: Text.ElideRight
                             }
 
-                            DankBadge {
+                            DBadge {
                                 text: content.dataModel.totalCount.toString()
                                 color: allTab.isSelected ? Theme.primary : Theme.surfaceVariant
                                 textColor: allTab.isSelected ? Theme.onPrimary : Theme.surfaceVariantText
@@ -595,7 +595,7 @@ FocusScope {
                     Repeater {
                         model: content.dataModel.sortedKeys
 
-                        DankListItem {
+                        DListItem {
                             id: catTab
                             required property var modelData
 
@@ -621,7 +621,7 @@ FocusScope {
                                 anchors.rightMargin: Theme.spacingL
                                 spacing: Theme.spacingS
 
-                                DankIcon {
+                                DIcon {
                                     name: content.getCategoryIcon(catTab.catName)
                                     size: Theme.iconSizeSmall
                                     color: catTab.contentColor
@@ -635,7 +635,7 @@ FocusScope {
                                     elide: Text.ElideRight
                                 }
 
-                                DankBadge {
+                                DBadge {
                                     text: (catTab.catInfo?.count || 0).toString()
                                     color: catTab.isSelected ? Theme.primary : Theme.surfaceVariant
                                     textColor: catTab.isSelected ? Theme.onPrimary : Theme.surfaceVariantText
@@ -657,7 +657,7 @@ FocusScope {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
 
-            DankFlickable {
+            DFlickable {
                 id: rightFlickable
                 anchors.fill: parent
                 contentWidth: width
@@ -686,7 +686,7 @@ FocusScope {
                                 width: parent.width
                                 spacing: Theme.spacingS
 
-                                DankIcon {
+                                DIcon {
                                     name: content.getCategoryIcon(sectionCol.sectionCatName)
                                     size: Theme.iconSizeMedium
                                     color: Theme.primary
@@ -767,7 +767,7 @@ FocusScope {
                 spacing: Theme.spacingM
                 visible: content.dataModel.totalCount === 0
 
-                DankIcon {
+                DIcon {
                     anchors.horizontalCenter: parent.horizontalCenter
                     name: content.activeSearchQuery.trim() !== "" ? "search_off" : "keyboard"
                     size: Theme.iconSizeLarge + Theme.spacingL

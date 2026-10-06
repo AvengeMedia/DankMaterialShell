@@ -4,7 +4,7 @@ import qs.Common
 import qs.Modals.Common
 import qs.Services
 
-DankModal {
+DModal {
     id: root
 
     property var parentPopout: null

@@ -1,8 +1,8 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
-DankActionButton {
+DActionButton {
     id: root
 
     property bool confirming: false

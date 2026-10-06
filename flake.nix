@@ -111,7 +111,7 @@
               inherit version;
               pname = "dms-shell";
               src = ./core;
-              vendorHash = "sha256-D3tYFfi0oubXEwrQqxeHLEyk4PXl6b7Gp1nGyVwC5KA=";
+              vendorHash = "sha256-K1014aWe1AAPWP3za7Kll8HbZfcw7fHOPxAYkPXtEh0=";
 
               subPackages = [ "cmd/dms" ];
 
@@ -131,8 +131,8 @@
                 tar -C ${rootSrc}/quickshell --mode=u+w --exclude-from=${rootSrc}/scripts/shell-test-excludes.txt -cf - . \
                   | tar -C $out/share/quickshell/dms -xf -
 
-                rm -f $out/share/quickshell/dms/DankCommon
-                tar -C ${dank-qml-common} --mode=u+w --exclude-from=${rootSrc}/scripts/shell-test-excludes.txt -cf - DankCommon \
+                rm -f $out/share/quickshell/dms/DCommon
+                tar -C ${dank-qml-common} --mode=u+w --exclude-from=${rootSrc}/scripts/shell-test-excludes.txt -cf - DCommon \
                   | tar -C $out/share/quickshell/dms -xf -
 
                 echo "${version}" > $out/share/quickshell/dms/VERSION

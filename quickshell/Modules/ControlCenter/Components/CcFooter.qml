@@ -5,7 +5,7 @@ import Quickshell
 import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../utils/widgets.js" as WidgetUtils
 
 Item {
@@ -440,7 +440,7 @@ Item {
             spacing: root.spacing
             visible: !root.dragging
 
-            DankActionButton {
+            DActionButton {
                 buttonSize: Theme.iconButtonSize
                 iconName: "add"
                 iconSize: CcMetrics.iconBoxIconSize
@@ -450,7 +450,7 @@ Item {
                 onClicked: root.addWidgetRequested()
             }
 
-            DankActionButton {
+            DActionButton {
                 id: moreButton
 
                 buttonSize: Theme.iconButtonSize
@@ -485,7 +485,7 @@ Item {
                 }
             }
 
-            DankIcon {
+            DIcon {
                 anchors.centerIn: parent
                 name: "delete"
                 size: CcMetrics.iconBoxIconSize
@@ -494,7 +494,7 @@ Item {
             }
         }
 
-        DankActionButton {
+        DActionButton {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             buttonSize: Theme.iconButtonSize

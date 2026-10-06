@@ -2,8 +2,9 @@ import QtQuick
 import QtQuick.Effects
 import qs.Common
 import qs.Modules.ControlCenter
-import qs.Modules.DankDash
+import qs.Modules.DDash
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import "../utils/widgets.js" as WidgetUtils
 
@@ -80,14 +81,14 @@ Item {
         height: root.avatarSide
         visible: !root.wide
 
-        DankMaterialShape {
+        DMaterialShape {
             anchors.fill: parent
             shape: root.shape
             color: Theme.primaryContainer
             visible: !root.hasImage
         }
 
-        DankIcon {
+        DIcon {
             anchors.centerIn: parent
             name: "person"
             size: Math.round(root.avatarSide * root.fallbackGlyphRatio)
@@ -103,7 +104,7 @@ Item {
             layer.enabled: root.hasImage
             visible: false
 
-            DankMaterialShape {
+            DMaterialShape {
                 anchors.fill: parent
                 shape: root.shape
             }
@@ -172,7 +173,7 @@ Item {
         }
     }
 
-    DankActionButton {
+    DActionButton {
         id: shapeButton
 
         anchors.bottom: avatar.bottom

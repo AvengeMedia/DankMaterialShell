@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modals.Common
 import qs.Modules.Settings.Widgets
 
@@ -248,7 +248,7 @@ FocusScope {
                 visible: root.pluginRepo !== ""
                 onClicked: Qt.openUrlExternally(root.pluginRepo)
 
-                DankIcon {
+                DIcon {
                     anchors.verticalCenter: parent.verticalCenter
                     name: "open_in_browser"
                     size: Theme.iconSizeMedium
@@ -265,7 +265,7 @@ FocusScope {
                     Repeater {
                         model: root.permissions
 
-                        DankBadge {
+                        DBadge {
                             required property string modelData
 
                             text: modelData

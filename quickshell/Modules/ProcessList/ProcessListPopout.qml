@@ -3,9 +3,10 @@ import QtQuick.Layouts
 import qs.Common
 import qs.Modules.ProcessList
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
-DankPopout {
+DPopout {
     id: processListPopout
 
     layerNamespace: "dms:process-list-popout"
@@ -130,7 +131,7 @@ DankPopout {
                     Layout.fillWidth: true
                     spacing: Theme.spacingM
 
-                    DankSearchField {
+                    DSearchField {
                         id: searchField
                         Layout.fillWidth: true
                         Layout.minimumWidth: Theme.fontSizeMedium * 8

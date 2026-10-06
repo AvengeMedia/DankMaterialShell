@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Rectangle {
     id: root
@@ -23,7 +23,7 @@ Rectangle {
             spacing: Theme.spacingS
             anchors.verticalCenter: parent.verticalCenter
 
-            DankIcon {
+            DIcon {
                 name: "grid_on"
                 size: Theme.iconSizeSmall
                 color: root.gridEnabled ? Theme.primary : Theme.surfaceText
@@ -38,7 +38,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            DankKeycap {
+            DKeycap {
                 text: "G"
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -55,7 +55,7 @@ Rectangle {
             spacing: Theme.spacingS
             anchors.verticalCenter: parent.verticalCenter
 
-            DankKeycap {
+            DKeycap {
                 text: "Z"
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -70,7 +70,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            DankKeycap {
+            DKeycap {
                 text: "X"
                 anchors.verticalCenter: parent.verticalCenter
             }

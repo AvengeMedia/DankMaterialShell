@@ -7,6 +7,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import qs.DCommon.Common as DCommon
 import "../Common/OutputModel.js" as OutputModel
 
 Singleton {
@@ -248,7 +249,7 @@ Singleton {
         }
     }
 
-    DankSocket {
+    DCommon.DSocket {
         id: eventStreamSocket
         path: root.socketPath
         connected: CompositorService.isNiri
@@ -272,7 +273,7 @@ Singleton {
         }
     }
 
-    DankSocket {
+    DCommon.DSocket {
         id: requestSocket
         path: root.socketPath
         connected: CompositorService.isNiri

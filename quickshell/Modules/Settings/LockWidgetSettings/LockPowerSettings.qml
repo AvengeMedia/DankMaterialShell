@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import qs.Modules.Settings.DesktopWidgetSettings
 
@@ -39,14 +39,14 @@ DesktopWidgetInstanceSettings {
                     Accessible.role: Accessible.RadioButton
                     Accessible.name: modelData
 
-                    DankMaterialShape {
+                    DMaterialShape {
                         anchors.centerIn: parent
                         width: Theme.iconSizeLarge
                         height: Theme.iconSizeLarge
                         shape: swatch.modelData === "round" ? "circle" : swatch.modelData
                         color: Theme.secondaryContainer
 
-                        DankIcon {
+                        DIcon {
                             anchors.centerIn: parent
                             name: "power_settings_new"
                             size: Theme.iconSizeSmall

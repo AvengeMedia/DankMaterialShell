@@ -31,23 +31,25 @@ func TestEnsureHyprlandSessionTargetWritesMissing(t *testing.T) {
 	}
 }
 
-func TestEnsureHyprlandSessionTargetUpgradesLegacy(t *testing.T) {
-	home := t.TempDir()
-	t.Setenv("HOME", home)
-	path := targetPathFor(t, home)
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(path, []byte(legacyHyprlandSessionTargetUnit), 0o644); err != nil {
-		t.Fatal(err)
-	}
+func TestEnsureHyprlandSessionTargetUpgradesStale(t *testing.T) {
+	for _, stale := range staleHyprlandSessionTargetUnits {
+		home := t.TempDir()
+		t.Setenv("HOME", home)
+		path := targetPathFor(t, home)
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte(stale), 0o644); err != nil {
+			t.Fatal(err)
+		}
 
-	if _, err := EnsureHyprlandSessionTarget(); err != nil {
-		t.Fatal(err)
-	}
-	data, _ := os.ReadFile(path)
-	if string(data) != hyprlandSessionTargetUnit {
-		t.Fatalf("legacy unit not upgraded:\n%s", data)
+		if _, err := EnsureHyprlandSessionTarget(); err != nil {
+			t.Fatal(err)
+		}
+		data, _ := os.ReadFile(path)
+		if string(data) != hyprlandSessionTargetUnit {
+			t.Fatalf("stale unit not upgraded:\n%s", data)
+		}
 	}
 }
 

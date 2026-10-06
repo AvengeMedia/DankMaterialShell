@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -82,14 +82,14 @@ Item {
                                         height: 1
                                     }
 
-                                    DankToggle {
+                                    DToggle {
                                         id: enableToggle
                                         hideText: true
                                         checked: paletteItem.modelData.enabled !== false
                                         onToggled: checked => PaletteInjectService.updatePalette(paletteItem.index, "enabled", checked)
                                     }
 
-                                    DankActionButton {
+                                    DActionButton {
                                         buttonSize: Theme.buttonHeightXXS
                                         iconName: "delete"
                                         iconColor: Theme.surfaceVariantText
@@ -100,7 +100,7 @@ Item {
                                     }
                                 }
 
-                                DankTextField {
+                                DTextField {
                                     outlined: true
                                     leftIconName: "label"
                                     labelText: I18n.tr("Name")
@@ -111,7 +111,7 @@ Item {
                                     onEditingFinished: PaletteInjectService.updatePalette(paletteItem.index, "namespace", text)
                                 }
 
-                                DankTextField {
+                                DTextField {
                                     outlined: true
                                     leftIconName: "terminal"
                                     labelText: I18n.tr("Command")
@@ -121,7 +121,7 @@ Item {
                                     onEditingFinished: PaletteInjectService.updatePalette(paletteItem.index, "command", text)
                                 }
 
-                                DankTextField {
+                                DTextField {
                                     outlined: true
                                     leftIconName: "data_array"
                                     labelText: I18n.tr("Arguments", "injected palette command arguments field label")
@@ -132,7 +132,7 @@ Item {
                                     onEditingFinished: PaletteInjectService.updatePalette(paletteItem.index, "args", PaletteInjectService.argsFromText(text))
                                 }
 
-                                DankTextField {
+                                DTextField {
                                     outlined: true
                                     leftIconName: "description"
                                     labelText: I18n.tr("JSON output path", "injected palette field label, file the command writes its palette to")
@@ -152,7 +152,7 @@ Item {
         SettingsFabBar {
             shown: Theme.matugenAvailable
 
-            DankFab {
+            DFab {
                 text: I18n.tr("Add palette", "injected palettes add button")
                 iconName: "add"
                 onClicked: PaletteInjectService.addPalette()

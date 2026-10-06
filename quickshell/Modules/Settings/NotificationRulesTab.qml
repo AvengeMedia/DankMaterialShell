@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -174,7 +174,7 @@ Item {
             settingKey: "notificationRules"
             tags: ["notification", "rules", "mute", "ignore", "priority", "regex", "history"]
 
-            headerActions: DankActionButton {
+            headerActions: DActionButton {
                 buttonSize: 36
                 iconName: "restart_alt"
                 tooltipText: I18n.tr("Reset to default")
@@ -203,7 +203,7 @@ Item {
                     titleColor: rule.enabled !== false ? Theme.surfaceText : Theme.surfaceVariantText
                     subtitle: root.matchSummary(rule)
 
-                    DankToggle {
+                    DToggle {
                         anchors.verticalCenter: parent.verticalCenter
                         hideText: true
                         text: ruleRow.title
@@ -211,14 +211,14 @@ Item {
                         onToggled: checked => SettingsData.updateNotificationRuleField(ruleRow.index, "enabled", checked)
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "edit"
                         Accessible.name: I18n.tr("Edit rule")
                         onClicked: root.openEditor(ruleRow.index, ruleRow.rule)
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "delete"
                         iconColor: Theme.error
@@ -234,7 +234,7 @@ Item {
                         Repeater {
                             model: ruleRow.badges
 
-                            delegate: DankBadge {
+                            delegate: DBadge {
                                 required property string modelData
                                 text: modelData
                                 color: Theme.primaryContainer
@@ -265,7 +265,7 @@ Item {
                     title: modelData.rule?.pattern || I18n.tr("Unknown")
                     singleLineTitle: true
 
-                    DankButton {
+                    DButton {
                         text: I18n.tr("Unmute")
                         backgroundColor: "transparent"
                         textColor: Theme.primary
@@ -276,7 +276,7 @@ Item {
         }
 
         SettingsFabBar {
-            DankFab {
+            DFab {
                 text: I18n.tr("Add rule", "notification rule dialog title and button")
                 iconName: "add"
                 onClicked: root.openEditor(-1, null)

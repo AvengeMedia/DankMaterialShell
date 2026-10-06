@@ -3,8 +3,8 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
-import qs.Modals.DankLauncherV2
-import qs.Modals.DankLauncherV2.Components
+import qs.Modals.DLauncherV2
+import qs.Modals.DLauncherV2.Components
 import qs.Services
 import qs.Widgets
 
