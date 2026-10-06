@@ -202,7 +202,7 @@ DankDialog {
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "delete"
                         iconColor: Theme.error
-                        Accessible.name: I18n.tr("Remove condition")
+                        Accessible.name: I18n.tr("Remove condition", "button in the notification rule editor, removes this match condition")
                         onClicked: root.removeCondition(conditionRow.index)
                     }
                 }
@@ -210,10 +210,10 @@ DankDialog {
         }
 
         SettingsRow {
-            subtitle: root.ruleConditions.length > 0 ? I18n.tr("A notification must match every condition") : ""
+            subtitle: root.ruleConditions.length > 0 ? I18n.tr("A notification must match every condition", "hint in the notification rule editor, all match conditions must apply") : ""
 
             DankButton {
-                text: I18n.tr("Add condition")
+                text: I18n.tr("Add condition", "button in the notification rule editor, adds another match condition")
                 iconName: "add"
                 backgroundColor: "transparent"
                 textColor: Theme.primary
