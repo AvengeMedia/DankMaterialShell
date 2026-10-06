@@ -171,9 +171,10 @@ func TestLinkInfo_Classify(t *testing.T) {
 		{"bond type", "bond0", "bond", true, false},
 		{"team type", "team0", "team", true, false},
 		{"vlan type", "vlan10", "vlan", true, false},
-		{"container bridge excluded", "lxdbr0", "bridge", false, false},
 		{"docker user bridge excluded", "br-1a2b3c", "bridge", false, false},
 		{"libvirt bridge excluded", "virbr0", "bridge", false, false},
+		{"bridge with only virtual members excluded", "lxcbr0", "bridge", false, false},
+		{"bridge without members excluded", "waydroid0", "bridge", false, false},
 		// Fallback path: linkType unavailable, name-prefix heuristic applies.
 		{"fallback enp wired", "enp141s0", "", true, false},
 		{"fallback wlan wireless", "wlan0", "", false, true},
@@ -182,6 +183,15 @@ func TestLinkInfo_Classify(t *testing.T) {
 		{"fallback docker skipped", "docker0", "", false, false},
 		{"fallback tun skipped", "tun0", "", false, false},
 	}
+	members := map[string][]string{
+		"br0":       {"enp42s0", "vnet0"},
+		"lxcbr0":    {"vethAbCd12"},
+		"waydroid0": nil,
+	}
+	orig := bridgeMembers
+	bridgeMembers = func(b string) []string { return members[b] }
+	t.Cleanup(func() { bridgeMembers = orig })
+
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			l := &linkInfo{name: tc.ifname, linkType: tc.linkType}
@@ -258,11 +268,11 @@ func TestSyncLinks_RefreshesSurvivingLink(t *testing.T) {
 }
 
 func TestLooksVirtual(t *testing.T) {
-	virtual := []string{"lo", "docker0", "veth123", "virbr0", "br-abc", "vnet0", "tun0", "tap0", "vboxnet0", "vmnet1", "kube-ipvs0", "cni0", "flannel.1", "cali-abc", "podman0", "podman3", "lxdbr0", "incusbr0"}
+	virtual := []string{"lo", "docker0", "veth123", "virbr0", "br-abc", "vnet0", "tun0", "tap0", "vboxnet0", "vmnet1", "kube-ipvs0", "cni0", "flannel.1", "cali-abc", "podman0", "podman3"}
 	for _, n := range virtual {
 		assert.True(t, looksVirtual(n), "%s should look virtual", n)
 	}
-	real := []string{"enp141s0", "eno1", "wlan0", "wlp3s0", "wifi", "dock", "nebula.homelab", "wg0", "br0", "bond0"}
+	real := []string{"enp141s0", "eno1", "wlan0", "wlp3s0", "wifi", "dock", "nebula.homelab", "wg0", "br0", "bond0", "team0", "vlan10"}
 	for _, n := range real {
 		assert.False(t, looksVirtual(n), "%s should not look virtual", n)
 	}
