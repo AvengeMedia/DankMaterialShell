@@ -3,21 +3,32 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"slices"
 )
 
+// Mirrors Hyprland's shipped target. Before=graphical-session.target would cycle with the add-wants implicit After=dms.service.
 const hyprlandSessionTargetUnit = `[Unit]
+Description=Hyprland Session Target
+BindsTo=graphical-session.target
+Wants=graphical-session-pre.target
+After=graphical-session-pre.target
+PropagatesStopTo=graphical-session.target
+`
+
+var staleHyprlandSessionTargetUnits = []string{
+	`[Unit]
+Description=Hyprland Session Target
+Requires=graphical-session.target
+After=graphical-session.target
+`,
+	`[Unit]
 Description=Hyprland Session Target
 BindsTo=graphical-session.target
 Before=graphical-session.target
 Wants=graphical-session-pre.target
 After=graphical-session-pre.target
-`
-
-const legacyHyprlandSessionTargetUnit = `[Unit]
-Description=Hyprland Session Target
-Requires=graphical-session.target
-After=graphical-session.target
-`
+`,
+}
 
 // Only a missing or dankinstall-written unit is replaced; hand-written units are left alone.
 func EnsureHyprlandSessionTarget() (string, error) {
@@ -30,10 +41,7 @@ func EnsureHyprlandSessionTarget() (string, error) {
 	existing, err := os.ReadFile(targetPath)
 	if err == nil {
 		content := string(existing)
-		if content == hyprlandSessionTargetUnit {
-			return targetPath, nil
-		}
-		if content != legacyHyprlandSessionTargetUnit {
+		if content == hyprlandSessionTargetUnit || !slices.Contains(staleHyprlandSessionTargetUnits, content) {
 			return targetPath, nil
 		}
 	}
