@@ -16,6 +16,9 @@ FocusScope {
 
     required property var host
 
+    property bool live: Window.window?.visible ?? false
+    property bool audioRefHeld: false
+
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
@@ -75,7 +78,23 @@ FocusScope {
     implicitHeight: targetImplicitHeight
     focus: true
 
-    Component.onCompleted: WidgetUtils.ensureEditButton()
+    function syncAudioRef(wanted) {
+        if (wanted === audioRefHeld)
+            return;
+        audioRefHeld = wanted;
+        if (wanted) {
+            AudioService.addRef();
+            return;
+        }
+        AudioService.removeRef();
+    }
+
+    onLiveChanged: syncAudioRef(live)
+    Component.onCompleted: {
+        WidgetUtils.ensureEditButton();
+        syncAudioRef(live);
+    }
+    Component.onDestruction: syncAudioRef(false)
     onPlacedWidgetIdsChanged: WidgetUtils.ensureEditButton()
 
     function navigateTo(section) {

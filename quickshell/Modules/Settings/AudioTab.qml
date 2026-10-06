@@ -90,6 +90,7 @@ Item {
         hiddenInputDeviceNames = SessionData.hiddenInputDeviceNames ?? [];
         updateDeviceList();
     }
+    Component.onDestruction: AudioService.removeRef()
 
     Component.onDestruction: AudioService.removeRef()
 

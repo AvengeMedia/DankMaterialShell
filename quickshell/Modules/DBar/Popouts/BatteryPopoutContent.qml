@@ -13,6 +13,7 @@ Item {
     id: root
 
     property bool active: false
+    property bool batteryRefHeld: false
     property real contentPadding: PopoutMetrics.contentPadding
     readonly property var historyDevice: BatteryService.usePreferred ? BatteryService.preferredDevice : BatteryService.device
     readonly property bool multipleBatteries: !BatteryService.usePreferred && BatteryService.batteries.length > 1
@@ -72,10 +73,24 @@ Item {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
+    function syncBatteryRef(wanted) {
+        if (wanted === batteryRefHeld)
+            return;
+        batteryRefHeld = wanted;
+        if (wanted) {
+            BatteryService.addRef();
+            return;
+        }
+        BatteryService.removeRef();
+    }
+
     onActiveChanged: {
+        syncBatteryRef(active);
         if (active)
             focusTimer.restart();
     }
+    Component.onCompleted: syncBatteryRef(active)
+    Component.onDestruction: syncBatteryRef(false)
     Keys.onEscapePressed: event => {
         dismissRequested();
         event.accepted = true;

@@ -14,6 +14,7 @@ Item {
     readonly property real stableLength: MprisController.activePlayerStableLength
     property var allPlayers: MprisController.availablePlayers
     property bool live: Window.window?.visible ?? false
+    property bool audioRefHeld: false
     property string entryId: "media"
     readonly property var options: DashRegistry.resolvedOptions(entryId)
     readonly property string playerStyle: options?.playerStyle ?? MediaOptions.defaultPlayerStyle
@@ -125,7 +126,22 @@ Item {
         onTriggered: root.activePlayer?.positionChanged()
     }
 
+    function syncAudioRef(wanted) {
+        if (wanted === audioRefHeld)
+            return;
+        audioRefHeld = wanted;
+        if (wanted) {
+            AudioService.addRef();
+            return;
+        }
+        AudioService.removeRef();
+    }
+
+    Component.onCompleted: syncAudioRef(live)
+    Component.onDestruction: syncAudioRef(false)
+
     onLiveChanged: {
+        syncAudioRef(live);
         if (live) {
             restoreLyrics();
             return;

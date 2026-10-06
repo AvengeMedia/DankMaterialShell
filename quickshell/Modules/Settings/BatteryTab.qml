@@ -29,6 +29,9 @@ Item {
 
     property bool chargeLimitSupported: Qt.platform.os === "linux"
 
+    Component.onCompleted: BatteryService.addRef()
+    Component.onDestruction: BatteryService.removeRef()
+
     Process {
         id: thresholdProbe
         running: Qt.platform.os === "linux"

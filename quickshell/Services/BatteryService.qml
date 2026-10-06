@@ -12,9 +12,6 @@ Singleton {
     property bool suppressSound: true
     property bool previousPluggedState: false
 
-    // Consumers such as the battery widget and battery-related popouts hold a
-    // reference while they need fresh battery information. This keeps the
-    // service independent from UI singletons and avoids creation-time cycles.
     property int refCount: 0
 
     function addRef() {
@@ -100,9 +97,7 @@ Singleton {
         const acMatch = text.match(/__DMS_AC__:(\d+)/);
 
         root.freebsdBatteryAvailable = blocks.length > 0;
-        root.freebsdBatteryLevel = blocks.length > 0
-            ? Math.max(0, Math.min(100, weight > 0 ? weightedPct / weight : (pctCount > 0 ? pctSum / pctCount : 0)))
-            : 0;
+        root.freebsdBatteryLevel = blocks.length > 0 ? Math.max(0, Math.min(100, weight > 0 ? weightedPct / weight : (pctCount > 0 ? pctSum / pctCount : 0))) : 0;
         root.freebsdIsCharging = charging;
         root.freebsdPluggedIn = acMatch ? acMatch[1] === "1" : charging;
         root.freebsdChangeRate = totalRateW;
@@ -117,17 +112,14 @@ Singleton {
 
         const script = 'units=$(sysctl -n hw.acpi.battery.units 2>/dev/null || echo 0); i=0; while [ "$i" -lt "$units" ]; do echo "__DMS_BATTERY_${i}__"; acpiconf -i "$i" 2>/dev/null; i=$((i+1)); done; printf "__DMS_AC__:"; sysctl -n hw.acpi.acline 2>/dev/null || echo 1';
 
-        Proc.runCommand("battery-freebsd-acpi",
-            ["nice", "-n", "10", "sh", "-c", script],
-            (output, exitCode) => {
-                root.freebsdBatteryProbeComplete = true;
+        Proc.runCommand("battery-freebsd-acpi", ["nice", "-n", "10", "sh", "-c", script], (output, exitCode) => {
+            root.freebsdBatteryProbeComplete = true;
 
-                if (exitCode === 0)
-                    root.applyFreeBsdBatteryState(output);
-                else
-                    root.freebsdBatteryAvailable = false;
-            },
-            0);
+            if (exitCode === 0)
+                root.applyFreeBsdBatteryState(output);
+            else
+                root.freebsdBatteryAvailable = false;
+        }, 0);
     }
 
     function updateFreeBsdBatteryFallback() {
@@ -154,10 +146,7 @@ Singleton {
     Timer {
         interval: 15000
         repeat: true
-        running: root.isBSD
-            && root.batteries.length === 0
-            && root.freebsdBatteryAvailable
-            && root.refCount > 0
+        running: root.isBSD && root.batteries.length === 0 && root.freebsdBatteryAvailable && root.refCount > 0
 
         onTriggered: root.refreshFreeBsdBattery()
     }
@@ -186,9 +175,7 @@ Singleton {
         if (!batteryAvailable)
             return;
 
-        const profileValue = isPluggedIn
-            ? SettingsData.acProfileName
-            : SettingsData.batteryProfileName;
+        const profileValue = isPluggedIn ? SettingsData.acProfileName : SettingsData.batteryProfileName;
 
         if (profileValue === "")
             return;
@@ -266,10 +253,7 @@ Singleton {
                     return Math.min(100, Math.round((energy * 100) / cap));
             }
 
-            return Math.min(100, Math.round(
-                chargeBatteries.reduce((sum, b) => sum + _chargePercent(b), 0)
-                / chargeBatteries.length
-            ));
+            return Math.min(100, Math.round(chargeBatteries.reduce((sum, b) => sum + _chargePercent(b), 0) / chargeBatteries.length));
         }
 
         if (_hasUsableCharge(UPower.displayDevice))
@@ -370,14 +354,10 @@ Singleton {
         return live > 0 ? live : _lastBatteryLevel;
     }
 
-    readonly property bool isCharging: (isBSD && freebsdBatteryAvailable)
-        ? freebsdIsCharging
-        : (_hasKnownChargingState ? _currentIsCharging : _lastIsCharging)
+    readonly property bool isCharging: (isBSD && freebsdBatteryAvailable) ? freebsdIsCharging : (_hasKnownChargingState ? _currentIsCharging : _lastIsCharging)
 
     // Is the system plugged in (Is not running on battery)
-    readonly property bool isPluggedIn: (isBSD && freebsdBatteryAvailable)
-        ? freebsdPluggedIn
-        : !UPower.onBattery
+    readonly property bool isPluggedIn: (isBSD && freebsdBatteryAvailable) ? freebsdPluggedIn : !UPower.onBattery
 
     readonly property bool hasBatteryReading: batteryAvailable && batteryLevel > 0
     readonly property bool isLowBattery: hasBatteryReading && batteryLevel <= SettingsData.batteryLowThreshold
@@ -431,21 +411,9 @@ Singleton {
     // urgency: "critical" (red), "warning" (orange/important), or "info"
     function sendAlert(title, message, urgency, icon, notificationType) {
         if (notificationType === 1) {
-            const dbusUrgency = urgency === "critical"
-                ? "critical"
-                : (urgency === "warning" ? "normal" : "low");
+            const dbusUrgency = urgency === "critical" ? "critical" : (urgency === "warning" ? "normal" : "low");
 
-            Quickshell.execDetached([
-                "notify-send",
-                "-u",
-                dbusUrgency,
-                "-a",
-                "DMS",
-                "-i",
-                icon,
-                title,
-                message
-            ]);
+            Quickshell.execDetached(["notify-send", "-u", dbusUrgency, "-a", "DMS", "-i", icon, title, message]);
         } else if (urgency === "critical") {
             ToastService.showError(title, message, "", icon);
         } else if (urgency === "warning") {
@@ -463,16 +431,7 @@ Singleton {
             if (!_hasNotifiedChargeLimit && SettingsData.batteryNotifyChargeLimit) {
                 _hasNotifiedChargeLimit = true;
 
-                sendAlert(
-                    I18n.tr("Charge Limit Reached"),
-                    I18n.tr(
-                        "Battery has charged to your set limit of %1%",
-                        "charge limit notification body, %1 is the limit percentage"
-                    ).arg(SettingsData.batteryChargeLimit),
-                    "info",
-                    "material:battery_profile",
-                    SettingsData.batteryChargeLimitNotificationType
-                );
+                sendAlert(I18n.tr("Charge Limit Reached"), I18n.tr("Battery has charged to your set limit of %1%", "charge limit notification body, %1 is the limit percentage").arg(SettingsData.batteryChargeLimit), "info", "material:battery_profile", SettingsData.batteryChargeLimitNotificationType);
             }
         } else if (!isCharging || batteryLevel < SettingsData.batteryChargeLimit - 2) {
             _hasNotifiedChargeLimit = false;
@@ -489,16 +448,7 @@ Singleton {
             if (!_hasNotifiedCriticalBattery && SettingsData.batteryNotifyCritical) {
                 _hasNotifiedCriticalBattery = true;
 
-                sendAlert(
-                    I18n.tr("Critical Battery"),
-                    I18n.tr(
-                        "Battery is at %1% - Connect charger immediately!",
-                        "critical battery notification body, %1 is the battery percentage"
-                    ).arg(batteryLevel),
-                    "critical",
-                    "material:battery_alert",
-                    SettingsData.batteryCriticalNotificationType
-                );
+                sendAlert(I18n.tr("Critical Battery"), I18n.tr("Battery is at %1% - Connect charger immediately!", "critical battery notification body, %1 is the battery percentage").arg(batteryLevel), "critical", "material:battery_alert", SettingsData.batteryCriticalNotificationType);
             }
 
             return;
@@ -512,16 +462,7 @@ Singleton {
             if (!_hasNotifiedLowBattery && SettingsData.batteryNotifyLow) {
                 _hasNotifiedLowBattery = true;
 
-                sendAlert(
-                    I18n.tr("Low Battery"),
-                    I18n.tr(
-                        "Battery is at %1% - Consider charging soon",
-                        "low battery notification body, %1 is the battery percentage"
-                    ).arg(batteryLevel),
-                    "warning",
-                    "material:battery_0_bar",
-                    SettingsData.batteryLowNotificationType
-                );
+                sendAlert(I18n.tr("Low Battery"), I18n.tr("Battery is at %1% - Consider charging soon", "low battery notification body, %1 is the battery percentage").arg(batteryLevel), "warning", "material:battery_0_bar", SettingsData.batteryLowNotificationType);
             }
 
             if (SettingsData.batteryAutoPowerSaver && PowerProfileWatcher.available) {
@@ -536,13 +477,9 @@ Singleton {
 
     onIsChargingChanged: {
         // Reset average when switching states
-        _smoothedChangeRate = (_hasKnownChargingState && changeRate > 0)
-            ? changeRate
-            : 0;
+        _smoothedChangeRate = (_hasKnownChargingState && changeRate > 0) ? changeRate : 0;
 
-        _lastRateSampleTime = _smoothedChangeRate > 0
-            ? Date.now()
-            : 0;
+        _lastRateSampleTime = _smoothedChangeRate > 0 ? Date.now() : 0;
 
         if (isCharging) {
             _hasNotifiedLowBattery = false;
@@ -569,11 +506,9 @@ Singleton {
         applyPowerProfile();
 
         if (isPluggedIn) {
-            const dismissLow = SettingsData.batteryLowNotificationType === 1
-                && SettingsData.notificationTimeoutNormal === 0;
+            const dismissLow = SettingsData.batteryLowNotificationType === 1 && SettingsData.notificationTimeoutNormal === 0;
 
-            const dismissCritical = SettingsData.batteryCriticalNotificationType === 1
-                && SettingsData.notificationTimeoutCritical === 0;
+            const dismissCritical = SettingsData.batteryCriticalNotificationType === 1 && SettingsData.notificationTimeoutCritical === 0;
 
             if (dismissLow || dismissCritical) {
                 const lowSummary = I18n.tr("Low Battery");
@@ -585,8 +520,7 @@ Singleton {
 
                     const summary = w.notification.summary;
 
-                    if ((dismissLow && summary === lowSummary)
-                            || (dismissCritical && summary === criticalSummary)) {
+                    if ((dismissLow && summary === lowSummary) || (dismissCritical && summary === criticalSummary)) {
                         NotificationService.dismissNotification(w);
                     }
                 }
@@ -646,9 +580,7 @@ Singleton {
             return "";
 
         const magnitude = Math.abs(rate);
-        const value = (compact || magnitude >= 10)
-            ? Math.round(magnitude).toString()
-            : magnitude.toFixed(1);
+        const value = (compact || magnitude >= 10) ? Math.round(magnitude).toString() : magnitude.toFixed(1);
 
         return `${rate > 0 ? "+" : "-"}${value}W`;
     }
@@ -705,17 +637,12 @@ Singleton {
         if (usePreferred && preferredDeviceReady && preferredDevice.healthSupported)
             return `${Math.round(preferredDevice.healthPercentage)}%`;
 
-        const validBatteries = readyBatteries.filter(
-            b => b.healthSupported && b.healthPercentage > 0
-        );
+        const validBatteries = readyBatteries.filter(b => b.healthSupported && b.healthPercentage > 0);
 
         if (validBatteries.length === 0)
             return "N/A";
 
-        const avgHealth = validBatteries.reduce(
-            (sum, b) => sum + b.healthPercentage,
-            0
-        ) / validBatteries.length;
+        const avgHealth = validBatteries.reduce((sum, b) => sum + b.healthPercentage, 0) / validBatteries.length;
 
         return `${Math.round(avgHealth)}%`;
     }
@@ -779,18 +706,14 @@ Singleton {
             if (isCharging)
                 return I18n.tr("Charging", "battery status");
 
-            return isPluggedIn
-                ? I18n.tr("Plugged in", "battery status")
-                : I18n.tr("Discharging", "battery status");
+            return isPluggedIn ? I18n.tr("Plugged in", "battery status") : I18n.tr("Discharging", "battery status");
         }
 
         if (stateKnownBatteries.length === 0) {
             if (isCharging)
                 return I18n.tr("Charging", "battery status");
 
-            return isPluggedIn
-                ? I18n.tr("Plugged in", "battery status")
-                : I18n.tr("Discharging", "battery status");
+            return isPluggedIn ? I18n.tr("Plugged in", "battery status") : I18n.tr("Discharging", "battery status");
         }
 
         if (isCharging && !stateKnownBatteries.some(b => b.changeRate > 0))
@@ -801,37 +724,21 @@ Singleton {
         if (states.every(s => s === states[0]))
             return translateBatteryState(states[0]);
 
-        return isCharging
-            ? I18n.tr("Charging", "battery status")
-            : (isPluggedIn
-                ? I18n.tr("Plugged in", "battery status")
-                : I18n.tr("Discharging", "battery status"));
+        return isCharging ? I18n.tr("Charging", "battery status") : (isPluggedIn ? I18n.tr("Plugged in", "battery status") : I18n.tr("Discharging", "battery status"));
     }
 
     readonly property bool suggestPowerSaver: false
 
-    readonly property var peripheralDevices: UPower.devices.values
-        .filter(dev => dev
-            && dev.ready
-            && !dev.isLaptopBattery
-            && peripheralIcon(dev.type) !== "")
-        .map(dev => ({
-            "name": dev.model || UPowerDeviceType.toString(dev.type),
-            "percentage": Math.round(dev.percentage * 100),
-            "type": dev.type,
-            "icon": peripheralIcon(dev.type),
-            "charging": dev.state === UPowerDeviceState.Charging
-        }))
+    readonly property var peripheralDevices: UPower.devices.values.filter(dev => dev && dev.ready && !dev.isLaptopBattery && peripheralIcon(dev.type) !== "").map(dev => ({
+                "name": dev.model || UPowerDeviceType.toString(dev.type),
+                "percentage": Math.round(dev.percentage * 100),
+                "type": dev.type,
+                "icon": peripheralIcon(dev.type),
+                "charging": dev.state === UPowerDeviceState.Charging
+            }))
 
     readonly property var bluetoothDevices: {
-        const bluetoothTypes = [
-            UPowerDeviceType.BluetoothGeneric,
-            UPowerDeviceType.Headphones,
-            UPowerDeviceType.Headset,
-            UPowerDeviceType.Keyboard,
-            UPowerDeviceType.Mouse,
-            UPowerDeviceType.Speakers
-        ];
+        const bluetoothTypes = [UPowerDeviceType.BluetoothGeneric, UPowerDeviceType.Headphones, UPowerDeviceType.Headset, UPowerDeviceType.Keyboard, UPowerDeviceType.Mouse, UPowerDeviceType.Speakers];
 
         return peripheralDevices.filter(dev => bluetoothTypes.includes(dev.type));
     }
@@ -873,13 +780,9 @@ Singleton {
         if (!batteryAvailable)
             return 0;
 
-        const rate = _smoothedChangeRate > 0
-            ? _smoothedChangeRate
-            : changeRate;
+        const rate = _smoothedChangeRate > 0 ? _smoothedChangeRate : changeRate;
 
-        const totalTime = isCharging
-            ? ((batteryCapacity - batteryEnergy) / rate)
-            : (batteryEnergy / rate);
+        const totalTime = isCharging ? ((batteryCapacity - batteryEnergy) / rate) : (batteryEnergy / rate);
 
         const seconds = Math.abs(totalTime * 3600);
 
@@ -893,9 +796,7 @@ Singleton {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
 
-        return hours > 0
-            ? I18n.tr("%1h %2m", "battery time remaining").arg(hours).arg(minutes)
-            : I18n.tr("%1m", "battery time remaining").arg(minutes);
+        return hours > 0 ? I18n.tr("%1h %2m", "battery time remaining").arg(hours).arg(minutes) : I18n.tr("%1m", "battery time remaining").arg(minutes);
     }
 
     function formatTimeRemaining() {
@@ -916,10 +817,7 @@ Singleton {
         const target = new Date(Date.now() + seconds * 1000);
         const use24Hour = SettingsData.use24HourClock !== false;
 
-        return target.toLocaleTimeString(
-            Qt.locale(),
-            use24Hour ? "HH:mm" : "h:mm AP"
-        );
+        return target.toLocaleTimeString(Qt.locale(), use24Hour ? "HH:mm" : "h:mm AP");
     }
 
     function getBatteryIcon() {

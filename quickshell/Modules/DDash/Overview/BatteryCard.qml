@@ -9,6 +9,7 @@ Card {
     id: root
 
     property bool live: Window.window?.visible ?? false
+    property bool batteryRefHeld: false
 
     readonly property bool wide: width >= DashMetrics.gridRowUnit * 2
     readonly property bool tall: height >= DashMetrics.gridRowUnit * 2
@@ -19,6 +20,21 @@ Card {
 
     entryId: "battery"
     tone: options.tone ?? ""
+
+    function syncBatteryRef(wanted) {
+        if (wanted === batteryRefHeld)
+            return;
+        batteryRefHeld = wanted;
+        if (wanted) {
+            BatteryService.addRef();
+            return;
+        }
+        BatteryService.removeRef();
+    }
+
+    onLiveChanged: syncBatteryRef(live)
+    Component.onCompleted: syncBatteryRef(live)
+    Component.onDestruction: syncBatteryRef(false)
 
     Row {
         anchors.left: parent.left

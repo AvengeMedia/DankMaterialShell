@@ -9,6 +9,9 @@ BasePill {
     id: battery
     readonly property var log: Log.scoped("Battery")
 
+    Component.onCompleted: BatteryService.addRef()
+    Component.onDestruction: BatteryService.removeRef()
+
     property bool batteryPopupVisible: false
     property var popoutTarget: null
     property var widgetData: null

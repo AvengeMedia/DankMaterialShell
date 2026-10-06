@@ -72,7 +72,7 @@ Item {
 
                     DTextField {
                         id: usernameField
-                        outlined: true
+                        expressive: true
                         leftIconName: "person"
                         labelText: I18n.tr("Username")
                         width: parent.width
@@ -113,7 +113,7 @@ Item {
 
                     DTextField {
                         id: passwordField
-                        outlined: true
+                        expressive: true
                         leftIconName: "lock"
                         labelText: I18n.tr("Password")
                         width: parent.width
@@ -131,7 +131,7 @@ Item {
 
                     DTextField {
                         id: confirmField
-                        outlined: true
+                        expressive: true
                         leftIconName: "lock"
                         labelText: I18n.tr("Confirm password")
                         width: parent.width
