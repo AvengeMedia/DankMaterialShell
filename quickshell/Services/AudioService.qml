@@ -34,10 +34,15 @@ Singleton {
 	readonly property var sink: freebsdAudio ? nativeSink : (pipewireBackend?.defaultSink ?? null)
 	readonly property var source: freebsdAudio ? nativeSource : (pipewireBackend?.defaultSource ?? null)
 
-	readonly property bool freeBsdPollingRequested:
-		(PopoutService.controlCenterPopout?.shouldBeVisible ?? false)
-		|| (PopoutService.dankDashPopout?.shouldBeVisible ?? false)
-		|| (PopoutService.settingsModal?.visible ?? false)
+	property int refCount: 0
+
+	function addRef() {
+		refCount++;
+	}
+
+	function removeRef() {
+		refCount = Math.max(0, refCount - 1);
+	}
 
 	function isPipewireVideoSource(node) {
 		return !freebsdAudio
@@ -1768,15 +1773,15 @@ EOFCONFIG
         return `Microphone volume decreased to ${newVolume}%`;
     }
 
-	onFreeBsdPollingRequestedChanged: {
-		if (root.freebsdAudio && root.freeBsdPollingRequested)
+	onRefCountChanged: {
+		if (root.freebsdAudio && root.refCount === 1)
 			root.refreshFreeBsdDevices();
 	}
 
 	Timer {
 		interval: 5000
 		repeat: true
-		running: root.freebsdAudio && root.freeBsdPollingRequested
+		running: root.freebsdAudio && root.refCount > 0
 		onTriggered: root.refreshFreeBsdDevices()
 	}
 
