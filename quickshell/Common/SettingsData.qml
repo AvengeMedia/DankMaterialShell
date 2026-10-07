@@ -2099,6 +2099,8 @@ Singleton {
     }
 
     function _reconcileConnectedFrameBarStyles() {
+        if (Quickshell.screens.length === 0)
+            return;
         const result = _applyConnectedFrameBarStyles(barConfigs);
         if (result.changed)
             barConfigs = result.configs;

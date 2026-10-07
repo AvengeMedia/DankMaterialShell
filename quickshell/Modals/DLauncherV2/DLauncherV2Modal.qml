@@ -65,8 +65,8 @@ Item {
 
     readonly property bool _desiredConnected: FrameTransitionState.effectiveConnectedFrameModeActive
     readonly property bool useSpotlightBackend: !_desiredConnected && SettingsData.launcherStyle === "spotlight"
-    // The island backend routes the host per call; style only picks the face.
-    readonly property bool useIslandBackend: !_desiredConnected && SettingsData.launcherStyle === "island"
+    // Routing decides the host per call inside the island backend; style only picks the face.
+    readonly property bool useIslandBackend: SettingsData.launcherStyle === "island"
     readonly property var _desiredBackend: useIslandBackend ? islandComp : hostComp
     property bool _resolvedConnected: false
     property bool _resolvedSpotlight: false

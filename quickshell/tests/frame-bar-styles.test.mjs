@@ -18,9 +18,9 @@ const styled = { shadowIntensity: 40, squareCorners: true, attachToScreenEdge: t
 const zeroed = { shadowIntensity: 0, squareCorners: false, attachToScreenEdge: false, gothCornersEnabled: false, borderEnabled: false };
 const style = cfg => Object.fromEntries(Object.keys(styled).map(key => [key, cfg[key]]));
 
-function frameSettings({ active = true, frameOn = ["A"], barConfigs, backups = {} } = {}) {
+function frameSettings({ active = true, frameOn = ["A"], barConfigs, backups = {}, screens = [{ name: "A" }, { name: "B" }] } = {}) {
     const settings = functions(settingsSource, "    ", vm.createContext({
-        Quickshell: { screens: [{ name: "A" }, { name: "B" }] },
+        Quickshell: { screens },
         connectedFrameModeActive: active,
         frameScreenPreferences: frameOn,
         connectedFrameBarStyleBackups: backups,
@@ -98,4 +98,14 @@ test("adding a bar off the frame display keeps its styling", () => {
     settings.addBarConfig({ id: "bar3", screenPreferences: ["B"], ...styled });
     assert.deepEqual(style(bar(settings, "bar3")), styled);
     assert.equal(plain(settings.connectedFrameBarStyleBackups).bar3, undefined);
+});
+
+test("an empty screen list leaves bar styles and backups alone", () => {
+    const settings = frameSettings();
+    settings._reconcileConnectedFrameBarStyles();
+    settings.Quickshell.screens = [];
+    settings._reconcileConnectedFrameBarStyles();
+    assert.deepEqual(style(bar(settings, "bar1")), zeroed);
+    assert.deepEqual(plain(settings.connectedFrameBarStyleBackups), { bar1: styled });
+    assert.equal(settings.updates, 1);
 });
