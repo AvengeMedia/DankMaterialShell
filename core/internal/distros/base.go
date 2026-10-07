@@ -575,8 +575,9 @@ func (b *BaseDistribution) EnableDMSService(ctx context.Context, wm deps.WindowM
 			b.log("Warning: failed to add dms as a want for niri.service")
 		}
 	case deps.WindowManagerHyprland:
-		if err := exec.CommandContext(ctx, "systemctl", "--user", "add-wants", "hyprland-session.target", "dms").Run(); err != nil {
-			b.log("Warning: failed to add dms as a want for hyprland-session.target")
+		// hyprland-session.target is Before=graphical-session.target and dms.service is After= it, so wanting dms from the target is an ordering cycle.
+		if err := exec.CommandContext(ctx, "systemctl", "--user", "enable", "dms.service").Run(); err != nil {
+			b.log("Warning: failed to enable dms.service")
 		}
 	}
 

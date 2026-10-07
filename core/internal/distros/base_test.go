@@ -107,3 +107,27 @@ func TestBaseDistribution_detectDMS_DirectoryWithoutGit(t *testing.T) {
 		t.Error("Expected Required to be true")
 	}
 }
+
+func TestBaseDistribution_EnableDMSService_HyprlandAvoidsOrderingCycle(t *testing.T) {
+	binDir := t.TempDir()
+	argsFile := filepath.Join(binDir, "args")
+	script := "#!/bin/sh\necho \"$@\" >> " + argsFile + "\n"
+	if err := os.WriteFile(filepath.Join(binDir, "systemctl"), []byte(script), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("PATH", binDir+":"+os.Getenv("PATH"))
+
+	logChan := make(chan string, 10)
+	base := NewBaseDistribution(logChan)
+	if err := base.EnableDMSService(t.Context(), deps.WindowManagerHyprland); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := os.ReadFile(argsFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(got) != "--user enable dms.service\n" {
+		t.Errorf("expected --user enable dms.service, got %q", got)
+	}
+}
