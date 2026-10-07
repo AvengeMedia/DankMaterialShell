@@ -8,6 +8,7 @@ import Quickshell.WindowManager
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../../Common/WheelInput.js" as WheelInput
 
 Item {
     id: root
@@ -992,7 +993,7 @@ Item {
                 return;
 
             const delta = wheel.angleDelta.y;
-            const isTouchpad = wheel.pixelDelta && wheel.pixelDelta.y !== 0;
+            const isTouchpad = WheelInput.isTouchpad(wheel);
             const reverse = SettingsData.reverseScrolling ? -1 : 1;
 
             if (isTouchpad) {

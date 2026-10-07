@@ -529,12 +529,12 @@ jobs:
       fail-fast: false
       matrix:
         repo:
-          - dgop
-          - dankgo
+#          - dgop
+#          - dankgo
 #          - dank-qml-common
 #          - dankcalendar
-          - danksearch
-          - dank-greeter
+#          - danksearch
+#          - dank-greeter
     steps:
       - name: Create GitHub App token
         id: app_token
