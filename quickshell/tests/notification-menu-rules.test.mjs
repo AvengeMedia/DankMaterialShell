@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
+import { loadScript } from "./qml-script.mjs";
 
 const source = readFileSync(new URL("../Common/SettingsData.qml", import.meta.url), "utf8");
 const serviceSource = readFileSync(new URL("../Services/NotificationService.qml", import.meta.url), "utf8");
+const ruleExpiry = loadScript(new URL("../Common/NotificationRuleExpiry.js", import.meta.url));
 
 function load(text, globals, only) {
     const context = vm.createContext(globals);
@@ -16,14 +18,14 @@ function load(text, globals, only) {
 }
 
 function settings(rules) {
-    const context = load(source, { notificationRules: rules });
+    const context = load(source, { notificationRules: rules, RuleExpiry: ruleExpiry });
     context.saveSettings = () => {};
     return context;
 }
 
 function policy(rules, notif) {
     const functions = ["_resolveAppNameForRule", "_ruleFieldValue", "_coerceRuleUrgency", "_matchesNotificationRule", "_evaluateNotificationPolicy"];
-    const context = load(serviceSource, { SettingsData: { notificationRules: rules }, NotificationUrgency: { Low: 0, Normal: 1, Critical: 2 } }, functions);
+    const context = load(serviceSource, { SettingsData: { notificationRules: rules, isNotificationRuleExpired: () => false }, NotificationUrgency: { Low: 0, Normal: 1, Critical: 2 } }, functions);
     return plain(context._evaluateNotificationPolicy(notif));
 }
 

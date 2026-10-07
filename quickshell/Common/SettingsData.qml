@@ -3411,11 +3411,14 @@ Singleton {
         if (!pattern)
             return;
         var rules = JSON.parse(JSON.stringify(notificationRules || []));
-        rules.push(_newNotificationRule(Object.assign({
+        const rule = _newNotificationRule(Object.assign({
             field: desktopEntry ? "desktopEntry" : "appName",
             pattern: pattern,
             matchType: "exact"
-        }, overrides)));
+        }, overrides));
+        if (!rule.expiresAt)
+            delete rule.expiresAt;
+        rules.push(rule);
         notificationRules = rules;
         saveSettings();
     }
@@ -3431,6 +3434,8 @@ Singleton {
         if (index === -1)
             return false;
         const rule = Object.assign(rules[index], changes);
+        if (!rule.expiresAt)
+            delete rule.expiresAt;
         if (_hasNoAction(rule) && (rule.urgency || "default").toString().toLowerCase() === "default" && !_isDndBypassRule(rule))
             rules.splice(index, 1);
         notificationRules = rules;
