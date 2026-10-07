@@ -8,7 +8,7 @@
       flake = false;
     };
     dank-qml-common = {
-      url = "github:AvengeMedia/dank-qml-common";
+      url = "github:AvengeMedia/dank-qml-common/stable-1.6";
       flake = false;
     };
   };
