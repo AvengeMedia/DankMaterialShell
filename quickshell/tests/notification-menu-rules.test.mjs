@@ -25,7 +25,7 @@ function settings(rules) {
 
 function policy(rules, notif) {
     const functions = ["_resolveAppNameForRule", "_ruleFieldValue", "_coerceRuleUrgency", "_matchesNotificationRule", "_evaluateNotificationPolicy"];
-    const context = load(serviceSource, { SettingsData: { notificationRules: rules, isNotificationRuleExpired: () => false }, NotificationUrgency: { Low: 0, Normal: 1, Critical: 2 } }, functions);
+    const context = load(serviceSource, { SettingsData: { notificationRules: rules, isNotificationRuleExpired: ruleExpiry.isRuleExpired }, NotificationUrgency: { Low: 0, Normal: 1, Critical: 2 } }, functions);
     return plain(context._evaluateNotificationPolicy(notif));
 }
 
@@ -129,4 +129,15 @@ test("rules that are not exact app or desktop-entry rules are never read or edit
     const u = settings([desktop]);
     assert.equal(u.isAppMuted("org.mozilla.firefox", "firefox"), false, "a desktopEntry rule is not matched against the app name");
     assert.equal(u.isAppMuted("Firefox", "org.mozilla.firefox"), true);
+});
+
+test("an expired timed mute releases the popup but keeps the rule's other settings", () => {
+    const notif = { appName: "Firefox", summary: "", body: "" };
+    const p = policy([rule({ action: "mute", bypassDnd: true, expiresAt: 1 })], notif);
+    assert.equal(p.disablePopup, false);
+    assert.equal(p.bypassDnd, true);
+
+    const s = settings([rule({ action: "mute", bypassDnd: true, expiresAt: 1 }), rule({ action: "mute", expiresAt: 1 })]);
+    s.pruneExpiredNotificationRules();
+    assert.deepEqual(plain(s.notificationRules), [rule({ bypassDnd: true })]);
 });

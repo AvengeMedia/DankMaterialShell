@@ -456,8 +456,6 @@ Singleton {
             return false;
         if (rule.enabled === false)
             return false;
-        if (SettingsData.isNotificationRuleExpired(rule))
-            return false;
 
         const pattern = (rule.pattern || "").toString();
         if (!pattern.trim())
@@ -507,7 +505,7 @@ Singleton {
         };
 
         policy.bypassDnd = rules.some(rule => rule.bypassDnd === true && _matchesNotificationRule(rule, info));
-        policy.disablePopup = rules.some(rule => (rule.action || "default").toString().toLowerCase() === "mute" && _matchesNotificationRule(rule, info));
+        policy.disablePopup = rules.some(rule => (rule.action || "default").toString().toLowerCase() === "mute" && !SettingsData.isNotificationRuleExpired(rule) && _matchesNotificationRule(rule, info));
 
         for (const rule of rules) {
             if (!_matchesNotificationRule(rule, info))
@@ -631,11 +629,11 @@ Singleton {
         return Format.formatRemaining(expiresAt - notificationRuleNowMs, "", I18n.tr("%1 min", "timed duration, %1 is a number of minutes"), I18n.tr("%1 h", "timed duration, %1 is a number of hours"), I18n.tr("%1 h %2 m", "timed duration, %1 is a number of hours, %2 is a number of minutes"));
     }
 
-    // Sweeps expired timed mute rules (SettingsData.addMuteRuleForApp with
-    // expiresAt) out of the persisted rules list. Matching already ignores
-    // them; this keeps the stored list and the settings UI truthful. Runs
-    // only while timed rules exist, and fires on start so rules that expired
-    // while the shell was offline are swept at launch.
+    // Clears lapsed timed mutes (SettingsData.addMuteRuleForApp with
+    // expiresAt) from the persisted rules. Matching already ignores them;
+    // this keeps the stored list and the settings UI truthful. Runs only
+    // while timed rules exist, and fires on start so mutes that lapsed while
+    // the shell was offline are cleared at launch.
     Timer {
         id: expiredRuleSweeper
         interval: 60000

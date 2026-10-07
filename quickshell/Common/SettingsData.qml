@@ -3376,13 +3376,13 @@ Singleton {
     }
 
     // Timed mute rules carry an expiresAt timestamp (ms since epoch); 0 or
-    // absent means the rule never expires. Expired rules are ignored by
-    // matching and swept from the persisted list by
-    // pruneExpiredNotificationRules(). The predicate itself lives in
-    // NotificationRuleExpiry.js so the logic suite covers it. nowMs is
-    // optional (defaults to the current time); reactive callers pass
-    // NotificationService.notificationRuleNowMs so their bindings refresh
-    // as rules expire instead of freezing on a stale Date.now().
+    // absent means the mute never expires. Only the mute lapses: a DND bypass
+    // or urgency on the same rule stays in force, and
+    // pruneExpiredNotificationRules() clears the lapsed mute from the
+    // persisted rule. nowMs is optional (defaults to the current time);
+    // reactive callers pass NotificationService.notificationRuleNowMs so
+    // their bindings refresh as rules expire instead of freezing on a stale
+    // Date.now().
     function isNotificationRuleExpired(rule, nowMs) {
         return RuleExpiry.isRuleExpired(rule, nowMs);
     }
@@ -3427,6 +3427,10 @@ Singleton {
         return (rule.action || "default").toString().toLowerCase() === "default";
     }
 
+    function _isNoopRule(rule) {
+        return _hasNoAction(rule) && (rule.urgency || "default").toString().toLowerCase() === "default" && !_isDndBypassRule(rule);
+    }
+
     // Edits the first enabled matching rule and drops it once it no longer does anything.
     function _updateAppRule(appName, desktopEntry, predicate, changes) {
         var rules = JSON.parse(JSON.stringify(notificationRules || []));
@@ -3436,7 +3440,7 @@ Singleton {
         const rule = Object.assign(rules[index], changes);
         if (!rule.expiresAt)
             delete rule.expiresAt;
-        if (_hasNoAction(rule) && (rule.urgency || "default").toString().toLowerCase() === "default" && !_isDndBypassRule(rule))
+        if (_isNoopRule(rule))
             rules.splice(index, 1);
         notificationRules = rules;
         saveSettings();
@@ -3466,23 +3470,29 @@ Singleton {
         return index === -1 ? 0 : (rules[index].expiresAt || 0);
     }
 
-    // Removes expired timed rules from the persisted list so the settings UI
-    // and the rules array stay truthful. Returns the number removed. The
-    // idle case must stay cheap: count first and only build the pruned list
-    // when something actually expired (no deep copies on the sweep path).
+    // Clears lapsed timed mutes from the persisted list so the settings UI
+    // stays truthful. Only the mute goes; the rule is dropped once nothing
+    // else is left on it. The idle sweep must stay cheap, so nothing is
+    // copied unless a rule actually expired.
     function pruneExpiredNotificationRules() {
         const rules = notificationRules || [];
-        let expired = 0;
-        for (let i = 0; i < rules.length; i++) {
-            if (isNotificationRuleExpired(rules[i]))
-                expired += 1;
+        if (!rules.some(rule => isNotificationRuleExpired(rule)))
+            return;
+        const kept = [];
+        for (const source of rules) {
+            if (!isNotificationRuleExpired(source)) {
+                kept.push(source);
+                continue;
+            }
+            const rule = Object.assign({}, source, {
+                action: "default"
+            });
+            delete rule.expiresAt;
+            if (!_isNoopRule(rule))
+                kept.push(rule);
         }
-        if (expired === 0)
-            return 0;
-        const result = RuleExpiry.pruneExpired(rules);
-        notificationRules = result.rules;
+        notificationRules = kept;
         saveSettings();
-        return result.removed;
     }
 
     function removeMuteRuleForApp(appName, desktopEntry) {

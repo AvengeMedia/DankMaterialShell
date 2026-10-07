@@ -1,6 +1,6 @@
 // Pure helpers for notification-rule expiry (timed mute rules). Kept free of
 // QML dependencies so the logic test suite can exercise them directly.
-// A rule with expiresAt > 0 (ms since epoch) stops matching once the
+// A rule with expiresAt > 0 (ms since epoch) stops muting once the
 // timestamp passes; expiresAt of 0 or absent means "never expires".
 // Remaining-time text is deliberately NOT formatted here: callers use the
 // shared Common/Format.js formatter with translated format strings.
@@ -25,20 +25,4 @@ function hasTimedRule(rules) {
             return true;
     }
     return false;
-}
-
-function pruneExpired(rules, nowMs) {
-    const kept = [];
-    let removed = 0;
-    const source = rules || [];
-    for (let i = 0; i < source.length; i++) {
-        if (isRuleExpired(source[i], nowMs))
-            removed += 1;
-        else
-            kept.push(source[i]);
-    }
-    return {
-        rules: kept,
-        removed: removed
-    };
 }
