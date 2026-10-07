@@ -3,9 +3,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.Common
-import qs.Modals.Settings
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -219,7 +218,7 @@ Item {
 
     Component.onCompleted: GreeterService.refresh()
 
-    DankSearchField {
+    DSearchField {
         id: searchField
 
         property real sideInset: root.searchActive ? Theme.spacingS : SettingsMetrics.paneMargin
@@ -240,6 +239,7 @@ Item {
         anchors.rightMargin: sideInset
         height: SettingsMetrics.searchBarHeight
         placeholderText: I18n.tr("Search settings", "settings search field placeholder")
+        rightAccessoryWidth: avatarButton.visible ? avatarButton.width + Theme.spacingXS : 0
         onFocusStateChanged: hasFocus => {
             root.searchFocused = hasFocus;
             if (!hasFocus)
@@ -317,9 +317,37 @@ Item {
                 event.accepted = true;
             }
         }
+
+        DActionButton {
+            id: avatarButton
+
+            anchors.right: parent.right
+            anchors.rightMargin: Theme.spacingXS
+            anchors.verticalCenter: parent.verticalCenter
+            visible: !root.searchActive
+            buttonSize: SettingsMetrics.searchBarHeight - Theme.spacingXS * 2
+            radius: Theme.buttonRadius(width, height, buttonSize, false, circular)
+            focusPolicy: Qt.TabFocus
+            tooltipText: I18n.tr("Users & accounts", "settings sidebar category")
+            onClicked: {
+                root.pageRequested("user_accounts");
+                root.focusAfterNavigation(visualFocus);
+            }
+
+            // Below the state layer so hover, press and focus tint the avatar
+            DCircularImage {
+                z: -1
+                anchors.fill: parent
+                ringWidth: Theme.avatarRingWidth
+                ringColor: Theme.avatarRingColor
+                imageSource: PortalService.profileImage
+                fallbackIcon: imageSource ? "material:person" : ""
+                fallbackText: (UserInfoService.fullName || I18n.tr("User")).charAt(0).toLocaleUpperCase()
+            }
+        }
     }
 
-    DankFlickable {
+    DFlickable {
         id: sidebarFlickable
         anchors.left: parent.left
         anchors.right: parent.right
@@ -336,21 +364,6 @@ Item {
             rightPadding: SettingsMetrics.paneMargin
             bottomPadding: SettingsMetrics.paneMargin
             spacing: SettingsMetrics.sidebarGroupGap
-
-            ProfileSection {
-                id: profileRow
-                width: parent.width - parent.leftPadding - parent.rightPadding
-                visible: !root.searchActive
-                highlighted: activeFocus
-                onActiveFocusChanged: {
-                    if (activeFocus)
-                        root.ensureRowVisible(profileRow);
-                }
-                onNavigationRequested: keyboard => {
-                    root.pageRequested("user_accounts");
-                    root.focusAfterNavigation(keyboard);
-                }
-            }
 
             Column {
                 id: searchResultsColumn

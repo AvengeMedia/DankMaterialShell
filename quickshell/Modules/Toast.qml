@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import "../Common/Format.js" as Format
 
@@ -107,7 +108,7 @@ PanelWindow {
         y: shadowBuffer
         width: root.toastWidth
         height: root.toastHeight
-        color: {
+        readonly property color surfaceColor: {
             switch (ToastService.currentLevel) {
             case ToastService.levelError:
                 return Theme.error;
@@ -119,6 +120,7 @@ PanelWindow {
                 return Theme.readableSurface;
             }
         }
+        color: "transparent"
         radius: Theme.windowRadius
         opacity: presented ? 1 : 0
 
@@ -137,7 +139,7 @@ PanelWindow {
                 width: parent.width
                 height: Math.max(Theme.iconSize + 8, messageText.implicitHeight)
 
-                DankIcon {
+                DIcon {
                     id: statusIcon
                     name: {
                         switch (ToastService.currentLevel) {
@@ -187,7 +189,7 @@ PanelWindow {
                     wrapMode: Text.NoWrap
                 }
 
-                DankActionButton {
+                DActionButton {
                     id: expandButton
                     iconName: toast.expanded ? "expand_less" : "expand_more"
                     Accessible.name: toast.expanded ? I18n.tr("Collapse", "verb, button that collapses an expanded item or section") : I18n.tr("Expand", "verb, button that expands a collapsed item or section")
@@ -217,7 +219,7 @@ PanelWindow {
                     }
                 }
 
-                DankActionButton {
+                DActionButton {
                     id: closeButton
                     iconName: "close"
                     Accessible.name: I18n.tr("Close")
@@ -301,7 +303,7 @@ PanelWindow {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             id: copyDetailsButton
                             iconName: "content_copy"
                             Accessible.name: I18n.tr("Copy")
@@ -383,7 +385,7 @@ PanelWindow {
                             wrapMode: Text.Wrap
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             id: copyButton
                             iconName: "content_copy"
                             Accessible.name: I18n.tr("Copy Full Command")
@@ -452,7 +454,7 @@ PanelWindow {
             level: Theme.elevationLevel3
             fallbackOffset: 6
             targetRadius: toast.radius
-            targetColor: toast.color
+            targetColor: toast.surfaceColor
             shadowOpacity: Theme.elevationLevel3 && Theme.elevationLevel3.alpha !== undefined ? Theme.elevationLevel3.alpha : 0.3
             shadowEnabled: Theme.elevationEnabled
         }
@@ -480,7 +482,7 @@ PanelWindow {
     WindowBlur {
         targetWindow: root
         blurEnabled: root.presented
-        surfaceColor: toast.color
+        surfaceColor: toast.surfaceColor
         blurX: toast.x
         blurY: toast.y
         blurWidth: root.presented ? toast.width : 0

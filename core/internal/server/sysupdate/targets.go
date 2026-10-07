@@ -2,7 +2,7 @@ package sysupdate
 
 import "regexp"
 
-var safePkgName = regexp.MustCompile(`^[A-Za-z0-9@._+:-]+$`)
+var safePkgName = regexp.MustCompile(`^[A-Za-z0-9@._+:/.-]+$`)
 
 // shellSafeNames drops names unsafe to interpolate into the apt/zypper sh -c scripts.
 func shellSafeNames(names []string) []string {

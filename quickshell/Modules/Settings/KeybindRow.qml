@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 SettingsRow {
@@ -51,12 +51,12 @@ SettingsRow {
                 anchors.right: parent?.right
                 spacing: Theme.spacingS
 
-                DankKeycap {
+                DKeycap {
                     text: keyLine.modelData.key
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                DankActionButton {
+                DActionButton {
                     iconName: "edit"
                     Accessible.name: I18n.tr("Edit")
                     Accessible.description: root.title + ", " + keyLine.modelData.key
@@ -70,7 +70,7 @@ SettingsRow {
                     visible: !root.readOnly
                     anchors.verticalCenter: parent.verticalCenter
 
-                    DankActionButton {
+                    DActionButton {
                         id: deleteButton
                         iconName: "delete"
                         iconColor: Theme.error

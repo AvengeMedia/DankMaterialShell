@@ -7,6 +7,7 @@ import Quickshell.Io
 import Quickshell.Services.Notifications
 import qs.Common
 import qs.Services
+import "../Common/Format.js" as Format
 import "../Common/markdown2html.js" as Markdown2Html
 
 Singleton {
@@ -69,13 +70,12 @@ Singleton {
 
     Component.onCompleted: {
         _recomputeGroups();
-        Quickshell.execDetached(["mkdir", "-p", Paths.strip(Paths.cache)]);
-        Quickshell.execDetached(["mkdir", "-p", imageCacheDir]);
+        Quickshell.execDetached(["mkdir", "-p", Paths.strip(Paths.cache), imageCacheDir]);
     }
 
     FileView {
         id: historyFileView
-        path: root.historyFile
+        path: SettingsData.notificationHistoryEnabled ? root.historyFile : ""
         printErrors: false
         onLoaded: root.loadHistory()
         onLoadFailed: error => {
@@ -172,6 +172,8 @@ Singleton {
     }
 
     function performSaveHistory() {
+        if (historyFileView.path === "")
+            return;
         try {
             historyAdapter.notifications = historyList;
             historyFileView.writeAdapter();
@@ -504,6 +506,7 @@ Singleton {
         };
 
         policy.bypassDnd = rules.some(rule => rule.bypassDnd === true && _matchesNotificationRule(rule, info));
+        policy.disablePopup = rules.some(rule => (rule.action || "default").toString().toLowerCase() === "mute" && !SettingsData.isNotificationRuleExpired(rule) && _matchesNotificationRule(rule, info));
 
         for (const rule of rules) {
             if (!_matchesNotificationRule(rule, info))
@@ -513,9 +516,6 @@ Singleton {
             switch (action) {
             case "ignore":
                 policy.drop = true;
-                break;
-            case "mute":
-                policy.disablePopup = true;
                 break;
             case "popup_only":
                 policy.hideFromCenter = true;
@@ -560,10 +560,17 @@ Singleton {
         }
         historyList = [];
         historyAdapter.notifications = [];
+        if (historyFileView.path === "") {
+            Quickshell.execDetached(["rm", "-f", root.historyFile]);
+            return;
+        }
         historyFileView.writeAdapter();
     }
 
+    property bool overlayOpen: false
+
     function onOverlayOpen() {
+        overlayOpen = true;
         popupsDisabled = true;
         markNotificationsSeen();
         addGate.stop();
@@ -581,6 +588,7 @@ Singleton {
     }
 
     function onOverlayClose() {
+        overlayOpen = false;
         popupsDisabled = false;
         markNotificationsSeen();
         processQueue();
@@ -601,11 +609,47 @@ Singleton {
         id: timeUpdateTimer
         interval: 30000
         repeat: true
-        running: root.allWrappers.length > 0 || visibleNotifications.length > 0
+        running: root.overlayOpen && (root.allWrappers.length > 0 || visibleNotifications.length > 0)
         triggeredOnStart: false
         onTriggered: {
             root.timeUpdateTick = !root.timeUpdateTick;
         }
+    }
+
+    // Date.now() inside a QML binding is not reactive, so anything counting
+    // down to a rule's expiresAt needs a ticking time source. Minute
+    // precision matches the countdown granularity, and the clock only runs
+    // while timed rules exist, so shells without them pay nothing.
+    SystemClock {
+        id: ruleExpiryClock
+        precision: SystemClock.Minutes
+        enabled: SettingsData.hasTimedNotificationRules
+    }
+
+    // Current time in ms for rule-expiry bindings. Reads 0 while the clock is
+    // off, which is safe: the clock is off exactly when no rule carries an
+    // expiry, so no binding can depend on the value moving.
+    readonly property double notificationRuleNowMs: ruleExpiryClock.enabled ? ruleExpiryClock.date.getTime() : 0
+
+    // Formatted remaining time for a rule's expiresAt, driven by the ticking
+    // clock above so bindings calling this refresh every minute. Single home
+    // for the translated duration strings; "" once the timestamp passes.
+    function formatRuleRemaining(expiresAt) {
+        return Format.formatRemaining(expiresAt - notificationRuleNowMs, "", I18n.tr("%1 min", "timed duration, %1 is a number of minutes"), I18n.tr("%1 h", "timed duration, %1 is a number of hours"), I18n.tr("%1 h %2 m", "timed duration, %1 is a number of hours, %2 is a number of minutes"));
+    }
+
+    // Clears lapsed timed mutes (SettingsData.addMuteRuleForApp with
+    // expiresAt) from the persisted rules. Matching already ignores them;
+    // this keeps the stored list and the settings UI truthful. Runs only
+    // while timed rules exist, and fires on start so mutes that lapsed while
+    // the shell was offline are cleared at launch.
+    Timer {
+        id: expiredRuleSweeper
+        interval: 60000
+        repeat: true
+        running: SettingsData.hasTimedNotificationRules
+        triggeredOnStart: true
+        onTriggered: SettingsData.pruneExpiredNotificationRules()
     }
 
     Timer {
@@ -699,23 +743,7 @@ Singleton {
                 }
             }
 
-            // Honor the freedesktop "suppress-sound" hint: the sender
-            // plays its own audio for this notification and asks the
-            // server not to double up. "sound-name" is the opposite — an
-            // explicit request for audio — so it plays even when the
-            // global new-notification sound is off.
-            const soundHints = notif.hints || {};
-            const suppressSound = !!soundHints["suppress-sound"];
-            const requestsSound = !!soundHints["sound-name"];
             const dndBlocked = SessionData.doNotDisturb && !_allowedInDnd(policy.urgency, policy.bypassDnd);
-            if (!dndBlocked && SettingsData.soundsEnabled && (SettingsData.soundNewNotification || requestsSound) && !suppressSound) {
-                if (policy.urgency === NotificationUrgency.Critical) {
-                    AudioService.playCriticalNotificationSound();
-                } else {
-                    AudioService.playNormalNotificationSound();
-                }
-            }
-
             const shouldShowPopup = !root.popupsDisabled && !dndBlocked && !policy.disablePopup;
             const isTransient = notif.transient;
             const shouldKeepInCenter = !isTransient && !policy.hideFromCenter;
@@ -725,6 +753,22 @@ Singleton {
                     notif.dismiss();
                 } catch (e) {}
                 return;
+            }
+
+            // Honor the freedesktop "suppress-sound" hint: the sender
+            // plays its own audio for this notification and asks the
+            // server not to double up. "sound-name" is the opposite — an
+            // explicit request for audio — so it plays even when the
+            // global new-notification sound is off.
+            const soundHints = notif.hints || {};
+            const suppressSound = !!soundHints["suppress-sound"];
+            const requestsSound = !!soundHints["sound-name"];
+            if (!dndBlocked && !policy.disablePopup && SettingsData.soundsEnabled && (SettingsData.soundNewNotification || requestsSound) && !suppressSound) {
+                if (policy.urgency === NotificationUrgency.Critical) {
+                    AudioService.playCriticalNotificationSound();
+                } else {
+                    AudioService.playNormalNotificationSound();
+                }
             }
 
             const wrapper = notifComponent.createObject(root, {
@@ -1460,7 +1504,7 @@ Singleton {
     }
 
     Connections {
-        target: PrivacyService
+        target: SettingsData.notificationDndWhileScreenSharing ? PrivacyService : null
         function onScreensharingActiveChanged() {
             SessionData.syncScreenShareDnd();
         }

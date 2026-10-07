@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -20,7 +20,9 @@ Item {
                 })).filter(entry => predicate(entry.rule));
     }
 
-    readonly property var mutedRules: indexedRules(rule => (rule.action || "").toString().toLowerCase() === "mute")
+    // Expired timed mutes drop out of the list the minute they lapse
+    // (notificationRuleNowMs ticks), without waiting for the sweep.
+    readonly property var mutedRules: indexedRules(rule => (rule.action || "").toString().toLowerCase() === "mute" && !SettingsData.isNotificationRuleExpired(rule, NotificationService.notificationRuleNowMs))
 
     readonly property var notificationRuleFieldOptions: [
         {
@@ -110,6 +112,14 @@ Item {
         return [getRuleOptionLabel(notificationRuleFieldOptions, rule.field, notificationRuleFieldOptions[0].label), getRuleOptionLabel(notificationRuleMatchTypeOptions, rule.matchType, notificationRuleMatchTypeOptions[0].label)].join(" · ");
     }
 
+    function remainingLabel(rule) {
+        const expiresAt = rule && rule.expiresAt ? rule.expiresAt : 0;
+        if (expiresAt <= NotificationService.notificationRuleNowMs)
+            return "";
+        const remaining = NotificationService.formatRuleRemaining(expiresAt);
+        return remaining ? I18n.tr("expires in %1", "timed notification rule, %1 = remaining time until it expires").arg(remaining) : "";
+    }
+
     function outcomeBadges(rule) {
         const badges = [];
         if ((rule.action || "default") !== "default")
@@ -118,6 +128,9 @@ Item {
             badges.push(getRuleOptionLabel(notificationRuleUrgencyOptions, rule.urgency, rule.urgency));
         if (rule.bypassDnd === true)
             badges.push(I18n.tr("Allow in Do Not Disturb"));
+        const remaining = remainingLabel(rule);
+        if (remaining !== "")
+            badges.push(remaining);
         return badges;
     }
 
@@ -170,11 +183,11 @@ Item {
             id: notificationRulesCard
             width: parent.width
             iconName: "rule_settings"
-            title: I18n.tr("Notification rules")
+            title: I18n.tr("Notification rules", "settings card title, per-app notification rules list")
             settingKey: "notificationRules"
             tags: ["notification", "rules", "mute", "ignore", "priority", "regex", "history"]
 
-            headerActions: DankActionButton {
+            headerActions: DActionButton {
                 buttonSize: 36
                 iconName: "restart_alt"
                 tooltipText: I18n.tr("Reset to default")
@@ -189,35 +202,36 @@ Item {
             }
 
             Repeater {
-                model: SettingsData.notificationRules
+                // Count model: a rule edit must not rebuild the row holding the focused toggle
+                model: SettingsData.notificationRules.length
 
                 delegate: SettingsRow {
                     id: ruleRow
 
-                    required property var modelData
                     required property int index
-                    readonly property var badges: root.outcomeBadges(modelData)
+                    readonly property var rule: SettingsData.notificationRules[index] ?? ({})
+                    readonly property var badges: root.outcomeBadges(rule)
 
-                    title: modelData.pattern || I18n.tr("Rule %1", "notification rule heading, %1 is the rule number").arg(index + 1)
-                    titleColor: modelData.enabled !== false ? Theme.surfaceText : Theme.surfaceVariantText
-                    subtitle: root.matchSummary(modelData)
+                    title: rule.pattern || I18n.tr("Rule %1", "notification rule heading, %1 is the rule number").arg(index + 1)
+                    titleColor: rule.enabled !== false ? Theme.surfaceText : Theme.surfaceVariantText
+                    subtitle: root.matchSummary(rule)
 
-                    DankToggle {
+                    DToggle {
                         anchors.verticalCenter: parent.verticalCenter
                         hideText: true
                         text: ruleRow.title
-                        checked: ruleRow.modelData.enabled !== false
+                        checked: ruleRow.rule.enabled !== false
                         onToggled: checked => SettingsData.updateNotificationRuleField(ruleRow.index, "enabled", checked)
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "edit"
                         Accessible.name: I18n.tr("Edit rule")
-                        onClicked: root.openEditor(ruleRow.index, ruleRow.modelData)
+                        onClicked: root.openEditor(ruleRow.index, ruleRow.rule)
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "delete"
                         iconColor: Theme.error
@@ -233,7 +247,7 @@ Item {
                         Repeater {
                             model: ruleRow.badges
 
-                            delegate: DankBadge {
+                            delegate: DBadge {
                                 required property string modelData
                                 text: modelData
                                 color: Theme.primaryContainer
@@ -262,9 +276,10 @@ Item {
                     required property var modelData
 
                     title: modelData.rule?.pattern || I18n.tr("Unknown")
+                    subtitle: root.remainingLabel(modelData.rule)
                     singleLineTitle: true
 
-                    DankButton {
+                    DButton {
                         text: I18n.tr("Unmute")
                         backgroundColor: "transparent"
                         textColor: Theme.primary
@@ -275,8 +290,8 @@ Item {
         }
 
         SettingsFabBar {
-            DankFab {
-                text: I18n.tr("Add rule")
+            DFab {
+                text: I18n.tr("Add rule", "notification rule dialog title and button")
                 iconName: "add"
                 onClicked: root.openEditor(-1, null)
             }

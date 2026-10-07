@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 StyledRect {
@@ -26,7 +26,7 @@ StyledRect {
             width: parent.width
             spacing: Theme.spacingM
 
-            DankIcon {
+            DIcon {
                 name: "monitor"
                 size: Theme.iconSize
                 color: Theme.surfaceVariantText

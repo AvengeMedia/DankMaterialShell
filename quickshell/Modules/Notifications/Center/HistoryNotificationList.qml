@@ -1,10 +1,10 @@
 import QtQuick
 import qs.Modules.Notifications
-import qs.DankCommon.Common as DC
+import qs.DCommon.Common as DC
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -223,7 +223,7 @@ Item {
         anchors.fill: parent
         spacing: Theme.spacingS
 
-        DankFilterChips {
+        DFilterChips {
             id: filterChips
             width: parent.width
             currentIndex: root.getChipIndex()
@@ -236,7 +236,7 @@ Item {
             }
         }
 
-        DankListView {
+        DListView {
             id: historyListView
             x: -root.swipeBleed
             width: parent.width + root.swipeBleed * 2

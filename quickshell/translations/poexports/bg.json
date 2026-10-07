@@ -8,6 +8,9 @@
   "%1 DMS binds may be overridden by config binds that come after the include.": {
     "%1 DMS binds may be overridden by config binds that come after the include.": ""
   },
+  "%1 Flatpak": {
+    "%1 Flatpak": ""
+  },
   "%1 KB": {
     "%1 KB": ""
   },
@@ -34,6 +37,12 @@
   },
   "%1 before": {
     "%1 before": ""
+  },
+  "%1 behind": {
+    "%1 behind": ""
+  },
+  "%1 breaking": {
+    "%1 breaking": ""
   },
   "%1 character": {
     "%1 character": "%1 знак"
@@ -68,8 +77,14 @@
   "%1 displays": {
     "%1 displays": "%1 дисплея"
   },
+  "%1 features": {
+    "%1 features": ""
+  },
   "%1 filtered": {
     "%1 filtered": "%1 филтрирани"
+  },
+  "%1 fixes": {
+    "%1 fixes": ""
   },
   "%1 h %2 m left": {
     "%1 h %2 m left": "%1 ч %2 мин остават"
@@ -104,6 +119,9 @@
   "%1 jobs": {
     "%1 jobs": ""
   },
+  "%1 limit reached": {
+    "%1 limit reached": ""
+  },
   "%1 min": {
     "%1 min": ""
   },
@@ -124,6 +142,15 @@
   },
   "%1 online": {
     "%1 online": "%1 на линия"
+  },
+  "%1 other": {
+    "%1 other": ""
+  },
+  "%1 package will be installed via %2.": {
+    "%1 package will be installed via %2.": ""
+  },
+  "%1 packages will be installed via %2.": {
+    "%1 packages will be installed via %2.": ""
   },
   "%1 position": {
     "%1 position": "Позиция на %1"
@@ -158,6 +185,9 @@
   "%1 wallpapers  •  %2 / %3": {
     "%1 wallpapers  •  %2 / %3": "%1 тапета  •  %2 / %3"
   },
+  "%1 will be downloaded and installed via %2.": {
+    "%1 will be downloaded and installed via %2.": ""
+  },
   "%1 will be removed from your system.": {
     "%1 will be removed from your system.": ""
   },
@@ -169,6 +199,9 @@
   },
   "%1: %2": {
     "%1: %2": "%1: %2"
+  },
+  "%1h": {
+    "%1h": ""
   },
   "%1h %2m": {
     "%1h %2m": ""
@@ -200,9 +233,6 @@
   "2.4 GHz": {
     "2.4 GHz": "2.4 GHz"
   },
-  "2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder": {
-    "2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder": ""
-  },
   "3rd party": {
     "3rd party": "от трети страни"
   },
@@ -212,14 +242,17 @@
   "50 uses Material shapes. Lower values reduce rounding; higher values increase it.": {
     "50 uses Material shapes. Lower values reduce rounding; higher values increase it.": ""
   },
+  "A custom seed color overrides this": {
+    "A custom seed color overrides this": ""
+  },
   "A floating companion that works alongside any bar layout": {
     "A floating companion that works alongside any bar layout": ""
   },
-  "A hidden field appears as soon as a key is pressed": {
-    "A hidden field appears as soon as a key is pressed": ""
-  },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "Модерен графичен шел за Wayland композитори"
+  },
+  "A newer dms binary is installed.": {
+    "A newer dms binary is installed.": ""
   },
   "A user with that name already exists.": {
     "A user with that name already exists.": "Потребител с такова име вече съществува."
@@ -229,9 +262,6 @@
   },
   "AC power": {
     "AC power": ""
-  },
-  "AM": {
-    "AM": ""
   },
   "API": {
     "API": "API"
@@ -247,6 +277,9 @@
   },
   "Acceleration profile": {
     "Acceleration profile": ""
+  },
+  "Accent minutes": {
+    "Accent minutes": ""
   },
   "Accept jobs": {
     "Accept jobs": ""
@@ -353,11 +386,26 @@
   "Add notes": {
     "Add notes": "Добавяне на бележки"
   },
+  "Add palette": {
+    "Add palette": ""
+  },
   "Add printer": {
     "Add printer": ""
   },
+  "Add rule": {
+    "Add rule": ""
+  },
+  "Add shortcut": {
+    "Add shortcut": ""
+  },
+  "Add substitution": {
+    "Add substitution": ""
+  },
   "Add to autostart": {
     "Add to autostart": ""
+  },
+  "Add user": {
+    "Add user": ""
   },
   "Add widget": {
     "Add widget": ""
@@ -371,11 +419,14 @@
   "Add, remove and configure dock items": {
     "Add, remove and configure dock items": ""
   },
-  "Add, remove, reorder and configure": {
-    "Add, remove, reorder and configure": ""
+  "Add, reorder, configure": {
+    "Add, reorder, configure": ""
   },
   "Added in front of every app launch command": {
     "Added in front of every app launch command": ""
+  },
+  "Adds a compositor window rule so DMS windows such as Settings open floating": {
+    "Adds a compositor window rule so DMS windows such as Settings open floating": ""
   },
   "Adds concave curves where the bar meets the screen edge": {
     "Adds concave curves where the bar meets the screen edge": ""
@@ -386,14 +437,17 @@
   "Adds them to the %1 group so they can use sudo": {
     "Adds them to the %1 group so they can use sudo": ""
   },
-  "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": {
-    "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": "Изискват се администраторски права. Използвайте бутона „Синхронизиране“ в Настройки → Greeter."
+  "Administrator access is required. Press Apply changes in Settings → Greeter.": {
+    "Administrator access is required. Press Apply changes in Settings → Greeter.": ""
   },
   "Advanced": {
     "Advanced": "Разширени"
   },
   "Advanced comma-separated libxkbcommon options.": {
     "Advanced comma-separated libxkbcommon options.": "Разширени libxkbcommon опции, разделени със запетаи."
+  },
+  "After %1": {
+    "After %1": ""
   },
   "Afternoon": {
     "Afternoon": "Следобед"
@@ -449,6 +503,12 @@
   "Also runs the templates in your matugen config.toml": {
     "Also runs the templates in your matugen config.toml": ""
   },
+  "Also saves the screenshot to disk": {
+    "Also saves the screenshot to disk": ""
+  },
+  "Also works on the lock screen": {
+    "Also works on the lock screen": ""
+  },
   "Alt + Shift": {
     "Alt + Shift": "Alt + Shift"
   },
@@ -458,8 +518,17 @@
   "Always here": {
     "Always here": ""
   },
+  "Always in overflow": {
+    "Always in overflow": ""
+  },
   "Always on icons": {
     "Always on icons": "Винаги видими икони"
+  },
+  "Always open here": {
+    "Always open here": ""
+  },
+  "Always show": {
+    "Always show": ""
   },
   "Always show percentage": {
     "Always show percentage": ""
@@ -470,6 +539,9 @@
   "Amount": {
     "Amount": "Количество"
   },
+  "An Island bar already covers a display this bar is on": {
+    "An Island bar already covers a display this bar is on": ""
+  },
   "An uninstallation is already in progress": {
     "An uninstallation is already in progress": ""
   },
@@ -479,8 +551,8 @@
   "Analog": {
     "Analog": "Аналогов"
   },
-  "Analog, digital, or stacked clock display": {
-    "Analog, digital, or stacked clock display": "Показване на аналогов, цифров или съставен часовник"
+  "Analog, digital, stacked, expressive, or overlapping clock": {
+    "Analog, digital, stacked, expressive, or overlapping clock": ""
   },
   "Analyzing configuration...": {
     "Analyzing configuration...": "Анализиране на конфигурацията..."
@@ -490,6 +562,9 @@
   },
   "Animation duration": {
     "Animation duration": ""
+  },
+  "Animation style": {
+    "Animation style": ""
   },
   "Animations": {
     "Animations": ""
@@ -533,6 +608,12 @@
   "App launcher": {
     "App launcher": ""
   },
+  "App limits": {
+    "App limits": ""
+  },
+  "App name": {
+    "App name": ""
+  },
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": "Име или самоличност на приложението (напр. firefox)"
   },
@@ -553,9 +634,6 @@
   },
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "Приложения и команди, стартиращи се автоматично при вход"
-  },
-  "Applies on the next greeter sync": {
-    "Applies on the next greeter sync": "Прилага се при следващата синхронизация на greeter"
   },
   "Applies the saved profile that matches the connected displays": {
     "Applies the saved profile that matches the connected displays": ""
@@ -602,6 +680,9 @@
   "Apps dock": {
     "Apps dock": ""
   },
+  "Apps that capture the keyboard can block it": {
+    "Apps that capture the keyboard can block it": ""
+  },
   "Apps with notification popups muted. Unmute or delete to remove.": {
     "Apps with notification popups muted. Unmute or delete to remove.": "Приложения със заглушени изскачащи известия. Включете звука или изтрийте за премахване."
   },
@@ -616,6 +697,9 @@
   },
   "Architecture": {
     "Architecture": "Архитектура"
+  },
+  "Archive manager": {
+    "Archive manager": ""
   },
   "Are you sure you want to kill session \"%1\"?": {
     "Are you sure you want to kill session \"%1\"?": "Сигурни ли сте, че искате да прекратите сесията \"%1\"?"
@@ -743,6 +827,9 @@
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": "Автоматичният режим е включен. Ръчният избор на профил е изключен."
   },
+  "Auto moves this widget into overflow when the bar runs out of space": {
+    "Auto moves this widget into overflow when the bar runs out of space": ""
+  },
   "Auto overflow": {
     "Auto overflow": ""
   },
@@ -794,6 +881,9 @@
   "Automatic cycling": {
     "Automatic cycling": ""
   },
+  "Automatic placement": {
+    "Automatic placement": ""
+  },
   "Automatically enable while screen sharing": {
     "Automatically enable while screen sharing": ""
   },
@@ -824,8 +914,8 @@
   "Available networks": {
     "Available networks": ""
   },
-  "Back": {
-    "Back": "Назад"
+  "Avatar ring": {
+    "Avatar ring": ""
   },
   "Backend": {
     "Backend": "Бекенд"
@@ -884,11 +974,11 @@
   "Bar size": {
     "Bar size": ""
   },
-  "Bar surface and spacing": {
-    "Bar surface and spacing": ""
-  },
   "Bar visibility": {
     "Bar visibility": "Видимост на лентата"
+  },
+  "Bar widget background behind the compact face": {
+    "Bar widget background behind the compact face": ""
   },
   "Bar widgets": {
     "Bar widgets": ""
@@ -926,9 +1016,6 @@
   "Behavior": {
     "Behavior": "Поведение"
   },
-  "Better Lyrics": {
-    "Better Lyrics": ""
-  },
   "Bind the %1 IPC action in your compositor config.": {
     "Bind the %1 IPC action in your compositor config.": "Задайте клавиш за IPC действието %1 в конфигурацията на композитора."
   },
@@ -956,6 +1043,12 @@
   "Blocked": {
     "Blocked": "Блокирано"
   },
+  "Bloom": {
+    "Bloom": ""
+  },
+  "Blue": {
+    "Blue": ""
+  },
   "Blue light filter": {
     "Blue light filter": "Филтър за синя светлина"
   },
@@ -980,6 +1073,9 @@
   "Blur on overview": {
     "Blur on overview": ""
   },
+  "Blur, shadows, corners": {
+    "Blur, shadows, corners": ""
+  },
   "Blurred surfaces show the wallpaper, not the windows beneath": {
     "Blurred surfaces show the wallpaper, not the windows beneath": ""
   },
@@ -991,6 +1087,9 @@
   },
   "Body font size": {
     "Body font size": ""
+  },
+  "Boot entry changed. Remove it and add it again.": {
+    "Boot entry changed. Remove it and add it again.": ""
   },
   "Border": {
     "Border": "Рамка"
@@ -1012,9 +1111,6 @@
   },
   "Border with Background": {
     "Border with Background": "Рамка с фон"
-  },
-  "Border, connected mode, arcs": {
-    "Border, connected mode, arcs": ""
   },
   "Both": {
     "Both": "И двете"
@@ -1084,6 +1180,9 @@
   },
   "Built-in plugins": {
     "Built-in plugins": ""
+  },
+  "Bundled greeter active": {
+    "Bundled greeter active": ""
   },
   "Button areas": {
     "Button areas": ""
@@ -1220,6 +1319,9 @@
   "Change Volume": {
     "Change Volume": "Силата на звука"
   },
+  "Changes save to %1": {
+    "Changes save to %1": ""
+  },
   "Channel": {
     "Channel": "Канал"
   },
@@ -1253,11 +1355,11 @@
   "Check interval": {
     "Check interval": "Интервал на проверка"
   },
-  "Check interval, ignored packages, custom command": {
-    "Check interval, ignored packages, custom command": ""
-  },
   "Check on startup": {
     "Check on startup": "Проверка при стартиране"
+  },
+  "Check status": {
+    "Check status": ""
   },
   "Check your custom command in Settings → Dock → Trash.": {
     "Check your custom command in Settings → Dock → Trash.": "Проверете потребителската си команда в Настройки → Док → Кошче."
@@ -1271,20 +1373,20 @@
   "Checking...": {
     "Checking...": "Проверка..."
   },
+  "Checks in the background at the check interval. Notifies only when the count grows.": {
+    "Checks in the background at the check interval. Notifies only when the count grows.": ""
+  },
   "Chip": {
     "Chip": ""
-  },
-  "Choose Dark Mode Color": {
-    "Choose Dark Mode Color": "Избор на цвят за тъмен режим"
   },
   "Choose Launcher Logo Color": {
     "Choose Launcher Logo Color": "Избор на цвят за логото на стартера"
   },
-  "Choose Light Mode Color": {
-    "Choose Light Mode Color": "Избор на цвят за светъл режим"
-  },
   "Choose Wallpaper Color": {
     "Choose Wallpaper Color": "Избор на цвят за тапета"
+  },
+  "Choose a clear area of the background. Drag the clock to place it yourself.": {
+    "Choose a clear area of the background. Drag the clock to place it yourself.": ""
   },
   "Choose a power profile": {
     "Choose a power profile": "Избор на профил на захранване"
@@ -1310,17 +1412,11 @@
   "Class": {
     "Class": ""
   },
-  "Class regex": {
-    "Class regex": "Регулярен израз за клас"
-  },
   "Class regex (e.g. ^firefox$)": {
     "Class regex (e.g. ^firefox$)": "Регулярен израз за клас (напр. ^firefox$)"
   },
   "Classes": {
     "Classes": ""
-  },
-  "Clear": {
-    "Clear": "Изчистване"
   },
   "Clear All": {
     "Clear All": "Изчистване на всички"
@@ -1351,15 +1447,6 @@
   },
   "Click Import to add a .ovpn or .conf": {
     "Click Import to add a .ovpn or .conf": "Щракнете върху „Внасяне“, за да добавите .ovpn или .conf"
-  },
-  "Click Refresh to check status.": {
-    "Click Refresh to check status.": "Щракнете върху Опресняване за проверка на състоянието."
-  },
-  "Click any shortcut to edit Aqueous configuration": {
-    "Click any shortcut to edit Aqueous configuration": ""
-  },
-  "Click any shortcut to edit. Changes save to %1": {
-    "Click any shortcut to edit. Changes save to %1": "Щракнете върху пряк път за редактиране. Промените се запазват в %1"
   },
   "Click method": {
     "Click method": ""
@@ -1421,11 +1508,11 @@
   "Clock, calendar, system info and profile": {
     "Clock, calendar, system info and profile": "Часовник, календар, системна информация и профил"
   },
-  "Clocks, system monitors, plugins": {
-    "Clocks, system monitors, plugins": ""
+  "Clock, weather, locale": {
+    "Clock, weather, locale": ""
   },
-  "Close": {
-    "Close": "Затваряне"
+  "Clocks, monitors, plugins": {
+    "Clocks, monitors, plugins": ""
   },
   "Close All Windows": {
     "Close All Windows": "Затваряне на всички прозорци"
@@ -1444,9 +1531,6 @@
   },
   "Collapse": {
     "Collapse": ""
-  },
-  "Color": {
-    "Color": "Цвят"
   },
   "Color %1 copied": {
     "Color %1 copied": "Цвят %1 е копиран"
@@ -1469,11 +1553,11 @@
   "Color gamut": {
     "Color gamut": ""
   },
-  "Color mode": {
-    "Color mode": ""
-  },
   "Color override": {
     "Color override": ""
+  },
+  "Color previews unavailable": {
+    "Color previews unavailable": ""
   },
   "Color space": {
     "Color space": ""
@@ -1583,14 +1667,8 @@
   "Configure a new printer": {
     "Configure a new printer": "Настройване на нов принтер"
   },
-  "Configure match criteria and actions": {
-    "Configure match criteria and actions": "Конфигуриране на критерии за съвпадение и действия"
-  },
   "Configure one in Settings → Dock → Trash.": {
     "Configure one in Settings → Dock → Trash.": "Конфигурирайте такава в Настройки → Док → Кошче."
-  },
-  "Confirm": {
-    "Confirm": "Потвърждение"
   },
   "Confirm Delete": {
     "Confirm Delete": "Потвърждение за изтриване"
@@ -1631,9 +1709,6 @@
   "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": {
     "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": "Свързаният режим на рамката използва свързания стартер за клавишните комбинации по подразбиране."
   },
-  "Connected displays": {
-    "Connected displays": ""
-  },
   "Connected to %1": {
     "Connected to %1": "Свързан към %1"
   },
@@ -1652,6 +1727,9 @@
   "Connections and autoconnect": {
     "Connections and autoconnect": ""
   },
+  "Container saturation": {
+    "Container saturation": ""
+  },
   "Contains": {
     "Contains": "Съдържа"
   },
@@ -1667,9 +1745,6 @@
   "Control Center": {
     "Control Center": "Контролен център"
   },
-  "Control Center tile color": {
-    "Control Center tile color": ""
-  },
   "Control currently playing media": {
     "Control currently playing media": "Управление на възпроизвежданото мултимедийно съдържание"
   },
@@ -1684,6 +1759,9 @@
   },
   "Copied!": {
     "Copied!": "Копирано!"
+  },
+  "Copies the screenshot to the clipboard": {
+    "Copies the screenshot to the clipboard": ""
   },
   "Copy": {
     "Copy": "Копиране"
@@ -1712,6 +1790,9 @@
   "Corner style": {
     "Corner style": ""
   },
+  "Cosine": {
+    "Cosine": ""
+  },
   "Couldn't load hotspot password": {
     "Couldn't load hotspot password": "Паролата на точката за достъп не можа да се зареди"
   },
@@ -1721,14 +1802,14 @@
   "Count only": {
     "Count only": ""
   },
+  "Counts time in the focused app while the session is active. Stays on this device.": {
+    "Counts time in the focused app while the session is active. Stays on this device.": ""
+  },
   "Cover Open": {
     "Cover Open": "Отворен капак"
   },
-  "Create": {
-    "Create": "Създаване"
-  },
-  "Create Window Rule": {
-    "Create Window Rule": "Създаване на правило за прозорци"
+  "Cover art": {
+    "Cover art": ""
   },
   "Create a new %1 session (^N)": {
     "Create a new %1 session (^N)": "Създаване на нова %1 сесия (^N)"
@@ -1741,9 +1822,6 @@
   },
   "Create rule for:": {
     "Create rule for:": "Създаване на правило за:"
-  },
-  "Create user": {
-    "Create user": ""
   },
   "Creating...": {
     "Creating...": "Създаване..."
@@ -1774,21 +1852,6 @@
   },
   "Ctrl+%1 is used for password editing": {
     "Ctrl+%1 is used for password editing": "Ctrl+%1 се използва за редактиране на паролата"
-  },
-  "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
-    "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A: Избор на всички • Ctrl+P: Преглед • Enter/Shift+Enter: Следващ/Предишен • Esc: Затваряне"
-  },
-  "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": {
-    "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": "Ctrl+S: Запазване • Ctrl+O: Отваряне • Ctrl+N: Ново • Ctrl+F: Търсене"
-  },
-  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
-    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab: Смяна на раздел • Ctrl+S: Закачане/Откачане • Shift+Del: Изчистване на всички • Esc: Затваряне"
-  },
-  "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": {
-    "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": "Ctrl+Tab: Смяна на раздели • Ctrl+S: Закачане/Откачане • Shift+Enter: Копиране • Shift+Del: Изчистване на всички • F10: Помощ • Esc: Затваряне"
-  },
-  "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close": {
-    "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close": "Ctrl+Tab: Смяна на раздели • Ctrl+S: Закачане/Откачане • Shift+Enter: Поставяне • Shift+Del: Изчистване на всички • F10: Помощ • Esc: Затваряне"
   },
   "Current": {
     "Current": "Текущи"
@@ -1898,8 +1961,8 @@
   "DDC/CI monitor": {
     "DDC/CI monitor": "DDC/CI монитор"
   },
-  "DEMO MODE - Click anywhere to exit": {
-    "DEMO MODE - Click anywhere to exit": "ДЕМО РЕЖИМ – Щракнете някъде за изход"
+  "DMS %1 available": {
+    "DMS %1 available": ""
   },
   "DMS Settings": {
     "DMS Settings": "DMS Настройки"
@@ -1909,6 +1972,9 @@
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "Клавишни комбинации за DMS"
+  },
+  "DMS and system updates": {
+    "DMS and system updates": ""
   },
   "DMS chooser": {
     "DMS chooser": ""
@@ -1943,8 +2009,14 @@
   "Daily": {
     "Daily": "Ежедневно"
   },
-  "Dank Island instance": {
-    "Dank Island instance": "Инстанция на Dank Island"
+  "Daily limit": {
+    "Daily limit": ""
+  },
+  "Daily screen time limit reached": {
+    "Daily screen time limit reached": ""
+  },
+  "Dank": {
+    "Dank": ""
   },
   "DankBar": {
     "DankBar": "DankBar"
@@ -1991,6 +2063,9 @@
   "Date first": {
     "Date first": ""
   },
+  "Date format": {
+    "Date format": ""
+  },
   "Date, time & region": {
     "Date, time & region": ""
   },
@@ -2002,6 +2077,9 @@
   },
   "Dawn (Nautical Twilight)": {
     "Dawn (Nautical Twilight)": "Зора (навигационен полумрак)"
+  },
+  "Day": {
+    "Day": ""
   },
   "Day date": {
     "Day date": ""
@@ -2017,9 +2095,6 @@
   },
   "Deck": {
     "Deck": "Колода"
-  },
-  "Decrease": {
-    "Decrease": ""
   },
   "Default": {
     "Default": "По подразбиране"
@@ -2039,6 +2114,9 @@
   "Default apps": {
     "Default apps": ""
   },
+  "Default leaves it to niri, which floats dialogs and fixed-size windows and tiles the rest": {
+    "Default leaves it to niri, which floats dialogs and fixed-size windows and tiles the rest": ""
+  },
   "Default selected action": {
     "Default selected action": "Действие по подразбиране"
   },
@@ -2048,14 +2126,11 @@
   "Default width (%)": {
     "Default width (%)": ""
   },
-  "Defaults": {
-    "Defaults": "По подразбиране"
+  "Defaults, autostart, rules": {
+    "Defaults, autostart, rules": ""
   },
   "Define rules for window behavior. Saves to %1": {
     "Define rules for window behavior. Saves to %1": "Дефиниране на правила за поведението на прозорците. Запазва се в %1"
-  },
-  "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
-    "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: Изчистване • Shift+Del: Изчистване на всички • 1-9: Действия • F10: Помощ • Esc: Затваряне"
   },
   "Delete": {
     "Delete": "Изтриване"
@@ -2093,6 +2168,9 @@
   "Delete user": {
     "Delete user": "Изтриване на потребител"
   },
+  "Deletes all stored screen time": {
+    "Deletes all stored screen time": ""
+  },
   "Dependencies & documentation": {
     "Dependencies & documentation": "Зависимости и документация"
   },
@@ -2108,9 +2186,6 @@
   "Description": {
     "Description": "Описание"
   },
-  "Desktop Clock": {
-    "Desktop Clock": "Часовник на работния плот"
-  },
   "Desktop Entry": {
     "Desktop Entry": "Файл за десктоп стартиране"
   },
@@ -2125,9 +2200,6 @@
   },
   "Details for \"%1": {
     "Details for \"%1\"": "Подробности за \"%1\""
-  },
-  "Detected backends: %1": {
-    "Detected backends: %1": "Открити бекенди: %1"
   },
   "Device": {
     "Device": "Устройство"
@@ -2152,6 +2224,9 @@
   },
   "Digital": {
     "Digital": "Цифров"
+  },
+  "Digital wellbeing": {
+    "Digital wellbeing": ""
   },
   "Dim": {
     "Dim": "Приглушен"
@@ -2342,6 +2417,9 @@
   "Docs": {
     "Docs": "Документация"
   },
+  "Documents": {
+    "Documents": "Документи"
+  },
   "Domain (optional)": {
     "Domain (optional)": "Домейн (незадължително)"
   },
@@ -2359,6 +2437,9 @@
   },
   "Dot": {
     "Dot": ""
+  },
+  "Dots": {
+    "Dots": ""
   },
   "Down": {
     "Down": ""
@@ -2378,9 +2459,6 @@
   "Drag to move, click to open activities": {
     "Drag to move, click to open activities": ""
   },
-  "Drag to reorder": {
-    "Drag to reorder": ""
-  },
   "Dragged displays line up with neighboring edges without overlapping": {
     "Dragged displays line up with neighboring edges without overlapping": ""
   },
@@ -2398,6 +2476,12 @@
   },
   "Drops bar gaps and rounding while a window is maximized": {
     "Drops bar gaps and rounding while a window is maximized": ""
+  },
+  "Dune": {
+    "Dune": ""
+  },
+  "Duo": {
+    "Duo": ""
   },
   "Duplicate": {
     "Duplicate": "Дублиране"
@@ -2435,6 +2519,9 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "Динамични цветове, шаблони"
   },
+  "Dynamic theme is off": {
+    "Dynamic theme is off": ""
+  },
   "Dynamic width": {
     "Dynamic width": ""
   },
@@ -2455,9 +2542,6 @@
   },
   "Edge to edge": {
     "Edge to edge": ""
-  },
-  "Edit": {
-    "Edit": "Редактиране"
   },
   "Edit App": {
     "Edit App": "Редактиране на приложение"
@@ -2483,8 +2567,23 @@
   "Edit rule": {
     "Edit rule": ""
   },
+  "Edit shortcut": {
+    "Edit shortcut": ""
+  },
   "Edit widgets": {
     "Edit widgets": ""
+  },
+  "Editing the lock screen": {
+    "Editing the lock screen": ""
+  },
+  "Editing the lock screen, the login screen follows it": {
+    "Editing the lock screen, the login screen follows it": ""
+  },
+  "Editing the login screen": {
+    "Editing the login screen": ""
+  },
+  "Editing the login screen, shared with the lock screen": {
+    "Editing the login screen, shared with the lock screen": ""
   },
   "Education": {
     "Education": "Образование"
@@ -2615,6 +2714,9 @@
   "Every %1": {
     "Every %1": ""
   },
+  "Every check": {
+    "Every check": ""
+  },
   "Every edge of this display is already taken": {
     "Every edge of this display is already taken": ""
   },
@@ -2623,6 +2725,9 @@
   },
   "Exact": {
     "Exact": "Точно съвпадение"
+  },
+  "Excluded apps": {
+    "Excluded apps": ""
   },
   "Excluded players": {
     "Excluded players": ""
@@ -2879,6 +2984,9 @@
   "Failed to set brightness": {
     "Failed to set brightness": "Неуспешно задаване на яркостта"
   },
+  "Failed to set next boot entry": {
+    "Failed to set next boot entry": ""
+  },
   "Failed to set night mode location": {
     "Failed to set night mode location": "Неуспешно задаване на местоположение за нощен режим"
   },
@@ -2948,9 +3056,6 @@
   "Family": {
     "Family": ""
   },
-  "Family, weight, scale, animation speed": {
-    "Family, weight, scale, animation speed": ""
-  },
   "Features": {
     "Features": "Функции"
   },
@@ -2962,9 +3067,6 @@
   },
   "Field": {
     "Field": "Поле"
-  },
-  "File": {
-    "File": "Файл"
   },
   "File changed on disk": {
     "File changed on disk": "Файлът е променен на диска"
@@ -3005,6 +3107,9 @@
   "Find in note...": {
     "Find in note...": "Търсене в бележката..."
   },
+  "Fine-tune the seed around the color wheel": {
+    "Fine-tune the seed around the color wheel": ""
+  },
   "Fingerprint": {
     "Fingerprint": ""
   },
@@ -3043,9 +3148,6 @@
   },
   "Fixed": {
     "Fixed": ""
-  },
-  "Flags": {
-    "Flags": "Флагове"
   },
   "Flat": {
     "Flat": "Равномерен (Flat)"
@@ -3128,9 +3230,6 @@
   "Fog": {
     "Fog": "Мъгла"
   },
-  "Folder": {
-    "Folder": "Папка"
-  },
   "Folder, interval, daily time": {
     "Folder, interval, daily time": ""
   },
@@ -3146,11 +3245,17 @@
   "Follow focus": {
     "Follow focus": "Следване на фокуса"
   },
+  "Follow lock screen": {
+    "Follow lock screen": ""
+  },
   "Follow mouse": {
     "Follow mouse": ""
   },
   "Follow playback": {
     "Follow playback": ""
+  },
+  "Follows the theme radius strength until overridden": {
+    "Follows the theme radius strength until overridden": ""
   },
   "Font": {
     "Font": "Шрифт"
@@ -3166,6 +3271,9 @@
   },
   "Fonts & motion": {
     "Fonts & motion": ""
+  },
+  "Fonts, scale, animations": {
+    "Fonts, scale, animations": ""
   },
   "For %1": {
     "For %1": ""
@@ -3233,9 +3341,6 @@
   "Frame Blur follows Background Blur in Theme & Colors": {
     "Frame Blur follows Background Blur in Theme & Colors": "Размазването на рамката следва размазването на фона от Тема и цветове"
   },
-  "Frame Border Color": {
-    "Frame Border Color": "Цвят на рамката на екрана"
-  },
   "Frame xray": {
     "Frame xray": ""
   },
@@ -3277,6 +3382,9 @@
   },
   "Fullscreen single column": {
     "Fullscreen single column": ""
+  },
+  "Fullscreen windows": {
+    "Fullscreen windows": ""
   },
   "Fully Charged": {
     "Fully Charged": "Напълно заредена"
@@ -3332,6 +3440,12 @@
   "Gaps, window borders, corner radius": {
     "Gaps, window borders, corner radius": ""
   },
+  "Garden": {
+    "Garden": ""
+  },
+  "Gaussian": {
+    "Gaussian": ""
+  },
   "General": {
     "General": "Общи"
   },
@@ -3352,6 +3466,9 @@
   },
   "Get Started": {
     "Get Started": "Начало"
+  },
+  "Git": {
+    "Git": ""
   },
   "Global fonts can be configured in Settings → Personalization": {
     "Global fonts can be configured in Settings → Personalization": "Глобалните шрифтове могат да се настроят в Настройки → Персонализация"
@@ -3385,6 +3502,9 @@
   },
   "Graphics": {
     "Graphics": "Графика"
+  },
+  "Green": {
+    "Green": ""
   },
   "Greeter": {
     "Greeter": "Входен екран (Greeter)"
@@ -3485,6 +3605,9 @@
   "Hidden icons expand in place instead of in a popup": {
     "Hidden icons expand in place instead of in a popup": ""
   },
+  "Hidden until screen time tracking is enabled": {
+    "Hidden until screen time tracking is enabled": ""
+  },
   "Hidden until weather is enabled": {
     "Hidden until weather is enabled": "Скрито, докато прогнозата за времето не бъде включена"
   },
@@ -3509,8 +3632,8 @@
   "Hide installed": {
     "Hide installed": "Скриване на инсталираните"
   },
-  "Hide password": {
-    "Hide password": ""
+  "Hide until typing": {
+    "Hide until typing": ""
   },
   "Hide when no updates": {
     "Hide when no updates": ""
@@ -3565,9 +3688,6 @@
   },
   "Home compact": {
     "Home compact": ""
-  },
-  "Home layout, notifications, satellites": {
-    "Home layout, notifications, satellites": ""
   },
   "Horizontal": {
     "Horizontal": "Хоризонтален"
@@ -3767,6 +3887,9 @@
   "Include transitions": {
     "Include transitions": ""
   },
+  "Includes the mouse pointer": {
+    "Includes the mouse pointer": ""
+  },
   "Incompatible plugins loaded": {
     "Incompatible plugins loaded": ""
   },
@@ -3775,9 +3898,6 @@
   },
   "Incorrect password - try again": {
     "Incorrect password - try again": "Грешна парола – опитайте отново"
-  },
-  "Increase": {
-    "Increase": ""
   },
   "Index centering": {
     "Index centering": ""
@@ -3793,9 +3913,6 @@
   },
   "Individual Batteries": {
     "Individual Batteries": "Отделни батерии"
-  },
-  "Individual bar configuration": {
-    "Individual bar configuration": "Индивидуална конфигурация на лента"
   },
   "Info": {
     "Info": "Информация"
@@ -3869,6 +3986,9 @@
   "Install plugin '%1' from the DMS registry?": {
     "Install plugin '%1' from the DMS registry?": "Да се инсталира ли приставката '%1' от регистъра на DMS?"
   },
+  "Install system updates?": {
+    "Install system updates?": ""
+  },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "Да се инсталира ли темата '%1' от регистъра на DMS?"
   },
@@ -3877,6 +3997,9 @@
   },
   "Installed": {
     "Installed": "Инсталирано"
+  },
+  "Installed %1, still running %2": {
+    "Installed %1, still running %2": ""
   },
   "Installed first": {
     "Installed first": "Инсталираните отпред"
@@ -3920,8 +4043,8 @@
   "Invalid configuration": {
     "Invalid configuration": "Невалидна конфигурация"
   },
-  "Invalid package name — letters, digits and @._+:- only.": {
-    "Invalid package name — letters, digits and @._+:- only.": "Невалидно име на пакет – разрешени са само букви, цифри и @._+:-."
+  "Invalid package name — letters, digits and @._+:/- only.": {
+    "Invalid package name — letters, digits and @._+:/- only.": ""
   },
   "Invalid username": {
     "Invalid username": "Невалидно потребителско име"
@@ -3934,6 +4057,9 @@
   },
   "Isolate displays": {
     "Isolate displays": ""
+  },
+  "Italic": {
+    "Italic": ""
   },
   "JSON output path": {
     "JSON output path": ""
@@ -3971,6 +4097,9 @@
   "Keeps the widget above windows instead of below them": {
     "Keeps the widget above windows instead of below them": ""
   },
+  "Kept for %1 days on this device": {
+    "Kept for %1 days on this device": ""
+  },
   "Kernel": {
     "Kernel": "Ядро"
   },
@@ -3998,9 +4127,6 @@
   "Keymap file": {
     "Keymap file": ""
   },
-  "Keys": {
-    "Keys": "Клавиши"
-  },
   "Kill": {
     "Kill": "Прекратяване"
   },
@@ -4012,9 +4138,6 @@
   },
   "LED device": {
     "LED device": "LED устройство"
-  },
-  "LRCLIB": {
-    "LRCLIB": ""
   },
   "LabWC IRC channel": {
     "LabWC IRC channel": ""
@@ -4039,6 +4162,9 @@
   },
   "Largest": {
     "Largest": "Най-голям"
+  },
+  "Last commit %1": {
+    "Last commit %1": ""
   },
   "Last hour": {
     "Last hour": "През последния час"
@@ -4121,6 +4247,9 @@
   "Layout, position, appearance": {
     "Layout, position, appearance": ""
   },
+  "Layout, scale, night mode": {
+    "Layout, scale, night mode": ""
+  },
   "Layouts": {
     "Layouts": ""
   },
@@ -4187,6 +4316,9 @@
   "Lightest": {
     "Lightest": ""
   },
+  "Limit": {
+    "Limit": ""
+  },
   "Limit set to %1%": {
     "Limit set to %1%": "Лимитът е зададен на %1%"
   },
@@ -4202,6 +4334,18 @@
   "Lines: %1": {
     "Lines: %1": "Редове: %1"
   },
+  "Link your DMS settings so the login screen follows them.": {
+    "Link your DMS settings so the login screen follows them.": ""
+  },
+  "Link your DMS settings so the login screen follows them. Administrator access is required.": {
+    "Link your DMS settings so the login screen follows them. Administrator access is required.": ""
+  },
+  "Linked": {
+    "Linked": ""
+  },
+  "Linked as a snapshot": {
+    "Linked as a snapshot": ""
+  },
   "List": {
     "List": "Списък"
   },
@@ -4210,6 +4354,9 @@
   },
   "Lists workspaces from whichever display has focus": {
     "Lists workspaces from whichever display has focus": ""
+  },
+  "Live activities that grow out of the bar": {
+    "Live activities that grow out of the bar": ""
   },
   "Lively palette with saturated accents.": {
     "Lively palette with saturated accents.": "Жива палитра с наситени акценти."
@@ -4240,9 +4387,6 @@
   },
   "Locale": {
     "Locale": "Локализация"
-  },
-  "Location": {
-    "Location": "Местоположение"
   },
   "Location search": {
     "Location search": ""
@@ -4280,6 +4424,12 @@
   "Login screen appearance and authentication": {
     "Login screen appearance and authentication": ""
   },
+  "Login screen unlinked.": {
+    "Login screen unlinked.": ""
+  },
+  "Long": {
+    "Long": ""
+  },
   "Long Text": {
     "Long Text": "Дълъг текст"
   },
@@ -4313,11 +4463,11 @@
   "Lyrics providers": {
     "Lyrics providers": ""
   },
-  "LyricsPlus": {
-    "LyricsPlus": ""
-  },
   "MIT License": {
     "MIT License": "Лиценз MIT"
+  },
+  "Magnification": {
+    "Magnification": ""
   },
   "Mail": {
     "Mail": "Поща"
@@ -4328,11 +4478,11 @@
   "Manage Registries": {
     "Manage Registries": ""
   },
-  "Managed by Frame": {
-    "Managed by Frame": "Управлява се от Frame"
-  },
   "Managed by Frame in Connected Mode": {
     "Managed by Frame in Connected Mode": "Управлява се от Frame в свързан режим"
+  },
+  "Managed by Nix": {
+    "Managed by Nix": ""
   },
   "Managed by the primary PAM source": {
     "Managed by the primary PAM source": "Управлява се от основния PAM източник"
@@ -4388,6 +4538,9 @@
   "Master": {
     "Master": ""
   },
+  "Master branch": {
+    "Master branch": ""
+  },
   "Master position": {
     "Master position": ""
   },
@@ -4403,8 +4556,17 @@
   "Match Criteria": {
     "Match Criteria": "Критерии за съвпадение"
   },
+  "Match corner style": {
+    "Match corner style": ""
+  },
+  "Match type": {
+    "Match type": ""
+  },
   "Matches player identity or desktop file name, case-insensitive": {
     "Matches player identity or desktop file name, case-insensitive": ""
+  },
+  "Material": {
+    "Material": ""
   },
   "Material Design inspired color themes": {
     "Material Design inspired color themes": "Цветови теми, вдъхновени от Material Design"
@@ -4453,9 +4615,6 @@
   },
   "Max volume": {
     "Max volume": ""
-  },
-  "Maximize": {
-    "Maximize": "Максимизиране"
   },
   "Maximize detection": {
     "Maximize detection": ""
@@ -4556,11 +4715,11 @@
   "Min W": {
     "Min W": "Мин. ширина"
   },
+  "Minimal": {
+    "Minimal": ""
+  },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "Минималистична палитра, изградена около един нюанс."
-  },
-  "Minimize": {
-    "Minimize": "Минимизиране"
   },
   "Minimum workspaces": {
     "Minimum workspaces": ""
@@ -4570,6 +4729,9 @@
   },
   "Missing Environment Variables": {
     "Missing Environment Variables": "Липсващи променливи на средата"
+  },
+  "Mix all stereo content into a single channel": {
+    "Mix all stereo content into a single channel": ""
   },
   "Mixed": {
     "Mixed": ""
@@ -4595,6 +4757,9 @@
   "Monitor": {
     "Monitor": "Монитор"
   },
+  "Mono Audio": {
+    "Mono Audio": ""
+  },
   "Monochrome": {
     "Monochrome": "Монохромен"
   },
@@ -4603,6 +4768,9 @@
   },
   "Monospace family": {
     "Monospace family": ""
+  },
+  "Month": {
+    "Month": ""
   },
   "Month date": {
     "Month date": ""
@@ -4619,6 +4787,9 @@
   "More": {
     "More": ""
   },
+  "More widgets": {
+    "More widgets": ""
+  },
   "Morning": {
     "Morning": "Сутрин"
   },
@@ -4627,6 +4798,12 @@
   },
   "Most Vivid": {
     "Most Vivid": ""
+  },
+  "Most used apps": {
+    "Most used apps": ""
+  },
+  "Motion": {
+    "Motion": ""
   },
   "Mount": {
     "Mount": ""
@@ -4640,14 +4817,14 @@
   "Mouse & touchpad": {
     "Mouse & touchpad": ""
   },
-  "Move": {
-    "Move": ""
-  },
-  "Move down": {
-    "Move down": ""
-  },
   "Move out of scratchpad": {
     "Move out of scratchpad": ""
+  },
+  "Move row to footer": {
+    "Move row to footer": ""
+  },
+  "Move row to header": {
+    "Move row to header": ""
   },
   "Move to scratchpad": {
     "Move to scratchpad": ""
@@ -4655,8 +4832,8 @@
   "Move to scratchpad: %1": {
     "Move to scratchpad: %1": ""
   },
-  "Move up": {
-    "Move up": ""
+  "Moves focus along with the column": {
+    "Moves focus along with the column": ""
   },
   "Moving to Paused": {
     "Moving to Paused": "Преминаване в пауза"
@@ -4772,9 +4949,6 @@
   "New": {
     "New": "Ново"
   },
-  "New Keybind": {
-    "New Keybind": "Нова клавишна комбинация"
-  },
   "New Session": {
     "New Session": "Нова сесия"
   },
@@ -4798,9 +4972,6 @@
   },
   "New profile": {
     "New profile": ""
-  },
-  "New shortcut": {
-    "New shortcut": ""
   },
   "New tab": {
     "New tab": ""
@@ -4828,6 +4999,9 @@
   },
   "Night mode & gamma": {
     "Night mode & gamma": "Нощен режим и гама"
+  },
+  "Night mode exceptions": {
+    "Night mode exceptions": ""
   },
   "Night mode failed: DMS gamma control not available": {
     "Night mode failed: DMS gamma control not available": "Неуспешен нощен режим: контролът на гамата в DMS не е наличен"
@@ -4889,6 +5063,9 @@
   "No app customizations.": {
     "No app customizations.": "Няма персонализации на приложения."
   },
+  "No app limits": {
+    "No app limits": ""
+  },
   "No application selected": {
     "No application selected": "Няма избрано приложение"
   },
@@ -4915,9 +5092,6 @@
   },
   "No brightness devices available": {
     "No brightness devices available": "Няма налични устройства за регулиране на яркостта"
-  },
-  "No changes": {
-    "No changes": "Няма промени"
   },
   "No checks passed": {
     "No checks passed": "Няма успешни проверки"
@@ -4957,6 +5131,9 @@
   },
   "No errors": {
     "No errors": "Няма грешки"
+  },
+  "No excluded apps configured": {
+    "No excluded apps configured": ""
   },
   "No excluded players configured": {
     "No excluded players configured": "Няма конфигурирани изключени плейъри"
@@ -5177,6 +5354,9 @@
   "Normal routing": {
     "Normal routing": ""
   },
+  "Not active": {
+    "Not active": ""
+  },
   "Not available": {
     "Not available": "Не е налично"
   },
@@ -5201,6 +5381,12 @@
   "Not detected": {
     "Not detected": "Не е открито"
   },
+  "Not installed": {
+    "Not installed": ""
+  },
+  "Not linked": {
+    "Not linked": ""
+  },
   "Not set": {
     "Not set": "Не е зададено"
   },
@@ -5219,8 +5405,8 @@
   "Nothing": {
     "Nothing": "Нищо"
   },
-  "Nothing to see here": {
-    "Nothing to see here": "Няма нищо за показване"
+  "Nothing tracked yet": {
+    "Nothing tracked yet": ""
   },
   "Notification": {
     "Notification": "Известие"
@@ -5234,8 +5420,23 @@
   "Notification popups": {
     "Notification popups": ""
   },
+  "Notification rules": {
+    "Notification rules": ""
+  },
   "Notifications": {
     "Notifications": "Известия"
+  },
+  "Notifies when today's screen time passes the limit": {
+    "Notifies when today's screen time passes the limit": ""
+  },
+  "Notifies when today's use of this app passes the limit": {
+    "Notifies when today's use of this app passes the limit": ""
+  },
+  "Notify at most": {
+    "Notify at most": ""
+  },
+  "Notify me on new updates": {
+    "Notify me on new updates": ""
   },
   "Notify when limit is reached": {
     "Notify when limit is reached": "Уведомяване при достигане на лимита"
@@ -5251,9 +5452,6 @@
   },
   "Numeric (M/D)": {
     "Numeric (M/D)": "Числов (М/Д)"
-  },
-  "OK": {
-    "OK": "Добре"
   },
   "OS Logo": {
     "OS Logo": "Лого на ОС"
@@ -5300,6 +5498,9 @@
   "Once a day": {
     "Once a day": "Веднъж дневно"
   },
+  "Once a week": {
+    "Once a week": ""
+  },
   "Online": {
     "Online": "На линия"
   },
@@ -5312,23 +5513,14 @@
   "Opacity": {
     "Opacity": "Непрозрачност"
   },
-  "Opacity, borders, blur, shadows, corners": {
-    "Opacity, borders, blur, shadows, corners": ""
-  },
   "Opaque": {
     "Opaque": "Непрозрачен"
-  },
-  "Open": {
-    "Open": "Отваряне"
   },
   "Open Frame": {
     "Open Frame": "Отваряне на Frame"
   },
   "Open From": {
     "Open From": "Отваряне от"
-  },
-  "Open Island": {
-    "Open Island": "Отваряне на Острова"
   },
   "Open Notepad File": {
     "Open Notepad File": "Отваряне на файл в Бележник"
@@ -5351,11 +5543,11 @@
   "Open folder": {
     "Open folder": "Отваряне на папка"
   },
-  "Open in Browser": {
-    "Open in Browser": "Отваряне в браузър"
-  },
   "Open in terminal": {
     "Open in terminal": "Отваряне в терминал"
+  },
+  "Open in the Island": {
+    "Open in the Island": ""
   },
   "Open large file?": {
     "Open large file?": ""
@@ -5378,6 +5570,12 @@
   "Opens": {
     "Opens": ""
   },
+  "Opens %1": {
+    "Opens %1": ""
+  },
+  "Opens a floating window with the live output": {
+    "Opens a floating window with the live output": ""
+  },
   "Optional description": {
     "Optional description": "Незадължително описание"
   },
@@ -5395,6 +5593,15 @@
   },
   "Options of one widget instance": {
     "Options of one widget instance": ""
+  },
+  "Orange": {
+    "Orange": ""
+  },
+  "Orbit": {
+    "Orbit": ""
+  },
+  "Order": {
+    "Order": ""
   },
   "Orientation": {
     "Orientation": ""
@@ -5450,6 +5657,12 @@
   "Overflow": {
     "Overflow": "Препълване"
   },
+  "Overflow button position": {
+    "Overflow button position": ""
+  },
+  "Overlapping": {
+    "Overlapping": ""
+  },
   "Overlay": {
     "Overlay": "Overlay"
   },
@@ -5489,9 +5702,6 @@
   "PIN": {
     "PIN": "PIN"
   },
-  "PM": {
-    "PM": ""
-  },
   "Package name (e.g., docker)": {
     "Package name (e.g., docker)": "Име на пакет (напр. docker)"
   },
@@ -5525,6 +5735,9 @@
   "Palette name": {
     "Palette name": ""
   },
+  "Palette style": {
+    "Palette style": ""
+  },
   "Panel height (rows)": {
     "Panel height (rows)": ""
   },
@@ -5533,6 +5746,9 @@
   },
   "Panel width (columns)": {
     "Panel width (columns)": ""
+  },
+  "Parabolic": {
+    "Parabolic": ""
   },
   "Partially synchronized": {
     "Partially synchronized": ""
@@ -5551,6 +5767,9 @@
   },
   "Password change failed (exit %1)": {
     "Password change failed (exit %1)": "Смяната на паролата се провали (код %1)"
+  },
+  "Password field": {
+    "Password field": ""
   },
   "Password must be 8 to 63 characters, or a 64-digit hex key.": {
     "Password must be 8 to 63 characters, or a 64-digit hex key.": ""
@@ -5582,6 +5801,15 @@
   "Pause": {
     "Pause": "Пауза"
   },
+  "Pause checks on battery": {
+    "Pause checks on battery": ""
+  },
+  "Pause night mode while a fullscreen window has focus": {
+    "Pause night mode while a fullscreen window has focus": ""
+  },
+  "Pause night mode while one of these apps has focus": {
+    "Pause night mode while one of these apps has focus": ""
+  },
   "Paused": {
     "Paused": "На пауза"
   },
@@ -5612,17 +5840,26 @@
   "Permission denied to set profile image.": {
     "Permission denied to set profile image.": "Отказан достъп за задаване на профилна снимка."
   },
+  "Petal": {
+    "Petal": ""
+  },
   "Pick Color": {
     "Pick Color": ""
   },
   "Pick a different file manager in Settings → Dock → Trash.": {
     "Pick a different file manager in Settings → Dock → Trash.": "Изберете друг файлов мениджър в Настройки → Док → Кошче."
   },
+  "Pick an app from the list above or the dashboard tab": {
+    "Pick an app from the list above or the dashboard tab": ""
+  },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": "Изберете за колко време да спрете известията"
   },
   "Pick how long to stay awake": {
     "Pick how long to stay awake": ""
+  },
+  "Pill": {
+    "Pill": ""
   },
   "Pills": {
     "Pills": ""
@@ -5632,6 +5869,9 @@
   },
   "Pin to Dock": {
     "Pin to Dock": "Закачане към дока"
+  },
+  "Pink": {
+    "Pink": ""
   },
   "Pinned": {
     "Pinned": "Закачено"
@@ -5689,6 +5929,9 @@
   },
   "Plugin": {
     "Plugin": "Приставка"
+  },
+  "Plugin Source Code": {
+    "Plugin Source Code": ""
   },
   "Plugin dependency missing": {
     "Plugin dependency missing": "Липсва зависимост за приставката"
@@ -5780,14 +6023,14 @@
   "Position": {
     "Position": "Позиция"
   },
-  "Position, appearance, island": {
-    "Position, appearance, island": ""
-  },
   "Position, displays, auto-hide, behavior": {
     "Position, displays, auto-hide, behavior": ""
   },
   "Position, pinned apps": {
     "Position, pinned apps": "Позиция, закачени приложения"
+  },
+  "Position, pinned apps, trash": {
+    "Position, pinned apps, trash": ""
   },
   "Possible override conflicts": {
     "Possible override conflicts": ""
@@ -5831,11 +6074,17 @@
   "Power source": {
     "Power source": "Източник на захранване"
   },
+  "Pre-release": {
+    "Pre-release": ""
+  },
   "Precipitation": {
     "Precipitation": "Валежи"
   },
   "Preference": {
     "Preference": "Предпочитание"
+  },
+  "Presentation": {
+    "Presentation": ""
   },
   "Preserve split": {
     "Preserve split": ""
@@ -5843,8 +6092,8 @@
   "Preset widths (%)": {
     "Preset widths (%)": ""
   },
-  "Presets": {
-    "Presets": ""
+  "Press Apply changes to update the login screen": {
+    "Press Apply changes to update the login screen": ""
   },
   "Press Ctrl+N or click 'New Session' to create one": {
     "Press Ctrl+N or click 'New Session' to create one": "Натиснете Ctrl+N или щракнете на „Нова сесия“, за да създадете такава"
@@ -5954,6 +6203,9 @@
   "Profile error": {
     "Profile error": "Грешка в профила"
   },
+  "Profile image": {
+    "Profile image": ""
+  },
   "Profile image is too large. Please use a smaller image.": {
     "Profile image is too large. Please use a smaller image.": "Профилната снимка е твърде голяма. Моля, използвайте по-малко изображение."
   },
@@ -5975,6 +6227,9 @@
   "Profile saved: %1": {
     "Profile saved: %1": "Профилът е запазен: %1"
   },
+  "Profile sync failed.": {
+    "Profile sync failed.": ""
+  },
   "Profiles": {
     "Profiles": ""
   },
@@ -5983,6 +6238,15 @@
   },
   "Protocol": {
     "Protocol": "Протокол"
+  },
+  "Pulse animation": {
+    "Pulse animation": ""
+  },
+  "Purple": {
+    "Purple": ""
+  },
+  "Push neighboring icons": {
+    "Push neighboring icons": ""
   },
   "QR Generator": {
     "QR Generator": "Генератор на QR"
@@ -6032,14 +6296,17 @@
   "Rate": {
     "Rate": "Скорост"
   },
+  "Re-applies the greetd command, permissions and PAM authentication. Needs administrator access.": {
+    "Re-applies the greetd command, permissions and PAM authentication. Needs administrator access.": ""
+  },
   "Re-enter the password before saving.": {
     "Re-enter the password before saving.": "Въведете паролата отново преди запазване."
   },
   "Reach local network devices while using an exit node": {
     "Reach local network devices while using an exit node": "Достъп до локални мрежови устройства при използване на изходен възел"
   },
-  "Read-only legacy config": {
-    "Read-only legacy config": "Конфигурация само за четене"
+  "Read the blog post": {
+    "Read the blog post": ""
   },
   "Read:": {
     "Read:": "Четене:"
@@ -6049,6 +6316,15 @@
   },
   "Reason": {
     "Reason": "Причина"
+  },
+  "Reboot recommended": {
+    "Reboot recommended": ""
+  },
+  "Reboot to %1": {
+    "Reboot to %1": ""
+  },
+  "Reboot to another OS": {
+    "Reboot to another OS": ""
   },
   "Recent": {
     "Recent": "Скорошни"
@@ -6065,11 +6341,11 @@
   "Record": {
     "Record": ""
   },
+  "Red": {
+    "Red": ""
+  },
   "Reduce motion": {
     "Reduce motion": ""
-  },
-  "Refresh": {
-    "Refresh": "Опресняване"
   },
   "Refresh Weather": {
     "Refresh Weather": "Опресняване на времето"
@@ -6094,6 +6370,12 @@
   },
   "Release": {
     "Release": "Отпускане"
+  },
+  "Release notes": {
+    "Release notes": ""
+  },
+  "Release notes are unavailable": {
+    "Release notes are unavailable": ""
   },
   "Release to confirm": {
     "Release to confirm": "Отпуснете за потвърждение"
@@ -6152,6 +6434,9 @@
   "Remove match": {
     "Remove match": "Премахване на съвпадение"
   },
+  "Remove override": {
+    "Remove override": ""
+  },
   "Remove the shortcut %1?": {
     "Remove the shortcut %1?": "Да се премахне ли прекия път %1?"
   },
@@ -6163,9 +6448,6 @@
   },
   "Removed greeter login access": {
     "Removed greeter login access": "Достъпът за вход през greeter беше отнет"
-  },
-  "Rename": {
-    "Rename": "Преименуване"
   },
   "Rename Session": {
     "Rename Session": "Преименуване на сесия"
@@ -6190,6 +6472,9 @@
   },
   "Repeat rate": {
     "Repeat rate": ""
+  },
+  "Repeats while the key is held": {
+    "Repeats while the key is held": ""
   },
   "Replace a displayed layout label with custom text, e.g. \"am-phonetic-alt\" → \"am": {
     "Replace a displayed layout label with custom text, e.g. \"am-phonetic-alt\" → \"am\"": ""
@@ -6251,9 +6536,6 @@
   "Reset to default": {
     "Reset to default": "Възстановяване по подразбиране"
   },
-  "Resize": {
-    "Resize": ""
-  },
   "Resize on border": {
     "Resize on border": ""
   },
@@ -6268,9 +6550,6 @@
   },
   "Restarting audio system...": {
     "Restarting audio system...": "Рестартиране на аудиосистемата..."
-  },
-  "Restore": {
-    "Restore": "Възстановяване"
   },
   "Restore special workspace": {
     "Restore special workspace": ""
@@ -6314,12 +6593,6 @@
   "Right-click an app in the launcher and choose 'Hide App'": {
     "Right-click an app in the launcher and choose 'Hide App'": ""
   },
-  "Right-click and drag anywhere on the widget": {
-    "Right-click and drag anywhere on the widget": "Щракнете с десен бутон и плъзнете върху уиджета"
-  },
-  "Right-click and drag the bottom-right corner": {
-    "Right-click and drag the bottom-right corner": "Щракнете с десен бутон и плъзнете долния десен ъгъл"
-  },
   "Right-click bar widget to cycle": {
     "Right-click bar widget to cycle": "Десен бутон върху уиджета в лентата за редуване"
   },
@@ -6337,6 +6610,9 @@
   },
   "Rounded": {
     "Rounded": "Заоблени"
+  },
+  "Roundness": {
+    "Roundness": ""
   },
   "Route Bluetooth headset controls to the active DMS media player": {
     "Route Bluetooth headset controls to the active DMS media player": ""
@@ -6380,6 +6656,9 @@
   "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": {
     "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": ""
   },
+  "Run full sync": {
+    "Run full sync": ""
+  },
   "Run user templates": {
     "Run user templates": ""
   },
@@ -6394,6 +6673,9 @@
   },
   "Running in terminal": {
     "Running in terminal": "Изпълнява се в терминал"
+  },
+  "Runs in a terminal.": {
+    "Runs in a terminal.": ""
   },
   "S": {
     "S": ""
@@ -6488,6 +6770,15 @@
   "Screen sharing": {
     "Screen sharing": "Споделяне на екрана"
   },
+  "Screen time": {
+    "Screen time": ""
+  },
+  "Screen time and app limits": {
+    "Screen time and app limits": ""
+  },
+  "Screen time history": {
+    "Screen time history": ""
+  },
   "Screenshot unavailable": {
     "Screenshot unavailable": "Снимката не е налична"
   },
@@ -6511,6 +6802,9 @@
   },
   "Scroll wheel": {
     "Scroll wheel": ""
+  },
+  "Scrollbars": {
+    "Scrollbars": ""
   },
   "Scrolling": {
     "Scrolling": "Превъртане"
@@ -6641,9 +6935,6 @@
   "Select an image file...": {
     "Select an image file...": "Избор на файл с изображение..."
   },
-  "Select background image": {
-    "Select background image": "Избор на фоново изображение"
-  },
   "Select device": {
     "Select device": "Избор на устройство"
   },
@@ -6692,6 +6983,9 @@
   "Server": {
     "Server": "Сървър"
   },
+  "Session": {
+    "Session": ""
+  },
   "Session filter": {
     "Session filter": ""
   },
@@ -6707,20 +7001,20 @@
   "Set custom names for your audio output devices": {
     "Set custom names for your audio output devices": "Задаване на персонализирани имена за аудиоизходните устройства"
   },
-  "Set key and action to save": {
-    "Set key and action to save": "Задайте клавиш и действие за запазване"
+  "Set limit": {
+    "Set limit": ""
   },
   "Set notification rules": {
     "Set notification rules": "Задаване на правила за известия"
   },
+  "Set under Theme & colors, Derived color": {
+    "Set under Theme & colors, Derived color": ""
+  },
+  "Set up": {
+    "Set up": ""
+  },
   "Set up a Wi-Fi hotspot for sharing this connection.": {
     "Set up a Wi-Fi hotspot for sharing this connection.": ""
-  },
-  "Set up hotspot": {
-    "Set up hotspot": "Настройване на точка за достъп"
-  },
-  "Set up hotspot in Settings": {
-    "Set up hotspot in Settings": "Настройте точка за достъп в Настройки"
   },
   "Setting": {
     "Setting": "Настройка"
@@ -6746,6 +7040,9 @@
   "Shadows": {
     "Shadows": "Сенки"
   },
+  "Shapes use the %1 theme's colors": {
+    "Shapes use the %1 theme's colors": ""
+  },
   "Share gamma control settings": {
     "Share gamma control settings": ""
   },
@@ -6761,6 +7058,9 @@
   "Shift+Enter to paste": {
     "Shift+Enter to paste": "Shift+Enter за поставяне"
   },
+  "Short": {
+    "Short": ""
+  },
   "Shortcut": {
     "Shortcut": ""
   },
@@ -6772,6 +7072,9 @@
   },
   "Shortcuts (%1)": {
     "Shortcuts (%1)": "Преки пътища (%1)"
+  },
+  "Shortcuts, keyboard, mouse": {
+    "Shortcuts, keyboard, mouse": ""
   },
   "Shortens the bar at both ends": {
     "Shortens the bar at both ends": ""
@@ -6881,9 +7184,6 @@
   "Show occupied only": {
     "Show occupied only": ""
   },
-  "Show on displays": {
-    "Show on displays": ""
-  },
   "Show on last display": {
     "Show on last display": ""
   },
@@ -6899,23 +7199,11 @@
   "Show package source badges": {
     "Show package source badges": ""
   },
-  "Show password": {
-    "Show password": ""
-  },
-  "Show password field": {
-    "Show password field": ""
-  },
   "Show percentage": {
     "Show percentage": ""
   },
-  "Show power actions": {
-    "Show power actions": ""
-  },
   "Show power off": {
     "Show power off": ""
-  },
-  "Show profile image": {
-    "Show profile image": ""
   },
   "Show readings": {
     "Show readings": ""
@@ -6950,20 +7238,20 @@
   "Show switch user": {
     "Show switch user": ""
   },
-  "Show system icons": {
-    "Show system icons": ""
-  },
   "Show temperature": {
     "Show temperature": ""
+  },
+  "Show the battery briefly when power is connected or removed": {
+    "Show the battery briefly when power is connected or removed": ""
   },
   "Show the current media activity": {
     "Show the current media activity": ""
   },
-  "Show time": {
-    "Show time": ""
-  },
   "Show trend": {
     "Show trend": ""
+  },
+  "Show upgrade in a window": {
+    "Show upgrade in a window": ""
   },
   "Show uptime": {
     "Show uptime": ""
@@ -6977,6 +7265,15 @@
   "Show welcome": {
     "Show welcome": ""
   },
+  "Show window": {
+    "Show window": ""
+  },
+  "Shown only while the microphone, camera or screen sharing is in use": {
+    "Shown only while the microphone, camera or screen sharing is in use": ""
+  },
+  "Shown while no image or color is set": {
+    "Shown while no image or color is set": ""
+  },
   "Shows all running applications with focus indication": {
     "Shows all running applications with focus indication": "Показва всички работещи приложения с индикация за фокус"
   },
@@ -6985,6 +7282,9 @@
   },
   "Shows only windows from the dock's own display": {
     "Shows only windows from the dock's own display": ""
+  },
+  "Shows the line being sung instead of the title and artist while synced lyrics are available": {
+    "Shows the line being sung instead of the title and artist while synced lyrics are available": ""
   },
   "Shows when caps lock is active": {
     "Shows when caps lock is active": "Показва кога Caps Lock е активен"
@@ -7070,6 +7370,12 @@
   "Soft square": {
     "Soft square": ""
   },
+  "Software updates": {
+    "Software updates": ""
+  },
+  "Software updates are ready to install.": {
+    "Software updates are ready to install.": ""
+  },
   "Solid": {
     "Solid": "Плътен"
   },
@@ -7142,6 +7448,9 @@
   "Spotlight bar": {
     "Spotlight bar": ""
   },
+  "Spreadsheet": {
+    "Spreadsheet": ""
+  },
   "Spring": {
     "Spring": ""
   },
@@ -7156,6 +7465,9 @@
   },
   "Square": {
     "Square": "Прави"
+  },
+  "Stable": {
+    "Stable": ""
   },
   "Stack": {
     "Stack": ""
@@ -7208,6 +7520,9 @@
   "Stopping": {
     "Stopping": "Спиране"
   },
+  "Stops syncing your DMS settings to the greeter. Set up links them again.": {
+    "Stops syncing your DMS settings to the greeter. Set up links them again.": ""
+  },
   "Stretch": {
     "Stretch": "Разтягане"
   },
@@ -7220,8 +7535,8 @@
   "Style": {
     "Style": ""
   },
-  "Style, shortcuts, search, hidden apps": {
-    "Style, shortcuts, search, hidden apps": ""
+  "Style, search, hidden apps": {
+    "Style, search, hidden apps": ""
   },
   "Success": {
     "Success": ""
@@ -7231,6 +7546,9 @@
   },
   "Summary font size": {
     "Summary font size": ""
+  },
+  "Summary, highlights, links": {
+    "Summary, highlights, links": ""
   },
   "Sun": {
     "Sun": ""
@@ -7286,6 +7604,9 @@
   "Swap": {
     "Swap": ""
   },
+  "Swatches show the seed color itself": {
+    "Swatches show the seed color itself": ""
+  },
   "Sway website": {
     "Sway website": ""
   },
@@ -7300,9 +7621,6 @@
   },
   "Sync": {
     "Sync": "Синхронизиране"
-  },
-  "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "Синхронизирането прилага вашата тема и настройки към входния екран. Споделените потребители трябва да изпълняват 'dms-greeter sync --profile'."
   },
   "Sync completed successfully.": {
     "Sync completed successfully.": "Синхронизирането завърши успешно."
@@ -7324,9 +7642,6 @@
   },
   "Sync position across displays": {
     "Sync position across displays": ""
-  },
-  "Sync to apply": {
-    "Sync to apply": "Синхронизирайте за прилагане"
   },
   "Sync with portal": {
     "Sync with portal": ""
@@ -7358,6 +7673,9 @@
   "System notification area icons": {
     "System notification area icons": "Икони в областта за системни известия"
   },
+  "System packages": {
+    "System packages": ""
+  },
   "System sound theme and events": {
     "System sound theme and events": ""
   },
@@ -7375,9 +7693,6 @@
   },
   "System update": {
     "System update": ""
-  },
-  "System updater": {
-    "System updater": ""
   },
   "Systemd override generated": {
     "Systemd override generated": ""
@@ -7424,6 +7739,9 @@
   "Taskbar": {
     "Taskbar": ""
   },
+  "Teal": {
+    "Teal": ""
+  },
   "Temperature": {
     "Temperature": ""
   },
@@ -7438,6 +7756,9 @@
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "Неуспешно стартиране на резервен терминал. Инсталирайте поддържан терминал или изпълнете 'dms-greeter sync' ръчно."
+  },
+  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.": ""
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": "Отваря се резервен терминал. Завършете удостоверяването там; той ще се затвори автоматично след това."
@@ -7523,6 +7844,15 @@
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "Опашката със задачи на този принтер е празна"
   },
+  "The login screen follows your theme, wallpaper, widgets and behavior live. Only authentication changes need applying.": {
+    "The login screen follows your theme, wallpaper, widgets and behavior live. Only authentication changes need applying.": ""
+  },
+  "The login screen shows the lock screen widgets it supports and its own session picker. Turn off to arrange it separately.": {
+    "The login screen shows the lock screen widgets it supports and its own session picker. Turn off to arrange it separately.": ""
+  },
+  "The login screen stops following your DMS theme, wallpaper, widgets and settings. greetd, authentication and other users are not affected.": {
+    "The login screen stops following your DMS theme, wallpaper, widgets and settings. greetd, authentication and other users are not affected.": ""
+  },
   "The new shortcut is already in use. Choose another shortcut.": {
     "The new shortcut is already in use. Choose another shortcut.": ""
   },
@@ -7534,6 +7864,12 @@
   },
   "The quick brown fox jumps over the lazy dog": {
     "The quick brown fox jumps over the lazy dog": ""
+  },
+  "The rest follow the shared rule": {
+    "The rest follow the shared rule": ""
+  },
+  "The rest open the bar's own popouts": {
+    "The rest open the bar's own popouts": ""
   },
   "The result is unknown. Refresh before trying again.": {
     "The result is unknown. Refresh before trying again.": ""
@@ -7550,11 +7886,17 @@
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
     "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "Сертификатът на сървъра е променен, откакто е бил одобрен за последно. Продължете само ако разпознавате новия отпечатък."
   },
+  "The shell palette is built from this color. Shapes take their colors from that palette.": {
+    "The shell palette is built from this color. Shapes take their colors from that palette.": ""
+  },
   "Theme": {
     "Theme": ""
   },
   "Theme & colors": {
     "Theme & colors": ""
+  },
+  "Theme color": {
+    "Theme color": ""
   },
   "Theme colors come from this display's wallpaper": {
     "Theme colors come from this display's wallpaper": ""
@@ -7568,11 +7910,17 @@
   "Theme, light and dark, matugen": {
     "Theme, light and dark, matugen": ""
   },
+  "Theme, palette, dark mode": {
+    "Theme, palette, dark mode": ""
+  },
   "Themes": {
     "Themes": "Теми"
   },
   "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": {
     "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": "Тези добавят записи в директорията за XDG автоматично стартиране (~/.config/autostart/*.desktop)"
+  },
+  "They load with the next update check. Release notes are also published on GitHub.": {
+    "They load with the next update check. Release notes are also published on GitHub.": ""
   },
   "Thickness": {
     "Thickness": "Дебелина"
@@ -7585,6 +7933,9 @@
   },
   "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": {
     "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "Приставките от трети страни са създадени от общността и нямат официална поддръжка от DankMaterialShell.\n\nТе могат да крият рискове за сигурността – инсталирайте на своя отговорност."
+  },
+  "This bar is the Island": {
+    "This bar is the Island": ""
   },
   "This bind is overridden by config.kdl": {
     "This bind is overridden by config.kdl": "Тази комбинация е пренаписана от config.kdl"
@@ -7606,6 +7957,12 @@
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Тази приставка няма разрешение 'settings_write'.\n\nДобавете \"permissions\": [\"settings_read\", \"settings_write\"] в plugin.json"
+  },
+  "This system cannot link settings live. Sync again after changing them.": {
+    "This system cannot link settings live. Sync again after changing them.": ""
+  },
+  "This system was not started in UEFI mode": {
+    "This system was not started in UEFI mode": ""
   },
   "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": {
     "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "Този уиджет предотвратява преминаването на видеокартата в спящ режим, което може значително да намали живота на батерията при лаптопи. Не се препоръчва при хибридни графични карти."
@@ -7679,6 +8036,9 @@
   "Tint strength": {
     "Tint strength": ""
   },
+  "Tinted cards and badges across the shell": {
+    "Tinted cards and badges across the shell": ""
+  },
   "Title": {
     "Title": "Заглавие"
   },
@@ -7699,9 +8059,6 @@
   },
   "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": {
     "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": "За вход като друг потребител излезте и изберете профила от входния екран. Паралелните сесии изискват мултисесиен greeter (greetd-flexiserver / GDM / LightDM)."
-  },
-  "To update, run the following command:": {
-    "To update, run the following command:": "За обновяване изпълнете следната команда:"
   },
   "To use this DMS bind, remove or change the keybind in your config.kdl": {
     "To use this DMS bind, remove or change the keybind in your config.kdl": "За да използвате тази комбинация на DMS, я премахнете или променете в config.kdl"
@@ -7781,6 +8138,9 @@
   "Touchpad": {
     "Touchpad": ""
   },
+  "Track screen time": {
+    "Track screen time": ""
+  },
   "Transform": {
     "Transform": "Трансформация"
   },
@@ -7808,6 +8168,12 @@
   "Trigger: %1": {
     "Trigger: %1": "Префикс: %1"
   },
+  "Triggers after holding the key": {
+    "Triggers after holding the key": ""
+  },
+  "Triggers when the key is released": {
+    "Triggers when the key is released": ""
+  },
   "Trust": {
     "Trust": "Доверяване"
   },
@@ -7834,6 +8200,9 @@
   },
   "Typing in the overview opens the launcher": {
     "Typing in the overview opens the launcher": ""
+  },
+  "Typing reveals the field. Escape hides it again. The editor always shows it.": {
+    "Typing reveals the field. Escape hides it again. The editor always shows it.": ""
   },
   "URL": {
     "URL": ""
@@ -7874,12 +8243,6 @@
   "Uninstalling: %1": {
     "Uninstalling: %1": "Деинсталиране: %1"
   },
-  "Unison": {
-    "Unison": ""
-  },
-  "Unknown": {
-    "Unknown": "Неизвестно"
-  },
   "Unknown App": {
     "Unknown App": "Неизвестно приложение"
   },
@@ -7898,9 +8261,6 @@
   "Unknown Model": {
     "Unknown Model": "Неизвестен модел"
   },
-  "Unknown Monitor": {
-    "Unknown Monitor": "Неизвестен монитор"
-  },
   "Unknown Network": {
     "Unknown Network": "Неизвестна мрежа"
   },
@@ -7909,6 +8269,18 @@
   },
   "Unknown Track": {
     "Unknown Track": "Неизвестна песен"
+  },
+  "Unlink": {
+    "Unlink": ""
+  },
+  "Unlink login screen": {
+    "Unlink login screen": ""
+  },
+  "Unlink needs sudo authentication. Opening terminal so you can use password or fingerprint.": {
+    "Unlink needs sudo authentication. Opening terminal so you can use password or fingerprint.": ""
+  },
+  "Unlink now?": {
+    "Unlink now?": ""
   },
   "Unload on close": {
     "Unload on close": ""
@@ -7988,6 +8360,12 @@
   "Update plugin": {
     "Update plugin": ""
   },
+  "Update the dms package with your package manager, then restart the shell.": {
+    "Update the dms package with your package manager, then restart the shell.": ""
+  },
+  "Updates, clipboard, %1": {
+    "Updates, clipboard, %1": ""
+  },
   "Updating %1...": {
     "Updating %1...": "Обновяване на %1..."
   },
@@ -8009,17 +8387,14 @@
   "Urgent color": {
     "Urgent color": ""
   },
-  "Use HH:MM time format": {
-    "Use HH:MM time format": "Използвайте формат HH:MM"
+  "Use Dynamic": {
+    "Use Dynamic": ""
   },
   "Use IP Location": {
     "Use IP Location": "Използване на местоположение по IP"
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Използване на равноширок шрифт"
-  },
-  "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "Използвайте персонализирано изображение за заключения екран или оставете празно за тапета на плота."
   },
   "Use a security key for lock screen authentication": {
     "Use a security key for lock screen authentication": "Използване на ключ за сигурност за отключване на екрана"
@@ -8029,6 +8404,9 @@
   },
   "Use custom command": {
     "Use custom command": ""
+  },
+  "Use default wallpaper": {
+    "Use default wallpaper": ""
   },
   "Use desktop wallpaper": {
     "Use desktop wallpaper": "Използване на тапета на плота"
@@ -8048,14 +8426,14 @@
   "Use overlay layer": {
     "Use overlay layer": ""
   },
+  "Use standard OSDs": {
+    "Use standard OSDs": ""
+  },
   "Use standard popups": {
     "Use standard popups": ""
   },
   "Use system PAM authentication": {
     "Use system PAM authentication": "Използване на системно PAM удостоверяване"
-  },
-  "Use system theme": {
-    "Use system theme": ""
   },
   "User": {
     "User": "Потребител"
@@ -8195,11 +8573,11 @@
   "View Changes": {
     "View Changes": ""
   },
+  "View on GitHub": {
+    "View on GitHub": ""
+  },
   "Visibility": {
     "Visibility": "Видимост"
-  },
-  "Visibility, position, pinned apps, trash": {
-    "Visibility, position, pinned apps, trash": ""
   },
   "Visible entry actions": {
     "Visible entry actions": ""
@@ -8228,8 +8606,8 @@
   "Volume style": {
     "Volume style": ""
   },
-  "Volume, brightness, caps lock, position": {
-    "Volume, brightness, caps lock, position": ""
+  "Volume, brightness, caps lock": {
+    "Volume, brightness, caps lock": ""
   },
   "Votes": {
     "Votes": "Гласове"
@@ -8276,6 +8654,12 @@
   "Web browser": {
     "Web browser": ""
   },
+  "Week": {
+    "Week": ""
+  },
+  "Weekly screen time": {
+    "Weekly screen time": ""
+  },
   "Weight": {
     "Weight": ""
   },
@@ -8284,6 +8668,9 @@
   },
   "Welcome to DankMaterialShell": {
     "Welcome to DankMaterialShell": "Добре дошли в DankMaterialShell"
+  },
+  "What changed": {
+    "What changed": ""
   },
   "When locked": {
     "When locked": "При заключен екран"
@@ -8321,8 +8708,8 @@
   "Wi-Fi not available": {
     "Wi-Fi not available": "Wi-Fi не е наличен"
   },
-  "WiFi": {
-    "WiFi": "Wi-Fi"
+  "Wi-Fi, Ethernet, VPN": {
+    "Wi-Fi, Ethernet, VPN": ""
   },
   "WiFi QR code for ": {
     "WiFi QR code for ": "Wi-Fi QR код за "
@@ -8338,6 +8725,9 @@
   },
   "Wide (BT2020)": {
     "Wide (BT2020)": "Широка (BT2020)"
+  },
+  "Widget": {
+    "Widget": ""
   },
   "Widget Background Color": {
     "Widget Background Color": "Цвят на фона на уиджета"
@@ -8362,6 +8752,9 @@
   },
   "Widgets": {
     "Widgets": "Уиджети"
+  },
+  "Widgets in this section move into overflow when space runs out": {
+    "Widgets in this section move into overflow when space runs out": ""
   },
   "Widgets, layout, style": {
     "Widgets, layout, style": "Уиджети, подредба, стил"
@@ -8404,6 +8797,9 @@
   },
   "With background blur on, cards and tiles keep their own backing": {
     "With background blur on, cards and tiles keep their own backing": ""
+  },
+  "Word processor": {
+    "Word processor": ""
   },
   "Working...": {
     "Working...": "Обработка..."
@@ -8456,6 +8852,9 @@
   "Y axis": {
     "Y axis": ""
   },
+  "Yellow": {
+    "Yellow": ""
+  },
   "Yes": {
     "Yes": "Да"
   },
@@ -8483,11 +8882,17 @@
   "Your compositor does not support background blur (ext-background-effect-v1)": {
     "Your compositor does not support background blur (ext-background-effect-v1)": "Композиторът ви не поддържа размазване на фона (ext-background-effect-v1)"
   },
+  "Your greeter slot and any cache links to your home are removed. Administrator access may be required. Set up links them again.": {
+    "Your greeter slot and any cache links to your home are removed. Administrator access may be required. Set up links them again.": ""
+  },
   "Your hotspot is running.": {
     "Your hotspot is running.": "Вашата точка за достъп работи."
   },
   "Your hotspot profile is saved and ready to start.": {
     "Your hotspot profile is saved and ready to start.": "Профилът на точката за достъп е запазен и готов за стартиране."
+  },
+  "Your keyboard layout puts %1 above the first level, so this bind will never fire. Pick a key the layout types without an extra layer.": {
+    "Your keyboard layout puts %1 above the first level, so this bind will never fire. Pick a key the layout types without an extra layer.": ""
   },
   "Your system is up to date!": {
     "Your system is up to date!": "Системата ви е напълно обновена!"
@@ -8500,6 +8905,9 @@
   },
   "adverb, wallpaper changes every day at a set time": {
     "Daily": ""
+  },
+  "and %1 more": {
+    "and %1 more": ""
   },
   "attached": {
     "attached": "прикачен"
@@ -8573,11 +8981,17 @@
   "e.g., scratch, /^tmp_.*/, build": {
     "e.g., scratch, /^tmp_.*/, build": "напр. scratch, /^tmp_.*/, build"
   },
+  "efibootmgr failed": {
+    "efibootmgr failed": ""
+  },
   "ext": {
     "ext": "разширение"
   },
   "featured": {
     "featured": "препоръчани"
+  },
+  "greetd is not using the DMS greeter yet.": {
+    "greetd is not using the DMS greeter yet.": ""
   },
   "keyboard tab key name": {
     "Tab": ""
@@ -8618,6 +9032,9 @@
   "matugen not found - install matugen package for dynamic theming": {
     "matugen not found - install matugen package for dynamic theming": "matugen не е намерен – инсталирайте пакета matugen за динамични теми"
   },
+  "missing program": {
+    "Requires %1": ""
+  },
   "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": {
     "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": ""
   },
@@ -8653,6 +9070,9 @@
   },
   "noun, badge on a keybind that overrides the default": {
     "Override": ""
+  },
+  "noun, overflow button position before the first widget": {
+    "Start": ""
   },
   "now": {
     "now": "сега"
@@ -8698,9 +9118,6 @@
   },
   "this app": {
     "this app": "това приложение"
-  },
-  "tmux and zellij sessions": {
-    "tmux and zellij sessions": ""
   },
   "tmux, zellij, and herdr sessions": {
     "tmux, zellij, and herdr sessions": ""
@@ -8764,14 +9181,5 @@
   },
   "• yyyy - Year (2024)": {
     "• yyyy - Year (2024)": "• yyyy – Година (2024)"
-  },
-  "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
-    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": "↑/↓: Навигация • Интервал: Разгъване • Enter: Действие/Разгъване • E: Текст"
-  },
-  "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
-    "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": "↑/↓: Навигация • Enter/Ctrl+C: Копиране • Del: Изтриване • Ctrl+E: Редактиране • Ctrl+S: Закачане/Откачане • F10: Помощ"
-  },
-  "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
-    "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": "↑/↓: Навигация • Enter: Поставяне • Ctrl+C: Копиране • Del: Изтриване • Ctrl+E: Редактиране • Ctrl+S: Закачане/Откачане • F10: Помощ"
   }
 }

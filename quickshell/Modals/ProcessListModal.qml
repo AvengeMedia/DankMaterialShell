@@ -4,10 +4,11 @@ import Quickshell.Wayland
 import qs.Common
 import qs.Modules.ProcessList
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import "../Common/Format.js" as Format
 
-DankFloatingWindow {
+DFloatingWindow {
     id: processListModal
     readonly property var log: Log.scoped("ProcessListModal")
 
@@ -170,7 +171,7 @@ DankFloatingWindow {
                 anchors.centerIn: parent
                 spacing: Theme.spacingL
 
-                DankIcon {
+                DIcon {
                     name: "error"
                     size: 48
                     color: Theme.error
@@ -201,14 +202,14 @@ DankFloatingWindow {
             spacing: 0
             visible: DgopService.dgopAvailable
 
-            DankWindowHeader {
+            DWindowHeader {
                 Layout.fillWidth: true
                 controls: windowControls
                 title: I18n.tr("System Monitor")
                 onCloseRequested: processListModal.hide()
             }
 
-            DankNavigationBar {
+            DNavigationBar {
                 id: viewNavigation
                 Layout.fillWidth: true
                 Layout.leftMargin: Theme.windowInset
@@ -253,7 +254,7 @@ DankFloatingWindow {
                 spacing: Theme.spacingM
                 visible: currentTab === 0
 
-                DankSearchField {
+                DSearchField {
                     id: searchField
                     Layout.fillWidth: true
                     Layout.preferredHeight: Theme.buttonHeightS
@@ -339,7 +340,7 @@ DankFloatingWindow {
                     Row {
                         spacing: Theme.spacingXS
 
-                        DankIcon {
+                        DIcon {
                             name: "swap_horiz"
                             size: Theme.iconSizeSmall
                             color: Theme.info
@@ -357,7 +358,7 @@ DankFloatingWindow {
                     Row {
                         spacing: Theme.spacingXS
 
-                        DankIcon {
+                        DIcon {
                             name: "storage"
                             size: Theme.iconSizeSmall
                             color: Theme.warning
@@ -375,7 +376,7 @@ DankFloatingWindow {
                     Row {
                         spacing: Theme.spacingXS
 
-                        DankIcon {
+                        DIcon {
                             name: "memory"
                             size: Theme.iconSizeSmall
                             color: Theme.primary
@@ -394,7 +395,7 @@ DankFloatingWindow {
                     Row {
                         spacing: Theme.spacingXS
 
-                        DankIcon {
+                        DIcon {
                             name: "sd_card"
                             size: Theme.iconSizeSmall
                             color: Theme.secondary

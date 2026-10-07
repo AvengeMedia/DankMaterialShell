@@ -32,6 +32,7 @@ Singleton {
     property int selectedIndex: 0
     property bool keyboardNavigationActive: false
     property int refCount: 0
+    property bool _pasteSupportChecked: false
     property bool _launcherCacheValid: false
     property string _launcherCachedQuery: ""
     property var _launcherCachedEntries: []
@@ -55,18 +56,40 @@ Singleton {
 
     Connections {
         target: DMSService
+        enabled: root.refCount > 0
         function onIsConnectedChanged() {
             root.refreshPasteSupport();
         }
     }
 
-    Component.onCompleted: refreshPasteSupport()
+    onRefCountChanged: {
+        if (refCount > 0) {
+            ensureSubscription();
+        } else if (refCount === 0 && DMSService.activeSubscriptions.includes("clipboard")) {
+            DMSService.removeSubscription("clipboard");
+        }
+    }
+
+    function ensureSubscription() {
+        if (refCount <= 0)
+            return;
+        if (!_pasteSupportChecked)
+            refreshPasteSupport();
+        if (DMSService.activeSubscriptions.includes("clipboard"))
+            return;
+        if (DMSService.activeSubscriptions.includes("all"))
+            return;
+        DMSService.addSubscription("clipboard");
+        refresh();
+    }
 
     function refreshPasteSupport() {
         if (!DMSService.isConnected) {
             pasteSupported = false;
+            _pasteSupportChecked = false;
             return;
         }
+        _pasteSupportChecked = true;
         DMSService.sendRequest("clipboard.pasteSupported", null, function (response) {
             root.pasteSupported = !response.error && response.result && response.result.supported === true;
         });
@@ -151,6 +174,8 @@ Singleton {
         if (!clipboardAvailable) {
             return;
         }
+        if (!_pasteSupportChecked)
+            refreshPasteSupport();
 
         const trimmed = (query || "").toString().trim();
         const maxItems = limit > 0 ? limit : 20;

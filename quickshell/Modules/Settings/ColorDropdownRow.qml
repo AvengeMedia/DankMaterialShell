@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
@@ -148,13 +149,13 @@ Column {
                 anchors.rightMargin: SettingsMetrics.rowPaddingH
                 spacing: Theme.spacingM
 
-                DankColorSwatch {
+                DColorSwatch {
                     width: Theme.avatarSize
                     height: Theme.avatarSize
                     swatchColor: root.customColor
                     anchors.verticalCenter: parent.verticalCenter
 
-                    DankIcon {
+                    DIcon {
                         anchors.centerIn: parent
                         name: "colorize"
                         size: Theme.iconSizeSmall
@@ -186,7 +187,7 @@ Column {
                     }
                 }
 
-                DankIcon {
+                DIcon {
                     id: editIcon
                     name: "edit"
                     size: Theme.iconSizeSmall

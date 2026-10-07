@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import qs.Services
 
@@ -20,7 +20,7 @@ SettingsCard {
     title: I18n.tr("Available Updates (%1)", "plugin updates dialog title, %1 is a count").arg(updatesList.length)
     visible: false
 
-    headerActions: DankActionButton {
+    headerActions: DActionButton {
         iconName: "close"
         tooltipText: I18n.tr("Close")
         iconColor: Theme.surfaceVariantText
@@ -90,7 +90,7 @@ SettingsCard {
     SettingsRow {
         visible: root.isUpdating
         title: root.currentUpdatingPlugin ? I18n.tr("Updating %1...", "plugin updates dialog progress, %1 is the plugin name").arg(root.currentUpdatingPlugin) : I18n.tr("Updating plugins...")
-        leading: DankSpinner {
+        leading: DSpinner {
             size: Theme.iconSize
             running: root.isUpdating
         }
@@ -115,14 +115,14 @@ SettingsCard {
             subtitle: !compatible ? I18n.tr("Requires DMS %1", "plugin incompatibility notice, %1 is the required DMS version").arg(modelData.requires_dms) : modelData.author ? I18n.tr("by %1", "author attribution").arg(modelData.author) : ""
             subtitleColor: compatible ? supportingContentColor : Theme.error
 
-            DankActionButton {
+            DActionButton {
                 iconName: "open_in_new"
                 tooltipText: I18n.tr("View Changes", "open plugin changes before updating")
                 visible: !!modelData.diffUrl || !!modelData.repo
                 onClicked: Qt.openUrlExternally(modelData.diffUrl || modelData.repo)
             }
 
-            DankActionButton {
+            DActionButton {
                 iconName: "download"
                 tooltipText: I18n.tr("Update", "verb, button installing a newer plugin version")
                 enabled: !root.isUpdating && !root.operationsBlocked && compatible
@@ -139,7 +139,7 @@ SettingsCard {
     SettingsRow {
         visible: !root.isUpdating
 
-        DankButton {
+        DButton {
             text: I18n.tr("Cancel")
             iconName: "close"
             backgroundColor: "transparent"
@@ -147,7 +147,7 @@ SettingsCard {
             onClicked: root.hide()
         }
 
-        DankButton {
+        DButton {
             text: I18n.tr("Update All")
             iconName: "download"
             enabled: !root.operationsBlocked && root.updatesList.some(plugin => PluginService.checkPluginCompatibility(plugin.requires_dms))

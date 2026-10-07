@@ -71,10 +71,6 @@ Singleton {
         conflictDiskContent = "";
     }
 
-    Component.onCompleted: {
-        ensureDirectories();
-    }
-
     FileView {
         id: metadataFile
         path: root.refCount > 0 ? root.metadataPath : ""
@@ -100,13 +96,21 @@ Singleton {
     }
 
     onRefCountChanged: {
-        if (refCount === 1 && !metadataLoaded) {
-            metadataFile.path = "";
-            metadataFile.path = root.metadataPath;
-        }
+        if (refCount !== 1)
+            return;
+        ensureDirectories();
+        if (metadataLoaded)
+            return;
+        metadataFile.path = "";
+        metadataFile.path = root.metadataPath;
     }
 
+    property bool _directoriesEnsured: false
+
     function ensureDirectories() {
+        if (_directoriesEnsured)
+            return;
+        _directoriesEnsured = true;
         Proc.runCommand("", ["mkdir", "-p", root.baseDir, root.filesDir], null);
     }
 

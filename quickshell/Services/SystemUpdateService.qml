@@ -72,7 +72,11 @@ Singleton {
     readonly property var notesRelease: {
         const list = releases?.releases ?? [];
         const mm = notesVersion.match(/^\d+\.\d+/)?.[0] ?? "";
-        return list.find(r => r.version === notesVersion) ?? list.find(r => mm !== "" && (r.version === mm || r.version.startsWith(mm + "."))) ?? null;
+        const match = list.find(r => r.version === notesVersion) ?? list.find(r => mm !== "" && (r.version === mm || r.version.startsWith(mm + "."))) ?? null;
+        if (match || shellChannel === "stable")
+            return match;
+        // Git builds may carry no semver (Fedora: 0.0.git.N.sha) or run past the newest tag
+        return list.find(r => !r.prerelease) ?? null;
     }
     readonly property bool shellManagedExternally: shellInstallMethod === "nix"
     readonly property bool helperAvailable: sysupdateAvailable && backends.length > 0
@@ -87,6 +91,10 @@ Singleton {
         if (pkgManager === "shelly")
             return pkg.repo === "flatpak";
         return systemHoldsAllowed || pkg.repo !== "system";
+    }
+
+    function isValidIgnoredName(name) {
+        return /^[A-Za-z0-9@._+:\/-]+$/.test(name);
     }
 
     Connections {
@@ -140,9 +148,11 @@ Singleton {
         const has = DMSService.capabilities.includes("sysupdate");
         if (has && !sysupdateAvailable) {
             sysupdateAvailable = true;
-            requestState();
-            // The daemon persists its last check but not the interval; re-apply it on every fresh connection.
-            setInterval(SettingsData.updaterIntervalSeconds);
+            if (pollWanted) {
+                requestState();
+                // The daemon persists its last check but not the interval; re-apply it on every fresh connection.
+                setInterval(SettingsData.updaterIntervalSeconds);
+            }
         } else if (!has) {
             sysupdateAvailable = false;
         }
@@ -224,14 +234,50 @@ Singleton {
             _maybeNotify();
     }
 
-    function _filterUpdates(pkgs) {
+    function _packageMatchesIgnore(pkgName, ignored) {
+        const split = s => {
+            if (!s)
+                return [s || "", ""];
+            const idx = s.indexOf(":");
+            if (idx === -1)
+                return [s, ""];
+            return [s.substring(0, idx), s.substring(idx + 1)];
+        };
+        const [pkgBase, pkgSlot] = split(pkgName);
+        const [ignBase, ignSlot] = split(ignored);
+        if (pkgSlot && ignSlot) {
+            if (pkgBase === ignBase && pkgSlot === ignSlot)
+                return true;
+            return false;
+        }
+        if (ignSlot && !pkgSlot) {
+            if (pkgBase === ignBase && ignSlot === "0")
+                return true;
+            return false;
+        }
+        if (pkgBase === ignBase)
+            return true;
+        return false;
+    }
+
+    function _isIgnored(pkg) {
+        if (!pkg || !pkg.name)
+            return false;
         const ignored = SettingsData.updaterIgnoredPackages || [];
+        for (let i = 0; i < ignored.length; i++) {
+            if (_packageMatchesIgnore(pkg.name, ignored[i]))
+                return true;
+        }
+        return false;
+    }
+
+    function _filterUpdates(pkgs) {
         return (pkgs || []).filter(p => {
             if (!SettingsData.updaterAllowAUR && p.repo === "aur")
                 return false;
             if (!canIgnorePackage(p))
                 return true;
-            return ignored.indexOf(p.name) === -1;
+            return !_isIgnored(p);
         });
     }
 
@@ -259,8 +305,7 @@ Singleton {
         const count = updateCount;
         DMSService.notifySend({
             "summary": count === 1 ? I18n.tr("%1 update", "singular, %1 is 1, available system update count").arg(count) : I18n.tr("%1 updates", "plural, %1 is a count of available system updates").arg(count),
-            "body": I18n.tr("Software updates are ready to install."),
-            "icon": "system-software-update",
+            "body": I18n.tr("Software updates are ready to install.", "notification body when system updates are available"),
             "actionLabel": I18n.tr("Settings"),
             "actionArgs": ["ipc", "call", "settings", "openWith", "updater"]
         }, resp => {
@@ -357,6 +402,7 @@ Singleton {
     onPollWantedChanged: {
         if (!pollWanted)
             _startupCheckDone = false;
+        _syncSubscription();
         Qt.callLater(() => root._syncAcquire());
         Qt.callLater(() => root._maybeStartupCheck());
     }
@@ -370,6 +416,19 @@ Singleton {
         _syncAcquire();
         if (sysupdateAvailable && releasesRefCount > 0 && releases === null)
             loadReleases(false);
+    }
+
+    function _syncSubscription() {
+        if (!pollWanted) {
+            if (DMSService.activeSubscriptions.includes("sysupdate"))
+                DMSService.removeSubscription("sysupdate");
+            return;
+        }
+        DMSService.addSubscription("sysupdate");
+        if (!sysupdateAvailable)
+            return;
+        requestState();
+        setInterval(SettingsData.updaterIntervalSeconds);
     }
 
     property bool _acquired: false

@@ -7,6 +7,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import qs.DCommon.Common as DCommon
 import "../Common/OutputModel.js" as OutputModel
 
 // Native MangoWM IPC client. mango advertises a JSON-over-Unix-socket protocol
@@ -101,10 +102,10 @@ Singleton {
         onFileChanged: root.handleWatchedConfigChanged()
     }
 
-    DankSocket {
+    DCommon.DSocket {
         id: monitorsSocket
         path: root.socketPath
-        connected: root.available
+        connected: CompositorService.isMango && root.available
 
         onConnectionStateChanged: {
             if (linkUp) {
@@ -118,10 +119,10 @@ Singleton {
         }
     }
 
-    DankSocket {
+    DCommon.DSocket {
         id: clientsSocket
         path: root.socketPath
-        connected: root.available
+        connected: CompositorService.isMango && root.available
 
         onConnectionStateChanged: {
             if (linkUp)
@@ -135,10 +136,10 @@ Singleton {
 
     // mango closes the connection after each non-watch command; queued
     // dispatches drain one per reconnect cycle.
-    DankSocket {
+    DCommon.DSocket {
         id: dispatchSocket
         path: root.socketPath
-        connected: root.available
+        connected: CompositorService.isMango && root.available
         reconnectBaseMs: 25
 
         onConnectionStateChanged: {
@@ -552,9 +553,8 @@ Singleton {
 
     Connections {
         target: SettingsData
+        enabled: CompositorService.isMango
         function onBarConfigsChanged() {
-            if (!CompositorService.isMango)
-                return;
             const newGaps = Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4));
             if (newGaps === root._lastGapValue)
                 return;

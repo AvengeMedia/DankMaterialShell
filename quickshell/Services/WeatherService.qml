@@ -1080,6 +1080,7 @@ Singleton {
 
     Connections {
         target: LocationService
+        enabled: root.refCount > 0 && SettingsData.weatherEnabled
 
         function onLocationChanged(data) {
             if (!SettingsData.useAutoLocation)

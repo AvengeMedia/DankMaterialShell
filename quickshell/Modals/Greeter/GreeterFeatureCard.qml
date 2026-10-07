@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Rectangle {
     id: root
@@ -37,7 +37,7 @@ Rectangle {
             color: Theme.primaryContainer
             anchors.horizontalCenter: parent.horizontalCenter
 
-            DankIcon {
+            DIcon {
                 anchors.centerIn: parent
                 name: root.iconName
                 size: Theme.iconSize - 4

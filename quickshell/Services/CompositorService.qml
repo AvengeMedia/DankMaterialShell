@@ -7,7 +7,7 @@ import Quickshell.I3
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.Common
-import qs.DankCommon.Common as DankCommon
+import qs.DCommon.Common as DCommon
 import qs.Services
 import "../Common/WorkspaceModel.js" as WorkspaceModel
 import "../Common/WindowModel.js" as WindowModel
@@ -30,6 +30,8 @@ Singleton {
     property bool outputPowerAvailable: false
     readonly property bool genericPowerBackend: compositorDetected && !isNiri && !isHyprland && !isMango && !isSway && !isScroll && !isMiracle && !isLabwc && !isUmbriel
     onGenericPowerBackendChanged: probeOutputPower()
+
+    readonly property bool inOverview: (isHyprland && HyprlandService.inOverview) || (isNiri && NiriService.inOverview) || (isMango && MangoService.inOverview)
 
     function probeOutputPower() {
         outputPowerAvailable = false;
@@ -63,6 +65,7 @@ Singleton {
         target: Quickshell
         function onScreensChanged() {
             root.probeOutputPower();
+            root.refreshHyprlandMonitorLayout();
         }
     }
     readonly property bool frameCompositorLayoutReady: (!isNiri || NiriService.frameLayoutReady) && (!isHyprland || HyprlandService.frameLayoutReady)
@@ -97,7 +100,7 @@ Singleton {
             right: SettingsData.Position.Right
         })
 
-    readonly property bool supportsMinimize: isAqueous && AqueousService.available ? AqueousService.capabilities.commands && !AqueousService.locked : DankCommon.Compositor.supportsMinimize
+    readonly property bool supportsMinimize: isAqueous && AqueousService.available ? AqueousService.capabilities.commands && !AqueousService.locked : DCommon.Compositor.supportsMinimize
 
     readonly property bool hasWorkspaceIpc: {
         switch (compositor) {
@@ -149,7 +152,7 @@ Singleton {
     readonly property string displayName: {
         switch (compositor) {
         case "niri":
-            return "Niri";
+            return "niri";
         case "hyprland":
             return "Hyprland";
         case "mango":
@@ -192,9 +195,8 @@ Singleton {
 
     Connections {
         target: AqueousService
+        enabled: root.isAqueous
         function onStateChanged() {
-            if (!root.isAqueous)
-                return;
             root.scheduleSort();
             if (AqueousService.available)
                 root.workspaceStateChanged();
@@ -494,6 +496,7 @@ Singleton {
     }
     Connections {
         target: NiriService
+        enabled: root.isNiri
         function onWindowsChanged() {
             root.scheduleSort();
         }
@@ -504,23 +507,17 @@ Singleton {
         detectCompositor();
         updateHyprlandVisibleSpecialWorkspaces(null);
         scheduleSort();
-        Qt.callLater(() => {
-            NiriService.generateNiriLayoutConfig();
-            HyprlandService.generateLayoutConfig();
-        });
     }
 
     Connections {
         target: MangoService
+        enabled: root.isMango
         function onStateChanged() {
-            if (!root.isMango)
-                return;
             root.scheduleSort();
             root.workspaceStateChanged();
         }
         function onWindowsChanged() {
-            if (isMango)
-                scheduleSort();
+            root.scheduleSort();
         }
     }
 
@@ -998,13 +995,6 @@ Singleton {
         }
     }
 
-    Connections {
-        target: Quickshell
-        function onScreensChanged() {
-            root.refreshHyprlandMonitorLayout();
-        }
-    }
-
     // Workspace moves can land before Hyprland announces the monitor and before the Wayland
     // output reaches us, so re-read both models once the screen set settles (#3133)
     function refreshHyprlandMonitorLayout() {
@@ -1374,22 +1364,6 @@ Singleton {
         } catch (e) {}
 
         return toplevels.filter(w => map.get(w) === currentWorkspaceId);
-    }
-
-    Timer {
-        id: compositorInitTimer
-        interval: 100
-        running: true
-        repeat: false
-        onTriggered: {
-            detectCompositor();
-            compositorDetected = true;
-            Qt.callLater(() => {
-                NiriService.generateNiriLayoutConfig();
-                HyprlandService.generateLayoutConfig();
-                MangoService.generateLayoutConfig();
-            });
-        }
     }
 
     // Primary detection asks the kernel which process owns the $WAYLAND_DISPLAY

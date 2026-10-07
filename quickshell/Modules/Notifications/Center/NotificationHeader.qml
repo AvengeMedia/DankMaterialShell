@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Notifications
 
@@ -63,7 +64,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.spacingXS
 
-        DankActionButton {
+        DActionButton {
             id: dndButton
             iconName: SessionData.doNotDisturb ? "notifications_off" : "notifications"
             buttonSize: Theme.buttonHeightXS
@@ -76,7 +77,7 @@ Item {
             }
         }
 
-        DankActionButton {
+        DActionButton {
             readonly property bool hintsShown: root.hintsOwner?.showKeyboardHints ?? false
 
             visible: root.hintsOwner !== null
@@ -89,7 +90,7 @@ Item {
         }
     }
 
-    DankButtonGroup {
+    DButtonGroup {
         id: tabs
         anchors.left: leadingActions.right
         anchors.right: actions.left
@@ -124,13 +125,13 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.spacingXS
 
-        DankActionButton {
+        DActionButton {
             iconName: "settings"
             buttonSize: Theme.buttonHeightXS
             tooltipText: I18n.tr("Settings")
             onClicked: root.settingsRequested()
         }
-        DankActionButton {
+        DActionButton {
             iconName: "delete_sweep"
             buttonSize: Theme.buttonHeightXS
             tooltipText: I18n.tr("Clear All")
@@ -145,7 +146,7 @@ Item {
                 NotificationService.clearHistory();
             }
         }
-        DankActionButton {
+        DActionButton {
             visible: root.modal
             iconName: "close"
             buttonSize: Theme.buttonHeightXS
@@ -154,7 +155,7 @@ Item {
         }
     }
 
-    DankDropdown {
+    DDropdown {
         id: durationMenu
         showTrigger: false
         popupAnchorItem: dndButton

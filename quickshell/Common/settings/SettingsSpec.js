@@ -1,7 +1,23 @@
 .pragma library
-.import "../../DankCommon/Common/settings/SharedSettingsSpec.js" as Shared
-.import "../../DankCommon/Common/settings/SpecUtil.js" as Util
+.import "../../DCommon/Common/settings/SharedSettingsSpec.js" as Shared
+.import "../../DCommon/Common/settings/SpecUtil.js" as Util
 .import "DockConfig.js" as DockConfig
+
+function lockWidgetDefaults() {
+    return Shared.lockWidgetDefaults();
+}
+
+function greeterWidgetsFromLock(lockInstances, previous) {
+    return Shared.greeterWidgetsFromLock(lockInstances, previous);
+}
+
+function greeterSessionDefault() {
+    return Shared.greeterSessionDefault();
+}
+
+function greeterWidgetDefaults() {
+    return Shared.greeterWidgetDefaults();
+}
 
 var LOCAL_SPEC = {
     dockConfigs: {
@@ -50,6 +66,9 @@ var LOCAL_SPEC = {
         coerce: Util.percentToUnit
     },
     floatingWindowSyncGlobal: {
+        def: true
+    },
+    floatingWindowTitleBars: {
         def: true
     },
     floatingWindowTransparency: {
@@ -544,6 +563,15 @@ var LOCAL_SPEC = {
                 w: 4,
                 h: 1,
                 footer: true
+            },
+            {
+                id: "edit",
+                enabled: true,
+                w: 1,
+                h: 1,
+                small: true,
+                footer: true,
+                footerEnd: true
             }
         ]
     },
@@ -632,6 +660,9 @@ var LOCAL_SPEC = {
         def: false,
         onChange: "scheduleGreeterAutoLoginSync"
     },
+    greeterFollowLockScreen: {
+        def: true
+    },
     greeterPamExternallyManaged: {
         def: false,
         onChange: "markGreeterSyncPending"
@@ -653,6 +684,10 @@ var LOCAL_SPEC = {
     },
     rememberLastQuery: {
         def: false
+    },
+    launcherHistoryEnabled: {
+        def: true,
+        onChange: "syncLauncherHistory"
     },
     rememberLastMode: {
         def: true
@@ -1134,24 +1169,6 @@ var LOCAL_SPEC = {
     modalDarkenBackground: {
         def: true
     },
-    lockScreenShowSystemIcons: {
-        def: true
-    },
-    lockScreenShowTime: {
-        def: true
-    },
-    lockScreenClockStyle: {
-        def: "horizontal"
-    },
-    lockScreenShowDate: {
-        def: true
-    },
-    lockScreenShowPasswordField: {
-        def: true
-    },
-    lockScreenShowMediaPlayer: {
-        def: true
-    },
     lockScreenPowerOffMonitorsOnLock: {
         def: false
     },
@@ -1194,9 +1211,6 @@ var LOCAL_SPEC = {
     },
     lockScreenInactiveColor: {
         def: "#000000"
-    },
-    lockScreenNotificationMode: {
-        def: 0
     },
     lockScreenVideoEnabled: {
         def: false
@@ -1364,11 +1378,11 @@ var LOCAL_SPEC = {
     updaterReopenAfterUpgrade: {
         def: true
     },
+    updaterUpgradeInWindow: {
+        def: false
+    },
     updaterIgnoredPackages: {
         def: []
-    },
-    displayNameMode: {
-        def: "system"
     },
     screenPreferences: {
         def: {}
@@ -1453,6 +1467,9 @@ var LOCAL_SPEC = {
                 scrollEnabled: true,
                 scrollXBehavior: "column",
                 scrollYBehavior: "workspace",
+                middleClickAction: "none",
+                rightClickAction: "none",
+                clickActionFollowMouse: false,
                 shadowIntensity: 0,
                 shadowOpacity: 60,
                 shadowColorMode: "default",
@@ -1546,6 +1563,12 @@ var LOCAL_SPEC = {
     },
     frameBarInsetPadding: {
         def: -1
+    },
+    nightModeExcludeFullscreen: {
+        def: false
+    },
+    nightModeExcludedApps: {
+        def: []
     }
 };
 

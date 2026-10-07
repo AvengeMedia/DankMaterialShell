@@ -36,6 +36,7 @@ var ISLAND_DEFAULTS = {
     islandNotificationExpand: false,
     islandNotificationPopups: false,
     islandSystemOsd: true,
+    islandChargingPulse: true,
     islandHomeCompactTight: false,
     islandHomeClockDisplay: "both",
     islandHomeVolumeDisplay: "both",
@@ -77,6 +78,8 @@ var DEFAULTS = {
     },
     workspaceSwitcher: {
         workspaceIndicatorStyle: "pills",
+        workspaceIndicatorRoundness: -1,
+        workspaceIndicatorCompact: false,
         showWorkspaceIndex: false,
         showWorkspaceName: false,
         showWorkspacePadding: false,
@@ -127,6 +130,8 @@ var DEFAULTS = {
     music: {
         mediaSize: 1,
         mediaAdaptiveWidthEnabled: true,
+        mediaShowLyrics: true,
+        mediaShowCoverArt: true,
         audioScrollMode: "volume"
     },
     focusedWindow: {

@@ -1,9 +1,10 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
-DankOSD {
+DOSD {
     id: root
 
     osdKind: "audioOutput"

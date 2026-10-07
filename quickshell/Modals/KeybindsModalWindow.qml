@@ -2,9 +2,10 @@ import QtQuick
 import qs.Common
 import qs.Modals
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
-DankFloatingWindow {
+DFloatingWindow {
     id: win
 
     property alias shouldBeVisible: win.visible
@@ -47,7 +48,7 @@ DankFloatingWindow {
         anchors.fill: parent
         spacing: 0
 
-        DankWindowHeader {
+        DWindowHeader {
             id: titleBar
             width: parent.width
             z: 10
@@ -55,7 +56,7 @@ DankFloatingWindow {
             title: KeybindsService.cheatsheet.title || I18n.tr("Keybinds")
             onCloseRequested: win.hide()
 
-            DankActionButton {
+            DActionButton {
                 iconName: "close_fullscreen"
                 buttonSize: Theme.buttonHeightXXS
                 iconSize: Theme.iconSizeSmall

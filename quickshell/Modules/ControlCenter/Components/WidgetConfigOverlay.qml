@@ -5,11 +5,12 @@ import Quickshell
 import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
-import qs.Modules.DankBar.Widgets
-import qs.Modules.DankDash
+import qs.Modules.DBar.Widgets
+import qs.Modules.DDash
 import "../utils/widgets.js" as WidgetUtils
 import "../../../Common/QmlUtils.js" as QmlUtils
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Item {
@@ -69,7 +70,7 @@ Item {
         WidgetUtils.setOption(widgetIndex, key, value);
     }
 
-    DankContextMenu {
+    DContextMenu {
         id: contextMenu
         layerNamespace: "dms:control-center-widget-options"
         minMenuWidth: CcMetrics.configMenuWidth
@@ -129,7 +130,7 @@ Item {
                     visible: root.isIdleInhibitor
                     iconName: "timer"
                     title: I18n.tr("Duration")
-                    body: DankDropdown {
+                    body: DDropdown {
                         readonly property var presets: IdleInhibitPresets.presetOptions
 
                         compactMode: true

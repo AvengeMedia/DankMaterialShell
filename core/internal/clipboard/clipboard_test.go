@@ -23,8 +23,8 @@ func TestFileOffers(t *testing.T) {
 	}, FileOffers("/exported/shot.png", "/home/u/shot.png", pngData))
 
 	assert.Equal(t, []wlclipboard.Offer{
-		{MimeType: "x-special/gnome-copied-files", Data: []byte("copy\nfile:///tmp/notes.txt")},
-		{MimeType: "text/uri-list", Data: []byte("file:///tmp/notes.txt\r\n")},
-		{MimeType: "text/plain", Data: []byte("/tmp/notes.txt")},
-	}, FileOffers("/tmp/notes.txt", "/tmp/notes.txt", []byte("hello")))
+		{MimeType: "x-special/gnome-copied-files", Data: []byte("copy\nfile:///tmp/my%20notes%23.txt")},
+		{MimeType: "text/uri-list", Data: []byte("file:///tmp/my%20notes%23.txt\r\n")},
+		{MimeType: "text/plain", Data: []byte("/tmp/my notes#.txt")},
+	}, FileOffers("/tmp/my notes#.txt", "/tmp/my notes#.txt", []byte("hello")))
 }

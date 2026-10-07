@@ -10,6 +10,7 @@ Loader {
     property var overflowAnchor: null
     property var overflowSurface: null
     property bool live: true
+    property real allottedPrimarySize: 0
     property string instanceId: widgetData?.id ?? widgetId
     readonly property string registrationId: (surfaceContext?.kind ?? "bar") + ":" + (surfaceContext?.configId ?? barConfig?.id ?? "") + ":" + section + ":" + instanceId
     property int occurrenceOrder: 0
@@ -83,7 +84,7 @@ Loader {
     }
 
     Instantiator {
-        model: ["parentScreen", "section", "widgetThickness", "barThickness", "barSpacing", "barConfig", "blurBarWindow", "axis", "widgetData", "isFirst", "isLast", "sectionSpacing", "sectionAvailablePrimarySize", "isLeftBarEdge", "isRightBarEdge", "isTopBarEdge", "isBottomBarEdge", "crossEdgeExtension", "segmentRole", "surfaceContext", "hostContext"]
+        model: ["parentScreen", "section", "widgetThickness", "barThickness", "barSpacing", "barConfig", "blurBarWindow", "axis", "widgetData", "isFirst", "isLast", "sectionSpacing", "sectionAvailablePrimarySize", "isLeftBarEdge", "isRightBarEdge", "isTopBarEdge", "isBottomBarEdge", "crossEdgeExtension", "segmentRole", "surfaceContext", "hostContext", "allottedPrimarySize"]
         delegate: Binding {
             required property string modelData
             target: root.item

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"io"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -89,7 +90,7 @@ func CopyMulti(offers []wlclipboard.Offer, foreground, pasteOnce bool) error {
 
 // FileOffers builds the offers for copying a file; uriPath may differ from path when the file was exported for flatpak.
 func FileOffers(uriPath, path string, data []byte) []wlclipboard.Offer {
-	fileURI := "file://" + uriPath
+	fileURI := (&url.URL{Scheme: "file", Path: uriPath}).String()
 	offers := []wlclipboard.Offer{
 		{MimeType: "x-special/gnome-copied-files", Data: []byte("copy\n" + fileURI)},
 		{MimeType: "text/uri-list", Data: []byte(fileURI + "\r\n")},

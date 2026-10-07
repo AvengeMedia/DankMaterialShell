@@ -170,6 +170,7 @@ type RegionSelector struct {
 
 	running   bool
 	cancelled bool
+	copyOnly  bool
 	result    Region
 
 	capturedBuffer *ShmBuffer
@@ -294,6 +295,7 @@ func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
 		YInverted: yInverted,
 		Format:    format,
 		Scale:     scale,
+		CopyOnly:  r.copyOnly,
 	}, false, nil
 }
 
@@ -754,7 +756,7 @@ func (r *RegionSelector) setNativeCursor(serial uint32) {
 		shape = cursorShapeForHandle(r.resizingHandle)
 	} else if r.movingSelection && r.selection.dragging {
 		shape = uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeGrabbing)
-	} else if r.ctrlHeld && r.selection.hasSelection {
+	} else if r.ctrlHeld && r.selection.hasSelection && !r.selection.dragging {
 		if r.activeSurface != nil && r.activeSurface.output != nil {
 			pointerGlobalX := r.pointerX + float64(r.activeSurface.output.x)
 			pointerGlobalY := r.pointerY + float64(r.activeSurface.output.y)
@@ -762,7 +764,7 @@ func (r *RegionSelector) setNativeCursor(serial uint32) {
 		} else {
 			shape = uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeGrab)
 		}
-	} else if r.ctrlHeld {
+	} else if r.ctrlHeld && !r.selection.dragging {
 		shape = uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeGrab)
 	}
 	if r.cursorDevice == nil {
@@ -1040,7 +1042,7 @@ func (r *RegionSelector) renderSurface(os *OutputSurface) {
 		slot.overlay, os.shown = nil, nil
 	default:
 		cur := r.overlayFor(os, slot.shm)
-		handles := (r.resizingHandle != handleNone || r.ctrlHeld) && r.selection.hasSelection && r.phase != phaseScroll
+		handles := (r.resizingHandle != handleNone || (r.ctrlHeld && !r.selection.dragging)) && r.selection.hasSelection && r.phase != phaseScroll
 		shift := r.shiftHeld && r.selection.hasSelection
 		switch {
 		case !slot.cacheValid(srcBuf, r.selection.dragging, r.showCapturedCursor, r.phase, handles, shift):

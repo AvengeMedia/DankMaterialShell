@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import Quickshell.Services.UPower
 import qs.Common
 import qs.Services
@@ -15,14 +14,16 @@ Singleton {
     signal statsUpdated
 
     property int refCount: 0
-    readonly property bool powerSaver: PowerProfileWatcher.currentProfile === PowerProfile.PowerSaver
-    property int updateInterval: refCount > 0 ? (powerSaver ? 6000 : 3000) : (powerSaver ? 60000 : 30000)
+    readonly property bool powerSaver: pollingActive && PowerProfileWatcher.currentProfile === PowerProfile.PowerSaver
+    property int updateInterval: powerSaver ? 6000 : 3000
     property bool isUpdating: false
     property bool pendingUpdate: false
     property int subscriptionGeneration: 0
     readonly property bool pollingActive: dgopAvailable && refCount > 0 && enabledModules.length > 0
     readonly property bool dgopAvailable: DMSService.isConnected && DMSService.capabilities.includes("dgop")
     property bool sessionGpuIdsSeeded: false
+    property bool _metaWanted: false
+    property bool _metaLoaded: false
 
     property var moduleRefCounts: ({})
     property var enabledModules: []
@@ -97,7 +98,17 @@ Singleton {
             "write": []
         })
 
+    function ensureMeta() {
+        _metaWanted = true;
+        if (_metaLoaded || !dgopAvailable)
+            return;
+        _metaLoaded = true;
+        initializeSystemMetadata();
+        initializeGpuMetadata();
+    }
+
     function addRef(modules = null) {
+        ensureMeta();
         refCount++;
         let modulesChanged = false;
 
@@ -205,6 +216,7 @@ Singleton {
     }
 
     function addGpuPciId(pciId) {
+        ensureMeta();
         const currentCount = gpuPciIdRefCounts[pciId] || 0;
         gpuPciIdRefCounts[pciId] = currentCount + 1;
 
@@ -395,7 +407,7 @@ Singleton {
             cpuCores = cpu.count || 1;
             cpuModel = cpu.model || "";
             perCoreCpuUsage = cpu.coreUsage || [];
-            addToHistory(cpuHistory, cpuUsage);
+            cpuHistory = appendHistory(cpuHistory, cpuUsage);
 
             if (cpu.cursor) {
                 cpuCursor = cpu.cursor;
@@ -425,7 +437,7 @@ Singleton {
             totalSwapKB = mem.swaptotal || 0;
             usedSwapKB = (mem.swaptotal || 0) - (mem.swapfree || 0);
 
-            addToHistory(memoryHistory, memoryUsage);
+            memoryHistory = appendHistory(memoryHistory, memoryUsage);
         }
 
         if (hasModule("network") && data.network && Array.isArray(data.network)) {
@@ -444,8 +456,10 @@ Singleton {
                 const txDiff = totalTx - lastNetworkStats.tx;
                 networkRxRate = Math.max(0, rxDiff / timeDiff);
                 networkTxRate = Math.max(0, txDiff / timeDiff);
-                addToHistory(networkHistory.rx, networkRxRate / 1024);
-                addToHistory(networkHistory.tx, networkTxRate / 1024);
+                networkHistory = {
+                    rx: appendHistory(networkHistory.rx, networkRxRate / 1024),
+                    tx: appendHistory(networkHistory.tx, networkTxRate / 1024)
+                };
             }
             lastNetworkStats = {
                 "time": sampleTime,
@@ -470,8 +484,10 @@ Singleton {
                 const writeDiff = totalWrite - lastDiskStats.write;
                 diskReadRate = Math.max(0, readDiff / timeDiff);
                 diskWriteRate = Math.max(0, writeDiff / timeDiff);
-                addToHistory(diskHistory.read, diskReadRate / (1024 * 1024));
-                addToHistory(diskHistory.write, diskWriteRate / (1024 * 1024));
+                diskHistory = {
+                    read: appendHistory(diskHistory.read, diskReadRate / (1024 * 1024)),
+                    write: appendHistory(diskHistory.write, diskWriteRate / (1024 * 1024))
+                };
             }
             lastDiskStats = {
                 "time": sampleTime,
@@ -570,11 +586,9 @@ Singleton {
         statsUpdated();
     }
 
-    function addToHistory(array, value) {
-        array.push(value);
-        if (array.length > historySize) {
-            array.splice(0, array.length - historySize);
-        }
+    function appendHistory(history, value) {
+        const next = history.concat([value]);
+        return next.length > historySize ? next.slice(next.length - historySize) : next;
     }
 
     function formatSystemMemory(memoryKB) {
@@ -694,11 +708,13 @@ Singleton {
     }
 
     onDgopAvailableChanged: {
-        if (!dgopAvailable)
+        if (!dgopAvailable) {
+            _metaLoaded = false;
             return;
+        }
 
-        initializeSystemMetadata();
-        initializeGpuMetadata();
+        if (_metaWanted)
+            ensureMeta();
         initializeDiskMounts();
 
         if (!sessionGpuIdsSeeded && SessionData.enabledGpuPciIds && SessionData.enabledGpuPciIds.length > 0) {
@@ -707,48 +723,5 @@ Singleton {
                 addGpuPciId(pciId);
             }
         }
-    }
-
-    Process {
-        id: osReleaseProcess
-        command: ["cat", "/etc/os-release"]
-        running: false
-        onExited: exitCode => {
-            if (exitCode !== 0) {
-                log.warn("Failed to read /etc/os-release");
-            }
-        }
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (text.trim()) {
-                    try {
-                        const lines = text.trim().split('\n');
-                        let prettyName = "";
-                        let name = "";
-
-                        for (const line of lines) {
-                            const trimmedLine = line.trim();
-                            if (trimmedLine.startsWith('PRETTY_NAME=')) {
-                                prettyName = trimmedLine.substring(12).replace(/^["']|["']$/g, '');
-                            } else if (trimmedLine.startsWith('NAME=')) {
-                                name = trimmedLine.substring(5).replace(/^["']|["']$/g, '');
-                            }
-                        }
-
-                        // Prefer PRETTY_NAME, fallback to NAME
-                        const distroName = prettyName || name || "Linux";
-                        distribution = distroName;
-                        log.info("Detected distribution:", distroName);
-                    } catch (e) {
-                        log.warn("Failed to parse /etc/os-release:", e);
-                        distribution = "Linux";
-                    }
-                }
-            }
-        }
-    }
-
-    Component.onCompleted: {
-        osReleaseProcess.running = true;
     }
 }

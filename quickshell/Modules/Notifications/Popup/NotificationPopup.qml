@@ -6,7 +6,9 @@ import Quickshell.Services.Notifications
 import qs.Common
 import qs.Modules.Notifications
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
+import qs.DCommon.Common as DCommon
 
 PanelWindow {
     id: win
@@ -667,7 +669,7 @@ PanelWindow {
             anchors.fill: parent
             anchors.margins: content.cardInset
             radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : NotificationMetrics.popupRadius
-            color: Theme.notificationFloatingSurface
+            color: "transparent"
 
             HoverHandler {
                 id: cardHoverHandler
@@ -690,7 +692,7 @@ PanelWindow {
                 radius: cardSurface.radius
                 color: "transparent"
 
-                DankFlickable {
+                DFlickable {
                     anchors.fill: parent
                     anchors.bottomMargin: win.timeoutRailClearance
                     contentHeight: notificationCard.targetHeight
@@ -708,10 +710,11 @@ PanelWindow {
                         bodyInvokesAction: win.bodyClickInvokesAction
                         persistImage: true
                         showClose: true
+                        revealControls: win.hovered || win.contextMenuActive
                         dismissText: I18n.tr("Clear")
                         animateHeight: false
                         outerRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : NotificationMetrics.popupRadius
-                        color: Theme.notificationFloatingSurface
+                        color: "transparent"
                         onExpandRequested: win.descriptionExpanded = !win.descriptionExpanded
                         onCloseRequested: win.dismissPopupReliably()
                         onDismissRequested: {
@@ -890,7 +893,7 @@ PanelWindow {
         ]
     }
 
-    DankAnim {
+    DCommon.DAnim {
         id: enterAnimation
         target: win
         property: "presentationProgress"
@@ -906,7 +909,7 @@ PanelWindow {
     SequentialAnimation {
         id: exitAnim
 
-        DankAnim {
+        DCommon.DAnim {
             target: win
             property: "presentationProgress"
             to: 0
@@ -914,7 +917,7 @@ PanelWindow {
             easing.bezierCurve: NotificationMetrics.exitCurve
         }
 
-        DankAnim {
+        DCommon.DAnim {
             target: win
             property: "chromeRelease"
             to: 1
@@ -996,6 +999,7 @@ PanelWindow {
             appName: notificationData?.appName ?? ""
             desktopEntry: notificationData?.desktopEntry ?? ""
             dismissText: notificationCard.dismissText
+            notification: notificationData
             onAppMuted: {
                 if (notificationData && !win.exiting)
                     NotificationService.dismissNotification(notificationData);

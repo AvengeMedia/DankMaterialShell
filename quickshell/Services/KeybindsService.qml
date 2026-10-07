@@ -132,10 +132,29 @@ Singleton {
         }
     }
 
+    property int _consumers: 0
+    property bool _bindsStale: false
+
+    function addRef() {
+        _consumers++;
+        if (!_bindsStale)
+            return;
+        _bindsStale = false;
+        loadBinds(false);
+    }
+
+    function removeRef() {
+        _consumers = Math.max(0, _consumers - 1);
+    }
+
     Connections {
         target: NiriService
         enabled: CompositorService.isNiri
         function onConfigReloaded() {
+            if (root._consumers === 0) {
+                root._bindsStale = true;
+                return;
+            }
             Qt.callLater(root.loadBinds, false);
         }
     }

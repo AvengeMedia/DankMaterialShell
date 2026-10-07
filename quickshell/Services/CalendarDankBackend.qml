@@ -5,12 +5,16 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import qs.DCommon.Common as DCommon
 
 Item {
     id: root
     readonly property var log: Log.scoped("CalendarDankBackend")
 
     property bool enabled: false
+    property bool preferred: false
+    property int _rediscoverMisses: 0
+    readonly property int _rediscoverCap: 20
 
     property string socketPath: ""
     readonly property bool socketFound: socketPath.length > 0
@@ -40,6 +44,7 @@ Item {
 
     onEnabledChanged: {
         if (enabled) {
+            _rediscoverMisses = 0;
             if (!connected)
                 discoverProcess.running = true;
             return;
@@ -50,8 +55,14 @@ Item {
         connected = false;
     }
 
+    onConnectedChanged: {
+        if (!connected)
+            _rediscoverMisses = 0;
+    }
+
     Component.onCompleted: {
-        binaryCheck.running = true;
+        if (!enabled)
+            return;
         discoverProcess.running = true;
     }
 
@@ -86,6 +97,8 @@ Item {
                     subscribeSocket.connected = false;
                     root.socketPath = "";
                 }
+                if (!root.binaryChecked)
+                    binaryCheck.running = true;
             }
         }
     }
@@ -94,8 +107,9 @@ Item {
         id: rediscoverTimer
         interval: 3000
         repeat: true
-        running: root.enabled && !root.connected
+        running: root.enabled && !root.connected && (root.preferred || (root.binaryChecked && root.binaryExists)) && root._rediscoverMisses < root._rediscoverCap
         onTriggered: {
+            root._rediscoverMisses++;
             if (!discoverProcess.running)
                 discoverProcess.running = true;
         }
@@ -112,8 +126,10 @@ Item {
         default:
             return;
         }
-        if (enabled && !connected)
-            discoverProcess.running = true;
+        if (!enabled || connected)
+            return;
+        _rediscoverMisses = 0;
+        discoverProcess.running = true;
     }
 
     function _applySocketPath(path) {
@@ -132,7 +148,7 @@ Item {
         Qt.callLater(() => requestSocket.connected = true);
     }
 
-    DankSocket {
+    DCommon.DSocket {
         id: requestSocket
         path: root.socketPath
         connected: false
@@ -173,7 +189,7 @@ Item {
         }
     }
 
-    DankSocket {
+    DCommon.DSocket {
         id: subscribeSocket
         path: root.socketPath
         connected: false

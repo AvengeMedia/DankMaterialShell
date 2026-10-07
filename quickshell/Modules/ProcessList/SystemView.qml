@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -34,7 +34,7 @@ Item {
                 Row {
                     spacing: Theme.spacingS
 
-                    DankIcon {
+                    DIcon {
                         name: "computer"
                         size: Theme.iconSize
                         color: Theme.primary
@@ -108,7 +108,7 @@ Item {
                 Row {
                     spacing: Theme.spacingS
 
-                    DankIcon {
+                    DIcon {
                         name: "developer_board"
                         size: Theme.iconSize
                         color: Theme.secondary
@@ -130,7 +130,7 @@ Item {
                     color: Theme.outlineLight
                 }
 
-                DankListView {
+                DListView {
                     id: gpuListView
 
                     Layout.fillWidth: true
@@ -181,7 +181,7 @@ Item {
                             anchors.margins: Theme.spacingM
                             spacing: Theme.spacingM
 
-                            DankIcon {
+                            DIcon {
                                 name: "developer_board"
                                 size: Theme.iconSize + 4
                                 color: {
@@ -253,7 +253,7 @@ Item {
                                     anchors.centerIn: parent
                                     spacing: Theme.spacingXS
 
-                                    DankIcon {
+                                    DIcon {
                                         name: "thermostat"
                                         size: 16
                                         color: {
@@ -341,7 +341,7 @@ Item {
                             anchors.centerIn: parent
                             spacing: Theme.spacingM
 
-                            DankIcon {
+                            DIcon {
                                 name: "developer_board_off"
                                 size: 32
                                 color: Theme.surfaceVariantText

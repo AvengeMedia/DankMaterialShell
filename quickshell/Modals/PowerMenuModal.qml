@@ -3,9 +3,9 @@ import qs.Common
 import qs.Modals.Common
 import qs.Services
 import qs.Modules.PowerMenu
-import qs.DankCommon.Session
+import qs.DCommon.Session
 
-DankModal {
+DModal {
     id: root
 
     layerNamespace: "dms:power-menu"

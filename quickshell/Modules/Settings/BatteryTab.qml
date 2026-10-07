@@ -2,9 +2,9 @@ import QtQuick
 import Quickshell.Io
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
-import qs.Modules.DankBar.Popouts
+import qs.Modules.DBar.Popouts
 
 Item {
     id: root
@@ -24,7 +24,10 @@ Item {
     readonly property string thresholdFileList: "charge_control_limit_max charge_stop_threshold charge_control_end_threshold"
     readonly property int noThresholdExitCode: 2
 
-    property bool chargeLimitSupported: true
+    property bool chargeLimitSupported: Qt.platform.os === "linux"
+
+    Component.onCompleted: BatteryService.addRef()
+    Component.onDestruction: BatteryService.removeRef()
 
     Process {
         id: thresholdProbe
@@ -86,7 +89,7 @@ done
                         width: parent.width
                         spacing: Theme.spacingM
 
-                        DankIcon {
+                        DIcon {
                             name: BatteryService.getBatteryIcon()
                             size: Theme.iconSizeLarge
                             color: root.batteryStatusColor
@@ -273,7 +276,7 @@ done
                         height: 1
                     }
 
-                    DankButton {
+                    DButton {
                         id: applyButton
                         text: I18n.tr("Apply to hardware")
                         iconName: "lock"

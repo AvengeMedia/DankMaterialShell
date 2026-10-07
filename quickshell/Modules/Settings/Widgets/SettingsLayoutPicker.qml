@@ -3,7 +3,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import qs.Common
-import qs.Modules.DankBar
+import qs.Modules.DBar
+import qs.DCommon.Widgets
 import qs.Widgets
 
 GridLayout {
@@ -12,12 +13,15 @@ GridLayout {
     property bool edgePlacement: false
     property bool widgetStyle: false
     property bool barLength: false
+    property bool indicatorStyle: false
+    property real indicatorRoundness: -1
+    property bool indicatorCompact: false
     property bool vertical: false
     property var choices: barModes
     property string selectedKey: activeBarMode
     signal selected(string key)
     onSelected: key => {
-        if (!edgePlacement && !widgetStyle && !barLength)
+        if (!edgePlacement && !widgetStyle && !barLength && !indicatorStyle)
             applyBarMode(key);
     }
 
@@ -168,6 +172,33 @@ GridLayout {
                                 joinedStart: style === "segments" && index > 0
                                 joinedEnd: style === "segments" && index < 2
                                 color: index === 1 ? Theme.primary : Theme.primaryContainer
+                            }
+                        }
+                    }
+
+                    Row {
+                        id: indicatorPreview
+                        readonly property real thickness: Theme.iconSizeLarge
+                        readonly property string style: modeCard.modelData.key
+                        visible: root.indicatorStyle
+                        anchors.centerIn: parent
+                        spacing: Theme.spacingXS
+                        scale: Math.min(1, (screenPreview.width - screenPreview.edgePad * 2 - Theme.spacingS) / Math.max(1, implicitWidth))
+
+                        Repeater {
+                            model: 3
+                            BarPillSurface {
+                                required property int index
+                                readonly property bool active: index === 1
+                                readonly property bool outlined: indicatorPreview.style === "cards" && !active
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: indicatorPreview.thickness * BarMetrics.indicatorRatio(indicatorPreview.style, active ? "active" : "compact", root.indicatorCompact)
+                                height: indicatorPreview.thickness * BarMetrics.indicatorRatio(indicatorPreview.style, active ? "activeSlim" : "slim", root.indicatorCompact)
+                                thickness: Math.min(width, height)
+                                radiusOverride: BarMetrics.indicatorRadius(indicatorPreview.style, thickness, root.indicatorRoundness)
+                                color: outlined ? "transparent" : active ? Theme.primary : Theme.primaryContainer
+                                border.width: outlined ? Theme.outlineWidth : 0
+                                border.color: Theme.primaryContainer
                             }
                         }
                     }

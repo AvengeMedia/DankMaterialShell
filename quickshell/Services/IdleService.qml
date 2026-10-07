@@ -24,8 +24,6 @@ Singleton {
     readonly property int postLockMonitorTimeout: isOnBattery ? SettingsData.batteryPostLockMonitorTimeout : SettingsData.acPostLockMonitorTimeout
     readonly property bool postLockMonitorActive: isShellLocked && postLockMonitorTimeout > 0
 
-    readonly property bool mediaPlaying: MprisController.activePlayer !== null && MprisController.activePlayer.isPlaying
-
     onEnabledChanged: _applyMonitorEnableds()
     onPostLockMonitorActiveChanged: _applyMonitorEnableds()
     onMonitorTimeoutChanged: _rearmIdleMonitors()

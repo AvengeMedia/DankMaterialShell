@@ -5,10 +5,11 @@ import Quickshell
 import qs.Common
 import qs.Modals.FileBrowser
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import "../../Common/Format.js" as Format
 import "../../Common/ThemePalette.js" as ThemePalette
+import "../../DCommon/Common/MaterialWallpaper.js" as Art
 
 Column {
     id: root
@@ -24,6 +25,12 @@ Column {
         SessionData.monitorWallpapers;
         return perMonitor ? SessionData.getMonitorWallpaper(selectedScreen) : SessionData.wallpaperPath;
     }
+    readonly property var materialTarget: SessionData.materialWallpaperTarget(selectedScreen)
+    readonly property var materialEntry: SessionData.materialWallpaperEntry(materialTarget)
+    readonly property bool materialWallpaper: currentWallpaper === ""
+    readonly property bool dynamicTheme: Theme.currentTheme === Theme.dynamic
+    readonly property var selectedDisplay: Quickshell.screens.find(screen => screen.name === selectedScreen) ?? Quickshell.screens[0]
+    readonly property real displayAspectRatio: selectedDisplay ? selectedDisplay.width / selectedDisplay.height : Art.designWidth / Art.designHeight
     readonly property bool hasWallpaper: currentWallpaper !== ""
     readonly property bool wallpaperIsImage: hasWallpaper && !currentWallpaper.startsWith("#")
     readonly property bool cyclingEnabled: {
@@ -120,20 +127,25 @@ Column {
     }
 
     function clearWallpaper() {
-        if (perMonitor) {
-            SessionData.setMonitorWallpaper(selectedScreen, "");
-            SessionData.setMonitorCyclingFolderPath(selectedScreen, "");
+        SessionData.setMaterialWallpaper(materialTarget, materialEntry);
+    }
+
+    function selectSeed(seed) {
+        if (!SessionData.setMaterialWallpaperSeed(materialTarget, seed))
             return;
-        }
-        if (perMode) {
-            SessionData.setWallpaperForMode("", SessionData.isLightMode);
+        SettingsData.setMatugenSeedColor("");
+    }
+
+    function pickSeed() {
+        const picker = PopoutService.colorPickerModal;
+        if (!picker)
             return;
-        }
-        if (Theme.currentTheme === Theme.dynamic)
-            Theme.switchTheme("blue");
-        SessionData.clearWallpaper();
-        SessionData.wallpaperCyclingFolderPath = "";
-        SessionData.saveSettings();
+        picker.selectedColor = materialEntry.seed;
+        picker.pickerTitle = I18n.tr("Seed color", "color picker title, the color the dynamic palette is built from");
+        picker.onColorSelectedCallback = function (color) {
+            root.selectSeed(Theme.withAlpha(color, 1).toString());
+        };
+        picker.show();
     }
 
     ConfigInclude {
@@ -197,6 +209,9 @@ Column {
                     id: thumb
                     width: hero.thumbWidth
                     path: root.currentWallpaper
+                    height: width / root.displayAspectRatio
+                    showMaterial: true
+                    materialComposition: SessionData.getMonitorMaterialWallpaper(root.selectedScreen)
                     onBrowse: root.openBrowser()
                     onPickColor: root.pickColor()
                     onClear: root.clearWallpaper()
@@ -210,7 +225,7 @@ Column {
                     width: hero.stacked ? hero.width : hero.width - hero.thumbWidth - hero.spacing
                     spacing: Theme.spacingM
 
-                    DankButtonGroup {
+                    DButtonGroup {
                         id: modeGroup
                         arrowKeysSelect: false
                         width: parent.width
@@ -269,7 +284,7 @@ Column {
                             paddingV: Theme.spacingM
                             onClicked: keyboard => root.parentModal?.navigateTo("theme", keyboard)
 
-                            leading: DankPaletteSwatch {
+                            leading: DPaletteSwatch {
                                 width: SettingsMetrics.heroLeadingSize
                                 height: width
                                 primaryColor: root.themePalette.primary
@@ -288,6 +303,23 @@ Column {
         tags: ["background", "image", "picture", "fill", "cycling", "transition", "monitor", "display"]
         title: I18n.tr("Wallpaper")
         settingKey: "wallpaperOptions"
+
+        SettingsRow {
+            tab: "wallpaper"
+            settingKey: "materialPresets"
+            tags: ["material", "shape", "preset", "dank", "bloom", "orbit", "garden", "petal", "dune"]
+            visible: root.materialWallpaper
+            title: I18n.tr("Material", "wallpaper type")
+            subtitle: I18n.tr("Shown while no image or color is set", "Material wallpaper presets description")
+            modified: root.materialEntry.preset !== Art.defaultPreset
+            onResetRequested: SessionData.setMaterialWallpaperPreset(root.materialTarget, Art.defaultPreset)
+            body: MaterialWallpaperPresets {
+                preset: root.materialEntry.preset
+                seed: root.materialEntry.seed
+                aspectRatio: root.displayAspectRatio
+                onSelected: preset => SessionData.setMaterialWallpaperPreset(root.materialTarget, preset)
+            }
+        }
 
         SettingsDropdownRow {
             id: fillModeRow
@@ -367,7 +399,6 @@ Column {
             tab: "wallpaper"
             tags: ["per-mode", "light", "dark", "theme"]
             settingKey: "perModeWallpaper"
-            visible: SessionData.wallpaperPath !== ""
             text: I18n.tr("Separate light and dark")
             checked: SessionData.perModeWallpaper
             onToggled: toggled => SessionData.setPerModeWallpaper(toggled)
@@ -377,10 +408,18 @@ Column {
             tab: "wallpaper"
             tags: ["per-monitor", "multi-monitor", "display", "monitor"]
             settingKey: "perMonitorWallpaper"
-            visible: SessionData.wallpaperPath !== ""
             text: I18n.tr("Separate per display")
             checked: SessionData.perMonitorWallpaper
             onToggled: toggled => SessionData.setPerMonitorWallpaper(toggled)
+        }
+
+        SettingsRow {
+            visible: root.perMonitor
+            title: I18n.tr("Use default wallpaper", "inherit the global wallpaper on this display")
+            DButton {
+                text: I18n.tr("Reset")
+                onClicked: SessionData.setMonitorWallpaper(root.selectedScreen, "")
+            }
         }
 
         SettingsDropdownRow {
@@ -479,7 +518,7 @@ Column {
                     color: Theme.surfaceText
                 }
 
-                DankFilterChips {
+                DFilterChips {
                     width: parent.width
                     multiSelect: true
                     model: SessionData.availableWallpaperTransitions.filter(t => t !== "none").map(t => ({
@@ -520,6 +559,171 @@ Column {
             text: I18n.tr("Blur on overview")
             checked: SettingsData.blurWallpaperOnOverview
             onToggled: checked => SettingsData.set("blurWallpaperOnOverview", checked)
+        }
+    }
+
+    SettingsCard {
+        tab: "wallpaper"
+        tags: ["material", "seed", "color", "palette", "hue", "matugen", "dynamic", "theme"]
+        title: I18n.tr("Theme color", "Material wallpaper seed card")
+        settingKey: "materialSeed"
+        visible: root.materialWallpaper
+
+        SettingsNoteRow {
+            visible: !Theme.matugenAvailable
+            text: I18n.tr("Install matugen package for dynamic theming", "matugen installation hint")
+        }
+
+        SettingsRow {
+            visible: Theme.matugenAvailable && !root.dynamicTheme
+            title: I18n.tr("Dynamic theme is off", "Material seed card status")
+            subtitle: I18n.tr("Shapes use the %1 theme's colors", "Material seed card status, %1 is a theme name").arg(Theme.currentThemeLabel)
+            DButton {
+                text: I18n.tr("Use Dynamic", "switch the shell theme to the dynamic palette")
+                onClicked: Theme.switchTheme(Theme.dynamic)
+            }
+        }
+
+        SettingsRow {
+            visible: root.dynamicTheme && SettingsData.matugenSeedColor !== ""
+            title: I18n.tr("A custom seed color overrides this", "Material seed card status")
+            subtitle: I18n.tr("Set under Theme & colors, Derived color", "Material seed card status")
+            leading: DColorSwatch {
+                width: SettingsMetrics.heroLeadingSize
+                height: width
+                swatchColor: SettingsData.matugenSeedColor
+            }
+            DButton {
+                text: I18n.tr("Remove override", "clear the custom matugen seed color")
+                onClicked: SettingsData.setMatugenSeedColor("")
+            }
+        }
+
+        SettingsRow {
+            tab: "wallpaper"
+            tags: ["seed", "hue", "color", "material", "palette"]
+            settingKey: "materialSeedColor"
+            visible: root.dynamicTheme
+            enabled: Theme.matugenAvailable
+            title: I18n.tr("Seed color", "color picker title, the color the dynamic palette is built from")
+            subtitle: I18n.tr("The shell palette is built from this color. Shapes take their colors from that palette.", "Material seed picker description")
+            modified: root.materialEntry.seed !== Art.defaultSeed
+            onResetRequested: root.selectSeed(Art.defaultSeed)
+            DActionButton {
+                iconName: "colorize"
+                iconColor: Theme.primary
+                backgroundColor: SettingsMetrics.controlColor
+                enabled: Theme.matugenAvailable
+                Accessible.name: I18n.tr("Custom color")
+                tooltipText: Accessible.name
+                onClicked: root.pickSeed()
+            }
+            body: MaterialSeedPicker {
+                id: seedPicker
+                seed: root.materialEntry.seed
+                enabled: Theme.matugenAvailable
+                onSeedSelected: seed => root.selectSeed(seed)
+            }
+        }
+
+        SettingsSliderRow {
+            tab: "wallpaper"
+            tags: ["hue", "seed", "color", "material", "warm", "cool"]
+            settingKey: "materialSeedHue"
+            visible: root.dynamicTheme
+            enabled: Theme.matugenAvailable
+            text: I18n.tr("Hue", "Hue angle in the color picker")
+            description: I18n.tr("Fine-tune the seed around the color wheel", "Material seed hue slider description")
+            minimum: 0
+            maximum: 359
+            unit: "°"
+            value: Math.round(Art.hueOf(root.materialEntry.seed)) % 360
+            onSliderDragFinished: finalValue => root.selectSeed(Art.seedForHue(finalValue, root.materialEntry.seed))
+            trackGradient: Gradient {
+                orientation: Gradient.Horizontal
+                GradientStop {
+                    position: 0
+                    color: Art.seedForHue(0)
+                }
+                GradientStop {
+                    position: 1 / 12
+                    color: Art.seedForHue(30)
+                }
+                GradientStop {
+                    position: 2 / 12
+                    color: Art.seedForHue(60)
+                }
+                GradientStop {
+                    position: 3 / 12
+                    color: Art.seedForHue(90)
+                }
+                GradientStop {
+                    position: 4 / 12
+                    color: Art.seedForHue(120)
+                }
+                GradientStop {
+                    position: 5 / 12
+                    color: Art.seedForHue(150)
+                }
+                GradientStop {
+                    position: 6 / 12
+                    color: Art.seedForHue(180)
+                }
+                GradientStop {
+                    position: 7 / 12
+                    color: Art.seedForHue(210)
+                }
+                GradientStop {
+                    position: 8 / 12
+                    color: Art.seedForHue(240)
+                }
+                GradientStop {
+                    position: 9 / 12
+                    color: Art.seedForHue(270)
+                }
+                GradientStop {
+                    position: 10 / 12
+                    color: Art.seedForHue(300)
+                }
+                GradientStop {
+                    position: 11 / 12
+                    color: Art.seedForHue(330)
+                }
+                GradientStop {
+                    position: 1
+                    color: Art.seedForHue(360)
+                }
+            }
+        }
+
+        SettingsRow {
+            visible: root.dynamicTheme && MatugenPreviewService.seedPreviewFailed
+            title: I18n.tr("Color previews unavailable", "Material seed card status")
+            subtitle: I18n.tr("Swatches show the seed color itself", "Material seed card status")
+            DButton {
+                text: I18n.tr("Retry")
+                onClicked: seedPicker.retry()
+            }
+        }
+
+        SettingsNavRow {
+            tab: "wallpaper"
+            tags: ["scheme", "palette", "vibrant", "neutral", "expressive", "matugen"]
+            settingKey: "paletteStyleNav"
+            visible: root.dynamicTheme
+            title: I18n.tr("Palette style", "matugen scheme navigation row")
+            hint: Theme.getMatugenScheme(SettingsData.matugenScheme).label
+            leading: DPaletteSwatch {
+                width: SettingsMetrics.heroLeadingSize
+                height: width
+                primaryColor: root.themePalette.primary
+                secondaryColor: root.themePalette.secondary
+                tertiaryColor: root.themePalette.tertiary
+            }
+            onClicked: keyboard => {
+                SettingsSearchService.navigateToSection("matugenScheme");
+                root.parentModal?.navigateTo("theme", keyboard);
+            }
         }
     }
 

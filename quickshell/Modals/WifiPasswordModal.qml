@@ -2,9 +2,10 @@ import QtQuick
 import qs.Common
 import qs.Modals.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
-DankModal {
+DModal {
     id: root
 
     layerNamespace: "dms:wifi-password"
@@ -164,15 +165,27 @@ DankModal {
 
         open();
         Qt.callLater(() => {
-            if (reason === "wrong-password" && fieldsInfo.length === 0) {
-                passwordInput.text = "";
-            }
+            if (reason === "wrong-password")
+                shakeSecretFields();
             focusFirstField();
         });
     }
 
     function hide() {
         close();
+    }
+
+    function shakeSecretFields() {
+        if (fieldsInfo.length === 0) {
+            passwordInput.text = "";
+            passwordInput.shake();
+            return;
+        }
+        for (var i = 0; i < dynamicFieldsRepeater.count; i++) {
+            const item = dynamicFieldsRepeater.itemAt(i);
+            if (item?.morph)
+                item.shake();
+        }
     }
 
     function getFieldLabel(fieldName) {
@@ -293,7 +306,7 @@ DankModal {
         }
     }
 
-    DankDialog {
+    DDialog {
         id: contentFocusScope
 
         anchors.fill: parent
@@ -365,16 +378,13 @@ DankModal {
             }
         }
 
-        DankTextField {
+        DTextField {
             id: ssidInput
             visible: isHiddenNetwork
-            outlined: true
-            controlHeight: Theme.fieldHeightLarge
+            expressive: true
             leftIconName: "wifi"
 
             width: parent.width
-            font.pixelSize: Theme.fontSizeMedium
-            textColor: Theme.surfaceText
             labelText: I18n.tr("Network Name (SSID)")
             enabled: root.shouldBeVisible
 
@@ -385,16 +395,14 @@ DankModal {
             id: dynamicFieldsRepeater
             model: fieldsInfo
 
-            delegate: DankTextField {
+            delegate: DTextField {
                 id: fieldInput
                 required property var modelData
                 required property int index
-                outlined: true
-                controlHeight: Theme.fieldHeightLarge
+                expressive: true
+                morph: modelData.isSecret
                 leftIconName: modelData.isSecret ? "lock" : "person"
                 width: contentFocusScope.contentItem.width
-                font.pixelSize: Theme.fontSizeMedium
-                textColor: Theme.surfaceText
                 showPasswordToggle: modelData.isSecret
                 isError: modelData.isSecret && isPromptMode && promptReason === "wrong-password" && text.length === 0
                 supportingText: isError ? I18n.tr("Incorrect password") : ""
@@ -437,7 +445,7 @@ DankModal {
                     color: Theme.surfaceVariantText
                 }
 
-                DankDropdown {
+                DDropdown {
                     width: parent.width
                     dropdownWidth: parent.width
                     compactMode: true
@@ -461,7 +469,7 @@ DankModal {
                     color: Theme.surfaceVariantText
                 }
 
-                DankDropdown {
+                DDropdown {
                     width: parent.width
                     dropdownWidth: parent.width
                     compactMode: true
@@ -472,16 +480,13 @@ DankModal {
             }
         }
 
-        DankTextField {
+        DTextField {
             id: usernameInput
             visible: showUsernameField
-            outlined: true
-            controlHeight: Theme.fieldHeightLarge
+            expressive: true
             leftIconName: "person"
 
             width: parent.width
-            font.pixelSize: Theme.fontSizeMedium
-            textColor: Theme.surfaceText
             text: wifiUsernameInput
             labelText: I18n.tr("Username", "text field label for network, vpn and account forms")
             enabled: root.shouldBeVisible
@@ -490,16 +495,14 @@ DankModal {
             onAccepted: passwordInput.forceActiveFocus()
         }
 
-        DankTextField {
+        DTextField {
             id: passwordInput
             visible: showPasswordField
-            outlined: true
-            controlHeight: Theme.fieldHeightLarge
+            expressive: true
+            morph: true
             leftIconName: "lock"
 
             width: parent.width
-            font.pixelSize: Theme.fontSizeMedium
-            textColor: Theme.surfaceText
             text: wifiPasswordInput
             showPasswordToggle: true
             isError: isPromptMode && promptReason === "wrong-password" && text.length === 0
@@ -518,16 +521,13 @@ DankModal {
             }
         }
 
-        DankTextField {
+        DTextField {
             id: anonInput
             visible: showAnonField
-            outlined: true
-            controlHeight: Theme.fieldHeightLarge
+            expressive: true
             leftIconName: "person_off"
 
             width: parent.width
-            font.pixelSize: Theme.fontSizeMedium
-            textColor: Theme.surfaceText
             text: wifiAnonymousIdentityInput
             labelText: I18n.tr("Anonymous Identity (optional)")
             enabled: root.shouldBeVisible
@@ -536,16 +536,13 @@ DankModal {
             onAccepted: domainMatchInput.forceActiveFocus()
         }
 
-        DankTextField {
+        DTextField {
             id: domainMatchInput
             visible: showDomainField
-            outlined: true
-            controlHeight: Theme.fieldHeightLarge
+            expressive: true
             leftIconName: "domain"
 
             width: parent.width
-            font.pixelSize: Theme.fontSizeMedium
-            textColor: Theme.surfaceText
             text: wifiDomainInput
             labelText: I18n.tr("Domain (optional)")
             enabled: root.shouldBeVisible
@@ -554,7 +551,7 @@ DankModal {
             onAccepted: submitCredentialsAndClose()
         }
 
-        DankToggle {
+        DToggle {
             id: savePasswordCheckbox
 
             width: parent.width
@@ -565,7 +562,7 @@ DankModal {
         }
 
         actions: [
-            DankButton {
+            DButton {
                 maximumWidth: contentFocusScope.actionWidth
                 wrapText: true
                 text: I18n.tr("Cancel")
@@ -573,7 +570,7 @@ DankModal {
                 textColor: Theme.primary
                 onClicked: clearAndClose()
             },
-            DankButton {
+            DButton {
                 id: connectButton
                 maximumWidth: contentFocusScope.actionWidth
                 wrapText: true

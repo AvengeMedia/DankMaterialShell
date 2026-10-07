@@ -4,7 +4,7 @@ import qs.Modules.Notifications
 import qs.Services
 import qs.Widgets
 
-DankPopout {
+DPopout {
     id: root
 
     layerNamespace: "dms:notification-center-popout"

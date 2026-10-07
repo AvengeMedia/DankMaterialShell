@@ -12,7 +12,7 @@ import (
 var registryCmd = &cobra.Command{
 	Use:   "registry",
 	Short: "Manage plugin and theme registries",
-	Long:  "Manage the registries DMS fetches plugins and themes from. The official registry is always active; additional registries can be added by name and git URL.",
+	Long:  "Manage the registries DMS fetches plugins and themes from. The official registry is always active and additional registries can be added by name and git URL, unless the CLI policy sets disable_registries.",
 }
 
 var registryListCmd = &cobra.Command{

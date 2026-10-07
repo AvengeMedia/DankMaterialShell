@@ -7,7 +7,7 @@ import qs.Common
 import qs.Modals.Common
 import qs.Modals.FileBrowser
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../../Common/Format.js" as Format
 
 Item {
@@ -161,9 +161,7 @@ Item {
         pendingSaveContent = content;
         saveFileView.path = filePath;
 
-        Qt.callLater(() => {
-            saveFileView.setText(pendingSaveContent);
-        });
+        saveFileView.setText(content);
     }
 
     function saveExternalWithFreshnessCheck() {
@@ -345,7 +343,7 @@ Item {
                     Layout.fillWidth: true
                     spacing: Theme.spacingM
 
-                    DankIcon {
+                    DIcon {
                         Layout.alignment: Qt.AlignVCenter
                         name: "sync_problem"
                         size: Theme.iconSize - 2
@@ -363,7 +361,7 @@ Item {
                         elide: Text.ElideRight
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         Layout.alignment: Qt.AlignVCenter
                         iconName: "close"
                         Accessible.name: I18n.tr("Dismiss")
@@ -694,7 +692,7 @@ Item {
         id: confirmationDialogLoader
         active: false
 
-        DankModal {
+        DModal {
             id: confirmationDialog
 
             modalWidth: 400
@@ -837,7 +835,7 @@ Item {
                         }
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.topMargin: Theme.spacingM

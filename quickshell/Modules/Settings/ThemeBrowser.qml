@@ -3,7 +3,7 @@ import Quickshell
 import qs.Common
 import qs.Modals.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import "../../Common/ThemePalette.js" as ThemePalette
 
@@ -307,7 +307,7 @@ RegistryBrowserWindow {
             anchors.right: parent.right
             spacing: Theme.spacingS
 
-            DankFilterChips {
+            DFilterChips {
                 width: parent.width
                 model: [I18n.tr("All"), I18n.tr("Installed"), I18n.tr("Available")]
                 currentIndex: root.filterIndex
@@ -330,7 +330,7 @@ RegistryBrowserWindow {
                 color: Theme.error
                 wrapMode: Text.Wrap
             }
-            DankButton {
+            DButton {
                 visible: root.loadError !== ""
                 text: I18n.tr("Retry", "retry failed action button")
                 iconName: "refresh"
@@ -340,7 +340,7 @@ RegistryBrowserWindow {
     ]
 
     listContent: [
-        DankGridView {
+        DGridView {
             id: themeGrid
 
             property int columns: Math.max(1, Math.floor(width / (Theme.smallBreakpoint / 2 + Theme.spacingXL * 2)))
@@ -372,6 +372,7 @@ RegistryBrowserWindow {
                     busy: !!root.pendingThemes[cardCell.modelData.id]
                     fallbackIcon: "palette"
                     previewSource: root.themePreviewUrl(cardCell.modelData)
+                    previewFallback: ""
                     badges: root.themeBadges(cardCell.modelData)
                     palette: root.themePalette(cardCell.modelData)
                     allowUninstall: true

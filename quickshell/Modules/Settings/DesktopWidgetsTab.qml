@@ -4,7 +4,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -111,7 +111,7 @@ Item {
                     spacing: Theme.spacingS
                     width: parent.width
 
-                    DankTextField {
+                    DTextField {
                         id: newGroupField
                         outlined: true
                         leftIconName: "folder"
@@ -128,7 +128,7 @@ Item {
                         }
                     }
 
-                    DankButton {
+                    DButton {
                         id: addGroupBtn
                         iconName: "add"
                         text: I18n.tr("Add")
@@ -154,13 +154,13 @@ Item {
                     title: modelData.name
                     singleLineTitle: true
 
-                    DankActionButton {
+                    DActionButton {
                         iconName: "edit"
                         tooltipText: I18n.tr("Rename")
                         onClicked: root.openRenameDialog(groupRow.modelData)
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         iconName: "delete"
                         iconColor: Theme.error
                         tooltipText: I18n.tr("Delete")
@@ -245,20 +245,6 @@ Item {
             title: I18n.tr("Help", "noun, card title for desktop widget usage tips")
 
             SettingsRow {
-                iconName: "drag_pan"
-                iconBox: true
-                title: I18n.tr("Move", "verb, help item title for moving a desktop widget")
-                subtitle: I18n.tr("Right-click and drag anywhere on the widget")
-            }
-
-            SettingsRow {
-                iconName: "open_in_full"
-                iconBox: true
-                title: I18n.tr("Resize", "verb, help item title for resizing a desktop widget")
-                subtitle: I18n.tr("Right-click and drag the bottom-right corner")
-            }
-
-            SettingsRow {
                 iconName: "drag_indicator"
                 iconBox: true
                 title: I18n.tr("Reorder & group")
@@ -267,14 +253,21 @@ Item {
         }
 
         SettingsFabBar {
-            DankFab {
+            DFab {
                 text: I18n.tr("Browse plugins")
                 iconName: "store"
                 colorRole: "secondaryContainer"
                 onClicked: root.showDesktopPluginBrowser()
             }
 
-            DankFab {
+            DFab {
+                text: I18n.tr("Edit widgets")
+                iconName: "edit"
+                colorRole: "secondaryContainer"
+                onClicked: DesktopWidgetRegistry.editing = true
+            }
+
+            DFab {
                 text: I18n.tr("Add widget")
                 iconName: "add"
                 onClicked: root.showWidgetBrowser()

@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -195,7 +195,7 @@ Item {
                 }
             }
 
-            DankTextField {
+            DTextField {
                 id: customFormatInput
                 outlined: true
                 leftIconName: "calendar_today"
@@ -274,7 +274,7 @@ Item {
                 }
             }
 
-            DankTextField {
+            DTextField {
                 id: customLockFormatInput
                 outlined: true
                 leftIconName: "calendar_today"

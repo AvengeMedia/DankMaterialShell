@@ -12,7 +12,13 @@ Singleton {
     readonly property var log: Log.scoped("BlurService")
 
     property bool compositorSupported: false
+    property bool _probed: false
     readonly property bool available: compositorSupported
+    readonly property bool blurRequested: SettingsData.blurEnabled ?? false
+    onBlurRequestedChanged: {
+        if (blurRequested)
+            probe();
+    }
     readonly property bool enabled: available && (SettingsData.blurEnabled ?? false)
 
     // These settings predate non-blurred surface borders, so keep their keys for compatibility.
@@ -68,5 +74,15 @@ Singleton {
         }
     }
 
-    Component.onCompleted: blurProbe.running = true
+    Component.onCompleted: {
+        if (blurRequested)
+            probe();
+    }
+
+    function probe() {
+        if (_probed)
+            return;
+        _probed = true;
+        blurProbe.running = true;
+    }
 }
