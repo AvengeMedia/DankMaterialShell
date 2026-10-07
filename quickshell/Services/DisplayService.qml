@@ -63,6 +63,26 @@ Singleton {
         onTriggered: root.requestSync("startup")
     }
 
+    property int powerSyncRecoveryAttempt: 0
+    readonly property var powerSyncRecoveryIntervals: [1000, 5000, 15000, 30000]
+
+    Timer {
+        id: powerSyncRecoveryTimer
+        interval: root.powerSyncRecoveryIntervals[0]
+        repeat: false
+        onTriggered: {
+            root.requestSync("resume-reconcile");
+            root.powerSyncRecoveryAttempt++;
+            if (root.powerSyncRecoveryAttempt < root.powerSyncRecoveryIntervals.length) {
+                interval = root.powerSyncRecoveryIntervals[root.powerSyncRecoveryAttempt];
+                restart();
+                return;
+            }
+            root.powerSyncRecoveryAttempt = 0;
+            interval = root.powerSyncRecoveryIntervals[0];
+        }
+    }
+
     signal brightnessChanged(bool showOsd)
     signal deviceSwitched
 
@@ -1541,6 +1561,9 @@ Singleton {
             resumeRecoveryAttempt = 0;
             resumeRecoveryTimer.interval = 400;
             resumeRecoveryTimer.restart();
+            powerSyncRecoveryAttempt = 0;
+            powerSyncRecoveryTimer.interval = powerSyncRecoveryIntervals[0];
+            powerSyncRecoveryTimer.restart();
         }
     }
 
