@@ -360,6 +360,13 @@ function qtKeyFromName(name) {
     return named[n] || 0;
 }
 
+// Mirrors QPlatformInputContextFactory::requested(): QT_IM_MODULES wins, Qt loads the first entry that exists.
+function compositorTextInputSelected(imModules, imModule) {
+    const requested = (imModules || "").split(";").filter(Boolean);
+    const first = requested.length ? requested[0] : (imModule || "");
+    return first === "" || first === "wayland";
+}
+
 function isModifierKey(qk) {
     return qk === Qt.Key_Control || qk === Qt.Key_Shift || qk === Qt.Key_Alt || qk === Qt.Key_Meta || qk === Qt.Key_NumLock || qk === Qt.Key_CapsLock || qk === Qt.Key_ScrollLock;
 }

@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Notifications
 import qs.Modules.Notifications as Notifications
@@ -52,7 +53,8 @@ Item {
         PopoutService.closeNotificationCenter();
     }
 
-    function openContextMenu(item, x, y) {
+    function openContextMenu(item, notification) {
+        contextActions.notification = notification;
         notificationCardContextMenu.popupAnchorItem = item;
         notificationCardContextMenu.showDropdownMenu();
     }
@@ -109,7 +111,7 @@ Item {
             }
             root.invokeAction(contextActions.defaultAction(notificationData));
         }
-        onContextMenuRequested: (x, y) => root.openContextMenu(collapsedCard, x, y)
+        onContextMenuRequested: (x, y) => root.openContextMenu(collapsedCard, collapsedCard.notificationData)
     }
 
     Column {
@@ -145,7 +147,7 @@ Item {
                 anchors.rightMargin: NotificationMetrics.cardPadding
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacingXS
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
                     text: I18n.tr("Dismiss")
                     buttonHeight: NotificationMetrics.controlSize
@@ -154,7 +156,7 @@ Item {
                     textColor: Theme.primary
                     onClicked: NotificationService.dismissGroup(root.notificationGroup?.key || "")
                 }
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
                     text: (root.notificationGroup?.count || 0).toString()
                     iconName: "expand_less"
@@ -210,7 +212,7 @@ Item {
                     onDismissRequested: NotificationService.dismissNotification(row.modelData)
                     onActionRequested: action => root.invokeAction(action)
                     onBodyClicked: root.invokeAction(contextActions.defaultAction(notificationData))
-                    onContextMenuRequested: (x, y) => root.openContextMenu(message, x, y)
+                    onContextMenuRequested: (x, y) => root.openContextMenu(message, row.modelData)
                 }
 
                 SequentialAnimation {
@@ -245,7 +247,7 @@ Item {
         onAppMuted: NotificationService.dismissGroup(root.notificationGroup?.key || "")
     }
 
-    DankDropdown {
+    DDropdown {
         id: notificationCardContextMenu
         showTrigger: false
         popupWidth: NotificationMetrics.menuWidth

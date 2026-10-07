@@ -2,7 +2,7 @@ import QtCore
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -63,7 +63,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 anchors.margins: Theme.spacingL
                 spacing: Theme.spacingM
 
-                DankIcon {
+                DIcon {
                     name: "warning"
                     size: Theme.iconSize
                     color: Theme.primary
@@ -138,31 +138,17 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 reason: Math.round(Theme.windowRadius) + "px"
             }
 
-            SettingsToggleRow {
+            SettingsToggleSliderRow {
                 tags: ["niri", "border", "override", "focus-ring"]
                 settingKey: "niriLayoutBorderSizeEnabled"
                 resetKeys: ["niriLayoutBorderSize"]
                 text: I18n.tr("Override border size")
                 checked: SettingsData.niriLayoutBorderSize >= 0
-                onToggled: checked => {
-                    if (checked) {
-                        SettingsData.set("niriLayoutBorderSize", 2);
-                        return;
-                    }
-                    SettingsData.set("niriLayoutBorderSize", -1);
-                }
-            }
-
-            SettingsSliderRow {
-                tags: ["niri", "border", "override", "focus-ring"]
-                settingKey: "niriLayoutBorderSize"
-                resetKeys: []
-                text: I18n.tr("Border size")
-                visible: SettingsData.niriLayoutBorderSize >= 0
                 value: Math.max(0, SettingsData.niriLayoutBorderSize)
                 minimum: 0
                 maximum: 10
                 unit: "px"
+                onToggled: checked => SettingsData.set("niriLayoutBorderSize", checked ? 2 : -1)
                 onSliderValueChanged: newValue => SettingsData.set("niriLayoutBorderSize", newValue)
             }
 
@@ -226,7 +212,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
             id: hyprTilingCard
             width: parent.width
             tags: ["hyprland", "layout", "tiling", "dwindle", "master", "scrolling", "general:layout"]
-            title: I18n.tr("Tiling layout")
+            title: I18n.tr("Tiling layout", "Hyprland settings card title")
             settingKey: "hyprlandTilingLayout"
             iconName: "view_quilt"
             visible: CompositorService.isHyprland
@@ -250,8 +236,8 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 tags: ["hyprland", "dwindle", "preserve", "split"]
                 settingKey: "hyprlandDwindlePreserveSplit"
                 visible: SettingsData.hyprlandTilingLayout === "dwindle"
-                text: I18n.tr("Preserve split")
-                description: I18n.tr("Split direction stays fixed when the container resizes")
+                text: I18n.tr("Preserve split", "Hyprland dwindle layout toggle")
+                description: I18n.tr("Split direction stays fixed when the container resizes", "Hyprland preserve split toggle description")
                 checked: SettingsData.hyprlandDwindlePreserveSplit
                 onToggled: checked => SettingsData.set("hyprlandDwindlePreserveSplit", checked)
             }
@@ -260,8 +246,8 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 tags: ["hyprland", "dwindle", "smart", "split", "cursor"]
                 settingKey: "hyprlandDwindleSmartSplit"
                 visible: SettingsData.hyprlandTilingLayout === "dwindle"
-                text: I18n.tr("Smart split")
-                description: I18n.tr("Split direction follows the cursor position in the window")
+                text: I18n.tr("Smart split", "Hyprland dwindle layout toggle")
+                description: I18n.tr("Split direction follows the cursor position in the window", "Hyprland smart split toggle description")
                 checked: SettingsData.hyprlandDwindleSmartSplit
                 onToggled: checked => SettingsData.set("hyprlandDwindleSmartSplit", checked)
             }
@@ -270,8 +256,8 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 tags: ["hyprland", "dwindle", "force", "split", "direction"]
                 settingKey: "hyprlandDwindleForceSplit"
                 visible: SettingsData.hyprlandTilingLayout === "dwindle"
-                text: I18n.tr("Force split")
-                model: [I18n.tr("Follow mouse"), I18n.tr("Left"), I18n.tr("Right")]
+                text: I18n.tr("Force split", "Hyprland dwindle layout dropdown, which side new windows split to")
+                model: [I18n.tr("Follow mouse", "Hyprland force split option, the split side follows the pointer"), I18n.tr("Left"), I18n.tr("Right")]
                 currentIndex: SettingsData.hyprlandDwindleForceSplit
                 onSelectionChanged: (index, selected) => {
                     if (!selected)
@@ -285,7 +271,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 tags: ["hyprland", "master", "orientation", "position"]
                 settingKey: "hyprlandMasterOrientation"
                 visible: SettingsData.hyprlandTilingLayout === "master"
-                text: I18n.tr("Master position")
+                text: I18n.tr("Master position", "Hyprland master layout dropdown, where the master window sits")
                 options: [I18n.tr("Left"), I18n.tr("Right"), I18n.tr("Top"), I18n.tr("Bottom"), I18n.tr("Center")]
                 currentValue: options[Math.max(0, ids.indexOf(SettingsData.hyprlandMasterOrientation))]
                 onValueChanged: value => SettingsData.set("hyprlandMasterOrientation", ids[Math.max(0, options.indexOf(value))])
@@ -296,8 +282,8 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 tags: ["hyprland", "master", "new", "window", "status", "slave"]
                 settingKey: "hyprlandMasterNewStatus"
                 visible: SettingsData.hyprlandTilingLayout === "master"
-                text: I18n.tr("New windows")
-                model: [I18n.tr("Stack"), I18n.tr("Master", "Hyprland tiling layout name"), I18n.tr("Inherit")]
+                text: I18n.tr("New windows", "Hyprland master layout dropdown, where new windows go")
+                model: [I18n.tr("Stack", "Hyprland master layout option, new windows join the stack"), I18n.tr("Master", "Hyprland tiling layout name"), I18n.tr("Inherit")]
                 currentIndex: Math.max(0, ids.indexOf(SettingsData.hyprlandMasterNewStatus))
                 onSelectionChanged: (index, selected) => {
                     if (!selected)
@@ -310,7 +296,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 tags: ["hyprland", "master", "new", "top", "stack"]
                 settingKey: "hyprlandMasterNewOnTop"
                 visible: SettingsData.hyprlandTilingLayout === "master"
-                text: I18n.tr("New windows on top of the stack")
+                text: I18n.tr("New windows on top of the stack", "Hyprland master layout toggle")
                 checked: SettingsData.hyprlandMasterNewOnTop
                 onToggled: checked => SettingsData.set("hyprlandMasterNewOnTop", checked)
             }
@@ -319,7 +305,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 tags: ["hyprland", "master", "size", "mfact", "ratio"]
                 settingKey: "hyprlandMasterSize"
                 visible: SettingsData.hyprlandTilingLayout === "master"
-                text: I18n.tr("Master size")
+                text: I18n.tr("Master size", "Hyprland master layout slider, share of the screen the master window takes")
                 value: SettingsData.hyprlandMasterSize
                 minimum: 10
                 maximum: 90
@@ -332,7 +318,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 settingKey: "hyprlandScrollingDirection"
                 visible: SettingsData.hyprlandTilingLayout === "scrolling"
                 text: I18n.tr("Direction")
-                model: [I18n.tr("Right"), I18n.tr("Left"), I18n.tr("Down"), I18n.tr("Up")]
+                model: [I18n.tr("Right"), I18n.tr("Left"), I18n.tr("Down", "Hyprland scrolling layout direction"), I18n.tr("Up", "Hyprland scrolling layout direction")]
                 currentIndex: Math.max(0, ids.indexOf(SettingsData.hyprlandScrollingDirection))
                 onSelectionChanged: (index, selected) => {
                     if (!selected)
@@ -356,7 +342,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 tags: ["hyprland", "scrolling", "fullscreen", "single", "column"]
                 settingKey: "hyprlandScrollingFullscreenOneColumn"
                 visible: SettingsData.hyprlandTilingLayout === "scrolling"
-                text: I18n.tr("Fullscreen single column")
+                text: I18n.tr("Fullscreen single column", "Hyprland scrolling layout toggle, a lone column fills the screen")
                 checked: SettingsData.hyprlandScrollingFullscreenOneColumn
                 onToggled: checked => SettingsData.set("hyprlandScrollingFullscreenOneColumn", checked)
             }
@@ -439,31 +425,17 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 reason: Math.round(Theme.windowRadius) + "px"
             }
 
-            SettingsToggleRow {
-                tags: ["hyprland", "border", "override"]
+            SettingsToggleSliderRow {
+                tags: ["hyprland", "border", "override", "border_size"]
                 settingKey: "hyprlandLayoutBorderSizeEnabled"
                 resetKeys: ["hyprlandLayoutBorderSize"]
                 text: I18n.tr("Override border size")
                 checked: SettingsData.hyprlandLayoutBorderSize >= 0
-                onToggled: checked => {
-                    if (checked) {
-                        SettingsData.set("hyprlandLayoutBorderSize", 2);
-                        return;
-                    }
-                    SettingsData.set("hyprlandLayoutBorderSize", -1);
-                }
-            }
-
-            SettingsSliderRow {
-                tags: ["hyprland", "border", "override", "border_size"]
-                settingKey: "hyprlandLayoutBorderSize"
-                resetKeys: []
-                text: I18n.tr("Border size")
-                visible: SettingsData.hyprlandLayoutBorderSize >= 0
                 value: Math.max(0, SettingsData.hyprlandLayoutBorderSize)
                 minimum: 0
                 maximum: 10
                 unit: "px"
+                onToggled: checked => SettingsData.set("hyprlandLayoutBorderSize", checked ? 2 : -1)
                 onSliderValueChanged: newValue => SettingsData.set("hyprlandLayoutBorderSize", newValue)
             }
 
@@ -565,31 +537,17 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 reason: Math.round(Theme.windowRadius) + "px"
             }
 
-            SettingsToggleRow {
-                tags: ["mangowc", "mango", "border", "override"]
+            SettingsToggleSliderRow {
+                tags: ["mangowc", "mango", "border", "override", "borderpx"]
                 settingKey: "mangoLayoutBorderSizeEnabled"
                 resetKeys: ["mangoLayoutBorderSize"]
                 text: I18n.tr("Override border size")
                 checked: SettingsData.mangoLayoutBorderSize >= 0
-                onToggled: checked => {
-                    if (checked) {
-                        SettingsData.set("mangoLayoutBorderSize", 2);
-                        return;
-                    }
-                    SettingsData.set("mangoLayoutBorderSize", -1);
-                }
-            }
-
-            SettingsSliderRow {
-                tags: ["mangowc", "mango", "border", "override", "borderpx"]
-                settingKey: "mangoLayoutBorderSize"
-                resetKeys: []
-                text: I18n.tr("Border size")
-                visible: SettingsData.mangoLayoutBorderSize >= 0
                 value: Math.max(0, SettingsData.mangoLayoutBorderSize)
                 minimum: 0
                 maximum: 10
                 unit: "px"
+                onToggled: checked => SettingsData.set("mangoLayoutBorderSize", checked ? 2 : -1)
                 onSliderValueChanged: newValue => SettingsData.set("mangoLayoutBorderSize", newValue)
             }
         }

@@ -23,8 +23,8 @@ Column {
 
         SettingsNavRow {
             iconName: "system_update_alt"
-            title: I18n.tr("Software updates")
-            hint: I18n.tr("DMS and system updates")
+            title: I18n.tr("Software updates", "settings page, modal and bar widget title, DMS and system package updates")
+            hint: I18n.tr("DMS and system updates", "settings sidebar hint for the software updates page")
             onClicked: keyboard => root.page.parentModal?.navigateTo("updater", keyboard)
         }
     }

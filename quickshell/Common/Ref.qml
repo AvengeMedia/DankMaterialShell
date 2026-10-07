@@ -12,15 +12,16 @@ QtObject {
         if (wanted === _held)
             return;
         _held = wanted;
-        if (modules === null) {
+        if (typeof service.addRef !== "function") {
             service.refCount += wanted ? 1 : -1;
             return;
         }
+        const held = modules ?? [];
         if (wanted) {
-            service.addRef(modules);
+            service.addRef(held);
             return;
         }
-        service.removeRef(modules);
+        service.removeRef(held);
     }
 
     onActiveChanged: sync(active)

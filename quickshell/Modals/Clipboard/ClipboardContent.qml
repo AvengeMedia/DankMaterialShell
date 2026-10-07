@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Services
 
@@ -126,7 +127,7 @@ Item {
                 modal: clipboardContent.modal
             }
 
-            DankSearchField {
+            DSearchField {
                 id: searchField
 
                 anchors.left: parent.left
@@ -160,7 +161,7 @@ Item {
                 }
             }
 
-            DankActionButton {
+            DActionButton {
                 id: filterButton
 
                 anchors.right: searchField.right
@@ -183,7 +184,7 @@ Item {
             Component {
                 id: filterMenuComponent
 
-                DankDropdown {
+                DDropdown {
                     showTrigger: false
                     popupAnchorItem: filterButton
                     popupWidth: 180
@@ -217,7 +218,7 @@ Item {
         anchors.bottomMargin: keyboardHintsLoader.active ? PopoutMetrics.contentGap : 0
         clip: true
 
-        DankListView {
+        DListView {
             id: clipboardListView
             reuseItems: true
             highlightSelection: clipboardContent.modal.keyboardNavigationActive && clipboardContent.modal.selectedIndex >= 0

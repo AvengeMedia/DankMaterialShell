@@ -1,8 +1,8 @@
 import QtQuick
 import qs.Common
 import Quickshell
-import qs.Widgets
-import qs.DankCommon.Widgets as CommonWidgets
+import qs.DCommon.Widgets
+import qs.DCommon.Widgets as CommonWidgets
 
 CcTile {
     id: root
@@ -35,7 +35,7 @@ CcTile {
                 Repeater {
                     model: SessionData.recentColors.slice(0, colors.swatchColumns * colors.swatchRows)
 
-                    CommonWidgets.DankColorButton {
+                    CommonWidgets.DColorButton {
                         required property var modelData
                         width: Theme.minimumTouchTargetSize
                         height: width
@@ -52,7 +52,7 @@ CcTile {
                 }
             }
 
-            DankButton {
+            DButton {
                 text: I18n.tr("Choose color", "color picker title")
                 maximumWidth: parent.width
                 visible: SessionData.recentColors.length === 0

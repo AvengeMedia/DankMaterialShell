@@ -8,6 +8,9 @@
   "%1 DMS binds may be overridden by config binds that come after the include.": {
     "%1 DMS binds may be overridden by config binds that come after the include.": "%1 קיצורי מקשים של DMS עלולים להידרס על ידי קיצורי מקשים מהתצורה שמופיעים אחרי הinclude."
   },
+  "%1 Flatpak": {
+    "%1 Flatpak": ""
+  },
   "%1 KB": {
     "%1 KB": "%1 KB"
   },
@@ -34,6 +37,12 @@
   },
   "%1 before": {
     "%1 before": "%1 לפני"
+  },
+  "%1 behind": {
+    "%1 behind": ""
+  },
+  "%1 breaking": {
+    "%1 breaking": ""
   },
   "%1 character": {
     "%1 character": "%1 תו"
@@ -68,8 +77,14 @@
   "%1 displays": {
     "%1 displays": "%1 מסכים"
   },
+  "%1 features": {
+    "%1 features": ""
+  },
   "%1 filtered": {
     "%1 filtered": "%1 מסוננים"
+  },
+  "%1 fixes": {
+    "%1 fixes": ""
   },
   "%1 h %2 m left": {
     "%1 h %2 m left": "נותרו %1 שעות ו-%2 דקות"
@@ -87,7 +102,7 @@
     "%1 hours": "%1 שעות"
   },
   "%1 is %2 and may use a lot of memory.": {
-    "%1 is %2 and may use a lot of memory.": ""
+    "%1 is %2 and may use a lot of memory.": "%1 הוא %2 ועלול להשתמש בכמות גדולה של זיכרון."
   },
   "%1 is now included in config": {
     "%1 is now included in config": "%1 כעת כלול בconfig"
@@ -103,6 +118,9 @@
   },
   "%1 jobs": {
     "%1 jobs": "%1 עבודות"
+  },
+  "%1 limit reached": {
+    "%1 limit reached": ""
   },
   "%1 min": {
     "%1 min": "%1 דקות"
@@ -124,6 +142,15 @@
   },
   "%1 online": {
     "%1 online": "%1 מקוונים"
+  },
+  "%1 other": {
+    "%1 other": ""
+  },
+  "%1 package will be installed via %2.": {
+    "%1 package will be installed via %2.": ""
+  },
+  "%1 packages will be installed via %2.": {
+    "%1 packages will be installed via %2.": ""
   },
   "%1 position": {
     "%1 position": "מיקום %1"
@@ -158,6 +185,9 @@
   "%1 wallpapers  •  %2 / %3": {
     "%1 wallpapers  •  %2 / %3": "%1 תמונות רקע  •  %2 / %3"
   },
+  "%1 will be downloaded and installed via %2.": {
+    "%1 will be downloaded and installed via %2.": ""
+  },
   "%1 will be removed from your system.": {
     "%1 will be removed from your system.": "%1 יוסר מהמערכת שלך."
   },
@@ -169,6 +199,9 @@
   },
   "%1: %2": {
     "%1: %2": "%1: %2"
+  },
+  "%1h": {
+    "%1h": ""
   },
   "%1h %2m": {
     "%1h %2m": "%1 שעות ו-%2 דקות"
@@ -200,9 +233,6 @@
   "2.4 GHz": {
     "2.4 GHz": "2.4 GHz"
   },
-  "2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder": {
-    "2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder": ""
-  },
   "3rd party": {
     "3rd party": "צד שלישי"
   },
@@ -212,14 +242,17 @@
   "50 uses Material shapes. Lower values reduce rounding; higher values increase it.": {
     "50 uses Material shapes. Lower values reduce rounding; higher values increase it.": "50 משתמש בצורות Material. ערכים נמוכים יותר מפחיתים את העיגול, וערכים גבוהים יותר מגבירים אותו."
   },
-  "A floating companion that works alongside any bar layout": {
-    "A floating companion that works alongside any bar layout": ""
+  "A custom seed color overrides this": {
+    "A custom seed color overrides this": ""
   },
-  "A hidden field appears as soon as a key is pressed": {
-    "A hidden field appears as soon as a key is pressed": "שדה מוסתר יופיע ברגע שתלחץ/י על מקש"
+  "A floating companion that works alongside any bar layout": {
+    "A floating companion that works alongside any bar layout": "רכיב צף שמלווה כל פריסת סרגל"
   },
   "A modern desktop shell for Wayland compositors": {
     "A modern desktop shell for Wayland compositors": "מעטפת שולחן עבודה מודרנית לקומפוזיטורים של Wayland"
+  },
+  "A newer dms binary is installed.": {
+    "A newer dms binary is installed.": ""
   },
   "A user with that name already exists.": {
     "A user with that name already exists.": "כבר קיים משתמש/ת עם השם זה."
@@ -229,9 +262,6 @@
   },
   "AC power": {
     "AC power": "חשמל AC"
-  },
-  "AM": {
-    "AM": "AM"
   },
   "API": {
     "API": "API"
@@ -247,6 +277,9 @@
   },
   "Acceleration profile": {
     "Acceleration profile": "פרופיל האצה"
+  },
+  "Accent minutes": {
+    "Accent minutes": ""
   },
   "Accept jobs": {
     "Accept jobs": "קבל/י עבודות"
@@ -353,11 +386,26 @@
   "Add notes": {
     "Add notes": "הוסף/י הערות"
   },
+  "Add palette": {
+    "Add palette": ""
+  },
   "Add printer": {
     "Add printer": "הוספת מדפסת"
   },
+  "Add rule": {
+    "Add rule": ""
+  },
+  "Add shortcut": {
+    "Add shortcut": ""
+  },
+  "Add substitution": {
+    "Add substitution": ""
+  },
   "Add to autostart": {
     "Add to autostart": "הוספה להפעלה אוטומטית"
+  },
+  "Add user": {
+    "Add user": ""
   },
   "Add widget": {
     "Add widget": "הוספת ווידג׳ט"
@@ -371,14 +419,17 @@
   "Add, remove and configure dock items": {
     "Add, remove and configure dock items": "הוספה, הסרה והגדרה של פריטים מהDock"
   },
-  "Add, remove, reorder and configure": {
-    "Add, remove, reorder and configure": "הוספה, הסרה, שינוי סדר והגדרה"
+  "Add, reorder, configure": {
+    "Add, reorder, configure": ""
   },
   "Added in front of every app launch command": {
-    "Added in front of every app launch command": ""
+    "Added in front of every app launch command": "נוסף לפני כל פקודת הפעלה של אפליקציה"
+  },
+  "Adds a compositor window rule so DMS windows such as Settings open floating": {
+    "Adds a compositor window rule so DMS windows such as Settings open floating": ""
   },
   "Adds concave curves where the bar meets the screen edge": {
-    "Adds concave curves where the bar meets the screen edge": ""
+    "Adds concave curves where the bar meets the screen edge": "מוסיף עיקולים קעורים במקום שבו הסרגל נפגש עם קצה המסך"
   },
   "Adds them to the %1 group so they can run dms-greeter sync --profile": {
     "Adds them to the %1 group so they can run dms-greeter sync --profile": "מוסיף את המשתמש/ת לקבוצה %1 כדי לאפשר הרצה של הפקודה dms-greeter sync --profile"
@@ -386,14 +437,17 @@
   "Adds them to the %1 group so they can use sudo": {
     "Adds them to the %1 group so they can use sudo": "מוסיף את המשתמש/ת לקבוצה %1 כדי לאפשר שימוש בsudo"
   },
-  "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": {
-    "Administrator access is required. Use the Sync button in Settings → Greeter to apply.": "נדרשת גישת מנהל מערכת. השתמש/י בכפתור 'סנכרון' תחת הגדרות → מסך ההתחברות כדי להחיל."
+  "Administrator access is required. Press Apply changes in Settings → Greeter.": {
+    "Administrator access is required. Press Apply changes in Settings → Greeter.": ""
   },
   "Advanced": {
     "Advanced": "מתקדם"
   },
   "Advanced comma-separated libxkbcommon options.": {
     "Advanced comma-separated libxkbcommon options.": "אפשרויות libxkbcommon מתקדמות מופרדות בפסיקים."
+  },
+  "After %1": {
+    "After %1": ""
   },
   "Afternoon": {
     "Afternoon": "אחר הצהריים"
@@ -447,7 +501,13 @@
     "Already on that session": "כבר בהפעלה זו"
   },
   "Also runs the templates in your matugen config.toml": {
-    "Also runs the templates in your matugen config.toml": ""
+    "Also runs the templates in your matugen config.toml": "מריץ גם את התבניות שבconfig.toml של matugen שלך"
+  },
+  "Also saves the screenshot to disk": {
+    "Also saves the screenshot to disk": ""
+  },
+  "Also works on the lock screen": {
+    "Also works on the lock screen": ""
   },
   "Alt + Shift": {
     "Alt + Shift": "Alt + Shift"
@@ -456,10 +516,19 @@
     "Alternative (OR)": "חלופי (OR)"
   },
   "Always here": {
-    "Always here": ""
+    "Always here": "תמיד כאן"
+  },
+  "Always in overflow": {
+    "Always in overflow": ""
   },
   "Always on icons": {
     "Always on icons": "סמלים דולקים תמיד"
+  },
+  "Always open here": {
+    "Always open here": ""
+  },
+  "Always show": {
+    "Always show": ""
   },
   "Always show percentage": {
     "Always show percentage": "הצגה תמידית של אחוזים"
@@ -470,6 +539,9 @@
   "Amount": {
     "Amount": "כמות"
   },
+  "An Island bar already covers a display this bar is on": {
+    "An Island bar already covers a display this bar is on": ""
+  },
   "An uninstallation is already in progress": {
     "An uninstallation is already in progress": "כבר מתבצעת הסרה"
   },
@@ -479,8 +551,8 @@
   "Analog": {
     "Analog": "אנלוגי"
   },
-  "Analog, digital, or stacked clock display": {
-    "Analog, digital, or stacked clock display": "שעון אנלוגי, דיגיטלי או בערימה"
+  "Analog, digital, stacked, expressive, or overlapping clock": {
+    "Analog, digital, stacked, expressive, or overlapping clock": ""
   },
   "Analyzing configuration...": {
     "Analyzing configuration...": "מנתח תצורה..."
@@ -490,6 +562,9 @@
   },
   "Animation duration": {
     "Animation duration": "משך זמן לאנימציה"
+  },
+  "Animation style": {
+    "Animation style": ""
   },
   "Animations": {
     "Animations": "אנימציות"
@@ -533,6 +608,12 @@
   "App launcher": {
     "App launcher": "משגר אפליקציות"
   },
+  "App limits": {
+    "App limits": ""
+  },
+  "App name": {
+    "App name": ""
+  },
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": "שם האפליקציה או זהות (לדוגמה firefox)"
   },
@@ -554,11 +635,8 @@
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "אפליקציות ופקודות שיופעלו אוטומטית בעת ההתחברות"
   },
-  "Applies on the next greeter sync": {
-    "Applies on the next greeter sync": "יוחל בסנכרון הבא של מסך ההתחברות"
-  },
   "Applies the saved profile that matches the connected displays": {
-    "Applies the saved profile that matches the connected displays": ""
+    "Applies the saved profile that matches the connected displays": "מחיל את הפרופיל השמור שתואם למסכים המחוברים"
   },
   "Apply": {
     "Apply": "החל/י"
@@ -602,6 +680,9 @@
   "Apps dock": {
     "Apps dock": "אפליקציות Dock"
   },
+  "Apps that capture the keyboard can block it": {
+    "Apps that capture the keyboard can block it": ""
+  },
   "Apps with notification popups muted. Unmute or delete to remove.": {
     "Apps with notification popups muted. Unmute or delete to remove.": "אפליקציות עם חלונות קופצים של התראות מושתקות. בטל/י השתקה או מחק/י להסרה."
   },
@@ -617,11 +698,14 @@
   "Architecture": {
     "Architecture": "ארכיטקטורה"
   },
+  "Archive manager": {
+    "Archive manager": ""
+  },
   "Are you sure you want to kill session \"%1\"?": {
     "Are you sure you want to kill session \"%1\"?": "האם אתה/את בטוח/ה שברצונך לסיים את ההפעלה \"%1\"?"
   },
   "Arguments": {
-    "Arguments": ""
+    "Arguments": "ארגומנטים"
   },
   "Arrangement": {
     "Arrangement": "סידור"
@@ -743,6 +827,9 @@
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": "מצב אוטומטי מופעל. בחירת פרופיל ידנית מושבתת."
   },
+  "Auto moves this widget into overflow when the bar runs out of space": {
+    "Auto moves this widget into overflow when the bar runs out of space": ""
+  },
   "Auto overflow": {
     "Auto overflow": "גלישה אוטומטית"
   },
@@ -794,6 +881,9 @@
   "Automatic cycling": {
     "Automatic cycling": "מעבר מחזורי אוטומטי"
   },
+  "Automatic placement": {
+    "Automatic placement": ""
+  },
   "Automatically enable while screen sharing": {
     "Automatically enable while screen sharing": "הפעלה אוטומטית בזמן שיתוף מסך"
   },
@@ -824,8 +914,8 @@
   "Available networks": {
     "Available networks": "רשתות זמינות"
   },
-  "Back": {
-    "Back": "חזרה"
+  "Avatar ring": {
+    "Avatar ring": ""
   },
   "Backend": {
     "Backend": "Backend"
@@ -864,7 +954,7 @@
     "Balanced": "מאוזן"
   },
   "Balanced palette with focused accents (default).": {
-    "Balanced palette with focused accents (default).": "פלטה מאוזנת עם דגשים ממוקדים (ברירת מחדל)."
+    "Balanced palette with focused accents (default).": "פלטת צבעים מאוזנת עם דגשים ממוקדים (ברירת מחדל)."
   },
   "Band": {
     "Band": "תדר"
@@ -884,11 +974,11 @@
   "Bar size": {
     "Bar size": "גודל הסרגל"
   },
-  "Bar surface and spacing": {
-    "Bar surface and spacing": "משטח הסרגל והמרווחים"
-  },
   "Bar visibility": {
     "Bar visibility": "נראות הסרגל"
+  },
+  "Bar widget background behind the compact face": {
+    "Bar widget background behind the compact face": ""
   },
   "Bar widgets": {
     "Bar widgets": "ווידג׳טים בסרגל"
@@ -926,9 +1016,6 @@
   "Behavior": {
     "Behavior": "התנהגות"
   },
-  "Better Lyrics": {
-    "Better Lyrics": "Better Lyrics"
-  },
   "Bind the %1 IPC action in your compositor config.": {
     "Bind the %1 IPC action in your compositor config.": "קשר/י את פעולת הIPC %1 בהגדרת הקומפוזיטור שלך."
   },
@@ -956,6 +1043,12 @@
   "Blocked": {
     "Blocked": "חסום"
   },
+  "Bloom": {
+    "Bloom": ""
+  },
+  "Blue": {
+    "Blue": ""
+  },
   "Blue light filter": {
     "Blue light filter": "מסנן אור כחול"
   },
@@ -980,6 +1073,9 @@
   "Blur on overview": {
     "Blur on overview": "טשטוש בסקירה"
   },
+  "Blur, shadows, corners": {
+    "Blur, shadows, corners": ""
+  },
   "Blurred surfaces show the wallpaper, not the windows beneath": {
     "Blurred surfaces show the wallpaper, not the windows beneath": "משטחים מטושטשים מציגים את תמונת הרקע, ולא את החלונות שמתחתיהם"
   },
@@ -991,6 +1087,9 @@
   },
   "Body font size": {
     "Body font size": "גודל גופן של גוף ההודעה"
+  },
+  "Boot entry changed. Remove it and add it again.": {
+    "Boot entry changed. Remove it and add it again.": ""
   },
   "Border": {
     "Border": "מסגרת"
@@ -1012,9 +1111,6 @@
   },
   "Border with Background": {
     "Border with Background": "מסגרת עם רקע"
-  },
-  "Border, connected mode, arcs": {
-    "Border, connected mode, arcs": "מסגרת, מצב מחובר וקשתות"
   },
   "Both": {
     "Both": "שניהם"
@@ -1077,13 +1173,16 @@
     "Browser, terminal, file manager, media": "דפדפן, מסוף, מנהל קבצים ומדיה"
   },
   "Built-in": {
-    "Built-in": ""
+    "Built-in": "מובנה"
   },
   "Built-in apps": {
-    "Built-in apps": ""
+    "Built-in apps": "אפליקציות מובנות"
   },
   "Built-in plugins": {
     "Built-in plugins": "תוספים מובנים"
+  },
+  "Bundled greeter active": {
+    "Bundled greeter active": ""
   },
   "Button areas": {
     "Button areas": "אזורי כפתורים"
@@ -1220,6 +1319,9 @@
   "Change Volume": {
     "Change Volume": "שינוי עוצמה"
   },
+  "Changes save to %1": {
+    "Changes save to %1": ""
+  },
   "Channel": {
     "Channel": "ערוץ"
   },
@@ -1253,11 +1355,11 @@
   "Check interval": {
     "Check interval": "מרווח בדיקה"
   },
-  "Check interval, ignored packages, custom command": {
-    "Check interval, ignored packages, custom command": "מרווח בדיקה, חבילות שמושמטות ופקודה מותאמת אישית"
-  },
   "Check on startup": {
     "Check on startup": "בדיקה בהפעלה"
+  },
+  "Check status": {
+    "Check status": ""
   },
   "Check your custom command in Settings → Dock → Trash.": {
     "Check your custom command in Settings → Dock → Trash.": "בדוק/בדקי את הפקודה המותאמת אישית שלך בהגדרות → Dock → אשפה."
@@ -1271,20 +1373,20 @@
   "Checking...": {
     "Checking...": "בודק..."
   },
-  "Chip": {
-    "Chip": ""
+  "Checks in the background at the check interval. Notifies only when the count grows.": {
+    "Checks in the background at the check interval. Notifies only when the count grows.": ""
   },
-  "Choose Dark Mode Color": {
-    "Choose Dark Mode Color": "בחר/י צבע למצב כהה"
+  "Chip": {
+    "Chip": "לחצן"
   },
   "Choose Launcher Logo Color": {
     "Choose Launcher Logo Color": "בחר/י צבע לוגו למשגר"
   },
-  "Choose Light Mode Color": {
-    "Choose Light Mode Color": "בחר/י צבע למצב בהיר"
-  },
   "Choose Wallpaper Color": {
     "Choose Wallpaper Color": "בחר/י צבע לרקע"
+  },
+  "Choose a clear area of the background. Drag the clock to place it yourself.": {
+    "Choose a clear area of the background. Drag the clock to place it yourself.": ""
   },
   "Choose a power profile": {
     "Choose a power profile": "בחר/י פרופיל חשמל"
@@ -1293,7 +1395,7 @@
     "Choose color": "בחר/י צבע"
   },
   "Choose colors from palette": {
-    "Choose colors from palette": "בחר/י צבעים מפלטה"
+    "Choose colors from palette": "בחר/י צבעים מפלטת צבעים"
   },
   "Choose wallpaper folder": {
     "Choose wallpaper folder": "בחר/י תיקיית רקעים"
@@ -1310,17 +1412,11 @@
   "Class": {
     "Class": "מחלקה"
   },
-  "Class regex": {
-    "Class regex": "Class regex"
-  },
   "Class regex (e.g. ^firefox$)": {
     "Class regex (e.g. ^firefox$)": "Class regex (לדוגמה ^firefox$)"
   },
   "Classes": {
     "Classes": "מחלקות"
-  },
-  "Clear": {
-    "Clear": "ניקוי"
   },
   "Clear All": {
     "Clear All": "ניקוי הכל"
@@ -1352,15 +1448,6 @@
   "Click Import to add a .ovpn or .conf": {
     "Click Import to add a .ovpn or .conf": "לחץ/י על ייבוא כדי להוסיף קובץ ovpn. או conf."
   },
-  "Click Refresh to check status.": {
-    "Click Refresh to check status.": "לחץ/י על רענון כדי לבדוק את הסטטוס."
-  },
-  "Click any shortcut to edit Aqueous configuration": {
-    "Click any shortcut to edit Aqueous configuration": "לחץ/י על קיצור דרך כלשהו כדי לערוך את תצורת Aqueous"
-  },
-  "Click any shortcut to edit. Changes save to %1": {
-    "Click any shortcut to edit. Changes save to %1": "לחץ/י על כל קיצור דרך כדי לערוך. השינויים נשמרים ב%1"
-  },
   "Click method": {
     "Click method": "שיטת לחיצה"
   },
@@ -1377,7 +1464,7 @@
     "Click to paste": "לחיצה להדבקה"
   },
   "Click to run": {
-    "Click to run": ""
+    "Click to run": "לחץ/י להפעלה"
   },
   "Click to select a custom theme JSON file": {
     "Click to select a custom theme JSON file": "לחץ/י כדי לבחור קובץ JSON של ערכת נושא מותאמת אישית"
@@ -1386,10 +1473,10 @@
     "Clickfinger": "Clickfinger"
   },
   "Clicking a window in a special workspace opens that workspace": {
-    "Clicking a window in a special workspace opens that workspace": ""
+    "Clicking a window in a special workspace opens that workspace": "לחיצה על חלון בסביבת עבודה מיוחדת פותחת את סביבת העבודה הזו"
   },
   "Clicks on empty bar space reach the windows below": {
-    "Clicks on empty bar space reach the windows below": ""
+    "Clicks on empty bar space reach the windows below": "לחיצות על שטח ריק בסרגל מגיעות לחלונות שמתחתיו"
   },
   "Clip": {
     "Clip": "חיתוך"
@@ -1421,11 +1508,11 @@
   "Clock, calendar, system info and profile": {
     "Clock, calendar, system info and profile": "שעון, יומן, מידע מערכת ופרופיל"
   },
-  "Clocks, system monitors, plugins": {
-    "Clocks, system monitors, plugins": "שעונים, צגי מערכת ותוספים"
+  "Clock, weather, locale": {
+    "Clock, weather, locale": ""
   },
-  "Close": {
-    "Close": "סגירה"
+  "Clocks, monitors, plugins": {
+    "Clocks, monitors, plugins": ""
   },
   "Close All Windows": {
     "Close All Windows": "סגור/י את כל החלונות"
@@ -1444,9 +1531,6 @@
   },
   "Collapse": {
     "Collapse": "כווץ/י"
-  },
-  "Color": {
-    "Color": "צבע"
   },
   "Color %1 copied": {
     "Color %1 copied": "צבע %1 הועתק"
@@ -1469,11 +1553,11 @@
   "Color gamut": {
     "Color gamut": "סולם צבעים"
   },
-  "Color mode": {
-    "Color mode": "מצב צבע"
-  },
   "Color override": {
     "Color override": "דריסת צבע"
+  },
+  "Color previews unavailable": {
+    "Color previews unavailable": ""
   },
   "Color space": {
     "Color space": "מרחב צבע"
@@ -1583,14 +1667,8 @@
   "Configure a new printer": {
     "Configure a new printer": "הגדר/י מדפסת חדשה"
   },
-  "Configure match criteria and actions": {
-    "Configure match criteria and actions": "הגדר/י קריטריוני התאמה ופעולות"
-  },
   "Configure one in Settings → Dock → Trash.": {
     "Configure one in Settings → Dock → Trash.": "הגדר/י פקודה אחת בהגדרות → Dock → אשפה."
-  },
-  "Confirm": {
-    "Confirm": "אשר/י"
   },
   "Confirm Delete": {
     "Confirm Delete": "אשר/י מחיקה"
@@ -1631,9 +1709,6 @@
   "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": {
     "Connected Frame Mode uses the connected launcher for default launcher shortcuts.": "מצב מסגרת מחוברת משתמש במשגר המחובר עבור קיצורי הדרך של משגר ברירת המחדל."
   },
-  "Connected displays": {
-    "Connected displays": "מסכים מחוברים"
-  },
   "Connected to %1": {
     "Connected to %1": "מחובר ל%1"
   },
@@ -1652,6 +1727,9 @@
   "Connections and autoconnect": {
     "Connections and autoconnect": "חיבורים והתחברות אוטומטית"
   },
+  "Container saturation": {
+    "Container saturation": ""
+  },
   "Contains": {
     "Contains": "כולל"
   },
@@ -1667,9 +1745,6 @@
   "Control Center": {
     "Control Center": "מרכז הבקרה"
   },
-  "Control Center tile color": {
-    "Control Center tile color": "צבע אריח במרכז הבקרה"
-  },
   "Control currently playing media": {
     "Control currently playing media": "שלוט/שלטי במדיה שמתנגנת כעת"
   },
@@ -1684,6 +1759,9 @@
   },
   "Copied!": {
     "Copied!": "הועתק!"
+  },
+  "Copies the screenshot to the clipboard": {
+    "Copies the screenshot to the clipboard": ""
   },
   "Copy": {
     "Copy": "העתקה"
@@ -1712,6 +1790,9 @@
   "Corner style": {
     "Corner style": "סגנון הפינות"
   },
+  "Cosine": {
+    "Cosine": ""
+  },
   "Couldn't load hotspot password": {
     "Couldn't load hotspot password": "לא ניתן היה לטעון את סיסמת הנקודה החמה"
   },
@@ -1721,14 +1802,14 @@
   "Count only": {
     "Count only": "ספירה בלבד"
   },
+  "Counts time in the focused app while the session is active. Stays on this device.": {
+    "Counts time in the focused app while the session is active. Stays on this device.": ""
+  },
   "Cover Open": {
     "Cover Open": "מכסה פתוח"
   },
-  "Create": {
-    "Create": "יצירה"
-  },
-  "Create Window Rule": {
-    "Create Window Rule": "צור/צרי חוק לחלון"
+  "Cover art": {
+    "Cover art": ""
   },
   "Create a new %1 session (^N)": {
     "Create a new %1 session (^N)": "צור/צרי הפעלה חדשה של %1 (^N)"
@@ -1741,9 +1822,6 @@
   },
   "Create rule for:": {
     "Create rule for:": "צור/צרי חוק עבור:"
-  },
-  "Create user": {
-    "Create user": "צור/צרי משתמש"
   },
   "Creating...": {
     "Creating...": "יוצר..."
@@ -1764,7 +1842,7 @@
     "Critical notification": "התראה קריטית"
   },
   "Critical notifications still pop up": {
-    "Critical notifications still pop up": ""
+    "Critical notifications still pop up": "התראות קריטיות עדיין מופיעות בחלונות קופצים"
   },
   "Critical threshold": {
     "Critical threshold": "סף קריטי"
@@ -1774,21 +1852,6 @@
   },
   "Ctrl+%1 is used for password editing": {
     "Ctrl+%1 is used for password editing": "הקיצור Ctrl+%1 משמש לעריכת סיסמה"
-  },
-  "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
-    "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A: בחירת הכל • Ctrl+P: תצוגה מקדימה • Enter/Shift+Enter: חיפוש הבא/הקודם • Esc: סגירה"
-  },
-  "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": {
-    "Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find": "Ctrl+S: שמירה • Ctrl+O: פתיחה • Ctrl+N: חדש • Ctrl+F: חיפוש"
-  },
-  "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": {
-    "Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close": "Ctrl+Tab: החלפת כרטיסיה • Ctrl+S: הצמדה/ביטול הצמדה • Shift+Del: ניקוי הכל • Esc: סגירה"
-  },
-  "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": {
-    "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Copy • Shift+Del: Clear All • F10: Help • Esc: Close": "Ctrl+Tab: החלפת כרטיסיות • Ctrl+S: הצמדה/ביטול הצמדה • Shift+Enter: העתקה • Shift+Del: ניקוי הכל • F10: עזרה • Esc: סגירה"
-  },
-  "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close": {
-    "Ctrl+Tab: Switch Tabs • Ctrl+S: Pin/Unpin • Shift+Enter: Paste • Shift+Del: Clear All • F10: Help • Esc: Close": "Ctrl+Tab: החלפת כרטיסיות • Ctrl+S: הצמדה/ביטול הצמדה • Shift+Enter: הדבקה • Shift+Del: ניקוי הכל • F10: עזרה • Esc: סגירה"
   },
   "Current": {
     "Current": "עכשיו"
@@ -1854,7 +1917,7 @@
     "Custom blend": "מיזוג מותאם אישית"
   },
   "Custom builds the palette from a color you pick": {
-    "Custom builds the palette from a color you pick": ""
+    "Custom builds the palette from a color you pick": "האפשרות ״מותאם אישית״ בונה את הפלטה מצבע שתבחר/י"
   },
   "Custom color": {
     "Custom color": "צבע מותאם אישית"
@@ -1872,7 +1935,7 @@
     "Custom interval in minutes (minimum 5)": "מרווח זמן מותאם אישית בדקות (מינימום 5)"
   },
   "Custom label": {
-    "Custom label": ""
+    "Custom label": "תווית מותאמת אישית"
   },
   "Custom location": {
     "Custom location": "מיקום מותאם אישית"
@@ -1898,8 +1961,8 @@
   "DDC/CI monitor": {
     "DDC/CI monitor": "מנטר DDC/CI"
   },
-  "DEMO MODE - Click anywhere to exit": {
-    "DEMO MODE - Click anywhere to exit": "מצב הדגמה - לחץ/י בכל מקום כדי לצאת"
+  "DMS %1 available": {
+    "DMS %1 available": ""
   },
   "DMS Settings": {
     "DMS Settings": "הגדרות DMS"
@@ -1909,6 +1972,9 @@
   },
   "DMS Shortcuts": {
     "DMS Shortcuts": "קיצורי DMS"
+  },
+  "DMS and system updates": {
+    "DMS and system updates": ""
   },
   "DMS chooser": {
     "DMS chooser": "הבוחר של DMS"
@@ -1932,7 +1998,7 @@
     "DMS shell actions (launcher, clipboard, etc.)": "פעולות מעטפת של DMS (משגר, לוח העתקה וכו')"
   },
   "DMS stops drawing wallpapers on every display": {
-    "DMS stops drawing wallpapers on every display": ""
+    "DMS stops drawing wallpapers on every display": "DMS מפסיק להציג תמונות רקע בכל מסך"
   },
   "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": {
     "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": "DMS משתמש במשפחת הגופן, במשקל ובקנה המידה. צורת הגופן המדויקת, הנטייה, הרוחב וסרגלים עם קנה מידה נפרד עשויים להיות שונים."
@@ -1943,8 +2009,14 @@
   "Daily": {
     "Daily": "יומי"
   },
-  "Dank Island instance": {
-    "Dank Island instance": "מופע של Dank Island"
+  "Daily limit": {
+    "Daily limit": ""
+  },
+  "Daily screen time limit reached": {
+    "Daily screen time limit reached": ""
+  },
+  "Dank": {
+    "Dank": ""
   },
   "DankBar": {
     "DankBar": "Dank Bar"
@@ -1991,6 +2063,9 @@
   "Date first": {
     "Date first": "תאריך ראשון"
   },
+  "Date format": {
+    "Date format": ""
+  },
   "Date, time & region": {
     "Date, time & region": "תאריך, שעה ואזור"
   },
@@ -2002,6 +2077,9 @@
   },
   "Dawn (Nautical Twilight)": {
     "Dawn (Nautical Twilight)": "שחר (דמדומים ימיים)"
+  },
+  "Day": {
+    "Day": ""
   },
   "Day date": {
     "Day date": "יום תאריך"
@@ -2017,9 +2095,6 @@
   },
   "Deck": {
     "Deck": "חפיסה"
-  },
-  "Decrease": {
-    "Decrease": "הפחת/י"
   },
   "Default": {
     "Default": "ברירת מחדל"
@@ -2039,6 +2114,9 @@
   "Default apps": {
     "Default apps": "אפליקציות ברירת מחדל"
   },
+  "Default leaves it to niri, which floats dialogs and fixed-size windows and tiles the rest": {
+    "Default leaves it to niri, which floats dialogs and fixed-size windows and tiles the rest": ""
+  },
   "Default selected action": {
     "Default selected action": "פעולת ברירת המחדל הרצויה"
   },
@@ -2048,14 +2126,11 @@
   "Default width (%)": {
     "Default width (%)": "רוחב ברירת מחדל (%)"
   },
-  "Defaults": {
-    "Defaults": "ערכי ברירת מחדל"
+  "Defaults, autostart, rules": {
+    "Defaults, autostart, rules": ""
   },
   "Define rules for window behavior. Saves to %1": {
     "Define rules for window behavior. Saves to %1": "הגדר/י חוקים להתנהגות חלון. נשמר ב%1"
-  },
-  "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
-    "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: ניקוי • Shift+Del: ניקוי הכל • 1-9: פעולות • F10: עזרה • Esc: סגירה"
   },
   "Delete": {
     "Delete": "מחיקה"
@@ -2093,6 +2168,9 @@
   "Delete user": {
     "Delete user": "מחק/י משתמש/ת"
   },
+  "Deletes all stored screen time": {
+    "Deletes all stored screen time": ""
+  },
   "Dependencies & documentation": {
     "Dependencies & documentation": "חבילות נדרשות ודוקיומנטציה"
   },
@@ -2100,16 +2178,13 @@
     "Depth": "עומק"
   },
   "Derived color": {
-    "Derived color": ""
+    "Derived color": "צבע נגזר"
   },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "גוזר צבעים התואמים באופן הדוק לתמונה שמתחת."
   },
   "Description": {
     "Description": "תיאור"
-  },
-  "Desktop Clock": {
-    "Desktop Clock": "שעון לשולחן העבודה"
   },
   "Desktop Entry": {
     "Desktop Entry": "רשומה של שולחן העבודה"
@@ -2125,9 +2200,6 @@
   },
   "Details for \"%1": {
     "Details for \"%1\"": "פרטים עבור \"%1\""
-  },
-  "Detected backends: %1": {
-    "Detected backends: %1": "הBackends שזוהו: %1"
   },
   "Device": {
     "Device": "התקן"
@@ -2152,6 +2224,9 @@
   },
   "Digital": {
     "Digital": "דיגיטלי"
+  },
+  "Digital wellbeing": {
+    "Digital wellbeing": ""
   },
   "Dim": {
     "Dim": "עמום"
@@ -2295,7 +2370,7 @@
     "Display the power system menu": "הצג/י את תפריט המערכת לניהול החשמל"
   },
   "Displayed label": {
-    "Displayed label": ""
+    "Displayed label": "תווית מוצגת"
   },
   "Displays": {
     "Displays": "מסכים"
@@ -2316,7 +2391,7 @@
     "Distro badge": "תג הפצה"
   },
   "Diverse palette spanning the full spectrum.": {
-    "Diverse palette spanning the full spectrum.": "פלטה מגוונת המקיפה את כל הספקטרום."
+    "Diverse palette spanning the full spectrum.": "פלטת צבעים מגוונת המקיפה את כל הספקטרום."
   },
   "Do not disturb": {
     "Do not disturb": "״נא לא להפריע״"
@@ -2334,13 +2409,16 @@
     "Dock window": "עגן/י חלון"
   },
   "Docked": {
-    "Docked": ""
+    "Docked": "מעוגן"
   },
   "Docks": {
     "Docks": "Docks"
   },
   "Docs": {
     "Docs": "דוקיומנטציה"
+  },
+  "Documents": {
+    "Documents": "מסמכים"
   },
   "Domain (optional)": {
     "Domain (optional)": "דומיין (לא חובה)"
@@ -2358,10 +2436,13 @@
     "Door Open": "דלת פתוחה"
   },
   "Dot": {
-    "Dot": ""
+    "Dot": "נקודה"
+  },
+  "Dots": {
+    "Dots": ""
   },
   "Down": {
-    "Down": ""
+    "Down": "למטה"
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "גרור/גררי ווידג׳ט באמצעות הידית שלו לכאן כדי לסדר אותו מחדש או לשחרר אותו לקבוצה אחרת"
@@ -2376,13 +2457,10 @@
     "Drag the handle to reorder. Tap a widget for its settings, use the switch to hide it without changing spacing, or X to remove it.": "גרור/גררי את הידית כדי לשנות את הסדר. לחץ/י על ווידג׳ט כדי לפתוח את ההגדרות שלו, השתמש/י במתג כדי להסתיר אותו בלי לשנות את המרווחים, או ב-X כדי להסיר אותו."
   },
   "Drag to move, click to open activities": {
-    "Drag to move, click to open activities": ""
-  },
-  "Drag to reorder": {
-    "Drag to reorder": "גרירה בכדי לסדר מחדש"
+    "Drag to move, click to open activities": "גרור/גררי כדי להזיז, לחץ/י כדי לפתוח פעילויות"
   },
   "Dragged displays line up with neighboring edges without overlapping": {
-    "Dragged displays line up with neighboring edges without overlapping": ""
+    "Dragged displays line up with neighboring edges without overlapping": "מסכים שנגררים מיושרים לקצוות הסמוכים בלי לחפוף"
   },
   "Driver": {
     "Driver": "מנהל התקן"
@@ -2397,7 +2475,13 @@
     "Drop your override for %1 so the DMS default action re-applies?": "לבטל את הדריסה שלך עבור %1 כך שפעולת ברירת המחדל של DMS תחול מחדש?"
   },
   "Drops bar gaps and rounding while a window is maximized": {
-    "Drops bar gaps and rounding while a window is maximized": ""
+    "Drops bar gaps and rounding while a window is maximized": "מסיר את מרווחי הסרגל ואת עיגול הפינות כאשר חלון מוגדל"
+  },
+  "Dune": {
+    "Dune": ""
+  },
+  "Duo": {
+    "Duo": ""
   },
   "Duplicate": {
     "Duplicate": "שכפל/י"
@@ -2415,7 +2499,7 @@
     "Dusk (Nautical Twilight)": "צאת הכוכבים (דמדומים ימיים)"
   },
   "Dwindle": {
-    "Dwindle": ""
+    "Dwindle": "Dwindle"
   },
   "Dynamic": {
     "Dynamic": "דינמי"
@@ -2435,6 +2519,9 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "צבעים דינמיים, הגדרות מוכנות"
   },
+  "Dynamic theme is off": {
+    "Dynamic theme is off": ""
+  },
   "Dynamic width": {
     "Dynamic width": "רוחב דינמי"
   },
@@ -2448,16 +2535,13 @@
     "Edge hover reveal": "חשיפה בריחוף על הקצה"
   },
   "Edge margin": {
-    "Edge margin": ""
+    "Edge margin": "שוליים מהקצה"
   },
   "Edge spacing": {
     "Edge spacing": "ריווח קצוות"
   },
   "Edge to edge": {
     "Edge to edge": "מקצה לקצה"
-  },
-  "Edit": {
-    "Edit": "עריכה"
   },
   "Edit App": {
     "Edit App": "ערוך/ערכי אפליקציה"
@@ -2483,8 +2567,23 @@
   "Edit rule": {
     "Edit rule": "עריכת חוק"
   },
+  "Edit shortcut": {
+    "Edit shortcut": ""
+  },
   "Edit widgets": {
     "Edit widgets": "עריכת ווידג׳טים"
+  },
+  "Editing the lock screen": {
+    "Editing the lock screen": ""
+  },
+  "Editing the lock screen, the login screen follows it": {
+    "Editing the lock screen, the login screen follows it": ""
+  },
+  "Editing the login screen": {
+    "Editing the login screen": ""
+  },
+  "Editing the login screen, shared with the lock screen": {
+    "Editing the login screen, shared with the lock screen": ""
   },
   "Education": {
     "Education": "חינוך"
@@ -2499,7 +2598,7 @@
     "Empty Trash (%1)": "רוקן/י אשפה (%1)"
   },
   "Empty placeholders fill the switcher up to the count": {
-    "Empty placeholders fill the switcher up to the count": ""
+    "Empty placeholders fill the switcher up to the count": "ממלאי מקום ריקים ממלאים את המחליף עד למספר שנקבע"
   },
   "Enable Wi-Fi before starting the hotspot.": {
     "Enable Wi-Fi before starting the hotspot.": "הפעל/י את הWiFi לפני הפעלת הנקודה החמה."
@@ -2607,13 +2706,16 @@
     "Ethernet": "Ethernet"
   },
   "Evenly space tabs": {
-    "Evenly space tabs": ""
+    "Evenly space tabs": "ריווח אחיד בין כרטיסיות"
   },
   "Event title": {
     "Event title": "כותרת האירוע"
   },
   "Every %1": {
     "Every %1": "כל %1"
+  },
+  "Every check": {
+    "Every check": ""
   },
   "Every edge of this display is already taken": {
     "Every edge of this display is already taken": "כל הקצוות של המסך הזה כבר תפוסים"
@@ -2623,6 +2725,9 @@
   },
   "Exact": {
     "Exact": "מדויק"
+  },
+  "Excluded apps": {
+    "Excluded apps": ""
   },
   "Excluded players": {
     "Excluded players": "נגנים שלא נכללים"
@@ -2670,7 +2775,7 @@
     "Extensible architecture": "ארכיטקטורה ניתנת להרחבה"
   },
   "External palette commands, namespaces": {
-    "External palette commands, namespaces": ""
+    "External palette commands, namespaces": "פקודות חיצוניות לפלטות ומרחבי שמות"
   },
   "Extra Arguments": {
     "Extra Arguments": "ארגומנטים נוספים"
@@ -2691,7 +2796,7 @@
     "Fade to lock screen": "דהייה למסך הנעילה"
   },
   "Fades the screen out first. Input during the fade cancels it": {
-    "Fades the screen out first. Input during the fade cancels it": ""
+    "Fades the screen out first. Input during the fade cancels it": "מעמעם תחילה את המסך. קלט במהלך העמעום מבטל אותו"
   },
   "Failed to activate configuration": {
     "Failed to activate configuration": "הפעלת התצורה נכשלה"
@@ -2879,6 +2984,9 @@
   "Failed to set brightness": {
     "Failed to set brightness": "הגדרת הבהירות נכשלה"
   },
+  "Failed to set next boot entry": {
+    "Failed to set next boot entry": ""
+  },
   "Failed to set night mode location": {
     "Failed to set night mode location": "הגדרת מיקום למצב לילה נכשלה"
   },
@@ -2948,9 +3056,6 @@
   "Family": {
     "Family": "משפחת הגופן"
   },
-  "Family, weight, scale, animation speed": {
-    "Family, weight, scale, animation speed": "משפחה, משקל, קנה מידה ומהירות אנימציה"
-  },
   "Features": {
     "Features": "תכונות"
   },
@@ -2962,9 +3067,6 @@
   },
   "Field": {
     "Field": "שדה"
-  },
-  "File": {
-    "File": "קובץ"
   },
   "File changed on disk": {
     "File changed on disk": "הקובץ השתנה בדיסק"
@@ -2979,7 +3081,7 @@
     "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "הכלי dsearch נדרש כדי לבצע חיפוש של קבצים.\nהתקן/י אותו מ: github.com/AvengeMedia/dsearch"
   },
   "File the command writes; leave empty to read stdout": {
-    "File the command writes; leave empty to read stdout": ""
+    "File the command writes; leave empty to read stdout": "הקובץ שאליו הפקודה כותבת; השאר/י ריק כדי לקרוא מstdout"
   },
   "Files": {
     "Files": "קבצים"
@@ -3004,6 +3106,9 @@
   },
   "Find in note...": {
     "Find in note...": "חפש/י בפתק..."
+  },
+  "Fine-tune the seed around the color wheel": {
+    "Fine-tune the seed around the color wheel": ""
   },
   "Fingerprint": {
     "Fingerprint": "טביעת אצבע"
@@ -3039,13 +3144,10 @@
     "Fit": "התאמה"
   },
   "Fits the song title instead of keeping a fixed width": {
-    "Fits the song title instead of keeping a fixed width": ""
+    "Fits the song title instead of keeping a fixed width": "מתאים את הרוחב לכותרת השיר במקום לשמור על רוחב קבוע"
   },
   "Fixed": {
-    "Fixed": ""
-  },
-  "Flags": {
-    "Flags": "דגלים"
+    "Fixed": "קבוע"
   },
   "Flat": {
     "Flat": "שטוח"
@@ -3128,9 +3230,6 @@
   "Fog": {
     "Fog": "ערפל"
   },
-  "Folder": {
-    "Folder": "תיקייה"
-  },
   "Folder, interval, daily time": {
     "Folder, interval, daily time": "תיקייה, מרווח זמן ושעה יומית"
   },
@@ -3146,11 +3245,17 @@
   "Follow focus": {
     "Follow focus": "עקוב/י אחר מיקוד"
   },
+  "Follow lock screen": {
+    "Follow lock screen": ""
+  },
   "Follow mouse": {
-    "Follow mouse": ""
+    "Follow mouse": "עקוב/י אחר העכבר"
   },
   "Follow playback": {
     "Follow playback": "עקוב/עקבי אחר ההשמעה"
+  },
+  "Follows the theme radius strength until overridden": {
+    "Follows the theme radius strength until overridden": ""
   },
   "Font": {
     "Font": "גופן"
@@ -3166,6 +3271,9 @@
   },
   "Fonts & motion": {
     "Fonts & motion": "גופנים ותנועה"
+  },
+  "Fonts, scale, animations": {
+    "Fonts, scale, animations": ""
   },
   "For %1": {
     "For %1": "למשך %1"
@@ -3186,7 +3294,7 @@
     "Force padding": "כפיית ריווח פנימי"
   },
   "Force split": {
-    "Force split": ""
+    "Force split": "כפה/י פיצול"
   },
   "Forecast": {
     "Forecast": "תחזית"
@@ -3233,14 +3341,11 @@
   "Frame Blur follows Background Blur in Theme & Colors": {
     "Frame Blur follows Background Blur in Theme & Colors": "טשטוש המסגרת עוקב אחר ההגדרה של ׳טשטוש רקע׳ ב׳ערכת נושא וצבעים׳"
   },
-  "Frame Border Color": {
-    "Frame Border Color": "צבע הגבול של המסגרת"
-  },
   "Frame xray": {
     "Frame xray": "רנטגן (xray) למסגרת"
   },
   "Frees the launcher when closed and rebuilds it on open": {
-    "Frees the launcher when closed and rebuilds it on open": ""
+    "Frees the launcher when closed and rebuilds it on open": "משחרר את המשגר כשהוא סגור ובונה אותו מחדש בעת הפתיחה"
   },
   "Freezing Drizzle": {
     "Freezing Drizzle": "טפטוף קפוא"
@@ -3252,7 +3357,7 @@
     "From %1": "מ-%1"
   },
   "From wallpaper": {
-    "From wallpaper": ""
+    "From wallpaper": "מתמונת הרקע"
   },
   "Fruit Salad": {
     "Fruit Salad": "סלט פירות"
@@ -3276,7 +3381,10 @@
     "Fullscreen only": "מסך מלא בלבד"
   },
   "Fullscreen single column": {
-    "Fullscreen single column": ""
+    "Fullscreen single column": "עמודה יחידה במסך מלא"
+  },
+  "Fullscreen windows": {
+    "Fullscreen windows": ""
   },
   "Fully Charged": {
     "Fully Charged": "טעונה במלואה"
@@ -3318,10 +3426,10 @@
     "Gap": "מרווח"
   },
   "Gap between the bar and its popouts follows edge spacing": {
-    "Gap between the bar and its popouts follows edge spacing": ""
+    "Gap between the bar and its popouts follows edge spacing": "המרווח בין הסרגל לחלונות הקופצים שלו עוקב אחר ריווח הקצוות"
   },
   "Gap between the bar ends and the outermost widgets": {
-    "Gap between the bar ends and the outermost widgets": ""
+    "Gap between the bar ends and the outermost widgets": "המרווח בין קצוות הסרגל לווידג׳טים החיצוניים ביותר"
   },
   "Gap size": {
     "Gap size": "גודל המרווח"
@@ -3332,11 +3440,17 @@
   "Gaps, window borders, corner radius": {
     "Gaps, window borders, corner radius": "מרווחים, מסגרות חלון ורדיוס פינות"
   },
+  "Garden": {
+    "Garden": ""
+  },
+  "Gaussian": {
+    "Gaussian": ""
+  },
   "General": {
     "General": "כללי"
   },
   "Generate Theme at Startup": {
-    "Generate Theme at Startup": ""
+    "Generate Theme at Startup": "יצירת ערכת נושא בהפעלה"
   },
   "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "צור/צרי תצורות בסיס עבור GTK3/4, QT5/QT6, או qtengine (לה qt6ct-kde נדרשת רק כשמשתמשים ב qt6ct) כדי לעקוב אחר הצבעים של DMS. צריך ליצור את התבנית רק פעם אחת.<br /><br />מומלץ להגדיר את %1 לפני החלת ערכות נושא על GTK."
@@ -3352,6 +3466,9 @@
   },
   "Get Started": {
     "Get Started": "התחל/י"
+  },
+  "Git": {
+    "Git": ""
   },
   "Global fonts can be configured in Settings → Personalization": {
     "Global fonts can be configured in Settings → Personalization": "ניתן להגדיר גופנים גלובליים בהגדרות ← התאמה אישית"
@@ -3385,6 +3502,9 @@
   },
   "Graphics": {
     "Graphics": "גרפיקה"
+  },
+  "Green": {
+    "Green": ""
   },
   "Greeter": {
     "Greeter": "מסך ההתחברות"
@@ -3429,7 +3549,7 @@
     "Groups": "קבוצות"
   },
   "Grows or shrinks the space windows keep clear": {
-    "Grows or shrinks the space windows keep clear": ""
+    "Grows or shrinks the space windows keep clear": "מגדיל או מקטין את השטח שהחלונות משאירים פנוי"
   },
   "H": {
     "H": "גובה"
@@ -3483,7 +3603,10 @@
     "Hidden apps": "אפליקציות מוסתרות"
   },
   "Hidden icons expand in place instead of in a popup": {
-    "Hidden icons expand in place instead of in a popup": ""
+    "Hidden icons expand in place instead of in a popup": "סמלים מוסתרים מתרחבים במקומם במקום בחלון קופץ"
+  },
+  "Hidden until screen time tracking is enabled": {
+    "Hidden until screen time tracking is enabled": ""
   },
   "Hidden until weather is enabled": {
     "Hidden until weather is enabled": "מוסתר עד שמזג האוויר מופעל"
@@ -3509,8 +3632,8 @@
   "Hide installed": {
     "Hide installed": "הסתר/י תוספים מותקנים"
   },
-  "Hide password": {
-    "Hide password": "הסתר/י סיסמה"
+  "Hide until typing": {
+    "Hide until typing": ""
   },
   "Hide when no updates": {
     "Hide when no updates": "הסתרה כשאין עדכונים"
@@ -3519,10 +3642,10 @@
     "Hide when windows open": "הסתר/י כאשר חלונות נפתחים"
   },
   "Hides even while a bar popout or menu is open": {
-    "Hides even while a bar popout or menu is open": ""
+    "Hides even while a bar popout or menu is open": "מסתיר גם כאשר חלון קופץ או תפריט של הסרגל פתוח"
   },
   "Hides only while a window overlaps the dock": {
-    "Hides only while a window overlaps the dock": ""
+    "Hides only while a window overlaps the dock": "מסתיר רק כאשר חלון חופף לDock"
   },
   "High": {
     "High": "גבוה"
@@ -3565,9 +3688,6 @@
   },
   "Home compact": {
     "Home compact": "בית קומפקטי"
-  },
-  "Home layout, notifications, satellites": {
-    "Home layout, notifications, satellites": "פריסת הבית, התראות ולוויינים"
   },
   "Horizontal": {
     "Horizontal": "אופקי"
@@ -3693,16 +3813,16 @@
     "Idle": "בהמתנה"
   },
   "Idle delay": {
-    "Idle delay": ""
+    "Idle delay": "השהיית המתנה"
   },
   "Idle inhibitor": {
     "Idle inhibitor": "מונע ההמתנה"
   },
   "Idle opacity": {
-    "Idle opacity": ""
+    "Idle opacity": "שקיפות במצב המתנה"
   },
   "Idle size": {
-    "Idle size": ""
+    "Idle size": "גודל במצב המתנה"
   },
   "Idle timeouts, power menu, custom actions": {
     "Idle timeouts, power menu, custom actions": "זמני המתנה לחוסר פעילות, תפריט חשמל ופעולות מותאמות אישית"
@@ -3767,6 +3887,9 @@
   "Include transitions": {
     "Include transitions": "כלול/כללי מעברים"
   },
+  "Includes the mouse pointer": {
+    "Includes the mouse pointer": ""
+  },
   "Incompatible plugins loaded": {
     "Incompatible plugins loaded": "נטענו תוספים לא תואמים"
   },
@@ -3775,9 +3898,6 @@
   },
   "Incorrect password - try again": {
     "Incorrect password - try again": "סיסמה שגויה - נסה/י שנית"
-  },
-  "Increase": {
-    "Increase": "הגדל/י"
   },
   "Index centering": {
     "Index centering": "מרכוז לפי אינדקס"
@@ -3793,9 +3913,6 @@
   },
   "Individual Batteries": {
     "Individual Batteries": "סוללות נפרדות"
-  },
-  "Individual bar configuration": {
-    "Individual bar configuration": "תצורת סרגל אישית"
   },
   "Info": {
     "Info": "מידע"
@@ -3816,7 +3933,7 @@
     "Initialised": "אותחל"
   },
   "Injected palettes": {
-    "Injected palettes": ""
+    "Injected palettes": "פלטות מוזרקות"
   },
   "Inline": {
     "Inline": "מוטמע"
@@ -3869,6 +3986,9 @@
   "Install plugin '%1' from the DMS registry?": {
     "Install plugin '%1' from the DMS registry?": "להתקין את התוסף '%1' מהמאגר של DMS?"
   },
+  "Install system updates?": {
+    "Install system updates?": ""
+  },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "להתקין את ערכת הנושא '%1' מהמאגר של DMS?"
   },
@@ -3877,6 +3997,9 @@
   },
   "Installed": {
     "Installed": "מותקן"
+  },
+  "Installed %1, still running %2": {
+    "Installed %1, still running %2": ""
   },
   "Installed first": {
     "Installed first": "מותקנים תחילה"
@@ -3920,8 +4043,8 @@
   "Invalid configuration": {
     "Invalid configuration": "הגדרה לא חוקית"
   },
-  "Invalid package name — letters, digits and @._+:- only.": {
-    "Invalid package name — letters, digits and @._+:- only.": "שם חבילה לא חוקי - אותיות, ספרות והתווים @._+:- בלבד."
+  "Invalid package name — letters, digits and @._+:/- only.": {
+    "Invalid package name — letters, digits and @._+:/- only.": ""
   },
   "Invalid username": {
     "Invalid username": "שם משתמש לא חוקי"
@@ -3935,8 +4058,11 @@
   "Isolate displays": {
     "Isolate displays": "בידוד מסכים"
   },
+  "Italic": {
+    "Italic": ""
+  },
   "JSON output path": {
-    "JSON output path": ""
+    "JSON output path": "נתיב פלט JSON"
   },
   "Jobs": {
     "Jobs": "עבודות"
@@ -3966,10 +4092,13 @@
     "Keeping Awake": "שינה נמנעת"
   },
   "Keeps the dock showing over fullscreen windows": {
-    "Keeps the dock showing over fullscreen windows": ""
+    "Keeps the dock showing over fullscreen windows": "משאיר את הDock מוצג מעל חלונות במסך מלא"
   },
   "Keeps the widget above windows instead of below them": {
-    "Keeps the widget above windows instead of below them": ""
+    "Keeps the widget above windows instead of below them": "משאיר את הווידג׳ט מעל החלונות במקום מתחתיהם"
+  },
+  "Kept for %1 days on this device": {
+    "Kept for %1 days on this device": ""
   },
   "Kernel": {
     "Kernel": "ליבה"
@@ -3998,9 +4127,6 @@
   "Keymap file": {
     "Keymap file": "קובץ מיפוי מקשים"
   },
-  "Keys": {
-    "Keys": "מקשים"
-  },
   "Kill": {
     "Kill": "סיום"
   },
@@ -4013,9 +4139,6 @@
   "LED device": {
     "LED device": "התקן LED"
   },
-  "LRCLIB": {
-    "LRCLIB": "LRCLIB"
-  },
   "LabWC IRC channel": {
     "LabWC IRC channel": "ערוץ הIRC של LabWC"
   },
@@ -4023,7 +4146,7 @@
     "LabWC website": "האתר של LabWC"
   },
   "Label overrides": {
-    "Label overrides": ""
+    "Label overrides": "דריסות תוויות"
   },
   "Language": {
     "Language": "שפה"
@@ -4039,6 +4162,9 @@
   },
   "Largest": {
     "Largest": "הכי גדול"
+  },
+  "Last commit %1": {
+    "Last commit %1": ""
   },
   "Last hour": {
     "Last hour": "בשעה האחרונה"
@@ -4071,7 +4197,7 @@
     "Last modified": "שונה לאחרונה"
   },
   "Last used on this screen": {
-    "Last used on this screen": ""
+    "Last used on this screen": "האחרון שהיה בשימוש במסך זה"
   },
   "Latitude": {
     "Latitude": "קו רוחב"
@@ -4119,7 +4245,10 @@
     "Layout, authentication, screensaver": "פריסה, אימות ושומר מסך"
   },
   "Layout, position, appearance": {
-    "Layout, position, appearance": ""
+    "Layout, position, appearance": "פריסה, מיקום ומראה"
+  },
+  "Layout, scale, night mode": {
+    "Layout, scale, night mode": ""
   },
   "Layouts": {
     "Layouts": "פריסות"
@@ -4134,7 +4263,7 @@
     "Least Saturated": "הכי פחות רווי"
   },
   "Leaves the overview when DMS launches an app or focuses a window": {
-    "Leaves the overview when DMS launches an app or focuses a window": ""
+    "Leaves the overview when DMS launches an app or focuses a window": "יוצא מהסקירה כאשר DMS מפעיל אפליקציה או ממקד חלון"
   },
   "Left": {
     "Left": "שמאל"
@@ -4155,7 +4284,7 @@
     "Level": "רמה"
   },
   "Light": {
-    "Light": "דק"
+    "Light": "בהיר"
   },
   "Light Rain": {
     "Light Rain": "גשם קל"
@@ -4167,7 +4296,7 @@
     "Light Snow Showers": "מקלחות שלג קלות"
   },
   "Light and dark mode follow and set the system color scheme": {
-    "Light and dark mode follow and set the system color scheme": ""
+    "Light and dark mode follow and set the system color scheme": "מצב בהיר וכהה עוקבים אחר ערכת הצבעים של המערכת ומגדירים אותה"
   },
   "Light direction": {
     "Light direction": "כיוון האור"
@@ -4187,6 +4316,9 @@
   "Lightest": {
     "Lightest": "הכי בהיר"
   },
+  "Limit": {
+    "Limit": ""
+  },
   "Limit set to %1%": {
     "Limit set to %1%": "המגבלה הוגדרה ל%1%"
   },
@@ -4197,10 +4329,22 @@
     "Line: %1": "שורה: %1"
   },
   "Lines": {
-    "Lines": ""
+    "Lines": "קווים"
   },
   "Lines: %1": {
     "Lines: %1": "שורות: %1"
+  },
+  "Link your DMS settings so the login screen follows them.": {
+    "Link your DMS settings so the login screen follows them.": ""
+  },
+  "Link your DMS settings so the login screen follows them. Administrator access is required.": {
+    "Link your DMS settings so the login screen follows them. Administrator access is required.": ""
+  },
+  "Linked": {
+    "Linked": ""
+  },
+  "Linked as a snapshot": {
+    "Linked as a snapshot": ""
   },
   "List": {
     "List": "רשימה"
@@ -4209,7 +4353,10 @@
     "Listening from": "מושמע מתוך"
   },
   "Lists workspaces from whichever display has focus": {
-    "Lists workspaces from whichever display has focus": ""
+    "Lists workspaces from whichever display has focus": "מציג סביבות עבודה מהמסך שנמצא במוקד"
+  },
+  "Live activities that grow out of the bar": {
+    "Live activities that grow out of the bar": ""
   },
   "Lively palette with saturated accents.": {
     "Lively palette with saturated accents.": "פלטת צבעים תוססת עם דגשים רוויים."
@@ -4240,9 +4387,6 @@
   },
   "Locale": {
     "Locale": "שפה ואזור"
-  },
-  "Location": {
-    "Location": "מיקום"
   },
   "Location search": {
     "Location search": "חיפוש מיקום"
@@ -4280,6 +4424,12 @@
   "Login screen appearance and authentication": {
     "Login screen appearance and authentication": "מראה מסך ההתחברות ואימות"
   },
+  "Login screen unlinked.": {
+    "Login screen unlinked.": ""
+  },
+  "Long": {
+    "Long": ""
+  },
   "Long Text": {
     "Long Text": "טקסט ארוך"
   },
@@ -4313,11 +4463,11 @@
   "Lyrics providers": {
     "Lyrics providers": "ספקי מילות שירים"
   },
-  "LyricsPlus": {
-    "LyricsPlus": "LyricsPlus"
-  },
   "MIT License": {
     "MIT License": "רישיון MIT"
+  },
+  "Magnification": {
+    "Magnification": ""
   },
   "Mail": {
     "Mail": "דואר"
@@ -4328,11 +4478,11 @@
   "Manage Registries": {
     "Manage Registries": "ניהול מאגרים"
   },
-  "Managed by Frame": {
-    "Managed by Frame": "מנוהל על ידי המסגרת"
-  },
   "Managed by Frame in Connected Mode": {
     "Managed by Frame in Connected Mode": "מנוהל על ידי המסגרת במצב ״מחובר״"
+  },
+  "Managed by Nix": {
+    "Managed by Nix": ""
   },
   "Managed by the primary PAM source": {
     "Managed by the primary PAM source": "מנוהל על ידי מקור הPAM הראשי"
@@ -4386,13 +4536,16 @@
     "Marker Waste Full": "מיכל העודפים מלא"
   },
   "Master": {
-    "Master": ""
+    "Master": "Master"
+  },
+  "Master branch": {
+    "Master branch": ""
   },
   "Master position": {
-    "Master position": ""
+    "Master position": "מיקום הMaster"
   },
   "Master size": {
-    "Master size": ""
+    "Master size": "גודל הMaster"
   },
   "Match (%1)": {
     "Match (%1)": "התאמה (%1)"
@@ -4403,8 +4556,17 @@
   "Match Criteria": {
     "Match Criteria": "קריטריוני התאמה"
   },
+  "Match corner style": {
+    "Match corner style": ""
+  },
+  "Match type": {
+    "Match type": ""
+  },
   "Matches player identity or desktop file name, case-insensitive": {
     "Matches player identity or desktop file name, case-insensitive": "מתאים לזהות הנגן או לשם קובץ הDesktop, ללא תלות באותיות גדולות וקטנות"
+  },
+  "Material": {
+    "Material": ""
   },
   "Material Design inspired color themes": {
     "Material Design inspired color themes": "ערכות צבעים בהשראת Material Design"
@@ -4413,10 +4575,10 @@
     "Material colors generated from wallpaper": "צבעי Material שנוצרו מהרקע"
   },
   "Material palette": {
-    "Material palette": ""
+    "Material palette": "פלטת Material"
   },
   "Material scale": {
-    "Material scale": ""
+    "Material scale": "קנה מידה של Material"
   },
   "Matugen Missing": {
     "Matugen Missing": "Matugen חסר"
@@ -4453,9 +4615,6 @@
   },
   "Max volume": {
     "Max volume": "עוצמה מקסימלית"
-  },
-  "Maximize": {
-    "Maximize": "ממוקסם"
   },
   "Maximize detection": {
     "Maximize detection": "זיהוי הגדלה של החלון"
@@ -4556,20 +4715,23 @@
   "Min W": {
     "Min W": "רוחב מינימלי"
   },
+  "Minimal": {
+    "Minimal": ""
+  },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "פלטת צבעים מינימלית הבנויה סביב גוון יחיד."
   },
-  "Minimize": {
-    "Minimize": "מזעור"
-  },
   "Minimum workspaces": {
-    "Minimum workspaces": ""
+    "Minimum workspaces": "מספר מינימלי של סביבות עבודה"
   },
   "Mirror display": {
     "Mirror display": "שיקוף תצוגה"
   },
   "Missing Environment Variables": {
     "Missing Environment Variables": "משתני סביבה חסרים"
+  },
+  "Mix all stereo content into a single channel": {
+    "Mix all stereo content into a single channel": ""
   },
   "Mixed": {
     "Mixed": "מעורב"
@@ -4595,6 +4757,9 @@
   "Monitor": {
     "Monitor": "מסך"
   },
+  "Mono Audio": {
+    "Mono Audio": ""
+  },
   "Monochrome": {
     "Monochrome": "מונוכרומטי"
   },
@@ -4603,6 +4768,9 @@
   },
   "Monospace family": {
     "Monospace family": "משפחת גופן ברוחב קבוע"
+  },
+  "Month": {
+    "Month": ""
   },
   "Month date": {
     "Month date": "חודש תאריך"
@@ -4619,6 +4787,9 @@
   "More": {
     "More": "עוד"
   },
+  "More widgets": {
+    "More widgets": ""
+  },
   "Morning": {
     "Morning": "בוקר"
   },
@@ -4627,6 +4798,12 @@
   },
   "Most Vivid": {
     "Most Vivid": "הכי ססגוני"
+  },
+  "Most used apps": {
+    "Most used apps": ""
+  },
+  "Motion": {
+    "Motion": ""
   },
   "Mount": {
     "Mount": "נקודת עגינה"
@@ -4640,23 +4817,23 @@
   "Mouse & touchpad": {
     "Mouse & touchpad": "עכבר ומשטח מגע"
   },
-  "Move": {
-    "Move": "הזזה"
-  },
-  "Move down": {
-    "Move down": "הזז/י למטה"
-  },
   "Move out of scratchpad": {
-    "Move out of scratchpad": ""
+    "Move out of scratchpad": "העבר/י אל מחוץ לScratchpad"
+  },
+  "Move row to footer": {
+    "Move row to footer": ""
+  },
+  "Move row to header": {
+    "Move row to header": ""
   },
   "Move to scratchpad": {
-    "Move to scratchpad": ""
+    "Move to scratchpad": "העבר/י לScratchpad"
   },
   "Move to scratchpad: %1": {
-    "Move to scratchpad: %1": ""
+    "Move to scratchpad: %1": "העבר/י לScratchpad: %1"
   },
-  "Move up": {
-    "Move up": "הזז/י למעלה"
+  "Moves focus along with the column": {
+    "Moves focus along with the column": ""
   },
   "Moving to Paused": {
     "Moving to Paused": "עובר להשהיה"
@@ -4716,7 +4893,7 @@
     "Name format": "תבנית שם"
   },
   "Named workspaces and scratchpads": {
-    "Named workspaces and scratchpads": ""
+    "Named workspaces and scratchpads": "סביבות עבודה בעלות שם וScratchpads"
   },
   "Names": {
     "Names": "שמות"
@@ -4734,7 +4911,7 @@
     "Near island": "קרוב לאי"
   },
   "Nested chip": {
-    "Nested chip": ""
+    "Nested chip": "לחצן מקונן"
   },
   "Network": {
     "Network": "רשת"
@@ -4772,9 +4949,6 @@
   "New": {
     "New": "חדש"
   },
-  "New Keybind": {
-    "New Keybind": "קיצור מקלדת חדש"
-  },
   "New Session": {
     "New Session": "הפעלה חדשה"
   },
@@ -4794,22 +4968,19 @@
     "New notification": "התראה חדשה"
   },
   "New notifications show as regular popups": {
-    "New notifications show as regular popups": ""
+    "New notifications show as regular popups": "התראות חדשות מוצגות כחלונות קופצים רגילים"
   },
   "New profile": {
     "New profile": "פרופיל חדש"
-  },
-  "New shortcut": {
-    "New shortcut": "קיצור דרך חדש"
   },
   "New tab": {
     "New tab": "כרטיסייה חדשה"
   },
   "New windows": {
-    "New windows": ""
+    "New windows": "חלונות חדשים"
   },
   "New windows on top of the stack": {
-    "New windows on top of the stack": ""
+    "New windows on top of the stack": "חלונות חדשים בראש הערימה"
   },
   "Next": {
     "Next": "הבא"
@@ -4828,6 +4999,9 @@
   },
   "Night mode & gamma": {
     "Night mode & gamma": "מצב לילה וגאמה"
+  },
+  "Night mode exceptions": {
+    "Night mode exceptions": ""
   },
   "Night mode failed: DMS gamma control not available": {
     "Night mode failed: DMS gamma control not available": "מצב לילה נכשל: בקרת גאמה של DMS אינה זמינה"
@@ -4889,6 +5063,9 @@
   "No app customizations.": {
     "No app customizations.": "אין התאמות אישיות לאפליקציות."
   },
+  "No app limits": {
+    "No app limits": ""
+  },
   "No application selected": {
     "No application selected": "לא נבחרה אפליקציה"
   },
@@ -4915,9 +5092,6 @@
   },
   "No brightness devices available": {
     "No brightness devices available": "אין התקני בהירות זמינים"
-  },
-  "No changes": {
-    "No changes": "אין שינויים"
   },
   "No checks passed": {
     "No checks passed": "אף בדיקה לא עברה"
@@ -4957,6 +5131,9 @@
   },
   "No errors": {
     "No errors": "אין שגיאות"
+  },
+  "No excluded apps configured": {
+    "No excluded apps configured": ""
   },
   "No excluded players configured": {
     "No excluded players configured": "לא הוגדרו נגנים שלא נכללים"
@@ -4998,7 +5175,7 @@
     "No keybinds found": "לא נמצאו קיצורי מקלדת"
   },
   "No label overrides": {
-    "No label overrides": ""
+    "No label overrides": "אין דריסות תוויות"
   },
   "No launcher plugins installed.": {
     "No launcher plugins installed.": "אין תוספי משגר מותקנים."
@@ -5016,7 +5193,7 @@
     "No matching processes": "אין תהליכים תואמים"
   },
   "No media found.": {
-    "No media found.": ""
+    "No media found.": "לא נמצאה מדיה."
   },
   "No monitors": {
     "No monitors": "אין מסכים"
@@ -5037,7 +5214,7 @@
     "No packages ignored. Add one here or hover an update in the popout and click the hide button.": "אין חבילות בהתעלמות. הוסף/י אחת כאן או באמצעות ריחוף מעל עדכון בחלון הקופץ ולחיצה על כפתור ההסתרה."
   },
   "No palettes configured. Use + to add one.": {
-    "No palettes configured. Use + to add one.": ""
+    "No palettes configured. Use + to add one.": "לא הוגדרו פלטות. השתמש/י ב+ כדי להוסיף אחת."
   },
   "No peers found": {
     "No peers found": "לא נמצאו עמיתים"
@@ -5103,7 +5280,7 @@
     "No supported package manager found.": "לא נמצא מנהל חבילות נתמך."
   },
   "No tabs enabled": {
-    "No tabs enabled": ""
+    "No tabs enabled": "לא הופעלו כרטיסיות"
   },
   "No themes found": {
     "No themes found": "לא נמצאו ערכות נושא"
@@ -5175,7 +5352,10 @@
     "Normal Priority": "עדיפות רגילה"
   },
   "Normal routing": {
-    "Normal routing": ""
+    "Normal routing": "ניתוב רגיל"
+  },
+  "Not active": {
+    "Not active": ""
   },
   "Not available": {
     "Not available": "לא זמינה"
@@ -5201,6 +5381,12 @@
   "Not detected": {
     "Not detected": "לא זוהה"
   },
+  "Not installed": {
+    "Not installed": ""
+  },
+  "Not linked": {
+    "Not linked": ""
+  },
   "Not set": {
     "Not set": "לא מוגדר"
   },
@@ -5219,8 +5405,8 @@
   "Nothing": {
     "Nothing": "כלום"
   },
-  "Nothing to see here": {
-    "Nothing to see here": "אין מה לראות כאן"
+  "Nothing tracked yet": {
+    "Nothing tracked yet": ""
   },
   "Notification": {
     "Notification": "התראה"
@@ -5229,13 +5415,28 @@
     "Notification Center": "מרכז ההתראות"
   },
   "Notification badge": {
-    "Notification badge": ""
+    "Notification badge": "תג התראות"
   },
   "Notification popups": {
     "Notification popups": "חלוניות התראה קופצות"
   },
+  "Notification rules": {
+    "Notification rules": ""
+  },
   "Notifications": {
     "Notifications": "התראות"
+  },
+  "Notifies when today's screen time passes the limit": {
+    "Notifies when today's screen time passes the limit": ""
+  },
+  "Notifies when today's use of this app passes the limit": {
+    "Notifies when today's use of this app passes the limit": ""
+  },
+  "Notify at most": {
+    "Notify at most": ""
+  },
+  "Notify me on new updates": {
+    "Notify me on new updates": ""
   },
   "Notify when limit is reached": {
     "Notify when limit is reached": "שליחת התראה בעת ההגעה למגבלה"
@@ -5252,9 +5453,6 @@
   "Numeric (M/D)": {
     "Numeric (M/D)": "מספרי (M/D)"
   },
-  "OK": {
-    "OK": "תקין"
-  },
   "OS Logo": {
     "OS Logo": "לוגו מערכת ההפעלה"
   },
@@ -5268,7 +5466,7 @@
     "Off": "כבוי"
   },
   "Off keeps the bar hidden until turned back on or shown over IPC": {
-    "Off keeps the bar hidden until turned back on or shown over IPC": ""
+    "Off keeps the bar hidden until turned back on or shown over IPC": "מצב כבוי משאיר את הסרגל מוסתר עד להפעלה מחדש או להצגה דרך IPC"
   },
   "Office": {
     "Office": "משרד"
@@ -5300,6 +5498,9 @@
   "Once a day": {
     "Once a day": "פעם ביום"
   },
+  "Once a week": {
+    "Once a week": ""
+  },
   "Online": {
     "Online": "מקוון"
   },
@@ -5312,23 +5513,14 @@
   "Opacity": {
     "Opacity": "שקיפות"
   },
-  "Opacity, borders, blur, shadows, corners": {
-    "Opacity, borders, blur, shadows, corners": "שקיפות, מסגרות, טשטוש, צללים ופינות"
-  },
   "Opaque": {
     "Opaque": "אטום"
-  },
-  "Open": {
-    "Open": "פתח/י"
   },
   "Open Frame": {
     "Open Frame": "פתח/י מסגרת"
   },
   "Open From": {
     "Open From": "פתח/י מתוך"
-  },
-  "Open Island": {
-    "Open Island": "פתח/י את האי"
   },
   "Open Notepad File": {
     "Open Notepad File": "פתח/י קובץ בפנקס"
@@ -5351,14 +5543,14 @@
   "Open folder": {
     "Open folder": "פתח/י תיקייה"
   },
-  "Open in Browser": {
-    "Open in Browser": "פתח/י בדפדפן"
-  },
   "Open in terminal": {
     "Open in terminal": "פתח/י במסוף"
   },
+  "Open in the Island": {
+    "Open in the Island": ""
+  },
   "Open large file?": {
-    "Open large file?": ""
+    "Open large file?": "לפתוח קובץ גדול?"
   },
   "Open network": {
     "Open network": "רשת פתוחה"
@@ -5378,6 +5570,12 @@
   "Opens": {
     "Opens": "פותח"
   },
+  "Opens %1": {
+    "Opens %1": ""
+  },
+  "Opens a floating window with the live output": {
+    "Opens a floating window with the live output": ""
+  },
   "Optional description": {
     "Optional description": "תיאור אופציונלי"
   },
@@ -5396,8 +5594,17 @@
   "Options of one widget instance": {
     "Options of one widget instance": "אפשרויות של מופע ווידג׳ט אחד"
   },
+  "Orange": {
+    "Orange": ""
+  },
+  "Orbit": {
+    "Orbit": ""
+  },
+  "Order": {
+    "Order": "סדר"
+  },
   "Orientation": {
-    "Orientation": ""
+    "Orientation": "כיוון"
   },
   "Original: %1": {
     "Original: %1": "מקורי: %1"
@@ -5450,6 +5657,12 @@
   "Overflow": {
     "Overflow": "גלישה"
   },
+  "Overflow button position": {
+    "Overflow button position": ""
+  },
+  "Overlapping": {
+    "Overlapping": ""
+  },
   "Overlay": {
     "Overlay": "שכבת כיסוי"
   },
@@ -5489,9 +5702,6 @@
   "PIN": {
     "PIN": "קוד PIN"
   },
-  "PM": {
-    "PM": "PM"
-  },
   "Package name (e.g., docker)": {
     "Package name (e.g., docker)": "שם החבילה (לדוגמה docker)"
   },
@@ -5517,13 +5727,16 @@
     "Pairing...": "מתאים..."
   },
   "Palette": {
-    "Palette": "פלטה"
+    "Palette": "פלטת צבעים"
   },
   "Palette %1": {
-    "Palette %1": ""
+    "Palette %1": "פלטה %1"
   },
   "Palette name": {
-    "Palette name": ""
+    "Palette name": "שם הפלטה"
+  },
+  "Palette style": {
+    "Palette style": ""
   },
   "Panel height (rows)": {
     "Panel height (rows)": "גובה הפאנל (שורות)"
@@ -5533,6 +5746,9 @@
   },
   "Panel width (columns)": {
     "Panel width (columns)": "רוחב הפאנל (עמודות)"
+  },
+  "Parabolic": {
+    "Parabolic": ""
   },
   "Partially synchronized": {
     "Partially synchronized": "מסונכרן חלקית"
@@ -5551,6 +5767,9 @@
   },
   "Password change failed (exit %1)": {
     "Password change failed (exit %1)": "שינוי הסיסמה נכשל (יציאה %1)"
+  },
+  "Password field": {
+    "Password field": ""
   },
   "Password must be 8 to 63 characters, or a 64-digit hex key.": {
     "Password must be 8 to 63 characters, or a 64-digit hex key.": "הסיסמה חייבת להכיל בין 8 ל63 תווים, או מפתח הקסדצימלי בן 64 ספרות."
@@ -5582,6 +5801,15 @@
   "Pause": {
     "Pause": "השהיה"
   },
+  "Pause checks on battery": {
+    "Pause checks on battery": ""
+  },
+  "Pause night mode while a fullscreen window has focus": {
+    "Pause night mode while a fullscreen window has focus": ""
+  },
+  "Pause night mode while one of these apps has focus": {
+    "Pause night mode while one of these apps has focus": ""
+  },
   "Paused": {
     "Paused": "מושהה"
   },
@@ -5612,17 +5840,26 @@
   "Permission denied to set profile image.": {
     "Permission denied to set profile image.": "ההרשאה להגדרת תמונת הפרופיל נדחתה."
   },
+  "Petal": {
+    "Petal": ""
+  },
   "Pick Color": {
     "Pick Color": "דגימת צבע"
   },
   "Pick a different file manager in Settings → Dock → Trash.": {
     "Pick a different file manager in Settings → Dock → Trash.": "בחר/י מנהל קבצים אחר בהגדרות → Dock → אשפה."
   },
+  "Pick an app from the list above or the dashboard tab": {
+    "Pick an app from the list above or the dashboard tab": ""
+  },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": "בחר/י כמה זמן להשהות התראות"
   },
   "Pick how long to stay awake": {
     "Pick how long to stay awake": "בחר/י למשך כמה זמן להישאר פעיל"
+  },
+  "Pill": {
+    "Pill": ""
   },
   "Pills": {
     "Pills": "כפתורים"
@@ -5632,6 +5869,9 @@
   },
   "Pin to Dock": {
     "Pin to Dock": "נעץ/י בDock"
+  },
+  "Pink": {
+    "Pink": ""
   },
   "Pinned": {
     "Pinned": "מוצמד"
@@ -5646,7 +5886,7 @@
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "מקם/י כאן את תיקיות התוספים. לכל תוסף צריך להיות קובץ מניפסט בשם plugin.json."
   },
   "Placement": {
-    "Placement": ""
+    "Placement": "מיקום"
   },
   "Play": {
     "Play": "נגן"
@@ -5690,6 +5930,9 @@
   "Plugin": {
     "Plugin": "תוסף"
   },
+  "Plugin Source Code": {
+    "Plugin Source Code": ""
+  },
   "Plugin dependency missing": {
     "Plugin dependency missing": "חסרה חבילה נדרשת לתוסף"
   },
@@ -5727,7 +5970,7 @@
     "Pointer": "מצביע"
   },
   "Pointer at the launcher edge opens it, unless a bar or dock is there": {
-    "Pointer at the launcher edge opens it, unless a bar or dock is there": ""
+    "Pointer at the launcher edge opens it, unless a bar or dock is there": "העברת הסמן לקצה המשגר פותחת אותו, אלא אם יש שם סרגל או Dock"
   },
   "Pointer speed": {
     "Pointer speed": "מהירות מצביע"
@@ -5742,7 +5985,7 @@
     "Popouts": "חלונות קופצים"
   },
   "Popouts and modals use the main animation duration": {
-    "Popouts and modals use the main animation duration": ""
+    "Popouts and modals use the main animation duration": "חלונות קופצים ומודלים משתמשים במשך האנימציה הראשי"
   },
   "Popular Plugins": {
     "Popular Plugins": "תוספים פופולריים"
@@ -5757,7 +6000,7 @@
     "Popups": "חלונות קופצים"
   },
   "Popups hide the message until expanded": {
-    "Popups hide the message until expanded": ""
+    "Popups hide the message until expanded": "חלונות קופצים מסתירים את ההודעה עד להרחבה"
   },
   "Popups, do not disturb, rules": {
     "Popups, do not disturb, rules": "חלונות קופצים, מצב ״נא לא להפריע״ וכללים"
@@ -5780,14 +6023,14 @@
   "Position": {
     "Position": "מיקום"
   },
-  "Position, appearance, island": {
-    "Position, appearance, island": "מיקום, מראה ואי"
-  },
   "Position, displays, auto-hide, behavior": {
     "Position, displays, auto-hide, behavior": "מיקום, מסכים, הסתרה אוטומטית והתנהגות"
   },
   "Position, pinned apps": {
     "Position, pinned apps": "מיקום, אפליקציות מוצמדות"
+  },
+  "Position, pinned apps, trash": {
+    "Position, pinned apps, trash": ""
   },
   "Possible override conflicts": {
     "Possible override conflicts": "קונפליקטים אפשריים של דריסה"
@@ -5831,20 +6074,26 @@
   "Power source": {
     "Power source": "מקור חשמל"
   },
+  "Pre-release": {
+    "Pre-release": ""
+  },
   "Precipitation": {
     "Precipitation": "משקעים"
   },
   "Preference": {
     "Preference": "העדפה"
   },
+  "Presentation": {
+    "Presentation": ""
+  },
   "Preserve split": {
-    "Preserve split": ""
+    "Preserve split": "שמור/שמרי על הפיצול"
   },
   "Preset widths (%)": {
     "Preset widths (%)": "רוחבים מוגדרים מראש (%)"
   },
-  "Presets": {
-    "Presets": "הגדרות מוכנות"
+  "Press Apply changes to update the login screen": {
+    "Press Apply changes to update the login screen": ""
   },
   "Press Ctrl+N or click 'New Session' to create one": {
     "Press Ctrl+N or click 'New Session' to create one": "לחץ/י על Ctrl+N או על הכפתור 'הפעלה חדשה' כדי ליצור אחת"
@@ -5954,6 +6203,9 @@
   "Profile error": {
     "Profile error": "שגיאת פרופיל"
   },
+  "Profile image": {
+    "Profile image": ""
+  },
   "Profile image is too large. Please use a smaller image.": {
     "Profile image is too large. Please use a smaller image.": "תמונת הפרופיל גדולה מדי. נא להשתמש בתמונה קטנה יותר."
   },
@@ -5975,6 +6227,9 @@
   "Profile saved: %1": {
     "Profile saved: %1": "פרופיל נשמר: %1"
   },
+  "Profile sync failed.": {
+    "Profile sync failed.": ""
+  },
   "Profiles": {
     "Profiles": "פרופילים"
   },
@@ -5983,6 +6238,15 @@
   },
   "Protocol": {
     "Protocol": "פרוטוקול"
+  },
+  "Pulse animation": {
+    "Pulse animation": ""
+  },
+  "Purple": {
+    "Purple": ""
+  },
+  "Push neighboring icons": {
+    "Push neighboring icons": ""
   },
   "QR Generator": {
     "QR Generator": "מחולל קודי QR"
@@ -6032,14 +6296,17 @@
   "Rate": {
     "Rate": "קצב"
   },
+  "Re-applies the greetd command, permissions and PAM authentication. Needs administrator access.": {
+    "Re-applies the greetd command, permissions and PAM authentication. Needs administrator access.": ""
+  },
   "Re-enter the password before saving.": {
     "Re-enter the password before saving.": "הזן/י את הסיסמה מחדש לפני השמירה."
   },
   "Reach local network devices while using an exit node": {
     "Reach local network devices while using an exit node": "אפשר/י גישה להתקני רשת מקומית בעת שימוש בנקודת יציאה (Exit node)"
   },
-  "Read-only legacy config": {
-    "Read-only legacy config": "תצורת מורשת לקריאה בלבד"
+  "Read the blog post": {
+    "Read the blog post": ""
   },
   "Read:": {
     "Read:": "קריאה:"
@@ -6049,6 +6316,15 @@
   },
   "Reason": {
     "Reason": "סיבה"
+  },
+  "Reboot recommended": {
+    "Reboot recommended": ""
+  },
+  "Reboot to %1": {
+    "Reboot to %1": ""
+  },
+  "Reboot to another OS": {
+    "Reboot to another OS": ""
   },
   "Recent": {
     "Recent": "אחרונים"
@@ -6065,11 +6341,11 @@
   "Record": {
     "Record": "הקלט/י"
   },
+  "Red": {
+    "Red": ""
+  },
   "Reduce motion": {
     "Reduce motion": "הפחתת תנועה"
-  },
-  "Refresh": {
-    "Refresh": "רענון"
   },
   "Refresh Weather": {
     "Refresh Weather": "רענן/י מזג אוויר"
@@ -6078,7 +6354,7 @@
     "Refreshing...": "מרענן..."
   },
   "Regenerate matugen colors when DMS starts, even if nothing changed.": {
-    "Regenerate matugen colors when DMS starts, even if nothing changed.": ""
+    "Regenerate matugen colors when DMS starts, even if nothing changed.": "צור/צרי מחדש את צבעי matugen כאשר DMS מופעל, גם אם דבר לא השתנה."
   },
   "Regex": {
     "Regex": "Regex"
@@ -6094,6 +6370,12 @@
   },
   "Release": {
     "Release": "שחרור"
+  },
+  "Release notes": {
+    "Release notes": ""
+  },
+  "Release notes are unavailable": {
+    "Release notes are unavailable": ""
   },
   "Release to confirm": {
     "Release to confirm": "שחרר/י כדי לאשר"
@@ -6152,6 +6434,9 @@
   "Remove match": {
     "Remove match": "הסר/י התאמה"
   },
+  "Remove override": {
+    "Remove override": ""
+  },
   "Remove the shortcut %1?": {
     "Remove the shortcut %1?": "להסיר את קיצור הדרך %1?"
   },
@@ -6163,9 +6448,6 @@
   },
   "Removed greeter login access": {
     "Removed greeter login access": "הוסרה גישת התחברות לgreeter"
-  },
-  "Rename": {
-    "Rename": "שנה/י שם"
   },
   "Rename Session": {
     "Rename Session": "שינוי שם להפעלה"
@@ -6191,8 +6473,11 @@
   "Repeat rate": {
     "Repeat rate": "קצב חזרה"
   },
+  "Repeats while the key is held": {
+    "Repeats while the key is held": ""
+  },
   "Replace a displayed layout label with custom text, e.g. \"am-phonetic-alt\" → \"am": {
-    "Replace a displayed layout label with custom text, e.g. \"am-phonetic-alt\" → \"am\"": ""
+    "Replace a displayed layout label with custom text, e.g. \"am-phonetic-alt\" → \"am\"": "החלף/י תווית פריסה מוצגת בטקסט מותאם אישית, לדוגמה \"am-phonetic-alt\" → \"am\""
   },
   "Replacement": {
     "Replacement": "החלפה"
@@ -6251,9 +6536,6 @@
   "Reset to default": {
     "Reset to default": "איפוס לברירת מחדל"
   },
-  "Resize": {
-    "Resize": "שינוי גודל"
-  },
   "Resize on border": {
     "Resize on border": "שינוי גודל במסגרת"
   },
@@ -6268,9 +6550,6 @@
   },
   "Restarting audio system...": {
     "Restarting audio system...": "מפעיל מערכת שמע מחדש..."
-  },
-  "Restore": {
-    "Restore": "שחזור"
   },
   "Restore special workspace": {
     "Restore special workspace": "שחזור סביבת עבודה מיוחדת"
@@ -6314,12 +6593,6 @@
   "Right-click an app in the launcher and choose 'Hide App'": {
     "Right-click an app in the launcher and choose 'Hide App'": "לחץ/י לחיצה ימנית על אפליקציה במשגר ובחר/י ׳הסתר/י אפליקציה׳"
   },
-  "Right-click and drag anywhere on the widget": {
-    "Right-click and drag anywhere on the widget": "לחץ/י לחיצה ימנית וגרור/גררי בכל מקום על הווידג׳ט"
-  },
-  "Right-click and drag the bottom-right corner": {
-    "Right-click and drag the bottom-right corner": "לחץ/י לחיצה ימנית וגרור/גררי את הפינה הימנית התחתונה"
-  },
   "Right-click bar widget to cycle": {
     "Right-click bar widget to cycle": "לחץ/י קליק ימני על הווידג׳ט כדי לעבור במעגל"
   },
@@ -6338,11 +6611,14 @@
   "Rounded": {
     "Rounded": "מעוגל"
   },
+  "Roundness": {
+    "Roundness": ""
+  },
   "Route Bluetooth headset controls to the active DMS media player": {
     "Route Bluetooth headset controls to the active DMS media player": "נתב/י את בקרי אוזניות הBluetooth לנגן המדיה הפעיל של DMS"
   },
   "Routes launcher, dash, control center and notification shortcuts": {
-    "Routes launcher, dash, control center and notification shortcuts": ""
+    "Routes launcher, dash, control center and notification shortcuts": "מנתב קיצורי דרך של המשגר, הDash, מרכז הבקרה וההתראות"
   },
   "Rows": {
     "Rows": "שורות"
@@ -6378,7 +6654,10 @@
     "Run a shell command (e.g., notify-send)": "הרץ/י פקודת מעטפת (לדוגמא notify-send)"
   },
   "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": {
-    "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": ""
+    "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": "הרץ/י פקודה חיצונית בכל שינוי של תמונת הרקע ומזג/י את פלטת הJSON שלה לתוך matugen תחת מרחב שמות, כדי שתבניות יוכלו להשתמש, לדוגמה, ב{{name.color0}}. הפקודה מקבלת את תמונת הרקע בתור {image} / $DMS_WALLPAPER ואת המצב בתור {mode} / $DMS_MODE."
+  },
+  "Run full sync": {
+    "Run full sync": ""
   },
   "Run user templates": {
     "Run user templates": "הרץ/י תבניות משתמש"
@@ -6394,6 +6673,9 @@
   },
   "Running in terminal": {
     "Running in terminal": "פועל במסוף"
+  },
+  "Runs in a terminal.": {
+    "Runs in a terminal.": ""
   },
   "S": {
     "S": "ד"
@@ -6488,6 +6770,15 @@
   "Screen sharing": {
     "Screen sharing": "שיתוף מסך"
   },
+  "Screen time": {
+    "Screen time": ""
+  },
+  "Screen time and app limits": {
+    "Screen time and app limits": ""
+  },
+  "Screen time history": {
+    "Screen time history": ""
+  },
   "Screenshot unavailable": {
     "Screenshot unavailable": "צילום מסך לא זמין"
   },
@@ -6512,6 +6803,9 @@
   "Scroll wheel": {
     "Scroll wheel": "גלגל הגלילה"
   },
+  "Scrollbars": {
+    "Scrollbars": ""
+  },
   "Scrolling": {
     "Scrolling": "גלילה"
   },
@@ -6519,7 +6813,7 @@
     "Search": "חיפוש"
   },
   "Search also matches actions apps provide, like New Window": {
-    "Search also matches actions apps provide, like New Window": ""
+    "Search also matches actions apps provide, like New Window": "החיפוש מאתר גם פעולות שאפליקציות מספקות, כמו ״חלון חדש״"
   },
   "Search applications...": {
     "Search applications...": "חפש/י אפליקציות..."
@@ -6528,7 +6822,7 @@
     "Search devices...": "חפש/י התקנים..."
   },
   "Search keybinds...": {
-    "Search keybinds...": ""
+    "Search keybinds...": "חפש/י קיצורי מקלדת..."
   },
   "Search plugins...": {
     "Search plugins...": "חפש/י תוספים..."
@@ -6594,7 +6888,7 @@
     "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": "זוהתה תמיכה במפתח אבטחה, אך לא נמצא מפתח רשום עדיין. ניתן להפעיל את ההזדהות כעת ולרשום מפתח מאוחר יותר."
   },
   "Seed color": {
-    "Seed color": ""
+    "Seed color": "צבע בסיס"
   },
   "Segments": {
     "Segments": "מקטעים"
@@ -6640,9 +6934,6 @@
   },
   "Select an image file...": {
     "Select an image file...": "בחר/י קובץ תמונה..."
-  },
-  "Select background image": {
-    "Select background image": "בחר/י תמונת רקע"
   },
   "Select device": {
     "Select device": "בחר/י התקן"
@@ -6692,6 +6983,9 @@
   "Server": {
     "Server": "שרת"
   },
+  "Session": {
+    "Session": ""
+  },
   "Session filter": {
     "Session filter": "מסנן הפעלות"
   },
@@ -6707,20 +7001,20 @@
   "Set custom names for your audio output devices": {
     "Set custom names for your audio output devices": "הגדר/י שמות מותאמים אישית להתקני פלט השמע שלך"
   },
-  "Set key and action to save": {
-    "Set key and action to save": "הגדר/י מקש ופעולה לשמירה"
+  "Set limit": {
+    "Set limit": ""
   },
   "Set notification rules": {
     "Set notification rules": "הגדר/י חוקים להתראות"
   },
+  "Set under Theme & colors, Derived color": {
+    "Set under Theme & colors, Derived color": ""
+  },
+  "Set up": {
+    "Set up": ""
+  },
   "Set up a Wi-Fi hotspot for sharing this connection.": {
     "Set up a Wi-Fi hotspot for sharing this connection.": "הגדר/י נקודה חמה של WiFi כדי לשתף את החיבור הזה."
-  },
-  "Set up hotspot": {
-    "Set up hotspot": "הגדר/י נקודה חמה"
-  },
-  "Set up hotspot in Settings": {
-    "Set up hotspot in Settings": "הגדר/י נקודה חמה בהגדרות"
   },
   "Setting": {
     "Setting": "הגדרה"
@@ -6746,11 +7040,14 @@
   "Shadows": {
     "Shadows": "צללים"
   },
+  "Shapes use the %1 theme's colors": {
+    "Shapes use the %1 theme's colors": ""
+  },
   "Share gamma control settings": {
     "Share gamma control settings": "שיתוף ההגדרות עם בקרת גאמה"
   },
   "Shared shortcuts": {
-    "Shared shortcuts": ""
+    "Shared shortcuts": "קיצורי דרך משותפים"
   },
   "Shell": {
     "Shell": "מעטפת"
@@ -6760,6 +7057,9 @@
   },
   "Shift+Enter to paste": {
     "Shift+Enter to paste": "Shift+Enter להדבקה"
+  },
+  "Short": {
+    "Short": ""
   },
   "Shortcut": {
     "Shortcut": "קיצור דרך"
@@ -6773,8 +7073,11 @@
   "Shortcuts (%1)": {
     "Shortcuts (%1)": "קיצורי דרך (%1)"
   },
+  "Shortcuts, keyboard, mouse": {
+    "Shortcuts, keyboard, mouse": ""
+  },
   "Shortens the bar at both ends": {
-    "Shortens the bar at both ends": ""
+    "Shortens the bar at both ends": "מקצר את הסרגל בשני קצותיו"
   },
   "Show": {
     "Show": "הצג/י"
@@ -6819,7 +7122,7 @@
     "Show device": "הצג/י התקן"
   },
   "Show device name": {
-    "Show device name": ""
+    "Show device name": "הצג/י את שם ההתקן"
   },
   "Show discharge rate": {
     "Show discharge rate": "הצגת קצב פריקה"
@@ -6881,9 +7184,6 @@
   "Show occupied only": {
     "Show occupied only": "הצג/י רק תפוסים"
   },
-  "Show on displays": {
-    "Show on displays": "הצג/י במסכים"
-  },
   "Show on last display": {
     "Show on last display": "הצג/י במסך האחרון"
   },
@@ -6899,23 +7199,11 @@
   "Show package source badges": {
     "Show package source badges": "הצגת תגיות של מקור החבילה"
   },
-  "Show password": {
-    "Show password": "הצג/י סיסמה"
-  },
-  "Show password field": {
-    "Show password field": "הצגת שדה לסיסמה"
-  },
   "Show percentage": {
     "Show percentage": "הצג/י אחוזים"
   },
-  "Show power actions": {
-    "Show power actions": "הצגת פעולות חשמל"
-  },
   "Show power off": {
     "Show power off": "הצגה של \"כיבוי\""
-  },
-  "Show profile image": {
-    "Show profile image": "הצגת תמונת הפרופיל"
   },
   "Show readings": {
     "Show readings": "הצג/י קריאות"
@@ -6930,7 +7218,7 @@
     "Show restart DMS": "הצגה של \"הפעלה מחדש של DMS\""
   },
   "Show scratchpads": {
-    "Show scratchpads": ""
+    "Show scratchpads": "הצג/י Scratchpads"
   },
   "Show seconds": {
     "Show seconds": "הצגת שניות"
@@ -6950,20 +7238,20 @@
   "Show switch user": {
     "Show switch user": "הצג/י החלפת משתמש"
   },
-  "Show system icons": {
-    "Show system icons": "הצגת סמלי מערכת"
-  },
   "Show temperature": {
     "Show temperature": "הצג/י טמפרטורה"
+  },
+  "Show the battery briefly when power is connected or removed": {
+    "Show the battery briefly when power is connected or removed": ""
   },
   "Show the current media activity": {
     "Show the current media activity": "הצג/י את פעילות המדיה הנוכחית"
   },
-  "Show time": {
-    "Show time": "הצג/י שעה"
-  },
   "Show trend": {
     "Show trend": "הצג/י מגמה"
+  },
+  "Show upgrade in a window": {
+    "Show upgrade in a window": ""
   },
   "Show uptime": {
     "Show uptime": "הצג/י זמן פעילות"
@@ -6977,6 +7265,15 @@
   "Show welcome": {
     "Show welcome": "הצגת המסך ״ברוכים הבאים״"
   },
+  "Show window": {
+    "Show window": ""
+  },
+  "Shown only while the microphone, camera or screen sharing is in use": {
+    "Shown only while the microphone, camera or screen sharing is in use": ""
+  },
+  "Shown while no image or color is set": {
+    "Shown while no image or color is set": ""
+  },
   "Shows all running applications with focus indication": {
     "Shows all running applications with focus indication": "מציג את כל האפליקציות הפעילות עם סימון למיקוד"
   },
@@ -6984,7 +7281,10 @@
     "Shows current workspace and allows switching": "מציג את סביבת העבודה הנוכחית ומאפשר להחליף סביבה"
   },
   "Shows only windows from the dock's own display": {
-    "Shows only windows from the dock's own display": ""
+    "Shows only windows from the dock's own display": "מציג רק חלונות מהמסך של הDock עצמו"
+  },
+  "Shows the line being sung instead of the title and artist while synced lyrics are available": {
+    "Shows the line being sung instead of the title and artist while synced lyrics are available": ""
   },
   "Shows when caps lock is active": {
     "Shows when caps lock is active": "מוצג כאשר Caps Lock פעיל"
@@ -7032,7 +7332,7 @@
     "Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.": "דלג/י על סיסמת מסך ההתחברות לאחר ההפעלה עד להתנתקות. פתיחת מסך הנעילה נשארת ללא שינוי. ייכנס לתוקף בהפעלה מחדש הבאה לאחר סנכרון."
   },
   "Slanted": {
-    "Slanted": ""
+    "Slanted": "משופע"
   },
   "Slideout": {
     "Slideout": "חלונית מחליקה"
@@ -7047,7 +7347,7 @@
     "Smart auto-hide": "הסתרה אוטומטית חכמה"
   },
   "Smart split": {
-    "Smart split": ""
+    "Smart split": "פיצול חכם"
   },
   "Smartcard Authentication": {
     "Smartcard Authentication": "אימות עם כרטיס חכם"
@@ -7056,7 +7356,7 @@
     "Smooth": "חלק"
   },
   "Smooth lyrics highlight": {
-    "Smooth lyrics highlight": ""
+    "Smooth lyrics highlight": "הדגשה חלקה של מילות השיר"
   },
   "Snap": {
     "Snap": "הצמד/י"
@@ -7068,7 +7368,13 @@
     "Soft reboot": "הפעלה מחדש רכה"
   },
   "Soft square": {
-    "Soft square": ""
+    "Soft square": "ריבוע רך"
+  },
+  "Software updates": {
+    "Software updates": ""
+  },
+  "Software updates are ready to install.": {
+    "Software updates are ready to install.": ""
   },
   "Solid": {
     "Solid": "מלא"
@@ -7089,7 +7395,7 @@
     "Sound & media": "שמע ומדיה"
   },
   "Sound theme": {
-    "Sound theme": ""
+    "Sound theme": "ערכת צלילים"
   },
   "Sounds": {
     "Sounds": "צלילים"
@@ -7104,7 +7410,7 @@
     "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": "מקורות לתוספים וערכות נושא. מאגרים הם מאגרי git עם תיקיית plugins/ או themes/."
   },
   "Space-separated; {image} and {mode} are substituted": {
-    "Space-separated; {image} and {mode} are substituted": ""
+    "Space-separated; {image} and {mode} are substituted": "מופרד ברווחים; {image} ו{mode} מוחלפים"
   },
   "Spacer": {
     "Spacer": "מרווח"
@@ -7116,7 +7422,7 @@
     "Speaker settings": "הגדרות רמקול"
   },
   "Special workspaces appear last; click to show or hide": {
-    "Special workspaces appear last; click to show or hide": ""
+    "Special workspaces appear last; click to show or hide": "סביבות עבודה מיוחדות מופיעות אחרונות; לחץ/י כדי להציג או להסתיר"
   },
   "Speed": {
     "Speed": "מהירות"
@@ -7125,10 +7431,10 @@
     "Speed, scrolling, tap to click": "מהירות, גלילה והקשה ללחיצה"
   },
   "Split direction follows the cursor position in the window": {
-    "Split direction follows the cursor position in the window": ""
+    "Split direction follows the cursor position in the window": "כיוון הפיצול עוקב אחר מיקום הסמן בחלון"
   },
   "Split direction stays fixed when the container resizes": {
-    "Split direction stays fixed when the container resizes": ""
+    "Split direction stays fixed when the container resizes": "כיוון הפיצול נשאר קבוע כאשר גודל המיכל משתנה"
   },
   "Spool Area Full": {
     "Spool Area Full": "אזור התור (Spool) מלא"
@@ -7141,6 +7447,9 @@
   },
   "Spotlight bar": {
     "Spotlight bar": "סרגל Spotlight"
+  },
+  "Spreadsheet": {
+    "Spreadsheet": ""
   },
   "Spring": {
     "Spring": "קפיץ"
@@ -7157,8 +7466,11 @@
   "Square": {
     "Square": "מרובע"
   },
+  "Stable": {
+    "Stable": ""
+  },
   "Stack": {
-    "Stack": ""
+    "Stack": "ערימה"
   },
   "Stacked": {
     "Stacked": "בערימה"
@@ -7185,13 +7497,13 @@
     "Starting...": "מפעיל..."
   },
   "Startup Behavior": {
-    "Startup Behavior": ""
+    "Startup Behavior": "התנהגות בהפעלה"
   },
   "State": {
     "State": "מצב"
   },
   "Stays visible while the workspace has no windows": {
-    "Stays visible while the workspace has no windows": ""
+    "Stays visible while the workspace has no windows": "נשאר גלוי כאשר אין חלונות בסביבת העבודה"
   },
   "Stop": {
     "Stop": "עצור/י"
@@ -7208,6 +7520,9 @@
   "Stopping": {
     "Stopping": "עוצר"
   },
+  "Stops syncing your DMS settings to the greeter. Set up links them again.": {
+    "Stops syncing your DMS settings to the greeter. Set up links them again.": ""
+  },
   "Stretch": {
     "Stretch": "מתיחה"
   },
@@ -7220,8 +7535,8 @@
   "Style": {
     "Style": "סגנון"
   },
-  "Style, shortcuts, search, hidden apps": {
-    "Style, shortcuts, search, hidden apps": "סגנון, קיצורי דרך, חיפוש ואפליקציות מוסתרות"
+  "Style, search, hidden apps": {
+    "Style, search, hidden apps": ""
   },
   "Success": {
     "Success": "הצלחה"
@@ -7231,6 +7546,9 @@
   },
   "Summary font size": {
     "Summary font size": "גודל גופן של התקציר"
+  },
+  "Summary, highlights, links": {
+    "Summary, highlights, links": ""
   },
   "Sun": {
     "Sun": "שמש"
@@ -7284,7 +7602,10 @@
     "Suspend then hibernate": "השהיה ואחריה שינה עמוקה"
   },
   "Swap": {
-    "Swap": ""
+    "Swap": "Swap"
+  },
+  "Swatches show the seed color itself": {
+    "Swatches show the seed color itself": ""
   },
   "Sway website": {
     "Sway website": "האתר של Sway"
@@ -7296,13 +7617,10 @@
     "Switch layout shortcut": "קיצור מקלדת להחלפת פריסה"
   },
   "Switches to power saver at the low battery threshold": {
-    "Switches to power saver at the low battery threshold": ""
+    "Switches to power saver at the low battery threshold": "עובר למצב חיסכון בחשמל בסף הסוללה החלשה"
   },
   "Sync": {
     "Sync": "סנכרון"
-  },
-  "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "הסנכרון מחיל את ערכת הנושא וההגדרות שלך על מסך ההתחברות. משתמשים משותפים צריכים להריץ dms-greeter sync --profile במקום סנכרון של המשתמש הראשי."
   },
   "Sync completed successfully.": {
     "Sync completed successfully.": "הסנכרון הושלם בהצלחה."
@@ -7325,9 +7643,6 @@
   "Sync position across displays": {
     "Sync position across displays": "סנכרון מיקום בין מסכים"
   },
-  "Sync to apply": {
-    "Sync to apply": "הרץ/י סנכרון כדי להחיל"
-  },
   "Sync with portal": {
     "Sync with portal": "סנכרון עם הפורטל"
   },
@@ -7338,7 +7653,7 @@
     "Syncing...": "מסנכרן..."
   },
   "System & integrations": {
-    "System & integrations": "מערכת ושילובים"
+    "System & integrations": "מערכת ואינטגרציות"
   },
   "System Information": {
     "System Information": "מידע מערכת"
@@ -7358,6 +7673,9 @@
   "System notification area icons": {
     "System notification area icons": "סמלי אזור ההתראות של המערכת"
   },
+  "System packages": {
+    "System packages": ""
+  },
   "System sound theme and events": {
     "System sound theme and events": "ערכת צלילי מערכת ואירועים"
   },
@@ -7375,9 +7693,6 @@
   },
   "System update": {
     "System update": "עדכון מערכת"
-  },
-  "System updater": {
-    "System updater": "מעדכן המערכת"
   },
   "Systemd override generated": {
     "Systemd override generated": "נוצרה דריסת systemd"
@@ -7424,6 +7739,9 @@
   "Taskbar": {
     "Taskbar": "שורת משימות"
   },
+  "Teal": {
+    "Teal": ""
+  },
   "Temperature": {
     "Temperature": "טמפרטורה"
   },
@@ -7438,6 +7756,9 @@
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "המעבר למסוף כגיבוי נכשל. התקן/י את אחד מיישומי המסוף הנתמכים או הרץ/י את הפקודה 'dms-greeter sync' באופן ידני."
+  },
+  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.": ""
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": "נפתח מסוף כגיבוי. השלם/י את האימות שם; הוא ייסגר אוטומטית בסיום."
@@ -7523,6 +7844,15 @@
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "תור ההדפסה של מדפסת זו ריק"
   },
+  "The login screen follows your theme, wallpaper, widgets and behavior live. Only authentication changes need applying.": {
+    "The login screen follows your theme, wallpaper, widgets and behavior live. Only authentication changes need applying.": ""
+  },
+  "The login screen shows the lock screen widgets it supports and its own session picker. Turn off to arrange it separately.": {
+    "The login screen shows the lock screen widgets it supports and its own session picker. Turn off to arrange it separately.": ""
+  },
+  "The login screen stops following your DMS theme, wallpaper, widgets and settings. greetd, authentication and other users are not affected.": {
+    "The login screen stops following your DMS theme, wallpaper, widgets and settings. greetd, authentication and other users are not affected.": ""
+  },
   "The new shortcut is already in use. Choose another shortcut.": {
     "The new shortcut is already in use. Choose another shortcut.": "קיצור הדרך החדש כבר נמצא בשימוש. בחר/י קיצור דרך אחר."
   },
@@ -7534,6 +7864,12 @@
   },
   "The quick brown fox jumps over the lazy dog": {
     "The quick brown fox jumps over the lazy dog": "דג סקרן שט לו בים זך ולפתע מצא חבורה נחמדה"
+  },
+  "The rest follow the shared rule": {
+    "The rest follow the shared rule": ""
+  },
+  "The rest open the bar's own popouts": {
+    "The rest open the bar's own popouts": ""
   },
   "The result is unknown. Refresh before trying again.": {
     "The result is unknown. Refresh before trying again.": "התוצאה אינה ידועה. רענן/י לפני ניסיון נוסף."
@@ -7550,14 +7886,20 @@
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
     "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "אישור השרת השתנה מאז הפעם האחרונה שסמכת עליו. המשך/י רק אם טביעת האצבע החדשה מוכרת לך."
   },
+  "The shell palette is built from this color. Shapes take their colors from that palette.": {
+    "The shell palette is built from this color. Shapes take their colors from that palette.": ""
+  },
   "Theme": {
     "Theme": "ערכת נושא"
   },
   "Theme & colors": {
     "Theme & colors": "ערכת נושא וצבעים"
   },
+  "Theme color": {
+    "Theme color": ""
+  },
   "Theme colors come from this display's wallpaper": {
-    "Theme colors come from this display's wallpaper": ""
+    "Theme colors come from this display's wallpaper": "צבעי ערכת הנושא מגיעים מתמונת הרקע של מסך זה"
   },
   "Theme extracted to: %1": {
     "Theme extracted to: %1": "ערכת הנושא חולצה אל: %1"
@@ -7568,11 +7910,17 @@
   "Theme, light and dark, matugen": {
     "Theme, light and dark, matugen": "ערכת נושא, מצב בהיר וכהה ו-matugen"
   },
+  "Theme, palette, dark mode": {
+    "Theme, palette, dark mode": ""
+  },
   "Themes": {
     "Themes": "ערכות נושא"
   },
   "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": {
     "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": "אלה מוסיפים רשומות לתיקיית ההפעלה האוטומטית של XDG (~/.config/autostart/*.desktop)"
+  },
+  "They load with the next update check. Release notes are also published on GitHub.": {
+    "They load with the next update check. Release notes are also published on GitHub.": ""
   },
   "Thickness": {
     "Thickness": "עובי"
@@ -7585,6 +7933,9 @@
   },
   "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": {
     "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "תוספי צד שלישי נוצרו על ידי הקהילה ואינם נתמכים רשמית על ידי DankMaterialShell.\n\nתוספים אלה עלולים להוות סיכוני אבטחה ופרטיות - התקן/י על אחריותך בלבד."
+  },
+  "This bar is the Island": {
+    "This bar is the Island": ""
   },
   "This bind is overridden by config.kdl": {
     "This bind is overridden by config.kdl": "קיצור זה נדרס על ידי config.kdl"
@@ -7606,6 +7957,12 @@
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "לתוסף זה אין הרשאת 'settings_write'.\n\nהוסף/י \"permissions\": [\"settings_read\", \"settings_write\"] ל-plugin.json"
+  },
+  "This system cannot link settings live. Sync again after changing them.": {
+    "This system cannot link settings live. Sync again after changing them.": ""
+  },
+  "This system was not started in UEFI mode": {
+    "This system was not started in UEFI mode": ""
   },
   "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": {
     "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "ווידג׳ט זה מונע מהGPU לעבור למצב כבוי, דבר שעלול להשפיע משמעותית על חיי הסוללה במחשבים ניידים. לא מומלץ להשתמש בו במחשבים ניידים עם גרפיקה היברידית."
@@ -7638,7 +7995,7 @@
     "Tile Vertically": "ריצוף אנכי"
   },
   "Tile color": {
-    "Tile color": ""
+    "Tile color": "צבע אריח"
   },
   "Tiled": {
     "Tiled": "באריחים"
@@ -7650,7 +8007,7 @@
     "Tiling": "ריצוף"
   },
   "Tiling layout": {
-    "Tiling layout": ""
+    "Tiling layout": "פריסת ריצוף"
   },
   "Time": {
     "Time": "זמן"
@@ -7679,6 +8036,9 @@
   "Tint strength": {
     "Tint strength": "עוצמת הגוון"
   },
+  "Tinted cards and badges across the shell": {
+    "Tinted cards and badges across the shell": ""
+  },
   "Title": {
     "Title": "כותרת"
   },
@@ -7699,9 +8059,6 @@
   },
   "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": {
     "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": "כדי להתחבר כמשתמש אחר, התנתק/י ובחר/י את החשבון ממסך ההתחברות (greeter). יצירת הפעלה חדשה במקביל דורשת מסך התחברות התומך בהפעלות מרובות (greetd-flexiserver / GDM / LightDM)."
-  },
-  "To update, run the following command:": {
-    "To update, run the following command:": "כדי לעדכן, הרץ/י את הפקודה הבאה:"
   },
   "To use this DMS bind, remove or change the keybind in your config.kdl": {
     "To use this DMS bind, remove or change the keybind in your config.kdl": "כדי להשתמש בקיצור המקלדת הזה ב DMS, הסר/י או שנה/י את קיצור המקלדת בקובץ הconfig.kdl שלך"
@@ -7781,6 +8138,9 @@
   "Touchpad": {
     "Touchpad": "משטח מגע"
   },
+  "Track screen time": {
+    "Track screen time": ""
+  },
   "Transform": {
     "Transform": "שינוי"
   },
@@ -7808,6 +8168,12 @@
   "Trigger: %1": {
     "Trigger: %1": "מפעיל: %1"
   },
+  "Triggers after holding the key": {
+    "Triggers after holding the key": ""
+  },
+  "Triggers when the key is released": {
+    "Triggers when the key is released": ""
+  },
   "Trust": {
     "Trust": "מתן אמון"
   },
@@ -7834,6 +8200,9 @@
   },
   "Typing in the overview opens the launcher": {
     "Typing in the overview opens the launcher": "הקלדה בסקירה פותחת את המשגר"
+  },
+  "Typing reveals the field. Escape hides it again. The editor always shows it.": {
+    "Typing reveals the field. Escape hides it again. The editor always shows it.": ""
   },
   "URL": {
     "URL": "URL"
@@ -7874,12 +8243,6 @@
   "Uninstalling: %1": {
     "Uninstalling: %1": "מסיר: %1"
   },
-  "Unison": {
-    "Unison": "Unison"
-  },
-  "Unknown": {
-    "Unknown": "לא ידוע"
-  },
   "Unknown App": {
     "Unknown App": "אפליקציה לא ידועה"
   },
@@ -7898,9 +8261,6 @@
   "Unknown Model": {
     "Unknown Model": "דגם לא ידוע"
   },
-  "Unknown Monitor": {
-    "Unknown Monitor": "מסך לא ידוע"
-  },
   "Unknown Network": {
     "Unknown Network": "רשת לא ידועה"
   },
@@ -7909,6 +8269,18 @@
   },
   "Unknown Track": {
     "Unknown Track": "רצועה לא ידועה"
+  },
+  "Unlink": {
+    "Unlink": ""
+  },
+  "Unlink login screen": {
+    "Unlink login screen": ""
+  },
+  "Unlink needs sudo authentication. Opening terminal so you can use password or fingerprint.": {
+    "Unlink needs sudo authentication. Opening terminal so you can use password or fingerprint.": ""
+  },
+  "Unlink now?": {
+    "Unlink now?": ""
   },
   "Unload on close": {
     "Unload on close": "פריקה בעת הסגירה"
@@ -7965,7 +8337,7 @@
     "Untrusted VPN certificate": "אישור VPN לא מהימן"
   },
   "Up": {
-    "Up": ""
+    "Up": "למעלה"
   },
   "Up to date": {
     "Up to date": "מעודכן"
@@ -7988,6 +8360,12 @@
   "Update plugin": {
     "Update plugin": "עדכן/י תוסף"
   },
+  "Update the dms package with your package manager, then restart the shell.": {
+    "Update the dms package with your package manager, then restart the shell.": ""
+  },
+  "Updates, clipboard, %1": {
+    "Updates, clipboard, %1": ""
+  },
   "Updating %1...": {
     "Updating %1...": "מעדכן את %1..."
   },
@@ -8009,17 +8387,14 @@
   "Urgent color": {
     "Urgent color": "צבע דחוף"
   },
-  "Use HH:MM time format": {
-    "Use HH:MM time format": "השתמש/י בתבנית זמן HH:MM"
+  "Use Dynamic": {
+    "Use Dynamic": ""
   },
   "Use IP Location": {
     "Use IP Location": "שימוש במיקום לפי כתובת IP"
   },
   "Use Monospace Font": {
     "Use Monospace Font": "השתמש/י בגופן ברוחב קבוע"
-  },
-  "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "השתמש/י בתמונה מותאמת אישית למסך הנעילה, או השאר/י ריק כדי להשתמש בתמונת הרקע של שולחן העבודה שלך."
   },
   "Use a security key for lock screen authentication": {
     "Use a security key for lock screen authentication": "השתמש/י במפתח אבטחה לאימות במסך הנעילה"
@@ -8030,11 +8405,14 @@
   "Use custom command": {
     "Use custom command": "שימוש בפקודה מותאמת אישית"
   },
+  "Use default wallpaper": {
+    "Use default wallpaper": ""
+  },
   "Use desktop wallpaper": {
     "Use desktop wallpaper": "שימוש ברקע של שולחן העבודה"
   },
   "Use external manager": {
-    "Use external manager": "שימוש במנהל חיצוני"
+    "Use external manager": "שימוש במנהל רקעים חיצוני"
   },
   "Use fingerprint authentication for the lock screen": {
     "Use fingerprint authentication for the lock screen": "השתמש/י בטביעת אצבע לאימות במסך הנעילה"
@@ -8048,14 +8426,14 @@
   "Use overlay layer": {
     "Use overlay layer": "שימוש בשכבת הכיסוי"
   },
+  "Use standard OSDs": {
+    "Use standard OSDs": ""
+  },
   "Use standard popups": {
     "Use standard popups": "שימוש בחלונות קופצים רגילים"
   },
   "Use system PAM authentication": {
     "Use system PAM authentication": "השתמש/י באימות PAM של המערכת"
-  },
-  "Use system theme": {
-    "Use system theme": "שימוש בערכת הנושא של המערכת"
   },
   "User": {
     "User": "משתמש"
@@ -8195,11 +8573,11 @@
   "View Changes": {
     "View Changes": "הצג/י שינויים"
   },
+  "View on GitHub": {
+    "View on GitHub": ""
+  },
   "Visibility": {
     "Visibility": "נראות"
-  },
-  "Visibility, position, pinned apps, trash": {
-    "Visibility, position, pinned apps, trash": "נראות, מיקום, אפליקציות מוצמדות ואשפה"
   },
   "Visible entry actions": {
     "Visible entry actions": "פעולות רשומה גלויות"
@@ -8228,8 +8606,8 @@
   "Volume style": {
     "Volume style": "סגנון עוצמת השמע"
   },
-  "Volume, brightness, caps lock, position": {
-    "Volume, brightness, caps lock, position": "עוצמת קול, בהירות, Caps Lock ומיקום"
+  "Volume, brightness, caps lock": {
+    "Volume, brightness, caps lock": ""
   },
   "Votes": {
     "Votes": "הצבעות"
@@ -8276,6 +8654,12 @@
   "Web browser": {
     "Web browser": "דפדפן לגלישה באינטרנט"
   },
+  "Week": {
+    "Week": ""
+  },
+  "Weekly screen time": {
+    "Weekly screen time": ""
+  },
   "Weight": {
     "Weight": "משקל"
   },
@@ -8284,6 +8668,9 @@
   },
   "Welcome to DankMaterialShell": {
     "Welcome to DankMaterialShell": "ברוכים הבאים לDankMaterialShell"
+  },
+  "What changed": {
+    "What changed": ""
   },
   "When locked": {
     "When locked": "כאשר נעול"
@@ -8295,7 +8682,7 @@
     "Which displays show the dock, popups, OSDs and wallpaper": "אילו מסכים מציגים את הDock, חלונות קופצים, OSD ותמונת הרקע"
   },
   "Which wallpaper color the palette is built from": {
-    "Which wallpaper color the palette is built from": ""
+    "Which wallpaper color the palette is built from": "מאיזה צבע בתמונת הרקע נבנית הפלטה"
   },
   "White": {
     "White": "לבן"
@@ -8321,8 +8708,8 @@
   "Wi-Fi not available": {
     "Wi-Fi not available": "Wi-Fi אינו זמין"
   },
-  "WiFi": {
-    "WiFi": "WiFi"
+  "Wi-Fi, Ethernet, VPN": {
+    "Wi-Fi, Ethernet, VPN": ""
   },
   "WiFi QR code for ": {
     "WiFi QR code for ": "קוד QR לרשת הWiFi "
@@ -8338,6 +8725,9 @@
   },
   "Wide (BT2020)": {
     "Wide (BT2020)": "רחב (BT2020)"
+  },
+  "Widget": {
+    "Widget": ""
   },
   "Widget Background Color": {
     "Widget Background Color": "צבע רקע לווידג׳טים"
@@ -8362,6 +8752,9 @@
   },
   "Widgets": {
     "Widgets": "ווידג׳טים"
+  },
+  "Widgets in this section move into overflow when space runs out": {
+    "Widgets in this section move into overflow when space runs out": ""
   },
   "Widgets, layout, style": {
     "Widgets, layout, style": "ווידג׳טים, פריסה, סגנון"
@@ -8403,7 +8796,10 @@
     "With Shelly, only Flatpak packages in the current update list can be ignored.": "עם Shelly, ניתן להתעלם רק מחבילות Flatpak שנמצאות ברשימת העדכונים הנוכחית."
   },
   "With background blur on, cards and tiles keep their own backing": {
-    "With background blur on, cards and tiles keep their own backing": ""
+    "With background blur on, cards and tiles keep their own backing": "כאשר טשטוש הרקע פעיל, כרטיסים ואריחים שומרים על הרקע שלהם"
+  },
+  "Word processor": {
+    "Word processor": ""
   },
   "Working...": {
     "Working...": "עובד..."
@@ -8418,7 +8814,7 @@
     "Workspace Switch": "החלפת סביבת עבודה"
   },
   "Workspace count": {
-    "Workspace count": ""
+    "Workspace count": "מספר סביבות עבודה"
   },
   "Workspace name": {
     "Workspace name": "שם סביבת העבודה"
@@ -8427,7 +8823,7 @@
     "Workspace switcher": "מחליף סביבות העבודה"
   },
   "Workspaces up to the count are always shown and can be opened": {
-    "Workspaces up to the count are always shown and can be opened": ""
+    "Workspaces up to the count are always shown and can be opened": "סביבות עבודה עד למספר שנקבע תמיד מוצגות וניתן לפתוח אותן"
   },
   "Wrap the app command. %command% is replaced with the actual executable": {
     "Wrap the app command. %command% is replaced with the actual executable": "עטוף/עטפי את פקודת האפליקציה. %command% יוחלף בקובץ ההרצה בפועל"
@@ -8456,6 +8852,9 @@
   "Y axis": {
     "Y axis": "ציר Y"
   },
+  "Yellow": {
+    "Yellow": ""
+  },
   "Yes": {
     "Yes": "כן"
   },
@@ -8478,16 +8877,22 @@
     "You're All Set!": "הכל מוכן!"
   },
   "You're all caught up": {
-    "You're all caught up": ""
+    "You're all caught up": "אין עוד התראות"
   },
   "Your compositor does not support background blur (ext-background-effect-v1)": {
     "Your compositor does not support background blur (ext-background-effect-v1)": "הקומפוזיטור שלך אינו תומך בטשטוש רקע (ext-background-effect-v1)"
+  },
+  "Your greeter slot and any cache links to your home are removed. Administrator access may be required. Set up links them again.": {
+    "Your greeter slot and any cache links to your home are removed. Administrator access may be required. Set up links them again.": ""
   },
   "Your hotspot is running.": {
     "Your hotspot is running.": "הנקודה החמה שלך פעילה."
   },
   "Your hotspot profile is saved and ready to start.": {
     "Your hotspot profile is saved and ready to start.": "פרופיל הנקודה החמה שלך נשמר ומוכן להפעלה."
+  },
+  "Your keyboard layout puts %1 above the first level, so this bind will never fire. Pick a key the layout types without an extra layer.": {
+    "Your keyboard layout puts %1 above the first level, so this bind will never fire. Pick a key the layout types without an extra layer.": ""
   },
   "Your system is up to date!": {
     "Your system is up to date!": "המערכת שלך מעודכנת!"
@@ -8500,6 +8905,9 @@
   },
   "adverb, wallpaper changes every day at a set time": {
     "Daily": "יומי"
+  },
+  "and %1 more": {
+    "and %1 more": ""
   },
   "attached": {
     "attached": "מחובר"
@@ -8573,11 +8981,17 @@
   "e.g., scratch, /^tmp_.*/, build": {
     "e.g., scratch, /^tmp_.*/, build": "לדוגמה, scratch, /^tmp_.*/, build"
   },
+  "efibootmgr failed": {
+    "efibootmgr failed": ""
+  },
   "ext": {
     "ext": "ext"
   },
   "featured": {
     "featured": "מומלץ"
+  },
+  "greetd is not using the DMS greeter yet.": {
+    "greetd is not using the DMS greeter yet.": ""
   },
   "keyboard tab key name": {
     "Tab": "טאב"
@@ -8618,6 +9032,9 @@
   "matugen not found - install matugen package for dynamic theming": {
     "matugen not found - install matugen package for dynamic theming": "matugen לא נמצא - התקן/י את החבילה של matugen כדי לאפשר עיצוב דינמי"
   },
+  "missing program": {
+    "Requires %1": ""
+  },
   "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": {
     "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": "mpris-proxy פועל וייצור נגני Bluetooth כפולים. השבת/י אותו באמצעות: systemctl --user disable --now mpris-proxy.service"
   },
@@ -8653,6 +9070,9 @@
   },
   "noun, badge on a keybind that overrides the default": {
     "Override": "דריסה"
+  },
+  "noun, overflow button position before the first widget": {
+    "Start": ""
   },
   "now": {
     "now": "עכשיו"
@@ -8699,11 +9119,8 @@
   "this app": {
     "this app": "אפליקציה זו"
   },
-  "tmux and zellij sessions": {
-    "tmux and zellij sessions": "הפעלות tmux ו-zellij"
-  },
   "tmux, zellij, and herdr sessions": {
-    "tmux, zellij, and herdr sessions": ""
+    "tmux, zellij, and herdr sessions": "הפעלות tmux, zellij וherdr"
   },
   "unmaintained": {
     "unmaintained": "לא מתוחזק"
@@ -8764,14 +9181,5 @@
   },
   "• yyyy - Year (2024)": {
     "• yyyy - Year (2024)": "• yyyy - שנה (2024)"
-  },
-  "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
-    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": "↑/↓: ניווט • Space: הרחב • Enter: פעולה/הרחבה • E: טקסט"
-  },
-  "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
-    "↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": "↑/↓: ניווט • Enter/Ctrl+C: העתקה • Del: מחיקה • Ctrl+E: עריכה • Ctrl+S: הצמדה/ביטול הצמדה • F10: עזרה"
-  },
-  "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": {
-    "↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help": "↑/↓: ניווט • Enter: הדבקה • Ctrl+C: העתקה • Del: מחיקה • Ctrl+E: עריכה • Ctrl+S: הצמדה/ביטול הצמדה • F10: עזרה"
   }
 }

@@ -6,7 +6,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
-import qs.Modules.DankDash
+import qs.Modules.DDash
 
 Singleton {
     id: root
@@ -20,6 +20,7 @@ Singleton {
     property var settingsIndex: []
     property bool indexLoaded: false
     property var _translatedCache: []
+    property bool _cacheDirty: false
     property int _scrollPass: 0
     property int _stablePasses: 0
     property real _appliedY: 0
@@ -339,6 +340,7 @@ Singleton {
     }
 
     function _rebuildTranslationCache() {
+        _cacheDirty = false;
         var cache = [];
         var items = settingsIndex.concat(_runtimeSearchEntries());
         for (var i = 0; i < items.length; i++) {
@@ -543,7 +545,7 @@ Singleton {
     function _refreshTranslatedCache() {
         if (!indexLoaded)
             return;
-        _rebuildTranslationCache();
+        _cacheDirty = true;
         if (query)
             results = _searchEntries(query, 15);
     }
@@ -553,6 +555,8 @@ Singleton {
         if (!queryLower)
             return [];
 
+        if (_cacheDirty)
+            _rebuildTranslationCache();
         var querySquash = _squash(queryLower);
         var queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
         var scored = [];

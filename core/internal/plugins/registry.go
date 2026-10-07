@@ -178,10 +178,14 @@ func NewRegistry() (*Registry, error) {
 }
 
 func NewRegistryWithFs(fs afero.Fs) (*Registry, error) {
+	sources, err := registries.Active(fs)
+	if err != nil {
+		return nil, err
+	}
 	return &Registry{
 		fs:         fs,
 		cacheDir:   getCacheDir(),
-		registries: registries.Load(fs),
+		registries: sources,
 		git:        &realGitClient{},
 	}, nil
 }

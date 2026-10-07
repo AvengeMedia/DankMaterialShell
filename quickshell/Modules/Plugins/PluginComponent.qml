@@ -366,6 +366,7 @@ Item {
 
     PluginPopout {
         id: pluginPopout
+        pluginId: root.pluginId
         contentWidth: root.popoutWidth
         contentHeight: root.popoutHeight
         pluginContent: root.popoutContent

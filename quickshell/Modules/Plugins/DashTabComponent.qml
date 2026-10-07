@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Modules.DankDash
+import qs.Modules.DDash
 
 Item {
     id: root

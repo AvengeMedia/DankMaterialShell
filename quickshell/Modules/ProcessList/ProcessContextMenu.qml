@@ -3,7 +3,7 @@ import QtQuick.Controls
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modals.Common
 
 Popup {
@@ -374,7 +374,7 @@ Popup {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: Theme.spacingS
 
-                            DankIcon {
+                            DIcon {
                                 name: modelData.icon || ""
                                 size: Theme.iconSizeSmall
                                 color: {
@@ -406,7 +406,7 @@ Popup {
                             }
                         }
 
-                        DankRipple {
+                        DRipple {
                             id: menuItemRipple
                             rippleColor: modelData.dangerous ? Theme.error : Theme.surfaceText
                             cornerRadius: menuItem.radius

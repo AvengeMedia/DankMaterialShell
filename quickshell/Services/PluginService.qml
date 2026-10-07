@@ -1294,6 +1294,17 @@ Singleton {
         return plugin.screenshot || "";
     }
 
+    // 16:10 screenshot-only render; the full preview card bakes in title text the card already shows
+    function thumbUrl(plugin) {
+        if (!plugin)
+            return "";
+        if (plugin.thumbUrl)
+            return plugin.thumbUrl;
+        if (plugin.id)
+            return previewApiBase + plugin.id + "/thumb";
+        return "";
+    }
+
     function heroUrl(plugin) {
         if (!plugin)
             return "";

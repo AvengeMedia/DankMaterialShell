@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipolicy"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/registries"
 	"github.com/spf13/afero"
 )
@@ -134,5 +135,61 @@ func TestUpdateMultiRegistry(t *testing.T) {
 	}
 	if path := r.GetThemeSourcePath("one"); path != base+"/official/themes/one/theme.json" {
 		t.Fatalf("expected theme source under official registry, got %q", path)
+	}
+}
+
+func TestRegistriesDisabledByPolicy(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", "/xdg")
+	fs := afero.NewMemMapFs()
+	if err := registries.Add(fs, "extra", "https://example.com/extra.git"); err != nil {
+		t.Fatal(err)
+	}
+	if err := afero.WriteFile(fs, clipolicy.AdminPath, []byte(`{"disable_registries": true}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	r, err := NewRegistryWithFs(fs)
+	if err != nil {
+		t.Fatalf("NewRegistryWithFs: %v", err)
+	}
+	var cloned []string
+	r.git = &stubGitClient{
+		cloneFunc: func(path string, url string) error {
+			cloned = append(cloned, url)
+			return nil
+		},
+	}
+
+	list, err := r.List()
+	if err != nil {
+		t.Fatalf("List: %v", err)
+	}
+	if len(list) != 0 {
+		t.Fatalf("expected no themes, got %d", len(list))
+	}
+	if len(cloned) != 0 {
+		t.Fatalf("expected no registry clone, got %v", cloned)
+	}
+}
+
+func TestNewRegistryWithFsMalformedPolicy(t *testing.T) {
+	fs := afero.NewMemMapFs()
+	if err := afero.WriteFile(fs, clipolicy.AdminPath, []byte("{not json"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := NewRegistryWithFs(fs); err == nil {
+		t.Fatal("expected an error for a malformed policy file")
+	}
+}
+
+func TestThemePathsWithoutRegistries(t *testing.T) {
+	r := &Registry{fs: afero.NewMemMapFs(), cacheDir: "/test-cache"}
+
+	if dir := r.GetThemeDir("one"); dir != "" {
+		t.Fatalf("expected no theme dir, got %q", dir)
+	}
+	if path := r.GetThemeSourcePath("one"); path != "" {
+		t.Fatalf("expected no theme source, got %q", path)
 	}
 }

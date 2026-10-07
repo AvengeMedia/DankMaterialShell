@@ -193,7 +193,7 @@
         "storage.type"
       ],
       "settings": {
-        "foreground": "{{dank16.color6.light.hex}}"
+        "foreground": "{{dank16.color4.light.hex}}"
       }
     },
     {
@@ -215,7 +215,7 @@
         "constant.character"
       ],
       "settings": {
-        "foreground": "{{dank16.color1.light.hex}}"
+        "foreground": "{{dank16.color12.light.hex}}"
       }
     },
     {
@@ -287,13 +287,23 @@
       }
     },
     {
+      "name": "Namespaces",
+      "scope": [
+        "entity.name.namespace",
+        "entity.name.type.namespace"
+      ],
+      "settings": {
+        "foreground": "{{colors.on_surface.light.hex}}"
+      }
+    },
+    {
       "name": "Functions",
       "scope": [
         "entity.name.function",
         "support.function"
       ],
       "settings": {
-        "foreground": "{{dank16.color4.light.hex}}"
+        "foreground": "{{dank16.color13.light.hex}}"
       }
     },
     {
@@ -304,7 +314,7 @@
         "support.type"
       ],
       "settings": {
-        "foreground": "{{colors.secondary.light.hex}}"
+        "foreground": "{{dank16.color11.light.hex}}"
       }
     },
     {
@@ -417,42 +427,51 @@
       "foreground": "{{colors.on_surface.light.hex}}"
     },
     "property": {
-      "foreground": "{{dank16.color4.light.hex}}"
+      "foreground": "{{colors.secondary.light.hex}}"
     },
     "function": {
-      "foreground": "{{dank16.color4.light.hex}}"
+      "foreground": "{{dank16.color13.light.hex}}"
     },
     "method": {
-      "foreground": "{{dank16.color4.light.hex}}"
+      "foreground": "{{dank16.color13.light.hex}}"
     },
     "type": {
-      "foreground": "{{colors.secondary.light.hex}}"
+      "foreground": "{{dank16.color11.light.hex}}"
     },
     "class": {
-      "foreground": "{{colors.secondary.light.hex}}"
+      "foreground": "{{dank16.color11.light.hex}}"
+    },
+    "struct": {
+      "foreground": "{{dank16.color11.light.hex}}"
+    },
+    "interface": {
+      "foreground": "{{dank16.color11.light.hex}}"
+    },
+    "enum": {
+      "foreground": "{{dank16.color11.light.hex}}"
     },
     "typeParameter": {
-      "foreground": "{{colors.tertiary.light.hex}}"
+      "foreground": "{{dank16.color11.light.hex}}"
     },
     "enumMember": {
-      "foreground": "{{dank16.color1.light.hex}}"
+      "foreground": "{{dank16.color13.light.hex}}"
+    },
+    "namespace": {
+      "foreground": "{{colors.on_surface.light.hex}}"
     },
     "string": {
       "foreground": "{{dank16.color2.light.hex}}"
     },
     "number": {
-      "foreground": "{{dank16.color1.light.hex}}"
+      "foreground": "{{dank16.color12.light.hex}}"
     },
     "comment": {
       "foreground": "{{colors.outline.light.hex}}"
     },
     "keyword": {
-      "foreground": "{{dank16.color6.light.hex}}"
+      "foreground": "{{dank16.color4.light.hex}}"
     },
     "operator": {
-      "foreground": "{{colors.on_surface.light.hex}}"
-    },
-    "namespace": {
       "foreground": "{{colors.on_surface.light.hex}}"
     }
   }

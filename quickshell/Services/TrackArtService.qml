@@ -291,22 +291,25 @@ Singleton {
         }
     }
 
-    Instantiator {
-        model: MprisController.availablePlayers
-        delegate: QtObject {
-            required property MprisPlayer modelData
-            readonly property bool playerIsPlaying: modelData.isPlaying
-            readonly property string playerTrackTitle: modelData.trackTitle
-            readonly property string playerTrackArtist: modelData.trackArtist
-            readonly property string playerTrackAlbum: modelData.trackAlbum
-            readonly property string playerTrackArtUrl: modelData.trackArtUrl
-            readonly property var playerMetadata: modelData.metadata
-            onPlayerIsPlayingChanged: root._updateArtUrl()
-            onPlayerTrackTitleChanged: root._updateArtUrl()
-            onPlayerTrackArtistChanged: root._updateArtUrl()
-            onPlayerTrackAlbumChanged: root._updateArtUrl()
-            onPlayerTrackArtUrlChanged: root._updateArtUrl()
-            onPlayerMetadataChanged: root._updateArtUrl()
+    Connections {
+        target: root.activePlayer
+        function onIsPlayingChanged() {
+            root._updateArtUrl();
+        }
+        function onTrackTitleChanged() {
+            root._updateArtUrl();
+        }
+        function onTrackArtistChanged() {
+            root._updateArtUrl();
+        }
+        function onTrackAlbumChanged() {
+            root._updateArtUrl();
+        }
+        function onTrackArtUrlChanged() {
+            root._updateArtUrl();
+        }
+        function onMetadataChanged() {
+            root._updateArtUrl();
         }
     }
 

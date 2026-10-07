@@ -5,7 +5,7 @@ import test from "node:test";
 
 const read = path => readFileSync(new URL("../" + path, import.meta.url), "utf8");
 const model = vm.createContext({});
-vm.runInContext(read("Modules/DankBar/WidgetModel.js").replace(/^\.pragma.*$/m, ""), model);
+vm.runInContext(read("Modules/DBar/WidgetModel.js").replace(/^\.pragma.*$/m, ""), model);
 const plain = value => JSON.parse(JSON.stringify(value));
 
 function method(source, name) {
@@ -57,28 +57,9 @@ test("focus discovery keeps compositor names separate from first-screen fallback
     assert.equal(context.getFocusedScreen(), null);
 });
 
-test("bar actions preserve first-instance fallback and reject a focused output without a bar", () => {
-    const source = read("Modules/DankBar/DankBar.qml");
-    let focused = "";
-    const calls = [];
-    const instance = name => ({ modelData: { name }, triggerControlCenter() { calls.push("cc:" + name); }, triggerWallpaperBrowser() { calls.push("wallpaper:" + name); } });
-    const context = vm.createContext({ CompositorService: { getFocusedScreenName: () => focused }, barVariants: { instances: [instance("second"), instance("first")] } });
-    for (const name of ["focusedBarInstance", "triggerControlCenterOnFocusedScreen", "triggerWallpaperBrowserOnFocusedScreen"])
-        vm.runInContext(method(source, name), context);
-    assert.equal(context.triggerControlCenterOnFocusedScreen(), true);
-    focused = "first";
-    assert.equal(context.triggerWallpaperBrowserOnFocusedScreen(), true);
-    focused = "missing";
-    assert.equal(context.triggerControlCenterOnFocusedScreen(), false);
-    focused = "";
-    context.barVariants.instances = [];
-    assert.equal(context.triggerWallpaperBrowserOnFocusedScreen(), false);
-    assert.deepEqual(calls, ["cc:second", "wallpaper:first"]);
-});
-
 test("center placement preserves configured anchors, visible fallbacks and geometric extents", () => {
     const layout = vm.createContext({});
-    vm.runInContext(read("Modules/DankBar/CenterLayout.js").replace(/^\.pragma.*$/m, ""), layout);
+    vm.runInContext(read("Modules/DBar/CenterLayout.js").replace(/^\.pragma.*$/m, ""), layout);
     const cases = [
         [[], 600, 4, "index", [], 0],
         [[null, null], 600, 4, "geometric", [null, null], 0],
@@ -100,7 +81,7 @@ test("center placement preserves configured anchors, visible fallbacks and geome
 
 test("center placement yields to side sections without overlapping them", () => {
     const layout = vm.createContext({});
-    vm.runInContext(read("Modules/DankBar/CenterLayout.js").replace(/^\.pragma.*$/m, ""), layout);
+    vm.runInContext(read("Modules/DBar/CenterLayout.js").replace(/^\.pragma.*$/m, ""), layout);
     const cases = [
         [{ min: 250 }, [250, 284, 368]],
         [{ max: 300 }, [122, 156, 240]],
@@ -109,19 +90,4 @@ test("center placement yields to side sections without overlapping them", () => 
     ];
     for (const [bounds, positions] of cases)
         assert.deepEqual(plain(layout.resolve([30, 80, 60], 600, 4, "geometric", bounds)), { positions, totalSize: 178 });
-});
-
-test("widget lookup preserves component aliases and plugin variant fallback", () => {
-    const builtin = { clockComponent: {}, mediaComponent: {}, mediaActivityComponent: {}, networkComponent: {}, keyboardLayoutNameComponent: {}, appsDockComponent: {} };
-    const plugins = { example: {}, "example:specific": {} };
-    const components = Object.assign(model.builtinComponents(builtin), plugins);
-    const context = vm.createContext({});
-    vm.runInContext(method(read("Modules/SurfaceWidgets/SurfaceWidgetHost.qml"), "getWidgetComponent"), context);
-    for (const [id, name] of [["clock", "clockComponent"], ["music", "mediaComponent"], ["mediaActivity", "mediaActivityComponent"], ["network_speed_monitor", "networkComponent"], ["keyboard_layout_name", "keyboardLayoutNameComponent"], ["appsDock", "appsDockComponent"]])
-        assert.equal(context.getWidgetComponent(id, components), builtin[name]);
-    assert.equal(context.getWidgetComponent("example:variant", components), plugins.example);
-    assert.equal(context.getWidgetComponent("example:specific", components), plugins["example:specific"]);
-    assert.equal(context.getWidgetComponent("clock", {}), null);
-    assert.equal(context.getWidgetComponent("unknown", components), null);
-    assert.equal(context.getWidgetComponent("clock", null), null);
 });

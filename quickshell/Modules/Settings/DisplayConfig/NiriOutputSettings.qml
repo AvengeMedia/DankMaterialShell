@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 SettingsCard {
@@ -109,7 +109,7 @@ SettingsCard {
                 width: parent.width
                 spacing: Theme.spacingM
 
-                DankTextField {
+                DTextField {
                     outlined: true
                     leftIconName: "space_dashboard"
                     labelText: I18n.tr("Window gaps (px)")
@@ -137,7 +137,7 @@ SettingsCard {
                     }
                 }
 
-                DankTextField {
+                DTextField {
                     outlined: true
                     leftIconName: "width_normal"
                     labelText: I18n.tr("Default width (%)", "niri output field label, default column width percent")
@@ -172,7 +172,7 @@ SettingsCard {
                 }
             }
 
-            DankTextField {
+            DTextField {
                 outlined: true
                 leftIconName: "view_column"
                 labelText: I18n.tr("Preset widths (%)", "niri output field label, preset column width percents")

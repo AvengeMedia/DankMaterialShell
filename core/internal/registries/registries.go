@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipolicy"
 	"github.com/spf13/afero"
 )
 
@@ -61,6 +62,19 @@ func Load(fs afero.Fs) []Source {
 		sources = append(sources, s)
 	}
 	return sources
+}
+
+// Active returns the registries to fetch from: none when the CLI policy
+// disables them, otherwise Load.
+func Active(fs afero.Fs) ([]Source, error) {
+	disabled, err := clipolicy.RegistriesDisabled(fs)
+	if err != nil {
+		return nil, err
+	}
+	if disabled {
+		return nil, nil
+	}
+	return Load(fs), nil
 }
 
 func saveExtras(fs afero.Fs, extras []Source) error {

@@ -44,7 +44,9 @@ FocusScope {
         } else if (contains(content, focusedItem)) {
             activePane = "content";
             content.rememberFocus();
-            content._reveal(focusedItem);
+            // Focus that falls back to a container when its control is destroyed must not scroll the page
+            if (keyboardDriven() || focusedItem.cursorPosition !== undefined)
+                content._reveal(focusedItem);
         }
     }
 

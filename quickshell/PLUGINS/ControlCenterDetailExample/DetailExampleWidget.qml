@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Plugins
 
 PluginComponent {
@@ -91,7 +91,7 @@ PluginComponent {
                             spacing: Theme.spacingS
                             enabled: false
 
-                            DankIcon {
+                            DIcon {
                                 name: detailRoot.currentSelection === modelData ? "radio_button_checked" : "radio_button_unchecked"
                                 color: detailRoot.currentSelection === modelData ? Theme.primary : Theme.surfaceVariantText
                                 size: Theme.iconSize
@@ -115,7 +115,7 @@ PluginComponent {
         Row {
             spacing: Theme.spacingXS
 
-            DankIcon {
+            DIcon {
                 name: root.isEnabled ? "settings" : "settings_off"
                 color: root.isEnabled ? Theme.primary : Theme.surfaceVariantText
                 size: root.iconSize

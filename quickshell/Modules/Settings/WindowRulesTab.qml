@@ -5,7 +5,9 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import "../../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
+import "../../Common/WindowRuleSize.js" as WindowRuleSize
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
@@ -73,6 +75,8 @@ Item {
             const label = root.actionLabels[k] || k;
             if (typeof a[k] === "boolean")
                 return a[k] ? label : label + ": " + I18n.tr("Off");
+            if (k === "defaultColumnWidth" || k === "defaultWindowHeight")
+                return label + ": " + WindowRuleSize.label(a[k]);
             return label + ": " + a[k];
         });
     }
@@ -341,7 +345,7 @@ Item {
                 visible: root.activeWindows.length > 0
                 title: I18n.tr("Create rule for:")
 
-                DankDropdown {
+                DDropdown {
                     id: windowSelector
                     downKeyOpens: false
                     backgroundColor: SettingsMetrics.controlSurface
@@ -383,7 +387,7 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingXS
 
-                    DankIcon {
+                    DIcon {
                         name: "select_window"
                         size: Theme.iconSizeLarge
                         color: Theme.surfaceVariantText
@@ -429,7 +433,7 @@ Item {
                         return parts.length > 0 ? parts.join(" · ") : I18n.tr("No match criteria");
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "edit"
                         enabled: !root.readOnly
@@ -437,7 +441,7 @@ Item {
                         onClicked: root.editRule(ruleRow.liveRuleData)
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "delete"
                         iconColor: Theme.error
@@ -455,7 +459,7 @@ Item {
                             id: actionRepeater
                             model: root.actionChips(ruleRow.liveRuleData.actions)
 
-                            delegate: DankBadge {
+                            delegate: DBadge {
                                 required property string modelData
                                 maximumWidth: parent?.width ?? 0
                                 text: modelData
@@ -523,7 +527,7 @@ Item {
                     clickable: true
                     onClicked: root.expandedExternalId = externalCard.expanded ? "" : externalCard.modelData.id
 
-                    DankBadge {
+                    DBadge {
                         visible: externalCard.sourceFile.length > 0
                         anchors.verticalCenter: parent.verticalCenter
                         text: externalCard.sourceFile
@@ -531,14 +535,14 @@ Item {
                         textColor: Theme.surfaceVariantText
                     }
 
-                    DankIcon {
+                    DIcon {
                         name: externalCard.expanded ? "expand_less" : "expand_more"
                         size: Theme.iconSize
                         color: Theme.surfaceVariantText
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         iconName: "content_copy"
                         iconColor: Theme.surfaceVariantText
                         enabled: !root.readOnly
@@ -561,7 +565,7 @@ Item {
                             Repeater {
                                 model: root.actionChips(externalCard.modelData.actions)
 
-                                delegate: DankBadge {
+                                delegate: DBadge {
                                     required property string modelData
                                     maximumWidth: parent?.width ?? 0
                                     text: modelData
@@ -638,7 +642,7 @@ Item {
         SettingsFabBar {
             shown: !root.readOnly
 
-            DankFab {
+            DFab {
                 text: I18n.tr("Add window rule")
                 iconName: "add"
                 onClicked: root.openRuleModal()
@@ -655,7 +659,7 @@ Item {
         onLoaded: root.presentEditor()
 
         sourceComponent: WindowRuleEditorDialog {
-            supportingText: I18n.tr("Changes save to %1", "keybind editor dialog hint, %1 is the binds file path").arg(root.dmsRulesFileName)
+            supportingText: I18n.tr("Changes save to %1", "hint under the keybind and window rule editors, %1 is the config file the changes are written to").arg(root.dmsRulesFileName)
             onRejected: root.closeEditor()
             onRuleSubmitted: {
                 root.loadWindowRules();

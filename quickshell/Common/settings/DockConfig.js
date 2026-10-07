@@ -57,6 +57,7 @@ function create(id, name) {
         magnification: false,
         magnificationScale: 130,
         magnificationProfile: DEFAULT_MAGNIFICATION_PROFILE,
+        magnificationExpand: false,
         order: [],
         widgets: [
             {

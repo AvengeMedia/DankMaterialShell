@@ -30,8 +30,7 @@ Item {
         const y = pos.y;
         const menuX = I18n.isRtl ? x : x + anchor.width - menu.effectiveMenuWidth;
         const below = y + anchor.height + Theme.spacingXS;
-        const menuY = below + menu.effectiveMenuHeight > screen.height - Theme.spacingS
-            ? y - menu.effectiveMenuHeight - Theme.spacingXS : below;
+        const menuY = below + menu.effectiveMenuHeight > screen.height - Theme.spacingS ? y - menu.effectiveMenuHeight - Theme.spacingXS : below;
         menu.open(screen, menuX, menuY, false);
     }
 
@@ -39,24 +38,24 @@ Item {
         menu.hide();
     }
 
-    DankContextMenu {
+    DContextMenu {
         id: menu
         layerNamespace: "dms:control-center-menu"
         minMenuWidth: CcMetrics.menuMinWidth
         keyboardNavigable: true
         transientSurfaceTracker: root.transientSurfaceTracker
         menuItems: root.visibleItems.map(item => ({
-            type: "item",
-            icon: item.iconName || "",
-            text: item.label || "",
-            enabled: item.enabled !== false,
-            isDestructive: item.destructive === true,
-            action: () => {
-                menu.hide();
-                if (typeof item.action === "function")
-                    item.action();
-            }
-        }))
+                    type: "item",
+                    icon: item.iconName || "",
+                    text: item.label || "",
+                    enabled: item.enabled !== false,
+                    isDestructive: item.destructive === true,
+                    action: () => {
+                        menu.hide();
+                        if (typeof item.action === "function")
+                            item.action();
+                    }
+                }))
 
         onOpenStateChanged: {
             if (openState)

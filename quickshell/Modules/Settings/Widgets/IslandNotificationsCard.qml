@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Services
 
 SettingsCard {
     id: root
@@ -27,12 +28,24 @@ SettingsCard {
 
     SettingsToggleRow {
         settingKey: root.keyPrefix + "SystemOsd"
-        tags: ["island", "volume", "brightness", "osd", "level", "standard"]
+        tags: ["island", "volume", "brightness", "microphone", "caps lock", "power profile", "idle inhibitor", "osd", "level", "standard"]
         resetStore: root.store
         resetKeys: ["islandSystemOsd"]
         text: I18n.tr("Use standard OSDs", "island settings: show volume and brightness changes as the regular on-screen displays instead of in the island")
         checked: !root.store.setting("islandSystemOsd")
         onToggled: checked => root.store.apply("islandSystemOsd", !checked)
+    }
+
+    SettingsToggleRow {
+        settingKey: root.keyPrefix + "ChargingPulse"
+        tags: ["island", "battery", "charging", "plugged", "power", "pulse"]
+        resetStore: root.store
+        resetKeys: ["islandChargingPulse"]
+        text: I18n.tr("Charging", "island settings: pulse the island when power is connected or removed")
+        description: I18n.tr("Show the battery briefly when power is connected or removed", "island settings: charging pulse toggle description")
+        visible: root.store.setting("islandSystemOsd") && BatteryService.batteryAvailable
+        checked: root.store.setting("islandChargingPulse")
+        onToggled: checked => root.store.apply("islandChargingPulse", checked)
     }
 
     SettingsToggleRow {

@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell.Widgets
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Rectangle {
@@ -9,11 +10,14 @@ Rectangle {
     property string path: ""
     property string placeholderIcon: "image"
     property string emptyText: I18n.tr("Not set", "wallpaper not set label")
+    property bool showMaterial: false
+    property var materialComposition: null
     property bool allowColor: true
 
     readonly property bool isColor: path.startsWith("#")
     readonly property bool isImage: path !== "" && !isColor
-    readonly property string fileName: path !== "" ? path.split("/").pop() : emptyText
+    readonly property bool isMaterial: showMaterial && path === ""
+    readonly property string fileName: path !== "" ? path.split("/").pop() : (showMaterial ? I18n.tr("Material", "wallpaper type") : emptyText)
 
     signal browse
     signal pickColor
@@ -29,6 +33,14 @@ Rectangle {
         color: "transparent"
 
         Loader {
+            anchors.fill: parent
+            active: root.showMaterial && !root.isColor && (!root.isImage || imageLoader.item?.status === Image.Error)
+            sourceComponent: MaterialWallpaper {
+                composition: root.materialComposition
+            }
+        }
+
+        Loader {
             id: imageLoader
             anchors.fill: parent
             active: root.isImage
@@ -42,12 +54,12 @@ Rectangle {
         }
     }
 
-    DankIcon {
+    DIcon {
         anchors.centerIn: parent
         name: root.placeholderIcon
         size: Theme.iconSizeLarge
         color: Theme.surfaceVariantText
-        visible: !root.isColor && (!root.isImage || imageLoader.item?.status === Image.Error)
+        visible: !root.showMaterial && !root.isColor && (!root.isImage || imageLoader.item?.status === Image.Error)
     }
 
     MouseArea {
@@ -75,7 +87,7 @@ Rectangle {
             anchors.centerIn: parent
             spacing: Theme.spacingS
 
-            DankActionButton {
+            DActionButton {
                 buttonSize: Theme.iconButtonSize
                 iconName: "folder_open"
                 iconSize: Theme.iconSizeMedium
@@ -85,7 +97,7 @@ Rectangle {
                 onClicked: root.browse()
             }
 
-            DankActionButton {
+            DActionButton {
                 buttonSize: Theme.iconButtonSize
                 iconName: "palette"
                 iconSize: Theme.iconSizeMedium
@@ -96,7 +108,7 @@ Rectangle {
                 onClicked: root.pickColor()
             }
 
-            DankActionButton {
+            DActionButton {
                 buttonSize: Theme.iconButtonSize
                 iconName: "close"
                 iconSize: Theme.iconSizeMedium

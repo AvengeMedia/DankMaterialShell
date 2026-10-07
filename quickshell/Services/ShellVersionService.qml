@@ -19,30 +19,18 @@ Singleton {
     Process {
         id: versionDetection
         running: true
-        command: ["sh", "-c", `cd "${Quickshell.shellDir}" && if [ -d .git ]; then echo "(git) $(git rev-parse --short HEAD)"; elif [ -f VERSION ]; then cat VERSION; fi`]
+        command: ["sh", "-c", `cd "${Quickshell.shellDir}" || exit 0
+semver=$(cat VERSION 2>/dev/null); codename=$(cat CODENAME 2>/dev/null)
+if [ -d .git ]; then shell="(git) $(git rev-parse --short HEAD)"; else shell=$semver; fi
+printf '%s\\n%s\\n%s\\n' "$shell" "$semver" "$codename"`]
 
         stdout: StdioCollector {
-            onStreamFinished: shellVersion = text.trim()
-        }
-    }
-
-    Process {
-        id: semverDetection
-        running: true
-        command: ["sh", "-c", `cd "${Quickshell.shellDir}" && if [ -f VERSION ]; then cat VERSION; fi`]
-
-        stdout: StdioCollector {
-            onStreamFinished: semverVersion = text.trim()
-        }
-    }
-
-    Process {
-        id: codenameDetection
-        running: true
-        command: ["sh", "-c", `cd "${Quickshell.shellDir}" && if [ -f CODENAME ]; then cat CODENAME; fi`]
-
-        stdout: StdioCollector {
-            onStreamFinished: shellCodename = text.trim()
+            onStreamFinished: {
+                const lines = text.split("\n");
+                shellVersion = (lines[0] || "").trim();
+                semverVersion = (lines[1] || "").trim();
+                shellCodename = (lines[2] || "").trim();
+            }
         }
     }
 

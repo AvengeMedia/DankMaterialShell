@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import test from "node:test";
 
-const source = readFileSync(new URL("../Modules/DankBar/SegmentRoles.js", import.meta.url), "utf8");
+const source = readFileSync(new URL("../Modules/DBar/SegmentRoles.js", import.meta.url), "utf8");
 const context = vm.createContext({});
 vm.runInContext(source.replace(/^\.pragma.*$/m, ""), context);
 const plain = value => JSON.parse(JSON.stringify(value));

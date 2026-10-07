@@ -1,7 +1,7 @@
 filippo.io/edwards25519 v1.2.0 h1:crnVqOiS4jqYleHd9vaKZ+HKtHfllngJIiOpNpoJsjo=
 filippo.io/edwards25519 v1.2.0/go.mod h1:xzAOLCNug/yB62zG1bQ8uziwrIqIuxhctzJT18Q77mc=
-github.com/AvengeMedia/dankgo v1.6.3-0.20260930202437-c5a872ad72bd h1:qjosoyzZdmMvS3Mz8jh856jiGva4pXuSp8oSX8K1huI=
-github.com/AvengeMedia/dankgo v1.6.3-0.20260930202437-c5a872ad72bd/go.mod h1:Fj+FTCumlv8YjKmdv75DREJuGmqU9EnGpBroZuCWc/k=
+github.com/AvengeMedia/dankgo v1.6.3-0.20261006143448-ac49b6718245 h1:U3z9hnBK1XS18SlcdUFpGXjMPZYuErx+ISL/2IXy1Yo=
+github.com/AvengeMedia/dankgo v1.6.3-0.20261006143448-ac49b6718245/go.mod h1:Fj+FTCumlv8YjKmdv75DREJuGmqU9EnGpBroZuCWc/k=
 github.com/AvengeMedia/dgop v1.6.3-0.20260920163359-59c7d81ae3b9 h1:ssoiAng7ng500BgtZa1riJH6kKudQVM8Uk9a9kF7mDA=
 github.com/AvengeMedia/dgop v1.6.3-0.20260920163359-59c7d81ae3b9/go.mod h1:8TFIP72NLxCbogF2hHU6sXj3RoTbHQW8beeCrisHs/Y=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
@@ -155,8 +155,8 @@ github.com/muesli/cancelreader v0.2.2 h1:3I4Kt4BQjOR54NavqnDogx/MIoWBFa0StPA8ELU
 github.com/muesli/cancelreader v0.2.2/go.mod h1:3XuTXfFS2VjM+HTLZY9Ak0l6eUKfijIfMUZ4EgX0QYo=
 github.com/muesli/termenv v0.16.0 h1:S5AlUN9dENB57rsbnkPyfdGuWIlkmzJjbFf0Tf5FWUc=
 github.com/muesli/termenv v0.16.0/go.mod h1:ZRfOIKPFDYQoDFF4Olj7/QJbW60Ol/kL1pU3VfY/Cnk=
-github.com/pilebones/go-udev v0.9.1 h1:uN72M1C1fgzhsVmBGEM8w9RD1JY4iVsPZpr+Z6rb3O8=
-github.com/pilebones/go-udev v0.9.1/go.mod h1:Bgcl07crebF3JSeS4+nuaRvhWFdCeFoBhXXeAp93XNo=
+github.com/pilebones/go-udev v0.10.0 h1:V4RKMDVZZUDqHyfAALBBpyozPONybBJRaZ9f8MuXKo8=
+github.com/pilebones/go-udev v0.10.0/go.mod h1:0u1XUZefS17H6cW9552TMLVOG/LUQlgiyZxLqS20u28=
 github.com/pjbgf/sha1cd v0.6.0 h1:3WJ8Wz8gvDz29quX1OcEmkAlUg9diU4GxJHqs0/XiwU=
 github.com/pjbgf/sha1cd v0.6.0/go.mod h1:lhpGlyHLpQZoxMv8HcgXvZEhcGs0PG/vsZnEJ7H0iCM=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=

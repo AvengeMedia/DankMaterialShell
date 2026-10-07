@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 StyledRect {
     id: root
@@ -71,7 +71,7 @@ StyledRect {
         anchors.rightMargin: Theme.spacingM
         spacing: Theme.spacingM
 
-        DankIcon {
+        DIcon {
             name: root.iconName
             size: Theme.iconSize
             color: Theme.primary
@@ -102,7 +102,7 @@ StyledRect {
             }
         }
 
-        DankButton {
+        DButton {
             id: openButton
             anchors.verticalCenter: parent.verticalCenter
             text: root.buttonText

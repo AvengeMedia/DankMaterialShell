@@ -166,6 +166,15 @@ func TestLinkInfo_Classify(t *testing.T) {
 		{"veth ether excluded", "veth1234", "ether", false, false},
 		{"podman bridge ether excluded", "podman3", "ether", false, false},
 		{"docker bridge ether excluded", "docker0", "ether", false, false},
+		// The IP lives on the aggregate while the member NIC is "enslaved" (#3463).
+		{"bridge type", "br0", "bridge", true, false},
+		{"bond type", "bond0", "bond", true, false},
+		{"team type", "team0", "team", true, false},
+		{"vlan type", "vlan10", "vlan", true, false},
+		{"docker user bridge excluded", "br-1a2b3c", "bridge", false, false},
+		{"libvirt bridge excluded", "virbr0", "bridge", false, false},
+		{"bridge with only virtual members excluded", "lxcbr0", "bridge", false, false},
+		{"bridge without members excluded", "waydroid0", "bridge", false, false},
 		// Fallback path: linkType unavailable, name-prefix heuristic applies.
 		{"fallback enp wired", "enp141s0", "", true, false},
 		{"fallback wlan wireless", "wlan0", "", false, true},
@@ -174,6 +183,15 @@ func TestLinkInfo_Classify(t *testing.T) {
 		{"fallback docker skipped", "docker0", "", false, false},
 		{"fallback tun skipped", "tun0", "", false, false},
 	}
+	members := map[string][]string{
+		"br0":       {"enp42s0", "vnet0"},
+		"lxcbr0":    {"vethAbCd12"},
+		"waydroid0": nil,
+	}
+	orig := bridgeMembers
+	bridgeMembers = func(b string) []string { return members[b] }
+	t.Cleanup(func() { bridgeMembers = orig })
+
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			l := &linkInfo{name: tc.ifname, linkType: tc.linkType}
@@ -254,7 +272,7 @@ func TestLooksVirtual(t *testing.T) {
 	for _, n := range virtual {
 		assert.True(t, looksVirtual(n), "%s should look virtual", n)
 	}
-	real := []string{"enp141s0", "eno1", "wlan0", "wlp3s0", "wifi", "dock", "nebula.homelab", "wg0"}
+	real := []string{"enp141s0", "eno1", "wlan0", "wlp3s0", "wifi", "dock", "nebula.homelab", "wg0", "br0", "bond0", "team0", "vlan10"}
 	for _, n := range real {
 		assert.False(t, looksVirtual(n), "%s should not look virtual", n)
 	}

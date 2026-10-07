@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 SettingsRow {
     id: root
@@ -14,7 +14,7 @@ SettingsRow {
     clickable: navigable
     onClicked: keyboard => navigated(keyboard)
 
-    DankIcon {
+    DIcon {
         name: "chevron_right"
         size: Theme.iconSize
         color: Theme.surfaceVariantText
@@ -34,7 +34,7 @@ SettingsRow {
         visible: root.navigable
     }
 
-    DankToggle {
+    DToggle {
         hideText: true
         text: root.title
         checked: root.checked

@@ -21,7 +21,7 @@ CcTile {
     expandedContent: instance?.ccExpandedContent ?? null
     bodyContent: docked ? (instance?.ccFooterContent ?? null) : null
     expandedMinimumHeight: instance?.ccExpandedMinimumHeight ?? Theme.listItemHeight
-    enabled: instance !== null
+    available: instance !== null
 
     onClicked: {
         if ((compact || !toggle) && hasDetail) {

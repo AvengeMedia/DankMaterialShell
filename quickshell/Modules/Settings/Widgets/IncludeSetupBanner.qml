@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 StyledRect {
     id: root
@@ -17,7 +17,7 @@ StyledRect {
     color: Theme.withAlpha(Theme.primary, 0.15)
     border.color: Theme.withAlpha(Theme.primary, 0.3)
     border.width: Theme.outlineWidth
-    visible: visibleCondition && (showLegacy || showSetup) && !include.checking
+    visible: visibleCondition && include.compositorSupported && (showLegacy || showSetup) && !include.checking
 
     Row {
         id: content
@@ -25,7 +25,7 @@ StyledRect {
         anchors.margins: Theme.spacingL
         spacing: Theme.spacingM
 
-        DankIcon {
+        DIcon {
             name: "warning"
             size: Theme.iconSize
             color: Theme.primary
@@ -56,7 +56,7 @@ StyledRect {
             }
         }
 
-        DankButton {
+        DButton {
             id: fixButton
             visible: root.showSetup
             text: root.include.fixing ? I18n.tr("Setting up...") : I18n.tr("Setup")

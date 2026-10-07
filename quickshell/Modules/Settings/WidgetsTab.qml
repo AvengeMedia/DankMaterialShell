@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -583,9 +583,9 @@ Item {
             visible: hasMultipleBars
 
             SettingsRow {
-                body: DankButtonGroup {
-                    arrowKeysSelect: false
+                body: DButtonGroup {
                     id: barSelectorGroup
+                    arrowKeysSelect: false
                     width: parent.width
                     model: SettingsData.barConfigs.map(cfg => cfg.name || ("Bar " + (SettingsData.barConfigs.indexOf(cfg) + 1)))
                     currentIndex: {
@@ -607,7 +607,7 @@ Item {
             iconName: "widgets"
             title: I18n.tr("Sections", "bar widget settings heading for left, center, right sections")
 
-            headerActions: DankButton {
+            headerActions: DButton {
                 text: I18n.tr("Reset")
                 iconName: "refresh"
                 buttonHeight: Theme.buttonHeightXS
@@ -694,7 +694,7 @@ Item {
                         width: parent.width
                         spacing: Theme.spacingS
 
-                        DankButton {
+                        DButton {
                             text: I18n.tr("Launcher", "island settings: button to launcher tab")
                             iconName: "grid_view"
                             onClicked: {
@@ -705,7 +705,7 @@ Item {
                             }
                         }
 
-                        DankButton {
+                        DButton {
                             text: I18n.tr("Time & weather", "island settings: button to weather tab")
                             iconName: "cloud"
                             onClicked: {

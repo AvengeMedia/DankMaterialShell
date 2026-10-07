@@ -1507,21 +1507,21 @@ const (
 
 var bundledFontRelPaths = map[string][]string{
 	"google sans flex": {
-		"DankCommon/assets/fonts/google-sans-flex/GoogleSansFlex.ttf",
+		"DCommon/assets/fonts/google-sans-flex/GoogleSansFlex.ttf",
 	},
 	"fira code": {
-		"DankCommon/assets/fonts/nerd-fonts/FiraCodeNerdFont-Regular.ttf",
+		"DCommon/assets/fonts/nerd-fonts/FiraCodeNerdFont-Regular.ttf",
 		"assets/fonts/nerd-fonts/FiraCodeNerdFont-Regular.ttf",
 	},
 	"firacode nerd font": {
-		"DankCommon/assets/fonts/nerd-fonts/FiraCodeNerdFont-Regular.ttf",
+		"DCommon/assets/fonts/nerd-fonts/FiraCodeNerdFont-Regular.ttf",
 		"assets/fonts/nerd-fonts/FiraCodeNerdFont-Regular.ttf",
 	},
 	"dm serif display": {
-		"DankCommon/assets/fonts/dm-serif-display/DMSerifDisplay-Regular.ttf",
+		"DCommon/assets/fonts/dm-serif-display/DMSerifDisplay-Regular.ttf",
 	},
 	"notable": {
-		"DankCommon/assets/fonts/notable/Notable-Regular.ttf",
+		"DCommon/assets/fonts/notable/Notable-Regular.ttf",
 	},
 }
 
@@ -1593,7 +1593,7 @@ func checkConfiguredFont(label, family, shellPath, fcCache string, fcListAvailab
 		return checkResult{
 			catFonts, label, statusWarn,
 			fmt.Sprintf("'%s' bundled file missing", family),
-			"Expected font file missing from shell install. Reinstall DMS or check DankCommon assets.",
+			"Expected font file missing from shell install. Reinstall DMS or check DCommon assets.",
 			url,
 		}
 	}

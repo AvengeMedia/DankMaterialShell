@@ -5,9 +5,10 @@ import Quickshell
 import qs.Common
 
 Singleton {
-    readonly property real sidebarWidth: 320
+    readonly property real sidebarWidth: 336
     readonly property real compactBreakpoint: 700
-    readonly property real contentMaxWidth: Number.POSITIVE_INFINITY
+    readonly property real contentMaxWidth: 920
+    readonly property real paneMaxWidth: contentMaxWidth + panePadding * 2
     readonly property real mediaMaxWidth: 720
     readonly property real windowWidth: 1100
     readonly property real windowHeight: 940
@@ -39,7 +40,7 @@ Singleton {
     readonly property real positionPickerMaxWidth: 360
     readonly property real wallpaperThumbRatio: 10 / 16
     readonly property int wallpaperThumbCache: 1024
-    readonly property real wallpaperHeroStackWidth: 640
+    readonly property real wallpaperHeroStackWidth: 520
     readonly property real wallpaperHeroSplit: 0.5
     readonly property real disabledOpacity: 0.38
     readonly property real highlightBlend: 0.2

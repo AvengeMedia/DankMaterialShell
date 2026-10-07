@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Column {
@@ -33,7 +34,7 @@ Column {
             anchors.verticalCenter: parent.verticalCenter
         }
 
-        DankBadge {
+        DBadge {
             visible: root.hasRelease && (root.release.codename || "") !== ""
             text: root.hasRelease ? root.release.codename || "" : ""
             color: Theme.primaryContainer
@@ -41,9 +42,9 @@ Column {
             anchors.verticalCenter: parent.verticalCenter
         }
 
-        DankBadge {
+        DBadge {
             visible: root.hasRelease && root.release.prerelease === true
-            text: I18n.tr("Pre-release")
+            text: I18n.tr("Pre-release", "badge on a release that is not a stable version")
             color: Theme.chipSurface
             textColor: Theme.surfaceVariantText
             anchors.verticalCenter: parent.verticalCenter
@@ -93,7 +94,7 @@ Column {
                 width: parent.width
                 spacing: Theme.spacingS
 
-                DankIcon {
+                DIcon {
                     name: "arrow_right"
                     size: Theme.iconSizeSmall
                     color: Theme.primary
@@ -116,18 +117,18 @@ Column {
         visible: root.hasRelease
         spacing: Theme.spacingS
 
-        DankButton {
+        DButton {
             visible: root.blogUrl !== ""
-            text: I18n.tr("Read the blog post")
+            text: I18n.tr("Read the blog post", "release notes link")
             iconName: "article"
             backgroundColor: Theme.primary
             textColor: Theme.onPrimary
             onClicked: Qt.openUrlExternally(root.blogUrl)
         }
 
-        DankButton {
+        DButton {
             visible: root.releaseUrl !== ""
-            text: I18n.tr("View on GitHub")
+            text: I18n.tr("View on GitHub", "link to the release on GitHub")
             iconName: "open_in_new"
             backgroundColor: Theme.chipSurface
             textColor: Theme.surfaceText

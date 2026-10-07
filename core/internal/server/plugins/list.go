@@ -27,7 +27,10 @@ func HandleList(conn *ipc.ConnWriter, req ipc.Request) {
 		return
 	}
 
-	feedback := plugins.FetchFeedback()
+	var feedback map[string]plugins.Feedback
+	if len(pluginList) > 0 {
+		feedback = plugins.FetchFeedback()
+	}
 
 	result := make([]PluginInfo, len(pluginList))
 	for i, p := range pluginList {

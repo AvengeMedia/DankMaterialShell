@@ -24,14 +24,16 @@ Singleton {
 
     readonly property var _pinKeys: ["brightnessDevicePins", "wifiNetworkPins", "bluetoothDevicePins", "audioInputDevicePins", "audioOutputDevicePins"]
     readonly property var _historyKeys: ["browserUsageHistory", "filePickerUsageHistory"]
-    readonly property var _dataKeys: ["fileBrowserSettings", "processFilterTypes", "pluginViewSort", "pluginViewFilter", "dashFocusCardId", "controlCenterCollapsedCategories", "mediaLyricsOpen", "matugenPreviews", "matugenAppliedKey"].concat(_pinKeys, _historyKeys)
+    readonly property var _dataKeys: ["fileBrowserSettings", "processFilterTypes", "pluginViewSort", "pluginViewFilter", "dashFocusCardId", "controlCenterCollapsedCategories", "mediaLyricsOpen", "matugenPreviews", "matugenSeedPreviews", "matugenAppliedKey", "lockScreenPlacementSamples"].concat(_pinKeys, _historyKeys)
 
     property string pluginViewFilter: "enabled"
     property string dashFocusCardId: ""
     property var controlCenterCollapsedCategories: []
     property bool mediaLyricsOpen: false
     property var matugenPreviews: ({})
+    property var matugenSeedPreviews: ({})
     property string matugenAppliedKey: ""
+    property var lockScreenPlacementSamples: ({})
     property var pluginViewSort: ({
             by: "modified",
             descending: true
@@ -134,7 +136,9 @@ Singleton {
                 controlCenterCollapsedCategories = Array.isArray(cache.controlCenterCollapsedCategories) ? cache.controlCenterCollapsedCategories.filter(id => typeof id === "string") : [];
                 mediaLyricsOpen = cache.mediaLyricsOpen === true;
                 matugenPreviews = typeof cache.matugenPreviews?.key === "string" ? cache.matugenPreviews : {};
+                matugenSeedPreviews = cache.matugenSeedPreviews && typeof cache.matugenSeedPreviews === "object" && !Array.isArray(cache.matugenSeedPreviews) ? cache.matugenSeedPreviews : {};
                 matugenAppliedKey = typeof cache.matugenAppliedKey === "string" ? cache.matugenAppliedKey : "";
+                lockScreenPlacementSamples = cache.lockScreenPlacementSamples && typeof cache.lockScreenPlacementSamples === "object" && !Array.isArray(cache.lockScreenPlacementSamples) ? cache.lockScreenPlacementSamples : {};
                 const pluginSort = cache.pluginViewSort;
                 pluginViewSort = {
                     by: ["name", "author", "modified"].includes(pluginSort?.by) ? pluginSort.by : "modified",
@@ -214,7 +218,9 @@ Singleton {
             "controlCenterCollapsedCategories": controlCenterCollapsedCategories,
             "mediaLyricsOpen": mediaLyricsOpen,
             "matugenPreviews": matugenPreviews,
+            "matugenSeedPreviews": matugenSeedPreviews,
             "matugenAppliedKey": matugenAppliedKey,
+            "lockScreenPlacementSamples": lockScreenPlacementSamples,
             "fileBrowserSettings": fileBrowserSettings,
             "configVersion": cacheConfigVersion
         };

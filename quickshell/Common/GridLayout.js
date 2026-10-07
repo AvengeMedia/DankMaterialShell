@@ -131,9 +131,10 @@ function cellAt(layout, x, y, cols, rows) {
     };
 }
 
-// With gravity, a tile dropped onto the one below it gets lifted straight back into the hole it left, so a tile
-// fully covering exactly one other that fits where it came from trades places with it instead.
-function swapInto(items, cells, index, target) {
+// With gravity, a tile dragged down onto another and dropped at its row gets lifted straight back above it. So a
+// tile coming from above lands just past the tiles it overlaps, and one fully covering a single tile that fits
+// where it came from trades places with it.
+function dropInto(items, cells, index, target) {
     const origin = cells[index];
     if (!origin || !target)
         return items;
@@ -151,12 +152,20 @@ function swapInto(items, cells, index, target) {
     };
     if (overlaps([box(origin)], moved.x, moved.y, moved.w, moved.h))
         return items;
-    const hits = cells.reduce((found, cell, i) => i !== index && cell && overlaps([box(cell)], moved.x, moved.y, moved.w, moved.h) ? found.concat([i]) : found, []);
-    const other = hits.length === 1 ? cells[hits[0]] : null;
+    const hits = cells.filter((cell, i) => i !== index && cell && overlaps([box(cell)], moved.x, moved.y, moved.w, moved.h));
+    if (hits.length === 0)
+        return items;
+    if (hits.every(cell => cell.row >= origin.row + origin.rows)) {
+        const row = hits.reduce((bottom, cell) => Math.max(bottom, cell.row + cell.rows), moved.y);
+        return items.map((item, i) => i === index ? Object.assign({}, item, {
+                "row": row
+            }) : item);
+    }
+    const other = hits.length === 1 ? hits[0] : null;
     const covered = other && other.col >= moved.x && other.row >= moved.y && other.col + other.cols <= moved.x + moved.w && other.row + other.rows <= moved.y + moved.h;
     if (!covered || other.cols > origin.cols || other.rows > origin.rows)
         return items;
-    return items.map((item, i) => i === hits[0] ? Object.assign({}, item, {
+    return items.map((item, i) => cells[i] === other ? Object.assign({}, item, {
             "col": origin.col,
             "row": origin.row
         }) : item);

@@ -75,18 +75,17 @@ Variants {
 
             Connections {
                 target: SessionData
+                enabled: SessionData.perModeWallpaper
+
                 function onIsLightModeChanged() {
-                    if (SessionData.perModeWallpaper) {
-                        var newSource = SessionData.getMonitorWallpaper(modelData.name) || "";
-                        if (newSource !== root.source) {
-                            root.source = newSource;
-                        }
-                    }
+                    const newSource = SessionData.getMonitorWallpaper(modelData.name) || "";
+                    if (newSource !== root.source)
+                        root.source = newSource;
                 }
             }
 
             Connections {
-                target: NiriService
+                target: CompositorService.isNiri ? NiriService : null
                 enabled: CompositorService.isNiri && root.scrollingEnabled
 
                 function onAllWorkspacesChanged() {
@@ -137,7 +136,7 @@ Variants {
             property string currentSource: ""
             property bool frozenValid: false
             property int _freezeWaitFrames: 0
-            readonly property bool overviewBlurActive: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentSource !== ""
+            readonly property bool overviewBlurActive: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && (currentSource !== "" || showsBackdrop)
             readonly property var backingWindow: Window.window
             readonly property bool showsBackdrop: !source || isColorSource || currentWallpaper.status === Image.Error
             readonly property bool backdropBusy: showsBackdrop && !(backdropLoader.item?.ready ?? false)
@@ -268,7 +267,7 @@ Variants {
             onSessionMonitorWallpaperFillModesChanged: regenerate()
             onSessionPerMonitorWallpaperChanged: regenerate()
 
-            // Theme changes repaint DankBackdrop but nothing else wakes the render loop
+            // Theme changes repaint DBackdrop but nothing else wakes the render loop
             readonly property color themePrimary: Theme.primary
             readonly property color themeBackground: Theme.background
 
@@ -605,6 +604,9 @@ Variants {
             }
 
             function setWallpaperImmediate(newSource) {
+                root.pendingWallpaper = "";
+                root._deferredSource = "";
+                root._freezeWaitFrames = 0;
                 transitionDelayTimer.stop();
                 transitionAnimation.stop();
                 root.transitionProgress = 0.0;
@@ -655,6 +657,9 @@ Variants {
             }
 
             function changeWallpaper(newPath) {
+                const expectedSource = root.source.startsWith("file://") ? root.source : encodeFileUrl(root.source);
+                if (newPath !== expectedSource)
+                    return;
                 if (!newPath || newPath.startsWith("#")) {
                     root.changePending = false;
                     return;
@@ -719,8 +724,10 @@ Variants {
                 active: root.showsBackdrop
                 asynchronous: true
 
-                sourceComponent: DankBackdrop {
+                sourceComponent: DBackdrop {
                     screenName: modelData.name
+                    blur: root.overviewBlurActive ? Theme.wallpaperBlur : 0
+                    onInvalidated: root.invalidate()
                 }
             }
 
@@ -1167,7 +1174,7 @@ Variants {
             Loader {
                 id: overviewBlurLoader
                 anchors.fill: parent
-                active: root.overviewBlurActive
+                active: root.overviewBlurActive && !root.showsBackdrop
 
                 sourceComponent: MultiEffect {
                     anchors.fill: parent

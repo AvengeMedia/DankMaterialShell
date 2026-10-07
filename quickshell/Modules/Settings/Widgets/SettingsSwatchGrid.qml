@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
@@ -105,7 +106,7 @@ Flow {
                     }
                 }
 
-                DankPaletteSwatch {
+                DPaletteSwatch {
                     anchors.centerIn: parent
                     width: Theme.minimumTouchTargetSize
                     height: Theme.minimumTouchTargetSize
@@ -116,7 +117,7 @@ Flow {
                 }
             }
 
-            DankBadge {
+            DBadge {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: Theme.spacingXS
@@ -126,7 +127,7 @@ Flow {
                 textColor: Theme.onSecondaryContainer
             }
 
-            DankActionButton {
+            DActionButton {
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.margins: Theme.spacingXS

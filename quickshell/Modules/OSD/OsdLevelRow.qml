@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -77,7 +77,7 @@ Item {
         width: Math.max(0, root.vertical ? parent.width - root.effectiveHorizontalPadding * 2 : parent.width - root.endPadding * 2 - icon.width - root.itemSpacing - root.valueExtent)
         height: Math.max(0, root.vertical ? parent.height - y - root.endPadding - root.valueExtent : parent.height)
 
-        DankSlider {
+        DSlider {
             id: levelSlider
 
             anchors.centerIn: parent

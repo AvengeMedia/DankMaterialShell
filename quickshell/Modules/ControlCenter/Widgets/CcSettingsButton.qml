@@ -2,9 +2,9 @@ import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
-DankActionButton {
+DActionButton {
     property string settingsTab: ""
 
     buttonSize: CcMetrics.headerActionSize

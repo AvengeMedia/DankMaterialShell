@@ -70,8 +70,16 @@ Singleton {
     Component.onCompleted: {
         _initialized = true;
         Paths.iconResolver = name => resolve(name);
-        _probeSystemTheme();
+        if (!settingsTheme)
+            _probeSystemTheme();
         Qt.callLater(_rebuild);
+    }
+
+    Timer {
+        id: rebuildDebounce
+        interval: 2000
+        repeat: false
+        onTriggered: root._rebuild()
     }
 
     Connections {
@@ -80,7 +88,7 @@ Singleton {
         function onApplicationsChanged() {
             if (!root.ready)
                 return;
-            Qt.callLater(root._rebuild);
+            rebuildDebounce.restart();
         }
     }
 

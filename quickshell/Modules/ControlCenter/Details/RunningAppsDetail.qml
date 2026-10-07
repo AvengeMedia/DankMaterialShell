@@ -6,7 +6,7 @@ import qs.Common
 import qs.Services
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -28,7 +28,7 @@ Item {
             dismissRequested();
     }
 
-    DankFlickable {
+    DFlickable {
         anchors.fill: parent
         contentHeight: column.height
         clip: true
@@ -68,7 +68,7 @@ Item {
                             iconSize: Theme.iconSizeLarge
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             anchors.verticalCenter: parent.verticalCenter
                             iconName: "close"
                             iconColor: Theme.onSurfaceVariant

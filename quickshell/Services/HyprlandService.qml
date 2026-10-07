@@ -22,6 +22,8 @@ Singleton {
     readonly property string windowrulesPath: hyprDmsDir + "/windowrules.lua"
     readonly property bool luaConfigActive: CompositorService.isHyprland && (Hyprland.usingLua === true || luaConfigDetected)
 
+    property bool inOverview: false
+
     property int _lastGapValue: -1
     property string _monitorLayoutSignature: ""
     signal monitorLayoutChanged
@@ -69,9 +71,9 @@ Singleton {
             try {
                 const rules = JSON.parse(output);
                 workspaceRules = Array.isArray(rules) ? rules.filter(rule => rule.monitor).map(rule => ({
-                    "workspaceString": rule.workspaceString,
-                    "monitor": rule.monitor
-                })) : [];
+                            "workspaceString": rule.workspaceString,
+                            "monitor": rule.monitor
+                        })) : [];
             } catch (error) {
                 log.warn("workspacerules parse failed:", error);
             }
@@ -103,9 +105,8 @@ Singleton {
 
     Connections {
         target: SettingsData
+        enabled: CompositorService.isHyprland
         function onBarConfigsChanged() {
-            if (!CompositorService.isHyprland)
-                return;
             const newGaps = Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4));
             if (newGaps === root._lastGapValue)
                 return;
@@ -121,6 +122,7 @@ Singleton {
                 refreshLuaConfigStatus();
                 if (luaConfigActive)
                     ensureDmsLuaConfigs();
+                generateLayoutConfig();
                 return;
             }
             luaConfigDetected = false;

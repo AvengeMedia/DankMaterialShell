@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Widgets
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -23,7 +23,7 @@ Item {
         visible: status === Image.Ready
     }
 
-    DankIcon {
+    DIcon {
         anchors.centerIn: parent
         name: "apps"
         size: root.iconSize

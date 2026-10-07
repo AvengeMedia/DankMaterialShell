@@ -32,6 +32,7 @@ type CaptureResult struct {
 	Format    uint32
 	Scale     float64
 	CICP      *CICP
+	CopyOnly  bool
 }
 
 func (o *WaylandOutput) effectiveScale() float64 {

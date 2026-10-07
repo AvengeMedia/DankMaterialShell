@@ -8,7 +8,7 @@ import (
 
 func TestCheckBundledGoogleSans(t *testing.T) {
 	shellPath := t.TempDir()
-	fontPath := filepath.Join(shellPath, "DankCommon", "assets", "fonts", "google-sans-flex", "GoogleSansFlex.ttf")
+	fontPath := filepath.Join(shellPath, "DCommon", "assets", "fonts", "google-sans-flex", "GoogleSansFlex.ttf")
 	missing := checkConfiguredFont("UI font", "Google Sans Flex", shellPath, "", false, "")
 	if missing.status != statusWarn {
 		t.Fatalf("missing bundled font status = %v, want %v", missing.status, statusWarn)

@@ -2,9 +2,12 @@
 .import qs.Services as Services
 .import qs.Modules.ControlCenter as ControlCenter
 .import "../../../Common/GridLayout.js" as GridLayout
+.import "../../../Common/settings/SettingsSpec.js" as Spec
 
 var OPTION_IDS = ["diskUsage", "brightnessSlider", "idleInhibitor", "user"];
 var ACTION_IDS = ["settings", "lock", "power"];
+var EDIT_ID = "edit";
+var BUTTON_IDS = ACTION_IDS.concat([EDIT_ID]);
 var FOOTER_CELLS = {
     "runningApps": 4,
     "user": 3,
@@ -30,13 +33,31 @@ function inFooter(widget) {
     return !!widget?.footer;
 }
 
+function isRemovable(widget) {
+    return widget?.id !== EDIT_ID;
+}
+
+// A saved list without the pencil gets it back whatever state the migration left it in.
+function ensureEditButton() {
+    const widgets = Common.SettingsData.controlCenterWidgets;
+    if (!Array.isArray(widgets) || widgets.some(widget => widget?.id === EDIT_ID))
+        return;
+    const fallback = Spec.SPEC.controlCenterWidgets.def.find(widget => widget.id === EDIT_ID);
+    Common.SettingsData.set("controlCenterWidgets", widgets.concat([Object.assign({}, fallback)]));
+}
+
 function footerMinCells(id) {
     return isSliderWidget(id) ? 3 : 1;
 }
 
+function footerStep(value) {
+    const step = ControlCenter.CcMetrics.gridStep;
+    return Math.round(value / step) * step;
+}
+
 // `footerW` outlives the footer flag, so an item dragged back in returns at the width it left with.
 function footerCells(widget) {
-    return Math.max(footerMinCells(widget?.id), Math.round(Number(widget?.footerW) || FOOTER_CELLS[widget?.id] || 1));
+    return Math.max(footerMinCells(widget?.id), footerStep(Number(widget?.footerW) || FOOTER_CELLS[widget?.id] || 1));
 }
 
 function footerFills(widget) {
@@ -47,17 +68,19 @@ function footerEnds(widget) {
     return widget?.footerEnd === true;
 }
 
-function fitFooterCells(sizes, mins, capacity) {
+function fitFooterCells(sizes, mins, capacity, keep, step) {
     const fitted = sizes.slice();
     let over = fitted.reduce((sum, cells) => sum + cells, 0) - capacity;
     while (over > 0) {
         const widest = fitted.reduce((best, cells, i) => cells > mins[i] && (best < 0 || cells > fitted[best]) ? i : best, -1);
         if (widest < 0)
             break;
-        fitted[widest]--;
-        over--;
+        fitted[widest] -= step;
+        over -= step;
     }
     for (let i = fitted.length - 1; over > 0 && i >= 0; i--) {
+        if (keep[i])
+            continue;
         over -= fitted[i];
         fitted[i] = 0;
     }
@@ -115,7 +138,7 @@ function sizeSpec(widget, columns, rows = Infinity) {
     };
     if (widget?.id === "user")
         spec.w = (Number.isFinite(columns) ? columns : ControlCenter.CcMetrics.defaultColumns) - ACTION_IDS.length;
-    if (ACTION_IDS.includes(widget?.id))
+    if (BUTTON_IDS.includes(widget?.id))
         spec.w = 1;
     return spec;
 }
@@ -142,7 +165,7 @@ function clampSize(widget, columns, rows = Infinity) {
 function addWidget(widgetId, columns) {
     const widgets = Common.SettingsData.controlCenterWidgets.slice();
     const widget = defaultWidget(widgetId, columns);
-    if (ACTION_IDS.includes(widgetId))
+    if (BUTTON_IDS.includes(widgetId))
         widget.small = true;
 
     if (widgetId === "diskUsage") {
@@ -166,7 +189,7 @@ function generateUniqueId() {
 
 function removeWidget(index) {
     const widgets = Common.SettingsData.controlCenterWidgets.slice();
-    if (index < 0 || index >= widgets.length)
+    if (index < 0 || index >= widgets.length || !isRemovable(widgets[index]))
         return;
     widgets.splice(index, 1);
     Common.SettingsData.set("controlCenterWidgets", widgets);
@@ -204,7 +227,7 @@ function moveToFooter(index, beforeIndex, cells, end) {
 }
 
 // Hands spare cells to fill items, the earlier ones taking the remainder.
-function spreadFooterFill(cells, fills, spare) {
+function spreadFooterFill(cells, fills, spare, step) {
     const count = fills.filter(Boolean).length;
     if (count === 0 || spare <= 0)
         return cells;
@@ -212,7 +235,7 @@ function spreadFooterFill(cells, fills, spare) {
     return cells.map((size, i) => {
         if (!fills[i] || size === 0)
             return size;
-        const share = Math.ceil(left / count);
+        const share = Math.ceil(left / count / step) * step;
         left -= share;
         return size + Math.max(0, share);
     });
@@ -254,5 +277,5 @@ function resetToDefault() {
 }
 
 function clearAll() {
-    Common.SettingsData.set("controlCenterWidgets", []);
+    Common.SettingsData.set("controlCenterWidgets", Common.SettingsData.controlCenterWidgets.filter(widget => !isRemovable(widget)));
 }

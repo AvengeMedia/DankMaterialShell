@@ -1,10 +1,11 @@
 import QtQuick
 import qs.Common
 import qs.Modals.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
-DankFloatingWindow {
+DFloatingWindow {
     id: root
 
     property var parentModal: null
@@ -159,7 +160,7 @@ DankFloatingWindow {
             }
         }
 
-        DankWindowHeader {
+        DWindowHeader {
             id: headerArea
             anchors.left: parent.left
             anchors.right: parent.right
@@ -168,7 +169,7 @@ DankFloatingWindow {
             title: root.headerTitle
             onCloseRequested: root.hide()
 
-            DankRefreshButton {
+            DRefreshButton {
                 buttonSize: Theme.buttonHeightXXS
                 iconSize: Theme.iconSizeSmall
                 iconColor: Theme.surfaceText
@@ -203,7 +204,7 @@ DankFloatingWindow {
                     spacing: Theme.spacingS
                 }
 
-                DankSearchField {
+                DSearchField {
                     id: browserSearchField
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -244,7 +245,7 @@ DankFloatingWindow {
                         anchors.fill: parent
                         visible: root.isLoading
 
-                        DankSpinner {
+                        DSpinner {
                             anchors.centerIn: parent
                             running: root.isLoading
                         }
