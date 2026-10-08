@@ -3793,13 +3793,12 @@ Singleton {
         _settingsFilesPaths = _settingsFilesPaths.filter(path => path != file.filePath);
     }
     function _tryCompleteDiscovery() {
-        const folderModel = settingsFolderModel;
-        if (_settingsStage !== SettingsData.Stage.Discovering || !folderModel.checked) {
+        if (_settingsStage !== SettingsData.Stage.Discovering || !_settingsFolderChecked) {
             return;
         }
         let expectedCount = 1;
-        if (folderModel.exists) {
-            expectedCount += settingsFolderModel.count;
+        if (_settingsFolderExists) {
+            expectedCount += settingsFolderLoader.item.count;
         }
         if (_settingsFilesPaths.length == expectedCount) {
             _settingsStage = SettingsData.Stage.Loading;
@@ -3867,16 +3866,18 @@ Singleton {
         }
     }
 
+    property bool _settingsFolderExists: false
+    property bool _settingsFolderChecked: isGreeterMode
     function _syncSettingsFilesModels() {
-        const listModel = settingsFilesListModel;
-        const folderModel = settingsFolderModel;
-        if (!folderModel.checked) {
+        if (!_settingsFolderChecked) {
             settingsFilesModelSyncDebounce.restart();
             return;
         }
-        if (!folderModel.exists) {
+        if (!_settingsFolderExists) {
             return;
         }
+        const listModel = settingsFilesListModel;
+        const folderModel = settingsFolderLoader.item;
 
         const folderPathsSet = new Set();
         for (let i = 0; i < folderModel.count; i++) {
@@ -3898,33 +3899,43 @@ Singleton {
         interval: 50
         repeat: false
         running: false
-        onTriggered: _syncSettingsFilesModels()
+        onTriggered: _syncSettingsFilesModels();
     }
     ListModel {
         id: settingsFilesListModel
     }
-    FolderListModel {
-        id: settingsFolderModel
+    Loader {
+        id: settingsFolderLoader
+        active: !isGreeterMode
+        function unloadModel() {
+            active = false;
+        }
+        sourceComponent: FolderListModel {
+            id: settingsFolderModel
 
-        // Folder seems to be reset to the CWD if the directory doesn't exist.
-        property url dir: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/DankMaterialShell/config.d"
-        property bool checked: false
-        property bool exists: folder === dir
+            property url dir: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/DankMaterialShell/config.d"
 
-        folder: isGreeterMode ? "" : dir
-        showDirs: false
-        nameFilters: ["*.json"]
-        onStatusChanged: {
-            if (status !== FolderListModel.Ready) {
-                return;
+            folder: dir
+            showDirs: false
+            nameFilters: ["*.json"]
+            onStatusChanged: {
+                // Folder gets reset to the CWD if the directory doesn't exist.
+                _settingsFolderExists = folder == dir;
+                if (status !== FolderListModel.Ready) {
+                    return;
+                }
+                _settingsFolderChecked = true;
+                if (!_settingsFolderExists) {
+                    Qt.callLater(() => settingsFolderLoader.unloadModel());
+                }
+
+                if (_hasLoaded) {
+                    settingsFilesModelSyncDebounce.restart();
+                } else {
+                    _syncSettingsFilesModels();
+                }
+                _tryCompleteDiscovery();
             }
-            checked = true;
-            if (_hasLoaded) {
-                settingsFilesModelSyncDebounce.restart();
-            } else {
-                _syncSettingsFilesModels();
-            }
-            _tryCompleteDiscovery();
         }
     }
 
