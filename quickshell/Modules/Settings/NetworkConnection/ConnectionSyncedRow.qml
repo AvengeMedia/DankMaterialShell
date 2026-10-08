@@ -1,0 +1,48 @@
+import QtQuick
+import qs.Modules.Settings.Widgets
+
+// Refills only when the stored value changed and differs from the typed text, so half-typed text survives other edits.
+SettingsTextFieldRow {
+    id: root
+
+    property string stored: ""
+    property string lastStored: ""
+    property var check: t => true
+    property var commit: null
+    // Digits match their normalized number ("050" is "50", "0" is unset), so a refill can't move the cursor.
+    property var same: (typed, stored) => typed === stored || (/^\d+$/.test(typed) && (String(Number(typed)) === stored || (Number(typed) === 0 && stored === "")))
+    // Object with a reset() signal; on reset the row refills unconditionally.
+    property var resetOn: null
+    readonly property bool ok: check(value.trim())
+    // The field reports programmatic text changes as edits too; refills must not commit.
+    property bool syncing: false
+
+    function fill(text) {
+        syncing = true;
+        value = text;
+        syncing = false;
+    }
+
+    isError: !ok
+    onStoredChanged: {
+        if (stored === lastStored)
+            return;
+        lastStored = stored;
+        if (!same(value.trim(), stored))
+            fill(stored);
+    }
+    Component.onCompleted: fill(lastStored = stored)
+    onValueEdited: text => {
+        if (!root.syncing && root.commit && root.check(text.trim()))
+            root.commit(text.trim());
+    }
+
+    Connections {
+        target: root.resetOn
+        ignoreUnknownSignals: true
+
+        function onReset() {
+            root.fill(root.lastStored = root.stored);
+        }
+    }
+}

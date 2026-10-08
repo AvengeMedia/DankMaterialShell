@@ -82,6 +82,8 @@ Singleton {
             "islandDocked": () => root.islandBarFor("islandDocked") !== null,
             "dotEnabled": () => SettingsData.dotBarConfig?.enabled ?? false,
             "cellularAvailable": () => NetworkService.cellularAvailable,
+            "connectionEditorAvailable": () => NetworkService.connectionEditorPagesSupported,
+            "tailscaleAvailable": () => TailscaleService.available,
             "dockEnabled": () => (SettingsData.dockConfigs ?? []).some(dock => dock.enabled)
         })
 

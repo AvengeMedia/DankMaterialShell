@@ -10,12 +10,14 @@ CcListRow {
 
     required property var profile
     property bool isExpanded: false
+    property bool opensEditor: false
     readonly property bool isTransient: !!profile?.transient
     readonly property bool canExpand: profile?.canExpand !== false
     readonly property bool canDelete: profile?.canDelete !== false
 
     signal toggleExpand
     signal deleteRequested
+    signal editRequested
 
     readonly property bool isActive: DMSNetworkService.vpnStateForUuid(profile?.uuid) === "activated"
     readonly property bool isConnecting: DMSNetworkService.isVpnConnectingUuid(profile?.uuid)
@@ -74,7 +76,12 @@ CcListRow {
     subtitleColor: isConnecting ? Theme.warning : (hasError ? Theme.error : Theme.surfaceVariantText)
     enabled: !(DMSNetworkService.isBusy && !isConnecting)
     clickable: true
-    onClicked: DMSNetworkService.toggle(profile.uuid)
+    onClicked: {
+        if (opensEditor)
+            editRequested();
+        else
+            DMSNetworkService.toggle(profile.uuid);
+    }
 
     leading: DSpinner {
         size: Theme.iconSizeMedium
@@ -98,7 +105,20 @@ CcListRow {
 
     DActionButton {
         anchors.verticalCenter: parent.verticalCenter
-        visible: root.canExpand
+        visible: root.opensEditor && !root.isActive && !root.isConnecting
+        buttonSize: Theme.buttonHeightXS
+        iconSize: Theme.iconSizeMedium
+        iconName: "link"
+        tooltipText: I18n.tr("Connect")
+        Accessible.name: I18n.tr("Connect")
+        iconColor: root.contentColor
+        enabled: !DMSNetworkService.isBusy
+        onClicked: DMSNetworkService.toggle(root.profile.uuid)
+    }
+
+    DActionButton {
+        anchors.verticalCenter: parent.verticalCenter
+        visible: root.canExpand && !root.opensEditor
         buttonSize: Theme.buttonHeightXS
         iconSize: Theme.iconSizeMedium
         iconName: root.isExpanded ? "expand_less" : "expand_more"

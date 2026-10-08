@@ -20,6 +20,16 @@ Singleton {
     property string selectedWidgetTitle: ""
     property string selectedWidgetDescription: ""
     property string selectedWidgetIcon: ""
+    // Empty selectedConnectionUuid means a new connection of newConnectionType.
+    property string selectedConnectionUuid: ""
+    property string selectedConnectionTitle: ""
+    property string newConnectionType: ""
+
+    function selectConnection(uuid, title, newType) {
+        selectedConnectionUuid = uuid ?? "";
+        selectedConnectionTitle = title ?? "";
+        newConnectionType = newType ?? "";
+    }
 
     // The dot has its own page, so bar selection never lands on it.
     function normalizeSelectedBar() {

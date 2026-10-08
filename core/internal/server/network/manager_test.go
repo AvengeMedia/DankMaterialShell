@@ -180,6 +180,50 @@ func (b *testHotspotBackend) GetHotspotSecrets() (string, error) {
 	return b.secrets, nil
 }
 
+func TestManager_ConnectionEditorUnsupportedBackend(t *testing.T) {
+	backend, err := NewIWDBackend()
+	assert.NoError(t, err)
+
+	manager := NewTestManager(backend, &NetworkState{ConnectionEditorSupported: true})
+	assert.NoError(t, manager.syncStateFromBackend())
+	assert.False(t, manager.GetState().ConnectionEditorSupported)
+
+	_, err = manager.ListConnectionProfiles()
+	assert.ErrorIs(t, err, ErrConnectionEditorNotSupported)
+	assert.ErrorIs(t, manager.DeleteConnectionProfile("u"), ErrConnectionEditorNotSupported)
+}
+
+func TestStateChangedMeaningfully_ConnectionEditorSupported(t *testing.T) {
+	assert.True(t, stateChangedMeaningfully(&NetworkState{}, &NetworkState{ConnectionEditorSupported: true}))
+}
+
+func TestStateChangedMeaningfully_ConnectivityAndHotspotFields(t *testing.T) {
+	tests := []struct {
+		name   string
+		mutate func(s *NetworkState)
+	}{
+		{name: "connectivity", mutate: func(s *NetworkState) { s.Connectivity = "portal" }},
+		{name: "check enabled", mutate: func(s *NetworkState) { s.ConnectivityCheckEnabled = true }},
+		{name: "check available", mutate: func(s *NetworkState) { s.ConnectivityCheckAvailable = true }},
+		{name: "check uri", mutate: func(s *NetworkState) { s.ConnectivityCheckURI = "http://x/" }},
+		{name: "hotspot channel", mutate: func(s *NetworkState) { s.HotspotChannel = 36 }},
+		{name: "hotspot address", mutate: func(s *NetworkState) { s.HotspotAddress = "10.43.0.1/24" }},
+		{name: "hotspot uuid", mutate: func(s *NetworkState) { s.HotspotUUID = "u" }},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			old, new := NetworkState{}, NetworkState{}
+			tt.mutate(&new)
+			assert.True(t, stateChangedMeaningfully(&old, &new))
+		})
+	}
+}
+
+func TestStateChangedMeaningfully_ConnectionProfilesRevision(t *testing.T) {
+	assert.True(t, stateChangedMeaningfully(&NetworkState{}, &NetworkState{ConnectionProfilesRevision: 1}))
+}
+
 func TestManager_HotspotUnsupportedBackend(t *testing.T) {
 	backend, err := NewIWDBackend()
 	assert.NoError(t, err)
@@ -429,6 +473,33 @@ func TestStateChangedMeaningfully_CellularDeviceFields(t *testing.T) {
 			old := NetworkState{CellularDevices: device(nil)}
 			new := NetworkState{CellularDevices: device(tt.mutate)}
 			assert.Equal(t, tt.changed, stateChangedMeaningfully(&old, &new))
+		})
+	}
+}
+
+func TestStateChangedMeaningfully_EthernetProfileFields(t *testing.T) {
+	base := func() NetworkState {
+		return NetworkState{
+			EthernetDevices:  []EthernetDevice{{Name: "enp6s0", ConnectionUUID: "a", ProfileUUIDs: []string{"a"}}},
+			WiredConnections: []WiredConnection{{UUID: "a", ID: "Wired", Device: "enp6s0"}},
+		}
+	}
+
+	tests := []struct {
+		name   string
+		mutate func(s *NetworkState)
+	}{
+		{name: "profileUuids", mutate: func(s *NetworkState) { s.EthernetDevices[0].ProfileUUIDs = []string{"a", "b"} }},
+		{name: "connectionUuid", mutate: func(s *NetworkState) { s.EthernetDevices[0].ConnectionUUID = "b" }},
+		{name: "wired device", mutate: func(s *NetworkState) { s.WiredConnections[0].Device = "enp5s0" }},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			old, new := base(), base()
+			assert.False(t, stateChangedMeaningfully(&old, &new))
+			tt.mutate(&new)
+			assert.True(t, stateChangedMeaningfully(&old, &new))
 		})
 	}
 }

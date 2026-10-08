@@ -42,13 +42,18 @@ Singleton {
     property var selfNode: null
     property var peers: []
     property bool exitNodeAllowLanAccess: false
+    property var prefs: ({})
+    property string authUrl: ""
+    property bool loginRequested: false
+    readonly property bool prefsSupported: DMSService.apiVersion >= 38
+    readonly property bool canWritePrefs: available && prefsSupported
 
     property bool available: false
     property bool stateInitialized: false
 
     readonly property var allPeersList: {
         const result = [];
-        if (selfNode)
+        if (selfNode && selfNode.id)
             result.push(selfNode);
         if (peers)
             result.push(...peers);
@@ -156,6 +161,15 @@ Singleton {
         selfNode = data.self || null;
         peers = data.peers || [];
         exitNodeAllowLanAccess = data.exitNodeAllowLanAccess || false;
+        prefs = data.prefs || ({});
+        const newUrl = data.authUrl || "";
+        const urlChanged = newUrl !== authUrl;
+        authUrl = newUrl;
+        // Only open a login page the user asked for from DMS.
+        if (loginRequested && newUrl !== "" && urlChanged) {
+            Qt.openUrlExternally(newUrl);
+            loginRequested = false;
+        }
     }
 
     function refresh(callback) {
@@ -204,6 +218,78 @@ Singleton {
         sendAction("tailscale.setAllowLanAccess", {
             "enabled": enabled
         }, callback);
+    }
+
+    function setPrefs(patch, callback) {
+        if (!canWritePrefs)
+            return false;
+        sendAction("tailscale.setPrefs", patch, response => {
+            const warning = response.result ? response.result.warning : "";
+            if (warning)
+                ToastService.showWarning(I18n.tr("Warning"), warning);
+            if (callback)
+                callback(response);
+        });
+        return true;
+    }
+
+    function login() {
+        if (!canWritePrefs)
+            return false;
+        loginRequested = true;
+        sendAction("tailscale.login", {}, r => {
+            if (r.error)
+                loginRequested = false;
+        });
+        return true;
+    }
+
+    function addProfile() {
+        if (!canWritePrefs)
+            return false;
+        loginRequested = true;
+        sendAction("tailscale.addProfile", {}, r => {
+            if (r.error)
+                loginRequested = false;
+        });
+        return true;
+    }
+
+    function logout(callback) {
+        if (!canWritePrefs)
+            return false;
+        sendAction("tailscale.logout", {}, callback);
+        return true;
+    }
+
+    function switchProfile(id, callback) {
+        if (!canWritePrefs)
+            return false;
+        sendAction("tailscale.switchProfile", {
+            "id": id
+        }, callback);
+        return true;
+    }
+
+    function grantOperator(callback) {
+        if (!canWritePrefs)
+            return false;
+        sendAction("tailscale.grantOperator", {}, callback);
+        return true;
+    }
+
+    function listProfiles(callback) {
+        if (!canWritePrefs)
+            return false;
+        DMSService.sendRequest("tailscale.profiles", {}, callback);
+        return true;
+    }
+
+    function suggestExitNode(callback) {
+        if (!canWritePrefs)
+            return false;
+        DMSService.sendRequest("tailscale.suggestExitNode", {}, callback);
+        return true;
     }
 
     function isMine(peer) {
