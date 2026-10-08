@@ -18,6 +18,7 @@ Rectangle {
     property bool showActions: true
     property bool showDismiss: true
     property bool showClose: false
+    property bool revealControls: true
     property string dismissText: I18n.tr("Dismiss")
     property bool showTime: true
     property bool bodyInvokesAction: false
@@ -224,6 +225,16 @@ Rectangle {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: Theme.spacingXXS
+                    opacity: root.revealControls ? 1 : 0
+                    visible: opacity > 0
+
+                    Behavior on opacity {
+                        enabled: NotificationMetrics.animationsEnabled
+                        NumberAnimation {
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
+                        }
+                    }
 
                     Rectangle {
                         visible: !root.interactive && root.groupCount > 1

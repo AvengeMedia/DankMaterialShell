@@ -173,15 +173,38 @@ var dmsConfigSpecs = map[string]dmsConfigSpec{
 	},
 }
 
-func detectTerminal() (string, error) {
-	terminals := []string{"ghostty", "foot", "kitty", "alacritty"}
+var knownTerminals = []string{"ghostty", "foot", "kitty", "alacritty"}
+
+func terminalFromEnv() string {
+	return strings.TrimSpace(os.Getenv("TERMINAL"))
+}
+
+func installedTerminals() []string {
 	var found []string
-	for _, t := range terminals {
+	for _, t := range knownTerminals {
 		if utils.CommandExists(t) {
 			found = append(found, t)
 		}
 	}
+	return found
+}
 
+func defaultTerminalCommand() string {
+	if env := terminalFromEnv(); env != "" {
+		return env
+	}
+	if found := installedTerminals(); len(found) > 0 {
+		return found[0]
+	}
+	return "ghostty"
+}
+
+func detectTerminal() (string, error) {
+	if env := terminalFromEnv(); env != "" {
+		return env, nil
+	}
+
+	found := installedTerminals()
 	switch len(found) {
 	case 0:
 		return "ghostty", nil
@@ -360,8 +383,12 @@ func runSetup() error {
 	var err error
 
 	if wmSelected {
+		terminalCommand := defaultTerminalCommand()
+		if terminalSelected {
+			terminalCommand = terminal.Command()
+		}
 		var result config.DeploymentResult
-		result, err = deployer.DeployCompositor(wm, terminal, useSystemd)
+		result, err = deployer.DeployCompositor(wm, terminalCommand, useSystemd)
 		results = append(results, result)
 	}
 	if err == nil && terminalSelected {

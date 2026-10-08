@@ -442,7 +442,7 @@ DFloatingWindow {
                     clip: true
 
                     Behavior on x {
-                        enabled: settingsModal.isCompactMode && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+                        enabled: settingsModal.isCompactMode && !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
                         NumberAnimation {
                             duration: SettingsMetrics.transitionDuration
                             easing.type: Easing.BezierSpline

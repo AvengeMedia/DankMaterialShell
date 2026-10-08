@@ -204,8 +204,7 @@ Item {
                     if (!root.shown || !item || !FocusNavigation.containsFocus(contentSlot))
                         return;
                     const top = item.mapToItem(contentSlot, 0, 0).y;
-                    const y = Math.min(top, Math.max(contentFlickable.contentY, top + item.height - contentFlickable.height));
-                    contentFlickable.contentY = Math.max(0, Math.min(contentFlickable.contentHeight - contentFlickable.height, y));
+                    contentFlickable.revealRange(top, top + item.height);
                 }
 
                 Column {

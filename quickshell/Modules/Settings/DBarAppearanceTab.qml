@@ -10,6 +10,8 @@ Item {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
+    Component.onCompleted: BlurService.probe()
+
     property var parentModal: null
     readonly property bool widgetBackgroundEnabled: !(bar.selectedBarConfig?.noBackground ?? false)
     readonly property var outlineColors: ["surfaceText", "secondary", "primary"]
@@ -18,6 +20,7 @@ Item {
     readonly property var satellitePositionValues: ["island", "edges"]
     readonly property bool selectedIslandEnabled: bar.selectedBarIsIsland && (bar.selectedBarConfig?.enabled ?? false)
     readonly property bool selectedIslandFree: bar.selectedBarIsIsland && SettingsData.islandFreePlacement(bar.selectedBarConfig)
+    readonly property bool selectedIslandNotch: bar.selectedBarIsIsland && !root.selectedIslandFree && bar.islandSetting("islandNotch")
     readonly property int frameInsetPaddingDisplay: Math.round(SettingsData.frameBarContentGap)
 
     BarSelectionState {
@@ -541,50 +544,42 @@ Item {
                 onToggled: checked => bar.apply("islandSatelliteGothCorners", checked)
             }
 
-            SettingsSliderRow {
-                settingKey: "islandSatelliteSwoopRadius"
-                tags: ["island", "satellite", "goth", "corners", "radius", "sweep", "size"]
+            SettingsToggleSliderRow {
+                settingKey: "islandGothCornerRadius"
+                tags: ["island", "satellite", "notch", "goth", "corners", "radius", "sweep", "size"]
                 resetStore: bar
-                resetKeys: ["islandSatelliteSwoopRadius"]
-                text: I18n.tr("Goth corner radius", "island settings: satellite goth corner radius slider")
+                resetKeys: ["gothCornerRadiusOverride"]
+                valueKeys: ["gothCornerRadiusValue"]
+                text: I18n.tr("Custom radius")
+                checked: bar.selectedBarConfig?.gothCornerRadiusOverride ?? false
                 unit: "px"
-                minimum: 4
+                minimum: 0
                 maximum: 64
                 step: 1
-                value: bar.islandSetting("islandSatelliteSwoopRadius")
-                visible: bar.islandSetting("islandSatellitesEnabled")
-                enabled: bar.islandSetting("islandSatelliteBackground") && bar.islandSetting("islandSatelliteGothCorners")
-                onSliderValueChanged: value => bar.apply("islandSatelliteSwoopRadius", value)
+                value: bar.selectedBarConfig?.gothCornerRadiusValue ?? SettingsData.barConfigDefault("gothCornerRadiusValue")
+                visible: bar.islandSetting("islandSatellitesEnabled") || root.selectedIslandNotch
+                enabled: (bar.islandSetting("islandSatelliteBackground") && bar.islandSetting("islandSatelliteGothCorners")) || root.selectedIslandNotch
+                onToggled: checked => bar.apply("gothCornerRadiusOverride", checked)
+                onSliderDragFinished: finalValue => bar.apply("gothCornerRadiusValue", finalValue)
             }
 
-            SettingsToggleRow {
-                id: satelliteOpacityRow
-
-                readonly property bool overridden: !bar.islandSetting("islandSatelliteFollowInterfaceStyle")
-
+            SettingsToggleSliderRow {
                 settingKey: "islandSatelliteTransparency"
                 tags: ["island", "satellite", "background", "opacity", "transparency", "blur", "override", "interface", "style"]
                 resetStore: bar
-                resetKeys: ["islandSatelliteFollowInterfaceStyle", "islandSatelliteTransparency"]
-                resetByKeys: true
+                resetKeys: ["islandSatelliteFollowInterfaceStyle"]
+                valueKeys: ["islandSatelliteTransparency"]
                 text: I18n.tr("Override", "verb, toggle to override the global setting for this item")
-                checked: overridden
+                description: I18n.tr("Opacity", "island settings: satellite background opacity slider")
+                checked: !bar.islandSetting("islandSatelliteFollowInterfaceStyle")
+                minimum: 0
+                maximum: 100
+                step: 1
+                value: Math.round(SettingsData.islandSatelliteTransparency(bar.selectedBarConfig) * 100)
                 visible: bar.islandSetting("islandSatellitesEnabled")
                 enabled: bar.islandSetting("islandSatelliteBackground")
                 onToggled: checked => bar.apply("islandSatelliteFollowInterfaceStyle", !checked)
-
-                body: SettingsSliderRow {
-                    width: parent.width
-                    text: I18n.tr("Opacity", "island settings: satellite background opacity slider")
-                    resetStore: bar
-                    resetKeys: ["islandSatelliteTransparency"]
-                    minimum: 0
-                    maximum: 100
-                    step: 1
-                    value: Math.round(SettingsData.islandSatelliteTransparency(bar.selectedBarConfig) * 100)
-                    enabled: bar.islandSetting("islandSatelliteBackground") && satelliteOpacityRow.overridden
-                    onSliderValueChanged: value => bar.apply("islandSatelliteTransparency", value / 100)
-                }
+                onSliderValueChanged: value => bar.apply("islandSatelliteTransparency", value / 100)
             }
 
             SettingsSliderRow {
@@ -594,12 +589,12 @@ Item {
                 resetKeys: ["islandSatelliteGap"]
                 text: I18n.tr("Gap", "island settings: satellite to island gap slider")
                 unit: "px"
-                minimum: 4
+                minimum: 0
                 maximum: 48
                 step: 1
                 value: bar.islandSetting("islandSatelliteGap")
                 visible: bar.islandSetting("islandSatellitesEnabled")
-                enabled: bar.islandSetting("islandSatellitePosition") !== "edges"
+                enabled: bar.islandSetting("islandSatellitePosition") !== "edges" || bar.islandSetting("islandSatelliteBackground")
                 onSliderValueChanged: value => bar.apply("islandSatelliteGap", value)
             }
         }
@@ -610,6 +605,18 @@ Item {
             settingKey: "barWidgets"
             tags: ["widget", "style", "pills", "segments", "opacity", "padding", "maximize"]
             visible: bar.selectedBarConfig?.enabled ?? false
+
+            SettingsToggleRow {
+                settingKey: "barNoBackground"
+                tags: ["transparent", "background", "invisible"]
+                text: I18n.tr("Background")
+                resetStore: bar
+                resetKeys: ["noBackground"]
+                checked: !(bar.selectedBarConfig?.noBackground ?? false)
+                onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
+                        noBackground: !checked
+                    })
+            }
 
             SettingsRow {
                 settingKey: "barWidgetStyle"
@@ -642,35 +649,24 @@ Item {
                 }
             }
 
-            SettingsToggleRow {
-                id: widgetOpacityRow
-
-                readonly property bool overridden: bar.selectedBarConfig?.widgetFollowInterfaceStyle === false
-
+            SettingsToggleSliderRow {
                 text: I18n.tr("Override", "verb, toggle to override the global setting for this item")
+                description: I18n.tr("Opacity")
                 tags: ["widget", "opacity", "transparency", "override", "foreground", "interface", "style"]
                 enabled: root.widgetBackgroundEnabled
                 resetStore: bar
-                resetKeys: ["widgetFollowInterfaceStyle", "widgetTransparency"]
-                resetByKeys: true
-                checked: overridden
+                resetKeys: ["widgetFollowInterfaceStyle"]
+                valueKeys: ["widgetTransparency"]
+                checked: bar.selectedBarConfig?.widgetFollowInterfaceStyle === false
+                value: Math.round(SettingsData.barWidgetTransparency(bar.selectedBarConfig) * 100)
+                minimum: 0
+                maximum: 100
                 onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
                         widgetFollowInterfaceStyle: !checked
                     })
-
-                body: SettingsSliderRow {
-                    width: parent.width
-                    text: I18n.tr("Opacity")
-                    enabled: root.widgetBackgroundEnabled && widgetOpacityRow.overridden
-                    resetStore: bar
-                    resetKeys: ["widgetTransparency"]
-                    value: Math.round(SettingsData.barWidgetTransparency(bar.selectedBarConfig) * 100)
-                    minimum: 0
-                    maximum: 100
-                    onSliderDragFinished: finalValue => SettingsData.updateBarConfig(bar.selectedBarId, {
-                            widgetTransparency: finalValue / 100
-                        })
-                }
+                onSliderDragFinished: finalValue => SettingsData.updateBarConfig(bar.selectedBarId, {
+                        widgetTransparency: finalValue / 100
+                    })
             }
 
             SettingsSliderRow {
@@ -684,18 +680,6 @@ Item {
                 unit: "px"
                 onSliderValueChanged: newValue => SettingsData.updateBarConfig(bar.selectedBarId, {
                         widgetPadding: newValue
-                    })
-            }
-
-            SettingsToggleRow {
-                settingKey: "barNoBackground"
-                tags: ["transparent", "background", "invisible"]
-                text: I18n.tr("Background")
-                resetStore: bar
-                resetKeys: ["noBackground"]
-                checked: !(bar.selectedBarConfig?.noBackground ?? false)
-                onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
-                        noBackground: !checked
                     })
             }
 

@@ -8,10 +8,6 @@ import qs.Widgets
 BasePill {
     id: root
 
-    Ref {
-        service: DMSNetworkService
-    }
-
     property bool isHovered: clickArea.containsMouse
 
     signal toggleVpnPopup

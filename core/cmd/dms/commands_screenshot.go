@@ -414,7 +414,13 @@ func runScreenshot(config screenshot.Config) {
 	}
 
 	if config.Clipboard {
-		if err := copyImageToClipboard(result.Buffer, config.Format, config.Quality, result.Format, result.CICP); err != nil {
+		var err error
+		if filePath != "" && config.Format != screenshot.FormatPPM {
+			err = copyFileToClipboard(filePath)
+		} else {
+			err = copyImageToClipboard(result.Buffer, config.Format, config.Quality, result.Format, result.CICP)
+		}
+		if err != nil {
 			exitScreenshotError(" copying to clipboard", err)
 		}
 		if !ssJSON && !config.SaveFile {

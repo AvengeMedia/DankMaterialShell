@@ -32,7 +32,12 @@ Item {
     property var dropHandler: null
     // An item hovering from outside, placed first so the grid makes room for it.
     property var externalItem: null
-    property bool swapDrags: false
+    // The layout compacts upward, so a drop has to account for the hole the dragged item leaves.
+    property bool gravity: false
+    // Takes the items with the dragged one at its target and returns their packed cells, so a drop can tell
+    // whether gravity would lift the dragged item back above where it was dropped.
+    property var packer: null
+    property real rowStep: 1
     readonly property alias tileModel: tiles
     readonly property bool interacting: draggingSourceIndex >= 0 || sizePreview !== null || externalItem !== null
     readonly property real layoutHeight: interacting ? Math.max(heldHeight, slotLayout.totalHeight) : slotLayout.totalHeight
@@ -54,7 +59,7 @@ Item {
         if (interactingIndex < 0 || !changes)
             return items;
         const changed = items.map((item, i) => i === interactingIndex ? Object.assign({}, item, changes) : item);
-        return swapDrags && dragCell && draggingSourceIndex >= 0 ? GridUtils.dropInto(changed, pinnedCells, draggingSourceIndex, dragCell) : changed;
+        return gravity && dragCell && draggingSourceIndex >= 0 ? GridUtils.dropInto(changed, pinnedCells, draggingSourceIndex, dragCell, packer, rowStep) : changed;
     }
 
     signal layoutCommitted(var items)

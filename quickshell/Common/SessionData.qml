@@ -64,9 +64,15 @@ Singleton {
         return "";
     }
 
+    function probeTerminals() {
+        if (terminalProbe.running || installedTerminals.length > 0)
+            return;
+        terminalProbe.running = true;
+    }
+
     Process {
         id: terminalProbe
-        running: true
+        running: false
         command: ["sh", "-c", "for t in ghostty kitty foot alacritty wezterm konsole gnome-terminal xterm; do command -v \"$t\" >/dev/null 2>&1 && echo \"$t\"; done"]
         stdout: StdioCollector {
             onStreamFinished: {
@@ -1856,7 +1862,7 @@ Singleton {
     FileView {
         id: greeterSessionFile
 
-        path: root.greeterSessionBaseDir ? (root.greeterSessionBaseDir + "/session.json") : ""
+        path: isGreeterMode && root.greeterSessionBaseDir ? (root.greeterSessionBaseDir + "/session.json") : ""
         preload: isGreeterMode
         blockLoading: false
         blockWrites: true

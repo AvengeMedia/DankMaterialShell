@@ -87,9 +87,9 @@ Item {
         Item {
             id: islandHole
 
-            readonly property var mask: root.body?.inputMaskItem ?? null
-            x: (mask?.x ?? 0) + root.hostOriginX
-            y: (mask?.y ?? 0) + root.hostOriginY
+            readonly property var mask: dismissWindow.visible ? root.body?.inputMaskItem ?? null : null
+            x: mask ? mask.x + root.hostOriginX : 0
+            y: mask ? mask.y + root.hostOriginY : 0
             width: mask?.width ?? 0
             height: mask?.height ?? 0
         }
@@ -97,9 +97,9 @@ Item {
         Item {
             id: fittsStripHole
 
-            readonly property var strip: root.body?.fittsStripItem ?? null
-            x: (strip?.x ?? 0) + root.hostOriginX
-            y: (strip?.y ?? 0) + root.hostOriginY
+            readonly property var strip: dismissWindow.visible ? root.body?.fittsStripItem ?? null : null
+            x: strip ? strip.x + root.hostOriginX : 0
+            y: strip ? strip.y + root.hostOriginY : 0
             width: strip?.visible ? strip.width : 0
             height: strip?.visible ? strip.height : 0
         }
@@ -107,9 +107,9 @@ Item {
         Item {
             id: leadingSectionHole
 
-            readonly property var r: root.body?.leadingSectionRect ?? null
-            x: (r?.x ?? 0) + (root.body?.sectionOriginX ?? 0)
-            y: (r?.y ?? 0) + (root.body?.sectionOriginY ?? 0)
+            readonly property var r: dismissWindow.visible ? root.body?.leadingSectionRect ?? null : null
+            x: r ? r.x + root.body.sectionOriginX : 0
+            y: r ? r.y + root.body.sectionOriginY : 0
             width: r?.w ?? 0
             height: r?.h ?? 0
         }
@@ -118,9 +118,9 @@ Item {
         Item {
             id: centerSectionHole
 
-            readonly property var r: root.body?.centerSectionRect ?? null
-            x: (r?.x ?? 0) + (root.body?.sectionOriginX ?? 0)
-            y: (r?.y ?? 0) + (root.body?.sectionOriginY ?? 0)
+            readonly property var r: dismissWindow.visible ? root.body?.centerSectionRect ?? null : null
+            x: r ? r.x + root.body.sectionOriginX : 0
+            y: r ? r.y + root.body.sectionOriginY : 0
             width: r?.w ?? 0
             height: r?.h ?? 0
         }
@@ -128,9 +128,9 @@ Item {
         Item {
             id: trailingSectionHole
 
-            readonly property var r: root.body?.trailingSectionRect ?? null
-            x: (r?.x ?? 0) + (root.body?.sectionOriginX ?? 0)
-            y: (r?.y ?? 0) + (root.body?.sectionOriginY ?? 0)
+            readonly property var r: dismissWindow.visible ? root.body?.trailingSectionRect ?? null : null
+            x: r ? r.x + root.body.sectionOriginX : 0
+            y: r ? r.y + root.body.sectionOriginY : 0
             width: r?.w ?? 0
             height: r?.h ?? 0
         }

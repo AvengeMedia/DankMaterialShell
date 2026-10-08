@@ -43,6 +43,7 @@ Item {
     onSectionsChanged: invalidateCandidateCache()
 
     onHoverPopoutsEnabledChanged: {
+        invalidateCandidateCache();
         if (hoverPopoutsEnabled)
             return;
         cancelQueuedHitTest();
@@ -58,6 +59,7 @@ Item {
 
     Connections {
         target: root.widgetOwner || root.barContent
+        enabled: root.hoverPopoutsEnabled
 
         function onWidthChanged() {
             root.invalidateCandidateCache();
@@ -74,6 +76,7 @@ Item {
 
     Connections {
         target: PopoutManager
+        enabled: root.hoverPopoutsEnabled
 
         function onPopoutChanged() {
             root._reconcileClosedHoverSurface();
@@ -86,6 +89,7 @@ Item {
 
     Connections {
         target: BarWidgetService
+        enabled: root.hoverPopoutsEnabled
 
         function onWidgetRegistered(_widgetId, screenName) {
             if (screenName === root.barWindow?.screen?.name)
@@ -455,6 +459,8 @@ Item {
 
     Connections {
         target: root.barWindow?.hostWindow ?? null
+        enabled: root.hoverPopoutsEnabled
+
         function onMarginsChanged() {
             root.invalidateCandidateCache();
         }

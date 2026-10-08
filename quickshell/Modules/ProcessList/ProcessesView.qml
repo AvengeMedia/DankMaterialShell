@@ -182,7 +182,7 @@ DCard {
     function ensureVisible() {
         if (selectedIndex < 0)
             return;
-        processListView.positionViewAtIndex(selectedIndex, ListView.Contain);
+        processListView.revealIndex(selectedIndex);
     }
 
     function handleKey(event) {

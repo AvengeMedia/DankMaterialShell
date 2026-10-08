@@ -28,6 +28,9 @@ BasePill {
     property bool compactMode: false
     property var widgetData: null
     readonly property bool adaptiveWidthEnabled: SettingsData.widgetOption("music", widgetData, "mediaAdaptiveWidthEnabled")
+    property real allottedPrimarySize: 0
+    readonly property real naturalPrimarySize: isVerticalOrientation ? height : !playerAvailable ? 0 : Theme.snap((contentItem?.naturalContentWidth ?? 0) + horizontalPadding * 2, dpr)
+    readonly property real minimumPrimarySize: isVerticalOrientation ? height : !playerAvailable ? 0 : Theme.snap((contentItem?.fixedContentWidth ?? 0) + horizontalPadding * 2, dpr)
     readonly property bool lyricsEnabled: SettingsData.widgetOption("music", widgetData, "mediaShowLyrics") && LyricsService.allowed
     readonly property bool coverArtEnabled: SettingsData.widgetOption("music", widgetData, "mediaShowCoverArt")
     readonly property string coverArtUrl: coverArtEnabled && activePlayer && TrackArtService.artReadyFor(activePlayer) ? TrackArtService.resolvedArtUrl : ""
@@ -228,7 +231,7 @@ BasePill {
     content: Component {
         Item {
             id: contentRoot
-            readonly property real measuredTextWidth: {
+            readonly property real naturalTextWidth: {
                 if (!root.playerAvailable || root.maxTextWidth <= 0)
                     return 0;
                 // Preserve the fixed-width text slot even if metadata is briefly empty.
@@ -241,10 +244,11 @@ BasePill {
                     return 0;
                 return Math.min(root.maxTextWidth, Math.ceil(rawWidth));
             }
-            readonly property int horizontalContentWidth: {
-                const controlsWidth = 64 * root.contentScale + Theme.spacingXS * 2;
-                return root.badgeExtent + controlsWidth + (measuredTextWidth > 0 ? measuredTextWidth + Theme.spacingXS : 0);
-            }
+            readonly property real fixedContentWidth: root.badgeExtent + 64 * root.contentScale + Theme.spacingXS * 2
+            readonly property real textBudget: root.allottedPrimarySize > 0 ? Math.max(0, root.allottedPrimarySize - root.horizontalPadding * 2 - fixedContentWidth - Theme.spacingXS) : Infinity
+            readonly property real measuredTextWidth: Math.min(naturalTextWidth, textBudget)
+            readonly property real naturalContentWidth: fixedContentWidth + (naturalTextWidth > 0 ? naturalTextWidth + Theme.spacingXS : 0)
+            readonly property int horizontalContentWidth: fixedContentWidth + (measuredTextWidth > 0 ? measuredTextWidth + Theme.spacingXS : 0)
 
             implicitWidth: root.playerAvailable ? (root.isVerticalOrientation ? root.currentContentWidth : horizontalContentWidth) : 0
             implicitHeight: root.playerAvailable ? root.currentContentHeight : 0

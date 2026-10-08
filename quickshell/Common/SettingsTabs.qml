@@ -773,8 +773,12 @@ Singleton {
             return false;
         if (entry.clipboardOnly && (!DMSService.isConnected || DMSService.apiVersion < 23))
             return false;
+        if (entry.greeterOnly)
+            GreeterService.ensureDetected();
         if (entry.greeterOnly && !GreeterService.available)
             return false;
+        if (entry.autostartOnly)
+            DesktopService.ensureProbed();
         if (entry.autostartOnly && !DesktopService.autostartAvailable)
             return false;
         if (entry.cellularOnly && (NetworkService.cellularDevices?.length ?? 0) === 0)

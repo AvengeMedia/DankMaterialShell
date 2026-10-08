@@ -16,7 +16,10 @@ Column {
     width: parent?.width ?? 0
     spacing: Theme.spacingL
 
-    Component.onCompleted: CompositorService.refreshDmsWindowFloatingRule()
+    Component.onCompleted: {
+        BlurService.probe();
+        CompositorService.refreshDmsWindowFloatingRule();
+    }
 
     ConfigInclude {
         id: windowRulesInclude
@@ -387,6 +390,16 @@ Column {
                 onToggled: checked => SettingsData.set("floatingWindowForegroundLayers", checked)
                 onSliderValueChanged: newValue => SettingsData.set("floatingWindowForegroundTransparency", newValue / 100)
             }
+        }
+
+        SettingsToggleRow {
+            tab: "theme"
+            tags: ["floating", "window", "title", "bar", "header", "csd", "decoration", "compositor", "kwin", "controls"]
+            settingKey: "floatingWindowTitleBars"
+            text: I18n.tr("Title bars")
+            description: I18n.tr("Off lets the compositor decorate DMS windows. Open windows update when reopened.", "theme floating windows section, title bars toggle description")
+            checked: SettingsData.floatingWindowTitleBars
+            onToggled: checked => SettingsData.set("floatingWindowTitleBars", checked)
         }
 
         SettingsToggleRow {

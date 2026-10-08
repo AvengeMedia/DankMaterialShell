@@ -122,13 +122,13 @@ Item {
 
                     Item {
                         width: parent.width
-                        height: themeCategoryGroup.implicitHeight
+                        height: themeCategoryGroup.implicitHeight + Theme.focusRingOffset * 2
                         clip: true
 
                         DButtonGroup {
                             id: themeCategoryGroup
                             arrowKeysSelect: false
-                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.centerIn: parent
                             buttonPadding: parent.width < 420 ? Theme.spacingS : Theme.spacingL
                             minButtonWidth: parent.width < 420 ? 44 : 64
                             textSize: parent.width < 420 ? Theme.fontSizeSmall : Theme.fontSizeMedium
@@ -660,14 +660,14 @@ Item {
 
                     Item {
                         width: parent.width
-                        height: flavorButtonGroup.implicitHeight
+                        height: flavorButtonGroup.implicitHeight + Theme.focusRingOffset * 2
                         clip: true
                         visible: variantSelector.isMultiVariant && variantSelector.flavorOptions.length > 1
 
                         DButtonGroup {
                             id: flavorButtonGroup
                             arrowKeysSelect: false
-                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.centerIn: parent
                             property int _count: variantSelector.flavorNames.length
                             property real _maxPerItem: _count > 1 ? (parent.width - (_count - 1) * spacing) / _count : parent.width
                             buttonPadding: _maxPerItem < 55 ? Theme.spacingXS : (_maxPerItem < 75 ? Theme.spacingS : Theme.spacingL)
@@ -737,14 +737,14 @@ Item {
 
                     Item {
                         width: parent.width
-                        height: variantButtonGroup.implicitHeight
+                        height: variantButtonGroup.implicitHeight + Theme.focusRingOffset * 2
                         clip: true
                         visible: !variantSelector.isMultiVariant && variantSelector.variantNames.length > 0
 
                         DButtonGroup {
                             id: variantButtonGroup
                             arrowKeysSelect: false
-                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.centerIn: parent
                             property int _count: variantSelector.variantNames.length
                             property real _maxPerItem: _count > 1 ? (parent.width - (_count - 1) * spacing) / _count : parent.width
                             buttonPadding: _maxPerItem < 55 ? Theme.spacingXS : (_maxPerItem < 75 ? Theme.spacingS : Theme.spacingL)

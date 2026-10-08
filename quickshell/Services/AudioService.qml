@@ -62,8 +62,10 @@ Singleton {
         target: pipewireBackendLoader.item
         ignoreUnknownSignals: true
         function onNodesUpdated() {
-            root.rebuildTypedNodeLists();
             root.adoptPendingCardSink();
+            if (root.refCount === 0)
+                return;
+            root.rebuildTypedNodeLists();
             root.deviceRevision++;
         }
     }
@@ -107,7 +109,7 @@ Singleton {
     property bool playersRequested: false
     property bool soundThemeSupported: false
     property bool soundThemeResolved: false
-    property bool loginSoundPending: false
+    property string pendingSoundPlayer: ""
     property var availableSoundThemes: []
     property string currentSoundTheme: ""
     property var soundFilePaths: ({})
@@ -259,6 +261,8 @@ Singleton {
     function setDefaultSinkByName(name) {
         if (!name)
             return false;
+        if (refCount === 0)
+            rebuildTypedNodeLists();
         for (const node of typedSinks) {
             if (node?.name === name)
                 return setSink(node);
@@ -269,6 +273,8 @@ Singleton {
     function setDefaultSourceByName(name) {
         if (!name)
             return false;
+        if (refCount === 0)
+            rebuildTypedNodeLists();
         for (const node of typedSources) {
             if (node?.name === name)
                 return setSource(node);
@@ -893,6 +899,7 @@ EOFCONFIG
 
     Connections {
         target: root.sink?.audio ?? null
+        enabled: SettingsData.soundsEnabled && SettingsData.soundVolumeChanged
 
         function onVolumeChanged() {
             if (SessionData.suppressOSD)
@@ -1067,10 +1074,10 @@ EOFCONFIG
 
     function markSoundThemeResolved() {
         soundThemeResolved = true;
-        if (!loginSoundPending)
-            return;
-        loginSoundPending = false;
-        playLoginSound();
+        const player = pendingSoundPlayer;
+        pendingSoundPlayer = "";
+        if (player)
+            playSound(player);
     }
 
     function getSoundPath(soundEvent) {
@@ -1106,12 +1113,17 @@ EOFCONFIG
 
     function reloadSounds() {
         log.debug("Reloading sounds, useSystemSoundTheme:", SettingsData.useSystemSoundTheme, "currentSoundTheme:", currentSoundTheme);
-        if (SettingsData.useSystemSoundTheme && currentSoundTheme) {
+        if (!SettingsData.useSystemSoundTheme) {
+            soundFilePaths = {};
+            markSoundThemeResolved();
+            return;
+        }
+        soundThemeResolved = false;
+        if (currentSoundTheme) {
             discoverSoundFiles(currentSoundTheme);
             return;
         }
-        soundFilePaths = {};
-        markSoundThemeResolved();
+        getCurrentSoundTheme();
     }
 
     function isMediaPlaying() {
@@ -1129,52 +1141,43 @@ EOFCONFIG
         playersRequested = true;
     }
 
-    function playVolumeChangeSound() {
-        ensurePlayers();
-        if (!soundsAvailable || !volumeChangeSound || notificationsAudioMuted || shouldMuteForMedia())
+    function playSound(playerName) {
+        if (!SettingsData.soundsEnabled)
             return;
-        volumeChangeSound.play();
+        ensurePlayers();
+        // before the theme paths land the player holds the bundled file, and the source swap stops it
+        if (SettingsData.useSystemSoundTheme && !soundThemeResolved) {
+            pendingSoundPlayer = playerName;
+            return;
+        }
+        const player = root[playerName];
+        if (!soundsAvailable || !player || notificationsAudioMuted || shouldMuteForMedia())
+            return;
+        player.play();
+    }
+
+    function playVolumeChangeSound() {
+        playSound("volumeChangeSound");
     }
 
     function playPowerPlugSound() {
-        ensurePlayers();
-        if (!soundsAvailable || !powerPlugSound || notificationsAudioMuted || shouldMuteForMedia())
-            return;
-        powerPlugSound.play();
+        playSound("powerPlugSound");
     }
 
     function playPowerUnplugSound() {
-        ensurePlayers();
-        if (!soundsAvailable || !powerUnplugSound || notificationsAudioMuted || shouldMuteForMedia())
-            return;
-        powerUnplugSound.play();
+        playSound("powerUnplugSound");
     }
 
     function playNormalNotificationSound() {
-        ensurePlayers();
-        if (!soundsAvailable || !normalNotificationSound || notificationsAudioMuted || shouldMuteForMedia())
-            return;
-        normalNotificationSound.play();
+        playSound("normalNotificationSound");
     }
 
     function playCriticalNotificationSound() {
-        ensurePlayers();
-        if (!soundsAvailable || !criticalNotificationSound || notificationsAudioMuted || shouldMuteForMedia())
-            return;
-        criticalNotificationSound.play();
+        playSound("criticalNotificationSound");
     }
 
     function playLoginSound() {
-        ensurePlayers();
-        // playing before the theme paths land swaps the player source mid-playback, which stops it
-        if (SettingsData.useSystemSoundTheme && !soundThemeResolved) {
-            loginSoundPending = true;
-            return;
-        }
-        if (!soundsAvailable || !loginSound || notificationsAudioMuted || shouldMuteForMedia()) {
-            return;
-        }
-        loginSound.play();
+        playSound("loginSound");
     }
 
     function playLoginSoundIfApplicable() {
@@ -1688,7 +1691,7 @@ EOFCONFIG
 
     // Re-apply the saved preference: the live PipeWire value is runtime-only and resets on restart
     function applyMonoStartupPreference() {
-        if (!SettingsData._hasLoaded)
+        if (!SettingsData._hasLoaded || !SettingsData.audioMono)
             return;
         queryMonoSetting((supported, currentValue) => {
             if (supported && currentValue !== SettingsData.audioMono)
@@ -1771,8 +1774,11 @@ EOFCONFIG
     }
 
     onRefCountChanged: {
-        if (root.refCount === 1)
-            root.refreshFreeBsdDevices();
+        if (root.refCount !== 1)
+            return;
+        root.rebuildTypedNodeLists();
+        root.deviceRevision++;
+        root.refreshFreeBsdDevices();
     }
 
     Timer {

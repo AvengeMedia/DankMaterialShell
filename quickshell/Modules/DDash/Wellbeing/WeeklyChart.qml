@@ -7,6 +7,7 @@ import qs.Services
 import qs.DCommon.Widgets
 import qs.Modules.DDash
 import "Wellbeing.js" as Wellbeing
+import "../../../DCommon/Common/WheelInput.js" as WheelInput
 
 DCard {
     id: root
@@ -364,7 +365,7 @@ DCard {
                         return;
                     }
                     snapAnim.stop();
-                    if (wheel.pixelDelta.x !== 0) {
+                    if (WheelInput.isTouchpad(wheel)) {
                         pager.contentX = Math.max(0, Math.min(pager.contentWidth - pager.width, pager.contentX - wheel.pixelDelta.x));
                         settleTimer.restart();
                         return;

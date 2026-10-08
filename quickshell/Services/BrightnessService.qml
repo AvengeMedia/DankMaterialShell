@@ -520,20 +520,24 @@ Singleton {
     }
 
     Timer {
-        id: screenChangeRescanTimer
-        property int rescanAttempt: 0
-        interval: 3000
+        id: rescanTimer
+        property var schedule: []
+        property int attempt: 0
         repeat: false
+        function run(intervals) {
+            schedule = intervals;
+            attempt = 0;
+            interval = intervals[0];
+            restart();
+        }
         onTriggered: {
             rescanDevices();
-            rescanAttempt++;
-            if (rescanAttempt < 3) {
-                interval = rescanAttempt === 1 ? 5000 : 8000;
+            attempt++;
+            if (attempt < schedule.length) {
+                interval = schedule[attempt];
                 restart();
                 return;
             }
-            rescanAttempt = 0;
-            interval = 3000;
             osdSuppressTimer.restart();
         }
     }
@@ -543,9 +547,7 @@ Singleton {
 
         function onScreensChanged() {
             suppressOsd = true;
-            screenChangeRescanTimer.rescanAttempt = 0;
-            screenChangeRescanTimer.interval = 3000;
-            screenChangeRescanTimer.restart();
+            rescanTimer.run([3000, 5000, 8000]);
         }
     }
 
@@ -575,6 +577,7 @@ Singleton {
         function onSessionResumed() {
             suppressOsd = true;
             osdSuppressTimer.restart();
+            rescanTimer.run([400, 1400, 2600]);
         }
     }
 

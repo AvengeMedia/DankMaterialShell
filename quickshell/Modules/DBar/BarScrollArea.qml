@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
+import "../../DCommon/Common/WheelInput.js" as WheelInput
 
 MouseArea {
     id: root
@@ -94,16 +95,15 @@ MouseArea {
 
         const deltaY = wheel.angleDelta.y;
         const deltaX = wheel.angleDelta.x;
-        const isTouchpadY = wheel.pixelDelta && wheel.pixelDelta.y !== 0;
-        const isTouchpadX = wheel.pixelDelta && wheel.pixelDelta.x !== 0;
+        const isTouchpad = WheelInput.isTouchpad(wheel);
 
         if (CompositorService.isNiri && xBehavior !== "none" && Math.abs(deltaX) > Math.abs(deltaY)) {
-            accumulateX(isTouchpadX, deltaX, xBehavior);
+            accumulateX(isTouchpad, deltaX, xBehavior);
             return;
         }
         if (yBehavior === "none")
             return;
-        accumulateY(isTouchpadY, deltaY, yBehavior);
+        accumulateY(isTouchpad, deltaY, yBehavior);
     }
 
     onWheel: wheel => processWheel(wheel)

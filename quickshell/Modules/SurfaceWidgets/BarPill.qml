@@ -43,6 +43,7 @@ Item {
     readonly property real visualWidth: Theme.snap(isVerticalOrientation ? widgetThickness : (contentLoader.item ? (contentLoader.item.implicitWidth + horizontalPadding * 2) : 0), dpr)
     readonly property real visualHeight: Theme.snap(isVerticalOrientation ? (contentLoader.item ? (contentLoader.item.implicitHeight + horizontalPadding * 2) : 0) : widgetThickness, dpr)
     readonly property alias visualContent: visualContent
+    readonly property alias contentItem: contentLoader.item
     readonly property real barEdgeExtension: BarMetrics.fittsReach
     readonly property real gapExtension: sectionSpacing
     readonly property real leftMargin: !isVerticalOrientation ? (isLeftBarEdge && isFirst ? barEdgeExtension : (isFirst ? gapExtension : gapExtension / 2)) : 0

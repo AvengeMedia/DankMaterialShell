@@ -12,8 +12,19 @@ Singleton {
     property var registeredWidgets: ({})
     property var registeredWidgetsList: []
     property bool editing: false
+    property string libraryScreen: ""
 
     signal registryChanged
+
+    onEditingChanged: {
+        if (!editing)
+            libraryScreen = "";
+    }
+
+    function startEditing(screen, openLibrary) {
+        libraryScreen = openLibrary ? (screen?.name ?? "") : "";
+        editing = true;
+    }
 
     Component.onCompleted: {
         registerBuiltins();

@@ -18,6 +18,10 @@ Item {
     readonly property real textSize: root.tight ? Theme.fontSizeSmall : Theme.fontSizeMedium
     readonly property real iconSize: root.textSize + Theme.spacingXS
     readonly property real statusIconSize: root.textSize + Theme.spacingXXS
+
+    Ref {
+        service: PrivacyService
+    }
     readonly property real groupSpacing: root.controller.homeSlotMargin
     readonly property bool isVertical: root.controller.isVertical
     readonly property string clockDisplay: root.controller.homeClockDisplay
@@ -31,6 +35,26 @@ Item {
     readonly property real touchpadThreshold: 100
     property real wheelAccumulator: 0
     property bool weatherRefHeld: false
+    // Same options as the bar's switcher widget
+    readonly property var workspaceWidgetData: SettingsData.barWidgetEntry(root.controller.barConfig, "workspaceSwitcher")
+
+    function workspaceOption(key) {
+        return SettingsData.widgetOption("workspaceSwitcher", root.workspaceWidgetData, key);
+    }
+
+    WorkspaceSwitcherModel {
+        id: workspaces
+
+        screenName: root.controller.screen?.name ?? ""
+        screen: root.controller.screen
+        followFocus: root.workspaceOption("workspaceFollowFocus")
+        occupiedOnly: root.workspaceOption("showOccupiedWorkspacesOnly")
+        showAllTags: root.workspaceOption("dwlShowAllTags")
+        showPadding: root.workspaceOption("showWorkspacePadding")
+        paddingCount: root.workspaceOption("workspacePaddingCount")
+        showSpecial: root.workspaceOption("showSpecialWorkspaces")
+        reverseScrolling: root.workspaceOption("reverseScrolling")
+    }
 
     function groupsForSide(side) {
         const groups = side === "left" ? root.controller.homeLeftGroups : root.controller.homeRightGroups;
@@ -49,6 +73,8 @@ Item {
             return BrightnessService.brightnessAvailable && !!root.brightnessDevice;
         case "privacy":
             return PrivacyService.anyPrivacyActive;
+        case "workspaces":
+            return workspaces.available;
         }
         return true;
     }
@@ -242,6 +268,8 @@ Item {
     }
 
     component GroupHoverArea: IslandSlotHoverArea {
+        id: slotArea
+
         required property var group
 
         enabled: !group.isClock
@@ -268,11 +296,26 @@ Item {
                     SessionData.suppressOSDTemporarily();
                     AudioService.toggleMute();
                 }
+                if (group.isWorkspaces)
+                    workspaces.secondaryAction(null);
+                return;
+            }
+            if (group.isWorkspaces) {
+                const pager = group.pager;
+                if (!pager)
+                    return;
+                const point = pager.mapFromItem(slotArea, event.x, event.y);
+                workspaces.switchTo(pager.entryAt(point.x, point.y));
                 return;
             }
             root.activateGroup(group.groupId);
         }
         onWheel: wheel => {
+            if (group.isWorkspaces) {
+                workspaces.handleWheel(wheel);
+                wheel.accepted = true;
+                return;
+            }
             if (!group.isVolume && !group.isBrightness)
                 return;
             root.adjustSystemLevel(group.groupId, wheel.angleDelta.y || wheel.angleDelta.x);
@@ -297,7 +340,9 @@ Item {
         readonly property bool isVolume: group.groupId === "volume"
         readonly property bool isBrightness: group.groupId === "brightness"
         readonly property bool isPrivacy: group.groupId === "privacy"
+        readonly property bool isWorkspaces: group.groupId === "workspaces"
         readonly property bool isSystemLevel: group.isVolume || group.isBrightness
+        readonly property var pager: pagerLoader.item
         readonly property bool usesConnectivity: group.isStatus && root.controller.homeStatusContent === "connectivity"
         readonly property bool usesBattery: group.isStatus && !group.usesConnectivity && BatteryService.batteryAvailable
         readonly property bool iconOnly: group.isMedia || (group.isStatus && !group.usesBattery && !group.usesConnectivity)
@@ -330,6 +375,18 @@ Item {
                 active: group.isClock
                 visible: active
                 sourceComponent: IslandClock {}
+            }
+
+            Loader {
+                id: pagerLoader
+
+                active: group.isWorkspaces
+                visible: active
+                sourceComponent: WorkspacePager {
+                    model: workspaces
+                    vertical: group.vertical
+                    dotSize: Math.round(root.iconSize / 2)
+                }
             }
 
             AudioVisualization {

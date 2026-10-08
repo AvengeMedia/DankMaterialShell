@@ -729,7 +729,7 @@ Singleton {
 
     readonly property bool suggestPowerSaver: false
 
-    readonly property var peripheralDevices: UPower.devices.values.filter(dev => dev && dev.ready && !dev.isLaptopBattery && peripheralIcon(dev.type) !== "").map(dev => ({
+    readonly property var peripheralDevices: refCount === 0 ? [] : UPower.devices.values.filter(dev => dev && dev.ready && !dev.isLaptopBattery && peripheralIcon(dev.type) !== "").map(dev => ({
                 "name": dev.model || UPowerDeviceType.toString(dev.type),
                 "percentage": Math.round(dev.percentage * 100),
                 "type": dev.type,
@@ -738,6 +738,8 @@ Singleton {
             }))
 
     readonly property var bluetoothDevices: {
+        if (refCount === 0)
+            return [];
         const bluetoothTypes = [UPowerDeviceType.BluetoothGeneric, UPowerDeviceType.Headphones, UPowerDeviceType.Headset, UPowerDeviceType.Keyboard, UPowerDeviceType.Mouse, UPowerDeviceType.Speakers];
 
         return peripheralDevices.filter(dev => bluetoothTypes.includes(dev.type));

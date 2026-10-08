@@ -47,9 +47,17 @@ Singleton {
         enabled: root.tracking
     }
 
-    onManagerActiveToplevelChanged: updateFocusedApp()
+    onManagerActiveToplevelChanged: {
+        if (!tracking)
+            return;
+        updateFocusedApp();
+    }
     onPushedStateChanged: pushState()
-    onTrackingChanged: ensureSubscription()
+    onTrackingChanged: {
+        ensureSubscription();
+        if (tracking)
+            updateFocusedApp();
+    }
     onLimitParamsChanged: pushLimits()
 
     Component.onCompleted: {
@@ -59,6 +67,7 @@ Singleton {
 
     Connections {
         target: CompositorService
+        enabled: root.tracking
 
         function onToplevelsChanged() {
             root.updateFocusedApp();

@@ -15,6 +15,7 @@ DFlickable {
     clip: true
     contentHeight: column.height + Theme.spacingXL
     contentWidth: width
+    fadeSideInset: (width - column.width) / 2
 
     Column {
         id: column

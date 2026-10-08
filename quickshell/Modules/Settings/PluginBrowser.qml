@@ -347,7 +347,7 @@ RegistryBrowserWindow {
             root.selectedIndex = index;
             root.keyboardNavigationActive = true;
             pluginGrid.currentIndex = index;
-            pluginGrid.positionViewAtIndex(index, GridView.Contain);
+            pluginGrid.revealIndex(index);
             pluginGrid.forceLayout();
             pluginGrid.currentItem?.focusTarget?.forceActiveFocus(Qt.TabFocusReason);
             root.pendingRevealPluginId = "";
@@ -416,7 +416,7 @@ RegistryBrowserWindow {
     function ensureSelectedVisible() {
         if (selectedIndex < 0 || !pluginGrid)
             return;
-        pluginGrid.positionViewAtIndex(selectedIndex, GridView.Contain);
+        pluginGrid.revealIndex(selectedIndex);
     }
 
     function selectNext() {

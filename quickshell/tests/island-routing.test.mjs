@@ -472,7 +472,7 @@ test("control-center IPC hide and status agree on both surfaces", () => {
     const state = { islandOpen: false, routed: false };
     const bar = { triggerControlCenter: () => calls.push("bar:trigger") };
     const handler = functions(block, "        ", vm.createContext({
-        root: { controlCenterLoader: { item: popout }, getPreferredBar: () => bar },
+        root: { controlCenterLoaderRef: { item: popout }, getPreferredBar: () => bar },
         PopoutService: {
             get islandControlCenterOpen() {
                 return state.islandOpen;

@@ -1475,7 +1475,7 @@ func refreshFcitx5() {
 	defer conn.Close()
 
 	obj := conn.Object("org.fcitx.Fcitx5", dbus.ObjectPath("/controller"))
-	if err := obj.Call("org.fcitx.Fcitx.Controller1.ReloadAddonConfig", 0, "classicui").Err; err != nil {
+	if err := obj.Call("org.fcitx.Fcitx.Controller1.ReloadAddonConfig", dbus.FlagNoAutoStart, "classicui").Err; err != nil {
 		log.Debugf("Failed to refresh Fcitx5 theme: %v", err)
 	}
 }

@@ -1,6 +1,8 @@
 import QtQml
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
+import Quickshell.Wayland
 import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
@@ -127,6 +129,7 @@ FocusScope {
     property bool floating: false
     property alias searchField: searchField
     property string selectedCategory: "All"
+    property bool searchFocused: false
 
     signal closeRequested
     signal floatingToggleRequested
@@ -154,12 +157,51 @@ FocusScope {
         }
     }
 
+    function captureShortcut(event) {
+        if (!searchFocused)
+            return false;
+        const chord = KeyUtils.shortcutFromSearchKey(event, KeybindsService.modKey, KeybindsService.modSymbol);
+        if (!chord)
+            return false;
+        if (ownToggleCombos().includes(KeyUtils.normalizeKeyCombo(chord, KeybindsService.modKey, KeybindsService.modSymbol))) {
+            closeRequested();
+            return true;
+        }
+        searchField.text = chord;
+        return true;
+    }
+
+    // the bind that opened the cheatsheet keeps closing it instead of becoming a search
+    function ownToggleCombos() {
+        const combos = [];
+        for (const cat in rawBinds) {
+            const binds = rawBinds[cat];
+            if (!Array.isArray(binds))
+                continue;
+            for (let i = 0; i < binds.length; i++) {
+                if (/\bkeybinds (toggle|close)\b/.test(binds[i].action || ""))
+                    combos.push(KeyUtils.normalizeKeyCombo(binds[i].key, KeybindsService.modKey, KeybindsService.modSymbol));
+            }
+        }
+        return combos;
+    }
+
+    ShortcutInhibitor {
+        id: searchInhibitor
+        window: content.QsWindow.window
+        enabled: content.searchFocused
+    }
+
     Shortcut {
         sequence: "Ctrl+F"
         onActivated: content.focusSearch()
     }
 
     Keys.onPressed: event => {
+        if (captureShortcut(event)) {
+            event.accepted = true;
+            return;
+        }
         if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_F) {
             focusSearch();
             event.accepted = true;
@@ -368,6 +410,7 @@ FocusScope {
                 const keyTokens = KeyUtils.formatKeyTokens(bind.key, KeybindsService.modKey, KeybindsService.modSymbol);
                 const tokenSig = keyTokens.join("+");
                 const keyLower = (bind.key || "").toLowerCase();
+                const keyCombo = KeyUtils.normalizeKeyCombo(bind.key, KeybindsService.modKey, KeybindsService.modSymbol);
                 const descLower = (bind.desc || "").toLowerCase();
                 const actionLower = (bind.action || "").toLowerCase();
 
@@ -376,7 +419,7 @@ FocusScope {
                     const word = lowerQueryWords[j];
                     if (!word)
                         continue;
-                    if (!keyLower.includes(word) && !labelLower.includes(word) && !descLower.includes(word) && !catLower.includes(word) && !actionLower.includes(word) && !tokenSig.toLowerCase().includes(word)) {
+                    if (!keyLower.includes(word) && !keyCombo.includes(KeyUtils.normalizeKeyCombo(word, KeybindsService.modKey, KeybindsService.modSymbol)) && !labelLower.includes(word) && !descLower.includes(word) && !catLower.includes(word) && !actionLower.includes(word) && !tokenSig.toLowerCase().includes(word)) {
                         matched = false;
                         break;
                     }
@@ -503,8 +546,9 @@ FocusScope {
                 DSearchField {
                     id: searchField
                     Layout.fillWidth: true
-                    placeholderText: I18n.tr("Search keybinds...", "keybinds cheatsheet search placeholder")
+                    placeholderText: I18n.tr("Search")
                     keyForwardTargets: [content]
+                    onFocusStateChanged: hasFocus => content.searchFocused = hasFocus
                     onTextChanged: {
                         if (text.trim() === "") {
                             searchDebounce.stop();

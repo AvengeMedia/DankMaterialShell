@@ -14,6 +14,8 @@ Column {
     readonly property bool dockHosted: page?.dockHosted ?? false
     readonly property var apps: page.appStore
 
+    Component.onCompleted: TrashService.detectFileManagers()
+
     readonly property var activeColorOptions: [({
                 "value": "primary",
                 "label": I18n.tr("Primary")

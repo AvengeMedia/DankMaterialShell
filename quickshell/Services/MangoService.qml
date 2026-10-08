@@ -105,7 +105,7 @@ Singleton {
     DCommon.DSocket {
         id: monitorsSocket
         path: root.socketPath
-        connected: root.available
+        connected: CompositorService.isMango && root.available
 
         onConnectionStateChanged: {
             if (linkUp) {
@@ -122,7 +122,7 @@ Singleton {
     DCommon.DSocket {
         id: clientsSocket
         path: root.socketPath
-        connected: root.available
+        connected: CompositorService.isMango && root.available
 
         onConnectionStateChanged: {
             if (linkUp)
@@ -139,7 +139,7 @@ Singleton {
     DCommon.DSocket {
         id: dispatchSocket
         path: root.socketPath
-        connected: root.available
+        connected: CompositorService.isMango && root.available
         reconnectBaseMs: 25
 
         onConnectionStateChanged: {
@@ -553,9 +553,8 @@ Singleton {
 
     Connections {
         target: SettingsData
+        enabled: CompositorService.isMango
         function onBarConfigsChanged() {
-            if (!CompositorService.isMango)
-                return;
             const newGaps = Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4));
             if (newGaps === root._lastGapValue)
                 return;

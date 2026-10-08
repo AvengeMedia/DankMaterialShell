@@ -7,6 +7,7 @@ import qs.Services
 import qs.DCommon.Widgets
 import qs.Widgets
 import "BatteryHistory.js" as History
+import "../../../DCommon/Common/WheelInput.js" as WheelInput
 
 DCard {
     id: root
@@ -297,7 +298,7 @@ DCard {
                         wheel.accepted = false;
                         return;
                     }
-                    const pixels = wheel.pixelDelta.x || wheel.pixelDelta.y;
+                    const pixels = WheelInput.isTouchpad(wheel) ? wheel.pixelDelta.x || wheel.pixelDelta.y : 0;
                     const steps = (wheel.angleDelta.x || wheel.angleDelta.y) / 120;
                     wheel.accepted = root.scrollTo(timeline.contentX - (pixels || steps * timeline.mouseWheelSpeed));
                 }

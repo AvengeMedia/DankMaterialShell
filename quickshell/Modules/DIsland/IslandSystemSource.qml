@@ -159,6 +159,7 @@ QtObject {
 
     property Connections audioConnection: Connections {
         target: AudioService.sink?.audio ?? null
+        enabled: root.enabled
 
         function onVolumeChanged() {
             if (SettingsData.osdVolumeEnabled)
@@ -173,6 +174,7 @@ QtObject {
 
     property Connections micConnection: Connections {
         target: AudioService.source?.audio ?? null
+        enabled: root.enabled
 
         function onMutedChanged() {
             if (SettingsData.osdMicMuteEnabled)
@@ -182,6 +184,7 @@ QtObject {
 
     property Connections micServiceConnection: Connections {
         target: AudioService
+        enabled: root.enabled
 
         function onMicVolumeChanged() {
             if (SettingsData.osdMicVolumeEnabled)
@@ -191,6 +194,7 @@ QtObject {
 
     property Connections brightnessConnection: Connections {
         target: BrightnessService
+        enabled: root.enabled
 
         function onBrightnessChanged(showOsd) {
             if (showOsd && SettingsData.osdBrightnessEnabled)
@@ -200,6 +204,7 @@ QtObject {
 
     property Connections capsLockConnection: Connections {
         target: DMSService
+        enabled: root.enabled
 
         function onCapsLockStateChanged() {
             if (SettingsData.osdCapsLockEnabled)
@@ -209,6 +214,7 @@ QtObject {
 
     property Connections powerProfileConnection: Connections {
         target: PowerProfileWatcher
+        enabled: root.enabled
 
         function onProfileChanged() {
             if (SettingsData.osdPowerProfileEnabled)
@@ -218,6 +224,7 @@ QtObject {
 
     property Connections idleInhibitorConnection: Connections {
         target: SessionService
+        enabled: root.enabled
 
         function onInhibitorChanged() {
             if (SettingsData.osdIdleInhibitorEnabled)
@@ -227,6 +234,7 @@ QtObject {
 
     property Connections batteryConnection: Connections {
         target: BatteryService
+        enabled: root.enabled
 
         function onIsPluggedInChanged() {
             if (root.chargingPulseEnabled && BatteryService.batteryAvailable)

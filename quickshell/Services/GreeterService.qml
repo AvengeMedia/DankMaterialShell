@@ -20,6 +20,7 @@ Singleton {
     property bool syncing: false
     property string syncStatus: ""
     property bool fallbackFromPrecheck: false
+    property bool _detected: false
 
     readonly property bool linked: slotState === "live"
     readonly property bool profileSyncSufficient: configured && inGroup
@@ -27,7 +28,14 @@ Singleton {
     signal syncFinished
 
     function refresh() {
+        _detected = true;
         detectProcess.running = true;
+    }
+
+    function ensureDetected() {
+        if (_detected)
+            return;
+        refresh();
     }
 
     function sync() {
@@ -95,7 +103,7 @@ for f in "/var/cache/dms-greeter/users/$USER/settings.json" /var/cache/dms-greet
 done
 [ -f "/var/cache/dms-greeter/users/$USER/settings.json" ] && echo slot
 exit 0`]
-        running: true
+        running: false
 
         stdout: StdioCollector {
             onStreamFinished: {

@@ -343,6 +343,7 @@ Item {
     }
 
     Component.onCompleted: {
+        DesktopService.ensureProbed();
         desktopApps = AppSearchService.getVisibleApplications() || [];
         autostartInitMkDirComp.createObject(root, {
             running: true

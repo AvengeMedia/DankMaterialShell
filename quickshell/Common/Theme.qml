@@ -120,7 +120,6 @@ Singleton {
     }
 
     Component.onCompleted: {
-        Quickshell.execDetached(["mkdir", "-p", stateDir]);
         Proc.runCommand("matugenCheck", ["sh", "-c", "command -v matugen"], (output, code) => {
             matugenAvailable = (code === 0) && !envDisableMatugen;
             generateSystemThemesFromCurrentTheme();
@@ -2196,15 +2195,11 @@ Singleton {
     }
 
     function withAlpha(c, a) {
-        if (!c || c.r === undefined)
-            return Qt.rgba(0, 0, 0, 0);
-        return Qt.rgba(c.r, c.g, c.b, a);
+        return DCommon.Style.withAlpha(c, a);
     }
 
     function blendAlpha(c, a) {
-        if (!c || c.r === undefined)
-            return Qt.rgba(0, 0, 0, 0);
-        return Qt.rgba(c.r, c.g, c.b, c.a * a);
+        return DCommon.Style.blendAlpha(c, a);
     }
 
     function hoverTint(base) {

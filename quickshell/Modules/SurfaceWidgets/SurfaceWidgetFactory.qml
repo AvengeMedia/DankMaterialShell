@@ -14,7 +14,6 @@ Item {
     readonly property string _barScreenName: surfaceContext.screen?.name ?? ""
     property bool spacingTight: false
     property bool overlapping: false
-    property real leadingSectionLimit: Infinity
     function getWidgetSection(item) {
         for (let current = item; current; current = current.parent) {
             if (typeof current.section === "string")
@@ -329,12 +328,6 @@ Item {
         FocusedApp {
             id: focusedWindowWidget
             axis: surfaceContext.axis
-            availableWidth: {
-                const container = focusedWindowWidget.parent?.parent;
-                if (!container || !isFinite(root.leadingSectionLimit) || root.getWidgetSection(focusedWindowWidget) !== "left")
-                    return focusedWindowWidget.maxWidth;
-                return Math.max(0, root.leadingSectionLimit - container.x);
-            }
             widgetThickness: surfaceContext.widgetThickness
             barThickness: surfaceContext.thickness
             barSpacing: barConfig?.spacing ?? 4

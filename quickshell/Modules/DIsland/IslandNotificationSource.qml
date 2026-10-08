@@ -150,6 +150,7 @@ QtObject {
 
     property Connections notificationConnections: Connections {
         target: NotificationService
+        enabled: root.enabled
 
         function onVisibleNotificationsChanged() {
             root.syncVisibleNotifications();

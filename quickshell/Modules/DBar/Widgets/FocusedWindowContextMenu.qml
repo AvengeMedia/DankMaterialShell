@@ -49,7 +49,7 @@ DPopout {
         if (!rules || !window)
             return null;
         return rules.find(rule => {
-            if (!(rule.source || "").includes("dms/windowrules") || rule.id === CompositorService.dmsFloatingRuleId)
+            if (!(rule.source || "").includes("dms/windowrules") || [CompositorService.dmsFloatingRuleId, CompositorService.dmsOpaqueRuleId].includes(rule.id))
                 return false;
             const matches = (rule.matches && rule.matches.length > 0) ? rule.matches : (rule.matchCriteria ? [rule.matchCriteria] : []);
             return matches.some(m => matchesCriteria(m, window));

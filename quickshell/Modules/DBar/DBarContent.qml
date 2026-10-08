@@ -21,6 +21,8 @@ Item {
     property var hoverSections: null
     property real leadingSectionOffset: 0
     property real trailingSectionOffset: 0
+    property real reservedStart: NaN
+    property real reservedEnd: NaN
     readonly property bool fitToWidgets: _hasBarWindow && (barWindow.fitToWidgets ?? false)
     readonly property real sectionGap: (_barIsVertical ? vLeftSection : hLeftSection).widgetSpacing
     readonly property real leadingImplicitSize: _barIsVertical ? vLeftSection.implicitHeight : hLeftSection.implicitWidth
@@ -47,8 +49,8 @@ Item {
     onOverflowLengthChanged: requestOverflowLayout()
     onOverflowSectionsChanged: requestOverflowLayout()
     onOverflowCenteringModeChanged: requestOverflowLayout()
-    onLeadingSectionOffsetChanged: requestOverflowLayout()
-    onTrailingSectionOffsetChanged: requestOverflowLayout()
+    onReservedStartChanged: requestOverflowLayout()
+    onReservedEndChanged: requestOverflowLayout()
     onFittedStartMarginChanged: requestOverflowLayout()
     onFittedEndMarginChanged: requestOverflowLayout()
 
@@ -68,8 +70,12 @@ Item {
         }
         const result = OverflowLayout.resolve(sections, {
             length: overflowLength,
-            start: (fitToWidgets ? fittedStartMargin : 0) + leadingSectionOffset,
-            end: (fitToWidgets ? fittedEndMargin : 0) + trailingSectionOffset,
+            start: fitToWidgets ? fittedStartMargin : 0,
+            end: fitToWidgets ? fittedEndMargin : 0,
+            reserve: isNaN(reservedStart) ? null : {
+                start: reservedStart,
+                end: reservedEnd
+            },
             spacing: sectionGap,
             triggerSize: overflowSections[0].overflowTriggerSize,
             positions,
@@ -79,6 +85,7 @@ Item {
         }, overflowPlan.hidden);
         const next = {
             hidden: result.hidden,
+            sizes: result.sizes,
             fits: result.fits
         };
         if (JSON.stringify(next) !== JSON.stringify(overflowPlan))
@@ -428,7 +435,6 @@ Item {
         surfaceContext: widgetContext
         spacingTight: topBarContent.spacingTight
         overlapping: topBarContent.overlapping
-        leadingSectionLimit: topBarContent.fitToWidgets || topBarContent._barIsVertical || hCenterSection.contentSize <= 0 ? Infinity : hCenterSection.x + hCenterSection.contentStart - topBarContent.sectionGap - hLeftSection.x
     }
     readonly property var allComponents: widgetFactory.componentMap
     readonly property var componentMap: widgetFactory.componentMap

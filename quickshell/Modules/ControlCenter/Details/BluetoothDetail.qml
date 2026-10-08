@@ -14,6 +14,10 @@ import "../../../Common/QmlUtils.js" as QmlUtils
 Item {
     id: root
 
+    Ref {
+        service: BatteryService
+    }
+
     implicitHeight: column.height
 
     LayoutMirroring.enabled: I18n.isRtl

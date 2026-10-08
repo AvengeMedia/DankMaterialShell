@@ -707,6 +707,7 @@ Item {
             _startDmenuSession(mode.slice("dmenu:".length));
             return;
         }
+        DSearchService.ensureChecked();
         if (appCategory !== "" || Object.keys(collapsedSections).length > 0)
             _clearModeCache();
         appCategory = "";

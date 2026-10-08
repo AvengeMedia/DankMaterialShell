@@ -62,10 +62,35 @@ test("edge insets count against the available length", () => {
     assert.deepEqual(plain(solve(...sections, { start: 6, end: 6 }).hidden.left), [1]);
 });
 
+test("a reserved range overflows both sides clear of it", () => {
+    const sections = [[entry(100), entry(60, "auto")], [], [entry(60, "auto"), entry(100)]];
+    assert.deepEqual(plain(solve(...sections).hidden), { left: [], center: [], right: [] });
+    const result = solve(...sections, { reserve: { start: 150, end: 250 } });
+    assert.deepEqual(plain(result.hidden), { left: [1], center: [], right: [0] });
+    assert.equal(result.fits, true);
+});
+
 test("a center holder does not replace the configured middle-widget anchor", () => {
     for (const position of [0, 1, 2, 3]) {
         const result = solve([], [entry(40, "always"), entry(80), entry(70)], [], { length: 600, centeringMode: "index", positions: { center: position } });
         const clockStart = result.intervals.center.start + result.layouts.center.positions[1];
         assert.equal(clockStart + 40, 300);
     }
+});
+
+test("flexible widgets shrink to their minimum before anything overflows", () => {
+    const result = solve([entry(100), { size: 200, min: 60, mode: "auto" }], [entry(80)], [], { length: 500 });
+    assert.deepEqual(plain(result.hidden), { left: [], center: [], right: [] });
+    assert.deepEqual(plain(result.sizes.left), [100, 102]);
+    assert.equal(result.fits, true);
+    const tight = solve([entry(100), { size: 200, min: 60, mode: "auto" }], [entry(80)], [], { length: 400 });
+    assert.deepEqual(plain(tight.hidden.left), [1]);
+});
+
+test("a hidden flexible widget returns once its minimum fits the margin", () => {
+    const sections = [[entry(100), { size: 200, min: 60, mode: "auto" }], [entry(80)], []];
+    const result = solve(...sections, { length: 432 }, { left: [1] });
+    assert.deepEqual(plain(result.hidden.left), []);
+    assert.deepEqual(plain(result.sizes.left), [100, 68]);
+    assert.deepEqual(plain(solve(...sections, { length: 420 }, { left: [1] }).hidden.left), [1]);
 });

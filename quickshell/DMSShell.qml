@@ -30,11 +30,9 @@ import qs.Services
 Item {
     id: root
     readonly property var log: Log.scoped("DMSShell")
-    readonly property var _sessionsServiceRef: SessionsService
     readonly property var _nightModeServiceRef: NightModeService
     readonly property var _brightnessServiceRef: BrightnessService
     readonly property var _refreshRateServiceRef: RefreshRateService
-    readonly property var _displayServiceRef: DisplayService
 
     property var core: null
 
@@ -62,6 +60,10 @@ Item {
     DesktopWidgetLayer {}
 
     DesktopWidgetEditor {}
+
+    DesktopContextMenu {
+        Component.onCompleted: PopoutService.desktopContextMenu = this
+    }
 
     Lock {
         id: lock
@@ -890,7 +892,7 @@ Item {
         target: DMSService
         function onOpenUrlRequested(url) {
             if (url.startsWith("dms://theme/install/")) {
-                var themeId = url.replace("dms://theme/install/", "").split(/[?#]/)[0];
+                const themeId = url.replace("dms://theme/install/", "").split(/[?#]/)[0];
                 if (themeId) {
                     PopoutService.pendingThemeInstall = themeId;
                     PopoutService.openSettingsWithTab("theme");
@@ -898,7 +900,7 @@ Item {
                 return;
             }
             if (url.startsWith("dms://plugin/install/")) {
-                var pluginId = url.replace("dms://plugin/install/", "").split(/[?#]/)[0];
+                const pluginId = url.replace("dms://plugin/install/", "").split(/[?#]/)[0];
                 if (pluginId) {
                     PopoutService.pendingPluginInstall = pluginId;
                     PopoutService.openSettingsWithTab("plugins");
@@ -957,8 +959,6 @@ Item {
         id: workspaceRenameModalLoader
 
         active: false
-
-        Component.onCompleted: PopoutService.workspaceRenameModalLoader = workspaceRenameModalLoader
 
         WorkspaceRenameModal {
             id: workspaceRenameModal
@@ -1208,12 +1208,12 @@ Item {
 
         active: false
 
+        Component.onCompleted: PopoutService.keybindsModalLoader = hyprKeybindsModalLoader
+
         KeybindsModal {
             id: keybindsModal
 
-            Component.onCompleted: {
-                PopoutService.hyprKeybindsModal = keybindsModal;
-            }
+            Component.onCompleted: PopoutService.keybindsModal = keybindsModal
         }
     }
 
@@ -1236,24 +1236,22 @@ Item {
     }
 
     DMSShellIPC {
-        powerMenuModalLoader: powerMenuModalLoader
-        processListModalLoader: processListModalLoader
-        controlCenterLoader: controlCenterLoader
-        dankDashPopoutLoader: dankDashPopoutLoader
-        notepadSlideoutVariants: notepadSlideoutVariants
-        hyprKeybindsModalLoader: hyprKeybindsModalLoader
+        powerMenuModalLoaderRef: powerMenuModalLoader
+        processListModalLoaderRef: processListModalLoader
+        controlCenterLoaderRef: controlCenterLoader
+        dankDashPopoutLoaderRef: dankDashPopoutLoader
+        notepadSlideoutVariantsRef: notepadSlideoutVariants
+        hyprKeybindsModalLoaderRef: hyprKeybindsModalLoader
         dankBarRepeater: root.core?.dankBarRepeater ?? null
         hyprlandOverviewLoader: root.core?.hyprlandOverviewLoader ?? null
-        workspaceRenameModalLoader: workspaceRenameModalLoader
-        windowRuleModalLoader: windowRuleModalLoader
+        workspaceRenameModalLoaderRef: workspaceRenameModalLoader
+        windowRuleModalLoaderRef: windowRuleModalLoader
     }
 
     Variants {
         model: SettingsData.getFilteredScreens("toast")
 
-        delegate: Toast {
-            visible: ToastService.toastVisible
-        }
+        delegate: Toast {}
     }
 
     Loader {
@@ -1264,37 +1262,37 @@ Item {
         sourceComponent: Component {
             Item {
                 Variants {
-                    model: root.legacySystemLevelOsdScreens
+                    model: SettingsData.osdVolumeEnabled ? root.legacySystemLevelOsdScreens : []
 
                     delegate: VolumeOSD {}
                 }
 
                 Variants {
-                    model: SettingsData.getFilteredScreens("osd")
+                    model: SettingsData.osdMediaVolumeEnabled ? SettingsData.getFilteredScreens("osd") : []
 
                     delegate: MediaVolumeOSD {}
                 }
 
                 Variants {
-                    model: SettingsData.getFilteredScreens("osd")
+                    model: SettingsData.osdMediaPlaybackEnabled ? SettingsData.getFilteredScreens("osd") : []
 
                     delegate: MediaPlaybackOSD {}
                 }
 
                 Variants {
-                    model: root.legacySystemLevelOsdScreens
+                    model: (SettingsData.osdMicMuteEnabled || SettingsData.osdMicVolumeEnabled) ? root.legacySystemLevelOsdScreens : []
 
                     delegate: MicVolumeOSD {}
                 }
 
                 Variants {
-                    model: root.legacySystemLevelOsdScreens
+                    model: SettingsData.osdBrightnessEnabled ? root.legacySystemLevelOsdScreens : []
 
                     delegate: BrightnessOSD {}
                 }
 
                 Variants {
-                    model: root.legacySystemLevelOsdScreens
+                    model: SettingsData.osdIdleInhibitorEnabled ? root.legacySystemLevelOsdScreens : []
 
                     delegate: IdleInhibitorOSD {}
                 }
@@ -1306,13 +1304,13 @@ Item {
                 }
 
                 Variants {
-                    model: root.legacySystemLevelOsdScreens
+                    model: SettingsData.osdCapsLockEnabled ? root.legacySystemLevelOsdScreens : []
 
                     delegate: CapsLockOSD {}
                 }
 
                 Variants {
-                    model: SettingsData.getFilteredScreens("osd")
+                    model: SettingsData.osdAudioOutputEnabled ? SettingsData.getFilteredScreens("osd") : []
 
                     delegate: AudioOutputOSD {}
                 }

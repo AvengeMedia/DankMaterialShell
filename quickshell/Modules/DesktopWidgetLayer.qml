@@ -96,7 +96,12 @@ Variants {
             model: ScriptModel {
                 objectProp: "id"
                 // Reversed so the top of the list maps last and renders in front.
-                values: screenDelegate.rebuilding ? [] : [...(SettingsData.desktopWidgetInstances || [])].reverse()
+                values: {
+                    if (screenDelegate.rebuilding)
+                        return [];
+                    const instances = SettingsData.desktopWidgetInstances || [];
+                    return instances.filter(inst => inst.enabled && DesktopWidgetRegistry.showsOnScreen(inst.config?.displayPreferences ?? ["all"], screenDelegate.screen)).reverse();
+                }
             }
 
             DesktopPluginWrapper {

@@ -43,12 +43,23 @@ Item {
         for (let index = 0; index < (entryRepeater?.count ?? 0); index++) {
             const wrapper = entryRepeater.itemAt(index);
             entries.push({
-                size: wrapper?.primarySize ?? 0,
+                size: wrapper?.preferredSize ?? 0,
+                min: wrapper?.minimumSize ?? 0,
                 mode: wrapper?.overflowMode ?? "bar"
             });
         }
         return entries;
     }
+    readonly property var inlineEntries: {
+        root.entryRevision;
+        const entries = [];
+        for (let index = 0; index < (entryRepeater?.count ?? 0); index++)
+            entries.push({
+                size: entryRepeater.itemAt(index)?.primarySize ?? 0
+            });
+        return entries;
+    }
+    readonly property var allottedSizes: barContent?.overflowPlan?.sizes?.[section] ?? []
     readonly property var hiddenEntries: {
         root.entryRevision;
         const entries = [];
@@ -86,6 +97,7 @@ Item {
     }
 
     onLayoutEntriesChanged: requestOverflowLayout()
+    onInlineEntriesChanged: layoutRequested()
     onOverflowIndicesChanged: layoutRequested()
     onOverflowPositionChanged: requestOverflowLayout()
     onOverflowTriggerSizeChanged: requestOverflowLayout()
@@ -97,7 +109,7 @@ Item {
     }
 
     function inlineLayout() {
-        return OverflowLayout.section(layoutEntries, hiddenEntries.map(entry => entry.occurrenceOrder), widgetSpacing, overflowTriggerSize, overflowPosition);
+        return OverflowLayout.section(inlineEntries, hiddenEntries.map(entry => entry.occurrenceOrder), widgetSpacing, overflowTriggerSize, overflowPosition);
     }
 
     Item {

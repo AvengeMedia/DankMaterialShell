@@ -14,6 +14,14 @@ Singleton {
     property int refCount: 0
     readonly property bool allowed: DashRegistry.option("media", "lyrics") === true && controller.available
     readonly property bool subscribed: refCount > 0 && controller.available
+    onSubscribedChanged: {
+        MediaAccentService.lyricsConsumers += subscribed ? 1 : -1;
+        if (subscribed) {
+            MprisController.addPositionRef();
+            return;
+        }
+        MprisController.removePositionRef();
+    }
     property var activePlayer: subscribed ? MprisController.activePlayer : null
     readonly property real stableLength: subscribed ? MprisController.activePlayerStableLength : 0
 

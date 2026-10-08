@@ -152,10 +152,9 @@ DBottomSheet {
         signal chosen(string widgetId)
         signal toggleRequested
 
-        height: expanded ? items.y + items.implicitHeight + Theme.spacingL : collapsedHeight
+        height: expanded ? itemsClip.y + items.implicitHeight + Theme.spacingL : collapsedHeight
         radius: Theme.cornerRadiusXL
         color: CcMetrics.rowColor
-        clip: true
 
         Behavior on height {
             enabled: CcMetrics.animationsEnabled
@@ -237,15 +236,22 @@ DBottomSheet {
             }
         }
 
-        PreviewGrid {
-            id: items
+        Item {
+            id: itemsClip
             x: Theme.spacingL
             y: header.height + Theme.spacingM
             width: parent.width - Theme.spacingL * 2
-            entries: card.entries
+            height: Math.max(0, card.height - y)
             visible: card.height > card.collapsedHeight
-            enabled: card.expanded
-            onChosen: widgetId => card.chosen(widgetId)
+            clip: true
+
+            PreviewGrid {
+                id: items
+                width: parent.width
+                entries: card.entries
+                enabled: card.expanded
+                onChosen: widgetId => card.chosen(widgetId)
+            }
         }
     }
 

@@ -54,6 +54,7 @@ Item {
         DActionButton {
             Keys.forwardTo: [actions.modal.modalFocusScope]
             iconName: "delete_sweep"
+            enabled: actions.modal.canClear
             iconColor: Theme.onSecondaryContainer
             backgroundColor: Theme.secondaryContainer
             tooltipText: actions.modal.clearsFilteredOnly ? I18n.tr("Clear Filtered", "clipboard modal: clear button tooltip while a search filter is active") : I18n.tr("Clear All")

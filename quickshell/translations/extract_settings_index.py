@@ -406,6 +406,8 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
     if file_tab_index == -1 and not file_page:
         return results
 
+    card_conditions = []
+
     for component in SEARCHABLE_COMPONENTS + sorted(wrappers):
         defaults = wrappers.get(component, {})
         pattern = rf"\b{component}\s*\{{"
@@ -413,6 +415,7 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
             block = parse_component_block(content, match.start(), component)
             if not block:
                 continue
+            block_end = content.index(block, match.start()) + len(block)
 
             setting_key = extract_property(block, "settingKey") or defaults.get("settingKey")
             if setting_key:
@@ -502,6 +505,12 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
                     condition_key = "dmsConnected"
                 elif "Theme.matugenAvailable" in visible_raw:
                     condition_key = "matugenAvailable"
+                elif "dock.config.enabled" in visible_raw:
+                    condition_key = "dockEnabled"
+                elif "selectedIslandDocked" in visible_raw or "!root.selectedIslandFree" in visible_raw:
+                    condition_key = "islandDocked"
+                elif "selectedIslandFree" in visible_raw and "!dankBarTab.selectedIslandFree" not in visible_raw:
+                    condition_key = "islandFree"
             if filename in BAR_TAB_FILES and not condition_key:
                 if setting_key.startswith("frame"):
                     condition_key = "frameEnabled"
@@ -509,6 +518,10 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
                     condition_key = "islandEnabled"
             if filename == "DDotTab.qml" and not condition_key and setting_key != "dotEnabled":
                 condition_key = "dotEnabled"
+            if component == "SettingsCard":
+                card_conditions.append((match.start(), block_end, condition_key if extract_property(own, "visible") else None))
+            elif not condition_key:
+                condition_key = next((cond for start, end, cond in card_conditions if start < match.start() < end), None)
 
             category, parent_label, _ = page_meta if page_meta else tab_meta.get(tab_index, TAB_META_DEFAULT)
             enriched_keywords = enrich_keywords(label, description, category, tags, parent_label)

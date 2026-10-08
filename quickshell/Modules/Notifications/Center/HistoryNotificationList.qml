@@ -1,6 +1,5 @@
 import QtQuick
 import qs.Modules.Notifications
-import qs.DCommon.Common as DC
 import Quickshell
 import qs.Common
 import qs.Services
@@ -245,10 +244,7 @@ Item {
             leftMargin: root.swipeBleed
             rightMargin: root.swipeBleed
             spacing: Theme.groupedListGap
-
-            add: NotificationMetrics.animationsEnabled ? DC.ListViewTransitions.add : null
-            remove: NotificationMetrics.animationsEnabled ? DC.ListViewTransitions.fadeRemove : null
-            displaced: NotificationMetrics.animationsEnabled ? DC.ListViewTransitions.displaced : null
+            rowFadeEnabled: NotificationMetrics.animationsEnabled
 
             model: ScriptModel {
                 id: historyModel
@@ -275,6 +271,8 @@ Item {
                 height: historyCard.height
                 onDismissed: root.removeWithScrollPreserve(modelData?.id || "")
 
+                Component.onCompleted: historyListView.fadeIn(delegateRoot, index)
+
                 HistoryNotificationCard {
                     id: historyCard
                     width: parent.width
@@ -298,7 +296,7 @@ Item {
             return;
         keyboardActive = true;
         selectedIndex = Math.min(selectedIndex + 1, historyModel.values.length - 1);
-        historyListView.positionViewAtIndex(selectedIndex, ListView.Contain);
+        historyListView.revealIndex(selectedIndex);
     }
 
     function selectPrevious() {
@@ -310,7 +308,7 @@ Item {
             return;
         }
         selectedIndex = Math.max(selectedIndex - 1, 0);
-        historyListView.positionViewAtIndex(selectedIndex, ListView.Contain);
+        historyListView.revealIndex(selectedIndex);
     }
 
     function clearSelected() {

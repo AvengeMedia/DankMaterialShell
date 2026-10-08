@@ -13,8 +13,9 @@ Singleton {
     id: root
 
     property bool cyclingActive: false
+    property bool _lastPushedEnabled: true
     readonly property bool fullscreenShowing: {
-        if (!ToplevelManager.toplevels?.values)
+        if (!cyclingActive || !ToplevelManager.toplevels?.values)
             return false;
         for (const toplevel of ToplevelManager.toplevels.values) {
             if (toplevel.fullscreen && toplevel.activated)
@@ -53,6 +54,7 @@ Singleton {
 
         function onCapabilitiesReceived() {
             lastCycleSeq = -1;
+            _lastPushedEnabled = true;
             updateCyclingState();
         }
     }
@@ -95,6 +97,9 @@ Singleton {
 
     function updateCyclingState() {
         cyclingActive = serverSchedulingAvailable && (SessionData.wallpaperCyclingEnabled || SessionData.perMonitorWallpaper);
+        if (!cyclingActive && !_lastPushedEnabled)
+            return;
+        _lastPushedEnabled = cyclingActive;
         pushConfigToServer();
     }
 

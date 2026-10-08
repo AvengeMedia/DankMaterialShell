@@ -2,7 +2,6 @@ import QtQuick
 import "." as Center
 import Quickshell
 import qs.Modules.Notifications
-import qs.DCommon.Common as DC
 import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
@@ -175,11 +174,8 @@ DListView {
     model: ScriptModel {
         values: NotificationService.groupedNotifications.map(group => group.key)
     }
-    add: NotificationMetrics.animationsEnabled ? DC.ListViewTransitions.add : null
-    remove: NotificationMetrics.animationsEnabled ? DC.ListViewTransitions.fadeRemove : null
-    displaced: NotificationMetrics.animationsEnabled ? DC.ListViewTransitions.displaced : null
-    move: NotificationMetrics.animationsEnabled ? DC.ListViewTransitions.move : null
     spacing: Theme.groupedListGap
+    rowFadeEnabled: NotificationMetrics.animationsEnabled
 
     onIsUserScrollingChanged: {
         if (isUserScrolling && keyboardController && keyboardController.keyboardNavigationActive) {
@@ -245,6 +241,8 @@ DListView {
         width: ListView.view.width - listView.swipeBleed * 2
         height: notificationCard.height
         onDismissed: NotificationService.dismissGroup(modelData)
+
+        Component.onCompleted: listView.fadeIn(delegateRoot, index)
 
         Center.NotificationCard {
             id: notificationCard

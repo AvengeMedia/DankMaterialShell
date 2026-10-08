@@ -129,7 +129,7 @@ Item {
 
         SettingsCard {
             tab: "typography"
-            tags: ["animation", "motion", "speed", "duration", "spring", "physics", "bounce", "accessibility", "reduce", "ripple", "fluid"]
+            tags: ["animation", "motion", "speed", "duration", "spring", "physics", "bounce", "accessibility", "ripple", "fluid"]
             title: I18n.tr("Animations", "settings card title")
             settingKey: "animations"
             iconName: "auto_awesome_motion"

@@ -59,6 +59,8 @@ Singleton {
     readonly property color selectedRowColor: Theme.selectedContainer
     readonly property int transitionDuration: Theme.expressiveDurations.expressiveFastSpatial
     readonly property int fadeDuration: Theme.expressiveDurations.expressiveEffects
+    readonly property int exitDuration: Theme.expressiveDurations.expressiveFastEffects
     readonly property int pageSettleFrames: 2
     readonly property int pageSettleDeadline: 250
+    readonly property int pageSpinnerDelay: 500
 }

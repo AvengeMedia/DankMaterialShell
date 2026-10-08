@@ -125,7 +125,7 @@ Singleton {
         path: StandardPaths.writableLocation(StandardPaths.GenericStateLocation) + "/DankMaterialShell/appusage.json"
         blockLoading: true
         blockWrites: true
-        watchChanges: true
+        watchChanges: SettingsData.launcherHistoryEnabled
         onLoaded: {
             if (root._saving)
                 return;

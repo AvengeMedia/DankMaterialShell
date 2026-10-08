@@ -184,12 +184,18 @@ FocusScope {
     }
 
     // Goes by the dragged tile, not the pointer: the middle of its top row has to cross the grid's edge as it
-    // was at drag start, which the grid growing under the drag cannot move.
+    // was at drag start, which the grid growing under the drag cannot move. Below the grid that edge sits one
+    // row lower while the panel has room to grow, so a tile can still be dropped into a new bottom row.
     function footerTakesGridDrag(tile) {
         if (gridDragWidget === null || footer.freeCells() < WidgetUtils.footerMinCells(gridDragWidget.id))
             return false;
-        const anchor = tile.y + Math.min(tile.height, widgetGrid.slotLayout.rowUnit) / 2;
-        return footerOnTop ? anchor < -CcMetrics.gridGap / 2 : anchor > widgetGrid.pinnedHeight + CcMetrics.gridGap / 2;
+        const rowUnit = widgetGrid.slotLayout.rowUnit;
+        const anchor = tile.y + Math.min(tile.height, rowUnit) / 2;
+        if (footerOnTop)
+            return anchor < -CcMetrics.gridGap / 2;
+        const newRow = CcMetrics.gridGap + rowUnit;
+        const room = widgetGrid.pinnedHeight + newRow <= availableGridHeight ? newRow : 0;
+        return anchor > widgetGrid.pinnedHeight + room + CcMetrics.gridGap / 2;
     }
 
     // Drops commit a tick later: committing inside the release handler would destroy the dragged item mid-signal.

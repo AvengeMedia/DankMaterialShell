@@ -68,6 +68,9 @@ var LOCAL_SPEC = {
     floatingWindowSyncGlobal: {
         def: true
     },
+    floatingWindowTitleBars: {
+        def: true
+    },
     floatingWindowTransparency: {
         def: 1.0,
         coerce: Util.percentToUnit
@@ -158,6 +161,10 @@ var LOCAL_SPEC = {
     },
     hyprlandResizeOnBorder: {
         def: false,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandWindowOpacity: {
+        def: 100,
         onChange: "updateCompositorLayout"
     },
     hyprlandTilingLayout: {
@@ -735,7 +742,7 @@ var LOCAL_SPEC = {
         def: "full"
     },
     avatarRing: {
-        def: "outline"
+        def: "none"
     },
     spotlightBarShowModeChips: {
         def: false
@@ -1485,6 +1492,9 @@ var LOCAL_SPEC = {
     },
     desktopWidgetGroups: {
         def: []
+    },
+    desktopContextMenu: {
+        def: "auto"
     },
     builtInPluginSettings: {
         def: {}

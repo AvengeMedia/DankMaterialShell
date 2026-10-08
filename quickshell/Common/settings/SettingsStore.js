@@ -51,7 +51,6 @@ var ISLAND_KEY_MOVES = {
     dankIslandSatelliteBackground: "islandSatelliteBackground",
     dankIslandSatelliteGothCorners: "islandSatelliteGothCorners",
     dankIslandSatelliteTransparency: "islandSatelliteTransparency",
-    dankIslandSatelliteSwoopRadius: "islandSatelliteSwoopRadius",
     dankIslandReducedMotion: "islandReducedMotion",
     dankIslandSpringStiffness: "islandSpringStiffness",
     dankIslandSpringDamping: "islandSpringDamping",
@@ -517,6 +516,7 @@ function migrateToVersion(obj, targetVersion) {
         for (var dropKey in ISLAND_KEY_MOVES)
             delete settings[dropKey];
         delete settings.dankIslandBarId;
+        delete settings.dankIslandSatelliteSwoopRadius;
 
         settings.configVersion = 18;
     }
@@ -717,7 +717,28 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 38;
     }
 
+    if (currentVersion < 39 && targetVersion >= 39) {
+        migrateIslandReducedMotion(settings);
+        settings.configVersion = 39;
+    }
+
     return settings;
+}
+
+// v39: the per-island toggle folded into the global reduceMotion; any bar that had it on turns the global one on
+function migrateIslandReducedMotion(settings) {
+    for (const bar of Array.isArray(settings.barConfigs) ? settings.barConfigs : []) {
+        if (!bar || typeof bar !== "object")
+            continue;
+        const holders = [bar];
+        for (const sectionId of ["leftWidgets", "centerWidgets", "rightWidgets"])
+            holders.push(...(Array.isArray(bar[sectionId]) ? bar[sectionId] : []).filter(entry => entry && typeof entry === "object" && entry.id === "island"));
+        for (const holder of holders) {
+            if (holder.islandReducedMotion === true)
+                settings.reduceMotion = true;
+            delete holder.islandReducedMotion;
+        }
+    }
 }
 
 var LOCK_WIDGET_MOVED_KEYS = ["lockScreenShowSystemIcons", "lockScreenShowTime", "lockScreenClockStyle", "lockScreenShowDate", "lockScreenShowPasswordField", "lockScreenShowMediaPlayer", "lockScreenNotificationMode"];

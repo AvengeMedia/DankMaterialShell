@@ -55,13 +55,14 @@ Item {
         motion.retarget(target);
     }
 
-    function release() {
+    function release(velocity = 0) {
         if (group?.row !== root)
             return;
-        if (Math.abs(group.translation) > width * NotificationMetrics.swipeThreshold) {
+        const projected = group.translation + velocity * NotificationMetrics.swipeFlingProjectionMs / 1000;
+        if (Math.abs(projected) > width * NotificationMetrics.swipeThreshold) {
             dismissing = true;
             motion.snapTo(motion.value);
-            dismissAnimation.to = (group.translation > 0 ? 1 : -1) * (width + bleed);
+            dismissAnimation.to = (projected > 0 ? 1 : -1) * (width + bleed);
             dismissAnimation.start();
         }
         group.end(root);
@@ -141,5 +142,12 @@ Item {
             root.release();
         }
         onTranslationChanged: root.group?.drag(root, translation.x)
+    }
+
+    NotificationSwipeWheel {
+        enabled: root.group !== null && !root.dismissing
+        onBegan: root.group.begin(root)
+        onMoved: travel => root.group?.drag(root, travel)
+        onEnded: velocity => root.release(velocity)
     }
 }

@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Common
 import qs.Modules.DBar
+import qs.Modules.SurfaceWidgets
 import qs.DCommon.Widgets
 import qs.Widgets
 
@@ -14,6 +15,8 @@ GridLayout {
     property bool widgetStyle: false
     property bool barLength: false
     property bool indicatorStyle: false
+    property bool islandShape: false
+    property bool statusStyle: false
     property real indicatorRoundness: -1
     property bool indicatorCompact: false
     property bool vertical: false
@@ -21,7 +24,7 @@ GridLayout {
     property string selectedKey: activeBarMode
     signal selected(string key)
     onSelected: key => {
-        if (!edgePlacement && !widgetStyle && !barLength && !indicatorStyle)
+        if (!edgePlacement && !widgetStyle && !barLength && !indicatorStyle && !islandShape && !statusStyle)
             applyBarMode(key);
     }
 
@@ -257,6 +260,69 @@ GridLayout {
                         height: screenPreview.stripSize
                         radius: screenPreview.radius
                         color: Theme.primary
+                    }
+
+                    BatteryMeter {
+                        visible: root.statusStyle && modeCard.modelData.key !== "connectivity"
+                        anchors.centerIn: parent
+                        thickness: Theme.iconSizeLarge
+                        meterStyle: modeCard.modelData.key
+                    }
+
+                    Row {
+                        visible: root.statusStyle && modeCard.modelData.key === "connectivity"
+                        anchors.centerIn: parent
+                        spacing: Theme.spacingXS
+
+                        DIcon {
+                            name: "wifi"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                        }
+
+                        DIcon {
+                            name: "bluetooth"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                        }
+                    }
+
+                    Item {
+                        id: shapePreview
+                        readonly property bool notch: modeCard.modelData.key === "notch"
+                        readonly property real seamOverlap: 1
+                        visible: root.islandShape
+                        anchors.fill: parent
+
+                        Rectangle {
+                            id: shapeBody
+                            x: Math.round((parent.width - width) / 2)
+                            y: shapePreview.notch ? 0 : screenPreview.edgePad
+                            width: Math.round(parent.width * root.previewIslandRatio)
+                            height: Math.round(screenPreview.stripSize * 1.5)
+                            radius: Theme.fullRadius(width, height)
+                            topLeftRadius: shapePreview.notch ? 0 : radius
+                            topRightRadius: shapePreview.notch ? 0 : radius
+                            color: Theme.primary
+                        }
+
+                        GothCorner {
+                            visible: shapePreview.notch
+                            radius: screenPreview.stripSize
+                            color: Theme.primary
+                            corner: "bottomLeft"
+                            x: shapeBody.x - radius + shapePreview.seamOverlap
+                            y: 0
+                        }
+
+                        GothCorner {
+                            visible: shapePreview.notch
+                            radius: screenPreview.stripSize
+                            color: Theme.primary
+                            corner: "bottomRight"
+                            x: shapeBody.x + shapeBody.width - shapePreview.seamOverlap
+                            y: 0
+                        }
                     }
 
                     Rectangle {

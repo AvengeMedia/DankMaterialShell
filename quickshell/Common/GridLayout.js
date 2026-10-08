@@ -131,44 +131,33 @@ function cellAt(layout, x, y, cols, rows) {
     };
 }
 
-// With gravity, a tile dragged down onto another and dropped at its row gets lifted straight back above it. So a
-// tile coming from above lands just past the tiles it overlaps, and one fully covering a single tile that fits
-// where it came from trades places with it.
-function dropInto(items, cells, index, target) {
+// With gravity, a tile dropped onto the stack it came from rises back toward the hole it left. So the drop tries
+// the target row and the rows below it, packing each, and keeps the one that settles nearest the target.
+function dropInto(items, cells, index, target, pack, step = 1) {
     const origin = cells[index];
-    if (!origin || !target)
+    if (!origin || !target || !pack)
         return items;
-    const box = cell => ({
-                "x": cell.col,
-                "y": cell.row,
-                "w": cell.cols,
-                "h": cell.rows
-            });
-    const moved = {
-        "x": target.col,
-        "y": target.row,
-        "w": origin.cols,
-        "h": origin.rows
-    };
-    if (overlaps([box(origin)], moved.x, moved.y, moved.w, moved.h))
+    if (target.col < origin.col + origin.cols && origin.col < target.col + origin.cols && target.row < origin.row + origin.rows && origin.row < target.row + origin.rows)
         return items;
-    const hits = cells.filter((cell, i) => i !== index && cell && overlaps([box(cell)], moved.x, moved.y, moved.w, moved.h));
-    if (hits.length === 0)
-        return items;
-    if (hits.every(cell => cell.row >= origin.row + origin.rows)) {
-        const row = hits.reduce((bottom, cell) => Math.max(bottom, cell.row + cell.rows), moved.y);
-        return items.map((item, i) => i === index ? Object.assign({}, item, {
+    const limit = cells.reduce((bottom, cell) => cell ? Math.max(bottom, cell.row + cell.rows) : bottom, 0) + origin.rows;
+    let best = null;
+    for (let row = target.row; row <= limit; row += step) {
+        const trial = items.map((item, i) => i === index ? Object.assign({}, item, {
                 "row": row
             }) : item);
+        const landed = pack(trial)[index]?.row;
+        if (landed === undefined)
+            return items;
+        const distance = Math.abs(landed - target.row);
+        if (!best || distance < best.distance || (distance === best.distance && landed >= target.row))
+            best = {
+                "trial": trial,
+                "distance": distance
+            };
+        if (landed >= target.row)
+            break;
     }
-    const other = hits.length === 1 ? hits[0] : null;
-    const covered = other && other.col >= moved.x && other.row >= moved.y && other.col + other.cols <= moved.x + moved.w && other.row + other.rows <= moved.y + moved.h;
-    if (!covered || other.cols > origin.cols || other.rows > origin.rows)
-        return items;
-    return items.map((item, i) => cells[i] === other ? Object.assign({}, item, {
-            "col": origin.col,
-            "row": origin.row
-        }) : item);
+    return best.trial;
 }
 
 function placedItems(items, slots) {

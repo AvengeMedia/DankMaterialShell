@@ -92,17 +92,14 @@ Singleton {
 
     Connections {
         target: Theme
+        enabled: CompositorService.isNiri
 
         function onScreenTransitionNeeded() {
-            if (CompositorService.isNiri) {
-                root.doScreenTransition();
-            }
+            root.doScreenTransition();
         }
 
         function onThemeGenerationStarting() {
-            if (CompositorService.isNiri) {
-                root.suppressNextToast();
-            }
+            root.suppressNextToast();
         }
     }
 
@@ -133,6 +130,7 @@ Singleton {
 
     Connections {
         target: SettingsData
+        enabled: CompositorService.isNiri
         function onBarConfigsChanged() {
             const newGaps = Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4));
             if (newGaps === root._lastGapValue)
@@ -145,9 +143,10 @@ Singleton {
     Connections {
         target: CompositorService
         function onIsNiriChanged() {
-            if (CompositorService.isNiri) {
-                generateNiriInputConfig();
-            }
+            if (!CompositorService.isNiri)
+                return;
+            generateNiriInputConfig();
+            generateNiriLayoutConfig();
         }
     }
 
@@ -279,12 +278,15 @@ Singleton {
         connected: CompositorService.isNiri
     }
 
-    NiriOutputCycle {
-        id: outputCycle
-        wlrOutputService: WlrOutputService
-        socket: requestSocket
-        isNiri: CompositorService.isNiri
-        currentOutput: root.currentOutput
+    Loader {
+        id: outputCycleLoader
+        active: CompositorService.isNiri
+        sourceComponent: NiriOutputCycle {
+            wlrOutputService: WlrOutputService
+            socket: requestSocket
+            isNiri: CompositorService.isNiri
+            currentOutput: root.currentOutput
+        }
     }
 
     function fetchOutputs() {
@@ -310,7 +312,9 @@ Singleton {
     }
 
     function cycleSingleOutput() {
-        return outputCycle.cycleSingleOutput();
+        if (!outputCycleLoader.item)
+            return "OUTPUT_CYCLE_UNSUPPORTED";
+        return outputCycleLoader.item.cycleSingleOutput();
     }
 
     function updateDisplayScales() {
@@ -496,6 +500,11 @@ Singleton {
         }
 
         setWorkspaces(updatedWorkspaces);
+
+        if (!data.focused) {
+            updateCurrentOutputWorkspaces();
+            return;
+        }
 
         focusedWorkspaceId = data.id;
         focusedWorkspaceIndex = allWorkspaces.findIndex(w => w.id === data.id);
@@ -1304,13 +1313,20 @@ window-rule {
             writeAlttabProcess.running = true;
         }
 
-        for (const name of ["outputs", "binds", "cursor", "windowrules", "colors", "alttab", "layout", "input"]) {
-            const path = niriDmsDir + "/" + name + ".kdl";
-            Proc.runCommand("niri-ensure-" + name, ["sh", "-c", `mkdir -p "${niriDmsDir}" && [ ! -f "${path}" ] && touch "${path}" || true`], (output, exitCode) => {
-                if (exitCode !== 0)
-                    log.warn("Failed to ensure " + name + ".kdl, exit code:", exitCode);
-            });
-        }
+        ensureDmsConfigFiles(niriDmsDir);
+    }
+
+    property bool _dmsConfigFilesEnsured: false
+
+    function ensureDmsConfigFiles(niriDmsDir) {
+        if (_dmsConfigFilesEnsured)
+            return;
+        _dmsConfigFilesEnsured = true;
+        const script = `mkdir -p "${niriDmsDir}" && for f in outputs binds cursor windowrules colors alttab layout input; do [ -f "${niriDmsDir}/$f.kdl" ] || touch "${niriDmsDir}/$f.kdl"; done`;
+        Proc.runCommand("niri-ensure-dms-configs", ["sh", "-c", script], (output, exitCode) => {
+            if (exitCode !== 0)
+                log.warn("Failed to ensure dms config files, exit code:", exitCode);
+        });
     }
 
     function generateNiriBlurrule() {

@@ -56,9 +56,12 @@ Item {
     }
 
     Component.onCompleted: {
+        KeybindsService.addRef();
         if (KeybindsService.available)
             KeybindsService.loadBinds(false);
     }
+
+    Component.onDestruction: KeybindsService.removeRef()
 
     SettingsPage {
         id: mainColumn

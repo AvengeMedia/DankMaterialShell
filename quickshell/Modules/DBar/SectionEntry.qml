@@ -18,6 +18,10 @@ Item {
     readonly property real itemHeight: widgetItem?.height ?? 0
     readonly property bool available: active && widgetLoader.widgetEnabled && itemVisible && effectiveVisible && itemWidth > 0 && itemHeight > 0
     readonly property real primarySize: available ? (sectionContext.isVertical ? itemHeight : itemWidth) : 0
+    // A flexible widget reports the width it wants and the width it can live with; the resolver allots between them.
+    readonly property real preferredSize: !available ? 0 : widgetItem && "naturalPrimarySize" in widgetItem ? widgetItem.naturalPrimarySize : primarySize
+    readonly property real minimumSize: available && widgetItem && "minimumPrimarySize" in widgetItem ? Math.min(preferredSize, widgetItem.minimumPrimarySize) : preferredSize
+    readonly property real allottedSize: sectionContext.allottedSizes[occurrenceOrder] ?? 0
     readonly property string overflowMode: OverflowLayout.placement(itemData, sectionContext.overflowDefaultMode)
     readonly property bool inOverflow: overflowMode === "always" || sectionContext.overflowIndices.includes(occurrenceOrder)
     readonly property bool inPopup: inOverflow && sectionContext.overflowOpen && !!sectionContext.overflowParent
@@ -61,6 +65,7 @@ Item {
             isTopBarEdge: !root.inOverflow && isInColumn && section === "left" && root.sectionContext.edgeIsScreenEdge
             isBottomBarEdge: !root.inOverflow && isInColumn && section === "right" && root.sectionContext.edgeIsScreenEdge
             crossEdgeExtension: !root.inOverflow && !isInColumn && section !== "center" ? root.sectionContext.crossEdgeExtension : 0
+            allottedPrimarySize: root.inOverflow ? 0 : root.allottedSize
             overflowAnchor: root.inOverflow ? root.sectionContext.overflowButton : null
             overflowSurface: root.inOverflow ? root.sectionContext.overflowSurface : null
         }

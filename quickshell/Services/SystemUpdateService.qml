@@ -148,9 +148,11 @@ Singleton {
         const has = DMSService.capabilities.includes("sysupdate");
         if (has && !sysupdateAvailable) {
             sysupdateAvailable = true;
-            requestState();
-            // The daemon persists its last check but not the interval; re-apply it on every fresh connection.
-            setInterval(SettingsData.updaterIntervalSeconds);
+            if (pollWanted) {
+                requestState();
+                // The daemon persists its last check but not the interval; re-apply it on every fresh connection.
+                setInterval(SettingsData.updaterIntervalSeconds);
+            }
         } else if (!has) {
             sysupdateAvailable = false;
         }
@@ -400,6 +402,7 @@ Singleton {
     onPollWantedChanged: {
         if (!pollWanted)
             _startupCheckDone = false;
+        _syncSubscription();
         Qt.callLater(() => root._syncAcquire());
         Qt.callLater(() => root._maybeStartupCheck());
     }
@@ -413,6 +416,19 @@ Singleton {
         _syncAcquire();
         if (sysupdateAvailable && releasesRefCount > 0 && releases === null)
             loadReleases(false);
+    }
+
+    function _syncSubscription() {
+        if (!pollWanted) {
+            if (DMSService.activeSubscriptions.includes("sysupdate"))
+                DMSService.removeSubscription("sysupdate");
+            return;
+        }
+        DMSService.addSubscription("sysupdate");
+        if (!sysupdateAvailable)
+            return;
+        requestState();
+        setInterval(SettingsData.updaterIntervalSeconds);
     }
 
     property bool _acquired: false

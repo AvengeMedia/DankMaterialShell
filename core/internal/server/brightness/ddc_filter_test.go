@@ -1,6 +1,9 @@
 package brightness
 
 import (
+	"maps"
+	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -69,5 +72,27 @@ func TestIsIgnorableI2CDeviceName(t *testing.T) {
 					tt.deviceName, tt.driver, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestDrmConnectorsByBusMapsBothDPBuses(t *testing.T) {
+	root := t.TempDir()
+	for _, dir := range []string{
+		"card1-DP-2/i2c-13",
+		"card1-DP-2/ddc/i2c-dev/i2c-4",
+		"card1-HDMI-A-1/ddc/i2c-dev/i2c-2",
+		"card1-DP-9",
+		"renderD128",
+	} {
+		if err := os.MkdirAll(filepath.Join(root, dir), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	got := drmConnectorsByBusIn(root)
+
+	want := map[int]string{13: "card1-DP-2", 4: "card1-DP-2", 2: "card1-HDMI-A-1"}
+	if !maps.Equal(got, want) {
+		t.Fatalf("drmConnectorsByBusIn() = %v, want %v", got, want)
 	}
 }

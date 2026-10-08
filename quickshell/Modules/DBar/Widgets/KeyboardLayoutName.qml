@@ -16,18 +16,20 @@ BasePill {
     readonly property bool codesOnly: KeyboardLayoutService.namesAreXkbCodes
     readonly property string currentLayout: compactMode ? KeyboardLayoutService.compactLayout : KeyboardLayoutService.currentLayout
     readonly property var _allLayoutLabels: (compactMode || !codesOnly ? KeyboardLayoutService.layoutNames : []).map(n => displayLabel(n))
-    readonly property string reserveLabel: widestLabel(_allLayoutLabels)
     readonly property var _allVerticalLabels: (compactMode || !codesOnly ? KeyboardLayoutService.layoutNames : []).map(n => verticalLabel(n))
-    readonly property string verticalReserveLabel: widestLabel(_allVerticalLabels)
 
     Component.onCompleted: KeyboardLayoutService.consumers++
     Component.onDestruction: KeyboardLayoutService.consumers--
 
-    function widestLabel(labels) {
+    function widestLabel(labels, metrics) {
         let widest = "";
-        for (let i = 0; i < labels.length; i++) {
-            if (labels[i].length > widest.length)
-                widest = labels[i];
+        let widestWidth = 0;
+        for (const label of labels) {
+            const width = metrics.advanceWidth(label);
+            if (width <= widestWidth)
+                continue;
+            widest = label;
+            widestWidth = width;
         }
         return widest;
     }
@@ -44,6 +46,11 @@ BasePill {
         Item {
             implicitWidth: root.isVerticalOrientation ? root.contentThickness : contentRow.implicitWidth
             implicitHeight: root.isVerticalOrientation ? contentColumn.implicitHeight : root.contentThickness
+
+            FontMetrics {
+                id: labelMetrics
+                font: horizontalLabel.font
+            }
 
             Column {
                 id: contentColumn
@@ -62,7 +69,7 @@ BasePill {
                 NumericText {
                     isMonospace: false
                     text: root.verticalLabel(root.currentLayout)
-                    reserveText: root.verticalReserveLabel
+                    reserveText: root.widestLabel(root._allVerticalLabels, labelMetrics)
                     width: Math.ceil(Math.max(implicitWidth, reservedWidth))
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
@@ -86,9 +93,11 @@ BasePill {
                 }
 
                 NumericText {
+                    id: horizontalLabel
+
                     isMonospace: false
                     text: root.displayLabel(root.currentLayout)
-                    reserveText: root.reserveLabel
+                    reserveText: root.widestLabel(root._allLayoutLabels, labelMetrics)
                     width: Math.ceil(Math.max(implicitWidth, reservedWidth))
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)

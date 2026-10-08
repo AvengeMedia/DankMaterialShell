@@ -28,7 +28,10 @@ BasePill {
             return 456;
         }
     }
-    property int availableWidth: maxWidth
+    property real allottedPrimarySize: 0
+    property int availableWidth: allottedPrimarySize > 0 ? allottedPrimarySize : maxWidth
+    readonly property real naturalPrimarySize: isVerticalOrientation ? height : !hasWindowsOnCurrentWorkspace ? 0 : Theme.snap(Math.min(contentItem?.naturalWidth ?? 0, maxWidth - horizontalPadding * 2) + horizontalPadding * 2, dpr)
+    readonly property real minimumPrimarySize: isVerticalOrientation ? height : Math.min(naturalPrimarySize, Theme.snap((contentItem?.minimumWidth ?? 0) + horizontalPadding * 2, dpr))
     readonly property real effectiveHorizontalWidth: Math.max(0, Math.min(maxWidth, availableWidth))
     readonly property real effectiveHorizontalInnerWidth: Math.max(0, effectiveHorizontalWidth - horizontalPadding * 2)
     property var activeWindow: null
@@ -114,6 +117,21 @@ BasePill {
 
     content: Component {
         Item {
+            readonly property bool iconShown: horizontalAppIcon.visible || horizontalSteamIcon.visible
+            readonly property real appTextNatural: appText.visible ? Math.min(appText.implicitWidth, root.compactMode ? 80 : 180) : 0
+            readonly property real naturalWidth: {
+                const parts = [];
+                if (iconShown)
+                    parts.push(contentRow.iconSize);
+                if (appText.visible)
+                    parts.push(appTextNatural);
+                if (appSeparator.visible)
+                    parts.push(appSeparator.width);
+                if (titleText.visible)
+                    parts.push(titleText.implicitWidth);
+                return parts.reduce((sum, part) => sum + part, 0) + Math.max(0, parts.length - 1) * contentRow.spacing;
+            }
+            readonly property real minimumWidth: (iconShown ? contentRow.iconSize + contentRow.spacing : 0) + Math.min(48, appText.visible ? appTextNatural : titleText.visible ? titleText.implicitWidth : 0)
             implicitWidth: {
                 if (!root.hasWindowsOnCurrentWorkspace)
                     return 0;

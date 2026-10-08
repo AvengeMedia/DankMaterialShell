@@ -11,6 +11,8 @@ Column {
     id: root
     readonly property var log: Log.scoped("WidgetsTabSection")
 
+    Component.onCompleted: DgopService.ensureMeta()
+
     property var items: []
     property var allWidgets: []
     property string title: ""

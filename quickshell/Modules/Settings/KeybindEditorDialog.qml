@@ -292,29 +292,20 @@ DDialog {
             return;
         }
 
-        let mods = KeyUtils.modsFromEvent(event.modifiers);
-        let qtKey = event.key;
+        const mods = KeyUtils.modsFromEvent(event.modifiers);
 
         if (_altShiftGhost && (event.modifiers & Qt.AltModifier) && !mods.includes("Shift"))
             mods.push("Shift");
         _altShiftGhost = false;
 
-        if (qtKey === Qt.Key_Backtab) {
-            qtKey = Qt.Key_Tab;
-            if (!mods.includes("Shift"))
-                mods.push("Shift");
-        }
-        const hasShift = mods.includes("Shift");
-        mods = KeyUtils.withSymbolicMod(mods, KeybindsService.modKey, KeybindsService.modSymbol);
-
-        const key = KeyUtils.xkbKeyFromQtKey(qtKey, !!(event.modifiers & Qt.KeypadModifier), hasShift, event.nativeScanCode);
-        if (!key) {
+        const token = KeyUtils.chordToken(event.key, event.modifiers, mods, event.nativeScanCode, KeybindsService.modKey, KeybindsService.modSymbol);
+        if (!token) {
             log.warn("Unknown key:", event.key, "mods:", event.modifiers);
             return;
         }
 
         updateEdit({
-            "key": KeyUtils.formatToken(mods, key)
+            "key": token
         });
         stopRecording();
     }

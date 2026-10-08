@@ -85,7 +85,7 @@ Item {
         Item {
             width: parent.width
             visible: root.checked || height > 0
-            height: root.checked ? control.height + SettingsMetrics.rowPaddingV : 0
+            height: root.checked ? control.y + control.height + SettingsMetrics.rowPaddingV : 0
             clip: true
 
             Behavior on height {
@@ -104,6 +104,7 @@ Item {
             SettingsSliderControl {
                 id: control
                 x: SettingsMetrics.rowPaddingH
+                y: Theme.focusRingOffset
                 width: parent.width - SettingsMetrics.rowPaddingH * 2
                 enabled: root.checked
                 value: root.value

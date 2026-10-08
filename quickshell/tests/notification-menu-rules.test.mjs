@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
+import { loadScript } from "./qml-script.mjs";
 
 const source = readFileSync(new URL("../Common/SettingsData.qml", import.meta.url), "utf8");
 const serviceSource = readFileSync(new URL("../Services/NotificationService.qml", import.meta.url), "utf8");
+const ruleExpiry = loadScript(new URL("../Common/NotificationRuleExpiry.js", import.meta.url));
 
 function load(text, globals, only) {
     const context = vm.createContext(globals);
@@ -16,14 +18,14 @@ function load(text, globals, only) {
 }
 
 function settings(rules) {
-    const context = load(source, { notificationRules: rules });
+    const context = load(source, { notificationRules: rules, RuleExpiry: ruleExpiry });
     context.saveSettings = () => {};
     return context;
 }
 
 function policy(rules, notif) {
     const functions = ["_resolveAppNameForRule", "_ruleFieldValue", "_coerceRuleUrgency", "_matchesNotificationRule", "_evaluateNotificationPolicy"];
-    const context = load(serviceSource, { SettingsData: { notificationRules: rules }, NotificationUrgency: { Low: 0, Normal: 1, Critical: 2 } }, functions);
+    const context = load(serviceSource, { SettingsData: { notificationRules: rules, isNotificationRuleExpired: ruleExpiry.isRuleExpired }, NotificationUrgency: { Low: 0, Normal: 1, Critical: 2 } }, functions);
     return plain(context._evaluateNotificationPolicy(notif));
 }
 
@@ -127,4 +129,15 @@ test("rules that are not exact app or desktop-entry rules are never read or edit
     const u = settings([desktop]);
     assert.equal(u.isAppMuted("org.mozilla.firefox", "firefox"), false, "a desktopEntry rule is not matched against the app name");
     assert.equal(u.isAppMuted("Firefox", "org.mozilla.firefox"), true);
+});
+
+test("an expired timed mute releases the popup but keeps the rule's other settings", () => {
+    const notif = { appName: "Firefox", summary: "", body: "" };
+    const p = policy([rule({ action: "mute", bypassDnd: true, expiresAt: 1 })], notif);
+    assert.equal(p.disablePopup, false);
+    assert.equal(p.bypassDnd, true);
+
+    const s = settings([rule({ action: "mute", bypassDnd: true, expiresAt: 1 }), rule({ action: "mute", expiresAt: 1 })]);
+    s.pruneExpiredNotificationRules();
+    assert.deepEqual(plain(s.notificationRules), [rule({ bypassDnd: true })]);
 });

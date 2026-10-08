@@ -13,7 +13,8 @@ DCard {
     property bool installed: false
     property bool selected: false
     property string fallbackIcon: "extension"
-    property string previewSource: PluginService.previewUrl(plugin)
+    property string previewSource: PluginService.thumbUrl(plugin)
+    property string previewFallback: PluginService.previewUrl(plugin)
     property var badges: PluginService.badgeModel(plugin)
     property bool allowUninstall: false
     property var palette: null
@@ -50,12 +51,20 @@ DCard {
 
             CachingImage {
                 id: cardPreview
+
+                property bool useFallback: false
+
                 anchors.fill: parent
-                imagePath: root.previewSource
+                imagePath: useFallback ? root.previewFallback : root.previewSource
                 maxCacheSize: 640
                 fillMode: Image.PreserveAspectCrop
                 animate: false
                 visible: status === Image.Ready
+                onStatusChanged: {
+                    if (status !== Image.Error || useFallback || !root.previewFallback || root.previewFallback === root.previewSource)
+                        return;
+                    useFallback = true;
+                }
             }
 
             DIcon {

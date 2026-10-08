@@ -103,7 +103,7 @@ Column {
 
     Item {
         width: parent.width
-        height: root.currentMode === "custom" ? customChip.height + Theme.spacingM : 0
+        height: root.currentMode === "custom" ? customChip.y + customChip.height + Theme.spacingM : 0
         opacity: root.currentMode === "custom" ? 1 : 0
         clip: true
 
@@ -127,6 +127,7 @@ Column {
             id: customChip
 
             x: SettingsMetrics.rowPaddingH
+            y: Theme.focusRingOffset
             width: parent.width - SettingsMetrics.rowPaddingH * 2
             height: Theme.listItemHeight
             radius: Theme.cornerRadiusM

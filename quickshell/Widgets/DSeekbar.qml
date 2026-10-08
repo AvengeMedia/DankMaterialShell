@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell.Services.Mpris
 import qs.Common
 import qs.DCommon.Widgets
+import qs.Services
 import qs.Widgets
 
 Item {
@@ -16,6 +17,22 @@ Item {
     readonly property real minimumValue: 0
     readonly property real maximumValue: 1
     readonly property real stepSize: stableLength > 0 ? 5 / stableLength : 0
+    readonly property bool wantsPosition: visible && (Window.window?.visible ?? false)
+    property bool _positionHeld: false
+    onWantsPositionChanged: _syncPositionRef(wantsPosition)
+    Component.onCompleted: _syncPositionRef(wantsPosition)
+    Component.onDestruction: _syncPositionRef(false)
+
+    function _syncPositionRef(wanted) {
+        if (wanted === _positionHeld)
+            return;
+        _positionHeld = wanted;
+        if (wanted) {
+            MprisController.addPositionRef();
+            return;
+        }
+        MprisController.removePositionRef();
+    }
     activeFocusOnTab: canSeek
     Accessible.role: Accessible.Slider
     Accessible.name: I18n.tr("Playback position", "media seekbar accessible name")

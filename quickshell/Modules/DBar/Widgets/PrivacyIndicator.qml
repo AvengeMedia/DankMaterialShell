@@ -23,6 +23,10 @@ BasePill {
 
     opacity: hasActivePrivacy ? 1 : 0
 
+    Ref {
+        service: PrivacyService
+    }
+
     states: [
         State {
             name: "hidden_horizontal"

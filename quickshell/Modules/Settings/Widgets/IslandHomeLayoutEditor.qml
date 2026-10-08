@@ -21,6 +21,10 @@ Column {
     readonly property bool isHighlighted: settingKey !== "" && SettingsSearchService.highlightSection === settingKey
 
     readonly property var presentation: ({
+            "workspaces": {
+                "icon": "view_module",
+                "text": I18n.tr("Workspace switcher")
+            },
             "media": {
                 "icon": "music_note",
                 "text": I18n.tr("Media / Launcher", "island settings: media or launcher slot row"),

@@ -4,6 +4,7 @@ import QtQuick
 import qs.Common
 import qs.DCommon.Widgets
 import "../../../DCommon/Common/FocusNavigation.js" as FocusNavigation
+import "../../../DCommon/Common/WheelInput.js" as WheelInput
 
 Item {
     id: root
@@ -114,7 +115,7 @@ Item {
         WheelHandler {
             enabled: !root.vertical && viewport.contentWidth > viewport.width
             onWheel: event => {
-                const delta = event.pixelDelta.x || event.pixelDelta.y || event.angleDelta.x || event.angleDelta.y;
+                const delta = WheelInput.anyAxisDelta(event);
                 viewport.contentX = Math.max(0, Math.min(viewport.contentWidth - viewport.width, viewport.contentX - delta));
                 event.accepted = true;
             }

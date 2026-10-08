@@ -377,7 +377,7 @@ func TestHyprlandConfigDeployment(t *testing.T) {
 		require.NoError(t, err)
 		defer os.RemoveAll(td)
 		os.Setenv("HOME", td)
-		result, err := cd.deployHyprlandConfig(deps.TerminalGhostty, true)
+		result, err := cd.deployHyprlandConfig("ghostty", true)
 		require.NoError(t, err)
 
 		assert.Equal(t, "Hyprland", result.ConfigType)
@@ -418,7 +418,7 @@ general {
 		require.NoError(t, os.WriteFile(filepath.Join(filepath.Dir(hyprPath), "hyprland.conf.backup.old"), []byte("old backup\n"), 0o644))
 		require.NoError(t, os.WriteFile(filepath.Join(dmsDir, "binds.conf.backup.old"), []byte("old dms backup\n"), 0o644))
 
-		result, err := cd.deployHyprlandConfig(deps.TerminalKitty, true)
+		result, err := cd.deployHyprlandConfig("kitty", true)
 		require.NoError(t, err)
 
 		assert.Equal(t, "Hyprland", result.ConfigType)
@@ -469,7 +469,7 @@ general {
 		require.NoError(t, os.WriteFile(luaPath, []byte(`require("dms.binds")`+"\n"), 0o644))
 		require.NoError(t, os.Symlink(filepath.Join(configDir, "missing-legacy.conf"), confPath))
 
-		result, err := cd.deployHyprlandConfig(deps.TerminalKitty, true)
+		result, err := cd.deployHyprlandConfig("kitty", true)
 		require.NoError(t, err)
 
 		assert.Equal(t, luaPath, result.Path)
@@ -491,7 +491,7 @@ general {
 		userBinds := "-- custom user binds\n"
 		require.NoError(t, os.WriteFile(filepath.Join(dmsDir, "binds-user.lua"), []byte(userBinds), 0o644))
 
-		_, err = cd.deployHyprlandConfig(deps.TerminalKitty, true)
+		_, err = cd.deployHyprlandConfig("kitty", true)
 		require.NoError(t, err)
 
 		managed, err := os.ReadFile(filepath.Join(dmsDir, "binds.lua"))
@@ -866,7 +866,7 @@ func TestDeployHyprlandConfigWritesLuaBeforeRemovingLegacyConf(t *testing.T) {
 	}()
 	defer close(logChan)
 
-	result, err := cd.deployHyprlandConfig(deps.TerminalGhostty, true)
+	result, err := cd.deployHyprlandConfig("ghostty", true)
 	require.NoError(t, err)
 
 	assert.NoFileExists(t, confPath)

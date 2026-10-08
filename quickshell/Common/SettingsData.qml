@@ -12,6 +12,7 @@ import qs.Common.settings
 import qs.Services
 import "GSettings.js" as GSettings
 import "LayoutResolver.js" as LayoutResolver
+import "NotificationRuleExpiry.js" as RuleExpiry
 import "settings/SettingsSpec.js" as Spec
 import "settings/SettingsStore.js" as Store
 import "../DCommon/Common/settings/SpecUtil.js" as SpecUtil
@@ -22,7 +23,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 38
+    readonly property int settingsConfigVersion: 39
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -174,6 +175,7 @@ Singleton {
     property string matugenTargetMonitor: Spec.SPEC.matugenTargetMonitor.def
     property real popupTransparency: Spec.SPEC.popupTransparency.def
     property bool floatingWindowSyncGlobal: Spec.SPEC.floatingWindowSyncGlobal.def
+    property bool floatingWindowTitleBars: Spec.SPEC.floatingWindowTitleBars.def
     property real floatingWindowTransparency: Spec.SPEC.floatingWindowTransparency.def
     property bool floatingWindowForegroundLayers: Spec.SPEC.floatingWindowForegroundLayers.def
     property real floatingWindowForegroundTransparency: Spec.SPEC.floatingWindowForegroundTransparency.def
@@ -205,6 +207,7 @@ Singleton {
     property int hyprlandLayoutRadiusOverride: Spec.SPEC.hyprlandLayoutRadiusOverride.def
     property int hyprlandLayoutBorderSize: Spec.SPEC.hyprlandLayoutBorderSize.def
     property bool hyprlandResizeOnBorder: Spec.SPEC.hyprlandResizeOnBorder.def
+    property int hyprlandWindowOpacity: Spec.SPEC.hyprlandWindowOpacity.def
     property string hyprlandTilingLayout: Spec.SPEC.hyprlandTilingLayout.def
     property bool hyprlandDwindlePreserveSplit: Spec.SPEC.hyprlandDwindlePreserveSplit.def
     property bool hyprlandDwindleSmartSplit: Spec.SPEC.hyprlandDwindleSmartSplit.def
@@ -782,6 +785,10 @@ Singleton {
     property bool lockAtStartup: Spec.SPEC.lockAtStartup.def
 
     property bool enableFprint: Spec.SPEC.enableFprint.def
+    onEnableFprintChanged: {
+        if (enableFprint)
+            refreshAuthAvailability();
+    }
     property int maxFprintTries: Spec.SPEC.maxFprintTries.def
     readonly property bool fprintdAvailable: Processes.fprintdAvailable
     readonly property bool lockFingerprintCanEnable: Processes.lockFingerprintCanEnable
@@ -792,6 +799,10 @@ Singleton {
     readonly property string greeterFingerprintReason: Processes.greeterFingerprintReason
     readonly property string greeterFingerprintSource: Processes.greeterFingerprintSource
     property bool enableU2f: Spec.SPEC.enableU2f.def
+    onEnableU2fChanged: {
+        if (enableU2f)
+            refreshAuthAvailability();
+    }
     property string u2fMode: Spec.SPEC.u2fMode.def
     readonly property bool u2fAvailable: Processes.u2fAvailable
     readonly property bool lockU2fCanEnable: Processes.lockU2fCanEnable
@@ -841,6 +852,7 @@ Singleton {
         return (barConfigs || []).filter(cfg => isIslandBarConfig(cfg));
     }
     readonly property bool dankIslandEnabled: (barConfigs || []).some(cfg => (cfg.enabled ?? false) && hostsIsland(cfg))
+    readonly property var enabledIslandBarConfigs: (barConfigs || []).filter(cfg => cfg?.island === true && (cfg.enabled ?? false))
     // Session-only: which bar, island or dot last-used shared shortcuts follow on each screen.
     property var lastUsedBarByScreen: ({})
     // One slot per edge; a dot floats, so it never takes one.
@@ -969,8 +981,12 @@ Singleton {
     function islandStripThickness(bc) {
         return LayoutResolver.islandThickness(islandSettings(bc), islandDefaultsFor(bc));
     }
-    readonly property var _islandHomeGroupIds: ["media", "clock", "weather", "status", "volume", "brightness", "notifications", "privacy"]
+    readonly property var _islandHomeGroupIds: ["workspaces", "media", "clock", "weather", "status", "volume", "brightness", "notifications", "privacy"]
     readonly property var _islandHomeLayoutDefault: [
+        {
+            "id": "workspaces",
+            "enabled": false
+        },
         {
             "id": "media",
             "enabled": true
@@ -1115,6 +1131,7 @@ Singleton {
 
     property var desktopWidgetInstances: Spec.SPEC.desktopWidgetInstances.def
     property var desktopWidgetGroups: Spec.SPEC.desktopWidgetGroups.def
+    property string desktopContextMenu: Spec.SPEC.desktopContextMenu.def
     property var lockScreenWidgetInstances: Spec.SPEC.lockScreenWidgetInstances.def
     property var greeterWidgetInstances: Spec.SPEC.greeterWidgetInstances.def
     property bool greeterFollowLockScreen: Spec.SPEC.greeterFollowLockScreen.def
@@ -1395,8 +1412,6 @@ Singleton {
         Processes.settingsRoot = root;
         const unsaved = _loadSettings();
         initializeListModels();
-        refreshAuthAvailability();
-        Processes.checkPluginSettings();
         return unsaved;
     }
 
@@ -3396,6 +3411,23 @@ Singleton {
         return rule.bypassDnd === true;
     }
 
+    // Timed mute rules carry an expiresAt timestamp (ms since epoch); 0 or
+    // absent means the mute never expires. Only the mute lapses: a DND bypass
+    // or urgency on the same rule stays in force, and
+    // pruneExpiredNotificationRules() clears the lapsed mute from the
+    // persisted rule. nowMs is optional (defaults to the current time);
+    // reactive callers pass NotificationService.notificationRuleNowMs so
+    // their bindings refresh as rules expire instead of freezing on a stale
+    // Date.now().
+    function isNotificationRuleExpired(rule, nowMs) {
+        return RuleExpiry.isRuleExpired(rule, nowMs);
+    }
+
+    // True while any rule carries an expiry timestamp. Gates the expiry
+    // clock and sweeper in NotificationService so they only run when a
+    // timed rule can actually expire.
+    readonly property bool hasTimedNotificationRules: RuleExpiry.hasTimedRule(notificationRules)
+
     function _appRuleIndex(rules, appName, desktopEntry, predicate) {
         const app = (appName || "").toString().toLowerCase();
         const desktop = (desktopEntry || "").toString().toLowerCase();
@@ -3415,17 +3447,24 @@ Singleton {
         if (!pattern)
             return;
         var rules = JSON.parse(JSON.stringify(notificationRules || []));
-        rules.push(_newNotificationRule(Object.assign({
+        const rule = _newNotificationRule(Object.assign({
             field: desktopEntry ? "desktopEntry" : "appName",
             pattern: pattern,
             matchType: "exact"
-        }, overrides)));
+        }, overrides));
+        if (!rule.expiresAt)
+            delete rule.expiresAt;
+        rules.push(rule);
         notificationRules = rules;
         saveSettings();
     }
 
     function _hasNoAction(rule) {
         return (rule.action || "default").toString().toLowerCase() === "default";
+    }
+
+    function _isNoopRule(rule) {
+        return _hasNoAction(rule) && (rule.urgency || "default").toString().toLowerCase() === "default" && !_isDndBypassRule(rule);
     }
 
     // Edits the first enabled matching rule and drops it once it no longer does anything.
@@ -3435,29 +3474,67 @@ Singleton {
         if (index === -1)
             return false;
         const rule = Object.assign(rules[index], changes);
-        if (_hasNoAction(rule) && (rule.urgency || "default").toString().toLowerCase() === "default" && !_isDndBypassRule(rule))
+        if (!rule.expiresAt)
+            delete rule.expiresAt;
+        if (_isNoopRule(rule))
             rules.splice(index, 1);
         notificationRules = rules;
         saveSettings();
         return true;
     }
 
-    function addMuteRuleForApp(appName, desktopEntry) {
-        if (!_updateAppRule(appName, desktopEntry, _hasNoAction, {
-            action: "mute"
-        }))
-            _addAppRule(appName, desktopEntry, {
-                action: "mute"
-            });
+    function addMuteRuleForApp(appName, desktopEntry, expiresAt) {
+        // Re-muting edits the app's existing no-action or mute rule (including an
+        // expired one not yet swept) so duplicates never accumulate.
+        const changes = {
+            action: "mute",
+            expiresAt: expiresAt || 0
+        };
+        if (!_updateAppRule(appName, desktopEntry, rule => _hasNoAction(rule) || _isMuteRule(rule), changes))
+            _addAppRule(appName, desktopEntry, changes);
     }
 
-    function isAppMuted(appName, desktopEntry) {
-        return _appRuleIndex(notificationRules || [], appName, desktopEntry, rule => rule.enabled !== false && _isMuteRule(rule)) !== -1;
+    function isAppMuted(appName, desktopEntry, nowMs) {
+        return _appRuleIndex(notificationRules || [], appName, desktopEntry, rule => rule.enabled !== false && _isMuteRule(rule) && !isNotificationRuleExpired(rule, nowMs)) !== -1;
+    }
+
+    // ExpiresAt of the active mute rule for an app (ms since epoch),
+    // or 0 when the app is not muted or the mute is permanent.
+    function muteExpiresAt(appName, desktopEntry, nowMs) {
+        const rules = notificationRules || [];
+        const index = _appRuleIndex(rules, appName, desktopEntry, rule => rule.enabled !== false && _isMuteRule(rule) && !isNotificationRuleExpired(rule, nowMs));
+        return index === -1 ? 0 : (rules[index].expiresAt || 0);
+    }
+
+    // Clears lapsed timed mutes from the persisted list so the settings UI
+    // stays truthful. Only the mute goes; the rule is dropped once nothing
+    // else is left on it. The idle sweep must stay cheap, so nothing is
+    // copied unless a rule actually expired.
+    function pruneExpiredNotificationRules() {
+        const rules = notificationRules || [];
+        if (!rules.some(rule => isNotificationRuleExpired(rule)))
+            return;
+        const kept = [];
+        for (const source of rules) {
+            if (!isNotificationRuleExpired(source)) {
+                kept.push(source);
+                continue;
+            }
+            const rule = Object.assign({}, source, {
+                action: "default"
+            });
+            delete rule.expiresAt;
+            if (!_isNoopRule(rule))
+                kept.push(rule);
+        }
+        notificationRules = kept;
+        saveSettings();
     }
 
     function removeMuteRuleForApp(appName, desktopEntry) {
         _updateAppRule(appName, desktopEntry, _isMuteRule, {
-            action: "default"
+            action: "default",
+            expiresAt: 0
         });
     }
 
@@ -3992,7 +4069,7 @@ Singleton {
     FileView {
         id: greeterSettingsFile
 
-        path: root.greeterSettingsBaseDir ? (root.greeterSettingsBaseDir + "/settings.json") : ""
+        path: isGreeterMode && root.greeterSettingsBaseDir ? (root.greeterSettingsBaseDir + "/settings.json") : ""
         preload: isGreeterMode
         blockLoading: false
         blockWrites: true
@@ -4020,13 +4097,16 @@ Singleton {
         onLoaded: {
             if (isGreeterMode)
                 return;
+            pluginSettingsFileExists = true;
             parsePluginSettings(pluginSettingsFile.text());
         }
         onLoadFailed: error => {
             if (isGreeterMode)
                 return;
             const msg = String(error || "");
-            if (!_isMissingPluginSettingsError(error))
+            const missing = _isMissingPluginSettingsError(error);
+            pluginSettingsFileExists = !missing;
+            if (!missing)
                 log.warn("Failed to load plugin_settings.json. Error:", msg);
             _resetPluginSettings();
         }

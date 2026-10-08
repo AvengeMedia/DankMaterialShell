@@ -20,6 +20,7 @@ Singleton {
     property var settingsIndex: []
     property bool indexLoaded: false
     property var _translatedCache: []
+    property bool _cacheDirty: false
     property int _scrollPass: 0
     property int _stablePasses: 0
     property real _appliedY: 0
@@ -76,10 +77,28 @@ Singleton {
             "matugenAvailable": () => Theme.matugenAvailable,
             "greeterAvailable": () => GreeterService.available,
             "frameEnabled": () => SettingsData.frameEnabled,
-            "islandEnabled": () => SettingsData.islandBarConfigs.length > 0,
+            "islandEnabled": () => root.islandBarFor("islandEnabled") !== null,
+            "islandFree": () => root.islandBarFor("islandFree") !== null,
+            "islandDocked": () => root.islandBarFor("islandDocked") !== null,
             "dotEnabled": () => SettingsData.dotBarConfig?.enabled ?? false,
-            "cellularAvailable": () => NetworkService.cellularAvailable
+            "cellularAvailable": () => NetworkService.cellularAvailable,
+            "dockEnabled": () => (SettingsData.dockConfigs ?? []).some(dock => dock.enabled)
         })
+
+    readonly property var islandBarFilters: ({
+            "islandEnabled": cfg => true,
+            "islandFree": cfg => SettingsData.islandFreePlacement(cfg),
+            "islandDocked": cfg => !SettingsData.islandFreePlacement(cfg)
+        })
+
+    // The bar pages only show island rows for the selected bar, so a result has to pick one that fits its condition.
+    function islandBarFor(conditionKey, preferredId) {
+        const filter = islandBarFilters[conditionKey];
+        if (!filter)
+            return null;
+        const bars = SettingsData.enabledIslandBarConfigs.filter(filter);
+        return bars.find(cfg => cfg.id === preferredId) ?? bars[0] ?? null;
+    }
 
     property var pluginSettingLabels: ({})
 
@@ -339,6 +358,7 @@ Singleton {
     }
 
     function _rebuildTranslationCache() {
+        _cacheDirty = false;
         var cache = [];
         var items = settingsIndex.concat(_runtimeSearchEntries());
         for (var i = 0; i < items.length; i++) {
@@ -543,7 +563,7 @@ Singleton {
     function _refreshTranslatedCache() {
         if (!indexLoaded)
             return;
-        _rebuildTranslationCache();
+        _cacheDirty = true;
         if (query)
             results = _searchEntries(query, 15);
     }
@@ -553,6 +573,8 @@ Singleton {
         if (!queryLower)
             return [];
 
+        if (_cacheDirty)
+            _rebuildTranslationCache();
         var querySquash = _squash(queryLower);
         var queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
         var scored = [];

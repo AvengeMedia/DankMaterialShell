@@ -108,9 +108,10 @@ function measure(sections, hidden, options) {
         }
     };
     const collisions = new Set();
+    const reserve = options.reserve;
     for (const name of names) {
         const interval = intervals[name];
-        if (interval.size > 0 && (interval.start < min || interval.end > max))
+        if (interval.size > 0 && (interval.start < min || interval.end > max || (reserve && interval.start < reserve.end && interval.end > reserve.start)))
             collisions.add(name);
     }
     const live = names.filter(name => intervals[name].size > 0);
@@ -132,8 +133,97 @@ function measure(sections, hidden, options) {
     };
 }
 
+const names = ["left", "center", "right"];
+
+function minimumOf(entry) {
+    return typeof entry.min === "number" ? Math.min(entry.min, entry.size) : entry.size;
+}
+
+function preferredSizes(sections) {
+    const sizes = {};
+    for (const name of names)
+        sizes[name] = sections[name].map(entry => entry.size);
+    return sizes;
+}
+
+function sized(sections, sizes) {
+    const result = {};
+    for (const name of names)
+        result[name] = sections[name].map((entry, index) => Object.assign({}, entry, {
+                size: sizes[name][index]
+            }));
+    return result;
+}
+
+function flexibleEntries(sections, hidden, scope) {
+    const entries = [];
+    for (const name of scope) {
+        for (let index = 0; index < sections[name].length; index++) {
+            const entry = sections[name][index];
+            if (entry.size > 0 && minimumOf(entry) < entry.size && !hidden[name].includes(index))
+                entries.push({
+                    name,
+                    index
+                });
+        }
+    }
+    return entries;
+}
+
+// Flexible widgets give up width down to their minimum before anything leaves the bar; the colliding sections shrink first.
+function shrinkToFit(sections, hidden, options) {
+    const preferred = preferredSizes(sections);
+    let measured = measure(sections, hidden, options);
+    if (measured.fits)
+        return {
+            sizes: preferred,
+            measured
+        };
+    let floor = null;
+    for (const scope of [measured.collisions, names]) {
+        const candidates = flexibleEntries(sections, hidden, scope);
+        if (!candidates.length)
+            continue;
+        const at = t => {
+            const sizes = preferredSizes(sections);
+            for (const {
+                name,
+                index
+            } of candidates) {
+                const entry = sections[name][index];
+                const minimum = minimumOf(entry);
+                sizes[name][index] = Math.floor(minimum + (entry.size - minimum) * t);
+            }
+            return {
+                sizes,
+                measured: measure(sized(sections, sizes), hidden, options)
+            };
+        };
+        floor = at(0);
+        if (!floor.measured.fits)
+            continue;
+        let low = 0;
+        let high = 1;
+        let best = floor;
+        for (let step = 0; step < 12; step++) {
+            const mid = (low + high) / 2;
+            const trial = at(mid);
+            if (trial.measured.fits) {
+                best = trial;
+                low = mid;
+            } else {
+                high = mid;
+            }
+        }
+        return best;
+    }
+    return floor ?? {
+        sizes: preferred,
+        measured
+    };
+}
+
 function resolve(sections, options, previous = {}) {
-    const names = ["left", "center", "right"];
     const hidden = {};
     for (const name of names) {
         hidden[name] = [];
@@ -144,8 +234,9 @@ function resolve(sections, options, previous = {}) {
         }
     }
 
-    let measured = measure(sections, hidden, options);
-    while (!measured.fits) {
+    let fit = shrinkToFit(sections, hidden, options);
+    while (!fit.measured.fits) {
+        const measured = fit.measured;
         // The center anchors the bar, so the sides yield first; between them the longer one gives up a widget.
         const colliding = measured.collisions.slice().sort((a, b) => (a === "center") - (b === "center") || measured.intervals[b].size - measured.intervals[a].size);
         let candidate = null;
@@ -169,15 +260,15 @@ function resolve(sections, options, previous = {}) {
         if (!candidate)
             break;
         hidden[candidate.name].push(candidate.index);
-        measured = measure(sections, hidden, options);
+        fit = shrinkToFit(sections, hidden, options);
     }
 
     const fresh = {};
     for (const name of names)
         fresh[name] = hidden[name].slice();
-    const freshFits = measured.fits;
+    const freshFits = fit.measured.fits;
 
-    // Hysteresis: a restored widget must also fit the margin, or it would bounce in and out at the boundary.
+    // Hysteresis: a restored widget must also fit the margin at its minimum, or it would bounce in and out at the boundary.
     const restoring = [];
     for (const name of names) {
         for (const index of previous[name] ?? []) {
@@ -197,18 +288,22 @@ function resolve(sections, options, previous = {}) {
         const trial = {};
         for (const key of names)
             trial[key] = hidden[key].filter(value => key !== name || value !== index);
+        const floor = minimumOf(sections[name][index]) + (options.restoreMargin ?? 0);
         const padded = Object.assign({}, sections, {
             [name]: sections[name].map((entry, entryIndex) => entryIndex === index ? Object.assign({}, entry, {
-                    size: entry.size + (options.restoreMargin ?? 0)
+                    size: floor,
+                    min: floor
                 }) : entry)
         });
-        if (measure(padded, trial, options).fits)
+        if (shrinkToFit(padded, trial, options).measured.fits)
             hidden[name] = trial[name];
     }
-    const result = freshFits && !measure(sections, hidden, options).fits ? fresh : hidden;
+    const result = freshFits && !shrinkToFit(sections, hidden, options).measured.fits ? fresh : hidden;
     for (const name of names)
         result[name].sort((a, b) => a - b);
+    fit = shrinkToFit(sections, result, options);
     return Object.assign({
-        hidden: result
-    }, measure(sections, result, options));
+        hidden: result,
+        sizes: fit.sizes
+    }, fit.measured);
 }

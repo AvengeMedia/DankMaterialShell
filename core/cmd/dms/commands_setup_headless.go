@@ -26,7 +26,7 @@ var setupHeadlessCmd = &cobra.Command{
 
 func init() {
 	setupHeadlessCmd.Flags().String("compositor", "", "Compositor to configure: niri, hyprland, or mango")
-	setupHeadlessCmd.Flags().String("terminal", "", "Also deploy a terminal config: ghostty, kitty, or alacritty")
+	setupHeadlessCmd.Flags().String("terminal", "", "Also deploy a terminal config: ghostty, kitty, or alacritty (binds otherwise use $TERMINAL or the first installed terminal)")
 	setupHeadlessCmd.Flags().Bool("no-systemd", false, "Deploy session config without systemd integration")
 	setupHeadlessCmd.Flags().Bool("force", false, "Overwrite existing configs (timestamped backups are created)")
 	setupHeadlessCmd.Flags().Bool("skip-existing", false, "Warn and skip instead of failing when a config already exists")
@@ -83,7 +83,11 @@ func runSetupHeadless(compositor, terminal string, noSystemd, force, skipExistin
 	var results []config.DeploymentResult
 	var deployErr error
 	if deployCompositor {
-		result, err := deployer.DeployCompositor(wm, term, headlessUseSystemd(wm, noSystemd))
+		terminalCommand := defaultTerminalCommand()
+		if termSelected {
+			terminalCommand = term.Command()
+		}
+		result, err := deployer.DeployCompositor(wm, terminalCommand, headlessUseSystemd(wm, noSystemd))
 		results = append(results, result)
 		deployErr = err
 	}

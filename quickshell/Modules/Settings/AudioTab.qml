@@ -86,6 +86,7 @@ Item {
 
     Component.onCompleted: {
         AudioService.addRef();
+        AudioService.queryMonoSetting(() => {});
         hiddenOutputDeviceNames = SessionData.hiddenOutputDeviceNames ?? [];
         hiddenInputDeviceNames = SessionData.hiddenInputDeviceNames ?? [];
         updateDeviceList();

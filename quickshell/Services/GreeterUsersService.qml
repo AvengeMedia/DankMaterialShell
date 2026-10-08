@@ -18,7 +18,11 @@ Singleton {
     property bool loaded: false
     property bool refreshing: false
 
-    Component.onCompleted: refresh()
+    Component.onCompleted: {
+        if (!SessionData.isGreeterMode)
+            return;
+        refresh();
+    }
 
     function refresh() {
         if (refreshing)

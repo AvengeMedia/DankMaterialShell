@@ -104,7 +104,7 @@ DOSD {
 
     Image {
         id: artPreloader
-        source: TrackArtService.resolvedArtUrl
+        source: SettingsData.osdMediaPlaybackEnabled ? TrackArtService.resolvedArtUrl : ""
         visible: false
         asynchronous: true
         cache: true
@@ -149,6 +149,7 @@ DOSD {
 
     Connections {
         target: player
+        enabled: SettingsData.osdMediaPlaybackEnabled
 
         function handleUpdate() {
             if (!root.player?.trackTitle)

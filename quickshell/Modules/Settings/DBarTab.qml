@@ -17,6 +17,7 @@ Item {
     }
 
     readonly property bool selectedIslandEnabled: bar.selectedBarIsIsland && (bar.selectedBarConfig?.enabled ?? false)
+    readonly property string clickThroughHint: I18n.tr("Disabled by Click through", "bar hover popouts card, Click through is the Advanced toggle name")
     readonly property bool selectedIslandFree: bar.selectedBarIsIsland && SettingsData.islandFreePlacement(bar.selectedBarConfig)
     readonly property bool selectedIslandDocked: bar.selectedBarIsIsland && !selectedIslandFree
     readonly property int placementIndex: !bar.islandSetting("islandFloating") ? 0 : (bar.islandSetting("islandPlacement") === "free" ? 2 : 1)
@@ -109,6 +110,31 @@ Item {
             }
 
             SettingsRow {
+                settingKey: "islandNotch"
+                tags: ["island", "notch", "pill", "shape", "style", "flush", "attached", "edge", "corners", "macbook"]
+                title: I18n.tr("Style")
+                visible: dankBarTab.selectedIslandDocked
+                resetStore: bar
+                resetKeys: ["islandNotch"]
+
+                body: SettingsLayoutPicker {
+                    islandShape: true
+                    choices: [
+                        {
+                            key: "pill",
+                            label: I18n.tr("Pill")
+                        },
+                        {
+                            key: "notch",
+                            label: I18n.tr("Notch", "island style option, the island is fused to the screen edge like a notch")
+                        }
+                    ]
+                    selectedKey: bar.islandSetting("islandNotch") ? "notch" : "pill"
+                    onSelected: key => bar.apply("islandNotch", key === "notch")
+                }
+            }
+
+            SettingsRow {
                 visible: dankBarTab.selectedIslandFree
                 body: StyledText {
                     width: parent.width
@@ -137,7 +163,7 @@ Item {
             SettingsSliderRow {
                 settingKey: "islandOuterGap"
                 tags: ["island", "placement", "gap", "top", "margin"]
-                visible: dankBarTab.selectedIslandDocked
+                visible: dankBarTab.selectedIslandDocked && !bar.islandSetting("islandNotch")
                 resetStore: bar
                 resetKeys: ["islandOuterGap"]
                 text: I18n.tr("Outer gap", "island settings: gap between screen edge and island")
@@ -405,6 +431,7 @@ Item {
             tags: ["bar", "hover", "popout", "reveal", "widget", "delay"]
             iconName: "touch_app"
             title: I18n.tr("Hover popouts")
+            description: enabled ? "" : root.clickThroughHint
             visible: bar.selectedBarConfig?.enabled ?? false
             enabled: !(bar.selectedBarConfig?.clickThrough ?? false)
             opacity: (bar.selectedBarConfig?.clickThrough ?? false) ? 0.5 : 1.0

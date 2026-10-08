@@ -17,6 +17,7 @@ Singleton {
     property bool automationAvailable: false
     property bool gammaControlAvailable: false
     property int resumeRecoveryAttempt: 0
+    readonly property bool _gammaNeeded: nightModeEnabled || SessionData.displayGamma !== 1.0 || SessionData.displayContrast !== 1.0
 
     property var gammaState: ({})
     property int gammaCurrentTemp: gammaState?.currentTemp ?? 0
@@ -343,7 +344,6 @@ Singleton {
 
     function runResumeRecoveryPass() {
         checkGammaControlAvailability();
-        BrightnessService.rescanDevices();
 
         if (nightModeEnabled) {
             evaluateNightMode();
@@ -375,7 +375,8 @@ Singleton {
             } else {
                 gammaControlAvailable = true;
                 automationAvailable = true;
-                applyGammaAdjustments();
+                if (_gammaNeeded)
+                    applyGammaAdjustments();
 
                 if (nightModeEnabled) {
                     _setNightModeEnabled(!nightModePaused, true, success => {
@@ -467,6 +468,7 @@ Singleton {
 
     Connections {
         target: SessionService
+        enabled: root._gammaNeeded
 
         function onSessionResumed() {
             resumeRecoveryAttempt = 0;
@@ -541,6 +543,7 @@ Singleton {
 
     Connections {
         target: ToplevelManager
+        enabled: root.nightModeEnabled
         function onActiveToplevelChanged() {
             root.handleNightModeExceptions();
         }
@@ -548,6 +551,7 @@ Singleton {
 
     Connections {
         target: ToplevelManager.activeToplevel
+        enabled: root.nightModeEnabled
         function onFullscreenChanged() {
             root.handleNightModeExceptions();
         }
@@ -555,6 +559,7 @@ Singleton {
 
     Connections {
         target: CompositorService
+        enabled: root.nightModeEnabled
         function onInOverviewChanged() {
             root.handleNightModeExceptions();
         }

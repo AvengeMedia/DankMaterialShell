@@ -14,6 +14,8 @@ Singleton {
     property string currentSessionId: ""
     property string currentSeat: ""
     property bool refreshing: false
+    property bool loaded: false
+    property var _afterLoad: []
     property bool loginctlAvailable: false
     property bool isBSD: Qt.platform.os === "unix"
 
@@ -45,6 +47,24 @@ Singleton {
         return sessions.filter(s => !s.current);
     }
 
+    function ensureLoaded(fn) {
+        if (loaded) {
+            fn();
+            return;
+        }
+        _afterLoad = _afterLoad.concat([fn]);
+        refresh();
+    }
+
+    function _finishRefresh() {
+        refreshing = false;
+        loaded = true;
+        const queued = _afterLoad;
+        _afterLoad = [];
+        for (const fn of queued)
+            fn();
+    }
+
     function refresh() {
         if (refreshing)
             return;
@@ -72,20 +92,22 @@ Singleton {
             const fields = (lines[0] || "self|0|").split("|");
             root.currentSessionId = fields[0] || "self";
             root.currentSeat = "";
-            root.sessions = [{
-                sessionId: root.currentSessionId,
-                uid: parseInt(fields[1] || "0", 10),
-                username: fields[2] || "",
-                seat: "",
-                tty: lines[1] || "",
-                type: (Quickshell.env("WAYLAND_DISPLAY") || "") !== "" ? "wayland" : "",
-                sessionClass: "user",
-                active: true,
-                state: "active",
-                remote: false,
-                current: true
-            }];
-            root.refreshing = false;
+            root.sessions = [
+                {
+                    sessionId: root.currentSessionId,
+                    uid: parseInt(fields[1] || "0", 10),
+                    username: fields[2] || "",
+                    seat: "",
+                    tty: lines[1] || "",
+                    type: (Quickshell.env("WAYLAND_DISPLAY") || "") !== "" ? "wayland" : "",
+                    sessionClass: "user",
+                    active: true,
+                    state: "active",
+                    remote: false,
+                    current: true
+                }
+            ];
+            root._finishRefresh();
         }, 0);
     }
 
@@ -136,7 +158,7 @@ Singleton {
                 return parseInt(a.sessionId, 10) - parseInt(b.sessionId, 10);
             });
             root.sessions = list;
-            root.refreshing = false;
+            root._finishRefresh();
         }, 0);
     }
 
@@ -239,6 +261,8 @@ Singleton {
         target: "sessions"
 
         function list(): string {
+            if (!root.loaded)
+                root.refresh();
             const lines = [];
             for (let i = 0; i < root.sessions.length; i++) {
                 const s = root.sessions[i];
@@ -261,17 +285,15 @@ Singleton {
         function activate(sessionId: string): string {
             if (!sessionId)
                 return "ERROR: missing session id";
-            root.activate(sessionId, null);
+            root.ensureLoaded(() => root.activate(sessionId, null));
             return "ok";
         }
 
         function switchTo(target: string): string {
             if (!target)
                 return "ERROR: missing target (username or session id)";
-            root.switchToUser(target, null);
+            root.ensureLoaded(() => root.switchToUser(target, null));
             return "ok";
         }
     }
-
-    Component.onCompleted: refresh()
 }

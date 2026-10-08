@@ -8,7 +8,7 @@ import qs.Modules.DBar
 import qs.Modules.Plugins
 import qs.Services
 import qs.DCommon.Widgets
-import "../../../Common/WorkspaceModel.js" as WorkspaceModel
+import qs.Widgets
 
 BasePill {
     id: root
@@ -39,7 +39,27 @@ BasePill {
     readonly property real hoverFadeAlpha: 0.7
     readonly property real cardWindowRatio: 0.45
 
-    readonly property bool useAqueous: CompositorService.isAqueous && AqueousService.available && Quickshell.env("DMS_FORCE_EXTWS") !== "1"
+    WorkspaceSwitcherModel {
+        id: workspaces
+
+        screenName: root.screenName
+        screen: root.parentScreen
+        followFocus: root.opt("workspaceFollowFocus")
+        occupiedOnly: root.opt("showOccupiedWorkspacesOnly")
+        showAllTags: root.opt("dwlShowAllTags")
+        showPadding: root.opt("showWorkspacePadding")
+        paddingCount: root.opt("workspacePaddingCount")
+        showSpecial: root.opt("showSpecialWorkspaces")
+        reverseScrolling: root.opt("reverseScrolling")
+    }
+
+    readonly property bool useAqueous: workspaces.useAqueous
+    readonly property bool useExtWorkspace: workspaces.useExtWorkspace
+    readonly property bool useNativeWorkspaces: workspaces.useNativeWorkspaces
+    readonly property string effectiveScreenName: workspaces.effectiveScreenName
+    readonly property bool workspacesHiddenByOverview: workspaces.hiddenByOverview
+    readonly property var currentWorkspace: workspaces.currentWorkspace
+    readonly property var workspaceList: workspaces.workspaceList
 
     function opt(key) {
         return SettingsData.widgetOption("workspaceSwitcher", widgetData, key);
@@ -47,73 +67,17 @@ BasePill {
 
     property int _desktopEntriesUpdateTrigger: 0
 
-    readonly property string effectiveScreenName: {
-        if (!root.opt("workspaceFollowFocus"))
-            return root.screenName;
-        return BarWidgetService.getFocusedScreenName() || root.screenName;
-    }
-    readonly property bool workspacesHiddenByOverview: CompositorService.workspacesHiddenByOverview(effectiveScreenName)
-
     readonly property bool isFocusedMonitor: {
         const focused = BarWidgetService.getFocusedScreenName();
         return focused === "" || root.screenName === "" || focused === root.screenName;
     }
     readonly property bool useUnfocusedAppearance: !isFocusedMonitor && root.opt("workspaceUnfocusedMonitorSeparateAppearance") && BarWidgetService.focusedScreenDetectionSupported
 
-    readonly property var extProjection: (useExtWorkspace && parentScreen) ? WindowManager.screenProjection(CompositorService.isAqueous ? Quickshell.screens.find(s => s.name === effectiveScreenName) || parentScreen : parentScreen) : null
-    readonly property bool useExtWorkspace: {
-        if (useAqueous)
-            return false;
-        if (Quickshell.env("DMS_FORCE_EXTWS") === "1")
-            return (WindowManager.windowsets?.length ?? 0) > 0;
-        if (!CompositorService.compositorDetected || CompositorService.hasWorkspaceIpc)
-            return false;
-        return (WindowManager.windowsets?.length ?? 0) > 0;
-    }
-    readonly property bool useNativeWorkspaces: useAqueous || (!useExtWorkspace && CompositorService.hasWorkspaceIpc)
-
     Connections {
         target: DesktopEntries
         function onApplicationsChanged() {
             _desktopEntriesUpdateTrigger++;
         }
-    }
-
-    readonly property string compositorName: CompositorService.compositor
-
-    onCompositorNameChanged: {
-        _placeholderPool = [];
-        _hyprSlotPool = {};
-    }
-
-    property var currentWorkspace: {
-        if (useExtWorkspace)
-            return getExtWorkspaceActiveWorkspace();
-        if (!useNativeWorkspaces)
-            return 1;
-        return CompositorService.currentWorkspaceKey(root.screenName, root.opt("workspaceFollowFocus"));
-    }
-    property var workspaceList: {
-        if (useExtWorkspace) {
-            const baseList = getExtWorkspaceWorkspaces();
-            return root.opt("showWorkspacePadding") ? padWorkspaces(baseList) : baseList;
-        }
-        if (!useNativeWorkspaces)
-            return [1];
-        if (root.workspacesHiddenByOverview)
-            return [];
-
-        const baseList = CompositorService.workspacesForScreen(root.screenName, root.opt("workspaceFollowFocus"), {
-            "occupiedOnly": root.opt("showOccupiedWorkspacesOnly"),
-            "showAllTags": root.opt("dwlShowAllTags"),
-            "minCount": root.opt("showWorkspacePadding") ? root.opt("workspacePaddingCount") : 0,
-            "showSpecial": root.opt("showSpecialWorkspaces")
-        });
-        if (CompositorService.ephemeralWorkspaces)
-            return hyprlandSlotList(baseList);
-        if (!root.opt("showWorkspacePadding") || CompositorService.supportsPersistentWorkspaces || (root.useAqueous && baseList.length === 0))
-            return baseList;
-        return padWorkspaces(baseList);
     }
 
     function getWorkspaceIcons(ws) {
@@ -159,104 +123,18 @@ BasePill {
         return Object.values(byApp);
     }
 
-    // Hyprland creates/destroys workspaces on empty enter/leave; slots keyed by id keep delegate identity so pills animate instead of popping
-    property var _hyprSlotPool: ({})
-
-    Component {
-        id: hyprSlotComponent
-
-        QtObject {
-            property var ws: null
-        }
-    }
-
     function recordOf(entry) {
-        if (!entry || entry.ws === undefined)
-            return entry;
-        return entry.ws;
-    }
-
-    function _hyprSlot(key, ws) {
-        let slot = _hyprSlotPool[key];
-        if (!slot) {
-            slot = hyprSlotComponent.createObject(root);
-            _hyprSlotPool[key] = slot;
-        }
-        if (slot.ws !== ws)
-            slot.ws = ws;
-        return slot;
-    }
-
-    function hyprlandSlotList(raw) {
-        return raw.map(ws => _hyprSlot(ws.id > 0 ? ws.id : (ws.special ? "special:" : "name:") + (ws.name ?? ""), ws));
-    }
-
-    // Stable placeholder instances so ScriptModel (identity-diffed) reuses padding delegates instead of recreating them on workspace churn
-    property var _placeholderPool: []
-
-    function padWorkspaces(list) {
-        const padded = list.slice();
-        const minCount = root.opt("workspacePaddingCount");
-        let slot = 0;
-        while (padded.length < minCount) {
-            if (root._placeholderPool.length <= slot)
-                root._placeholderPool.push(WorkspaceModel.placeholder());
-            padded.push(root._placeholderPool[slot]);
-            slot++;
-        }
-        return padded;
-    }
-
-    function getExtWorkspaceWorkspaces() {
-        const fallback = [
-            {
-                "id": "1",
-                "name": "1",
-                "active": false
-            }
-        ];
-        if (!extProjection)
-            return fallback;
-
-        let visible = extProjection.windowsets.filter(ws => ws.shouldDisplay);
-
-        const hasValidCoordinates = visible.some(ws => ws.coordinates && ws.coordinates.length > 0);
-        if (hasValidCoordinates) {
-            visible = visible.slice().sort((a, b) => {
-                const coordsA = a.coordinates || [0, 0];
-                const coordsB = b.coordinates || [0, 0];
-                if (coordsA[0] !== coordsB[0])
-                    return coordsA[0] - coordsB[0];
-                return coordsA[1] - coordsB[1];
-            });
-        }
-
-        return visible.length > 0 ? visible : fallback;
-    }
-
-    function getExtWorkspaceActiveWorkspace() {
-        if (!extProjection)
-            return "";
-        const activeWs = extProjection.windowsets.find(ws => ws.active);
-        return activeWs || null;
+        return workspaces.recordOf(entry);
     }
 
     readonly property real appIconSize: Theme.barIconSize(barThickness, -6 + root.opt("workspaceAppIconSizeOffset"), root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
 
     function getRealWorkspaces() {
-        return root.workspaceList.filter(ws => ws && !root.recordOf(ws).placeholder);
+        return workspaces.realWorkspaces;
     }
 
     function switchToWorkspaceByModelData(entry) {
-        const data = root.recordOf(entry);
-        if (!data || data.placeholder)
-            return;
-        if (root.useNativeWorkspaces) {
-            CompositorService.switchToWorkspace(data, root.effectiveScreenName);
-            return;
-        }
-        if (root.useExtWorkspace && typeof data.activate === "function")
-            data.activate();
+        workspaces.switchTo(entry);
     }
 
     function toggleHyprlandOverview() {
@@ -288,37 +166,7 @@ BasePill {
     }
 
     function switchWorkspace(direction) {
-        if (useAqueous) {
-            const workspaces = getRealWorkspaces();
-            const index = workspaces.findIndex(w => w.id === currentWorkspace);
-            const next = Math.max(0, Math.min(workspaces.length - 1, index + (direction > 0 ? 1 : -1)));
-            if (next !== index)
-                CompositorService.switchToWorkspace(workspaces[next]);
-            return;
-        }
-        if (useExtWorkspace) {
-            const realWorkspaces = getRealWorkspaces();
-            if (realWorkspaces.length < 2) {
-                return;
-            }
-
-            const currentIndex = realWorkspaces.findIndex(ws => ws === root.currentWorkspace);
-            const validIndex = currentIndex === -1 ? 0 : currentIndex;
-            const nextIndex = direction > 0 ? Math.min(validIndex + 1, realWorkspaces.length - 1) : Math.max(validIndex - 1, 0);
-
-            if (nextIndex === validIndex) {
-                return;
-            }
-
-            const nextWorkspace = realWorkspaces[nextIndex];
-            if (typeof nextWorkspace.activate === "function")
-                nextWorkspace.activate();
-            return;
-        }
-        if (!useNativeWorkspaces)
-            return;
-        // specials are overlays you toggle, not positions you scroll to
-        CompositorService.stepWorkspace(getRealWorkspaces().map(ws => root.recordOf(ws)).filter(ws => ws.special !== true), root.currentWorkspace, direction);
+        workspaces.step(direction);
     }
 
     function getWorkspaceIndexFallback(modelData, index) {
@@ -357,8 +205,7 @@ BasePill {
         return getWorkspaceIndexFallback(modelData, index);
     }
 
-    readonly property bool hasWorkspaces: getRealWorkspaces().length > 0
-    readonly property bool shouldShow: useNativeWorkspaces || (useExtWorkspace && hasWorkspaces)
+    readonly property bool shouldShow: workspaces.available
 
     width: shouldShow ? (isVertical ? barThickness : visualWidth) : 0
     height: shouldShow ? (isVertical ? visualHeight : barThickness) : 0
@@ -369,16 +216,6 @@ BasePill {
             implicitWidth: workspaceRow.implicitWidth
             implicitHeight: workspaceRow.implicitHeight
         }
-    }
-
-    property real touchpadAccumulator: 0
-    property real mouseAccumulator: 0
-    property bool scrollInProgress: false
-
-    Timer {
-        id: scrollCooldown
-        interval: 100
-        onTriggered: root.scrollInProgress = false
     }
 
     onRightClicked: {
@@ -396,34 +233,7 @@ BasePill {
         if (Math.abs(wheel.angleDelta.x) > Math.abs(wheel.angleDelta.y))
             return;
         wheel.accepted = true;
-
-        if (scrollInProgress)
-            return;
-
-        const delta = wheel.angleDelta.y;
-        const isTouchpad = wheel.pixelDelta && wheel.pixelDelta.y !== 0;
-        const reverse = root.opt("reverseScrolling") ? -1 : 1;
-
-        if (isTouchpad) {
-            touchpadAccumulator += delta;
-            if (Math.abs(touchpadAccumulator) < 500)
-                return;
-            const direction = touchpadAccumulator * reverse < 0 ? 1 : -1;
-            root.switchWorkspace(direction);
-            scrollInProgress = true;
-            scrollCooldown.restart();
-            touchpadAccumulator = 0;
-            return;
-        }
-
-        mouseAccumulator += delta;
-        if (Math.abs(mouseAccumulator) < 120)
-            return;
-        const direction = mouseAccumulator * reverse < 0 ? 1 : -1;
-        root.switchWorkspace(direction);
-        scrollInProgress = true;
-        scrollCooldown.restart();
-        mouseAccumulator = 0;
+        workspaces.handleWheel(wheel);
     }
 
     property int dragSourceIndex: -1

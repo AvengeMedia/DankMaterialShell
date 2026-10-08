@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import Quickshell.Services.UPower
 import qs.Common
 import qs.Services
@@ -15,14 +14,16 @@ Singleton {
     signal statsUpdated
 
     property int refCount: 0
-    readonly property bool powerSaver: PowerProfileWatcher.currentProfile === PowerProfile.PowerSaver
-    property int updateInterval: refCount > 0 ? (powerSaver ? 6000 : 3000) : (powerSaver ? 60000 : 30000)
+    readonly property bool powerSaver: pollingActive && PowerProfileWatcher.currentProfile === PowerProfile.PowerSaver
+    property int updateInterval: powerSaver ? 6000 : 3000
     property bool isUpdating: false
     property bool pendingUpdate: false
     property int subscriptionGeneration: 0
     readonly property bool pollingActive: dgopAvailable && refCount > 0 && enabledModules.length > 0
     readonly property bool dgopAvailable: DMSService.isConnected && DMSService.capabilities.includes("dgop")
     property bool sessionGpuIdsSeeded: false
+    property bool _metaWanted: false
+    property bool _metaLoaded: false
 
     property var moduleRefCounts: ({})
     property var enabledModules: []
@@ -97,7 +98,17 @@ Singleton {
             "write": []
         })
 
+    function ensureMeta() {
+        _metaWanted = true;
+        if (_metaLoaded || !dgopAvailable)
+            return;
+        _metaLoaded = true;
+        initializeSystemMetadata();
+        initializeGpuMetadata();
+    }
+
     function addRef(modules = null) {
+        ensureMeta();
         refCount++;
         let modulesChanged = false;
 
@@ -205,6 +216,7 @@ Singleton {
     }
 
     function addGpuPciId(pciId) {
+        ensureMeta();
         const currentCount = gpuPciIdRefCounts[pciId] || 0;
         gpuPciIdRefCounts[pciId] = currentCount + 1;
 
@@ -696,11 +708,13 @@ Singleton {
     }
 
     onDgopAvailableChanged: {
-        if (!dgopAvailable)
+        if (!dgopAvailable) {
+            _metaLoaded = false;
             return;
+        }
 
-        initializeSystemMetadata();
-        initializeGpuMetadata();
+        if (_metaWanted)
+            ensureMeta();
         initializeDiskMounts();
 
         if (!sessionGpuIdsSeeded && SessionData.enabledGpuPciIds && SessionData.enabledGpuPciIds.length > 0) {
@@ -709,48 +723,5 @@ Singleton {
                 addGpuPciId(pciId);
             }
         }
-    }
-
-    Process {
-        id: osReleaseProcess
-        command: ["cat", "/etc/os-release"]
-        running: false
-        onExited: exitCode => {
-            if (exitCode !== 0) {
-                log.warn("Failed to read /etc/os-release");
-            }
-        }
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (text.trim()) {
-                    try {
-                        const lines = text.trim().split('\n');
-                        let prettyName = "";
-                        let name = "";
-
-                        for (const line of lines) {
-                            const trimmedLine = line.trim();
-                            if (trimmedLine.startsWith('PRETTY_NAME=')) {
-                                prettyName = trimmedLine.substring(12).replace(/^["']|["']$/g, '');
-                            } else if (trimmedLine.startsWith('NAME=')) {
-                                name = trimmedLine.substring(5).replace(/^["']|["']$/g, '');
-                            }
-                        }
-
-                        // Prefer PRETTY_NAME, fallback to NAME
-                        const distroName = prettyName || name || "Linux";
-                        distribution = distroName;
-                        log.info("Detected distribution:", distroName);
-                    } catch (e) {
-                        log.warn("Failed to parse /etc/os-release:", e);
-                        distribution = "Linux";
-                    }
-                }
-            }
-        }
-    }
-
-    Component.onCompleted: {
-        osReleaseProcess.running = true;
     }
 }

@@ -83,6 +83,11 @@ Item {
             ancestor = ancestor.parent;
         if (!ancestor)
             return;
+        if (typeof ancestor.revealRange === "function") {
+            const inContent = target.mapToItem(ancestor.contentItem, 0, 0);
+            ancestor.revealRange(inContent.y - Theme.spacingS, inContent.y + target.height + Theme.spacingS);
+            return;
+        }
         const point = target.mapToItem(ancestor, 0, 0);
         let offset = 0;
         if (point.y < Theme.spacingS)

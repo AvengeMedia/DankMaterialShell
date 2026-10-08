@@ -33,6 +33,15 @@ Singleton {
     property bool _mprisRequestInFlight: false
     property bool _mprisPublishDirty: false
     property int _mprisConnectionEpoch: 0
+    property int positionConsumers: 0
+
+    function addPositionRef() {
+        positionConsumers++;
+    }
+
+    function removePositionRef() {
+        positionConsumers = Math.max(0, positionConsumers - 1);
+    }
 
     Connections {
         target: root.activePlayer
@@ -52,14 +61,23 @@ Singleton {
             if (root.activePlayer && root.activePlayer.lengthSupported && root.activePlayer.length > 1) {
                 root.activePlayerStableLength = root.activePlayer.length;
             }
+        }
+        function onPlaybackStateChanged() {
+            root._syncStableMeta();
+            root._checkIdle();
+        }
+    }
+
+    Connections {
+        target: root.activePlayer
+        enabled: SettingsData.bluetoothMprisEnabled
+        function onLengthChanged() {
             root._scheduleMPRISPublish();
         }
         function onMetadataChanged() {
             root._scheduleMPRISPublish();
         }
         function onPlaybackStateChanged() {
-            root._syncStableMeta();
-            root._checkIdle();
             root._scheduleMPRISPublish();
         }
         function onCanControlChanged() {
@@ -378,7 +396,7 @@ Singleton {
 
     Timer {
         interval: 1000
-        running: root.activePlayer?.playbackState === MprisPlaybackState.Playing
+        running: root.positionConsumers > 0 && root.activePlayer?.playbackState === MprisPlaybackState.Playing
         repeat: true
         onTriggered: root.activePlayer?.positionChanged()
     }

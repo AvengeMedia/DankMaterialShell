@@ -3,11 +3,13 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Window
 import Quickshell
+import Quickshell.Wayland
 import qs.Common
 import qs.Modals.Common
 import qs.Modules.Settings.Widgets
 import qs.Services
 import qs.DCommon.Widgets
+import "../../Common/KeyUtils.js" as KeyUtils
 
 Item {
     id: keybindsTab
@@ -19,6 +21,7 @@ Item {
     property string selectedCategory: ""
     property string searchQuery: ""
     property string requestedSearchQuery: ""
+    property bool searchFocused: false
 
     property int _lastDataVersion: -1
     property var _cachedCategories: []
@@ -50,6 +53,22 @@ Item {
     onWindowFocusItemChanged: {
         if (editorOpen && !removeBindConfirm.visible)
             focusTrapTimer.restart();
+    }
+
+    Keys.onPressed: event => {
+        if (!searchFocused)
+            return;
+        const chord = KeyUtils.shortcutFromSearchKey(event, KeybindsService.modKey, KeybindsService.modSymbol);
+        if (!chord)
+            return;
+        event.accepted = true;
+        flickable.headerItem.searchField.text = chord;
+    }
+
+    ShortcutInhibitor {
+        id: searchInhibitor
+        window: keybindsTab.QsWindow.window
+        enabled: keybindsTab.searchFocused
     }
 
     readonly property var categoryChips: [
@@ -95,6 +114,7 @@ Item {
     Component.onDestruction: {
         _editAlive = false;
         _editRequest++;
+        KeybindsService.removeRef();
     }
 
     function beginEdit(binding, key) {
@@ -396,7 +416,8 @@ Item {
     function _matchesSearch(group, query) {
         if (!query)
             return true;
-        if (group.keys.some(entry => entry.key.toLowerCase().includes(query)))
+        const combo = KeyUtils.normalizeKeyCombo(query, KeybindsService.modKey, KeybindsService.modSymbol);
+        if (group.keys.some(entry => KeyUtils.normalizeKeyCombo(entry.key, KeybindsService.modKey, KeybindsService.modSymbol).includes(combo)))
             return true;
         return group.desc.toLowerCase().includes(query) || group.action.toLowerCase().includes(query);
     }
@@ -431,7 +452,7 @@ Item {
         const index = _filteredBinds.findIndex(bind => bind.action === action);
         if (!action || index < 0)
             return;
-        flickable.positionViewAtIndex(index, ListView.Contain);
+        flickable.revealIndex(index);
     }
 
     function _ensureCurrentProvider() {
@@ -470,6 +491,7 @@ Item {
     }
 
     Component.onCompleted: {
+        KeybindsService.addRef();
         _ensureCurrentProvider();
         Qt.callLater(_applyRequestedSearch);
     }
@@ -645,7 +667,9 @@ Item {
                 DSearchField {
                     id: searchInput
                     width: parent.width
-                    placeholderText: I18n.tr("Search shortcuts...")
+                    placeholderText: searchInhibitor.active ? I18n.tr("Search or press a shortcut...") : I18n.tr("Search shortcuts...")
+                    keyForwardTargets: [keybindsTab]
+                    onFocusStateChanged: hasFocus => keybindsTab.searchFocused = hasFocus
                     onTextChanged: {
                         keybindsTab.searchQuery = text;
                         searchDebounce.restart();
@@ -785,11 +809,20 @@ Item {
                 }
 
                 SettingsFabBar {
-                    shown: !KeybindsService.readOnly
+                    shown: !KeybindsService.readOnly || KeybindsService.cheatsheetAvailable
+
+                    DFab {
+                        text: I18n.tr("Cheatsheet", "button opening the keybinds cheatsheet overlay")
+                        iconName: "keyboard"
+                        colorRole: "secondaryContainer"
+                        visible: KeybindsService.cheatsheetAvailable
+                        onClicked: PopoutService.showKeybindsModal()
+                    }
 
                     DFab {
                         text: I18n.tr("Add shortcut", "keybind editor dialog title and button")
                         iconName: "add"
+                        visible: !KeybindsService.readOnly
                         onClicked: keybindsTab.openNewEditor()
                     }
                 }

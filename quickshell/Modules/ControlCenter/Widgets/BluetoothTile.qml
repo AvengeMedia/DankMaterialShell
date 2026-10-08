@@ -27,6 +27,10 @@ CcTile {
 
     iconName: "bluetooth"
     iconBlinking: BluetoothService.connecting
+
+    Ref {
+        service: BatteryService
+    }
     title: {
         if (!BluetoothService.available)
             return I18n.tr("Bluetooth", "bluetooth status");

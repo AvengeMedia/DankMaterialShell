@@ -10,10 +10,6 @@ DPopout {
 
     layerNamespace: "dms:vpn"
 
-    Ref {
-        service: DMSNetworkService
-    }
-
     property bool wasVisible: false
     property var triggerScreen: null
 
