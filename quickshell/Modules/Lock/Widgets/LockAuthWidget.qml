@@ -30,7 +30,7 @@ Item {
     readonly property bool ring: style === "ring"
     readonly property bool morph: style === "expressive"
     readonly property bool minimal: style === "minimal"
-    readonly property bool authenticating: (pam?.passwd.active ?? false) && !unlocking
+    readonly property bool authenticating: (pam?.authBusy ?? false) && !unlocking
     readonly property bool failed: pamState !== ""
     readonly property var morphShapes: ["cookie4", "clover4", "sunny", "cookie9", "softBurst", "pentagon", "oval", "cookie6"]
     readonly property string morphShape: morphShapes[passwordBuffer.length % morphShapes.length]
@@ -113,7 +113,7 @@ Item {
     }
 
     function canStartSecurityKeyUnlock() {
-        return !demoMode && pam && pam.u2f && pam.u2f.available && SettingsData.enableU2f && SettingsData.u2fMode === "or" && !pam.passwd.active && !pam.u2f.active && !pam.u2fPending && !unlocking;
+        return !demoMode && pam && pam.u2f && pam.u2f.available && SettingsData.enableU2f && SettingsData.u2fMode === "or" && !pam.authBusy && !pam.u2f.active && !pam.u2fPending && !unlocking;
     }
 
     function triggerSecurityKeyUnlock() {
@@ -160,6 +160,12 @@ Item {
             passwordField.clear();
             if (keyboardController.isKeyboardActive)
                 keyboardController.hide();
+        }
+
+        // onStateChanged only fires when the conversation ends, too late between prompts
+        function onAwaitingUserInputChanged() {
+            if (root.pam.awaitingUserInput)
+                passwordField.clear();
         }
     }
 
@@ -534,7 +540,7 @@ Item {
                                 return root.accentColor;
                             return root.contained ? Theme.surfaceVariantText : Theme.withAlpha(root.plainColor, Theme.pendingOpacity);
                         }
-                        opacity: root.pam?.passwd.active && !root.morph ? 0 : 1
+                        opacity: root.pam?.authBusy && !root.morph ? 0 : 1
 
                         Behavior on opacity {
                             NumberAnimation {
@@ -652,8 +658,8 @@ Item {
                     activeFocusOnTab: !root.demoMode
                     onTextChanged: cursorPosition = text.length
                     onAccepted: {
-                        if (!root.demoMode && !root.unlocking && !root.pam.passwd.active && !root.pam.u2fPending)
-                            root.pam.passwd.start();
+                        if (!root.demoMode && !root.unlocking && !root.pam.authBusy && !root.pam.u2fPending)
+                            root.pam.submitPassword();
                     }
                     Keys.onPressed: event => handleKey(event)
 
@@ -686,7 +692,7 @@ Item {
                             return;
                         }
 
-                        if (root.pam.passwd.active) {
+                        if (root.pam.authBusy) {
                             root.log.debug("PAM is active, ignoring input");
                             event.accepted = true;
                             return;
@@ -809,7 +815,7 @@ Item {
                                     return;
                                 const committed = text;
                                 text = "";
-                                if (root.demoMode || root.unlocking || root.pam.passwd.active)
+                                if (root.demoMode || root.unlocking || root.pam.authBusy)
                                     return;
                                 passwordField.insertText(committed);
                             }
@@ -848,14 +854,16 @@ Item {
                                 return I18n.tr("Insert your security key...");
                             return I18n.tr("Touch your security key...");
                         }
-                        if (root.pam.passwd.active)
+                        if (root.pam.authBusy)
                             return I18n.tr("Authenticating...", "lock screen status text while the password is checked");
                         if (root.passwordVisibility !== "always")
                             return "";
+                        if (root.pam.authPromptText !== "")
+                            return root.pam.authPromptText;
                         return I18n.tr("Password", "lock screen password field placeholder") + "…";
                     }
                     color: {
-                        if (root.unlocking || (root.pam?.passwd.active ?? false))
+                        if (root.unlocking || (root.pam?.authBusy ?? false))
                             return root.accentColor;
                         return root.contained ? Theme.outline : Theme.withAlpha(root.plainColor, Theme.pendingOpacity);
                     }
@@ -969,7 +977,7 @@ Item {
                         x: passwordDisplay.x + passwordDisplay.cursorRectangle.x
                         y: passwordDisplay.y + passwordDisplay.cursorRectangle.y
                         height: passwordDisplay.cursorRectangle.height
-                        shown: !root.demoMode && root.showPasswordField && !root.ring && passwordField.activeFocus && !(root.pam?.passwd.active ?? false) && !(root.pam?.u2fPending ?? false) && !root.unlocking
+                        shown: !root.demoMode && root.showPasswordField && !root.ring && passwordField.activeFocus && !(root.pam?.authBusy ?? false) && !(root.pam?.u2fPending ?? false) && !root.unlocking
 
                         readonly property int fieldCursorPosition: passwordField.cursorPosition
                         readonly property string fieldText: passwordField.text
@@ -994,7 +1002,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     iconName: parent.showPassword ? "visibility_off" : "visibility"
                     buttonSize: Theme.buttonHeightXS
-                    visible: !root.demoMode && !root.ring && !root.minimal && root.passwordBuffer.length > 0 && !(root.pam?.passwd.active ?? false) && !root.unlocking
+                    visible: !root.demoMode && !root.ring && !root.minimal && root.passwordBuffer.length > 0 && !(root.pam?.authBusy ?? false) && !root.unlocking
                     enabled: visible
                     onClicked: parent.showPassword = !parent.showPassword
                 }
@@ -1031,7 +1039,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     iconName: "keyboard"
                     buttonSize: Theme.buttonHeightXS
-                    visible: !root.demoMode && !root.ring && !root.minimal && !(root.pam?.passwd.active ?? false) && !root.unlocking && !(root.pam?.u2fPending ?? false)
+                    visible: !root.demoMode && !root.ring && !root.minimal && !(root.pam?.authBusy ?? false) && !root.unlocking && !(root.pam?.u2fPending ?? false)
                     enabled: visible && root.showPasswordField
                     onClicked: {
                         if (keyboardController.isKeyboardActive)
@@ -1049,7 +1057,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     width: Theme.iconSize
                     height: Theme.iconSize
-                    visible: !root.demoMode && !root.ring && !root.morph && ((root.pam?.passwd.active ?? false) || root.unlocking)
+                    visible: !root.demoMode && !root.ring && !root.morph && ((root.pam?.authBusy ?? false) || root.unlocking)
 
                     DIcon {
                         anchors.centerIn: parent
@@ -1073,7 +1081,7 @@ Item {
                         size: Theme.iconSize
                         contained: root.style === "expressive"
                         color: root.style === "expressive" ? Theme.onPrimaryContainer : root.accentColor
-                        visible: (root.pam?.passwd.active ?? false) && !root.unlocking
+                        visible: (root.pam?.authBusy ?? false) && !root.unlocking
                         running: visible
                     }
                 }
@@ -1089,11 +1097,11 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     iconName: "keyboard_return"
                     buttonSize: Theme.buttonHeightXS
-                    visible: !root.ring && !root.minimal && (root.demoMode || (!(root.pam?.passwd.active ?? false) && !root.unlocking && !(root.pam?.u2fPending ?? false)))
+                    visible: !root.ring && !root.minimal && (root.demoMode || (!(root.pam?.authBusy ?? false) && !root.unlocking && !(root.pam?.u2fPending ?? false)))
                     enabled: !root.demoMode && root.showPasswordField
                     onClicked: {
                         if (!root.demoMode && !root.unlocking && !root.pam.u2fPending)
-                            root.pam.passwd.start();
+                            root.pam.submitPassword();
                     }
 
                     Behavior on opacity {

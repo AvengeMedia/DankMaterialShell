@@ -24,6 +24,15 @@ Scope {
     property string u2fPendingMode
     property string buffer
 
+    // the prompt pam asked for, e.g. "PIN: "
+    property string authPromptText: ""
+    property bool responseSubmitted: false
+    property bool awaitingUserInput: false
+    property bool responseInFlight: false
+    // the conversation is held open while waiting, so passwd.active is not "busy"
+    readonly property bool authBusy: passwd.active && root.responseInFlight
+    // stops a conversation that never prompts from being reopened forever
+    property int autoRestartCount: 0
     property var attemptInfoMessages: []
     property bool lockoutAnnouncedThisAttempt: false
 
@@ -51,6 +60,37 @@ Scope {
         stateReset.restart();
         fprint.checkAvail();
         u2f.checkAvail();
+    }
+
+    // open the conversation without answering it, so the prompt is known before typing
+    function beginAuthSession(): void {
+        if (passwd.active || root.unlockInProgress || !root.lockSecured)
+            return;
+        if (root.autoRestartCount >= 3)
+            return;
+        root.autoRestartCount = root.autoRestartCount + 1;
+        root.responseSubmitted = false;
+        root.awaitingUserInput = false;
+        root.responseInFlight = false;
+        eagerStart.restart();
+    }
+
+    function submitPassword(): void {
+        root.responseSubmitted = true;
+        if (!passwd.active) {
+            passwd.start();
+            return;
+        }
+        if (passwd.responseRequired) {
+            root.responseSubmitted = false;
+            root.awaitingUserInput = false;
+            root.responseInFlight = true;
+            passwdActiveTimeout.restart();
+            passwd.respond(root.buffer);
+        } else {
+            // kept and sent when the prompt arrives; a stack that never asks still times out
+            passwdActiveTimeout.restart();
+        }
     }
 
     function completeUnlock(): void {
@@ -187,9 +227,14 @@ Scope {
                 root.attemptInfoMessages = root.attemptInfoMessages.concat([message]);
         }
 
-        onResponseRequiredChanged: {
+        // not responseRequiredChanged: that only fires on change, so two prompts in
+        // a row leave the second unhandled
+        onPamMessage: {
             if (!responseRequired)
                 return;
+
+            root.authPromptText = (message || "").replace(/:\s*$/, "").trim();
+            root.autoRestartCount = 0;
 
             const notice = root.attemptInfoMessages.filter(m => m !== message);
             if (notice.length > 0) {
@@ -198,7 +243,17 @@ Scope {
             }
             root.attemptInfoMessages = [];
 
-            respond(root.buffer);
+            // each prompt needs its own submission, or the second gets the first answer
+            if (root.responseSubmitted) {
+                root.responseSubmitted = false;
+                root.awaitingUserInput = false;
+                root.responseInFlight = true;
+                respond(root.buffer);
+            } else {
+                root.awaitingUserInput = true;
+                root.responseInFlight = false;
+                passwdActiveTimeout.running = false;
+            }
         }
 
         onCompleted: res => {
@@ -236,6 +291,12 @@ Scope {
             else if (res === PamResult.Failed)
                 root.state = "fail";
 
+            root.responseSubmitted = false;
+            root.awaitingUserInput = false;
+            root.responseInFlight = false;
+            if (res !== PamResult.MaxTries)
+                root.beginAuthSession();
+
             root.flashMsg();
             stateReset.restart();
         }
@@ -248,7 +309,11 @@ Scope {
             if (passwd.active) {
                 root.attemptInfoMessages = [];
                 root.lockoutAnnouncedThisAttempt = false;
-                passwdActiveTimeout.restart();
+                root.authPromptText = "";
+                if (root.responseSubmitted)
+                    passwdActiveTimeout.restart();
+                else
+                    passwdActiveTimeout.running = false;
             } else {
                 passwdActiveTimeout.running = false;
             }
@@ -431,7 +496,7 @@ Scope {
         }
 
         function startForAlternativeAuth(): void {
-            if (!available || !SettingsData.enableU2f || root.u2fSuppressedByPrimaryPam || SettingsData.u2fMode !== "or" || root.unlockInProgress || passwd.active || active)
+            if (!available || !SettingsData.enableU2f || root.u2fSuppressedByPrimaryPam || SettingsData.u2fMode !== "or" || root.unlockInProgress || root.authBusy || active)
                 return;
             abort();
             root.u2fPending = true;
@@ -549,6 +614,16 @@ Scope {
     }
 
     Timer {
+        id: eagerStart
+
+        interval: 50
+        onTriggered: {
+            if (!passwd.active && root.lockSecured && !root.unlockInProgress)
+                passwd.start();
+        }
+    }
+
+    Timer {
         id: passwdActiveTimeout
 
         interval: 15000
@@ -602,6 +677,10 @@ Scope {
         root.attemptInfoMessages = [];
         root.lockoutAnnouncedThisAttempt = false;
         root.resetAuthFlows();
+        root.responseSubmitted = false;
+        root.awaitingUserInput = false;
+        root.autoRestartCount = 0;
+        root.beginAuthSession();
         fprint.tries = 0;
         fprint.errorTries = 0;
         if (!SettingsData.lockPamExternallyManaged && !dankshellConfigWatcher.loaded && !userPamWatcher.loaded)
