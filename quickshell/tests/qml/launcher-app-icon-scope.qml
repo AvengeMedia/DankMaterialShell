@@ -3,9 +3,9 @@ import QtTest
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Modals.DankLauncherV2
-import qs.Modals.DankLauncherV2.Components
-import qs.DankCommon.Common as DC
+import qs.Modals.DLauncherV2
+import qs.Modals.DLauncherV2.Components
+import qs.DCommon.Common as DC
 
 ShellRoot {
     id: root

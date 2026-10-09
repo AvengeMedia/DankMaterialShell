@@ -38,7 +38,7 @@ Options:
 
 Examples:
     dms-greeter --command niri
-    dms-greeter --command hyprland -C /etc/greetd/custom-hypr.conf
+    dms-greeter --command hyprland -C /etc/greetd/custom-hypr.lua
     dms-greeter --command sway -p /home/user/.config/quickshell/custom-dms
     dms-greeter --command scroll -p /home/user/.config/quickshell/custom-dms
     dms-greeter --command niri --cache-dir /tmp/dmsgreeter
@@ -381,7 +381,7 @@ NIRI_EOF
             cat >> "$TEMP_CONFIG" << HYPRLAND_LUA_EOF
 
 hl.on("hyprland.start", function()
-    hl.exec_cmd('sh -c "$QS_CMD; hyprctl dispatch exit"')
+    hl.exec_cmd("sh -c \"$QS_CMD; hyprctl dispatch 'hl.dsp.exit()'\"")
 end)
 HYPRLAND_LUA_EOF
             COMPOSITOR_CONFIG="$TEMP_CONFIG"
@@ -397,11 +397,12 @@ hl.config({
 })
 
 hl.on("hyprland.start", function()
-    hl.exec_cmd('sh -c "$QS_CMD; hyprctl dispatch exit"')
+    hl.exec_cmd("sh -c \"$QS_CMD; hyprctl dispatch 'hl.dsp.exit()'\"")
 end)
 HYPRLAND_LUA_EOF
             COMPOSITOR_CONFIG="$TEMP_CONFIG"
         else
+            # hyprlang stays usable until 0.57 ships; legacy dispatch is the only form a .conf session accepts
             TEMP_CONFIG=$(mktemp)
             cat "$COMPOSITOR_CONFIG" > "$TEMP_CONFIG"
             cat >> "$TEMP_CONFIG" << HYPRLAND_EOF
@@ -491,7 +492,9 @@ MIRACLE_EOF
         if [[ -n "$COMPOSITOR_CONFIG" ]]; then
             exec_compositor "mango" mango -c "$COMPOSITOR_CONFIG" -s "$QS_CMD && mmsg dispatch quit"
         else
-            exec_compositor "mango" mango -s "$QS_CMD && mmsg dispatch quit"
+            # Without -c mango falls back to /etc/mango/config.conf, whose spawn/quit binds work at the login screen.
+            TEMP_CONFIG=$(mktemp)
+            exec_compositor "mango" mango -c "$TEMP_CONFIG" -s "$QS_CMD && mmsg dispatch quit"
         fi
         ;;
 

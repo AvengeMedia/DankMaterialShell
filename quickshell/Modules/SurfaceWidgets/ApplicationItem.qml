@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Modules.Dock
-import qs.Widgets
 
 Item {
     id: delegateItem

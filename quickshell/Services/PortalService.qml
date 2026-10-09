@@ -144,10 +144,6 @@ Singleton {
     }
 
     function setSystemColorScheme(isLightMode) {
-        if (typeof SettingsData !== "undefined" && SettingsData.syncModeWithPortal === false) {
-            return;
-        }
-
         const preferLight = isLightMode && systemColorScheme === 2;
         const targetScheme = isLightMode ? (preferLight ? "prefer-light" : "default") : "prefer-dark";
 
@@ -209,6 +205,7 @@ Singleton {
 
     Connections {
         target: Theme
+        enabled: SettingsData.syncModeWithPortal
 
         function onIsLightModeChanged() {
             root.setSystemColorScheme(Theme.isLightMode);

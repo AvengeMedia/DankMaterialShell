@@ -285,6 +285,10 @@ const DMS_ACTIONS = [
         label: "Dashboard: Weather"
     },
     {
+        id: "spawn dms ipc call dash open wellbeing",
+        label: "Dashboard: Digital Wellbeing"
+    },
+    {
         id: "spawn dms ipc call dankdash wallpaper",
         label: "Wallpaper Browser"
     },
@@ -457,6 +461,10 @@ const DMS_ACTIONS = [
     {
         id: "spawn dms ipc call night disable",
         label: "Night Mode: Disable"
+    },
+    {
+        id: "spawn dms ipc call wellbeing toggle",
+        label: "Screen Time Tracking: Toggle"
     },
     {
         id: "spawn dms ipc call bar toggle index 0",
@@ -1240,6 +1248,14 @@ const HYPRLAND_ACTIONS = {
             label: "Toggle Fullscreen"
         },
         {
+            id: "fullscreen 1",
+            label: "Toggle Maximize"
+        },
+        {
+            id: "pseudo",
+            label: "Toggle Pseudotile"
+        },
+        {
             id: "fullscreenstate",
             label: "Set Fullscreen State"
         },
@@ -1534,6 +1550,22 @@ const HYPRLAND_ACTIONS = {
             label: "Move into Group Down"
         },
         {
+            id: "moveintoorcreategroup l",
+            label: "Move into or Create Group Left"
+        },
+        {
+            id: "moveintoorcreategroup r",
+            label: "Move into or Create Group Right"
+        },
+        {
+            id: "moveintoorcreategroup u",
+            label: "Move into or Create Group Up"
+        },
+        {
+            id: "moveintoorcreategroup d",
+            label: "Move into or Create Group Down"
+        },
+        {
             id: "moveoutofgroup",
             label: "Move out of Group"
         },
@@ -1596,24 +1628,176 @@ const HYPRLAND_ACTIONS = {
         {
             id: "denywindowfromgroup toggle",
             label: "Toggle Deny from Group"
-        },
-        {
-            id: "setignoregrouplock on",
-            label: "Ignore Group Lock"
-        },
-        {
-            id: "setignoregrouplock off",
-            label: "Respect Group Lock"
-        },
-        {
-            id: "setignoregrouplock toggle",
-            label: "Toggle Ignore Group Lock"
         }
     ],
     "Layout": [
         {
             id: "splitratio",
             label: "Adjust Split Ratio"
+        },
+        {
+            id: "layoutmsg",
+            label: "Layout Message"
+        },
+        {
+            id: "layoutmsg togglesplit",
+            label: "Toggle Split (dwindle)"
+        },
+        {
+            id: "layoutmsg swapsplit",
+            label: "Swap Split (dwindle)"
+        },
+        {
+            id: "layoutmsg rotatesplit",
+            label: "Rotate Split (dwindle)"
+        },
+        {
+            id: "layoutmsg preselect l",
+            label: "Preselect Left (dwindle)"
+        },
+        {
+            id: "layoutmsg preselect r",
+            label: "Preselect Right (dwindle)"
+        },
+        {
+            id: "layoutmsg preselect u",
+            label: "Preselect Up (dwindle)"
+        },
+        {
+            id: "layoutmsg preselect d",
+            label: "Preselect Down (dwindle)"
+        },
+        {
+            id: "layoutmsg movetoroot",
+            label: "Move to Root (dwindle)"
+        },
+        {
+            id: "layoutmsg swapwithmaster",
+            label: "Swap with Master (master)"
+        },
+        {
+            id: "layoutmsg focusmaster",
+            label: "Focus Master (master)"
+        },
+        {
+            id: "layoutmsg cyclenext",
+            label: "Cycle Next (master)"
+        },
+        {
+            id: "layoutmsg cycleprev",
+            label: "Cycle Previous (master)"
+        },
+        {
+            id: "layoutmsg swapnext",
+            label: "Swap Next (master)"
+        },
+        {
+            id: "layoutmsg swapprev",
+            label: "Swap Previous (master)"
+        },
+        {
+            id: "layoutmsg rollnext",
+            label: "Roll Next (master)"
+        },
+        {
+            id: "layoutmsg rollprev",
+            label: "Roll Previous (master)"
+        },
+        {
+            id: "layoutmsg addmaster",
+            label: "Add Master (master)"
+        },
+        {
+            id: "layoutmsg removemaster",
+            label: "Remove Master (master)"
+        },
+        {
+            id: "layoutmsg orientationnext",
+            label: "Next Orientation (master)"
+        },
+        {
+            id: "layoutmsg orientationprev",
+            label: "Previous Orientation (master)"
+        },
+        {
+            id: "layoutmsg orientationcycle",
+            label: "Cycle Orientation (master)"
+        },
+        {
+            id: "layoutmsg orientationleft",
+            label: "Orientation Left (master)"
+        },
+        {
+            id: "layoutmsg orientationright",
+            label: "Orientation Right (master)"
+        },
+        {
+            id: "layoutmsg orientationtop",
+            label: "Orientation Top (master)"
+        },
+        {
+            id: "layoutmsg orientationbottom",
+            label: "Orientation Bottom (master)"
+        },
+        {
+            id: "layoutmsg orientationcenter",
+            label: "Orientation Center (master)"
+        },
+        {
+            id: "layoutmsg center",
+            label: "Center Column (scrolling)"
+        },
+        {
+            id: "layoutmsg fit_into_view",
+            label: "Fit Column into View (scrolling)"
+        },
+        {
+            id: "layoutmsg consume",
+            label: "Consume into Column (scrolling)"
+        },
+        {
+            id: "layoutmsg expel",
+            label: "Expel from Column (scrolling)"
+        },
+        {
+            id: "layoutmsg consume_or_expel prev",
+            label: "Consume or Expel Previous (scrolling)"
+        },
+        {
+            id: "layoutmsg consume_or_expel next",
+            label: "Consume or Expel Next (scrolling)"
+        },
+        {
+            id: "layoutmsg promote",
+            label: "Promote to Column (scrolling)"
+        },
+        {
+            id: "layoutmsg inhibit_scroll",
+            label: "Toggle Scroll Inhibit (scrolling)"
+        },
+        {
+            id: "layoutmsg colresize +conf",
+            label: "Next Column Width (scrolling)"
+        },
+        {
+            id: "layoutmsg colresize -conf",
+            label: "Previous Column Width (scrolling)"
+        },
+        {
+            id: "layoutmsg swapcol l",
+            label: "Swap Column Left (scrolling)"
+        },
+        {
+            id: "layoutmsg swapcol r",
+            label: "Swap Column Right (scrolling)"
+        },
+        {
+            id: "layoutmsg move +col",
+            label: "Scroll Next Column (scrolling)"
+        },
+        {
+            id: "layoutmsg move -col",
+            label: "Scroll Previous Column (scrolling)"
         }
     ],
     "System": [
@@ -1640,6 +1824,10 @@ const HYPRLAND_ACTIONS = {
         {
             id: "forceidle",
             label: "Force Idle"
+        },
+        {
+            id: "releaseinputcapture",
+            label: "Release Input Capture"
         },
         {
             id: "submap",
@@ -2151,7 +2339,13 @@ const HYPRLAND_ACTION_ARGS = {
                 name: "mode",
                 type: "text",
                 label: "Mode",
-                placeholder: "0=full, 1=max, 2=fake"
+                placeholder: "0=fullscreen, 1=maximize"
+            },
+            {
+                name: "action",
+                type: "text",
+                label: "Action",
+                placeholder: "toggle, set, unset"
             }
         ]
     },
@@ -2516,6 +2710,26 @@ const HYPRLAND_ACTION_ARGS = {
                 type: "text",
                 label: "Direction",
                 placeholder: "l, r, u, d"
+            }
+        ]
+    },
+    "moveintoorcreategroup": {
+        args: [
+            {
+                name: "direction",
+                type: "text",
+                label: "Direction",
+                placeholder: "l, r, u, d"
+            }
+        ]
+    },
+    "layoutmsg": {
+        args: [
+            {
+                name: "message",
+                type: "text",
+                label: "Message",
+                placeholder: "togglesplit, swapwithmaster, colresize +0.1"
             }
         ]
     },
@@ -3089,6 +3303,7 @@ function parseCompositorActionArgs(compositor, action) {
             case "swapactiveworkspaces":
             case "renameworkspace":
             case "fullscreenstate":
+            case "fullscreen":
             case "movecursor":
                 if (argParts.length >= 2) {
                     args[argConfig.args[0].name] = argParts[0];

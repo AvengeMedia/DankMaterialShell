@@ -2168,7 +2168,7 @@ func (m *Manager) CopyFile(filePath string) error {
 	// paste target read the file itself, and the image probe size-guards
 	// internally.
 	var fileData []byte
-	if fileInfo.Size() <= cfg.MaxEntrySize {
+	if !fileInfo.IsDir() && fileInfo.Size() <= cfg.MaxEntrySize {
 		fileData, err = os.ReadFile(filePath)
 		if err != nil {
 			return fmt.Errorf("read file: %w", err)
@@ -2179,7 +2179,6 @@ func (m *Manager) CopyFile(filePath string) error {
 	if err != nil {
 		exportedPath = filePath
 	}
-	fileURI := encodeFileURI(exportedPath)
 
 	if imgData, imgMime, ok := m.tryReadImageFromURI([]byte(encodeFileURI(filePath))); ok {
 		entry := Entry{
@@ -2216,16 +2215,7 @@ func (m *Manager) CopyFile(filePath string) error {
 	m.updateState()
 	m.notifySubscribers()
 
-	offers := []wlclipboard.Offer{
-		{MimeType: "x-special/gnome-copied-files", Data: []byte("copy\n" + fileURI)},
-		{MimeType: "text/uri-list", Data: []byte(fileURI + "\r\n")},
-		{MimeType: "text/plain", Data: []byte(filePath)},
-	}
-	if _, imgMime, err := image.DecodeConfig(bytes.NewReader(fileData)); err == nil {
-		offers = append(offers, wlclipboard.Offer{MimeType: "image/" + imgMime, Data: fileData})
-	}
-
-	m.takeSelection(offers)
+	m.takeSelection(clipboardstore.FileOffers(exportedPath, filePath, fileData))
 	return nil
 }
 

@@ -3,9 +3,10 @@ import qs.Common
 import qs.Modules.Settings.Widgets
 import qs.Modules.SystemUpdate
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
-DankFloatingWindow {
+DFloatingWindow {
     id: root
 
     function show() {
@@ -17,7 +18,7 @@ DankFloatingWindow {
     }
 
     objectName: "systemUpdateModal"
-    title: I18n.tr("Software updates")
+    title: I18n.tr("Software updates", "settings page, modal and bar widget title, DMS and system package updates")
     minimumSize: Qt.size(SettingsMetrics.windowMinWidth, SettingsMetrics.windowMinHeight)
     implicitWidth: SettingsMetrics.formDialogWidth + SettingsMetrics.pagePaddingH * 2
     readonly property real defaultHeight: SettingsMetrics.windowHeight - SettingsMetrics.pagePaddingV * 4
@@ -35,7 +36,7 @@ DankFloatingWindow {
         anchors.fill: parent
         spacing: 0
 
-        DankWindowHeader {
+        DWindowHeader {
             id: titleBar
             width: parent.width
             controls: windowControls

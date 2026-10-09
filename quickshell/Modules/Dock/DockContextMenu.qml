@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell.Widgets
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 DockContextMenuBase {
     id: root
@@ -66,7 +66,7 @@ DockContextMenuBase {
                 radius: Theme.cornerRadiusS
                 color: minimizeMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
 
-                DankIcon {
+                DIcon {
                     anchors.centerIn: parent
                     name: modelData.minimized ? "expand_content" : "minimize"
                     size: 12
@@ -101,7 +101,7 @@ DockContextMenuBase {
                 radius: Theme.cornerRadiusS
                 color: closeMouseArea.containsMouse ? Theme.errorPressed : Theme.withAlpha(Theme.errorPressed, 0)
 
-                DankIcon {
+                DIcon {
                     anchors.centerIn: parent
                     name: "close"
                     size: 12
@@ -122,7 +122,7 @@ DockContextMenuBase {
                 }
             }
 
-            DankRipple {
+            DRipple {
                 id: windowRipple
                 rippleColor: Theme.surfaceText
                 cornerRadius: Theme.cornerRadius
@@ -199,7 +199,7 @@ DockContextMenuBase {
                 wrapMode: Text.NoWrap
             }
 
-            DankRipple {
+            DRipple {
                 id: actionRipple
                 rippleColor: Theme.surfaceText
                 cornerRadius: Theme.cornerRadius
@@ -241,7 +241,7 @@ DockContextMenuBase {
         radius: Theme.cornerRadius
         color: pinArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
-        DankIcon {
+        DIcon {
             id: pinIcon
             anchors.left: parent.left
             anchors.leftMargin: Theme.spacingS
@@ -267,7 +267,7 @@ DockContextMenuBase {
             wrapMode: Text.NoWrap
         }
 
-        DankRipple {
+        DRipple {
             id: pinRipple
             rippleColor: Theme.surfaceText
             cornerRadius: Theme.cornerRadius
@@ -314,7 +314,7 @@ DockContextMenuBase {
         radius: Theme.cornerRadius
         color: nvidiaArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
 
-        DankIcon {
+        DIcon {
             id: nvidiaIcon
             anchors.left: parent.left
             anchors.leftMargin: Theme.spacingS
@@ -340,7 +340,7 @@ DockContextMenuBase {
             wrapMode: Text.NoWrap
         }
 
-        DankRipple {
+        DRipple {
             id: nvidiaRipple
             rippleColor: Theme.surfaceText
             cornerRadius: Theme.cornerRadius
@@ -369,7 +369,7 @@ DockContextMenuBase {
         radius: Theme.cornerRadius
         color: closeArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
 
-        DankIcon {
+        DIcon {
             id: closeIcon
             anchors.left: parent.left
             anchors.leftMargin: Theme.spacingS
@@ -395,7 +395,7 @@ DockContextMenuBase {
             wrapMode: Text.NoWrap
         }
 
-        DankRipple {
+        DRipple {
             id: closeRipple
             rippleColor: Theme.error
             cornerRadius: Theme.cornerRadius

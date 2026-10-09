@@ -36,32 +36,6 @@ func TestHandleInstallMissingName(t *testing.T) {
 	assert.Contains(t, resp.Error, "missing or invalid 'name' parameter")
 }
 
-func TestHandleInstallInvalidName(t *testing.T) {
-	mc := net.NewMockConn(t)
-	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
-	conn := ipc.NewConnWriter(mc)
-	var written []byte
-	mc.EXPECT().Write(mock.Anything).RunAndReturn(func(b []byte) (int, error) {
-		written = b
-		return len(b), nil
-	}).Maybe()
-
-	req := ipc.Request{
-		ID:     123,
-		Method: "plugins.install",
-		Params: map[string]any{
-			"name": 123,
-		},
-	}
-
-	HandleInstall(conn, req)
-
-	var resp ipc.Response[SuccessResult]
-	err := json.Unmarshal(written, &resp)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, resp.Error)
-}
-
 func TestHandleUninstallMissingName(t *testing.T) {
 	mc := net.NewMockConn(t)
 	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()

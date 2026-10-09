@@ -212,6 +212,11 @@ func (b *BaseDistribution) detectHyprlandTools() []deps.Dependency {
 	return dependencies
 }
 
+// Hyprland 0.52+ calls hyprland-dialog and friends from hyprland-guiutils and complains when they are missing.
+func (b *BaseDistribution) detectHyprlandGuiutils() deps.Dependency {
+	return b.detectPackage("hyprland-guiutils", "Hyprland dialogs and helper apps", b.commandExists("hyprland-dialog"))
+}
+
 func (b *BaseDistribution) detectQuickshell() deps.Dependency {
 	if !b.commandExists("qs") {
 		return deps.Dependency{
@@ -281,6 +286,22 @@ func (b *BaseDistribution) detectQuickshell() deps.Dependency {
 	}
 }
 
+var (
+	hyprlandTagRegex     = regexp.MustCompile(`Tag: v?(\d+\.\d+\.\d+)`)
+	hyprlandVersionRegex = regexp.MustCompile(`v?(\d+\.\d+\.\d+)`)
+)
+
+// ParseHyprlandVersion prefers the Tag: line because main-branch builds print a stale version first.
+func ParseHyprlandVersion(out string) string {
+	if m := hyprlandTagRegex.FindStringSubmatch(out); m != nil {
+		return m[1]
+	}
+	if m := hyprlandVersionRegex.FindStringSubmatch(out); m != nil {
+		return m[1]
+	}
+	return ""
+}
+
 func (b *BaseDistribution) detectWindowManager(wm deps.WindowManager) deps.Dependency {
 	switch wm {
 	case deps.WindowManagerHyprland:
@@ -296,12 +317,7 @@ func (b *BaseDistribution) detectWindowManager(wm deps.WindowManager) deps.Depen
 				if strings.Contains(outStr, "git") || strings.Contains(outStr, "dirty") {
 					variant = deps.VariantGit
 				}
-				if versionRegex := regexp.MustCompile(`v(\d+\.\d+\.\d+)`); versionRegex.MatchString(outStr) {
-					matches := versionRegex.FindStringSubmatch(outStr)
-					if len(matches) > 1 {
-						version = matches[1]
-					}
-				}
+				version = ParseHyprlandVersion(outStr)
 			}
 		}
 		return deps.Dependency{
@@ -598,7 +614,7 @@ func (b *BaseDistribution) WriteHyprlandSessionTarget() error {
 		return fmt.Errorf("failed to write hyprland-session.target: %w", err)
 	}
 
-	b.log(fmt.Sprintf("Wrote hyprland-session.target to %s", targetPath))
+	b.log(fmt.Sprintf("Using hyprland-session.target at %s", targetPath))
 	return nil
 }
 

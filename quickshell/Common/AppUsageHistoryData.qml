@@ -44,7 +44,7 @@ Singleton {
     }
 
     function addAppUsage(app) {
-        if (!app)
+        if (!app || !SettingsData.launcherHistoryEnabled)
             return;
         var appId = app.id || (app.execString || app.exec || "");
         if (!appId)
@@ -71,6 +71,11 @@ Singleton {
         _saving = true;
         saveSettings();
         _saving = false;
+    }
+
+    function clear() {
+        appUsageRanking = {};
+        saveSettings();
     }
 
     function getRankedApps() {
@@ -120,7 +125,7 @@ Singleton {
         path: StandardPaths.writableLocation(StandardPaths.GenericStateLocation) + "/DankMaterialShell/appusage.json"
         blockLoading: true
         blockWrites: true
-        watchChanges: true
+        watchChanges: SettingsData.launcherHistoryEnabled
         onLoaded: {
             if (root._saving)
                 return;

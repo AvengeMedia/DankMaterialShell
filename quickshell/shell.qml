@@ -2,7 +2,6 @@
 //@ pragma Env QT_MEDIA_BACKEND=ffmpeg
 //@ pragma Env QT_FFMPEG_DECODING_HW_DEVICE_TYPES=vaapi
 //@ pragma Env QT_FFMPEG_ENCODING_HW_DEVICE_TYPES=vaapi
-//@ pragma Env QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 //@ pragma Env QT_QUICK_CONTROLS_STYLE=Material
 //@ pragma UseQApplication
 //@ pragma AppId com.danklinux.dms
@@ -10,8 +9,9 @@
 import QtQuick
 import Quickshell
 import qs.Common
-import qs.DankCommon.Common as DC
+import qs.DCommon.Common as DC
 import qs.Modules
+import qs.Modules.Lock
 import qs.Services
 
 ShellRoot {
@@ -35,6 +35,8 @@ ShellRoot {
         DC.Host.session = SessionService;
         DC.Host.cache = CacheData;
         DC.Host.files = FilesService;
+        DC.Host.hyprlandFocusGrab = Qt.binding(() => CompositorService.useHyprlandFocusGrab);
+        DC.Host.ownWindowDecorations = Qt.binding(() => SettingsData.floatingWindowTitleBars);
         void IconThemeService.ready;
         if (entrypoint.runGreeter)
             return;
@@ -49,6 +51,7 @@ ShellRoot {
 
         sourceComponent: Scope {
             WallpaperBackground {}
+            LockPlacementPreparer {}
 
             Loader {
                 active: SettingsData.blurredWallpaperLayer && CompositorService.isNiri

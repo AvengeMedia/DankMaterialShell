@@ -171,6 +171,7 @@ QtObject {
         case "lock":
         case "power":
         case "settings":
+        case "edit":
             return actionTile;
         case "runningApps":
             return runningAppsTile;
@@ -224,6 +225,15 @@ QtObject {
             "text": I18n.tr("Power"),
             "description": I18n.tr("Power menu"),
             "icon": "power_settings_new",
+            "type": "action",
+            "category": "system",
+            "enabled": true
+        },
+        {
+            "id": "edit",
+            "text": I18n.tr("Edit"),
+            "description": I18n.tr("Edit widgets"),
+            "icon": "edit",
             "type": "action",
             "category": "system",
             "enabled": true

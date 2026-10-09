@@ -153,7 +153,7 @@ help:
 	@echo "  build                - Same as 'all'"
 	@echo "  clean                - Clean build artifacts"
 	@echo "  lint-qml             - Run qmllint on shell entrypoints using the Quickshell tooling VFS"
-	@echo "  test-qml             - Run shell logic, Qt unit tests and QML widget regressions"
+	@echo "  test-qml             - Run shell logic and Qt unit tests"
 	@echo ""
 	@echo "Install:"
 	@echo "  install              - Build and install everything (requires sudo)"

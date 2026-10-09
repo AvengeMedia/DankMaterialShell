@@ -8,6 +8,8 @@ Column {
 
     property var page: null
 
+    Component.onCompleted: DgopService.ensureMeta()
+
     readonly property string type: page.widgetType
     readonly property var gpuLabels: (DgopService.availableGpus ?? []).map(gpu => (gpu.driver ? gpu.driver.toUpperCase() + " " : "") + (gpu.displayName ?? ""))
     readonly property var mountLabels: {

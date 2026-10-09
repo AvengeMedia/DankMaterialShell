@@ -23,6 +23,9 @@ CcTile {
         case "settings":
             host?.settingsRequested();
             return;
+        case "edit":
+            host?.editRequested();
+            return;
         }
     }
 }

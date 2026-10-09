@@ -5,11 +5,11 @@ import QtQuick.Layouts
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
-import qs.DankCommon.Widgets as CommonWidgets
+import qs.DCommon.Widgets as CommonWidgets
 
-DankDialog {
+DDialog {
     id: root
 
     readonly property var log: Log.scoped("ColorPickerContent")
@@ -140,7 +140,7 @@ DankDialog {
         width: parent.width
         spacing: Theme.spacingS
 
-        CommonWidgets.DankSaturationValuePicker {
+        CommonWidgets.DSaturationValuePicker {
             id: gradientPicker
 
             width: parent.width
@@ -155,7 +155,7 @@ DankDialog {
             }
         }
 
-        DankSlider {
+        DSlider {
             id: hueSlider
 
             width: parent.width
@@ -223,7 +223,7 @@ DankDialog {
             Layout.preferredWidth: Theme.fieldDefaultWidth
             spacing: Theme.spacingS
 
-            DankColorSwatch {
+            DColorSwatch {
                 Layout.preferredWidth: hexInput.controlHeight
                 Layout.preferredHeight: hexInput.controlHeight
                 Layout.topMargin: hexInput.containerTop
@@ -231,7 +231,7 @@ DankDialog {
                 minPreviewAlpha: 0
             }
 
-            DankTextField {
+            DTextField {
                 id: hexInput
 
                 Layout.fillWidth: true
@@ -245,7 +245,7 @@ DankDialog {
                 onEditingFinished: root.applyHex()
             }
 
-            DankActionButton {
+            DActionButton {
                 Layout.topMargin: hexInput.containerTop
                 iconName: "content_copy"
                 Accessible.name: I18n.tr("Copy")
@@ -256,7 +256,7 @@ DankDialog {
                 }
             }
 
-            DankActionButton {
+            DActionButton {
                 Layout.topMargin: hexInput.containerTop
                 iconName: "colorize"
                 Accessible.name: I18n.tr("Pick Color")
@@ -288,7 +288,7 @@ DankDialog {
                 }
             }
 
-            DankSlider {
+            DSlider {
                 id: opacitySlider
 
                 width: parent.width
@@ -320,7 +320,7 @@ DankDialog {
             paddingH: Theme.spacingL
             paddingV: Theme.spacingS
 
-            DankActionButton {
+            DActionButton {
                 iconName: "content_copy"
                 Accessible.name: I18n.tr("Copy")
                 onClicked: root.copyColor(root.rgbText)
@@ -333,7 +333,7 @@ DankDialog {
             paddingH: Theme.spacingL
             paddingV: Theme.spacingS
 
-            DankActionButton {
+            DActionButton {
                 iconName: "content_copy"
                 Accessible.name: I18n.tr("Copy")
                 onClicked: root.copyColor(root.hsvText)
@@ -355,7 +355,7 @@ DankDialog {
             Repeater {
                 model: root.standardColors
 
-                CommonWidgets.DankColorButton {
+                CommonWidgets.DColorButton {
                     required property string modelData
                     width: palette.width / palette.columns
                     height: Theme.buttonHeightXS
@@ -388,7 +388,7 @@ DankDialog {
             Repeater {
                 model: SessionData.recentColors.slice(0, 5)
 
-                CommonWidgets.DankColorButton {
+                CommonWidgets.DColorButton {
                     required property var modelData
                     swatchColor: modelData
                     selected: Qt.colorEqual(root.currentColor, swatchColor)
@@ -398,7 +398,7 @@ DankDialog {
         }
     }
 
-    actions: DankButton {
+    actions: DButton {
         maximumWidth: root.actionWidth
         wrapText: true
         text: I18n.tr("Save")

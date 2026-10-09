@@ -1,5 +1,5 @@
 %global debug_package %{nil}
-%global go_toolchain_version 1.26.5
+%global go_toolchain_version 1.27.1
 
 Name:           dms-git
 Version:        1.4.0+git2528.d336866f

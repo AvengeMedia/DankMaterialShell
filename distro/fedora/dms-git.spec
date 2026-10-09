@@ -15,7 +15,7 @@ printf '0.0.git.%s.%s\n' \
     "$(git rev-parse --short=8 HEAD)"
 }}}
 %global pkg_summary DankMaterialShell - Material 3 inspired shell for Wayland compositors
-%global go_toolchain_version 1.26.5
+%global go_toolchain_version 1.27.1
 
 Name:           dms
 Epoch:          2
@@ -76,7 +76,7 @@ Provides native DBus bindings, NetworkManager integration, and system utilities.
 {{{ git_repo_setup_macro }}}
 rm -rf dank-qml-common
 tar -xzf %{SOURCE3}
-test -e quickshell/DankCommon/Widgets/DankIcon.qml || { echo "DankCommon missing after submodule unpack"; exit 1; }
+test -e quickshell/DCommon/Widgets/DIcon.qml || { echo "DCommon missing after submodule unpack"; exit 1; }
 
 %build
 # Build DMS CLI from source (core/subdirectory)

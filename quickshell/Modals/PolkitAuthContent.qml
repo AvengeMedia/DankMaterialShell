@@ -2,10 +2,10 @@ import QtQuick
 import Quickshell.Io
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../Common/PamStack.js" as PamStack
 
-DankDialog {
+DDialog {
     id: root
 
     property var currentFlow: PolkitService.agent?.flow
@@ -95,6 +95,7 @@ DankDialog {
 
         function onAuthenticationFailed() {
             root.isLoading = false;
+            passwordField.shake();
         }
 
         function onAuthenticationRequestCancelled() {
@@ -146,32 +147,27 @@ DankDialog {
         visible: text !== ""
     }
 
-    DankTextField {
+    DTextField {
         id: passwordField
 
         width: parent.width
-        outlined: true
-        controlHeight: Theme.fieldHeightLarge
+        expressive: true
+        morph: true
+        busy: root.isLoading
         labelText: root.inputPromptLabel || I18n.tr("Password")
         isError: PolkitService.authFailed
         supportingText: isError ? I18n.tr("Authentication failed - try again") : ""
         leftIconName: root.polkitPamHasFprint ? "fingerprint" : "lock"
-        leftIconSize: Theme.iconSizeSmall
-        leftIconColor: Theme.primary
-        leftIconFocusedColor: Theme.primary
-        font.pixelSize: Theme.fontSizeMedium
-        textColor: Theme.surfaceText
         text: root.passwordInput
         showPasswordToggle: !(root.currentFlow?.responseVisible ?? false)
         echoMode: (root.currentFlow?.responseVisible ?? false) || passwordVisible ? TextInput.Normal : TextInput.Password
-        placeholderText: ""
         enabled: !root.isLoading
         onTextEdited: root.passwordInput = text
         onAccepted: root.submitAuth()
     }
 
     actions: [
-        DankButton {
+        DButton {
             maximumWidth: root.actionWidth
             wrapText: true
             text: I18n.tr("Cancel")
@@ -179,12 +175,11 @@ DankDialog {
             textColor: Theme.primary
             onClicked: root.cancelAuth()
         },
-        DankButton {
+        DButton {
             maximumWidth: root.actionWidth
             wrapText: true
             text: I18n.tr("Authenticate", "verb, polkit password dialog submit button")
             enabled: !root.isLoading
-            busy: root.isLoading
             onClicked: root.submitAuth()
         }
     ]

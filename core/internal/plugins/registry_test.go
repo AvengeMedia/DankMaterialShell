@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipolicy"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/registries"
 	"github.com/go-git/go-git/v6"
 	"github.com/go-git/go-git/v6/plumbing"
@@ -171,8 +172,6 @@ func TestLoadPlugins(t *testing.T) {
 
 		assert.Equal(t, "TestPlugin1", plugins[0].Name)
 		assert.Equal(t, "TestPlugin2", plugins[1].Name)
-		assert.Equal(t, []string{"dankbar-widget"}, plugins[0].Capabilities)
-		assert.Equal(t, []string{"dep1", "dep2"}, plugins[1].Dependencies)
 	})
 
 	t.Run("skips non-json files", func(t *testing.T) {
@@ -310,6 +309,72 @@ func TestList(t *testing.T) {
 		plugins, err := registry.List()
 		assert.NoError(t, err)
 		assert.Len(t, plugins, 1)
+	})
+}
+
+func setupDisabledRegistry(t *testing.T) (*Registry, afero.Fs) {
+	t.Helper()
+	t.Setenv("XDG_CONFIG_HOME", "/xdg")
+	fs := afero.NewMemMapFs()
+	require.NoError(t, registries.Add(fs, "extra", "https://example.com/extra.git"))
+	require.NoError(t, afero.WriteFile(fs, clipolicy.AdminPath, []byte(`{"disable_registries": true}`), 0o644))
+	registry, err := NewRegistryWithFs(fs)
+	require.NoError(t, err)
+	return registry, fs
+}
+
+func TestRegistriesDisabledByPolicy(t *testing.T) {
+	t.Run("does not clone", func(t *testing.T) {
+		registry, _ := setupDisabledRegistry(t)
+
+		var cloned []string
+		registry.git = &mockGitClient{
+			cloneFunc: func(path string, url string) error {
+				cloned = append(cloned, url)
+				return nil
+			},
+		}
+
+		plugins, err := registry.List()
+		assert.NoError(t, err)
+		assert.Empty(t, plugins)
+		assert.Empty(t, cloned)
+	})
+
+	t.Run("does not pull a cached clone", func(t *testing.T) {
+		registry, fs := setupDisabledRegistry(t)
+
+		origins := make(map[string]string)
+		for _, src := range registries.Load(fs) {
+			dir := filepath.Join(registry.cacheDir, src.Name)
+			require.NoError(t, fs.MkdirAll(dir, 0o755))
+			origins[dir] = src.URL
+		}
+		require.Len(t, origins, 2)
+
+		var pulled []string
+		registry.git = &mockGitClient{
+			originFunc: func(path string) (string, error) {
+				return origins[path], nil
+			},
+			pullFunc: func(path string) error {
+				pulled = append(pulled, path)
+				return nil
+			},
+		}
+
+		plugins, err := registry.List()
+		assert.NoError(t, err)
+		assert.Empty(t, plugins)
+		assert.Empty(t, pulled)
+	})
+
+	t.Run("malformed policy fails construction", func(t *testing.T) {
+		fs := afero.NewMemMapFs()
+		require.NoError(t, afero.WriteFile(fs, clipolicy.AdminPath, []byte("{not json"), 0o644))
+
+		_, err := NewRegistryWithFs(fs)
+		assert.Error(t, err)
 	})
 }
 

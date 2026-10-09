@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import qs.Modules.Settings.BarWidgetOptions
 
@@ -192,14 +192,14 @@ Item {
                     Row {
                         spacing: Theme.spacingXS
 
-                        DankActionButton {
+                        DActionButton {
                             iconName: "settings"
                             visible: widgetRow.modelData.widgetId !== "appsDock" && !!BarWidgetCatalog.optionsFile(widgetRow.modelData.widgetId)
                             Accessible.name: I18n.tr("Settings")
                             onClicked: root.configureWidget(widgetRow.modelData)
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             iconName: widgetRow.shown ? "visibility" : "visibility_off"
                             Accessible.name: widgetRow.shown ? I18n.tr("Hide") : I18n.tr("Show")
                             onClicked: {
@@ -235,7 +235,7 @@ Item {
         SettingsFabBar {
             shown: dock.hasConfig
 
-            DankFab {
+            DFab {
                 text: I18n.tr("Add widget")
                 iconName: "add"
                 onClicked: {

@@ -4,7 +4,7 @@ import Quickshell.Wayland
 import Quickshell.Services.SystemTray
 import Quickshell.Services.UPower
 import qs.Common
-import qs.Modules.DankDash
+import qs.Modules.DDash
 import qs.Services
 import qs.Modules.Settings.DisplayConfig
 
@@ -12,16 +12,16 @@ Item {
     id: root
     readonly property var log: Log.scoped("DMSShellIPC")
 
-    required property var powerMenuModalLoader
-    required property var processListModalLoader
-    required property var controlCenterLoader
-    required property var dankDashPopoutLoader
-    required property var notepadSlideoutVariants
-    required property var hyprKeybindsModalLoader
+    required property var powerMenuModalLoaderRef
+    required property var processListModalLoaderRef
+    required property var controlCenterLoaderRef
+    required property var dankDashPopoutLoaderRef
+    required property var notepadSlideoutVariantsRef
+    required property var hyprKeybindsModalLoaderRef
     required property var dankBarRepeater
     required property var hyprlandOverviewLoader
-    required property var workspaceRenameModalLoader
-    required property var windowRuleModalLoader
+    required property var workspaceRenameModalLoaderRef
+    required property var windowRuleModalLoaderRef
 
     function getPreferredBar(refPropertyName) {
         const focusedScreenName = BarWidgetService.getFocusedScreenName();
@@ -167,27 +167,27 @@ Item {
 
     IpcHandler {
         function open() {
-            root.powerMenuModalLoader.active = true;
-            if (root.powerMenuModalLoader.item)
-                root.powerMenuModalLoader.item.openCentered();
+            root.powerMenuModalLoaderRef.active = true;
+            if (root.powerMenuModalLoaderRef.item)
+                root.powerMenuModalLoaderRef.item.openCentered();
 
             return "POWERMENU_OPEN_SUCCESS";
         }
 
         function close() {
-            if (root.powerMenuModalLoader.item)
-                root.powerMenuModalLoader.item.close();
+            if (root.powerMenuModalLoaderRef.item)
+                root.powerMenuModalLoaderRef.item.close();
 
             return "POWERMENU_CLOSE_SUCCESS";
         }
 
         function toggle() {
-            root.powerMenuModalLoader.active = true;
-            if (root.powerMenuModalLoader.item) {
-                if (root.powerMenuModalLoader.item.shouldBeVisible) {
-                    root.powerMenuModalLoader.item.close();
+            root.powerMenuModalLoaderRef.active = true;
+            if (root.powerMenuModalLoaderRef.item) {
+                if (root.powerMenuModalLoaderRef.item.shouldBeVisible) {
+                    root.powerMenuModalLoaderRef.item.close();
                 } else {
-                    root.powerMenuModalLoader.item.openCentered();
+                    root.powerMenuModalLoaderRef.item.openCentered();
                 }
             }
 
@@ -199,37 +199,37 @@ Item {
 
     IpcHandler {
         function open(): string {
-            root.processListModalLoader.active = true;
+            root.processListModalLoaderRef.active = true;
             Qt.callLater(() => {
-                if (root.processListModalLoader.item)
-                    root.processListModalLoader.item.show();
+                if (root.processListModalLoaderRef.item)
+                    root.processListModalLoaderRef.item.show();
             });
 
             return "PROCESSLIST_OPEN_SUCCESS";
         }
 
         function close(): string {
-            if (root.processListModalLoader.item)
-                root.processListModalLoader.item.hide();
+            if (root.processListModalLoaderRef.item)
+                root.processListModalLoaderRef.item.hide();
 
             return "PROCESSLIST_CLOSE_SUCCESS";
         }
 
         function toggle(): string {
-            root.processListModalLoader.active = true;
+            root.processListModalLoaderRef.active = true;
             Qt.callLater(() => {
-                if (root.processListModalLoader.item)
-                    root.processListModalLoader.item.toggle();
+                if (root.processListModalLoaderRef.item)
+                    root.processListModalLoaderRef.item.toggle();
             });
 
             return "PROCESSLIST_TOGGLE_SUCCESS";
         }
 
         function focusOrToggle(): string {
-            root.processListModalLoader.active = true;
+            root.processListModalLoaderRef.active = true;
             Qt.callLater(() => {
-                if (root.processListModalLoader.item)
-                    root.processListModalLoader.item.focusOrToggle();
+                if (root.processListModalLoaderRef.item)
+                    root.processListModalLoaderRef.item.focusOrToggle();
             });
 
             return "PROCESSLIST_FOCUS_OR_TOGGLE_SUCCESS";
@@ -253,7 +253,7 @@ Item {
         function openWith(section: string): string {
             if (PopoutService.routeToIsland("controlcenter", null, false, section))
                 return "CONTROL_CENTER_OPEN_SUCCESS";
-            const popout = root.controlCenterLoader.item;
+            const popout = root.controlCenterLoaderRef.item;
             if (popout?.shouldBeVisible) {
                 popout.expandedSection = section;
                 return "CONTROL_CENTER_OPEN_SUCCESS";
@@ -262,7 +262,7 @@ Item {
             if (!bar)
                 return "CONTROL_CENTER_OPEN_FAILED";
             bar.triggerControlCenter();
-            const opened = root.controlCenterLoader.item;
+            const opened = root.controlCenterLoaderRef.item;
             if (!opened)
                 return "CONTROL_CENTER_OPEN_SUCCESS";
             if (opened.shouldBeVisible)
@@ -273,7 +273,7 @@ Item {
         }
 
         function back(): string {
-            const content = root.controlCenterLoader.item?.contentLoader?.item;
+            const content = root.controlCenterLoaderRef.item?.contentLoader?.item;
             if (!content)
                 return "CONTROL_CENTER_BACK_FAILED";
             content.goBack();
@@ -283,15 +283,15 @@ Item {
         // The island and the popout can both show the control center, so close and status cover both.
         function hide(): string {
             const islandClosed = PopoutService.closeIslandActivity("controlcenter");
-            const popoutOpen = root.controlCenterLoader.item?.shouldBeVisible ?? false;
+            const popoutOpen = root.controlCenterLoaderRef.item?.shouldBeVisible ?? false;
             if (popoutOpen)
-                root.controlCenterLoader.item.close();
+                root.controlCenterLoaderRef.item.close();
             return islandClosed || popoutOpen ? "CONTROL_CENTER_HIDE_SUCCESS" : "CONTROL_CENTER_HIDE_FAILED";
         }
 
         function toggle(): string {
-            if (root.controlCenterLoader.item?.shouldBeVisible) {
-                root.controlCenterLoader.item.close();
+            if (root.controlCenterLoaderRef.item?.shouldBeVisible) {
+                root.controlCenterLoaderRef.item.close();
                 return "CONTROL_CENTER_TOGGLE_SUCCESS";
             }
             if (PopoutService.routeToIsland("controlcenter", null, true, ""))
@@ -306,7 +306,7 @@ Item {
         }
 
         function status(): string {
-            const popoutOpen = root.controlCenterLoader.item?.shouldBeVisible ?? false;
+            const popoutOpen = root.controlCenterLoaderRef.item?.shouldBeVisible ?? false;
             return popoutOpen || PopoutService.islandControlCenterOpen ? "visible" : "hidden";
         }
 
@@ -380,7 +380,7 @@ Item {
         if (!bar)
             return false;
 
-        const dash = root.dankDashPopoutLoader.item;
+        const dash = root.dankDashPopoutLoaderRef.item;
         if (dash && dash.shouldBeVisible && dash.triggerScreen?.name === bar.screen?.name) {
             if (position && bar.positionDash)
                 bar.positionDash(dash, position);
@@ -394,8 +394,8 @@ Item {
     }
 
     function toggleDash(tab, position) {
-        if (root.dankDashPopoutLoader.item?.dashVisible) {
-            root.dankDashPopoutLoader.item.dashVisible = false;
+        if (root.dankDashPopoutLoaderRef.item?.dashVisible) {
+            root.dankDashPopoutLoaderRef.item.dashVisible = false;
             return true;
         }
 
@@ -424,9 +424,9 @@ Item {
 
         function close(): string {
             const islandClosed = SettingsData.islandDashActivities.filter(activity => PopoutService.closeIslandActivity(activity)).length > 0;
-            if (root.dankDashPopoutLoader.item)
-                root.dankDashPopoutLoader.item.dashVisible = false;
-            return islandClosed || root.dankDashPopoutLoader.item ? "DASH_CLOSE_SUCCESS" : "DASH_CLOSE_FAILED";
+            if (root.dankDashPopoutLoaderRef.item)
+                root.dankDashPopoutLoaderRef.item.dashVisible = false;
+            return islandClosed || root.dankDashPopoutLoaderRef.item ? "DASH_CLOSE_SUCCESS" : "DASH_CLOSE_FAILED";
         }
 
         function toggle(tab: string): string {
@@ -446,32 +446,32 @@ Item {
         }
 
         function getActiveNotepadInstance() {
-            if (root.notepadSlideoutVariants.instances.length === 0) {
+            if (root.notepadSlideoutVariantsRef.instances.length === 0) {
                 return null;
             }
 
-            if (root.notepadSlideoutVariants.instances.length === 1) {
-                return root.notepadSlideoutVariants.instances[0];
+            if (root.notepadSlideoutVariantsRef.instances.length === 1) {
+                return root.notepadSlideoutVariantsRef.instances[0];
             }
 
             var focusedScreen = getFocusedScreenName();
-            if (focusedScreen && root.notepadSlideoutVariants.instances.length > 0) {
-                for (var i = 0; i < root.notepadSlideoutVariants.instances.length; i++) {
-                    var slideout = root.notepadSlideoutVariants.instances[i];
+            if (focusedScreen && root.notepadSlideoutVariantsRef.instances.length > 0) {
+                for (var i = 0; i < root.notepadSlideoutVariantsRef.instances.length; i++) {
+                    var slideout = root.notepadSlideoutVariantsRef.instances[i];
                     if (slideout.modelData && slideout.modelData.name === focusedScreen) {
                         return slideout;
                     }
                 }
             }
 
-            for (var i = 0; i < root.notepadSlideoutVariants.instances.length; i++) {
-                var slideout = root.notepadSlideoutVariants.instances[i];
+            for (var i = 0; i < root.notepadSlideoutVariantsRef.instances.length; i++) {
+                var slideout = root.notepadSlideoutVariantsRef.instances[i];
                 if (slideout.isVisible) {
                     return slideout;
                 }
             }
 
-            return root.notepadSlideoutVariants.instances[0];
+            return root.notepadSlideoutVariantsRef.instances[0];
         }
 
         function open(): string {
@@ -671,15 +671,15 @@ Item {
                 return "ERROR: No provider specified";
 
             KeybindsService.loadCheatsheet(provider);
-            root.hyprKeybindsModalLoader.active = true;
+            root.hyprKeybindsModalLoaderRef.active = true;
 
-            if (!root.hyprKeybindsModalLoader.item)
+            if (!root.hyprKeybindsModalLoaderRef.item)
                 return `KEYBINDS_TOGGLE_FAILED: ${provider}`;
 
-            if (root.hyprKeybindsModalLoader.item.shouldBeVisible)
-                root.hyprKeybindsModalLoader.item.close();
+            if (root.hyprKeybindsModalLoaderRef.item.shouldBeVisible)
+                root.hyprKeybindsModalLoaderRef.item.close();
             else
-                root.hyprKeybindsModalLoader.item.open();
+                root.hyprKeybindsModalLoaderRef.item.open();
             return `KEYBINDS_TOGGLE_SUCCESS: ${provider}`;
         }
 
@@ -688,15 +688,15 @@ Item {
                 return "ERROR: No provider specified";
 
             KeybindsService.loadCheatsheet(provider);
-            root.hyprKeybindsModalLoader.active = true;
+            root.hyprKeybindsModalLoaderRef.active = true;
 
-            if (!root.hyprKeybindsModalLoader.item)
+            if (!root.hyprKeybindsModalLoaderRef.item)
                 return `KEYBINDS_TOGGLE_FAILED: ${provider}`;
 
-            if (root.hyprKeybindsModalLoader.item.shouldBeVisible)
-                root.hyprKeybindsModalLoader.item.close();
+            if (root.hyprKeybindsModalLoaderRef.item.shouldBeVisible)
+                root.hyprKeybindsModalLoaderRef.item.close();
             else
-                root.hyprKeybindsModalLoader.item.open();
+                root.hyprKeybindsModalLoaderRef.item.open();
             return `KEYBINDS_TOGGLE_SUCCESS: ${provider} (${path})`;
         }
 
@@ -705,12 +705,12 @@ Item {
                 return "ERROR: No provider specified";
 
             KeybindsService.loadCheatsheet(provider);
-            root.hyprKeybindsModalLoader.active = true;
+            root.hyprKeybindsModalLoaderRef.active = true;
 
-            if (!root.hyprKeybindsModalLoader.item)
+            if (!root.hyprKeybindsModalLoaderRef.item)
                 return `KEYBINDS_OPEN_FAILED: ${provider}`;
 
-            root.hyprKeybindsModalLoader.item.open();
+            root.hyprKeybindsModalLoaderRef.item.open();
             return `KEYBINDS_OPEN_SUCCESS: ${provider}`;
         }
 
@@ -719,20 +719,20 @@ Item {
                 return "ERROR: No provider specified";
 
             KeybindsService.loadCheatsheet(provider);
-            root.hyprKeybindsModalLoader.active = true;
+            root.hyprKeybindsModalLoaderRef.active = true;
 
-            if (!root.hyprKeybindsModalLoader.item)
+            if (!root.hyprKeybindsModalLoaderRef.item)
                 return `KEYBINDS_OPEN_FAILED: ${provider}`;
 
-            root.hyprKeybindsModalLoader.item.open();
+            root.hyprKeybindsModalLoaderRef.item.open();
             return `KEYBINDS_OPEN_SUCCESS: ${provider} (${path})`;
         }
 
         function close(): string {
-            if (!root.hyprKeybindsModalLoader.item)
+            if (!root.hyprKeybindsModalLoaderRef.item)
                 return "KEYBINDS_CLOSE_FAILED";
 
-            root.hyprKeybindsModalLoader.item.close();
+            root.hyprKeybindsModalLoaderRef.item.close();
             return "KEYBINDS_CLOSE_SUCCESS";
         }
 
@@ -746,12 +746,12 @@ Item {
 
             KeybindsService.currentProvider = "hyprland";
             KeybindsService.loadBinds();
-            root.hyprKeybindsModalLoader.active = true;
+            root.hyprKeybindsModalLoaderRef.active = true;
 
-            if (!root.hyprKeybindsModalLoader.item)
+            if (!root.hyprKeybindsModalLoaderRef.item)
                 return "HYPR_KEYBINDS_OPEN_FAILED";
 
-            root.hyprKeybindsModalLoader.item.open();
+            root.hyprKeybindsModalLoaderRef.item.open();
             return "HYPR_KEYBINDS_OPEN_SUCCESS";
         }
 
@@ -759,10 +759,10 @@ Item {
             if (!CompositorService.isHyprland)
                 return "HYPR_NOT_AVAILABLE";
 
-            if (!root.hyprKeybindsModalLoader.item)
+            if (!root.hyprKeybindsModalLoaderRef.item)
                 return "HYPR_KEYBINDS_CLOSE_FAILED";
 
-            root.hyprKeybindsModalLoader.item.close();
+            root.hyprKeybindsModalLoaderRef.item.close();
             return "HYPR_KEYBINDS_CLOSE_SUCCESS";
         }
 
@@ -772,15 +772,15 @@ Item {
 
             KeybindsService.currentProvider = "hyprland";
             KeybindsService.loadBinds();
-            root.hyprKeybindsModalLoader.active = true;
+            root.hyprKeybindsModalLoaderRef.active = true;
 
-            if (!root.hyprKeybindsModalLoader.item)
+            if (!root.hyprKeybindsModalLoaderRef.item)
                 return "HYPR_KEYBINDS_TOGGLE_FAILED";
 
-            if (root.hyprKeybindsModalLoader.item.shouldBeVisible) {
-                root.hyprKeybindsModalLoader.item.close();
+            if (root.hyprKeybindsModalLoaderRef.item.shouldBeVisible) {
+                root.hyprKeybindsModalLoaderRef.item.close();
             } else {
-                root.hyprKeybindsModalLoader.item.open();
+                root.hyprKeybindsModalLoaderRef.item.open();
             }
             return "HYPR_KEYBINDS_TOGGLE_SUCCESS";
         }
@@ -1874,41 +1874,46 @@ Item {
             return enabledBool ? `DESKTOP_WIDGET_SYNC_POSITION_ENABLED: ${instanceId}` : `DESKTOP_WIDGET_SYNC_POSITION_DISABLED: ${instanceId}`;
         }
 
+        function edit(): string {
+            DesktopWidgetRegistry.editing = true;
+            return "DESKTOP_WIDGET_EDITOR_OPENED";
+        }
+
         target: "desktopWidget"
     }
 
     IpcHandler {
         function open(): string {
-            root.workspaceRenameModalLoader.active = true;
-            if (root.workspaceRenameModalLoader.item) {
+            root.workspaceRenameModalLoaderRef.active = true;
+            if (root.workspaceRenameModalLoaderRef.item) {
                 if (CompositorService.isAqueous)
-                    return root.workspaceRenameModalLoader.item.show("") ? "WORKSPACE_RENAME_MODAL_OPENED" : "WORKSPACE_RENAME_UNAVAILABLE";
+                    return root.workspaceRenameModalLoaderRef.item.show("") ? "WORKSPACE_RENAME_MODAL_OPENED" : "WORKSPACE_RENAME_UNAVAILABLE";
                 const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
-                root.workspaceRenameModalLoader.item.show(ws?.name || "");
+                root.workspaceRenameModalLoaderRef.item.show(ws?.name || "");
                 return "WORKSPACE_RENAME_MODAL_OPENED";
             }
             return "WORKSPACE_RENAME_MODAL_NOT_FOUND";
         }
 
         function close(): string {
-            if (root.workspaceRenameModalLoader.item) {
-                root.workspaceRenameModalLoader.item.hide();
+            if (root.workspaceRenameModalLoaderRef.item) {
+                root.workspaceRenameModalLoaderRef.item.hide();
                 return "WORKSPACE_RENAME_MODAL_CLOSED";
             }
             return "WORKSPACE_RENAME_MODAL_NOT_FOUND";
         }
 
         function toggle(): string {
-            root.workspaceRenameModalLoader.active = true;
-            if (root.workspaceRenameModalLoader.item) {
-                if (root.workspaceRenameModalLoader.item.visible) {
-                    root.workspaceRenameModalLoader.item.hide();
+            root.workspaceRenameModalLoaderRef.active = true;
+            if (root.workspaceRenameModalLoaderRef.item) {
+                if (root.workspaceRenameModalLoaderRef.item.visible) {
+                    root.workspaceRenameModalLoaderRef.item.hide();
                     return "WORKSPACE_RENAME_MODAL_CLOSED";
                 }
                 if (CompositorService.isAqueous)
-                    return root.workspaceRenameModalLoader.item.show("") ? "WORKSPACE_RENAME_MODAL_OPENED" : "WORKSPACE_RENAME_UNAVAILABLE";
+                    return root.workspaceRenameModalLoaderRef.item.show("") ? "WORKSPACE_RENAME_MODAL_OPENED" : "WORKSPACE_RENAME_UNAVAILABLE";
                 const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
-                root.workspaceRenameModalLoader.item.show(ws?.name || "");
+                root.workspaceRenameModalLoaderRef.item.show(ws?.name || "");
                 return "WORKSPACE_RENAME_MODAL_OPENED";
             }
             return "WORKSPACE_RENAME_MODAL_NOT_FOUND";
@@ -1964,17 +1969,17 @@ Item {
         function open(): string {
             if (!CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
                 return "WINDOW_RULES_UNSUPPORTED_COMPOSITOR";
-            root.windowRuleModalLoader.active = true;
-            if (root.windowRuleModalLoader.item) {
-                root.windowRuleModalLoader.item.show(getFocusedWindow());
+            root.windowRuleModalLoaderRef.active = true;
+            if (root.windowRuleModalLoaderRef.item) {
+                root.windowRuleModalLoaderRef.item.show(getFocusedWindow());
                 return "WINDOW_RULE_MODAL_OPENED";
             }
             return "WINDOW_RULE_MODAL_NOT_FOUND";
         }
 
         function close(): string {
-            if (root.windowRuleModalLoader.item) {
-                root.windowRuleModalLoader.item.hide();
+            if (root.windowRuleModalLoaderRef.item) {
+                root.windowRuleModalLoaderRef.item.hide();
                 return "WINDOW_RULE_MODAL_CLOSED";
             }
             return "WINDOW_RULE_MODAL_NOT_FOUND";
@@ -1983,13 +1988,13 @@ Item {
         function toggle(): string {
             if (!CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
                 return "WINDOW_RULES_UNSUPPORTED_COMPOSITOR";
-            root.windowRuleModalLoader.active = true;
-            if (root.windowRuleModalLoader.item) {
-                if (root.windowRuleModalLoader.item.visible) {
-                    root.windowRuleModalLoader.item.hide();
+            root.windowRuleModalLoaderRef.active = true;
+            if (root.windowRuleModalLoaderRef.item) {
+                if (root.windowRuleModalLoaderRef.item.visible) {
+                    root.windowRuleModalLoaderRef.item.hide();
                     return "WINDOW_RULE_MODAL_CLOSED";
                 }
-                root.windowRuleModalLoader.item.show(getFocusedWindow());
+                root.windowRuleModalLoaderRef.item.show(getFocusedWindow());
                 return "WINDOW_RULE_MODAL_OPENED";
             }
             return "WINDOW_RULE_MODAL_NOT_FOUND";

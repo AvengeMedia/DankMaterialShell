@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 SettingsRow {
     id: root
@@ -20,7 +20,7 @@ SettingsRow {
         radius: Theme.cornerRadius
         color: root.tintBackground
 
-        DankFlickable {
+        DFlickable {
             anchors.fill: parent
             anchors.margins: Theme.spacingS
             contentHeight: noteRow.implicitHeight
@@ -33,7 +33,7 @@ SettingsRow {
                 width: parent.width
                 spacing: Theme.spacingS
 
-                DankIcon {
+                DIcon {
                     visible: root.noteIconName !== ""
                     name: root.noteIconName
                     size: Theme.iconSizeSmall

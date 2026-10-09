@@ -40,7 +40,7 @@ function islandMetrics(config, defaults) {
     const value = key => config?.[key] ?? defaults[key];
     const reserve = Math.max(24, Math.min(128, value("islandReserveThickness")));
     const compact = Math.max(24, Math.min(72, value("islandCompactThickness")));
-    const gap = Math.max(0, Math.min(48, value("islandOuterGap")));
+    const gap = value("islandNotch") ? 0 : Math.max(0, Math.min(48, value("islandOuterGap")));
     return {
         reserve,
         compact,

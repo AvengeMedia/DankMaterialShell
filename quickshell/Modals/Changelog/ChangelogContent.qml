@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Effects
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
@@ -222,7 +223,7 @@ Column {
         Row {
             spacing: Theme.spacingS
 
-            DankIcon {
+            DIcon {
                 name: "warning"
                 size: Theme.iconSizeSmall
                 color: Theme.warning
@@ -284,7 +285,7 @@ Column {
         Row {
             spacing: Theme.spacingS
 
-            DankIcon {
+            DIcon {
                 name: "auto_awesome"
                 size: Theme.iconSizeSmall
                 color: Theme.primary
@@ -292,7 +293,7 @@ Column {
             }
 
             StyledText {
-                text: I18n.tr("What changed")
+                text: I18n.tr("What changed", "changelog section heading listing the changes in a release")
                 font.pixelSize: Theme.fontSizeMedium
                 font.weight: Theme.fontWeightMedium
                 color: Theme.surfaceText

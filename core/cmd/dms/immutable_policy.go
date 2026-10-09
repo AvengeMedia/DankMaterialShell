@@ -9,13 +9,10 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipolicy"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-)
-
-const (
-	cliPolicyPackagedPath = "/usr/share/dms/cli-policy.json"
-	cliPolicyAdminPath    = "/etc/dms/cli-policy.json"
 )
 
 var (
@@ -32,13 +29,6 @@ type immutableCommandPolicy struct {
 	ImmutableReason string
 	BlockedCommands []string
 	Message         string
-}
-
-type cliPolicyFile struct {
-	PolicyVersion   int       `json:"policy_version"`
-	ImmutableSystem *bool     `json:"immutable_system"`
-	BlockedCommands *[]string `json:"blocked_commands"`
-	Message         *string   `json:"message"`
 }
 
 func normalizeCommandSpec(raw string) string {
@@ -82,25 +72,8 @@ func commandBlockedByPolicy(commandPath string, blocked []string) bool {
 	return false
 }
 
-func loadPolicyFile(path string) (*cliPolicyFile, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, nil
-		}
-		return nil, fmt.Errorf("failed to read %s: %w", path, err)
-	}
-
-	var policy cliPolicyFile
-	if err := json.Unmarshal(data, &policy); err != nil {
-		return nil, fmt.Errorf("failed to parse %s: %w", path, err)
-	}
-
-	return &policy, nil
-}
-
 func mergePolicyFile(base *immutableCommandPolicy, path string) error {
-	policyFile, err := loadPolicyFile(path)
+	policyFile, err := clipolicy.LoadFile(afero.NewOsFs(), path)
 	if err != nil {
 		return err
 	}
@@ -218,7 +191,7 @@ func getImmutablePolicy() (*immutableCommandPolicy, error) {
 			Message:         "This command is disabled on immutable/image-based systems. Use your distro-native workflow for system-level changes.",
 		}
 
-		var defaultPolicy cliPolicyFile
+		var defaultPolicy clipolicy.File
 		if err := json.Unmarshal(defaultCLIPolicyJSON, &defaultPolicy); err != nil {
 			immutablePolicyErr = fmt.Errorf("failed to parse embedded default CLI policy: %w", err)
 			return
@@ -233,11 +206,11 @@ func getImmutablePolicy() (*immutableCommandPolicy, error) {
 			}
 		}
 
-		if err := mergePolicyFile(&immutablePolicy, cliPolicyPackagedPath); err != nil {
+		if err := mergePolicyFile(&immutablePolicy, clipolicy.PackagedPath); err != nil {
 			immutablePolicyErr = err
 			return
 		}
-		if err := mergePolicyFile(&immutablePolicy, cliPolicyAdminPath); err != nil {
+		if err := mergePolicyFile(&immutablePolicy, clipolicy.AdminPath); err != nil {
 			immutablePolicyErr = err
 			return
 		}
@@ -268,7 +241,7 @@ func requireMutableSystemCommand(cmd *cobra.Command, _ []string) error {
 		reason = "Detected immutable system: " + policy.ImmutableReason + "\n"
 	}
 
-	return fmt.Errorf("%s%s\nCommand: dms %s\nPolicy files:\n  %s\n  %s", reason, policy.Message, commandPath, cliPolicyPackagedPath, cliPolicyAdminPath)
+	return fmt.Errorf("%s%s\nCommand: dms %s\nPolicy files:\n  %s\n  %s", reason, policy.Message, commandPath, clipolicy.PackagedPath, clipolicy.AdminPath)
 }
 
 // preRunPrivileged combines the immutable-system check with a privesc tool

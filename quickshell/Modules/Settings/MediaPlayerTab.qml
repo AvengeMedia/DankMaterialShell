@@ -1,9 +1,9 @@
 import QtQuick
 import Quickshell.Io
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
-import qs.Modules.DankDash
+import qs.Modules.DDash
 import qs.Services
 
 Item {
@@ -99,7 +99,7 @@ Item {
                 resetKeys: ["audioWheelScrollAmount"]
                 title: I18n.tr("Volume step")
 
-                DankTextField {
+                DTextField {
                     outlined: true
                     leftIconName: "volume_up"
                     width: Theme.fieldHeight * 2
@@ -140,7 +140,7 @@ Item {
             settingKey: "mediaLyricsProviders"
             tags: ["lyrics", "provider", "priority", "order", "source", "lrclib", "better lyrics", "unison", "lyricsplus", "kugou", "youtube music"]
 
-            headerActions: DankActionButton {
+            headerActions: DActionButton {
                 iconName: "restart_alt"
                 tooltipText: I18n.tr("Reset to default")
                 enabled: !SettingsData.isDefault(["mediaLyricsProviders"])
@@ -166,7 +166,7 @@ Item {
                     clickable: true
                     onClicked: MediaOptions.setLyricsProviderEnabled(modelData, !provider?.enabled)
 
-                    DankToggle {
+                    DToggle {
                         hideText: true
                         Accessible.name: providerRow.title
                         checked: providerRow.provider?.enabled ?? false
@@ -192,14 +192,14 @@ Item {
                 onAccepted: root.addExcludedPlayer()
 
                 actions: [
-                    DankIconButton {
+                    DIconButton {
                         variant: "filled"
                         iconName: "add"
                         Accessible.name: I18n.tr("Add")
                         enabled: excludeEditor.value.trim() !== ""
                         onClicked: root.addExcludedPlayer()
                     },
-                    DankIconButton {
+                    DIconButton {
                         iconName: "apps"
                         tooltipText: I18n.tr("Browse")
                         onClicked: appBrowserPopup.show()
@@ -217,7 +217,7 @@ Item {
                     title: modelData
                     iconName: "music_off"
 
-                    DankActionButton {
+                    DActionButton {
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "delete"
                         iconColor: Theme.error

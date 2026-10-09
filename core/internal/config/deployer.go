@@ -10,12 +10,15 @@ import (
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/version"
 )
 
 const hyprlandBackupDirName = ".dms-backups"
 
 type ConfigDeployer struct {
-	logChan chan<- string
+	logChan           chan<- string
+	replaceMangoBinds bool
+	hyprlandVersion   string
 }
 
 type DeploymentResult struct {
@@ -38,6 +41,18 @@ func (cd *ConfigDeployer) log(message string) {
 	}
 }
 
+// SetHyprlandVersion gates the Lua deploy; empty means unknown (e.g. no session on a TTY) and deploys anyway.
+func (cd *ConfigDeployer) SetHyprlandVersion(ver string) {
+	cd.hyprlandVersion = ver
+}
+
+func hyprlandLuaUnsupported(ver string) error {
+	if ver == "" || version.CompareVersions(ver, "0.55.0") >= 0 {
+		return nil
+	}
+	return fmt.Errorf("hyprland.lua is not loaded by Hyprland %s; DMS needs 0.55 or newer", ver)
+}
+
 func (cd *ConfigDeployer) DeployConfigurationsSelectiveWithReinstalls(ctx context.Context, wm deps.WindowManager, terminal deps.Terminal, installedDeps []deps.Dependency, replaceConfigs map[string]bool, reinstallItems map[string]bool) ([]DeploymentResult, error) {
 	return cd.deployConfigurationsInternal(ctx, wm, terminal, installedDeps, replaceConfigs, reinstallItems, true)
 }
@@ -46,7 +61,7 @@ func (cd *ConfigDeployer) DeployConfigurationsSelectiveWithReinstallsAndSystemd(
 	return cd.deployConfigurationsInternal(ctx, wm, terminal, installedDeps, replaceConfigs, reinstallItems, useSystemd)
 }
 
-func (cd *ConfigDeployer) deployConfigurationsInternal(_ context.Context, wm deps.WindowManager, terminal deps.Terminal, _ []deps.Dependency, replaceConfigs map[string]bool, _ map[string]bool, useSystemd bool) ([]DeploymentResult, error) {
+func (cd *ConfigDeployer) deployConfigurationsInternal(_ context.Context, wm deps.WindowManager, terminal deps.Terminal, installedDeps []deps.Dependency, replaceConfigs map[string]bool, _ map[string]bool, useSystemd bool) ([]DeploymentResult, error) {
 	var results []DeploymentResult
 
 	// Primary config file paths used to detect fresh installs.
@@ -56,6 +71,7 @@ func (cd *ConfigDeployer) deployConfigurationsInternal(_ context.Context, wm dep
 		},
 		"Hyprland": {
 			filepath.Join(os.Getenv("HOME"), ".config", "hypr", "hyprland.lua"),
+			// A conf-only install still counts: deploying moves it into backups.
 			filepath.Join(os.Getenv("HOME"), ".config", "hypr", "hyprland.conf"),
 		},
 		"Mango": {
@@ -98,26 +114,33 @@ func (cd *ConfigDeployer) deployConfigurationsInternal(_ context.Context, wm dep
 		return false
 	}
 
+	terminalCommand := terminal.Command()
 	switch wm {
 	case deps.WindowManagerNiri:
 		if shouldReplaceConfig("Niri") {
-			result, err := cd.deployNiriConfig(terminal, useSystemd)
+			result, err := cd.deployNiriConfig(terminalCommand, useSystemd)
 			results = append(results, result)
 			if err != nil {
 				return results, fmt.Errorf("failed to deploy Niri config: %w", err)
 			}
 		}
 	case deps.WindowManagerHyprland:
+		for _, dep := range installedDeps {
+			if dep.Name == "hyprland" && cd.hyprlandVersion == "" {
+				cd.hyprlandVersion = dep.Version
+			}
+		}
 		if shouldReplaceConfig("Hyprland") {
-			result, err := cd.deployHyprlandConfig(terminal, useSystemd)
+			result, err := cd.deployHyprlandConfig(terminalCommand, useSystemd)
 			results = append(results, result)
 			if err != nil {
 				return results, fmt.Errorf("failed to deploy Hyprland config: %w", err)
 			}
 		}
 	case deps.WindowManagerMango:
+		cd.replaceMangoBinds = replaceConfigs[MangoBindsConfigType]
 		if shouldReplaceConfig("Mango") {
-			result, err := cd.deployMangoConfig(terminal, useSystemd)
+			result, err := cd.deployMangoConfig(terminalCommand, useSystemd)
 			results = append(results, result)
 			if err != nil {
 				return results, fmt.Errorf("failed to deploy Mango config: %w", err)
@@ -155,14 +178,14 @@ func (cd *ConfigDeployer) deployConfigurationsInternal(_ context.Context, wm dep
 	return results, nil
 }
 
-func (cd *ConfigDeployer) DeployCompositor(wm deps.WindowManager, terminal deps.Terminal, useSystemd bool) (DeploymentResult, error) {
+func (cd *ConfigDeployer) DeployCompositor(wm deps.WindowManager, terminalCommand string, useSystemd bool) (DeploymentResult, error) {
 	switch wm {
 	case deps.WindowManagerNiri:
-		return cd.deployNiriConfig(terminal, useSystemd)
+		return cd.deployNiriConfig(terminalCommand, useSystemd)
 	case deps.WindowManagerHyprland:
-		return cd.deployHyprlandConfig(terminal, useSystemd)
+		return cd.deployHyprlandConfig(terminalCommand, useSystemd)
 	case deps.WindowManagerMango:
-		return cd.deployMangoConfig(terminal, useSystemd)
+		return cd.deployMangoConfig(terminalCommand, useSystemd)
 	default:
 		return DeploymentResult{}, fmt.Errorf("unsupported window manager")
 	}
@@ -181,7 +204,7 @@ func (cd *ConfigDeployer) DeployTerminal(terminal deps.Terminal) ([]DeploymentRe
 	}
 }
 
-func (cd *ConfigDeployer) deployNiriConfig(terminal deps.Terminal, useSystemd bool) (DeploymentResult, error) {
+func (cd *ConfigDeployer) deployNiriConfig(terminalCommand string, useSystemd bool) (DeploymentResult, error) {
 	result := DeploymentResult{
 		ConfigType: "Niri",
 		Path:       filepath.Join(os.Getenv("HOME"), ".config", "niri", "config.kdl"),
@@ -217,18 +240,6 @@ func (cd *ConfigDeployer) deployNiriConfig(terminal deps.Terminal, useSystemd bo
 			return result, result.Error
 		}
 		cd.log(fmt.Sprintf("Backed up existing config to %s", result.BackupPath))
-	}
-
-	var terminalCommand string
-	switch terminal {
-	case deps.TerminalGhostty:
-		terminalCommand = "ghostty"
-	case deps.TerminalKitty:
-		terminalCommand = "kitty"
-	case deps.TerminalAlacritty:
-		terminalCommand = "alacritty"
-	default:
-		terminalCommand = "ghostty"
 	}
 
 	newConfig := strings.ReplaceAll(NiriConfig, "{{TERMINAL_COMMAND}}", terminalCommand)
@@ -283,96 +294,6 @@ func (cd *ConfigDeployer) deployNiriDmsConfigs(dmsDir, terminalCommand string) e
 		if info, err := os.Stat(path); err == nil && info.Size() > 0 {
 			cd.log(fmt.Sprintf("Skipping %s (already exists)", cfg.name))
 			continue
-		}
-		if err := os.WriteFile(path, []byte(cfg.content), 0o644); err != nil {
-			return fmt.Errorf("failed to write %s: %w", cfg.name, err)
-		}
-		cd.log(fmt.Sprintf("Deployed %s", cfg.name))
-	}
-
-	return nil
-}
-
-func (cd *ConfigDeployer) deployMangoConfig(terminal deps.Terminal, _ bool) (DeploymentResult, error) {
-	result := DeploymentResult{
-		ConfigType: "Mango",
-		Path:       filepath.Join(os.Getenv("HOME"), ".config", "mango", "config.conf"),
-	}
-
-	configDir := filepath.Dir(result.Path)
-	if err := os.MkdirAll(configDir, 0o755); err != nil {
-		result.Error = fmt.Errorf("failed to create config directory: %w", err)
-		return result, result.Error
-	}
-
-	dmsDir := filepath.Join(configDir, "dms")
-	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
-		result.Error = fmt.Errorf("failed to create dms directory: %w", err)
-		return result, result.Error
-	}
-
-	var terminalCommand string
-	switch terminal {
-	case deps.TerminalGhostty:
-		terminalCommand = "ghostty"
-	case deps.TerminalKitty:
-		terminalCommand = "kitty"
-	case deps.TerminalAlacritty:
-		terminalCommand = "alacritty"
-	default:
-		terminalCommand = "ghostty"
-	}
-
-	// DMS owns config.conf for mango (like niri/hyprland): back up and replace.
-	if existingData, err := os.ReadFile(result.Path); err == nil {
-		cd.log("Found existing Mango configuration")
-		timestamp := time.Now().Format("2006-01-02_15-04-05")
-		result.BackupPath = result.Path + ".backup." + timestamp
-		if err := os.WriteFile(result.BackupPath, existingData, 0o644); err != nil {
-			result.Error = fmt.Errorf("failed to create backup: %w", err)
-			return result, result.Error
-		}
-		cd.log(fmt.Sprintf("Backed up existing config to %s", result.BackupPath))
-	}
-
-	newConfig := strings.ReplaceAll(MangoConfig, "{{TERMINAL_COMMAND}}", terminalCommand)
-	if err := os.WriteFile(result.Path, []byte(newConfig), 0o644); err != nil {
-		result.Error = fmt.Errorf("failed to write config: %w", err)
-		return result, result.Error
-	}
-
-	if err := cd.deployMangoDmsConfigs(dmsDir, terminalCommand); err != nil {
-		result.Error = fmt.Errorf("failed to deploy dms configs: %w", err)
-		return result, result.Error
-	}
-
-	result.Deployed = true
-	cd.log("Successfully deployed Mango configuration")
-	return result, nil
-}
-
-func (cd *ConfigDeployer) deployMangoDmsConfigs(dmsDir, terminalCommand string) error {
-	configs := []struct {
-		name      string
-		content   string
-		overwrite bool
-	}{
-		// binds.conf is DMS-owned (overwrite); the rest are runtime/user-managed.
-		{"binds.conf", strings.ReplaceAll(MangoBindsConfig, "{{TERMINAL_COMMAND}}", terminalCommand), true},
-		{"colors.conf", MangoColorsConfig, false},
-		{"layout.conf", MangoLayoutConfig, false},
-		{"outputs.conf", "", false},
-		{"cursor.conf", "", false},
-		{"windowrules.conf", "", false},
-	}
-
-	for _, cfg := range configs {
-		path := filepath.Join(dmsDir, cfg.name)
-		if !cfg.overwrite {
-			if info, err := os.Stat(path); err == nil && info.Size() > 0 {
-				cd.log(fmt.Sprintf("Skipping %s (already exists)", cfg.name))
-				continue
-			}
 		}
 		if err := os.WriteFile(path, []byte(cfg.content), 0o644); err != nil {
 			return fmt.Errorf("failed to write %s: %w", cfg.name, err)
@@ -632,10 +553,14 @@ func (cd *ConfigDeployer) mergeNiriOutputSections(newConfig, existingConfig, dms
 }
 
 // deployHyprlandConfig handles Hyprland configuration deployment with backup and merging
-func (cd *ConfigDeployer) deployHyprlandConfig(terminal deps.Terminal, useSystemd bool) (DeploymentResult, error) {
+func (cd *ConfigDeployer) deployHyprlandConfig(terminalCommand string, useSystemd bool) (DeploymentResult, error) {
 	result := DeploymentResult{
 		ConfigType: "Hyprland",
 		Path:       filepath.Join(os.Getenv("HOME"), ".config", "hypr", "hyprland.lua"),
+	}
+	if err := hyprlandLuaUnsupported(cd.hyprlandVersion); err != nil {
+		result.Error = err
+		return result, err
 	}
 
 	configDir := filepath.Dir(result.Path)
@@ -671,18 +596,6 @@ func (cd *ConfigDeployer) deployHyprlandConfig(terminal deps.Terminal, useSystem
 			return result, result.Error
 		}
 		cd.log(fmt.Sprintf("Backed up existing config to %s", result.BackupPath))
-	}
-
-	var terminalCommand string
-	switch terminal {
-	case deps.TerminalGhostty:
-		terminalCommand = "ghostty"
-	case deps.TerminalKitty:
-		terminalCommand = "kitty"
-	case deps.TerminalAlacritty:
-		terminalCommand = "alacritty"
-	default:
-		terminalCommand = "ghostty"
 	}
 
 	newConfig := strings.ReplaceAll(HyprlandLuaConfig, "{{TERMINAL_COMMAND}}", terminalCommand)
@@ -854,6 +767,7 @@ func (cd *ConfigDeployer) deployHyprlandDmsConfigs(dmsDir string, terminalComman
 		{name: "binds-user.lua", content: DMSBindsUserLuaConfig},
 		{name: "outputs.lua", content: DMSOutputsLuaConfig},
 		{name: "cursor.lua", content: DMSCursorLuaConfig},
+		{name: "input.lua", content: DMSInputLuaConfig},
 		{name: "windowrules.lua", content: DMSWindowRulesLuaConfig},
 	}
 

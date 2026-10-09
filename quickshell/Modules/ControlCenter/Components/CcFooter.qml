@@ -5,7 +5,7 @@ import Quickshell
 import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../utils/widgets.js" as WidgetUtils
 
 Item {
@@ -34,38 +34,43 @@ Item {
     property var gridSlot: null
     property var resizePreview: null
     property Item flyingItem: null
+    property bool incomingRemovable: true
     readonly property bool dragging: gridDragging || liftedIndex >= 0
+    readonly property bool dragRemovable: liftedIndex >= 0 ? WidgetUtils.isRemovable(items.find(item => item.index === liftedIndex)?.widget) : incomingRemovable
     readonly property bool overTrash: trashContains(liftedIndex >= 0 ? liftedPoint : gridDragPoint)
 
     signal addWidgetRequested
     signal resetRequested
     signal clearRequested
     signal moveRequested
-    signal editToggled
+    signal finishRequested
     signal cancelRequested
     signal removeRequested(int index)
     signal configRequested(int index, var widgetData, var anchor)
     signal itemMoved(int index, rect sceneRect, bool leaving)
-    signal resized(int index, int cells, bool fill)
+    signal resized(int index, real cells, bool fill)
 
     // Grid columns, so footer widths line up with the tiles above.
     readonly property real spacing: CcMetrics.gridGap
     readonly property real pitch: grid.cellWidth
-    readonly property real editActionsWidth: Theme.iconButtonSize * 2 + spacing
-    readonly property real trackWidth: Math.max(0, width - trailing.width - CcMetrics.footerGap)
-    // Edit mode shows the whole row scaled into the room beside the edit buttons, so every width stays reachable.
-    readonly property real editScale: trackWidth > 0 ? Math.min(1, (trackWidth - editActionsWidth - CcMetrics.footerGap) / trackWidth) : 1
+    readonly property real editActionsWidth: Theme.iconButtonSize * 3 + spacing * 2
+    // The row owns its full width in both modes, so capacity never changes under the user's feet; edit mode
+    // shows the whole row scaled into the room beside the edit buttons, so every width stays reachable.
+    readonly property real trackWidth: width
+    readonly property real editScale: width > 0 ? Math.min(1, (width - editActionsWidth - CcMetrics.footerGap) / width) : 1
     readonly property real trackScale: editMode ? editScale : 1
-    readonly property int capacity: Math.max(0, Math.floor((trackWidth + spacing) / pitch))
+    readonly property real step: CcMetrics.gridStep
+    readonly property real capacity: Math.max(0, Math.floor((trackWidth + spacing) / pitch / step + 1e-6) * step)
     readonly property var fills: items.map(item => resizePreview?.index === item.index ? resizePreview.fill : WidgetUtils.footerFills(item.widget))
     readonly property var mins: items.map(item => WidgetUtils.footerMinCells(item.widget.id))
     readonly property var ends: items.map(item => WidgetUtils.footerEnds(item.widget))
+    readonly property var keeps: items.map(item => !WidgetUtils.isRemovable(item.widget))
     // Fill items count at their minimum, so a drop or a neighbour growing takes room from them first.
-    readonly property var fixedCells: WidgetUtils.fitFooterCells(items.map((item, i) => fills[i] ? mins[i] : (resizePreview?.index === item.index ? resizePreview.cells : WidgetUtils.footerCells(item.widget))), mins, capacity)
-    readonly property int fixedUsed: fixedCells.reduce((sum, count) => sum + count, 0)
-    readonly property var cells: WidgetUtils.spreadFooterFill(fixedCells, fills, capacity - fixedUsed - (incoming?.cells ?? 0))
+    readonly property var fixedCells: WidgetUtils.fitFooterCells(items.map((item, i) => fills[i] ? mins[i] : (resizePreview?.index === item.index ? resizePreview.cells : WidgetUtils.footerCells(item.widget))), mins, capacity, keeps, step)
+    readonly property real fixedUsed: fixedCells.reduce((sum, count) => sum + count, 0)
+    readonly property var cells: WidgetUtils.spreadFooterFill(fixedCells, fills, capacity - fixedUsed - (incoming?.cells ?? 0), step)
     readonly property int slackIndex: fills.findIndex((fill, i) => fill && cells[i] > 0)
-    // The first fill item also takes the part of a cell left over, so it ends exactly at the next button.
+    // The first fill item also takes the part of a cell left over, so it ends exactly at the next item or the edge.
     readonly property real fillSlack: slackIndex < 0 ? 0 : Math.max(0, trackWidth + spacing - (cells.reduce((sum, count) => sum + count, 0) + (incoming?.cells ?? 0)) * pitch)
     // Stable keys keep delegates alive across resizes and reorders, so they update in place instead of rebuilding.
     readonly property var keys: {
@@ -109,7 +114,7 @@ Item {
     }
 
     function trashContains(scenePosition) {
-        if (!editMode || !dragging)
+        if (!editMode || !dragging || !dragRemovable)
             return false;
         return trash.contains(trash.mapFromItem(null, scenePosition.x, scenePosition.y));
     }
@@ -275,7 +280,7 @@ Item {
                         "index": -1,
                         "widget": ({})
                     })
-                readonly property int cells: root.cells[index] ?? 0
+                readonly property real cells: root.cells[index] ?? 0
                 readonly property bool lifted: root.liftedIndex === entry.index
                 readonly property real span: root.spanWidth(Math.max(1, cells)) + (index === root.slackIndex ? root.fillSlack : 0)
                 readonly property real restX: root.xFor(root.layout.offsets[index] ?? 0, span)
@@ -337,7 +342,7 @@ Item {
                     id: chrome
 
                     property real startX: 0
-                    property int startCells: 0
+                    property real startCells: 0
                     property bool startFill: false
 
                     anchors.fill: parent
@@ -361,12 +366,12 @@ Item {
                             "fill": startFill
                         };
                     }
-                    // Pulling past the edit buttons turns the item into a fill, which runs on to the pencil outside edit mode.
+                    // Pulling past the edit buttons turns the item into a fill, which runs on to the row's edge outside edit mode.
                     onResizeMoved: (px, py) => {
                         const delta = (mapToItem(null, px, py).x - startX) * (I18n.isRtl ? -1 : 1) / root.trackScale;
                         const min = root.mins[footerItem.index];
                         const max = Math.max(min, root.capacity - (root.fixedUsed - root.fixedCells[footerItem.index]));
-                        const wanted = Math.round(startCells + delta / root.pitch);
+                        const wanted = Math.round((startCells + delta / root.pitch) / root.step) * root.step;
                         root.resizePreview = {
                             "index": footerItem.entry.index,
                             "cells": Math.max(min, Math.min(max, wanted)),
@@ -420,65 +425,85 @@ Item {
         }
     }
 
-    Row {
-        anchors.right: trailing.left
-        anchors.rightMargin: CcMetrics.footerGap
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: root.spacing
-        visible: root.editMode && !root.dragging
+    Item {
+        id: editActions
 
-        DankActionButton {
-            buttonSize: Theme.iconButtonSize
-            iconName: "add"
-            iconSize: CcMetrics.iconBoxIconSize
-            iconColor: Theme.onSecondaryContainer
-            backgroundColor: Theme.secondaryContainer
-            tooltipText: I18n.tr("Add widget")
-            onClicked: root.addWidgetRequested()
-        }
-
-        DankActionButton {
-            id: moreButton
-
-            buttonSize: Theme.iconButtonSize
-            iconName: "more_horiz"
-            iconSize: CcMetrics.iconBoxIconSize
-            iconColor: CcMetrics.tileInactiveContent
-            backgroundColor: CcMetrics.tileInactiveColor
-            border.width: Theme.layerOutlineWidth
-            border.color: Theme.outlineMedium
-            tooltipText: I18n.tr("More")
-            onClicked: editMenu.openAt(moreButton)
-        }
-    }
-
-    StyledRect {
-        id: trash
-
-        anchors.right: trailing.left
-        anchors.rightMargin: CcMetrics.footerGap
+        anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         width: root.editActionsWidth
         height: CcMetrics.footerHeight
-        radius: Theme.fullRadius(width, height)
-        color: root.overTrash ? Theme.errorContainer : CcMetrics.tileInactiveColor
-        visible: root.editMode && root.dragging
-        Accessible.role: Accessible.Graphic
-        Accessible.name: I18n.tr("Remove")
+        visible: root.editMode
 
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.shortDuration
-                easing.type: Theme.standardEasing
+        Row {
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: root.spacing
+            visible: !root.dragging
+
+            DActionButton {
+                buttonSize: Theme.iconButtonSize
+                iconName: "add"
+                iconSize: CcMetrics.iconBoxIconSize
+                iconColor: Theme.onSecondaryContainer
+                backgroundColor: Theme.secondaryContainer
+                tooltipText: I18n.tr("Add widget")
+                onClicked: root.addWidgetRequested()
+            }
+
+            DActionButton {
+                id: moreButton
+
+                buttonSize: Theme.iconButtonSize
+                iconName: "more_horiz"
+                iconSize: CcMetrics.iconBoxIconSize
+                iconColor: CcMetrics.tileInactiveContent
+                backgroundColor: CcMetrics.tileInactiveColor
+                border.width: Theme.layerOutlineWidth
+                border.color: Theme.outlineMedium
+                tooltipText: I18n.tr("More")
+                onClicked: editMenu.openAt(moreButton)
             }
         }
 
-        DankIcon {
-            anchors.centerIn: parent
-            name: "delete"
-            size: CcMetrics.iconBoxIconSize
-            filled: root.overTrash
-            color: root.overTrash ? Theme.onErrorContainer : CcMetrics.tileInactiveContent
+        StyledRect {
+            id: trash
+
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            width: root.editActionsWidth - Theme.iconButtonSize - root.spacing
+            height: CcMetrics.footerHeight
+            radius: Theme.fullRadius(width, height)
+            color: root.overTrash ? Theme.errorContainer : CcMetrics.tileInactiveColor
+            visible: root.dragging && root.dragRemovable
+            Accessible.role: Accessible.Graphic
+            Accessible.name: I18n.tr("Remove")
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
+                }
+            }
+
+            DIcon {
+                anchors.centerIn: parent
+                name: "delete"
+                size: CcMetrics.iconBoxIconSize
+                filled: root.overTrash
+                color: root.overTrash ? Theme.onErrorContainer : CcMetrics.tileInactiveContent
+            }
+        }
+
+        DActionButton {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            buttonSize: Theme.iconButtonSize
+            iconName: "check"
+            iconSize: CcMetrics.iconBoxIconSize
+            iconColor: Theme.onPrimary
+            backgroundColor: Theme.primary
+            tooltipText: I18n.tr("Save")
+            onClicked: root.finishRequested()
         }
     }
 
@@ -489,7 +514,7 @@ Item {
         items: [
             {
                 "iconName": root.onTop ? "vertical_align_bottom" : "vertical_align_top",
-                "label": root.onTop ? I18n.tr("Move down") : I18n.tr("Move up"),
+                "label": root.onTop ? I18n.tr("Move row to footer", "control center edit menu, moves the row from the header to the footer") : I18n.tr("Move row to header", "control center edit menu, moves the row from the footer to the header"),
                 "action": () => root.moveRequested()
             },
             {
@@ -509,42 +534,6 @@ Item {
                 "action": () => root.cancelRequested()
             }
         ]
-    }
-
-    Item {
-        id: trailing
-
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
-        // One column, the same pill as a small button docked beside it.
-        width: root.spanWidth(1)
-        height: CcMetrics.footerHeight
-
-        DankActionButton {
-            anchors.fill: parent
-            buttonSize: CcMetrics.footerHeight
-            iconName: "check"
-            iconSize: CcMetrics.iconBoxIconSize
-            iconColor: Theme.onPrimary
-            backgroundColor: Theme.primary
-            tooltipText: I18n.tr("Save")
-            visible: root.editMode
-            onClicked: root.editToggled()
-        }
-
-        DankActionButton {
-            anchors.fill: parent
-            buttonSize: CcMetrics.footerHeight
-            iconName: "edit"
-            iconSize: CcMetrics.iconBoxIconSize
-            iconColor: CcMetrics.tileInactiveContent
-            backgroundColor: CcMetrics.tileInactiveColor
-            border.width: Theme.layerOutlineWidth
-            border.color: Theme.outlineMedium
-            tooltipText: I18n.tr("Edit")
-            visible: !root.editMode
-            onClicked: root.editToggled()
-        }
     }
 
     // The track's layer only draws inside the row, so a lifted item is shown from here while it travels.

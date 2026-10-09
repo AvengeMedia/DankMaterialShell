@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 SettingsCard {
@@ -55,7 +55,7 @@ SettingsCard {
             width: parent.width
             height: workspaceTabBar.height + Theme.spacingM
 
-            DankTabBar {
+            DTabBar {
                 id: workspaceTabBar
                 width: parent.width
                 tabHeight: 44
@@ -205,7 +205,7 @@ SettingsCard {
         settingKey: "workspaceIcons"
         tags: ["workspace", "icon", "named", "scratchpad", "special"]
         title: I18n.tr("Icons")
-        subtitle: I18n.tr("Named workspaces and scratchpads")
+        subtitle: I18n.tr("Named workspaces and scratchpads", "workspace appearance row subtitle")
     }
 
     Repeater {
@@ -216,7 +216,7 @@ SettingsCard {
 
             title: modelData
 
-            DankIconPicker {
+            DIconPicker {
                 id: iconPicker
                 anchors.verticalCenter: parent.verticalCenter
 
@@ -247,7 +247,7 @@ SettingsCard {
                 }
             }
 
-            DankActionButton {
+            DActionButton {
                 buttonSize: Theme.iconButtonSize
                 iconName: "close"
                 Accessible.name: I18n.tr("Remove")

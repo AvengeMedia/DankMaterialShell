@@ -7,7 +7,9 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import qs.DCommon.Common as DCommon
 import "../Common/OutputModel.js" as OutputModel
+import "../Common/BlurStrength.js" as BlurStrength
 
 Singleton {
     id: root
@@ -91,17 +93,14 @@ Singleton {
 
     Connections {
         target: Theme
+        enabled: CompositorService.isNiri
 
         function onScreenTransitionNeeded() {
-            if (CompositorService.isNiri) {
-                root.doScreenTransition();
-            }
+            root.doScreenTransition();
         }
 
         function onThemeGenerationStarting() {
-            if (CompositorService.isNiri) {
-                root.suppressNextToast();
-            }
+            root.suppressNextToast();
         }
     }
 
@@ -132,6 +131,7 @@ Singleton {
 
     Connections {
         target: SettingsData
+        enabled: CompositorService.isNiri
         function onBarConfigsChanged() {
             const newGaps = Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4));
             if (newGaps === root._lastGapValue)
@@ -144,9 +144,10 @@ Singleton {
     Connections {
         target: CompositorService
         function onIsNiriChanged() {
-            if (CompositorService.isNiri) {
-                generateNiriInputConfig();
-            }
+            if (!CompositorService.isNiri)
+                return;
+            generateNiriInputConfig();
+            generateNiriLayoutConfig();
         }
     }
 
@@ -248,7 +249,7 @@ Singleton {
         }
     }
 
-    DankSocket {
+    DCommon.DSocket {
         id: eventStreamSocket
         path: root.socketPath
         connected: CompositorService.isNiri
@@ -272,18 +273,21 @@ Singleton {
         }
     }
 
-    DankSocket {
+    DCommon.DSocket {
         id: requestSocket
         path: root.socketPath
         connected: CompositorService.isNiri
     }
 
-    NiriOutputCycle {
-        id: outputCycle
-        wlrOutputService: WlrOutputService
-        socket: requestSocket
-        isNiri: CompositorService.isNiri
-        currentOutput: root.currentOutput
+    Loader {
+        id: outputCycleLoader
+        active: CompositorService.isNiri
+        sourceComponent: NiriOutputCycle {
+            wlrOutputService: WlrOutputService
+            socket: requestSocket
+            isNiri: CompositorService.isNiri
+            currentOutput: root.currentOutput
+        }
     }
 
     function fetchOutputs() {
@@ -309,7 +313,9 @@ Singleton {
     }
 
     function cycleSingleOutput() {
-        return outputCycle.cycleSingleOutput();
+        if (!outputCycleLoader.item)
+            return "OUTPUT_CYCLE_UNSUPPORTED";
+        return outputCycleLoader.item.cycleSingleOutput();
     }
 
     function updateDisplayScales() {
@@ -495,6 +501,11 @@ Singleton {
         }
 
         setWorkspaces(updatedWorkspaces);
+
+        if (!data.focused) {
+            updateCurrentOutputWorkspaces();
+            return;
+        }
 
         focusedWorkspaceId = data.id;
         focusedWorkspaceIndex = allWorkspaces.findIndex(w => w.id === data.id);
@@ -1204,6 +1215,19 @@ Singleton {
         configGenerationAction.schedule();
     }
 
+    // niri's own defaults stay untouched until the user moves the shell-wide slider
+    function niriBlurBlock(strength) {
+        if (!(strength > 0))
+            return "";
+        const blur = BlurStrength.niriBlur(strength);
+        return `
+
+blur {
+    passes ${blur.passes}
+    offset ${blur.offset}
+}`;
+    }
+
     function doGenerateNiriLayoutConfig() {
         if (writeConfigProcess.running || _awaitingLayoutReloadRevision > _layoutAppliedRevision)
             return;
@@ -1275,7 +1299,7 @@ window-rule {
     clip-to-geometry true
     tiled-state true
     draw-border-with-background false
-}` + xrayRules;
+}` + niriBlurBlock(typeof SettingsData !== "undefined" ? SettingsData.blurStrength : 0) + xrayRules;
 
         const alttabContent = dmsWarning + `recent-windows {
     highlight {
@@ -1303,13 +1327,20 @@ window-rule {
             writeAlttabProcess.running = true;
         }
 
-        for (const name of ["outputs", "binds", "cursor", "windowrules", "colors", "alttab", "layout", "input"]) {
-            const path = niriDmsDir + "/" + name + ".kdl";
-            Proc.runCommand("niri-ensure-" + name, ["sh", "-c", `mkdir -p "${niriDmsDir}" && [ ! -f "${path}" ] && touch "${path}" || true`], (output, exitCode) => {
-                if (exitCode !== 0)
-                    log.warn("Failed to ensure " + name + ".kdl, exit code:", exitCode);
-            });
-        }
+        ensureDmsConfigFiles(niriDmsDir);
+    }
+
+    property bool _dmsConfigFilesEnsured: false
+
+    function ensureDmsConfigFiles(niriDmsDir) {
+        if (_dmsConfigFilesEnsured)
+            return;
+        _dmsConfigFilesEnsured = true;
+        const script = `mkdir -p "${niriDmsDir}" && for f in outputs binds cursor windowrules colors alttab layout input; do [ -f "${niriDmsDir}/$f.kdl" ] || touch "${niriDmsDir}/$f.kdl"; done`;
+        Proc.runCommand("niri-ensure-dms-configs", ["sh", "-c", script], (output, exitCode) => {
+            if (exitCode !== 0)
+                log.warn("Failed to ensure dms config files, exit code:", exitCode);
+        });
     }
 
     function generateNiriBlurrule() {

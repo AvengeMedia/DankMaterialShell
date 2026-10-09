@@ -96,7 +96,7 @@ def scan_line(line, occ, translations, real_patterns, context_patterns, simple_p
 def extract_qstr_strings(root_dir):
     translations = defaultdict(new_translation_bucket)
 
-    # DankCommon terms are owned by the dank-qml-common repo (synced through
+    # DCommon terms are owned by the dank-qml-common repo (synced through
     # the DMS POEditor project); rglob not following the symlink is load-bearing.
     for qml_file in Path(root_dir).rglob('*.qml'):
         relative_path = qml_file.relative_to(root_dir)

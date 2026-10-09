@@ -6,6 +6,7 @@ import Quickshell.Wayland
 import qs.Common
 import qs.Widgets
 import qs.Services
+import "../Common/WorkspaceModel.js" as WorkspaceModel
 
 Variants {
     id: variants
@@ -13,6 +14,16 @@ Variants {
     // An entry present in PanelWindow.onCompleted means we're recreating
     // after a wl_output rebind, not at initial startup.
     property var _seenScreens: ({})
+    readonly property bool desktopMenuEnabled: {
+        switch (SettingsData.desktopContextMenu) {
+        case "on":
+            return true;
+        case "off":
+            return false;
+        default:
+            return !CompositorService.reservesDesktopInput;
+        }
+    }
     model: SettingsData.getFilteredScreens("wallpaper")
 
     PanelWindow {
@@ -36,8 +47,18 @@ Variants {
 
         updatesEnabled: root.renderActive || root._settleFrames > 0
 
-        mask: Region {
-            item: Item {}
+        Region {
+            id: emptyRegion
+        }
+
+        mask: variants.desktopMenuEnabled ? null : emptyRegion
+
+        MouseArea {
+            anchors.fill: parent
+            z: 1
+            enabled: variants.desktopMenuEnabled
+            acceptedButtons: Qt.RightButton
+            onClicked: mouse => PopoutService.desktopContextMenu?.open(wallpaperWindow.screen, mouse.x, mouse.y, false)
         }
 
         Item {
@@ -75,18 +96,17 @@ Variants {
 
             Connections {
                 target: SessionData
+                enabled: SessionData.perModeWallpaper
+
                 function onIsLightModeChanged() {
-                    if (SessionData.perModeWallpaper) {
-                        var newSource = SessionData.getMonitorWallpaper(modelData.name) || "";
-                        if (newSource !== root.source) {
-                            root.source = newSource;
-                        }
-                    }
+                    const newSource = SessionData.getMonitorWallpaper(modelData.name) || "";
+                    if (newSource !== root.source)
+                        root.source = newSource;
                 }
             }
 
             Connections {
-                target: NiriService
+                target: CompositorService.isNiri ? NiriService : null
                 enabled: CompositorService.isNiri && root.scrollingEnabled
 
                 function onAllWorkspacesChanged() {
@@ -141,7 +161,7 @@ Variants {
             readonly property var backingWindow: Window.window
             readonly property bool showsBackdrop: !source || isColorSource || currentWallpaper.status === Image.Error
             readonly property bool backdropBusy: showsBackdrop && !(backdropLoader.item?.ready ?? false)
-            readonly property bool renderActive: backdropBusy || effectActive || overviewBlurActive || pendingWallpaper !== "" || _deferredSource !== "" || changePending || _freezeWaitFrames > 0 || frameAnim.running || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading
+            readonly property bool renderActive: backdropBusy || effectActive || overviewBlurActive || pendingWallpaper !== "" || _deferredSource !== "" || changePending || _freezeWaitFrames > 0 || frameAnim.running || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading || parallaxImage.status === Image.Loading
             property int _settleFrames: 3
 
             function invalidate() {
@@ -268,7 +288,7 @@ Variants {
             onSessionMonitorWallpaperFillModesChanged: regenerate()
             onSessionPerMonitorWallpaperChanged: regenerate()
 
-            // Theme changes repaint DankBackdrop but nothing else wakes the render loop
+            // Theme changes repaint DBackdrop but nothing else wakes the render loop
             readonly property color themePrimary: Theme.primary
             readonly property color themeBackground: Theme.background
 
@@ -402,8 +422,8 @@ Variants {
                     const monitorWorkspaces = workspaces.filter(ws => ws.monitor?.name === modelData.name).sort((a, b) => a.id - b.id);
 
                     totalWorkspaces = monitorWorkspaces.length;
-                    const focusedId = Hyprland.focusedWorkspace?.id;
-                    currentWorkspaceIndex = monitorWorkspaces.findIndex(ws => ws.id === focusedId);
+                    const focusedKey = WorkspaceModel.hyprlandKey(Hyprland.focusedWorkspace);
+                    currentWorkspaceIndex = monitorWorkspaces.findIndex(ws => WorkspaceModel.hyprlandKey(ws) === focusedKey);
 
                     if (currentWorkspaceIndex < 0)
                         currentWorkspaceIndex = 0;
@@ -725,7 +745,7 @@ Variants {
                 active: root.showsBackdrop
                 asynchronous: true
 
-                sourceComponent: DankBackdrop {
+                sourceComponent: DBackdrop {
                     screenName: modelData.name
                     blur: root.overviewBlurActive ? Theme.wallpaperBlur : 0
                     onInvalidated: root.invalidate()

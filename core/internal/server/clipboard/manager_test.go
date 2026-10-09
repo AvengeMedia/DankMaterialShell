@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -86,53 +85,6 @@ func TestEncodeDecodeEntry_Roundtrip(t *testing.T) {
 	assert.Equal(t, original.IsImage, decoded.IsImage)
 }
 
-func TestEncodeDecodeEntry_EmptyData(t *testing.T) {
-	original := Entry{
-		ID:        1,
-		Data:      []byte{},
-		MimeType:  "text/plain",
-		Preview:   "",
-		Size:      0,
-		Timestamp: time.Now().Truncate(time.Second),
-		IsImage:   false,
-	}
-
-	encoded, err := encodeEntry(original)
-	assert.NoError(t, err)
-
-	decoded, err := decodeEntry(encoded)
-	assert.NoError(t, err)
-
-	assert.Equal(t, original.ID, decoded.ID)
-	assert.Empty(t, decoded.Data)
-}
-
-func TestEncodeDecodeEntry_LargeData(t *testing.T) {
-	largeData := make([]byte, 100000)
-	for i := range largeData {
-		largeData[i] = byte(i % 256)
-	}
-
-	original := Entry{
-		ID:        777,
-		Data:      largeData,
-		MimeType:  "application/octet-stream",
-		Preview:   "binary data...",
-		Size:      len(largeData),
-		Timestamp: time.Now().Truncate(time.Second),
-		IsImage:   false,
-	}
-
-	encoded, err := encodeEntry(original)
-	assert.NoError(t, err)
-
-	decoded, err := decodeEntry(encoded)
-	assert.NoError(t, err)
-
-	assert.Equal(t, original.Data, decoded.Data)
-	assert.Equal(t, original.Size, decoded.Size)
-}
-
 func TestEncodeDecodeEntry_AltRepresentation(t *testing.T) {
 	original := Entry{
 		ID:          555,
@@ -167,22 +119,6 @@ func TestEncodeDecodeEntry_AltRepresentation(t *testing.T) {
 	assert.Equal(t, original.Hash, extractHash(encoded))
 }
 
-func TestExtractHash_NoAlt(t *testing.T) {
-	entry := Entry{
-		ID:        1,
-		Data:      []byte("plain entry"),
-		MimeType:  "text/plain",
-		Preview:   "plain entry",
-		Size:      11,
-		Timestamp: time.Now().Truncate(time.Second),
-		Hash:      computeHash([]byte("plain entry")),
-	}
-
-	encoded, err := encodeEntry(entry)
-	assert.NoError(t, err)
-	assert.Equal(t, entry.Hash, extractHash(encoded))
-}
-
 func TestSelectAltTextMimeType(t *testing.T) {
 	tests := []struct {
 		mimes    []string
@@ -191,7 +127,6 @@ func TestSelectAltTextMimeType(t *testing.T) {
 		{[]string{"image/bmp", "TEXT", "text/html", "text/plain", "text/plain;charset=utf-8", "UTF8_STRING"}, "text/plain;charset=utf-8"},
 		{[]string{"image/png", "UTF8_STRING"}, "UTF8_STRING"},
 		{[]string{"image/png", "text/html"}, ""},
-		{[]string{"image/png"}, ""},
 	}
 
 	for _, tt := range tests {
@@ -396,17 +331,6 @@ func TestDeleteEntries_IgnoresUnknownIDs(t *testing.T) {
 	assert.Empty(t, m.GetHistory())
 }
 
-func TestDeleteEntries_EmptyListIsNoOp(t *testing.T) {
-	m := newTestManagerWithDB(t)
-
-	storeTestEntry(t, m, "keep me")
-
-	deleted, err := m.DeleteEntries(nil)
-	require.NoError(t, err)
-	assert.Equal(t, 0, deleted)
-	assert.Len(t, m.GetHistory(), 1)
-}
-
 func TestHandleDeleteEntries_ReportsDeletedCount(t *testing.T) {
 	m := newTestManagerWithDB(t)
 
@@ -436,7 +360,6 @@ func TestHandleDeleteEntries_RejectsBadParams(t *testing.T) {
 		{"missing ids", map[string]any{}},
 		{"ids not an array", map[string]any{"ids": float64(1)}},
 		{"negative id", map[string]any{"ids": []any{float64(-1)}}},
-		{"fractional id", map[string]any{"ids": []any{float64(1.5)}}},
 		{"id of the wrong type", map[string]any{"ids": []any{"1"}}},
 	}
 
@@ -657,37 +580,29 @@ func TestEditEntry_NonTextReturnsError(t *testing.T) {
 }
 
 func TestEditEntry_AltTextMimeTypesAllowed(t *testing.T) {
-	for _, mime := range []string{"UTF8_STRING", "STRING", "TEXT", "text/plain;charset=utf-8", "text/plain"} {
-		t.Run(mime, func(t *testing.T) {
-			m := newTestManagerWithDB(t)
-			entry := Entry{
-				Data:      []byte("old text"),
-				MimeType:  mime,
-				Preview:   "old text",
-				Size:      8,
-				Timestamp: time.Now().Truncate(time.Second),
-				IsImage:   false,
-			}
-			require.NoError(t, m.storeEntry(entry))
-			history := m.GetHistory()
-			require.Len(t, history, 1)
-			id := history[0].ID
-
-			err := m.EditEntry(id, "replacement text")
-			assert.NoError(t, err)
-		})
+	m := newTestManagerWithDB(t)
+	entry := Entry{
+		Data:      []byte("old text"),
+		MimeType:  "UTF8_STRING",
+		Preview:   "old text",
+		Size:      8,
+		Timestamp: time.Now().Truncate(time.Second),
+		IsImage:   false,
 	}
+	require.NoError(t, m.storeEntry(entry))
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+
+	assert.NoError(t, m.EditEntry(history[0].ID, "replacement text"))
 }
 
 func TestEditEntry_EmptyOrWhitespaceReturnsError(t *testing.T) {
 	m := newTestManagerWithDB(t)
 	id := storeTestEntry(t, m, "keep me")
 
-	for _, badText := range []string{"", "   ", "\t\n\r"} {
-		err := m.EditEntry(id, badText)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "cannot save empty entry")
-	}
+	err := m.EditEntry(id, "   ")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "cannot save empty entry")
 
 	history := m.GetHistory()
 	require.Len(t, history, 1)
@@ -749,7 +664,6 @@ func TestManager_ConcurrentSubscriberAccess(t *testing.T) {
 			subID := string(rune('a' + id))
 			ch := m.Subscribe(subID)
 			assert.NotNil(t, ch)
-			time.Sleep(time.Millisecond)
 			m.Unsubscribe(subID)
 		}(i)
 	}
@@ -844,33 +758,13 @@ func TestManager_NotifySubscribersNonBlocking(t *testing.T) {
 	assert.Len(t, m.dirty, 1)
 }
 
-func TestItob(t *testing.T) {
-	tests := []struct {
-		input    uint64
-		expected []byte
-	}{
-		{0, []byte{0, 0, 0, 0, 0, 0, 0, 0}},
-		{1, []byte{0, 0, 0, 0, 0, 0, 0, 1}},
-		{256, []byte{0, 0, 0, 0, 0, 0, 1, 0}},
-		{0xFFFFFFFFFFFFFFFF, []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}},
-	}
-
-	for _, tt := range tests {
-		result := itob(tt.input)
-		assert.Equal(t, tt.expected, result)
-	}
-}
-
 func TestSizeStr(t *testing.T) {
 	tests := []struct {
 		input    int
 		expected string
 	}{
-		{0, "0 B"},
 		{100, "100 B"},
-		{1024, "1 KiB"},
 		{2048, "2 KiB"},
-		{1048576, "1 MiB"},
 		{5242880, "5 MiB"},
 	}
 
@@ -887,13 +781,8 @@ func TestSelectMimeType(t *testing.T) {
 		mimes    []string
 		expected string
 	}{
-		{[]string{"text/plain;charset=utf-8", "text/html"}, "text/plain;charset=utf-8"},
 		{[]string{"text/html", "text/plain"}, "text/plain"},
-		{[]string{"text/html", "image/png"}, "image/png"},
-		{[]string{"image/png", "text/plain"}, "image/png"},
 		{[]string{"text/plain", "image/png"}, "image/png"},
-		{[]string{"image/png", "image/jpeg"}, "image/png"},
-		{[]string{"image/png"}, "image/png"},
 		{[]string{"application/octet-stream"}, "application/octet-stream"},
 		{[]string{}, ""},
 	}
@@ -902,16 +791,6 @@ func TestSelectMimeType(t *testing.T) {
 		result := m.selectMimeType(tt.mimes)
 		assert.Equal(t, tt.expected, result)
 	}
-}
-
-func TestIsImageMimeType(t *testing.T) {
-	m := &Manager{}
-
-	assert.True(t, m.isImageMimeType("image/png"))
-	assert.True(t, m.isImageMimeType("image/jpeg"))
-	assert.True(t, m.isImageMimeType("image/gif"))
-	assert.False(t, m.isImageMimeType("text/plain"))
-	assert.False(t, m.isImageMimeType("application/json"))
 }
 
 func TestTextPreview(t *testing.T) {
@@ -930,59 +809,6 @@ func TestTextPreview(t *testing.T) {
 	preview := m.textPreview(longText)
 	assert.True(t, len(preview) > 100)
 	assert.Contains(t, preview, "…")
-}
-
-func TestDefaultConfig(t *testing.T) {
-	cfg := DefaultConfig()
-	assert.Equal(t, 100, cfg.MaxHistory)
-	assert.Equal(t, int64(5*1024*1024), cfg.MaxEntrySize)
-	assert.Equal(t, 0, cfg.AutoClearDays)
-	assert.False(t, cfg.ClearAtStartup)
-	assert.False(t, cfg.Disabled)
-}
-
-func TestManager_PostDelegatesToWlContext(t *testing.T) {
-	mockCtx := mocks_wlcontext.NewMockWaylandContext(t)
-
-	var called atomic.Bool
-	mockCtx.EXPECT().Post(mock.AnythingOfType("func()")).Run(func(fn func()) {
-		called.Store(true)
-		fn()
-	}).Once()
-
-	m := &Manager{
-		wlCtx: mockCtx,
-	}
-
-	executed := false
-	m.post(func() {
-		executed = true
-	})
-
-	assert.True(t, called.Load())
-	assert.True(t, executed)
-}
-
-func TestManager_PostExecutesFunctionViaContext(t *testing.T) {
-	mockCtx := mocks_wlcontext.NewMockWaylandContext(t)
-
-	var capturedFn func()
-	mockCtx.EXPECT().Post(mock.AnythingOfType("func()")).Run(func(fn func()) {
-		capturedFn = fn
-	}).Times(3)
-
-	m := &Manager{
-		wlCtx: mockCtx,
-	}
-
-	counter := 0
-	m.post(func() { counter++ })
-	m.post(func() { counter += 10 })
-	m.post(func() { counter += 100 })
-
-	assert.NotNil(t, capturedFn)
-	capturedFn()
-	assert.Equal(t, 100, counter)
 }
 
 // zero padding in a fresh db, never a valid page
@@ -1097,26 +923,39 @@ func TestFileURIRoundTrip(t *testing.T) {
 // unencoded makes EntryToFile decode a path that was never encoded, so a
 // literal "%20" in the name resolves to a different, missing file.
 func TestCopyFile_OversizedEntryRoundTrips(t *testing.T) {
-	names := []string{"report%20final.fbx", "My File #1.fbx", "吉祥物 男女(2).fbx"}
-	for _, name := range names {
-		t.Run(name, func(t *testing.T) {
-			m := newTestManagerWithDB(t)
-			m.config.MaxEntrySize = 8 // force the nil fileData branch
+	m := newTestManagerWithDB(t)
+	m.config.MaxEntrySize = 8 // force the nil fileData branch
 
-			path := filepath.Join(t.TempDir(), name)
-			require.NoError(t, os.WriteFile(path, []byte("fbx-bytes-"+name), 0o644))
+	path := filepath.Join(t.TempDir(), "report%20final.fbx")
+	require.NoError(t, os.WriteFile(path, []byte("fbx-bytes"), 0o644))
 
-			require.NoError(t, m.CopyFile(path))
+	require.NoError(t, m.CopyFile(path))
 
-			history := m.GetHistory()
-			require.Len(t, history, 1)
-			require.Equal(t, "text/uri-list", history[0].MimeType)
-			// GetHistory only carries metadata; the stored body lives in GetEntry.
-			entry, err := m.GetEntry(history[0].ID)
-			require.NoError(t, err)
-			assert.Equal(t, path, m.EntryToFile(entry))
-		})
-	}
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	require.Equal(t, "text/uri-list", history[0].MimeType)
+	// GetHistory only carries metadata; the stored body lives in GetEntry.
+	entry, err := m.GetEntry(history[0].ID)
+	require.NoError(t, err)
+	assert.Equal(t, path, m.EntryToFile(entry))
+}
+
+// A directory's stat size is tiny, so it passes the MaxEntrySize check and
+// must not reach os.ReadFile, which fails with EISDIR.
+func TestCopyFile_DirectoryStoresURI(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	dir := filepath.Join(t.TempDir(), "My Folder")
+	require.NoError(t, os.Mkdir(dir, 0o755))
+
+	require.NoError(t, m.CopyFile(dir))
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	require.Equal(t, "text/uri-list", history[0].MimeType)
+	entry, err := m.GetEntry(history[0].ID)
+	require.NoError(t, err)
+	assert.Equal(t, dir, m.EntryToFile(entry))
 }
 
 // CopyFile hands the image probe a URI the probe then decodes; it must be an

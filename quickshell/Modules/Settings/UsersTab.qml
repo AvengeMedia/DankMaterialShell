@@ -4,7 +4,7 @@ import QtQuick
 import qs.Common
 import qs.Modals.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -89,7 +89,7 @@ Item {
                         id: actionButtons
                         spacing: Theme.spacingS
 
-                        DankActionButton {
+                        DActionButton {
                             id: greeterToggleBtn
                             readonly property bool actionBlocked: root.operationPending
                             buttonSize: Theme.iconButtonSize
@@ -117,7 +117,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             id: adminToggleBtn
                             readonly property bool actionBlocked: root.operationPending || (userRow.isLastAdmin && userRow.modelData.isAdmin)
                             buttonSize: Theme.iconButtonSize
@@ -145,7 +145,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             id: deleteBtn
                             readonly property bool actionBlocked: root.operationPending || !UsersService.canDelete(userRow.modelData.username)
                             buttonSize: Theme.iconButtonSize
@@ -189,8 +189,8 @@ Item {
         SettingsFabBar {
             shown: PolkitService.polkitAvailable
 
-            DankFab {
-                text: I18n.tr("Add user")
+            DFab {
+                text: I18n.tr("Add user", "button and settings page title, creates a new user account")
                 iconName: "person_add"
                 onClicked: keyboard => root.parentModal?.navigateTo("user_create", keyboard)
             }

@@ -23,6 +23,7 @@ Singleton {
     property bool wpexecChecked: false
     property var pendingCodecActions: []
     property bool _codecSignalsSubscribed: false
+    property var _codecSubscriptionIds: []
     readonly property string bluezService: "org.bluez"
     readonly property string mediaTransportIface: "org.bluez.MediaTransport1"
     readonly property string mediaEndpointIface: "org.bluez.MediaEndpoint1"
@@ -77,10 +78,21 @@ Singleton {
         });
     }
 
-    Component.onCompleted: {
-        detectWpexecProcess.running = true;
-        maybeSubscribeCodecSignals();
+    readonly property bool hasConnectedAudioDevice: {
+        if (!adapter?.devices)
+            return false;
+        return adapter.devices.values.some(dev => dev?.connected && isAudioDevice(dev));
     }
+
+    onHasConnectedAudioDeviceChanged: {
+        if (hasConnectedAudioDevice) {
+            maybeSubscribeCodecSignals();
+            return;
+        }
+        unsubscribeCodecSignals();
+    }
+
+    Component.onCompleted: maybeSubscribeCodecSignals()
 
     function setBluetoothEnabled(enabled) {
         if (bluetoothBridgeAvailable) {
@@ -117,12 +129,18 @@ Singleton {
 
         function onConnectionStateChanged() {
             root._codecSignalsSubscribed = false;
+            root._codecSubscriptionIds = [];
             root.maybeSubscribeCodecSignals();
         }
 
         function onCapabilitiesReceived() {
             root.maybeSubscribeCodecSignals();
         }
+    }
+
+    Connections {
+        target: DMSService
+        enabled: root._codecSignalsSubscribed
 
         function onDbusSignalReceived(subscriptionId, data) {
             root.handleCodecDbusSignal(data);
@@ -143,12 +161,34 @@ Singleton {
     }
 
     function maybeSubscribeCodecSignals() {
-        if (!dbusBridgeAvailable || _codecSignalsSubscribed)
+        if (!dbusBridgeAvailable || _codecSignalsSubscribed || !hasConnectedAudioDevice)
             return;
         _codecSignalsSubscribed = true;
-        DMSService.dbusSubscribe("system", bluezService, "", objectManagerIface, "InterfacesAdded", null);
-        DMSService.dbusSubscribe("system", bluezService, "", objectManagerIface, "InterfacesRemoved", null);
-        DMSService.dbusSubscribe("system", bluezService, "", propertiesIface, "PropertiesChanged", null);
+        DMSService.dbusSubscribe("system", bluezService, "", objectManagerIface, "InterfacesAdded", _rememberCodecSubscription);
+        DMSService.dbusSubscribe("system", bluezService, "", objectManagerIface, "InterfacesRemoved", _rememberCodecSubscription);
+        DMSService.dbusSubscribe("system", bluezService, "", propertiesIface, "PropertiesChanged", _rememberCodecSubscription);
+    }
+
+    function _rememberCodecSubscription(response) {
+        const id = response.result?.subscriptionId;
+        if (response.error || !id)
+            return;
+        if (!_codecSignalsSubscribed) {
+            DMSService.dbusUnsubscribe(id, null);
+            return;
+        }
+        _codecSubscriptionIds = _codecSubscriptionIds.concat([id]);
+    }
+
+    function unsubscribeCodecSignals() {
+        if (!_codecSignalsSubscribed)
+            return;
+        _codecSignalsSubscribed = false;
+        const ids = _codecSubscriptionIds;
+        _codecSubscriptionIds = [];
+        if (!DMSService.isConnected)
+            return;
+        ids.forEach(id => DMSService.dbusUnsubscribe(id, null));
     }
 
     function handleCodecDbusSignal(data) {
@@ -466,28 +506,116 @@ Singleton {
 
     function codecMap() {
         return {
-            "LHDC_V5": { "name": "LHDC v5", "description": "Highest quality • Low latency", "qualityColor": "#4CAF50" },
-            "LHDC_V3": { "name": "LHDC v3", "description": "High quality • Low latency", "qualityColor": "#FF9800" },
-            "LDAC": { "name": "LDAC", "description": "Highest quality • Higher battery usage", "qualityColor": "#4CAF50" },
-            "APTX_HD": { "name": "aptX HD", "description": "High quality • Balanced battery", "qualityColor": "#FF9800" },
-            "APTX_LL": { "name": "aptX LL", "description": "Low latency • Gaming and video", "qualityColor": "#FF9800" },
-            "APTX_ADAPTIVE": { "name": "aptX Adaptive", "description": "Adaptive quality and latency", "qualityColor": "#FF9800" },
-            "APTX": { "name": "aptX", "description": "Good quality • Low latency", "qualityColor": "#FF9800" },
-            "AAC_ELD": { "name": "AAC-ELD", "description": "Low-delay AAC • Voice and video", "qualityColor": "#2196F3" },
-            "AAC": { "name": "AAC", "description": "Balanced quality and battery", "qualityColor": "#2196F3" },
-            "OPUS_05": { "name": "Opus", "description": "High quality • Modern Bluetooth LE audio", "qualityColor": "#4CAF50" },
-            "OPUS_G": { "name": "Opus", "description": "High quality • Modern Bluetooth LE audio", "qualityColor": "#4CAF50" },
-            "OPUS": { "name": "Opus", "description": "High quality • Efficient streaming", "qualityColor": "#4CAF50" },
-            "LC3": { "name": "LC3", "description": "LE Audio • Efficient high quality", "qualityColor": "#4CAF50" },
-            "LC3_SWB": { "name": "LC3-SWB", "description": "Wideband speech • Hands-free calls", "qualityColor": "#9E9E9E" },
-            "LC3_A127": { "name": "LC3", "description": "LE Audio speech • Hands-free calls", "qualityColor": "#9E9E9E" },
-            "LC3PLUS_HR": { "name": "LC3plus HR", "description": "High resolution LE Audio", "qualityColor": "#4CAF50" },
-            "SBC_XQ": { "name": "SBC-XQ", "description": "Enhanced SBC • Better compatibility", "qualityColor": "#2196F3" },
-            "SBC": { "name": "SBC", "description": "Basic quality • Universal compatibility", "qualityColor": "#9E9E9E" },
-            "MSBC": { "name": "mSBC", "description": "Modified SBC • Optimized for speech", "qualityColor": "#9E9E9E" },
-            "CVSD": { "name": "CVSD", "description": "Basic speech codec • Legacy compatibility", "qualityColor": "#9E9E9E" },
-            "G722": { "name": "G722", "description": "ASHA • Hearing aid audio", "qualityColor": "#9E9E9E" },
-            "FASTSTREAM": { "name": "FastStream", "description": "Low latency SBC variant", "qualityColor": "#2196F3" }
+            "LHDC_V5": {
+                "name": "LHDC v5",
+                "description": "Highest quality • Low latency",
+                "qualityColor": "#4CAF50"
+            },
+            "LHDC_V3": {
+                "name": "LHDC v3",
+                "description": "High quality • Low latency",
+                "qualityColor": "#FF9800"
+            },
+            "LDAC": {
+                "name": "LDAC",
+                "description": "Highest quality • Higher battery usage",
+                "qualityColor": "#4CAF50"
+            },
+            "APTX_HD": {
+                "name": "aptX HD",
+                "description": "High quality • Balanced battery",
+                "qualityColor": "#FF9800"
+            },
+            "APTX_LL": {
+                "name": "aptX LL",
+                "description": "Low latency • Gaming and video",
+                "qualityColor": "#FF9800"
+            },
+            "APTX_ADAPTIVE": {
+                "name": "aptX Adaptive",
+                "description": "Adaptive quality and latency",
+                "qualityColor": "#FF9800"
+            },
+            "APTX": {
+                "name": "aptX",
+                "description": "Good quality • Low latency",
+                "qualityColor": "#FF9800"
+            },
+            "AAC_ELD": {
+                "name": "AAC-ELD",
+                "description": "Low-delay AAC • Voice and video",
+                "qualityColor": "#2196F3"
+            },
+            "AAC": {
+                "name": "AAC",
+                "description": "Balanced quality and battery",
+                "qualityColor": "#2196F3"
+            },
+            "OPUS_05": {
+                "name": "Opus",
+                "description": "High quality • Modern Bluetooth LE audio",
+                "qualityColor": "#4CAF50"
+            },
+            "OPUS_G": {
+                "name": "Opus",
+                "description": "High quality • Modern Bluetooth LE audio",
+                "qualityColor": "#4CAF50"
+            },
+            "OPUS": {
+                "name": "Opus",
+                "description": "High quality • Efficient streaming",
+                "qualityColor": "#4CAF50"
+            },
+            "LC3": {
+                "name": "LC3",
+                "description": "LE Audio • Efficient high quality",
+                "qualityColor": "#4CAF50"
+            },
+            "LC3_SWB": {
+                "name": "LC3-SWB",
+                "description": "Wideband speech • Hands-free calls",
+                "qualityColor": "#9E9E9E"
+            },
+            "LC3_A127": {
+                "name": "LC3",
+                "description": "LE Audio speech • Hands-free calls",
+                "qualityColor": "#9E9E9E"
+            },
+            "LC3PLUS_HR": {
+                "name": "LC3plus HR",
+                "description": "High resolution LE Audio",
+                "qualityColor": "#4CAF50"
+            },
+            "SBC_XQ": {
+                "name": "SBC-XQ",
+                "description": "Enhanced SBC • Better compatibility",
+                "qualityColor": "#2196F3"
+            },
+            "SBC": {
+                "name": "SBC",
+                "description": "Basic quality • Universal compatibility",
+                "qualityColor": "#9E9E9E"
+            },
+            "MSBC": {
+                "name": "mSBC",
+                "description": "Modified SBC • Optimized for speech",
+                "qualityColor": "#9E9E9E"
+            },
+            "CVSD": {
+                "name": "CVSD",
+                "description": "Basic speech codec • Legacy compatibility",
+                "qualityColor": "#9E9E9E"
+            },
+            "G722": {
+                "name": "G722",
+                "description": "ASHA • Hearing aid audio",
+                "qualityColor": "#9E9E9E"
+            },
+            "FASTSTREAM": {
+                "name": "FastStream",
+                "description": "Low latency SBC variant",
+                "qualityColor": "#2196F3"
+            }
         };
     }
 

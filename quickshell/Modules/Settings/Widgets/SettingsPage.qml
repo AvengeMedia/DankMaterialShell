@@ -1,8 +1,8 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
-DankFlickable {
+DFlickable {
     id: root
 
     default property alias content: column.data
@@ -15,6 +15,7 @@ DankFlickable {
     clip: true
     contentHeight: column.height + Theme.spacingXL
     contentWidth: width
+    fadeSideInset: (width - column.width) / 2
 
     Column {
         id: column

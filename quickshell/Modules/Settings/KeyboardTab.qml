@@ -1,7 +1,6 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -115,6 +114,7 @@ Item {
             }
 
             SettingsTextFieldRow {
+                visible: CompositorService.isNiri || CompositorService.isHyprland
                 resetKeys: ["keyboardKeymapFile"]
                 leftIconName: "description"
                 text: I18n.tr("Keymap file")
@@ -133,6 +133,7 @@ Item {
             iconName: "settings"
 
             SettingsButtonGroupRow {
+                visible: CompositorService.isNiri
                 tags: ["keyboard", "track", "layout"]
                 settingKey: "keyboardTrackLayout"
                 text: I18n.tr("Remember layout")

@@ -4,30 +4,32 @@ import (
 	"fmt"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/plugins"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/dankgo/ipc"
 )
 
 func HandleList(conn *ipc.ConnWriter, req ipc.Request) {
 	registry, err := plugins.NewRegistry()
 	if err != nil {
-		models.RespondError(conn, req.ID, fmt.Sprintf("failed to create registry: %v", err))
+		conn.RespondError(req.ID, fmt.Sprintf("failed to create registry: %v", err))
 		return
 	}
 
 	pluginList, err := registry.List()
 	if err != nil {
-		models.RespondError(conn, req.ID, fmt.Sprintf("failed to list plugins: %v", err))
+		conn.RespondError(req.ID, fmt.Sprintf("failed to list plugins: %v", err))
 		return
 	}
 
 	manager, err := plugins.NewManager()
 	if err != nil {
-		models.RespondError(conn, req.ID, fmt.Sprintf("failed to create manager: %v", err))
+		conn.RespondError(req.ID, fmt.Sprintf("failed to create manager: %v", err))
 		return
 	}
 
-	feedback := plugins.FetchFeedback()
+	var feedback map[string]plugins.Feedback
+	if len(pluginList) > 0 {
+		feedback = plugins.FetchFeedback()
+	}
 
 	result := make([]PluginInfo, len(pluginList))
 	for i, p := range pluginList {
@@ -42,5 +44,5 @@ func HandleList(conn *ipc.ConnWriter, req ipc.Request) {
 		result[i] = info
 	}
 
-	models.Respond(conn, req.ID, result)
+	conn.Respond(req.ID, result)
 }

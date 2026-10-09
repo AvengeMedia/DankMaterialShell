@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 FocusScope {
     id: updaterPanel
@@ -137,7 +137,7 @@ FocusScope {
                 }
             }
 
-            DankRefreshButton {
+            DRefreshButton {
                 Layout.alignment: Qt.AlignTop
                 buttonSize: Theme.buttonHeightXS
                 iconSize: Theme.iconSizeSmall
@@ -155,7 +155,7 @@ FocusScope {
             Layout.fillHeight: true
             Layout.minimumHeight: Theme.listItemTwoLineHeight
 
-            DankListView {
+            DListView {
                 id: packagesList
                 anchors.fill: parent
                 visible: updaterPanel.showPackages
@@ -163,7 +163,7 @@ FocusScope {
                 spacing: Theme.groupedListGap
                 model: SystemUpdateService.availableUpdates
 
-                delegate: DankListRow {
+                delegate: DListRow {
                     id: packageRow
                     required property var modelData
                     required property int index
@@ -215,7 +215,7 @@ FocusScope {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             buttonSize: Theme.iconButtonSize
                             iconSize: Theme.iconSize
                             iconName: "visibility_off"
@@ -223,7 +223,7 @@ FocusScope {
                             tooltipText: I18n.tr("Ignore package", "tooltip, exclude a package from system updates")
                             onActiveFocusChanged: {
                                 if (activeFocus)
-                                    packagesList.positionViewAtIndex(packageRow.index, ListView.Contain);
+                                    packagesList.revealIndex(packageRow.index);
                             }
                             onClicked: SystemUpdateService.ignorePackage(packageRow.modelData.name)
                         }
@@ -231,7 +231,7 @@ FocusScope {
                 }
             }
 
-            DankFlickable {
+            DFlickable {
                 id: statusView
                 anchors.fill: parent
                 visible: !updaterPanel.showPackages && (!SystemUpdateService.isUpgrading || updaterPanel.upgradeRunsInTerminal)
@@ -246,7 +246,7 @@ FocusScope {
                     width: statusView.width - Theme.spacingL * 2
                     spacing: Theme.spacingM
 
-                    DankIcon {
+                    DIcon {
                         anchors.horizontalCenter: parent.horizontalCenter
                         name: {
                             switch (true) {
@@ -301,7 +301,7 @@ FocusScope {
                 }
             }
 
-            DankFlickable {
+            DFlickable {
                 id: upgradeLog
                 anchors.fill: parent
                 visible: SystemUpdateService.isUpgrading && !updaterPanel.upgradeRunsInTerminal
@@ -324,7 +324,7 @@ FocusScope {
             }
         }
 
-        DankButton {
+        DButton {
             Layout.fillWidth: true
             visible: updaterPanel.showIgnored
             text: I18n.tr("Ignored (%1)").arg(updaterPanel.ignoredNames.length)
@@ -338,7 +338,7 @@ FocusScope {
             onClicked: updaterPanel.ignoredExpanded = !updaterPanel.ignoredExpanded
         }
 
-        DankListView {
+        DListView {
             id: ignoredList
             Layout.fillWidth: true
             Layout.preferredHeight: Math.min(contentHeight, Theme.listItemHeight * 2)
@@ -347,7 +347,7 @@ FocusScope {
             spacing: Theme.groupedListGap
             model: updaterPanel.ignoredNames
 
-            delegate: DankListRow {
+            delegate: DListRow {
                 id: ignoredRow
                 required property string modelData
                 required property int index
@@ -372,14 +372,14 @@ FocusScope {
                         elide: Text.ElideRight
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         buttonSize: Theme.iconButtonSize
                         iconSize: Theme.iconSize
                         iconName: "visibility"
                         tooltipText: I18n.tr("Stop ignoring %1").arg(ignoredRow.modelData)
                         onActiveFocusChanged: {
                             if (activeFocus)
-                                ignoredList.positionViewAtIndex(ignoredRow.index, ListView.Contain);
+                                ignoredList.revealIndex(ignoredRow.index);
                         }
                         onClicked: SystemUpdateService.unignorePackage(ignoredRow.modelData)
                     }
@@ -393,7 +393,7 @@ FocusScope {
             layoutDirection: Qt.RightToLeft
             spacing: Theme.spacingS
 
-            DankButton {
+            DButton {
                 text: SystemUpdateService.isUpgrading ? I18n.tr("Cancel") : I18n.tr("Update All")
                 iconName: SystemUpdateService.isUpgrading ? "stop" : "system_update_alt"
                 backgroundColor: Theme.primary
@@ -404,7 +404,7 @@ FocusScope {
                 onClicked: updaterPanel.updateAll()
             }
 
-            DankButton {
+            DButton {
                 id: closeButton
                 text: I18n.tr("Close")
                 backgroundColor: "transparent"

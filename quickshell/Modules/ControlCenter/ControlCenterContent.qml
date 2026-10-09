@@ -6,6 +6,7 @@ import qs.Services
 import qs.Modules.ControlCenter.Components
 import qs.Modules.ControlCenter.Models
 import qs.Modules.ControlCenter.Details
+import qs.DCommon.Widgets
 import qs.Widgets
 import "./utils/sections.js" as Sections
 import "./utils/widgets.js" as WidgetUtils
@@ -14,6 +15,9 @@ FocusScope {
     id: root
 
     required property var host
+
+    property bool live: Window.window?.visible ?? false
+    property bool audioRefHeld: false
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
@@ -56,7 +60,7 @@ FocusScope {
     readonly property int gridColumns: host.gridColumns ?? Math.min(CcMetrics.gridColumns, gridColumnCap)
     readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - chromeHeight
     readonly property vector4d chromeRoom: host.chromeRoom ?? Qt.vector4d(Infinity, Infinity, Infinity, Infinity)
-    readonly property DankPanelResizer panelResizer: DankPanelResizer {
+    readonly property DPanelResizer panelResizer: DPanelResizer {
         popout: root.host
         stepWidth: CcMetrics.columnWidth + CcMetrics.gridGap
         widthFor: columns => CcMetrics.sheetWidthFor(columns) + root.sheetContentWidth - CcMetrics.sheetWidthFor(root.gridColumns)
@@ -73,6 +77,25 @@ FocusScope {
 
     implicitHeight: targetImplicitHeight
     focus: true
+
+    function syncAudioRef(wanted) {
+        if (wanted === audioRefHeld)
+            return;
+        audioRefHeld = wanted;
+        if (wanted) {
+            AudioService.addRef();
+            return;
+        }
+        AudioService.removeRef();
+    }
+
+    onLiveChanged: syncAudioRef(live)
+    Component.onCompleted: {
+        WidgetUtils.ensureEditButton();
+        syncAudioRef(live);
+    }
+    Component.onDestruction: syncAudioRef(false)
+    onPlacedWidgetIdsChanged: WidgetUtils.ensureEditButton()
 
     function navigateTo(section) {
         if (section === host.expandedSection)
@@ -161,12 +184,18 @@ FocusScope {
     }
 
     // Goes by the dragged tile, not the pointer: the middle of its top row has to cross the grid's edge as it
-    // was at drag start, which the grid growing under the drag cannot move.
+    // was at drag start, which the grid growing under the drag cannot move. Below the grid that edge sits one
+    // row lower while the panel has room to grow, so a tile can still be dropped into a new bottom row.
     function footerTakesGridDrag(tile) {
         if (gridDragWidget === null || footer.freeCells() < WidgetUtils.footerMinCells(gridDragWidget.id))
             return false;
-        const anchor = tile.y + Math.min(tile.height, widgetGrid.slotLayout.rowUnit) / 2;
-        return footerOnTop ? anchor < -CcMetrics.gridGap / 2 : anchor > widgetGrid.pinnedHeight + CcMetrics.gridGap / 2;
+        const rowUnit = widgetGrid.slotLayout.rowUnit;
+        const anchor = tile.y + Math.min(tile.height, rowUnit) / 2;
+        if (footerOnTop)
+            return anchor < -CcMetrics.gridGap / 2;
+        const newRow = CcMetrics.gridGap + rowUnit;
+        const room = widgetGrid.pinnedHeight + newRow <= availableGridHeight ? newRow : 0;
+        return anchor > widgetGrid.pinnedHeight + room + CcMetrics.gridGap / 2;
     }
 
     // Drops commit a tick later: committing inside the release handler would destroy the dragged item mid-signal.
@@ -279,6 +308,13 @@ FocusScope {
         event.accepted = true;
     }
 
+    Shortcut {
+        sequences: ["F2", "Ctrl+E"]
+        enabled: root.host.shouldBeVisible && !root.host.editMode && !root.pageOpen
+        context: Qt.WindowShortcut
+        onActivated: root.host.editMode = true
+    }
+
     readonly property string expandedSection: host.expandedSection ?? ""
     readonly property bool editMode: host.editMode
 
@@ -305,7 +341,7 @@ FocusScope {
             forceActiveFocus();
     }
 
-    DankGridEditChrome {
+    DGridEditChrome {
         id: panelChrome
 
         readonly property real screenWidth: root.host.triggerScreen?.width ?? Infinity
@@ -366,7 +402,7 @@ FocusScope {
         }
     }
 
-    DankFlickable {
+    DFlickable {
         id: contentFlickable
 
         anchors.left: parent.left
@@ -416,6 +452,7 @@ FocusScope {
                     onColorPickerRequested: root.host.openColorPicker()
                     onCloseRequested: root.host.close()
                     onSettingsRequested: root.host.openSettings()
+                    onEditRequested: root.host.editMode = true
                     onAccountsRequested: root.host.openAccounts()
                     onLockRequested: {
                         root.host.close();
@@ -449,6 +486,7 @@ FocusScope {
         items: root.footerItems
         gridDragging: root.gridDragWidget !== null
         gridDragPoint: widgetGrid.dragScenePoint
+        incomingRemovable: WidgetUtils.isRemovable(root.gridDragWidget)
         incoming: root.gridDragWidget !== null && widgetGrid.heldOutside && !footer.overTrash ? Object.assign({
             "cells": Math.min(WidgetUtils.footerCells(root.gridDragWidget), footer.freeCells())
         }, footer.gridSlot) : null
@@ -463,7 +501,7 @@ FocusScope {
         onConfigRequested: (index, widgetData, anchor) => root.openConfigOverlay(index, widgetData, anchor)
         onItemMoved: (index, sceneRect, leaving) => root.previewFooterDrag(index, sceneRect, leaving)
         onResized: (index, cells, fill) => WidgetUtils.setFooterSize(index, cells, fill)
-        onEditToggled: root.host.editMode = !root.host.editMode
+        onFinishRequested: root.host.editMode = false
         onCancelRequested: root.cancelEdit()
     }
 

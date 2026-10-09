@@ -2,11 +2,12 @@ import QtQuick
 import QtQuick.Effects
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import Quickshell.Services.Mpris
 import Quickshell.Widgets
 
-DankOSD {
+DOSD {
     id: root
 
     osdKind: "mediaPlayback"
@@ -103,7 +104,7 @@ DankOSD {
 
     Image {
         id: artPreloader
-        source: TrackArtService.resolvedArtUrl
+        source: SettingsData.osdMediaPlaybackEnabled ? TrackArtService.resolvedArtUrl : ""
         visible: false
         asynchronous: true
         cache: true
@@ -148,6 +149,7 @@ DankOSD {
 
     Connections {
         target: player
+        enabled: SettingsData.osdMediaPlaybackEnabled
 
         function handleUpdate() {
             if (!root.player?.trackTitle)
@@ -274,7 +276,7 @@ DankOSD {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacingXXS
 
-                DankActionButton {
+                DActionButton {
                     buttonSize: Theme.buttonHeightXS
                     anchors.verticalCenter: parent.verticalCenter
                     objectName: "previousTrack"
@@ -289,7 +291,7 @@ DankOSD {
                     }
                 }
 
-                DankIconButton {
+                DIconButton {
                     width: Theme.buttonHeightS
                     buttonSize: Theme.buttonHeightS
                     variant: "filled"
@@ -308,7 +310,7 @@ DankOSD {
                     }
                 }
 
-                DankActionButton {
+                DActionButton {
                     buttonSize: Theme.buttonHeightXS
                     anchors.verticalCenter: parent.verticalCenter
                     iconName: "skip_next"
@@ -357,7 +359,7 @@ DankOSD {
     Component {
         id: verticalContent
 
-        DankIconButton {
+        DIconButton {
             anchors.fill: parent
             size: "m"
             round: false

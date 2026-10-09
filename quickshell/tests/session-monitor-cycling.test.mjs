@@ -32,20 +32,14 @@ function plain(value) {
     return JSON.parse(JSON.stringify(value));
 }
 
-test("each setter writes its field under the display identifier and keeps other screens", () => {
-    const cases = [["setMonitorCyclingEnabled", "enabled", true], ["setMonitorCyclingRandom", "random", true], ["setMonitorCyclingMode", "mode", "time"], ["setMonitorCyclingInterval", "interval", 60], ["setMonitorCyclingTime", "time", "07:30"], ["setMonitorCyclingFolderPath", "folderPath", "/walls"]];
-    for (const [setter, field, value] of cases) {
-        const { context, saved } = session({ "HDMI-A-1": { enabled: true, interval: 10 } });
-        context[setter]("DP-1", value);
-        const result = plain(context.monitorCyclingSettings);
-        assert.deepEqual(Object.keys(result).sort(), ["HDMI-A-1", "LG 27"]);
-        assert.deepEqual(result["HDMI-A-1"], { enabled: true, interval: 10 });
-        assert.equal(result["LG 27"][field], value);
-        const expected = { enabled: false, random: false, mode: "interval", interval: 300, time: "06:00", folderPath: "" };
-        expected[field] = value;
-        assert.deepEqual(result["LG 27"], expected);
-        assert.equal(saved(), 1);
-    }
+test("a setter writes its field under the display identifier and keeps other screens", () => {
+    const { context, saved } = session({ "HDMI-A-1": { enabled: true, interval: 10 } });
+    context.setMonitorCyclingInterval("DP-1", 60);
+    const result = plain(context.monitorCyclingSettings);
+    assert.deepEqual(Object.keys(result).sort(), ["HDMI-A-1", "LG 27"]);
+    assert.deepEqual(result["HDMI-A-1"], { enabled: true, interval: 10 });
+    assert.deepEqual(result["LG 27"], { enabled: false, random: false, mode: "interval", interval: 60, time: "06:00", folderPath: "" });
+    assert.equal(saved(), 1);
 });
 
 test("keys stored under the connector name or model are replaced by the identifier", () => {

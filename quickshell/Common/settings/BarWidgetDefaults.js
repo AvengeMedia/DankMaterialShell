@@ -25,6 +25,7 @@ var ISLAND_DEFAULTS = {
     islandReserveThickness: 40,
     islandCompactThickness: 38,
     islandOuterGap: 4,
+    islandNotch: false,
     islandAlongOffset: 0,
     islandInteractionMode: "hybrid",
     islandHoverOpenDelay: 150,
@@ -36,12 +37,13 @@ var ISLAND_DEFAULTS = {
     islandNotificationExpand: false,
     islandNotificationPopups: false,
     islandSystemOsd: true,
+    islandChargingPulse: true,
     islandHomeCompactTight: false,
     islandHomeClockDisplay: "both",
     islandHomeVolumeDisplay: "both",
     islandHomeBrightnessDisplay: "both",
     islandHomeStatusContent: "battery",
-    islandBatteryStyle: "solid",
+    islandBatteryStyle: "duo",
     islandSatellitesEnabled: true,
     islandSatellitePosition: "edges",
     islandSatelliteGap: 12,
@@ -49,8 +51,6 @@ var ISLAND_DEFAULTS = {
     islandSatelliteGothCorners: true,
     islandSatelliteFollowInterfaceStyle: true,
     islandSatelliteTransparency: 1,
-    islandSatelliteSwoopRadius: 24,
-    islandReducedMotion: false,
     islandSpringStiffness: 560,
     islandSpringDamping: 37,
     islandSpringMass: 1
@@ -77,6 +77,8 @@ var DEFAULTS = {
     },
     workspaceSwitcher: {
         workspaceIndicatorStyle: "pills",
+        workspaceIndicatorRoundness: -1,
+        workspaceIndicatorCompact: false,
         showWorkspaceIndex: false,
         showWorkspaceName: false,
         showWorkspacePadding: false,
@@ -220,6 +222,10 @@ var DEFAULTS = {
         mountPath: "/",
         diskUsageMode: 0,
         showMountPath: true
+    },
+    network_speed_monitor: {
+        hideWhenIdle: false,
+        compactMode: false
     },
     systemUpdate: {
         hideWhenIdle: false

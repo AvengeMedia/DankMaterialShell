@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { loadScript } from "./qml-script.mjs";
 
-const model = loadScript(new URL("../Modules/DankDash/Wellbeing/Wellbeing.js", import.meta.url));
+const model = loadScript(new URL("../Modules/DDash/Wellbeing/Wellbeing.js", import.meta.url));
 const plain = value => JSON.parse(JSON.stringify(value));
 
 const days = [

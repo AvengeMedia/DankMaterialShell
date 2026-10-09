@@ -4,7 +4,7 @@ import QtQuick
 import QtQuick.Templates as T
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 T.Control {
     id: root
@@ -178,7 +178,7 @@ T.Control {
         }
     }
 
-    DankRipple {
+    DRipple {
         id: ripple
         visible: root.clickable
         rippleColor: root.contentColor
@@ -262,7 +262,7 @@ T.Control {
                     color: root.iconBox ? Theme.withAlpha(root.iconColor, Theme.tonalTintAlpha) : "transparent"
                     visible: root.iconName !== ""
 
-                    DankIcon {
+                    DIcon {
                         anchors.centerIn: parent
                         name: root.iconName
                         size: root.iconBox ? Theme.iconSizeMedium : Theme.iconSize
@@ -313,7 +313,7 @@ T.Control {
                 active: root.modified && root.resetInHeader
                 visible: active
 
-                sourceComponent: DankActionButton {
+                sourceComponent: DActionButton {
                     buttonSize: Theme.iconButtonSize
                     iconName: "restart_alt"
                     iconSize: Theme.iconSizeMedium
@@ -346,7 +346,7 @@ T.Control {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                DankIcon {
+                DIcon {
                     name: "chevron_right"
                     size: Theme.iconSize
                     color: root.supportingContentColor

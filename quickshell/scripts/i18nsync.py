@@ -20,7 +20,7 @@ TERM_RENAMES_JSON = REPO_ROOT / "translations" / "term_renames.json"
 # consumer gets them with the pointer. dankcalendar merges from this project.
 COMMON_ROOT = REPO_ROOT.parent / "dank-qml-common"
 COMMON_EN_JSON = COMMON_ROOT / "translations" / "en.json"
-COMMON_POEXPORTS_DIR = COMMON_ROOT / "DankCommon" / "translations" / "poexports"
+COMMON_POEXPORTS_DIR = COMMON_ROOT / "DCommon" / "translations" / "poexports"
 
 # The official plugin monorepo is scanned by extraction: its plugins use
 # I18n.tr, so their terms belong to the shell catalog. I18n.trFor terms

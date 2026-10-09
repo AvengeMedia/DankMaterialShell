@@ -302,20 +302,25 @@ func (p *MangoWCParser) addBind(kb *MangoWCKeyBinding) {
 	normalizedKey := p.normalizeKey(key)
 	isDMSBind := strings.Contains(kb.Source, "dms/binds.conf") || strings.Contains(kb.Source, "dms"+string(os.PathSeparator)+"binds.conf")
 
-	if isDMSBind {
-		p.dmsBindKeys[normalizedKey] = true
-	} else if p.dmsBindKeys[normalizedKey] {
-		p.bindsAfterDMS++
-		p.conflictingConfigs[normalizedKey] = kb
-		p.configBindKeys[normalizedKey] = true
-		return
-	} else {
-		p.configBindKeys[normalizedKey] = true
-	}
-
-	if _, exists := p.bindMap[normalizedKey]; !exists {
+	// Mango (>= 0.15.5) applies the first matching bind and ignores later ones.
+	existing, exists := p.bindMap[normalizedKey]
+	if !exists {
 		p.bindOrder = append(p.bindOrder, key)
+		p.bindMap[normalizedKey] = kb
+		if isDMSBind {
+			p.dmsBindKeys[normalizedKey] = true
+		} else {
+			p.configBindKeys[normalizedKey] = true
+		}
+		return
 	}
+	if !isDMSBind || p.dmsBindKeys[normalizedKey] {
+		return
+	}
+	// A config bind sourced earlier shadows this DMS bind; list the DMS bind with it as the conflict.
+	p.bindsAfterDMS++
+	p.conflictingConfigs[normalizedKey] = existing
+	p.dmsBindKeys[normalizedKey] = true
 	p.bindMap[normalizedKey] = kb
 }
 

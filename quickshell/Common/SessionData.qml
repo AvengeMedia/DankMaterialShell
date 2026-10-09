@@ -8,9 +8,9 @@ import Quickshell.Io
 import qs.Common
 import qs.Services
 import "settings/SessionSpec.js" as Spec
-import "../DankCommon/Common/MaterialWallpaper.js" as MaterialWallpaper
+import "../DCommon/Common/MaterialWallpaper.js" as MaterialWallpaper
 import "settings/SessionStore.js" as Store
-import "../DankCommon/Common/settings/SpecUtil.js" as SpecUtil
+import "../DCommon/Common/settings/SpecUtil.js" as SpecUtil
 
 Singleton {
     id: root
@@ -64,9 +64,15 @@ Singleton {
         return "";
     }
 
+    function probeTerminals() {
+        if (terminalProbe.running || installedTerminals.length > 0)
+            return;
+        terminalProbe.running = true;
+    }
+
     Process {
         id: terminalProbe
-        running: true
+        running: false
         command: ["sh", "-c", "for t in ghostty kitty foot alacritty wezterm konsole gnome-terminal xterm; do command -v \"$t\" >/dev/null 2>&1 && echo \"$t\"; done"]
         stdout: StdioCollector {
             onStreamFinished: {
@@ -291,7 +297,10 @@ Singleton {
     property var activeDisplayProfile: ({})
     property var activeDisplayProfileModes: ({})
     property var desktopWidgetGridSettings: ({})
+    property var lockScreenWidgetGridSettings: ({})
     property var desktopWidgetInstancePositions: ({})
+    property var lockScreenAutoPositions: ({})
+    property var greeterAutoPositions: ({})
     property var islandFreePositions: ({})
     property var builtInPluginState: ({})
     property bool greeterSyncPending: false
@@ -587,25 +596,43 @@ Singleton {
         saveSettings();
     }
 
-    function getDesktopWidgetGridSetting(screenKey, property, defaultValue) {
-        const val = desktopWidgetGridSettings?.[screenKey]?.[property];
+    function getWidgetGridSetting(lockScreen, screenKey, property, defaultValue) {
+        const store = lockScreen ? lockScreenWidgetGridSettings : desktopWidgetGridSettings;
+        const val = store?.[screenKey]?.[property];
         return val !== undefined ? val : defaultValue;
     }
 
-    function setDesktopWidgetGridSetting(screenKey, property, value) {
-        const allSettings = JSON.parse(JSON.stringify(desktopWidgetGridSettings || {}));
+    function setWidgetGridSetting(lockScreen, screenKey, property, value) {
+        const allSettings = JSON.parse(JSON.stringify((lockScreen ? lockScreenWidgetGridSettings : desktopWidgetGridSettings) || {}));
         if (!allSettings[screenKey])
             allSettings[screenKey] = {};
         allSettings[screenKey][property] = value;
-        desktopWidgetGridSettings = allSettings;
+        if (lockScreen)
+            lockScreenWidgetGridSettings = allSettings;
+        else
+            desktopWidgetGridSettings = allSettings;
         saveSettings();
+    }
+
+    readonly property var widgetAnchorKeys: ({
+            x: "anchorX",
+            y: "anchorY"
+        })
+
+    function mergedWidgetPosition(current, updates) {
+        const merged = Object.assign({}, current || {}, updates);
+        for (const key in merged) {
+            if (merged[key] === undefined)
+                delete merged[key];
+        }
+        return merged;
     }
 
     function updateDesktopWidgetInstancePosition(instanceId, screenKey, positionUpdates) {
         const updated = JSON.parse(JSON.stringify(desktopWidgetInstancePositions));
         if (!updated[instanceId])
             updated[instanceId] = {};
-        updated[instanceId][screenKey] = Object.assign({}, updated[instanceId][screenKey] || {}, positionUpdates);
+        updated[instanceId][screenKey] = mergedWidgetPosition(updated[instanceId][screenKey], positionUpdates);
         desktopWidgetInstancePositions = updated;
         saveSettings();
     }
@@ -645,12 +672,69 @@ Singleton {
             synced.width = sourcePos.width;
         if (sourcePos.height !== undefined)
             synced.height = sourcePos.height;
+        if (sourcePos.anchorX !== undefined)
+            synced.anchorX = sourcePos.anchorX;
+        if (sourcePos.anchorY !== undefined)
+            synced.anchorY = sourcePos.anchorY;
         const updated = JSON.parse(JSON.stringify(desktopWidgetInstancePositions));
         updated[instanceId]["_synced"] = synced;
         desktopWidgetInstancePositions = updated;
         saveSettings();
     }
 
+    function setGreeterAutoPositions(screenKey, placement) {
+        if (JSON.stringify(greeterAutoPositions[screenKey] ?? null) === JSON.stringify(placement))
+            return;
+        const updated = Object.assign({}, greeterAutoPositions);
+        updated[screenKey] = placement;
+        greeterAutoPositions = updated;
+        saveSettings();
+    }
+    function setLockScreenAutoPositions(screenKey, placement) {
+        if (JSON.stringify(lockScreenAutoPositions[screenKey] ?? null) === JSON.stringify(placement))
+            return;
+        const updated = Object.assign({}, lockScreenAutoPositions);
+        updated[screenKey] = placement;
+        lockScreenAutoPositions = updated;
+        saveSettings();
+    }
+
+    function copyDesktopWidgetInstancePositions(fromId, toId) {
+        const source = desktopWidgetInstancePositions[fromId];
+        if (!source)
+            return;
+        const updated = JSON.parse(JSON.stringify(desktopWidgetInstancePositions));
+        updated[toId] = JSON.parse(JSON.stringify(source));
+        desktopWidgetInstancePositions = updated;
+        saveSettings();
+    }
+    // Detached greeter clocks keep the spot the lock screen picked for them.
+    function pinPublishedLockPosition(fromId, toId, synced) {
+        const updated = JSON.parse(JSON.stringify(desktopWidgetInstancePositions));
+        let pinned = false;
+        for (const screenKey in lockScreenAutoPositions) {
+            const entry = lockScreenAutoPositions[screenKey];
+            const position = entry?.positions?.[fromId];
+            if (!position || !(entry.width > 0) || !(entry.height > 0))
+                continue;
+            const key = synced ? "_synced" : screenKey;
+            if (!updated[toId])
+                updated[toId] = {};
+            updated[toId][key] = mergedWidgetPosition(updated[toId][key], {
+                x: synced ? position.x / entry.width : position.x,
+                y: synced ? position.y / entry.height : position.y,
+                anchorX: undefined,
+                anchorY: undefined
+            });
+            pinned = true;
+            if (synced)
+                break;
+        }
+        if (!pinned)
+            return;
+        desktopWidgetInstancePositions = updated;
+        saveSettings();
+    }
     function removeDesktopWidgetInstancePositions(instanceId) {
         if (!(instanceId in desktopWidgetInstancePositions))
             return;
@@ -665,8 +749,11 @@ Singleton {
             return;
         const updated = JSON.parse(JSON.stringify(desktopWidgetInstancePositions));
         for (const screenKey in updated[instanceId]) {
-            for (const key of keys)
+            for (const key of keys) {
                 delete updated[instanceId][screenKey][key];
+                if (key in widgetAnchorKeys)
+                    delete updated[instanceId][screenKey][widgetAnchorKeys[key]];
+            }
         }
         desktopWidgetInstancePositions = updated;
         saveSettings();
@@ -1597,7 +1684,15 @@ Singleton {
         saveSettings();
     }
 
+    function clearLauncherHistory() {
+        launcherLastQuery = "";
+        launcherQueryHistory = [];
+        saveSettings();
+    }
+
     function addLauncherHistory(query, skipLastQuery) {
+        if (!SettingsData.launcherHistoryEnabled)
+            return;
         let q = query.trim();
 
         if (!skipLastQuery)
@@ -1767,7 +1862,7 @@ Singleton {
     FileView {
         id: greeterSessionFile
 
-        path: root.greeterSessionBaseDir ? (root.greeterSessionBaseDir + "/session.json") : ""
+        path: isGreeterMode && root.greeterSessionBaseDir ? (root.greeterSessionBaseDir + "/session.json") : ""
         preload: isGreeterMode
         blockLoading: false
         blockWrites: true

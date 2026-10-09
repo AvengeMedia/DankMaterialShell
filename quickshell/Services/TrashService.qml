@@ -20,6 +20,8 @@ Singleton {
     readonly property bool isEmpty: count === 0
 
     property var availableFileManagers: ["default"]
+    property bool _fileManagersDetected: false
+    property var _pendingOpenOptions: null
     property string defaultFileManagerLabel: "default (xdg-open)"
 
     signal emptyTrashConfirmRequested(int itemCount)
@@ -55,14 +57,25 @@ Singleton {
             onStreamFinished: {
                 const detected = (text || "").split("\n").map(s => s.trim()).filter(s => s.length > 0);
                 root.availableFileManagers = ["default"].concat(detected).concat(["custom"]);
+                if (!root._pendingOpenOptions)
+                    return;
+                const options = root._pendingOpenOptions;
+                root._pendingOpenOptions = null;
+                root.openTrash(options);
             }
         }
     }
 
     Component.onCompleted: {
         Paths.trashHandler = (path, callback) => trashPath(path, callback);
-        detectProc.running = true;
         refreshCount();
+    }
+
+    function detectFileManagers() {
+        if (_fileManagersDetected)
+            return;
+        _fileManagersDetected = true;
+        detectProc.running = true;
     }
 
     function refreshCount() {
@@ -103,6 +116,11 @@ Singleton {
             return;
         case "custom":
             openCustom(options);
+            return;
+        }
+        if (!_fileManagersDetected) {
+            _pendingOpenOptions = options;
+            detectFileManagers();
             return;
         }
         if (availableFileManagers.indexOf(choice) < 0) {
