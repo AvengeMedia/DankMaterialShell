@@ -426,8 +426,9 @@ func buildOnce(opts *Options) (bool, error) {
 			primaryLight = primaryDark
 		}
 
-		dank16JSON = generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode, opts.TerminalPalette)
-		importData := fmt.Sprintf(`{"colors": %s, "dank16": %s}`, opts.StockColors, dank16JSON)
+		dank16JSON = generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode, "")
+		dank16TermJSON := generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode, opts.TerminalPalette)
+		importData := fmt.Sprintf(`{"colors": %s, "dank16": %s, "dank16term": %s}`, opts.StockColors, dank16JSON, dank16TermJSON)
 		importArgs = []string{"--import-json-string", importData}
 
 		log.Info("Running matugen color hex with stock color overrides")
@@ -495,9 +496,10 @@ func buildOnce(opts *Options) (bool, error) {
 			primaryLight = primaryDark
 		}
 
-		injections := InjectedPalettes(opts.ConfigDir, sourceImage, opts.Mode)
-
-		dank16JSON = generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode, opts.TerminalPalette)
+		dank16JSON = generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode, "")
+		// The terminal palette only reaches the terminal templates; editor themes and user templates keep dank16.
+		dank16Term := paletteInjection{Namespace: "dank16term", JSON: generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode, opts.TerminalPalette)}
+		injections := append([]paletteInjection{dank16Term}, InjectedPalettes(opts.ConfigDir, sourceImage, opts.Mode)...)
 		importArgs = []string{"--import-json-string", buildImportData(dank16JSON, sourceImage, specColors, injections)}
 
 		log.Infof("Running matugen %s with dank16 injection", opts.Kind)

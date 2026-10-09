@@ -139,9 +139,9 @@ func decodeSpecColorsMode(t *testing.T, seed, scheme, version string, mode Color
 }
 
 // Runs the real matugen against the repo's dank.json template, colors only,
-// into a temp state dir: the shell must read back the seed and the 2025 primary
-// from dms-colors.json.
-func TestBuildOnceSeedColorAndSpec2025(t *testing.T) {
+// into a temp state dir, and returns the rendered dms-colors.json.
+func buildColorsOnly(t *testing.T, terminalPalette string) []byte {
+	t.Helper()
 	if _, err := exec.LookPath("matugen"); err != nil {
 		t.Skip("matugen not installed")
 	}
@@ -161,17 +161,18 @@ func TestBuildOnceSeedColorAndSpec2025(t *testing.T) {
 	require.NoError(t, f.Close())
 
 	opts := &Options{
-		StateDir:    t.TempDir(),
-		ShellDir:    shellDir,
-		ConfigDir:   t.TempDir(),
-		Kind:        "image",
-		Value:       wallpaper,
-		Mode:        ColorModeDark,
-		MatugenType: "scheme-vibrant",
-		SeedColor:   "#FF3D00",
-		Spec:        Spec2025,
-		ColorsOnly:  true,
-		AppChecker:  utils.DefaultAppChecker{},
+		StateDir:        t.TempDir(),
+		ShellDir:        shellDir,
+		ConfigDir:       t.TempDir(),
+		Kind:            "image",
+		Value:           wallpaper,
+		Mode:            ColorModeDark,
+		MatugenType:     "scheme-vibrant",
+		SeedColor:       "#FF3D00",
+		Spec:            Spec2025,
+		ColorsOnly:      true,
+		TerminalPalette: terminalPalette,
+		AppChecker:      utils.DefaultAppChecker{},
 	}
 	changed, err := buildOnce(opts)
 	require.NoError(t, err)
@@ -179,6 +180,12 @@ func TestBuildOnceSeedColorAndSpec2025(t *testing.T) {
 
 	raw, err := os.ReadFile(opts.ColorsOutput())
 	require.NoError(t, err)
+	return raw
+}
+
+// The shell must read back the seed and the 2025 primary from dms-colors.json.
+func TestBuildOnceSeedColorAndSpec2025(t *testing.T) {
+	raw := buildColorsOnly(t, "")
 	var out struct {
 		Colors struct {
 			Dark map[string]string `json:"dark"`
@@ -187,4 +194,17 @@ func TestBuildOnceSeedColorAndSpec2025(t *testing.T) {
 	require.NoError(t, json.Unmarshal(raw, &out))
 	require.Equal(t, "#ff3d00", out.Colors.Dark["source_color"])
 	require.Equal(t, "#ff8f73", out.Colors.Dark["primary"])
+}
+
+// The terminal palette is injected as dank16term, so dank16 (editor themes, user templates) stays unchanged.
+func TestBuildOnceTerminalPaletteLeavesDank16(t *testing.T) {
+	dank16 := func(raw []byte) json.RawMessage {
+		var out struct {
+			Dank16 json.RawMessage `json:"dank16"`
+		}
+		require.NoError(t, json.Unmarshal(raw, &out))
+		require.NotEmpty(t, out.Dank16)
+		return out.Dank16
+	}
+	require.JSONEq(t, string(dank16(buildColorsOnly(t, ""))), string(dank16(buildColorsOnly(t, "high"))))
 }

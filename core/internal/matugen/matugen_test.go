@@ -9,6 +9,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -1495,4 +1496,33 @@ func TestGenerateDank16VariantsProfile(t *testing.T) {
 	def, high := gen(""), gen("high")
 	assert.NotEqual(t, def["color1"], high["color1"])
 	assert.Equal(t, def["color0"], high["color0"])
+}
+
+func TestTerminalPaletteOnlyReachesTerminalTemplates(t *testing.T) {
+	shellDir := filepath.Join("..", "..", "..", "quickshell")
+	inputPath := regexp.MustCompile(`input_path = 'SHELL_DIR/([^']+)'`)
+	checked := 0
+	for _, def := range templateRegistry {
+		if def.ConfigFile == "" {
+			continue
+		}
+		config, err := os.ReadFile(filepath.Join(shellDir, "matugen", "configs", def.ConfigFile))
+		if !assert.NoError(t, err) {
+			continue
+		}
+		for _, m := range inputPath.FindAllStringSubmatch(string(config), -1) {
+			data, err := os.ReadFile(filepath.Join(shellDir, m[1]))
+			if !assert.NoError(t, err) {
+				continue
+			}
+			content := string(data)
+			if def.Kind == TemplateKindTerminal {
+				assert.NotContains(t, content, "{{dank16.", "%s: terminal templates read dank16term", m[1])
+			} else {
+				assert.NotContains(t, content, "dank16term", "%s: only terminal templates follow the terminal palette", m[1])
+			}
+			checked++
+		}
+	}
+	assert.Greater(t, checked, 10)
 }
