@@ -12,7 +12,9 @@ DContextMenu {
 
     readonly property bool hasPinnedDuplicate: !!entry && !entry.pinned && ClipboardService.getPinnedEntryByHash(entry.hash) !== null
     readonly property bool canEditEntry: ClipboardService.canEditEntry(entry)
-    readonly property bool hasTextAlternative: !!entry && (entry.altMimeType ?? "") !== ""
+    // uri-list entries are files: their text form is the bare path, even
+    // when no alternate text was captured at copy time.
+    readonly property bool hasTextAlternative: !!entry && ((entry.altMimeType ?? "") !== "" || (entry.mimeType ?? "") === "text/uri-list")
     readonly property bool pinned: entry?.pinned || hasPinnedDuplicate
 
     layerNamespace: "dms:clipboard-context-menu"

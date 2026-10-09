@@ -208,9 +208,9 @@ func handleCopyEntry(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 		return
 	}
 
-	textOnly := params.BoolOpt(req.Params, "textOnly", false) && entry.AltMimeType != ""
+	textOnly := params.BoolOpt(req.Params, "textOnly", false)
 
-	if entry.AltMimeType == "" {
+	if entry.AltMimeType == "" && !textOnly {
 		filePath := m.EntryToFile(entry)
 		if filePath != "" {
 			if err := m.CopyFile(filePath); err != nil {
@@ -228,7 +228,15 @@ func handleCopyEntry(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	var setErr error
 	switch {
 	case textOnly:
-		setErr = m.SetClipboard(entry.AltData, entry.AltMimeType)
+		// Text-only copy: never the entry's own representation — a file
+		// entry IS text/uri-list, which Blink classifies as Files inside a
+		// contenteditable, so text-only editors would paste nothing.
+		data, mime, err := m.textOnlyClipboardPayload(entry)
+		if err != nil {
+			models.RespondError(conn, req.ID, err.Error())
+			return
+		}
+		setErr = m.SetClipboard(data, mime)
 	default:
 		setErr = m.SetClipboardEntry(entry)
 	}
