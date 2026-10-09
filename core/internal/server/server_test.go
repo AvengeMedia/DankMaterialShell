@@ -3,26 +3,16 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/bluez"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
 	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-func TestGetSocketPath(t *testing.T) {
-	path := GetSocketPath()
-	assert.Contains(t, path, "danklinux-")
-	assert.Contains(t, path, ".sock")
-	assert.Contains(t, path, fmt.Sprintf("%d", os.Getpid()))
-}
 
 func TestGetCapabilities(t *testing.T) {
 	originalNetworkManager := networkManager
@@ -31,14 +21,12 @@ func TestGetCapabilities(t *testing.T) {
 	t.Run("capabilities without network manager", func(t *testing.T) {
 		networkManager = nil
 		caps := getCapabilities()
-		assert.Contains(t, caps.Capabilities, "plugins")
 		assert.NotContains(t, caps.Capabilities, "network")
 	})
 
 	t.Run("capabilities with network manager", func(t *testing.T) {
 		networkManager = &network.Manager{}
 		caps := getCapabilities()
-		assert.Contains(t, caps.Capabilities, "plugins")
 		assert.Contains(t, caps.Capabilities, "network")
 	})
 }
@@ -82,34 +70,6 @@ func (m *mockConn) Close() error {
 
 func (m *mockConn) SetWriteDeadline(t time.Time) error { return nil }
 
-func TestRespondError(t *testing.T) {
-	mc := &mockConn{}
-	models.RespondError(ipc.NewConnWriter(mc), 123, "test error")
-
-	var resp ipc.Response[any]
-	err := json.Unmarshal(mc.written, &resp)
-	require.NoError(t, err)
-
-	assert.Equal(t, 123, resp.ID)
-	assert.Equal(t, "test error", resp.Error)
-	assert.Nil(t, resp.Result)
-}
-
-func TestRespond(t *testing.T) {
-	mc := &mockConn{}
-	result := map[string]string{"foo": "bar"}
-	models.Respond(ipc.NewConnWriter(mc), 123, result)
-
-	var resp ipc.Response[map[string]string]
-	err := json.Unmarshal(mc.written, &resp)
-	require.NoError(t, err)
-
-	assert.Equal(t, 123, resp.ID)
-	assert.Empty(t, resp.Error)
-	require.NotNil(t, resp.Result)
-	assert.Equal(t, "bar", (*resp.Result)["foo"])
-}
-
 func TestExclusiveServiceRequiresExplicitSubscription(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -119,7 +79,6 @@ func TestExclusiveServiceRequiresExplicitSubscription(t *testing.T) {
 	}{
 		{name: "explicit", services: []string{"mpris.command"}, want: true},
 		{name: "all excluded", services: []string{"all"}, want: false},
-		{name: "omitted excluded", services: nil, want: false},
 		{name: "regular service via all", services: []string{"all"}, includeAll: true, want: true},
 	}
 

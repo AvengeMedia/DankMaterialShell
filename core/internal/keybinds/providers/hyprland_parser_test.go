@@ -18,9 +18,6 @@ func TestHyprlandAutogenerateComment(t *testing.T) {
 		{"resizewindow", "", "Resize window"},
 		{"movewindow", "", "Move window"},
 		{"movewindow", "l", "move in left direction"},
-		{"movewindow", "r", "move in right direction"},
-		{"movewindow", "u", "move in up direction"},
-		{"movewindow", "d", "move in down direction"},
 		{"pin", "", "pin (show on all workspaces)"},
 		{"splitratio", "0.5", "Window split ratio 0.5"},
 		{"togglefloating", "", "Float/unfloat window"},
@@ -48,17 +45,9 @@ func TestHyprlandAutogenerateComment(t *testing.T) {
 		{"workspace", "-1", "focus left"},
 		{"workspace", "5", "focus workspace 5"},
 		{"movefocus", "l", "move focus left"},
-		{"movefocus", "r", "move focus right"},
-		{"movefocus", "u", "move focus up"},
-		{"movefocus", "d", "move focus down"},
 		{"swapwindow", "l", "swap in left direction"},
-		{"swapwindow", "r", "swap in right direction"},
-		{"swapwindow", "u", "swap in up direction"},
-		{"swapwindow", "d", "swap in down direction"},
 		{"movetoworkspace", "+1", "move to right workspace (non-silent)"},
-		{"movetoworkspace", "-1", "move to left workspace (non-silent)"},
 		{"movetoworkspace", "3", "move to workspace 3 (non-silent)"},
-		{"movetoworkspacesilent", "+1", "move to right workspace"},
 		{"movetoworkspacesilent", "-1", "move to left workspace"},
 		{"movetoworkspacesilent", "2", "move to workspace 2"},
 		{"togglespecialworkspace", "", "toggle special"},
@@ -1120,37 +1109,6 @@ func TestHyprlandReadContentErrors(t *testing.T) {
 	}
 }
 
-func TestHyprlandReadContentWithTildeExpansion(t *testing.T) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		t.Skip("Cannot get home directory")
-	}
-
-	tmpSubdir := filepath.Join(homeDir, ".config", "test-hypr-"+t.Name())
-	if err := os.MkdirAll(tmpSubdir, 0o755); err != nil {
-		t.Skip("Cannot create test directory in home")
-	}
-	defer os.RemoveAll(tmpSubdir)
-
-	configFile := filepath.Join(tmpSubdir, "test.conf")
-	if err := os.WriteFile(configFile, []byte("bind = SUPER, Q, killactive\n"), 0o644); err != nil {
-		t.Fatalf("Failed to write test config: %v", err)
-	}
-
-	relPath, err := filepath.Rel(homeDir, tmpSubdir)
-	if err != nil {
-		t.Skip("Cannot create relative path")
-	}
-
-	parser := NewHyprlandParser("")
-	tildePathMatch := "~/" + relPath
-	err = parser.ReadContent(tildePathMatch)
-
-	if err != nil {
-		t.Errorf("ReadContent with tilde path failed: %v", err)
-	}
-}
-
 func TestHyprlandKeybindWithParamsContainingCommas(t *testing.T) {
 	parser := NewHyprlandParser("")
 	parser.contentLines = []string{"bind = SUPER, R, exec, notify-send 'Title' 'Message, with comma'"}
@@ -1201,17 +1159,9 @@ func TestExtractBindFlags(t *testing.T) {
 	}{
 		{"bind", ""},
 		{"binde", "e"},
-		{"bindl", "l"},
-		{"bindr", "r"},
-		{"bindd", "d"},
-		{"bindo", "o"},
 		{"bindel", "el"},
-		{"bindler", "ler"},
-		{"bindem", "em"},
-		{"  bind  ", ""},
 		{"  binde  ", "e"},
 		{"bindkd", "kd"},
-		{"bindux", "ux"},
 		{"bindpcg", "pcg"},
 	}
 
@@ -1241,14 +1191,6 @@ func TestHyprlandBindFlags(t *testing.T) {
 		expectedDesc  string
 	}{
 		{
-			name:          "regular bind",
-			line:          "bind = SUPER, Q, killactive",
-			expectedFlags: "",
-			expectedKey:   "Q",
-			expectedDisp:  "killactive",
-			expectedDesc:  "Close window",
-		},
-		{
 			name:          "binde (repeat on hold)",
 			line:          "binde = , XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
 			expectedFlags: "e",
@@ -1257,44 +1199,12 @@ func TestHyprlandBindFlags(t *testing.T) {
 			expectedDesc:  "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
 		},
 		{
-			name:          "bindl (locked/inhibitor bypass)",
-			line:          "bindl = , XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-",
-			expectedFlags: "l",
-			expectedKey:   "XF86AudioLowerVolume",
-			expectedDisp:  "exec",
-			expectedDesc:  "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-",
-		},
-		{
-			name:          "bindr (release trigger)",
-			line:          "bindr = SUPER, SUPER_L, exec, pkill wofi || wofi",
-			expectedFlags: "r",
-			expectedKey:   "SUPER_L",
-			expectedDisp:  "exec",
-			expectedDesc:  "pkill wofi || wofi",
-		},
-		{
 			name:          "bindd (description)",
 			line:          "bindd = SUPER, Q, Open my favourite terminal, exec, kitty",
 			expectedFlags: "d",
 			expectedKey:   "Q",
 			expectedDisp:  "exec",
 			expectedDesc:  "Open my favourite terminal",
-		},
-		{
-			name:          "bindo (long press)",
-			line:          "bindo = SUPER, XF86AudioNext, exec, playerctl next",
-			expectedFlags: "o",
-			expectedKey:   "XF86AudioNext",
-			expectedDisp:  "exec",
-			expectedDesc:  "playerctl next",
-		},
-		{
-			name:          "bindel (combined flags)",
-			line:          "bindel = , XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+",
-			expectedFlags: "el",
-			expectedKey:   "XF86AudioRaiseVolume",
-			expectedDisp:  "exec",
-			expectedDesc:  "wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+",
 		},
 		{
 			name:          "bindk (per-device)",

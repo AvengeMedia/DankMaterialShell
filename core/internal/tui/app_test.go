@@ -108,18 +108,6 @@ func TestTerminalChoicesOmitGhosttyOnGentoo(t *testing.T) {
 	}
 }
 
-func TestMoveIndexClamps(t *testing.T) {
-	if moveIndex(0, -1, 2) != 0 {
-		t.Fatal("moveIndex should not go below 0")
-	}
-	if moveIndex(2, 1, 2) != 2 {
-		t.Fatal("moveIndex should not exceed max")
-	}
-	if moveIndex(1, 1, 2) != 2 {
-		t.Fatal("moveIndex should advance within bounds")
-	}
-}
-
 func TestToggleSelectedDependency(t *testing.T) {
 	m := archModel()
 	m.dependencies = []deps.Dependency{

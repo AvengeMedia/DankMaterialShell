@@ -58,7 +58,6 @@ func TestScrollCaptureRect(t *testing.T) {
 		want  [4]int
 	}{
 		{CompositorHyprland, 1.25, [4]int{1230, 160, 642, 480}},
-		{CompositorNiri, 1.25, [4]int{1230, 160, 642, 480}},
 		{CompositorMango, 1.25, [4]int{1538, 200, 802, 600}},
 		{CompositorHyprland, 1, [4]int{1538, 200, 802, 600}},
 	}

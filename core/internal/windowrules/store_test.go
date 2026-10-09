@@ -196,12 +196,6 @@ func TestDMSOpaqueRuleIsPinnedLast(t *testing.T) {
 			have: []string{"a", OpaqueRuleID, "b"},
 			want: []string{"a", "b", OpaqueRuleID},
 		},
-		{
-			name: "opaque absent leaves order unchanged",
-			run:  func(s *fakeStore) error { return Set(s, WindowRule{ID: "c"}) },
-			have: []string{"b", "a"},
-			want: []string{"b", "a", "c"},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

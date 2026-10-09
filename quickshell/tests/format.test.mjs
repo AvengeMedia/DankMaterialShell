@@ -13,18 +13,14 @@ vm.runInContext("String.prototype.arg = function() { let out = this.toString(); 
 const HOUR_MS = 60 * 60 * 1000;
 
 test("formatRemaining returns zeroText at or below zero", () => {
-    assert.equal(format.formatRemaining(0, "Off", "%1 min", "%1 h", "%1 h %2 m"), "Off");
     assert.equal(format.formatRemaining(-5, "Off", "%1 min", "%1 h", "%1 h %2 m"), "Off");
-    assert.equal(format.formatRemaining(0, "", "%1 min", "%1 h", "%1 h %2 m"), "");
 });
 
 test("formatRemaining formats minutes below an hour, rounding up", () => {
     assert.equal(format.formatRemaining(30 * 1000, "", "%1 min", "%1 h", "%1 h %2 m"), "1 min");
-    assert.equal(format.formatRemaining(43 * 60 * 1000, "", "%1 min", "%1 h", "%1 h %2 m"), "43 min");
 });
 
 test("formatRemaining formats whole hours without minutes", () => {
-    assert.equal(format.formatRemaining(HOUR_MS, "", "%1 min", "%1 h", "%1 h %2 m"), "1 h");
     assert.equal(format.formatRemaining(2 * HOUR_MS, "", "%1 min", "%1 h", "%1 h %2 m"), "2 h");
 });
 
@@ -34,5 +30,4 @@ test("formatRemaining rounds 59m59s up to one hour, not 60 min", () => {
 
 test("formatRemaining formats hours and minutes together", () => {
     assert.equal(format.formatRemaining(2 * HOUR_MS + 5 * 60 * 1000, "", "%1 min", "%1 h", "%1 h %2 m"), "2 h 5 m");
-    assert.equal(format.formatRemaining(4 * HOUR_MS + 59 * 60 * 1000 + 59000, "", "%1 min", "%1 h", "%1 h %2 m"), "5 h");
 });

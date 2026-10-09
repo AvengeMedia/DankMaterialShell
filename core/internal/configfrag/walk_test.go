@@ -31,13 +31,6 @@ func recordingWalker(t *testing.T, isDMS func(string) bool) (*Walker, *[]string,
 	return NewWalker(isDMS), &visited, record
 }
 
-func TestAFreshScanReportsNoIncludeAtPositionMinusOne(t *testing.T) {
-	scan := NewScan()
-	if scan.Count != 0 || scan.DMSSeen || scan.DMSPosition != -1 {
-		t.Fatalf("fresh scan = %+v, want count 0, unseen, position -1", scan)
-	}
-}
-
 func TestARelativeSourceResolvesAgainstTheIncludingFile(t *testing.T) {
 	dir := t.TempDir()
 	writeFile(t, filepath.Join(dir, "dms", "binds.conf"), "")
@@ -65,10 +58,8 @@ func TestAnAbsoluteSourceIsUsedAsIs(t *testing.T) {
 }
 
 func TestATildeSourceExpandsToHomeAndIsNotJoinedToTheBaseDir(t *testing.T) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		t.Skipf("no home dir: %v", err)
-	}
+	home := t.TempDir()
+	t.Setenv("HOME", home)
 
 	walker, visited, record := recordingWalker(t, nil)
 	walker.Include(t.TempDir(), "~/dms-walker-probe.conf", record)

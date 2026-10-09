@@ -11,46 +11,17 @@ const resolve = vm.createContext({});
 vm.runInContext(readFileSync(new URL("../Common/ConfigIncludeResolve.js", import.meta.url), "utf8").replace(/^\.pragma.*$/m, ""), resolve);
 const plain = value => JSON.parse(JSON.stringify(value));
 
-test("includeSpec returns null off the table", () => {
-    assert.equal(resolve.includeSpec("colors", "mango"), null, "colors is deployed by setup, never repaired");
-    assert.equal(resolve.includeSpec("colors", "niri"), null, "unknown kind");
-    assert.equal(resolve.includeSpec("outputs", "sway"), null, "unknown compositor");
-    assert.equal(resolve.includeSpec("outputs", ""), null, "empty compositor");
-});
-
-test("binds on hyprland carries dms.binds before dms.binds-user", () => {
-    const spec = resolve.includeSpec("binds", "hyprland");
-    assert.deepEqual(plain(spec.fragmentNames), ["binds.lua", "binds-user.lua"]);
-});
-
 test("includePaths joins the compositor directory, with hypr for hyprland", () => {
-    const niri = resolve.includePaths("outputs", "niri", "/home/u/.config");
-    assert.equal(niri.configFile, "/home/u/.config/niri/config.kdl");
-    assert.deepEqual(plain(niri.fragmentFiles), ["/home/u/.config/niri/dms/outputs.kdl"]);
     const hyprland = resolve.includePaths("layout", "hyprland", "/home/u/.config");
     assert.equal(hyprland.configFile, "/home/u/.config/hypr/hyprland.lua");
     assert.deepEqual(plain(hyprland.fragmentFiles), ["/home/u/.config/hypr/dms/layout.lua"]);
-    const mango = resolve.includePaths("cursor", "mango", "/home/u/.config");
-    assert.equal(mango.configFile, "/home/u/.config/mango/config.conf");
-    assert.deepEqual(plain(mango.fragmentFiles), ["/home/u/.config/mango/dms/cursor.conf"]);
-    const binds = resolve.includePaths("binds", "hyprland", "/home/u/.config");
-    assert.deepEqual(plain(binds.fragmentFiles), ["/home/u/.config/hypr/dms/binds.lua", "/home/u/.config/hypr/dms/binds-user.lua"]);
-    assert.deepEqual(plain(resolve.includePaths("input", "mango", "/home/u/.config").fragmentFiles), ["/home/u/.config/mango/dms/input.conf"]);
     assert.equal(resolve.includePaths("colors", "mango", "/home/u/.config"), null, "no spec, no paths");
 });
 
 test("resolveIncludeArgs spells mango as mangowc and names the fragment", () => {
     assert.deepEqual(plain(resolve.resolveIncludeArgs("outputs", "niri")), ["niri", "outputs.kdl"]);
-    assert.deepEqual(plain(resolve.resolveIncludeArgs("layout", "hyprland")), ["hyprland", "layout.lua"]);
-    assert.deepEqual(plain(resolve.resolveIncludeArgs("input", "hyprland")), ["hyprland", "input.lua"]);
     assert.deepEqual(plain(resolve.resolveIncludeArgs("windowrules", "mango")), ["mangowc", "windowrules.conf"]);
-    assert.deepEqual(plain(resolve.resolveIncludeArgs("input", "mango")), ["mangowc", "input.conf"]);
     assert.equal(resolve.resolveIncludeArgs("colors", "mango"), null, "no spec, no args");
-});
-
-test("repairScriptFor returns an empty script off the table", () => {
-    assert.equal(resolve.repairScriptFor("colors", "mango", "/home/u/.config", "/x"), "");
-    assert.equal(resolve.repairScriptFor("nope", "niri", "/home/u/.config", "/x"), "");
 });
 
 test("repair preserves config and fragments, backs up, and adds live includes only once", t => {

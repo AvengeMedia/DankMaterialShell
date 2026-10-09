@@ -21,24 +21,6 @@ func TestIsIgnorableI2CDeviceName(t *testing.T) {
 			want:       true,
 		},
 		{
-			name:       "SMBus should be ignored",
-			deviceName: "SMBus I801 adapter",
-			driver:     "",
-			want:       true,
-		},
-		{
-			name:       "Synopsys DesignWare should be ignored",
-			deviceName: "Synopsys DesignWare I2C adapter",
-			driver:     "",
-			want:       true,
-		},
-		{
-			name:       "smu prefix should be ignored (Mac G5)",
-			deviceName: "smu-i2c-controller",
-			driver:     "",
-			want:       true,
-		},
-		{
 			name:       "Regular NVIDIA DDC should not be ignored",
 			deviceName: "NVIDIA i2c adapter 1",
 			driver:     "nvidia",

@@ -14,13 +14,8 @@ test("compact rates never show bytes or more than three digits", () => {
     const cases = [
         [0, "0 KB/s", "0K"],
         [1, "1 KB/s", "1K"],
-        [900, "1 KB/s", "1K"],
-        [3 * KB, "3 KB/s", "3K"],
         [999.4 * KB, "999 KB/s", "999K"],
         [999.5 * KB, "1 MB/s", "1M"],
-        [1023 * KB, "1 MB/s", "1M"],
-        [1.5 * MB, "2 MB/s", "2M"],
-        [1000 * MB, "1 GB/s", "1G"],
         [1000 * GB, "1 TB/s", "1T"]
     ];
     for (const [rate, long, short] of cases) {

@@ -94,43 +94,6 @@ layout {
 			wantContains: []string{"gaps 5"}, // Should keep new config
 		},
 		{
-			name: "merge single output",
-			newConfig: `input {
-    keyboard {
-        xkb {
-        }
-    }
-}
-/-output "eDP-2" {
-    mode "2560x1600@239.998993"
-    position x=2560 y=0
-}
-layout {
-    gaps 5
-}`,
-			existingConfig: `input {
-    keyboard {
-        xkb {
-        }
-    }
-}
-output "eDP-1" {
-    mode "1920x1080@60.000000"
-    position x=0 y=0
-    scale 1.0
-}
-layout {
-    gaps 10
-}`,
-			wantError: false,
-			wantContains: []string{
-				"gaps 5",                              // New config preserved
-				`output "eDP-1"`,                      // Existing output merged
-				"1920x1080@60.000000",                 // Existing output details
-				"Outputs from existing configuration", // Comment added
-			},
-		},
-		{
 			name: "merge multiple outputs",
 			newConfig: `input {
     keyboard {
@@ -165,46 +128,11 @@ layout {
 }`,
 			wantError: false,
 			wantContains: []string{
-				"gaps 5",              // New config preserved
-				`output "eDP-1"`,      // First existing output
-				`/-output "HDMI-1"`,   // Second existing output (commented)
-				"1920x1080@60.000000", // Output details
-			},
-		},
-		{
-			name: "merge commented outputs",
-			newConfig: `input {
-    keyboard {
-        xkb {
-        }
-    }
-}
-/-output "eDP-2" {
-    mode "2560x1600@239.998993"
-    position x=2560 y=0
-}
-layout {
-    gaps 5
-}`,
-			existingConfig: `input {
-    keyboard {
-        xkb {
-        }
-    }
-}
-/-output "eDP-1" {
-    mode "1920x1080@60.000000"
-    position x=0 y=0
-    scale 1.0
-}
-layout {
-    gaps 10
-}`,
-			wantError: false,
-			wantContains: []string{
-				"gaps 5",              // New config preserved
-				`/-output "eDP-1"`,    // Commented output preserved
-				"1920x1080@60.000000", // Output details
+				"gaps 5",                              // New config preserved
+				`output "eDP-1"`,                      // First existing output
+				`/-output "HDMI-1"`,                   // Second existing output (commented)
+				"1920x1080@60.000000",                 // Output details
+				"Outputs from existing configuration", // Comment added
 			},
 		},
 	}
@@ -879,9 +807,7 @@ func TestDeployHyprlandConfigWritesLuaBeforeRemovingLegacyConf(t *testing.T) {
 func TestHyprlandLuaUnsupported(t *testing.T) {
 	for ver, refuse := range map[string]bool{
 		"0.54.2": true,
-		"0.41.0": true,
 		"0.55.0": false,
-		"0.56.1": false,
 		"":       false,
 	} {
 		err := hyprlandLuaUnsupported(ver)

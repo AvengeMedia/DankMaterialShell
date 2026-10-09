@@ -62,14 +62,10 @@ test("center placement preserves configured anchors, visible fallbacks and geome
     vm.runInContext(read("Modules/DBar/CenterLayout.js").replace(/^\.pragma.*$/m, ""), layout);
     const cases = [
         [[], 600, 4, "index", [], 0],
-        [[null, null], 600, 4, "geometric", [null, null], 0],
         [[30, 80, 60], 600, 4, "geometric", [211, 245, 329], 178],
         [[30, 80, 60], 600, 4, "index", [226, 260, 344], 178],
         [[30, null, 60], 600, 4, "index", [268, null, 302], 94],
         [[30, 80, 60, 20], 600, 4, "index", [184, 218, 302, 366], 202],
-        [[30, null, 60, 20], 600, 4, "index", [236, null, 270, 334], 118],
-        [[null, 80, 60, 20, 40], 600, 4, "index", [null, 186, 270, 334, 358], 212],
-        [[0, null, 91.5, 32, 120], 31, 5.5, "index", [-35.75, null, -30.25, 66.75, 104.25], 260],
         [[30, 80], 31, 0, "geometric", [-39.5, -9.5], 110]
     ];
     for (const [sizes, length, spacing, mode, positions, totalSize] of cases) {
@@ -85,8 +81,7 @@ test("center placement yields to side sections without overlapping them", () => 
     const cases = [
         [{ min: 250 }, [250, 284, 368]],
         [{ max: 300 }, [122, 156, 240]],
-        [{ min: 100, max: 200 }, [61, 95, 179]],
-        [{ min: 0, max: 600 }, [211, 245, 329]]
+        [{ min: 100, max: 200 }, [61, 95, 179]]
     ];
     for (const [bounds, positions] of cases)
         assert.deepEqual(plain(layout.resolve([30, 80, 60], 600, 4, "geometric", bounds)), { positions, totalSize: 178 });

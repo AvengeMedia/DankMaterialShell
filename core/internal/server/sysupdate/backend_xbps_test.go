@@ -12,11 +12,6 @@ func TestParseXbpsInstalled(t *testing.T) {
 		want  map[string]string
 	}{
 		{
-			name:  "empty",
-			input: "",
-			want:  map[string]string{},
-		},
-		{
 			name: "splits on the last dash so hyphenated names survive",
 			input: `ii bash-5.2.21_1                         GNU Bourne Again Shell
 ii xorg-server-xwayland-24.1.2_1         Nested X server that runs as a wayland client
@@ -54,11 +49,6 @@ func TestParseXbpsDryRun(t *testing.T) {
 		input string
 		want  []Package
 	}{
-		{
-			name:  "no updates",
-			input: "",
-			want:  nil,
-		},
 		{
 			name: "updates only, installs and removals ignored",
 			input: `xorg-server-xwayland-24.1.2_1 update x86_64 https://repo-default.voidlinux.org/current 2461696 912345

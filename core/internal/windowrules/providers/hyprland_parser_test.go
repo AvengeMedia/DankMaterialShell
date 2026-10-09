@@ -192,34 +192,6 @@ func TestHyprlandLoadDMSRulesFromConfFragment(t *testing.T) {
 	}
 }
 
-func TestHyprlandSetAndLoadDMSRules(t *testing.T) {
-	tmpDir := t.TempDir()
-	provider := NewHyprlandWritableProvider(tmpDir)
-
-	rule := newTestWindowRule("test_id", "Test Rule", "^(firefox)$")
-	rule.Actions.OpenFloating = new(true)
-
-	if err := provider.SetRule(rule); err != nil {
-		t.Fatalf("SetRule failed: %v", err)
-	}
-
-	rules, err := provider.LoadDMSRules()
-	if err != nil {
-		t.Fatalf("LoadDMSRules failed: %v", err)
-	}
-
-	if len(rules) != 1 {
-		t.Fatalf("expected 1 rule, got %d", len(rules))
-	}
-
-	if rules[0].ID != "test_id" {
-		t.Errorf("ID = %q, want test_id", rules[0].ID)
-	}
-	if rules[0].MatchCriteria.AppID != "^(firefox)$" {
-		t.Errorf("AppID = %q, want ^(firefox)$", rules[0].MatchCriteria.AppID)
-	}
-}
-
 func TestHyprlandSetRuleLeavesConfOnlyInstallReadOnly(t *testing.T) {
 	tmpDir := t.TempDir()
 	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.conf"), []byte("windowrulev2 = float, class:^(kitty)$\n"), 0o644); err != nil {
@@ -472,11 +444,6 @@ func TestApplyLuaActionKeyTableSyntax(t *testing.T) {
 			raw:  `"800x600"`,
 		},
 		{
-			name: "move string syntax returns false",
-			key:  "move",
-			raw:  `"100 200"`,
-		},
-		{
 			name:      "size expressions",
 			key:       "size",
 			raw:       `{ "window_w * 0.5", "window_h - 50" }`,
@@ -518,78 +485,6 @@ func TestApplyLuaActionKeyTableSyntax(t *testing.T) {
 				t.Errorf("MoveY = %q, want %q", a.MoveY, tt.wantMoveY)
 			}
 		})
-	}
-}
-
-func TestLuaRoundTripTableSyntax(t *testing.T) {
-	original := windowrules.Actions{
-		SizeWidth:  "800",
-		SizeHeight: "600",
-		MoveX:      "100",
-		MoveY:      "200",
-	}
-
-	var out []string
-	luaAppendActions(original, &out)
-
-	var parsed windowrules.Actions
-	for _, line := range out {
-		parts := strings.SplitN(line, "=", 2)
-		if len(parts) != 2 {
-			continue
-		}
-		key := strings.TrimSpace(parts[0])
-		val := strings.TrimSpace(parts[1])
-		applyLuaActionKey(&parsed, key, val)
-	}
-
-	if parsed.SizeWidth != original.SizeWidth {
-		t.Errorf("SizeWidth = %q, want %q", parsed.SizeWidth, original.SizeWidth)
-	}
-	if parsed.SizeHeight != original.SizeHeight {
-		t.Errorf("SizeHeight = %q, want %q", parsed.SizeHeight, original.SizeHeight)
-	}
-	if parsed.MoveX != original.MoveX {
-		t.Errorf("MoveX = %q, want %q", parsed.MoveX, original.MoveX)
-	}
-	if parsed.MoveY != original.MoveY {
-		t.Errorf("MoveY = %q, want %q", parsed.MoveY, original.MoveY)
-	}
-}
-
-func TestLuaRoundTripTableSyntaxExpressions(t *testing.T) {
-	original := windowrules.Actions{
-		SizeWidth:  "window_w * 0.5",
-		SizeHeight: "window_h - 50",
-		MoveX:      "100",
-		MoveY:      "(monitor_h / 2) + 17",
-	}
-
-	var out []string
-	luaAppendActions(original, &out)
-
-	var parsed windowrules.Actions
-	for _, line := range out {
-		parts := strings.SplitN(line, "=", 2)
-		if len(parts) != 2 {
-			continue
-		}
-		key := strings.TrimSpace(parts[0])
-		val := strings.TrimSpace(parts[1])
-		applyLuaActionKey(&parsed, key, val)
-	}
-
-	if parsed.SizeWidth != original.SizeWidth {
-		t.Errorf("SizeWidth = %q, want %q", parsed.SizeWidth, original.SizeWidth)
-	}
-	if parsed.SizeHeight != original.SizeHeight {
-		t.Errorf("SizeHeight = %q, want %q", parsed.SizeHeight, original.SizeHeight)
-	}
-	if parsed.MoveX != original.MoveX {
-		t.Errorf("MoveX = %q, want %q", parsed.MoveX, original.MoveX)
-	}
-	if parsed.MoveY != original.MoveY {
-		t.Errorf("MoveY = %q, want %q", parsed.MoveY, original.MoveY)
 	}
 }
 

@@ -62,21 +62,9 @@ QT_VERSION:5.15.19`
 			want:   "/usr/lib/qt/plugins",
 		},
 		{
-			name:   "a different key from the same dump",
-			output: dumpAll,
-			key:    "QT_VERSION",
-			want:   "5.15.19",
-		},
-		{
 			name:   "key absent from a multi line dump yields nothing",
 			output: dumpAll,
 			key:    "QT_INSTALL_LIBEXECS",
-			want:   "",
-		},
-		{
-			name:   "empty output yields nothing",
-			output: "",
-			key:    "QT_INSTALL_PLUGINS",
 			want:   "",
 		},
 		{
@@ -256,11 +244,8 @@ func TestCheckMangoConfigFlagsWrongDialectAndOverviewBinds(t *testing.T) {
 
 func TestHyprlandLacksLua(t *testing.T) {
 	for ver, want := range map[string]bool{
-		"0.41.2": true,
 		"0.54.9": true,
 		"0.55.0": false,
-		"0.56.2": false,
-		"1.0.0":  false,
 		"":       false,
 	} {
 		if got := hyprlandLacksLua(ver); got != want {

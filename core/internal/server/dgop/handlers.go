@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/AvengeMedia/dankgo/ipc/params"
 	"github.com/AvengeMedia/dgop/gops"
@@ -30,14 +29,14 @@ func dispatch(conn *ipc.ConnWriter, req ipc.Request) {
 	case "dgop.modules":
 		handleModules(conn, req)
 	default:
-		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
+		conn.RespondError(req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
 }
 
 func handleMeta(conn *ipc.ConnWriter, req ipc.Request) {
 	modules := params.StringSlice(req.Params, "modules")
 	if len(modules) == 0 {
-		models.RespondError(conn, req.ID, "modules is required")
+		conn.RespondError(req.ID, "modules is required")
 		return
 	}
 
@@ -58,39 +57,39 @@ func handleMeta(conn *ipc.ConnWriter, req ipc.Request) {
 
 	meta, err := util.GetMeta(ctx, modules, metaParams)
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, meta)
+	conn.Respond(req.ID, meta)
 }
 
 func handleGPU(conn *ipc.ConnWriter, req ipc.Request) {
 	gpu, err := util.GetGPUInfo()
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, gpu)
+	conn.Respond(req.ID, gpu)
 }
 
 func handleHardware(conn *ipc.ConnWriter, req ipc.Request) {
 	hw, err := util.GetSystemHardware()
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, hw)
+	conn.Respond(req.ID, hw)
 }
 
 func handleModules(conn *ipc.ConnWriter, req ipc.Request) {
 	modules, err := util.GetModules()
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, modules)
+	conn.Respond(req.ID, modules)
 }
