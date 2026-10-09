@@ -1122,6 +1122,14 @@ var LOCAL_SPEC = {
         def: false,
         onChange: "regenSystemThemes"
     },
+    terminalOpacity: {
+        def: 100,
+        onChange: "regenSystemThemes"
+    },
+    terminalPalette: {
+        def: "default",
+        onChange: "regenSystemThemes"
+    },
     muxType: {
         def: "tmux"
     },

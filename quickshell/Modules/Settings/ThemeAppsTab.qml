@@ -132,6 +132,40 @@ Item {
                 checked: SettingsData.terminalsAlwaysDark
                 onToggled: checked => SettingsData.set("terminalsAlwaysDark", checked)
             }
+
+            SettingsSliderRow {
+                tab: "theme"
+                tags: ["terminal", "opacity", "transparency", "background", "kitty", "foot", "ghostty", "alacritty"]
+                settingKey: "terminalOpacity"
+                text: I18n.tr("Opacity")
+                value: SettingsData.terminalOpacity
+                minimum: 10
+                maximum: 100
+                unit: "%"
+                enabled: Theme.matugenAvailable
+                onSliderDragFinished: finalValue => SettingsData.set("terminalOpacity", finalValue)
+            }
+
+            SettingsToggleRow {
+                tab: "theme"
+                tags: ["terminal", "palette", "ansi", "colors", "wallpaper", "intensity"]
+                settingKey: "terminalPalette"
+                text: I18n.tr("Colors from wallpaper")
+                enabled: Theme.matugenAvailable
+                checked: SettingsData.terminalPalette !== "default"
+                onToggled: checked => SettingsData.set("terminalPalette", checked ? "medium" : "default")
+            }
+
+            SettingsButtonGroupRow {
+                text: I18n.tr("Intensity")
+                visible: SettingsData.terminalPalette !== "default"
+                enabled: Theme.matugenAvailable
+                model: [I18n.tr("Low"), I18n.tr("Medium"), I18n.tr("High")]
+                values: ["low", "medium", "high"]
+                value: SettingsData.terminalPalette
+                fallbackValue: "medium"
+                onValueSelected: value => SettingsData.set("terminalPalette", value)
+            }
         }
 
         SettingsCard {

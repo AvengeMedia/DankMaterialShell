@@ -14866,6 +14866,32 @@
     "description": "GTK, Qt, portal, matugen templates"
   },
   {
+    "section": "terminalPalette",
+    "label": "Colors from wallpaper",
+    "tabIndex": 50,
+    "category": "App theming",
+    "keywords": [
+      "ansi",
+      "app",
+      "background",
+      "bg",
+      "colors",
+      "colour",
+      "colours",
+      "desktop",
+      "hue",
+      "image",
+      "intensity",
+      "palette",
+      "picture",
+      "terminal",
+      "theming",
+      "tint",
+      "wallpaper"
+    ],
+    "parentLabel": "Wallpaper & colors"
+  },
+  {
     "section": "matugenTemplateNeovimSettings",
     "label": "Dark mode base",
     "tabIndex": 50,
@@ -15182,6 +15208,36 @@
     "icon": "auto_awesome",
     "description": "Also runs the templates in your matugen config.toml",
     "conditionKey": "matugenAvailable"
+  },
+  {
+    "section": "terminalOpacity",
+    "label": "Opacity",
+    "tabIndex": 50,
+    "category": "App theming",
+    "keywords": [
+      "alacritty",
+      "app",
+      "background",
+      "bg",
+      "colors",
+      "colour",
+      "colours",
+      "desktop",
+      "foot",
+      "ghostty",
+      "hue",
+      "image",
+      "kitty",
+      "opacity",
+      "palette",
+      "picture",
+      "terminal",
+      "theming",
+      "tint",
+      "transparency",
+      "wallpaper"
+    ],
+    "parentLabel": "Wallpaper & colors"
   },
   {
     "section": "applications",
