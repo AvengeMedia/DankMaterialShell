@@ -114,6 +114,7 @@ TAB_INDEX_MAP = {
     "NetworkEthernetTab.qml": 39,
     "NetworkWifiTab.qml": 40,
     "NetworkVpnTab.qml": 41,
+    "NetworkTailscaleTab.qml": 70,
     "NetworkCellularTab.qml": 47,
     "PrinterTab.qml": 8,
     "LauncherTab.qml": 9,
@@ -134,6 +135,8 @@ TAB_INDEX_MAP = {
     "RunningAppsTab.qml": 19,
     "SoftwareUpdatesTab.qml": 20,
     "ChangelogTab.qml": 66,
+    "NetworkConnectionsTab.qml": 68,
+    "NetworkConnectionTab.qml": 69,
     "PowerSleepTab.qml": 21,
     "ClipboardTab.qml": 23,
     "DisplayConfigTab.qml": 24,
@@ -170,6 +173,8 @@ SIDEBAR_GATE_CONDITIONS = [
     ("windowRulesCapable", "windowRulesCapable"),
     ("layoutCapable", "layoutCapable"),
     ("cellularOnly", "cellularAvailable"),
+    ("connectionEditorOnly", "connectionEditorAvailable"),
+    ("tailscaleOnly", "tailscaleAvailable"),
 ]
 
 FILE_PAGE_MAP = {
@@ -669,7 +674,12 @@ def build_hub_meta(hubs):
 def generate_hub_entries(hubs):
     entries = []
     for hub in hubs:
-        child_labels = [child["label"] for child in hub["children"] if child["label"]]
+        # Connection-editor pages may not exist at runtime, so they don't feed the hub's keywords.
+        child_labels = [
+            child["label"]
+            for child in hub["children"]
+            if child["label"] and child["conditionKey"] != "connectionEditorAvailable"
+        ]
         keywords = set(enrich_keywords(hub["label"], " ".join(child_labels + [hub["hint"] or ""]), hub["label"], []))
         for child_label in child_labels:
             keywords.update(w for w in re.split(r"[\s\-_&/]+", child_label.lower()) if len(w) > 2)
@@ -702,6 +712,8 @@ def generate_tab_entries(leaves, settings_entries):
     for leaf in leaves:
         base_label = leaf["label"] or ""
         if leaf["children"] or not (base_label or leaf["runtimeLabel"]):
+            continue
+        if '"searchable": false' in leaf["own"]:
             continue
         label = (
             f"{leaf['parentLabel']}: {base_label}"

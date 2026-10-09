@@ -402,12 +402,38 @@ Singleton {
                     "hint": I18n.tr("Connections and autoconnect")
                 },
                 {
+                    "id": "network_tailscale",
+                    "text": I18n.tr("Tailscale", "Tailscale mesh VPN widget title"),
+                    "icon": "hub",
+                    "tabIndex": 70,
+                    "tailscaleOnly": true,
+                    "hint": I18n.tr("Tailscale Network")
+                },
+                {
                     "id": "network_cellular",
                     "text": I18n.tr("Cellular"),
                     "icon": "network_cell",
                     "tabIndex": 47,
                     "cellularOnly": true,
                     "hint": I18n.tr("Modem and mobile data")
+                },
+                {
+                    "id": "network_connections",
+                    "text": I18n.tr("Connections", "settings page listing saved network connection profiles"),
+                    "icon": "network_manage",
+                    "tabIndex": 68,
+                    "connectionEditorOnly": true,
+                    "hint": I18n.tr("Saved configurations")
+                },
+                {
+                    "id": "network_connection",
+                    "hidden": true,
+                    "searchable": false,
+                    "connectionEditorOnly": true,
+                    "titleFrom": "selectedConnectionTitle",
+                    "text": I18n.tr("Profile"),
+                    "icon": "tune",
+                    "tabIndex": 69
                 },
                 {
                     "id": "network_status",
@@ -782,6 +808,10 @@ Singleton {
         if (entry.autostartOnly && !DesktopService.autostartAvailable)
             return false;
         if (entry.cellularOnly && (NetworkService.cellularDevices?.length ?? 0) === 0)
+            return false;
+        if (entry.connectionEditorOnly && !NetworkService.connectionEditorPagesSupported)
+            return false;
+        if (entry.tailscaleOnly && !TailscaleService.available)
             return false;
         if (entry.kind === "hub" && !entry.hubHeader && visibleLeaves(entry.id).length === 0)
             return false;

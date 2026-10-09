@@ -3,6 +3,7 @@ package tailscale
 import (
 	"context"
 	"fmt"
+	"net/netip"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -10,9 +11,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"tailscale.com/client/local"
+	"tailscale.com/client/tailscale/apitype"
 	"tailscale.com/ipn"
 	"tailscale.com/ipn/ipnstate"
 	"tailscale.com/tailcfg"
+	"tailscale.com/types/empty"
 )
 
 // blockingWatch is a watchFn that blocks until the context is cancelled, used
@@ -80,6 +84,63 @@ type mockClient struct {
 	statusFn    func(ctx context.Context) (*ipnstate.Status, error)
 	getPrefsFn  func(ctx context.Context) (*ipn.Prefs, error)
 	editPrefsFn func(ctx context.Context, mp *ipn.MaskedPrefs) (*ipn.Prefs, error)
+
+	startLoginFn    func(ctx context.Context) error
+	logoutFn        func(ctx context.Context) error
+	profileStatusFn func(ctx context.Context) (ipn.LoginProfile, []ipn.LoginProfile, error)
+	switchProfileFn func(ctx context.Context, id ipn.ProfileID) error
+	switchEmptyFn   func(ctx context.Context) error
+	suggestFn       func(ctx context.Context) (apitype.ExitNodeSuggestionResponse, error)
+	checkIPFwdFn    func(ctx context.Context) error
+}
+
+func (c *mockClient) StartLoginInteractive(ctx context.Context) error {
+	if c.startLoginFn != nil {
+		return c.startLoginFn(ctx)
+	}
+	return nil
+}
+
+func (c *mockClient) Logout(ctx context.Context) error {
+	if c.logoutFn != nil {
+		return c.logoutFn(ctx)
+	}
+	return nil
+}
+
+func (c *mockClient) ProfileStatus(ctx context.Context) (ipn.LoginProfile, []ipn.LoginProfile, error) {
+	if c.profileStatusFn != nil {
+		return c.profileStatusFn(ctx)
+	}
+	return ipn.LoginProfile{}, nil, nil
+}
+
+func (c *mockClient) SwitchProfile(ctx context.Context, id ipn.ProfileID) error {
+	if c.switchProfileFn != nil {
+		return c.switchProfileFn(ctx, id)
+	}
+	return nil
+}
+
+func (c *mockClient) SwitchToEmptyProfile(ctx context.Context) error {
+	if c.switchEmptyFn != nil {
+		return c.switchEmptyFn(ctx)
+	}
+	return nil
+}
+
+func (c *mockClient) SuggestExitNode(ctx context.Context) (apitype.ExitNodeSuggestionResponse, error) {
+	if c.suggestFn != nil {
+		return c.suggestFn(ctx)
+	}
+	return apitype.ExitNodeSuggestionResponse{}, nil
+}
+
+func (c *mockClient) CheckIPForwarding(ctx context.Context) error {
+	if c.checkIPFwdFn != nil {
+		return c.checkIPFwdFn(ctx)
+	}
+	return nil
 }
 
 func (c *mockClient) WatchIPNBus(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error) {
@@ -424,4 +485,293 @@ func TestWatchLoop_NotifyWithoutStateOrNetMap(t *testing.T) {
 	require.Eventually(t, func() bool {
 		return statusCalls.Load() >= 2
 	}, 2*time.Second, 10*time.Millisecond)
+}
+
+func prefixes(ss ...string) []netip.Prefix {
+	out := make([]netip.Prefix, len(ss))
+	for i, s := range ss {
+		out[i] = netip.MustParsePrefix(s)
+	}
+	return out
+}
+
+func boolPtr(b bool) *bool { return &b }
+
+func TestSetPrefs_AdvertiseExitNodeKeepsRoutesAndWarns(t *testing.T) {
+	var captured *ipn.MaskedPrefs
+	client := &mockClient{
+		watchFn:  blockingWatch,
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) { return runningStatus(), nil },
+		getPrefsFn: func(ctx context.Context) (*ipn.Prefs, error) {
+			return &ipn.Prefs{AdvertiseRoutes: prefixes("192.168.1.0/24")}, nil
+		},
+		editPrefsFn: func(ctx context.Context, mp *ipn.MaskedPrefs) (*ipn.Prefs, error) {
+			captured = mp
+			return &ipn.Prefs{}, nil
+		},
+		checkIPFwdFn: func(ctx context.Context) error { return fmt.Errorf("IP forwarding is disabled") },
+	}
+	m := newManager(client)
+	defer m.Close()
+
+	warning, err := m.SetPrefs(PrefsPatch{AdvertiseExitNode: boolPtr(true)})
+	require.NoError(t, err)
+	require.NotNil(t, captured)
+	assert.True(t, captured.AdvertiseRoutesSet)
+	assert.Equal(t, prefixes("0.0.0.0/0", "::/0", "192.168.1.0/24"), captured.AdvertiseRoutes)
+	assert.Equal(t, "IP forwarding is disabled", warning)
+}
+
+func TestSetPrefs_InvalidRouteWritesNothing(t *testing.T) {
+	edited := false
+	client := &mockClient{
+		watchFn:  blockingWatch,
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) { return runningStatus(), nil },
+		editPrefsFn: func(ctx context.Context, mp *ipn.MaskedPrefs) (*ipn.Prefs, error) {
+			edited = true
+			return &ipn.Prefs{}, nil
+		},
+	}
+	m := newManager(client)
+	defer m.Close()
+
+	for _, bad := range []string{"bogus", "0.0.0.0/0", "::/0"} {
+		_, err := m.SetPrefs(PrefsPatch{AdvertiseRoutes: &[]string{"10.0.0.0/8", bad}})
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), bad)
+	}
+	_, err := m.SetPrefs(PrefsPatch{})
+	assert.EqualError(t, err, "no changes")
+	assert.False(t, edited)
+}
+
+func TestSetPrefs_MaskOnlyRequestedFields(t *testing.T) {
+	var captured *ipn.MaskedPrefs
+	client := &mockClient{
+		watchFn:  blockingWatch,
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) { return runningStatus(), nil },
+		editPrefsFn: func(ctx context.Context, mp *ipn.MaskedPrefs) (*ipn.Prefs, error) {
+			captured = mp
+			return &ipn.Prefs{}, nil
+		},
+		checkIPFwdFn: func(ctx context.Context) error { return fmt.Errorf("must not be called") },
+	}
+	m := newManager(client)
+	defer m.Close()
+
+	host := "x"
+	warning, err := m.SetPrefs(PrefsPatch{AcceptRoutes: boolPtr(true), Hostname: &host})
+	require.NoError(t, err)
+	assert.Empty(t, warning)
+	want := &ipn.MaskedPrefs{
+		Prefs:       ipn.Prefs{RouteAll: true, Hostname: "x"},
+		RouteAllSet: true,
+		HostnameSet: true,
+	}
+	assert.Equal(t, want, captured)
+}
+
+func TestProfiles(t *testing.T) {
+	denied := true
+	client := &mockClient{
+		watchFn:  blockingWatch,
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) { return runningStatus(), nil },
+		profileStatusFn: func(ctx context.Context) (ipn.LoginProfile, []ipn.LoginProfile, error) {
+			if denied {
+				return ipn.LoginProfile{}, nil, fmt.Errorf("profiles: %w", &local.AccessDeniedError{})
+			}
+			work := ipn.LoginProfile{ID: "b", Name: "work@corp.com", NetworkProfile: ipn.NetworkProfile{DomainName: "corp.com"}}
+			home := ipn.LoginProfile{ID: "a", Name: "alice@example.com", NetworkProfile: ipn.NetworkProfile{DomainName: "example.com", DisplayName: "Alice's tailnet"}}
+			return work, []ipn.LoginProfile{work, home}, nil
+		},
+	}
+	m := newManager(client)
+	defer m.Close()
+
+	res, err := m.Profiles()
+	require.NoError(t, err)
+	assert.Equal(t, ProfilesResult{}, res)
+
+	denied = false
+	res, err = m.Profiles()
+	require.NoError(t, err)
+	assert.Equal(t, ProfilesResult{
+		CanOperate: true,
+		Current:    "b",
+		Profiles: []TailscaleProfile{
+			{ID: "a", Name: "alice@example.com", Tailnet: "Alice's tailnet"},
+			{ID: "b", Name: "work@corp.com", Tailnet: "corp.com"},
+		},
+	}, res)
+}
+
+func TestAccountActions(t *testing.T) {
+	var calls []string
+	client := &mockClient{
+		watchFn:  blockingWatch,
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) { return runningStatus(), nil },
+		startLoginFn: func(ctx context.Context) error {
+			calls = append(calls, "login")
+			return nil
+		},
+		logoutFn: func(ctx context.Context) error {
+			calls = append(calls, "logout")
+			return nil
+		},
+		switchEmptyFn: func(ctx context.Context) error {
+			calls = append(calls, "empty")
+			return nil
+		},
+		switchProfileFn: func(ctx context.Context, id ipn.ProfileID) error {
+			calls = append(calls, "switch:"+string(id))
+			return nil
+		},
+		suggestFn: func(ctx context.Context) (apitype.ExitNodeSuggestionResponse, error) {
+			return apitype.ExitNodeSuggestionResponse{ID: "nX", Name: "de-fra"}, nil
+		},
+	}
+	m := newManager(client)
+	defer m.Close()
+
+	require.NoError(t, m.Login())
+	require.NoError(t, m.Logout())
+	require.NoError(t, m.AddProfile())
+	require.NoError(t, m.SwitchProfile("p1"))
+	assert.Error(t, m.SwitchProfile(""))
+	assert.Equal(t, []string{"login", "logout", "empty", "login", "switch:p1"}, calls)
+
+	s, err := m.SuggestExitNode()
+	require.NoError(t, err)
+	assert.Equal(t, ExitNodeSuggestion{ID: "nX", Name: "de-fra"}, s)
+
+	client.startLoginFn = func(ctx context.Context) error { return fmt.Errorf("Access denied: login") }
+	assert.EqualError(t, m.Login(), "Access denied: login")
+}
+
+func TestFetchState_MapsPrefs(t *testing.T) {
+	client := &mockClient{
+		watchFn:  blockingWatch,
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) { return runningStatus(), nil },
+		getPrefsFn: func(ctx context.Context) (*ipn.Prefs, error) {
+			return &ipn.Prefs{
+				RouteAll:        true,
+				CorpDNS:         true,
+				RunSSH:          true,
+				Hostname:        "rog",
+				AdvertiseRoutes: prefixes("0.0.0.0/0", "::/0", "10.0.0.0/8"),
+			}, nil
+		},
+	}
+	m := newManager(client)
+	defer m.Close()
+
+	m.RefreshState()
+	assert.Equal(t, TailscalePrefs{
+		AcceptRoutes:      true,
+		AcceptDNS:         true,
+		RunSSH:            true,
+		Hostname:          "rog",
+		AdvertiseExitNode: true,
+		AdvertiseRoutes:   []string{"10.0.0.0/8"},
+	}, m.GetState().Prefs)
+}
+
+func TestWatchLoop_AuthURL(t *testing.T) {
+	notifyCh := make(chan ipn.Notify, 1)
+	client := &mockClient{
+		watchFn: func(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error) {
+			return &dynamicWatcher{ctx: ctx, ch: notifyCh}, nil
+		},
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) { return runningStatus(), nil },
+	}
+	m := newManager(client)
+	defer m.Close()
+
+	u := "https://login.tailscale.com/a/abc"
+	notifyCh <- ipn.Notify{BrowseToURL: &u}
+	require.Eventually(t, func() bool { return m.GetState().AuthURL == u }, 2*time.Second, 10*time.Millisecond)
+
+	notifyCh <- ipn.Notify{LoginFinished: &empty.Message{}}
+	require.Eventually(t, func() bool { return m.GetState().AuthURL == "" }, 2*time.Second, 10*time.Millisecond)
+}
+
+func TestWatchLoop_ReconnectClearsAuthURL(t *testing.T) {
+	notifyCh := make(chan ipn.Notify, 1)
+	var watches atomic.Int32
+	client := &mockClient{
+		watchFn: func(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error) {
+			if watches.Add(1) == 1 {
+				return &dynamicWatcher{ctx: ctx, ch: notifyCh}, nil
+			}
+			return newMockWatcher(ctx, nil, nil), nil
+		},
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) { return runningStatus(), nil },
+	}
+	m := newManager(client)
+	defer m.Close()
+
+	u := "https://login.tailscale.com/a/abc"
+	notifyCh <- ipn.Notify{BrowseToURL: &u}
+	require.Eventually(t, func() bool { return m.GetState().AuthURL == u }, 2*time.Second, 10*time.Millisecond)
+
+	close(notifyCh)
+	require.Eventually(t, func() bool { return watches.Load() == 2 && m.GetState().AuthURL == "" }, 3*time.Second, 10*time.Millisecond)
+}
+
+func TestManager_AdvertiseRoutesNeverNull(t *testing.T) {
+	m := newManager(&mockClient{watchFn: blockingWatch})
+	assert.NotNil(t, m.GetState().Prefs.AdvertiseRoutes)
+	m.Close()
+
+	m = newManager(&mockClient{watchFn: func(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error) {
+		return nil, fmt.Errorf("connection refused")
+	}})
+	defer m.Close()
+	require.Eventually(t, func() bool { return m.GetState().BackendState == "Unreachable" }, 2*time.Second, 10*time.Millisecond)
+	assert.NotNil(t, m.GetState().Prefs.AdvertiseRoutes)
+}
+
+func TestSetPrefs_DedupesRoutes(t *testing.T) {
+	var captured *ipn.MaskedPrefs
+	client := &mockClient{
+		watchFn:  blockingWatch,
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) { return runningStatus(), nil },
+		editPrefsFn: func(ctx context.Context, mp *ipn.MaskedPrefs) (*ipn.Prefs, error) {
+			captured = mp
+			return &ipn.Prefs{}, nil
+		},
+	}
+	m := newManager(client)
+	defer m.Close()
+
+	_, err := m.SetPrefs(PrefsPatch{AdvertiseRoutes: &[]string{"10.0.0.0/8", "192.168.1.0/24", "10.0.0.0/8"}})
+	require.NoError(t, err)
+	assert.Equal(t, prefixes("10.0.0.0/8", "192.168.1.0/24"), captured.AdvertiseRoutes)
+
+	_, err = m.SetPrefs(PrefsPatch{AdvertiseRoutes: &[]string{"10.0.0.0/8,0.0.0.0/0"}})
+	assert.Error(t, err)
+}
+
+func TestSetPrefs_UnchangedRoutesSkipEditAndForwardingCheck(t *testing.T) {
+	edits, checks := 0, 0
+	client := &mockClient{
+		watchFn:  blockingWatch,
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) { return runningStatus(), nil },
+		getPrefsFn: func(ctx context.Context) (*ipn.Prefs, error) {
+			return &ipn.Prefs{AdvertiseRoutes: prefixes("10.0.0.0/8", "192.168.1.0/24")}, nil
+		},
+		editPrefsFn: func(ctx context.Context, mp *ipn.MaskedPrefs) (*ipn.Prefs, error) {
+			edits++
+			return &ipn.Prefs{}, nil
+		},
+		checkIPFwdFn: func(ctx context.Context) error { checks++; return fmt.Errorf("IP forwarding is disabled") },
+	}
+	m := newManager(client)
+	defer m.Close()
+
+	warning, err := m.SetPrefs(PrefsPatch{AdvertiseRoutes: &[]string{"192.168.1.0/24", "10.0.0.0/8"}})
+	require.NoError(t, err)
+	assert.Empty(t, warning)
+	assert.Zero(t, edits)
+	assert.Zero(t, checks)
 }

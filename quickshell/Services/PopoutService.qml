@@ -1189,6 +1189,16 @@ Singleton {
         }
     }
 
+    function showWifiEnterpriseImport(profile, fileName) {
+        if (wifiPasswordModalLoader)
+            wifiPasswordModalLoader.active = true;
+        if (wifiPasswordModal) {
+            wifiPasswordModal.showImport(profile, fileName);
+        } else {
+            Qt.callLater(() => wifiPasswordModal?.showImport(profile, fileName));
+        }
+    }
+
     function hideWifiPasswordModal() {
         wifiPasswordModal?.hide();
     }

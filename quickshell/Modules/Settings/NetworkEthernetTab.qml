@@ -9,6 +9,8 @@ import qs.DCommon.Widgets
 Item {
     id: networkEthernetTab
 
+    property var parentModal
+
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
@@ -183,9 +185,32 @@ Item {
                                                         root.expandedEthDevice = "";
                                                     } else {
                                                         root.expandedEthDevice = modelData.name;
-                                                        NetworkService.fetchWiredNetworkInfo(NetworkService.ethernetConnectionUuid);
+                                                        NetworkService.fetchWiredNetworkInfo(modelData.connectionUuid || NetworkService.ethernetConnectionUuid);
                                                     }
                                                 }
+                                            }
+
+                                            DActionButton {
+                                                buttonSize: Theme.buttonHeightXXS
+                                                iconName: "tune"
+                                                iconColor: Theme.surfaceText
+                                                tooltipText: I18n.tr("Configure")
+                                                visible: isConnected && NetworkService.connectionEditorPagesSupported && !!modelData.connectionUuid
+                                                onClicked: {
+                                                    const uuid = modelData.connectionUuid;
+                                                    const profile = NetworkService.wiredConnections.find(c => c.uuid === uuid);
+                                                    SettingsUiState.selectConnection(uuid, profile?.id || modelData.name, "");
+                                                    networkEthernetTab.parentModal?.navigateTo("network_connection");
+                                                }
+                                            }
+
+                                            DActionButton {
+                                                buttonSize: Theme.buttonHeightXXS
+                                                iconName: "link"
+                                                iconColor: Theme.surfaceText
+                                                tooltipText: I18n.tr("Connect")
+                                                visible: !isConnected && modelData.state !== "unmanaged" && NetworkService.ethernetDeviceConnectSupported
+                                                onClicked: NetworkService.connectEthernetDevice(modelData.name)
                                             }
 
                                             DActionButton {
@@ -291,7 +316,7 @@ Item {
                     Column {
                         width: parent.width
                         spacing: Theme.spacingS
-                        visible: NetworkService.wiredConnections.length > 0
+                        visible: !NetworkService.connectionEditorPagesSupported && NetworkService.wiredConnections.length > 0
 
                         StyledText {
                             text: I18n.tr("Saved configurations")
@@ -365,6 +390,14 @@ Item {
                         }
                     }
                 }
+            }
+
+            SettingsNavRow {
+                visible: NetworkService.connectionEditorPagesSupported
+                iconName: "lan"
+                title: I18n.tr("Connections", "settings page listing saved network connection profiles")
+                hint: I18n.tr("Saved configurations")
+                onClicked: keyboard => networkEthernetTab.parentModal?.navigateTo("network_connections", keyboard)
             }
         }
     }

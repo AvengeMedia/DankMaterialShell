@@ -1,16 +1,21 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import Quickshell
 import qs.Common
 import qs.Modules.Network
 import qs.Modules.Settings.Widgets
 import qs.Modals.Common
+import qs.Modals.FileBrowser
 import qs.Services
 import qs.DCommon.Widgets
 import "../../Common/QmlUtils.js" as QmlUtils
+import "../../Common/ConnectionEditor.js" as CE
 
 Item {
     id: networkWifiTab
+
+    property var parentModal
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
@@ -22,6 +27,19 @@ Item {
 
     Component.onDestruction: {
         NetworkService.removeRef();
+    }
+
+    function configureWifiProfile(ssid) {
+        NetworkService.listConnections(response => {
+            const matches = (response.result || []).filter(p => p.ssid === ssid);
+            if (matches.length === 0) {
+                parentModal?.navigateTo("network_connections");
+                return;
+            }
+            const best = matches.reduce((a, b) => b.timestamp > a.timestamp ? b : a);
+            SettingsUiState.selectConnection(best.uuid, ssid, "");
+            parentModal?.navigateTo("network_connection");
+        });
     }
 
     function wifiDetailFields(net) {
@@ -291,6 +309,33 @@ Item {
             tags: ["wifi", "wi-fi", "wireless", "network", "scan", "hidden", "connect"]
             visible: NetworkService.wifiEnabled && !NetworkService.wifiToggling
 
+            function openEapFileBrowser() {
+                eapFileBrowserLoader.active = true;
+                if (eapFileBrowserLoader.item)
+                    eapFileBrowserLoader.item.open();
+            }
+
+            function importEapConfig(path) {
+                NetworkService.parseEapConfig(path, r => {
+                    if (r.error || !r.result) {
+                        ToastService.showError(I18n.tr("Failed to import profile", "toast title when importing a WiFi profile file fails"), r.error || "");
+                        return;
+                    }
+                    PopoutService.showWifiEnterpriseImport(r.result, path.split("/").pop());
+                });
+            }
+
+            property var eapFileBrowserLoader: LazyLoader {
+                active: false
+
+                FileBrowserModal {
+                    browserTitle: I18n.tr("Import", "verb, button that imports a vpn profile file")
+                    bucket: "eapconfig"
+                    filters: ["*.eap-config", "*"]
+                    onAccepted: paths => availableWifiCard.importEapConfig(paths[0])
+                }
+            }
+
             headerActions: [
                 StyledText {
                     text: availableWifiCard.sortedNetworks.length
@@ -304,6 +349,13 @@ Item {
                     buttonSize: Theme.buttonHeightXS
                     visible: NetworkService.backend === "networkmanager"
                     onClicked: PopoutService.showHiddenNetworkModal()
+                },
+                DActionButton {
+                    iconName: "upload_file"
+                    tooltipText: I18n.tr("Import", "verb, button that imports a vpn profile file")
+                    buttonSize: Theme.buttonHeightXS
+                    visible: NetworkService.enterpriseSupported
+                    onClicked: availableWifiCard.openEapFileBrowser()
                 },
                 DRefreshButton {
                     tooltipText: I18n.tr("Scan")
@@ -407,6 +459,13 @@ Item {
                                     NetworkService.fetchNetworkInfo(wifiNetworkDelegate.modelData.ssid);
                                 }
                             }
+                        }
+
+                        DActionButton {
+                            iconName: "tune"
+                            tooltipText: I18n.tr("Configure")
+                            visible: NetworkService.connectionEditorPagesSupported && wifiNetworkDelegate.modelData.saved
+                            onClicked: networkWifiTab.configureWifiProfile(wifiNetworkDelegate.modelData.ssid)
                         }
 
                         DActionButton {
@@ -590,6 +649,13 @@ Item {
                         }
 
                         DActionButton {
+                            iconName: "tune"
+                            tooltipText: I18n.tr("Configure")
+                            visible: NetworkService.connectionEditorPagesSupported
+                            onClicked: networkWifiTab.configureWifiProfile(savedWifiDelegate.modelData.ssid)
+                        }
+
+                        DActionButton {
                             iconName: "qr_code"
                             tooltipText: I18n.tr("Show QR Code")
                             visible: savedWifiDelegate.modelData.secured && !(savedWifiDelegate.modelData.enterprise || false)
@@ -651,13 +717,31 @@ Item {
             title: I18n.tr("Hotspot", "hotspot settings card title")
             iconName: "wifi_tethering"
             settingKey: "networkHotspot"
-            tags: ["wifi", "wi-fi", "wireless", "network", "hotspot", "access point", "sharing", "ssid"]
+            tags: ["wifi", "wi-fi", "wireless", "network", "hotspot", "access point", "sharing", "ssid", "qr code", "channel"]
             visible: NetworkService.hotspotAvailable
+
+            headerActions: DActionButton {
+                iconName: "tune"
+                tooltipText: I18n.tr("Configure")
+                buttonSize: Theme.buttonHeightXS
+                visible: NetworkService.hotspotConfigured && !!NetworkService.hotspotUuid && NetworkService.connectionEditorPagesSupported && !!networkWifiTab.parentModal
+                onClicked: {
+                    SettingsUiState.selectConnection(NetworkService.hotspotUuid, NetworkService.hotspotSSID, "");
+                    networkWifiTab.parentModal.navigateTo("network_connection");
+                }
+            }
 
             property string ssid: NetworkService.hotspotSSID || ""
             property string password: ""
             property string device: NetworkService.hotspotDevice || ""
             property string band: NetworkService.hotspotBand || ""
+            property int channel: NetworkService.hotspotChannel || 0
+            property string address: NetworkService.hotspotAddress || ""
+            readonly property bool addressValid: address.trim().length === 0 || CE.isValidHotspotAddress(address.trim())
+            readonly property var hotspotOptions: NetworkService.hotspotExtendedSupported ? {
+                "channel": channel,
+                "address": address.trim()
+            } : ({})
             property bool editing: false
             property bool passwordLoading: false
             property bool passwordResolved: true
@@ -704,6 +788,8 @@ Item {
                 ssid = NetworkService.hotspotSSID || ssid || "";
                 device = NetworkService.hotspotDevice || "";
                 band = NetworkService.hotspotBand || "";
+                channel = NetworkService.hotspotChannel || 0;
+                address = NetworkService.hotspotAddress || "";
             }
 
             function beginEditing() {
@@ -746,7 +832,7 @@ Item {
             }
 
             function buildCanConfigure() {
-                return ssid.trim().length > 0 && passwordValid && passwordResolved && !passwordLoading && !NetworkService.hotspotBusy && !NetworkService.hotspotEnabled && !NetworkService.hotspotActivating;
+                return ssid.trim().length > 0 && passwordValid && addressValid && passwordResolved && !passwordLoading && !NetworkService.hotspotBusy && !NetworkService.hotspotEnabled && !NetworkService.hotspotActivating;
             }
 
             function explainWiFiDisabled() {
@@ -761,7 +847,7 @@ Item {
                         stopEditing();
                         ToastService.showInfo(I18n.tr("Hotspot saved", "hotspot configuration success message"));
                     }
-                });
+                }, hotspotOptions);
             }
 
             function startOrStop() {
@@ -785,7 +871,7 @@ Item {
                         NetworkService.configureAndStartHotspot(ssid.trim(), password, device, band, response => {
                             if (!response.error)
                                 stopEditing();
-                        });
+                        }, hotspotOptions);
                     });
                     return;
                 }
@@ -845,6 +931,10 @@ Item {
                     const parts = [NetworkService.hotspotSecured ? I18n.tr("WPA2 password", "hotspot security summary") : I18n.tr("Open network", "hotspot security summary"), hotspotCard.bandLabel(NetworkService.hotspotBand)];
                     if (NetworkService.hotspotDevice)
                         parts.push(NetworkService.hotspotDevice);
+                    if (NetworkService.hotspotChannel > 0)
+                        parts.push(I18n.tr("Channel") + " " + NetworkService.hotspotChannel);
+                    if (NetworkService.hotspotAddress)
+                        parts.push(NetworkService.hotspotAddress);
                     return parts.join(" • ");
                 }
             }
@@ -912,7 +1002,33 @@ Item {
                 text: I18n.tr("Band", "hotspot WiFi band field label")
                 currentValue: hotspotCard.bandLabel(hotspotCard.band)
                 options: [I18n.tr("Auto", "hotspot device or band option"), I18n.tr("2.4 GHz", "hotspot WiFi band option"), I18n.tr("5 GHz", "hotspot WiFi band option")]
-                onValueChanged: value => hotspotCard.band = hotspotCard.bandValue(value)
+                onValueChanged: value => {
+                    hotspotCard.band = hotspotCard.bandValue(value);
+                    if (hotspotCard.channel > 0 && CE.hotspotChannels(hotspotCard.band).indexOf(hotspotCard.channel) < 0)
+                        hotspotCard.channel = 0;
+                }
+            }
+
+            SettingsDropdownRow {
+                visible: hotspotCard.showForm && NetworkService.hotspotExtendedSupported && hotspotCard.band !== ""
+                text: I18n.tr("Channel")
+                currentValue: hotspotCard.channel > 0 ? String(hotspotCard.channel) : I18n.tr("Auto", "hotspot device or band option")
+                options: [I18n.tr("Auto", "hotspot device or band option")].concat(CE.hotspotChannels(hotspotCard.band).map(c => String(c)))
+                onValueChanged: value => hotspotCard.channel = parseInt(value) || 0
+            }
+
+            SettingsRow {
+                visible: hotspotCard.showForm && NetworkService.hotspotExtendedSupported
+                body: DTextField {
+                    expressive: true
+                    width: parent.width
+                    labelText: I18n.tr("IP address")
+                    placeholderText: "10.42.0.1/24"
+                    text: hotspotCard.address
+                    isError: !hotspotCard.addressValid
+                    onTextEdited: hotspotCard.address = text
+                    onAccepted: hotspotCard.saveOnly()
+                }
             }
 
             SettingsRow {
@@ -945,6 +1061,16 @@ Item {
                     backgroundColor: SettingsMetrics.controlSurface
                     textColor: Theme.surfaceText
                     onClicked: hotspotCard.saveOnly()
+                }
+
+                DButton {
+                    visible: NetworkService.hotspotEnabled && NetworkService.hotspotSecured && NetworkService.hotspotExtendedSupported
+                    text: I18n.tr("Show QR Code")
+                    iconName: "qr_code"
+                    buttonHeight: 36
+                    backgroundColor: SettingsMetrics.controlSurface
+                    textColor: Theme.surfaceText
+                    onClicked: PopoutService.showWifiQRCodeModal(NetworkService.hotspotSSID)
                 }
 
                 DButton {

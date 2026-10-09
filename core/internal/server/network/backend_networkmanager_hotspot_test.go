@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	mock_gonetworkmanager "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/github.com/Wifx/gonetworkmanager/v2"
+	mock_dbus "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/github.com/godbus/dbus/v5"
 	"github.com/Wifx/gonetworkmanager/v2"
 	"github.com/godbus/dbus/v5"
 	"github.com/stretchr/testify/assert"
@@ -17,17 +18,12 @@ func TestBuildHotspotSettings(t *testing.T) {
 		Password: "hunter2-password",
 		Device:   "wlan0",
 		Band:     "bg",
-	}, gonetworkmanager.ConnectionSettings{
-		"connection": {
-			"uuid": "existing-uuid",
-		},
 	})
 
 	assert.Equal(t, dmsHotspotConnectionID, settings["connection"]["id"])
 	assert.Equal(t, "802-11-wireless", settings["connection"]["type"])
 	assert.Equal(t, false, settings["connection"]["autoconnect"])
 	assert.Equal(t, dmsHotspotStableID, settings["connection"]["stable-id"])
-	assert.Equal(t, "existing-uuid", settings["connection"]["uuid"])
 	assert.Equal(t, "wlan0", settings["connection"]["interface-name"])
 
 	assert.Equal(t, "ap", settings["802-11-wireless"]["mode"])
@@ -44,7 +40,7 @@ func TestBuildHotspotSettings(t *testing.T) {
 }
 
 func TestBuildHotspotSettingsOpenNetwork(t *testing.T) {
-	settings := buildHotspotSettings(HotspotRequest{SSID: "Open Hotspot"}, nil)
+	settings := buildHotspotSettings(HotspotRequest{SSID: "Open Hotspot"})
 
 	_, hasSecurity := settings["802-11-wireless-security"]
 	assert.False(t, hasSecurity)
@@ -349,7 +345,7 @@ func TestGetAPCapableWiFiDeviceAutoSticksWithActiveDMSHotspot(t *testing.T) {
 		"wlan1": {device: wlan1, wireless: wlan1, name: "wlan1"},
 	}
 
-	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"}, nil)
+	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"})
 
 	wlan0.EXPECT().GetPropertyManaged().Return(true, nil)
 	wlan0.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP, nil)
@@ -444,7 +440,7 @@ func TestConfigureHotspotAllowsAutoDeviceWithoutCurrentAPCapableDevice(t *testin
 	}
 
 	req := HotspotRequest{SSID: "DMS Hotspot", Password: "hunter2-password", Band: "a"}
-	expectedSettings := buildHotspotSettings(req, nil)
+	expectedSettings := buildHotspotSettings(req)
 
 	mockSettings.EXPECT().ListConnections().Return([]gonetworkmanager.Connection{}, nil).Once()
 	mockSettings.EXPECT().AddConnection(expectedSettings).Return(mockConn, nil).Once()
@@ -479,7 +475,7 @@ func TestConfigureHotspotCreatesDMSProfile(t *testing.T) {
 	}
 
 	req := HotspotRequest{SSID: "DMS Hotspot", Password: "hunter2-password", Device: "wlan0"}
-	expectedSettings := buildHotspotSettings(req, nil)
+	expectedSettings := buildHotspotSettings(req)
 
 	mockWiFi.EXPECT().GetPropertyManaged().Return(true, nil).Twice()
 	mockWiFi.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP, nil).Twice()
@@ -516,7 +512,7 @@ func TestGetSavedWiFiProfilesFiltersAPModeProfiles(t *testing.T) {
 			"ssid": []byte("Home WiFi"),
 		},
 	}
-	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"}, nil)
+	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"})
 	userAPSettings := gonetworkmanager.ConnectionSettings{
 		"connection": {
 			"type": "802-11-wireless",
@@ -576,7 +572,7 @@ func TestFindConnectionIgnoresAPModeProfiles(t *testing.T) {
 	require.NoError(t, err)
 	backend.settings = mockSettings
 
-	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "Shared SSID"}, nil)
+	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "Shared SSID"})
 	clientSettings := gonetworkmanager.ConnectionSettings{
 		"connection": {
 			"type": "802-11-wireless",
@@ -606,7 +602,7 @@ func TestFindConnectionReturnsNotFoundForDMSHotspotOnly(t *testing.T) {
 	require.NoError(t, err)
 	backend.settings = mockSettings
 
-	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"}, nil)
+	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"})
 
 	mockSettings.EXPECT().ListConnections().Return([]gonetworkmanager.Connection{dmsHotspotConn}, nil).Once()
 	dmsHotspotConn.EXPECT().GetSettings().Return(dmsSettings, nil).Once()
@@ -635,7 +631,7 @@ func TestFindActiveDMSHotspotConnectionIgnoresUserAPProfiles(t *testing.T) {
 			"ssid": []byte("DMS Hotspot"),
 		},
 	}
-	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"}, nil)
+	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"})
 
 	mockNM.EXPECT().GetPropertyActiveConnections().Return([]gonetworkmanager.ActiveConnection{userActive, dmsActive}, nil).Once()
 	userActive.EXPECT().GetPropertyType().Return("802-11-wireless", nil).Once()
@@ -661,7 +657,7 @@ func TestUpdateWiFiStateSuppressesActiveAPModeConnection(t *testing.T) {
 	backend.wifiDevice = mockWiFi
 	backend.wifiDev = mockWiFi
 
-	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"}, nil)
+	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"})
 
 	mockWiFi.EXPECT().GetPropertyInterface().Return("wlan0", nil).Once()
 	mockWiFi.EXPECT().GetPropertyState().Return(gonetworkmanager.NmDeviceStateActivated, nil).Once()
@@ -697,7 +693,7 @@ func TestUpdateAllWiFiDevicesSuppressesActiveAPModeConnection(t *testing.T) {
 		"wlan0": {device: mockWiFi, wireless: mockWiFi, name: "wlan0", hwAddress: "00:11:22:33:44:55"},
 	}
 
-	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"}, nil)
+	dmsSettings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"})
 
 	mockSettings.EXPECT().ListConnections().Return([]gonetworkmanager.Connection{}, nil).Once()
 	mockWiFi.EXPECT().GetPropertyState().Return(gonetworkmanager.NmDeviceStateActivated, nil).Once()
@@ -737,7 +733,7 @@ func TestUpdateHotspotStateDetectsRunningDMSHotspot(t *testing.T) {
 		"wlan0": {device: mockWiFi, wireless: mockWiFi, name: "wlan0"},
 	}
 
-	settings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot", Device: "wlan0", Band: "bg"}, nil)
+	settings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot", Device: "wlan0", Band: "bg"})
 
 	mockWiFi.EXPECT().GetPropertyManaged().Return(true, nil).Once()
 	mockWiFi.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP, nil).Once()
@@ -775,7 +771,7 @@ func TestUpdateHotspotStateReportsActivating(t *testing.T) {
 		"wlan0": {device: mockWiFi, wireless: mockWiFi, name: "wlan0"},
 	}
 
-	settings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot", Device: "wlan0", Band: "bg"}, nil)
+	settings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot", Device: "wlan0", Band: "bg"})
 
 	mockWiFi.EXPECT().GetPropertyManaged().Return(true, nil).Once()
 	mockWiFi.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP, nil).Once()
@@ -814,7 +810,7 @@ func TestUpdateHotspotStateReportsActivationFailure(t *testing.T) {
 	backend.hotspotPendingDevice = "wlan1"
 	backend.stateMutex.Unlock()
 
-	settings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot", Device: "wlan0", Band: "bg"}, nil)
+	settings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot", Device: "wlan0", Band: "bg"})
 
 	mockWiFi.EXPECT().GetPropertyManaged().Return(true, nil).Once()
 	mockWiFi.EXPECT().GetPropertyWirelessCapabilities().Return(nmWiFiDeviceCapAP, nil).Once()
@@ -846,10 +842,10 @@ func TestClassifyHotspotStateReason(t *testing.T) {
 }
 
 func TestHotspotSecuredFromSettings(t *testing.T) {
-	secured := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot", Password: "hunter2-password"}, nil)
+	secured := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot", Password: "hunter2-password"})
 	assert.True(t, hotspotSecuredFromSettings(secured))
 
-	open := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"}, nil)
+	open := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"})
 	assert.False(t, hotspotSecuredFromSettings(open))
 
 	assert.False(t, hotspotSecuredFromSettings(nil))
@@ -865,7 +861,7 @@ func TestGetHotspotSecrets(t *testing.T) {
 		require.NoError(t, err)
 		backend.settings = mockSettings
 
-		settings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot", Password: "hunter2-password"}, nil)
+		settings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot", Password: "hunter2-password"})
 
 		mockSettings.EXPECT().ListConnections().Return([]gonetworkmanager.Connection{mockConn}, nil).Once()
 		mockConn.EXPECT().GetSettings().Return(settings, nil).Once()
@@ -887,7 +883,7 @@ func TestGetHotspotSecrets(t *testing.T) {
 		require.NoError(t, err)
 		backend.settings = mockSettings
 
-		settings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"}, nil)
+		settings := buildHotspotSettings(HotspotRequest{SSID: "DMS Hotspot"})
 
 		mockSettings.EXPECT().ListConnections().Return([]gonetworkmanager.Connection{mockConn}, nil).Once()
 		mockConn.EXPECT().GetSettings().Return(settings, nil).Once()
@@ -955,4 +951,190 @@ func TestConfigureHotspotRejectsShortPasswordBeforeTouchingNetworkManager(t *tes
 	err = backend.ConfigureHotspot(HotspotRequest{SSID: "DMS Hotspot", Password: "123", Device: "wlan0"})
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "8 to 63 characters")
+}
+
+const testHotspotPath = dbus.ObjectPath("/org/freedesktop/NetworkManager/Settings/7")
+
+const testHotspotPSK = "dms-ap-psk-1"
+
+func storedHotspotSettings() nmSettings {
+	return nmSettings{
+		"connection": {
+			"id":             dbus.MakeVariant(dmsHotspotConnectionID),
+			"uuid":           dbus.MakeVariant("hotspot-uuid"),
+			"type":           dbus.MakeVariant("802-11-wireless"),
+			"stable-id":      dbus.MakeVariant(dmsHotspotStableID),
+			"autoconnect":    dbus.MakeVariant(false),
+			"interface-name": dbus.MakeVariant("wlan0"),
+			"metered":        dbus.MakeVariant(int32(1)),
+		},
+		"802-11-wireless": {
+			"ssid":      dbus.MakeVariant([]byte("old")),
+			"mode":      dbus.MakeVariant("ap"),
+			"band":      dbus.MakeVariant("bg"),
+			"channel":   dbus.MakeVariant(uint32(6)),
+			"powersave": dbus.MakeVariant(uint32(2)),
+			"hidden":    dbus.MakeVariant(true),
+			"security":  dbus.MakeVariant("802-11-wireless-security"),
+		},
+		"802-11-wireless-security": {
+			"key-mgmt":  dbus.MakeVariant("wpa-psk"),
+			"psk-flags": dbus.MakeVariant(uint32(0)),
+		},
+		"ipv4": {
+			"method":       dbus.MakeVariant("shared"),
+			"addresses":    dbus.MakeVariant([][]uint32{{0x01002b0a, 24, 0}}),
+			"address-data": dbus.MakeVariant([]map[string]dbus.Variant{{"address": dbus.MakeVariant("10.43.0.1"), "prefix": dbus.MakeVariant(uint32(24))}}),
+		},
+		"ipv6": {"method": dbus.MakeVariant("ignore")},
+	}
+}
+
+// configureExistingHotspot runs ConfigureHotspot against a stored DMS hotspot
+// and returns the settings sent with Update2.
+func configureExistingHotspot(t *testing.T, req HotspotRequest) nmSettings {
+	t.Helper()
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	mockSettings := mock_gonetworkmanager.NewMockSettings(t)
+	mockConn := mock_gonetworkmanager.NewMockConnection(t)
+	obj := mock_dbus.NewMockBusObject(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	require.NoError(t, err)
+	backend.settings = mockSettings
+	backend.wifiDevices = map[string]*wifiDeviceInfo{}
+	backend.nmObjectFn = func(p dbus.ObjectPath) dbus.BusObject {
+		assert.Equal(t, testHotspotPath, p)
+		return obj
+	}
+
+	listed := buildHotspotSettings(HotspotRequest{SSID: "old", Band: "bg"})
+	mockSettings.EXPECT().ListConnections().Return([]gonetworkmanager.Connection{mockConn}, nil)
+	mockConn.EXPECT().GetSettings().Return(listed, nil)
+	mockConn.EXPECT().GetPath().Return(testHotspotPath)
+	mockNM.EXPECT().GetPropertyActiveConnections().Return([]gonetworkmanager.ActiveConnection{}, nil).Maybe()
+
+	expectGetSettings(obj, storedHotspotSettings())
+	expectGetSecrets(obj, "802-11-wireless-security", nmSettings{
+		"802-11-wireless-security": {"psk": dbus.MakeVariant("stored-psk")},
+	})
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
+
+	require.NoError(t, backend.ConfigureHotspot(req))
+	return *got
+}
+
+func TestConfigureHotspotUpdatesExistingProfileInPlace(t *testing.T) {
+	got := configureExistingHotspot(t, HotspotRequest{
+		SSID: "dms-ap", Password: testHotspotPSK, Band: "a", Channel: 36, Address: "10.43.0.1/24",
+	})
+
+	assert.Equal(t, "hotspot-uuid", got["connection"]["uuid"].Value())
+	assert.Equal(t, int32(1), got["connection"]["metered"].Value())
+	assert.Equal(t, dmsHotspotConnectionID, got["connection"]["id"].Value())
+	assert.NotContains(t, got["connection"], "interface-name")
+
+	wifi := got["802-11-wireless"]
+	assert.Equal(t, uint32(2), wifi["powersave"].Value())
+	assert.Equal(t, true, wifi["hidden"].Value())
+	assert.Equal(t, []byte("dms-ap"), wifi["ssid"].Value())
+	assert.Equal(t, "ap", wifi["mode"].Value())
+	assert.Equal(t, "a", wifi["band"].Value())
+	assert.Equal(t, uint32(36), wifi["channel"].Value())
+	assert.Equal(t, "802-11-wireless-security", wifi["security"].Value())
+
+	sec := got["802-11-wireless-security"]
+	assert.Equal(t, "wpa-psk", sec["key-mgmt"].Value())
+	assert.Equal(t, testHotspotPSK, sec["psk"].Value())
+	assert.Equal(t, uint32(0), sec["psk-flags"].Value())
+
+	assert.Equal(t, "shared", got["ipv4"]["method"].Value())
+	assert.Equal(t, []map[string]dbus.Variant{{
+		"address": dbus.MakeVariant("10.43.0.1"),
+		"prefix":  dbus.MakeVariant(uint32(24)),
+	}}, got["ipv4"]["address-data"].Value())
+	assert.NotContains(t, got["ipv4"], "addresses")
+	assert.Equal(t, "ignore", got["ipv6"]["method"].Value())
+}
+
+func TestConfigureHotspotOpenWithDefaultRangeDropsSecurityAndAddress(t *testing.T) {
+	got := configureExistingHotspot(t, HotspotRequest{SSID: "dms-ap"})
+
+	assert.NotContains(t, got, "802-11-wireless-security")
+	assert.NotContains(t, got["802-11-wireless"], "security")
+	assert.NotContains(t, got["802-11-wireless"], "band")
+	assert.NotContains(t, got["802-11-wireless"], "channel")
+	assert.NotContains(t, got["ipv4"], "address-data")
+	assert.NotContains(t, got["ipv4"], "addresses")
+	assert.Equal(t, "shared", got["ipv4"]["method"].Value())
+	assert.Equal(t, uint32(2), got["802-11-wireless"]["powersave"].Value())
+}
+
+func TestConfigureHotspotRejectsBadChannelAndAddressBeforeDBus(t *testing.T) {
+	tests := []struct {
+		name string
+		req  HotspotRequest
+		want string
+	}{
+		{"channel without band", HotspotRequest{SSID: "x", Channel: 36}, "channel requires a band"},
+		{"bg channel too high", HotspotRequest{SSID: "x", Band: "bg", Channel: 36}, "channel 36"},
+		{"a channel too high", HotspotRequest{SSID: "x", Band: "a", Channel: 200}, "channel 200"},
+		{"network address", HotspotRequest{SSID: "x", Address: "10.43.0.0/24"}, "10.43.0.0/24"},
+		{"broadcast address", HotspotRequest{SSID: "x", Address: "10.43.0.255/24"}, "10.43.0.255/24"},
+		{"ipv6", HotspotRequest{SSID: "x", Address: "fd00::1/64"}, "fd00::1/64"},
+		{"prefix too long", HotspotRequest{SSID: "x", Address: "10.43.0.1/31"}, "10.43.0.1/31"},
+		{"prefix too short", HotspotRequest{SSID: "x", Address: "10.43.0.1/7"}, "10.43.0.1/7"},
+		{"garbage", HotspotRequest{SSID: "x", Address: "nope"}, "nope"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			backend, err := NewNetworkManagerBackend(mock_gonetworkmanager.NewMockNetworkManager(t))
+			require.NoError(t, err)
+			backend.settings = mock_gonetworkmanager.NewMockSettings(t)
+			backend.nmObjectFn = func(dbus.ObjectPath) dbus.BusObject { return mock_dbus.NewMockBusObject(t) }
+
+			assert.ErrorContains(t, backend.ConfigureHotspot(tt.req), tt.want)
+		})
+	}
+}
+
+func TestBuildHotspotSettingsChannelAndAddress(t *testing.T) {
+	s := buildHotspotSettings(HotspotRequest{SSID: "x", Band: "bg", Channel: 11, Address: "192.168.50.1/24"})
+
+	assert.Equal(t, uint32(11), s["802-11-wireless"]["channel"])
+	assert.Equal(t, []map[string]any{{"address": "192.168.50.1", "prefix": uint32(24)}}, s["ipv4"]["address-data"])
+	assert.Equal(t, "aa{sv}", dbus.SignatureOf(s["ipv4"]["address-data"]).String())
+
+	open := buildHotspotSettings(HotspotRequest{SSID: "x"})
+	assert.NotContains(t, open["802-11-wireless"], "channel")
+	assert.NotContains(t, open["ipv4"], "address-data")
+}
+
+func TestUpdateHotspotStateReportsChannelAddressAndUUID(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	mockSettings := mock_gonetworkmanager.NewMockSettings(t)
+	mockConn := mock_gonetworkmanager.NewMockConnection(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	require.NoError(t, err)
+	backend.settings = mockSettings
+	backend.wifiDevices = map[string]*wifiDeviceInfo{}
+
+	// GetSettings decodes aa{sv} into []map[string]any, as built here.
+	stored := buildHotspotSettings(HotspotRequest{SSID: "x", Band: "a", Channel: 44, Address: "10.43.0.1/24"})
+	stored["connection"]["uuid"] = "hotspot-uuid"
+	mockSettings.EXPECT().ListConnections().Return([]gonetworkmanager.Connection{mockConn}, nil)
+	mockConn.EXPECT().GetSettings().Return(stored, nil)
+	mockNM.EXPECT().GetPropertyActiveConnections().Return([]gonetworkmanager.ActiveConnection{}, nil)
+
+	require.NoError(t, backend.updateHotspotState())
+	assert.Equal(t, uint32(44), backend.state.HotspotChannel)
+	assert.Equal(t, "10.43.0.1/24", backend.state.HotspotAddress)
+	assert.Equal(t, "hotspot-uuid", backend.state.HotspotUUID)
+
+	delete(stored["802-11-wireless"], "channel")
+	delete(stored["ipv4"], "address-data")
+	require.NoError(t, backend.updateHotspotState())
+	assert.Equal(t, uint32(0), backend.state.HotspotChannel)
+	assert.Empty(t, backend.state.HotspotAddress)
 }

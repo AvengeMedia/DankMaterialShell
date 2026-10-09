@@ -1,6 +1,9 @@
 import QtQuick
+import Quickshell
 import qs.Common
 import qs.Modals.Common
+import qs.Modals.FileBrowser
+import qs.Modules.Network
 import qs.Services
 import qs.DCommon.Widgets
 import qs.Widgets
@@ -24,11 +27,9 @@ DModal {
     property string wifiUsernameInput: ""
     property bool requiresEnterprise: false
     property bool isHiddenNetwork: false
-
-    property string wifiAnonymousIdentityInput: ""
-    property string wifiDomainInput: ""
-    property string eapMethodValue: "peap"
-    property string phase2AuthValue: "mschapv2"
+    property string hiddenSecurity: "wpa-psk"
+    property var importProfile: null
+    property string browseTarget: ""
 
     property bool isPromptMode: false
     property string promptToken: ""
@@ -46,14 +47,19 @@ DModal {
 
     readonly property bool isCertificateChangedPrompt: promptReason === "server-certificate-changed"
     readonly property bool isCertificatePrompt: promptReason === "server-certificate" || isCertificateChangedPrompt
+    readonly property bool isWiredPrompt: isPromptMode && !isVpnPrompt && connectionType !== "802-11-wireless"
     readonly property string serverCertificateFingerprint: promptHints.length > 0 ? promptHints[0] : ""
-    readonly property bool showUsernameField: requiresEnterprise && !isVpnPrompt && fieldsInfo.length === 0
-    readonly property bool showPasswordField: fieldsInfo.length === 0 && !isCertificatePrompt
-    readonly property bool showEapFields: requiresEnterprise && !isVpnPrompt && !isPromptMode
-    readonly property bool showPhase2Dropdown: eapMethodValue === "peap" || eapMethodValue === "ttls"
-    readonly property bool showAnonField: requiresEnterprise && !isVpnPrompt && !isPromptMode && eapMethodValue !== "pwd"
-    readonly property bool showDomainField: showAnonField
-    readonly property bool showSavePasswordCheckbox: (isVpnPrompt || fieldsInfo.length > 0) && promptReason !== "pkcs11" && !isCertificatePrompt
+    readonly property bool showEnterpriseForm: requiresEnterprise && !isVpnPrompt && !isPromptMode
+    readonly property bool hiddenNeedsPassword: hiddenSecurity === "wpa-psk" || hiddenSecurity === "sae"
+    readonly property bool showUsernameField: requiresEnterprise && !isVpnPrompt && isPromptMode && fieldsInfo.length === 0
+    readonly property bool showPasswordField: fieldsInfo.length === 0 && !isCertificatePrompt && !showEnterpriseForm && (!isHiddenNetwork || hiddenNeedsPassword)
+    readonly property bool showSavePasswordCheckbox: isVpnPrompt && promptReason !== "pkcs11" && !isCertificatePrompt
+    readonly property var hiddenSecurityChoices: {
+        const choices = [[I18n.tr("Open", "network security type", true), "none"], ["WPA/WPA2", "wpa-psk"], ["WPA3", "sae"], ["OWE", "owe"]];
+        if (NetworkService.enterpriseSupported)
+            choices.push([I18n.tr("Enterprise", "wifi security type value, 802.1x enterprise network"), "wpa-eap"]);
+        return choices;
+    }
 
     readonly property int certificateWarningHeight: certificateWarningColumn.implicitHeight + Theme.spacingM * 2
 
@@ -74,23 +80,27 @@ DModal {
             ssidInput.forceActiveFocus();
             return;
         }
-        if (requiresEnterprise && !isVpnPrompt) {
+        if (showUsernameField) {
             usernameInput.forceActiveFocus();
             return;
         }
-        passwordInput.forceActiveFocus();
+        if (showEnterpriseForm) {
+            enterpriseForm.focusIdentity();
+            return;
+        }
+        if (showPasswordField)
+            passwordInput.forceActiveFocus();
     }
 
-    function show(ssid) {
-        wifiPasswordSSID = ssid;
+    function resetState() {
+        wifiPasswordSSID = "";
         wifiPasswordInput = "";
         wifiUsernameInput = "";
-        wifiAnonymousIdentityInput = "";
-        wifiDomainInput = "";
-        eapMethodValue = "peap";
-        phase2AuthValue = "mschapv2";
-        isPromptMode = false;
+        requiresEnterprise = false;
         isHiddenNetwork = false;
+        hiddenSecurity = "wpa-psk";
+        importProfile = null;
+        isPromptMode = false;
         promptToken = "";
         promptReason = "";
         promptFields = [];
@@ -102,7 +112,15 @@ DModal {
         connectionType = "";
         fieldsInfo = [];
         secretValues = {};
+        enterpriseForm.usernameSuffix = "";
+        enterpriseForm.usernameSuffixRequired = false;
+        enterpriseForm.caDisplayName = "";
+        enterpriseForm.reset();
+    }
 
+    function show(ssid) {
+        resetState();
+        wifiPasswordSSID = ssid;
         const network = NetworkService.wifiNetworks.find(n => n.ssid === ssid);
         requiresEnterprise = network?.enterprise || false;
 
@@ -111,33 +129,29 @@ DModal {
     }
 
     function showHidden() {
-        wifiPasswordSSID = "";
-        wifiPasswordInput = "";
-        wifiUsernameInput = "";
-        wifiAnonymousIdentityInput = "";
-        wifiDomainInput = "";
-        eapMethodValue = "peap";
-        phase2AuthValue = "mschapv2";
-        isPromptMode = false;
+        resetState();
         isHiddenNetwork = true;
-        promptToken = "";
-        promptReason = "";
-        promptFields = [];
-        promptHints = [];
-        promptSetting = "";
-        isVpnPrompt = false;
-        connectionName = "";
-        vpnServiceType = "";
-        connectionType = "";
-        fieldsInfo = [];
-        secretValues = {};
-        requiresEnterprise = false;
+
+        open();
+        Qt.callLater(focusFirstField);
+    }
+
+    function showImport(profile, fileName) {
+        resetState();
+        importProfile = profile;
+        wifiPasswordSSID = profile.ssids?.[0] ?? "";
+        requiresEnterprise = true;
+        enterpriseForm.usernameSuffix = profile.usernameSuffix || "";
+        enterpriseForm.usernameSuffixRequired = !!profile.usernameSuffix && !!profile.usernameHint;
+        enterpriseForm.caDisplayName = fileName || "";
+        enterpriseForm.reset(profile.enterprise);
 
         open();
         Qt.callLater(focusFirstField);
     }
 
     function showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fInfo) {
+        resetState();
         isPromptMode = true;
         promptToken = token;
         promptReason = reason;
@@ -148,20 +162,12 @@ DModal {
         connectionName = connName || ssid || "";
         vpnServiceType = vpnService || "";
         fieldsInfo = fInfo || [];
-        secretValues = {};
 
         isVpnPrompt = (connectionType === "vpn" || connectionType === "wireguard");
-        wifiPasswordSSID = isVpnPrompt ? connectionName : ssid;
+        wifiPasswordSSID = connectionType === "802-11-wireless" ? ssid : connectionName;
         savePasswordCheckbox.checked = !isVpnPrompt;
 
         requiresEnterprise = setting === "802-1x";
-
-        wifiPasswordInput = "";
-        wifiUsernameInput = "";
-        wifiAnonymousIdentityInput = "";
-        wifiDomainInput = "";
-        eapMethodValue = "peap";
-        phase2AuthValue = "mschapv2";
 
         open();
         Qt.callLater(() => {
@@ -212,13 +218,27 @@ DModal {
         }
     }
 
+    function submitImport() {
+        const options = {
+            "security": "wpa-eap",
+            "enterprise": enterpriseForm.toConfig()
+        };
+        const ssids = importProfile?.ssids ?? [];
+        const visible = ssids.find(s => NetworkService.wifiNetworks.some(n => n.ssid === s));
+        if (visible)
+            NetworkService.connectToWifi(visible, "", options);
+        for (const ssid of ssids) {
+            if (ssid !== visible)
+                NetworkService.saveWifiProfile(ssid, options, null);
+        }
+    }
+
     function submitCredentialsAndClose() {
         if (!connectButton.enabled)
             return;
         if (fieldsInfo.length > 0) {
             NetworkService.submitCredentials(promptToken, secretValues, savePasswordCheckbox.checked);
             hide();
-            secretValues = {};
             return;
         }
 
@@ -234,41 +254,34 @@ DModal {
                     secrets["identity"] = usernameInput.text;
                 if (passwordInput.text)
                     secrets["password"] = passwordInput.text;
-                if (wifiAnonymousIdentityInput)
-                    secrets["anonymous-identity"] = wifiAnonymousIdentityInput;
             }
             NetworkService.submitCredentials(promptToken, secrets, savePasswordCheckbox.checked);
+        } else if (importProfile) {
+            submitImport();
+        } else if (isHiddenNetwork) {
+            const options = {
+                "hidden": true,
+                "security": hiddenSecurity
+            };
+            if (showEnterpriseForm)
+                options.enterprise = enterpriseForm.toConfig();
+            NetworkService.connectToWifi(ssidInput.text, hiddenNeedsPassword ? passwordInput.text : "", options);
+        } else if (showEnterpriseForm) {
+            NetworkService.connectToWifi(wifiPasswordSSID, "", {
+                "security": "wpa-eap",
+                "enterprise": enterpriseForm.toConfig()
+            });
         } else {
-            const ssid = isHiddenNetwork ? ssidInput.text : wifiPasswordSSID;
-            const username = requiresEnterprise ? usernameInput.text : "";
-            const anonIdentity = showAnonField ? wifiAnonymousIdentityInput : "";
-            const domainMatch = showDomainField ? wifiDomainInput : "";
-            const eap = requiresEnterprise ? eapMethodValue : "";
-            const phase2 = requiresEnterprise && showPhase2Dropdown ? phase2AuthValue : "";
-            NetworkService.connectToWifi(ssid, passwordInput.text, username, anonIdentity, domainMatch, isHiddenNetwork, eap, phase2);
+            NetworkService.connectToWifi(wifiPasswordSSID, passwordInput.text);
         }
 
         hide();
-        wifiPasswordInput = "";
-        wifiUsernameInput = "";
-        wifiAnonymousIdentityInput = "";
-        wifiDomainInput = "";
-        passwordInput.text = "";
-        if (requiresEnterprise)
-            usernameInput.text = "";
-        if (isHiddenNetwork)
-            ssidInput.text = "";
     }
 
     function clearAndClose() {
         if (isPromptMode)
             NetworkService.cancelCredentials(promptToken);
         hide();
-        wifiPasswordInput = "";
-        wifiUsernameInput = "";
-        wifiAnonymousIdentityInput = "";
-        wifiDomainInput = "";
-        secretValues = {};
     }
 
     onShouldBeVisibleChanged: {
@@ -278,13 +291,10 @@ DModal {
         }
         wifiPasswordInput = "";
         wifiUsernameInput = "";
-        wifiAnonymousIdentityInput = "";
-        wifiDomainInput = "";
         secretValues = {};
+        enterpriseForm.reset();
         passwordInput.text = "";
         usernameInput.text = "";
-        anonInput.text = "";
-        domainMatchInput.text = "";
         ssidInput.text = "";
         for (var i = 0; i < dynamicFieldsRepeater.count; i++) {
             const item = dynamicFieldsRepeater.itemAt(i);
@@ -299,10 +309,19 @@ DModal {
         function onPasswordDialogShouldReopenChanged() {
             if (!NetworkService.passwordDialogShouldReopen || NetworkService.connectingSSID === "")
                 return;
-            wifiPasswordSSID = NetworkService.connectingSSID;
-            wifiPasswordInput = "";
-            open();
+            show(NetworkService.connectingSSID);
             NetworkService.passwordDialogShouldReopen = false;
+        }
+    }
+
+    LazyLoader {
+        id: certBrowserLoader
+        active: false
+
+        FileBrowserSurfaceModal {
+            bucket: "certificate"
+            filters: ["*.pem", "*.crt", "*.cer", "*.der", "*.p12", "*.pfx", "*.key", "*"]
+            onAccepted: paths => enterpriseForm.setPath(root.browseTarget, paths[0])
         }
     }
 
@@ -321,6 +340,10 @@ DModal {
                 return I18n.tr("Untrusted VPN certificate", "Title for VPN server certificate trust confirmation");
             if (isVpnPrompt)
                 return I18n.tr("Connect to VPN");
+            if (isWiredPrompt)
+                return I18n.tr("Ethernet");
+            if (importProfile)
+                return importProfile.providerName || I18n.tr("Connect to Wi-Fi");
             if (isHiddenNetwork)
                 return I18n.tr("Connect to Hidden Network");
             return I18n.tr("Connect to Wi-Fi");
@@ -335,7 +358,7 @@ DModal {
             if (isVpnPrompt)
                 return I18n.tr("Enter password for ") + wifiPasswordSSID;
             if (isHiddenNetwork)
-                return I18n.tr("Enter network name and password");
+                return hiddenNeedsPassword ? I18n.tr("Enter network name and password") : I18n.tr("Enter network name", "hidden Wi-Fi prompt subtitle when the chosen security needs no password");
             return (requiresEnterprise ? I18n.tr("Enter credentials for ") : I18n.tr("Enter password for ")) + wifiPasswordSSID;
         }
 
@@ -388,7 +411,28 @@ DModal {
             labelText: I18n.tr("Network Name (SSID)")
             enabled: root.shouldBeVisible
 
-            onAccepted: passwordInput.forceActiveFocus()
+            onAccepted: {
+                if (showPasswordField)
+                    passwordInput.forceActiveFocus();
+            }
+        }
+
+        DDropdown {
+            id: hiddenSecurityDropdown
+            visible: isHiddenNetwork
+            width: parent.width
+            text: I18n.tr("Security", "noun, settings page name and wifi security type label")
+            options: hiddenSecurityChoices.map(c => c[0])
+            // DDropdown assigns currentValue on pick, which drops a plain binding; this re-applies it on reset.
+            Binding {
+                target: hiddenSecurityDropdown
+                property: "currentValue"
+                value: hiddenSecurityChoices.find(c => c[1] === hiddenSecurity)?.[0] ?? ""
+            }
+            onValueChanged: value => {
+                hiddenSecurity = hiddenSecurityChoices.find(c => c[0] === value)?.[1] ?? "wpa-psk";
+                requiresEnterprise = hiddenSecurity === "wpa-eap";
+            }
         }
 
         Repeater {
@@ -428,58 +472,6 @@ DModal {
             }
         }
 
-        Row {
-            id: eapSelectorRow
-
-            visible: showEapFields
-            width: parent.width
-            spacing: Theme.spacingM
-
-            Column {
-                width: showPhase2Dropdown ? (parent.width - Theme.spacingM) / 2 : parent.width
-                spacing: Theme.spacingXS
-
-                StyledText {
-                    text: I18n.tr("Authentication")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                }
-
-                DDropdown {
-                    width: parent.width
-                    dropdownWidth: parent.width
-                    compactMode: true
-                    options: ["PEAP", "TTLS", "PWD"]
-                    currentValue: eapMethodValue.toUpperCase()
-                    onValueChanged: value => {
-                        eapMethodValue = value.toLowerCase();
-                        phase2AuthValue = eapMethodValue === "ttls" ? "pap" : "mschapv2";
-                    }
-                }
-            }
-
-            Column {
-                visible: showPhase2Dropdown
-                width: (parent.width - Theme.spacingM) / 2
-                spacing: Theme.spacingXS
-
-                StyledText {
-                    text: I18n.tr("Inner authentication", "802.1X phase 2 authentication method")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                }
-
-                DDropdown {
-                    width: parent.width
-                    dropdownWidth: parent.width
-                    compactMode: true
-                    options: eapMethodValue === "ttls" ? ["PAP", "MSCHAPv2", "MSCHAP", "CHAP", "GTC", "MD5"] : ["MSCHAPv2", "GTC", "MD5"]
-                    currentValue: phase2AuthValue === "mschapv2" ? "MSCHAPv2" : phase2AuthValue.toUpperCase()
-                    onValueChanged: value => phase2AuthValue = value.toLowerCase()
-                }
-            }
-        }
-
         DTextField {
             id: usernameInput
             visible: showUsernameField
@@ -512,43 +504,24 @@ DModal {
             enabled: root.shouldBeVisible
 
             onTextEdited: wifiPasswordInput = text
-            onAccepted: {
-                if (showAnonField) {
-                    anonInput.forceActiveFocus();
-                    return;
-                }
-                submitCredentialsAndClose();
-            }
-        }
-
-        DTextField {
-            id: anonInput
-            visible: showAnonField
-            expressive: true
-            leftIconName: "person_off"
-
-            width: parent.width
-            text: wifiAnonymousIdentityInput
-            labelText: I18n.tr("Anonymous Identity (optional)")
-            enabled: root.shouldBeVisible
-
-            onTextEdited: wifiAnonymousIdentityInput = text
-            onAccepted: domainMatchInput.forceActiveFocus()
-        }
-
-        DTextField {
-            id: domainMatchInput
-            visible: showDomainField
-            expressive: true
-            leftIconName: "domain"
-
-            width: parent.width
-            text: wifiDomainInput
-            labelText: I18n.tr("Domain (optional)")
-            enabled: root.shouldBeVisible
-
-            onTextEdited: wifiDomainInput = text
             onAccepted: submitCredentialsAndClose()
+        }
+
+        EnterpriseAuthForm {
+            id: enterpriseForm
+            expressive: true
+            // System CA needs a server domain, which most users don't know when connecting.
+            defaultCa: "none"
+            visible: showEnterpriseForm
+            width: parent.width
+            onSubmitRequested: submitCredentialsAndClose()
+            onBrowseRequested: target => {
+                root.browseTarget = target;
+                certBrowserLoader.active = true;
+                const browser = certBrowserLoader.item;
+                if (browser)
+                    browser.open();
+            }
         }
 
         DToggle {
@@ -591,9 +564,13 @@ DModal {
                         return serverCertificateFingerprint.length > 0;
                     if (isVpnPrompt)
                         return passwordInput.text.length > 0;
+                    if (isHiddenNetwork && ssidInput.text.length === 0)
+                        return false;
+                    if (showEnterpriseForm)
+                        return enterpriseForm.valid;
                     if (isHiddenNetwork)
-                        return ssidInput.text.length > 0;
-                    return requiresEnterprise ? (usernameInput.text.length > 0 && passwordInput.text.length > 0) : passwordInput.text.length > 0;
+                        return !hiddenNeedsPassword || passwordInput.text.length >= (hiddenSecurity === "wpa-psk" ? 8 : 1);
+                    return showUsernameField ? (usernameInput.text.length > 0 && passwordInput.text.length > 0) : passwordInput.text.length > 0;
                 }
                 onClicked: submitCredentialsAndClose()
             }

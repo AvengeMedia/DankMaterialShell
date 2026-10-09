@@ -127,10 +127,6 @@ Item {
             wifiMenu.close();
             return true;
         }
-        if (wiredMenu.open) {
-            wiredMenu.close();
-            return true;
-        }
         return false;
     }
 
@@ -197,35 +193,6 @@ Item {
         wifiMenu.openAt(anchor);
     }
 
-    function openWiredMenu(connection, anchor) {
-        const connected = connection.isActive;
-        wiredMenu.items = [
-            {
-                "label": I18n.tr("Activate"),
-                "iconName": "lan",
-                "visible": !connected,
-                "action": () => NetworkService.connectToSpecificWiredConfig(connection.uuid)
-            },
-            {
-                "label": I18n.tr("Disconnect"),
-                "iconName": "link_off",
-                "destructive": true,
-                "visible": connected,
-                "action": () => NetworkService.toggleNetworkConnection("ethernet")
-            },
-            {
-                "label": I18n.tr("Network Info"),
-                "iconName": "info",
-                "visible": connected,
-                "action": () => {
-                    networkWiredInfoModalLoader.active = true;
-                    networkWiredInfoModalLoader.item.showNetworkInfo(connection.id, NetworkService.getWiredNetworkInfo(connection.uuid));
-                }
-            }
-        ];
-        wiredMenu.openAt(anchor);
-    }
-
     ScriptModel {
         id: wifiListModel
         objectProp: "ssid"
@@ -276,20 +243,6 @@ Item {
     }
 
     ScriptModel {
-        id: wiredConnectionsModel
-        objectProp: "uuid"
-        values: {
-            const sorted = [...(NetworkService.wiredConnections || [])];
-            sorted.sort((a, b) => {
-                if (a.isActive !== b.isActive)
-                    return a.isActive ? -1 : 1;
-                return a.id.localeCompare(b.id);
-            });
-            return sorted;
-        }
-    }
-
-    ScriptModel {
         id: cellularConnectionsModel
         objectProp: "uuid"
         values: {
@@ -319,6 +272,18 @@ Item {
             width: pageList.width
             spacing: CcMetrics.detailContentGap
             bottomPadding: pageList.count > 0 ? CcMetrics.detailContentGap : 0
+
+            CcGroup {
+                visible: NetworkService.connectivityPortal
+
+                CcListRow {
+                    iconName: "login"
+                    active: true
+                    clickable: true
+                    title: I18n.tr("Log in to network", "captive portal: open the login page")
+                    onClicked: NetworkService.openCaptivePortal()
+                }
+            }
 
             DButtonGroup {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -384,6 +349,17 @@ Item {
                         running: visible
                     }
 
+                    DActionButton {
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: NetworkService.hotspotEnabled && NetworkService.hotspotSecured && NetworkService.hotspotExtendedSupported
+                        buttonSize: Theme.buttonHeightXS
+                        iconSize: Theme.iconSizeMedium
+                        iconName: "qr_code"
+                        tooltipText: I18n.tr("Show QR Code")
+                        iconColor: Theme.surfaceText
+                        onClicked: PopoutService.showWifiQRCodeModal(NetworkService.hotspotSSID)
+                    }
+
                     DToggle {
                         anchors.verticalCenter: parent.verticalCenter
                         hideText: true
@@ -431,33 +407,71 @@ Item {
                 visible: root.ethernetMode && root.networkManager && DMSService.apiVersion > 10
 
                 Repeater {
-                    model: wiredConnectionsModel
+                    model: NetworkService.ethernetDevices || []
 
-                    CcListRow {
-                        id: wiredRow
+                    Column {
+                        id: adapterItem
 
                         required property var modelData
-
-                        iconName: "lan"
-                        active: modelData.isActive
-                        title: modelData.id || I18n.tr("Unknown Config")
-                        subtitle: active ? I18n.tr("Connected") : I18n.tr("Available")
-                        clickable: true
-                        onClicked: {
-                            if (modelData.uuid === NetworkService.ethernetConnectionUuid)
-                                return;
-                            NetworkService.connectToSpecificWiredConfig(modelData.uuid);
+                        readonly property var profiles: {
+                            const byUuid = {};
+                            for (const c of (NetworkService.wiredConnections || []))
+                                byUuid[c.uuid] = c;
+                            return (modelData.profileUuids || []).map(u => byUuid[u]).filter(c => !!c);
                         }
 
-                        DActionButton {
-                            id: wiredOptionsButton
-                            anchors.verticalCenter: parent.verticalCenter
-                            buttonSize: Theme.buttonHeightXS
-                            iconSize: Theme.iconSizeMedium
-                            iconName: "more_horiz"
-                            Accessible.name: I18n.tr("Options")
-                            iconColor: Theme.surfaceText
-                            onClicked: root.openWiredMenu(wiredRow.modelData, wiredOptionsButton)
+                        width: parent.width
+
+                        CcListRow {
+                            id: adapterRow
+
+                            iconName: "lan"
+                            active: adapterItem.modelData.connected
+                            title: adapterItem.modelData.name
+                            subtitle: {
+                                if (adapterItem.modelData.connected)
+                                    return I18n.tr("Connected") + (adapterItem.modelData.ip ? " • " + adapterItem.modelData.ip : "");
+                                return adapterItem.modelData.state === "unavailable" ? I18n.tr("Unavailable") : I18n.tr("Disconnected");
+                            }
+                            clickable: active && !!adapterItem.modelData.connectionUuid
+                            onClicked: {
+                                const uuid = adapterItem.modelData.connectionUuid;
+                                const conn = (NetworkService.wiredConnections || []).find(c => c.uuid === uuid);
+                                networkWiredInfoModalLoader.active = true;
+                                networkWiredInfoModalLoader.item.showNetworkInfo(conn?.id || adapterItem.modelData.name, NetworkService.getWiredNetworkInfo(uuid));
+                            }
+
+                            DActionButton {
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: NetworkService.ethernetDeviceConnectSupported
+                                buttonSize: Theme.buttonHeightXS
+                                iconSize: Theme.iconSizeMedium
+                                iconName: adapterRow.active ? "link_off" : "link"
+                                tooltipText: adapterRow.active ? I18n.tr("Disconnect") : I18n.tr("Connect")
+                                iconColor: adapterRow.active ? Theme.error : Theme.primary
+                                onClicked: {
+                                    if (adapterRow.active)
+                                        NetworkService.disconnectEthernetDevice(adapterItem.modelData.name);
+                                    else
+                                        NetworkService.connectEthernetDevice(adapterItem.modelData.name);
+                                }
+                            }
+                        }
+
+                        Repeater {
+                            model: adapterItem.profiles.length > 1 ? adapterItem.profiles : []
+
+                            CcListRow {
+                                id: profileRow
+
+                                required property var modelData
+
+                                paddingH: CcMetrics.rowPaddingH + Theme.spacingL
+                                title: modelData.id
+                                active: modelData.uuid === adapterItem.modelData.connectionUuid
+                                clickable: !active
+                                onClicked: NetworkService.connectToSpecificWiredConfig(modelData.uuid, adapterItem.modelData.name)
+                            }
                         }
                     }
                 }
@@ -652,11 +666,6 @@ Item {
 
     CcMenu {
         id: wifiMenu
-        transientSurfaceTracker: root.transientSurfaceTracker
-    }
-
-    CcMenu {
-        id: wiredMenu
         transientSurfaceTracker: root.transientSurfaceTracker
     }
 

@@ -34,6 +34,7 @@ packages:
       pkgname: mocks_network
     interfaces:
       Backend: {}
+      ConnectionEditorBackend: {}
   github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext:
     config:
       dir: internal/mocks/wlcontext

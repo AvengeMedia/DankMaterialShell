@@ -13,6 +13,8 @@ import qs.DCommon.Widgets
 Item {
     id: networkVpnTab
 
+    property var parentModal
+
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
@@ -102,6 +104,11 @@ Item {
                     required property var modelData
 
                     profile: modelData
+                    opensEditor: NetworkService.vpnEditorSupported
+                    onEditRequested: {
+                        SettingsUiState.selectConnection(modelData.uuid, modelData.name, "");
+                        networkVpnTab.parentModal?.navigateTo("network_connection");
+                    }
                     isExpanded: root.expandedVpnUuid === modelData.uuid
                     onToggleExpand: {
                         if (root.expandedVpnUuid === modelData.uuid) {
@@ -124,6 +131,16 @@ Item {
 
         SettingsFabBar {
             shown: DMSNetworkService.vpnAvailable
+
+            DFab {
+                visible: NetworkService.vpnEditorSupported
+                text: I18n.tr("Add")
+                iconName: "add"
+                onClicked: {
+                    SettingsUiState.selectConnection("", "WireGuard", "wireguard");
+                    networkVpnTab.parentModal?.navigateTo("network_connection");
+                }
+            }
 
             DFab {
                 text: I18n.tr("Import VPN")
