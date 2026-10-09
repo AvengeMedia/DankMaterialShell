@@ -190,6 +190,12 @@ DModal {
             return "NOTIFICATION_DISMISS_SUCCESS";
         }
 
+        function invokeLast(): string {
+            if (!NotificationService.invokeLastNotification())
+                return "NOTIFICATION_INVOKE_NO_ACTION";
+            return "NOTIFICATION_INVOKE_SUCCESS";
+        }
+
         target: "notifications"
     }
 
