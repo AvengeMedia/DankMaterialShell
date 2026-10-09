@@ -16,11 +16,14 @@ func TestReadinessBackoffAndSuccess(t *testing.T) {
 		r.ShellReady(42)
 		start := time.Now()
 		var checks []time.Duration
-		err := r.wait(context.Background(), func(_ context.Context, pid uint32) (bool, error) {
+		err := r.wait(context.Background(), time.Minute, func(_ context.Context, pid uint32) (bool, error) {
 			require.Equal(t, uint32(42), pid)
 			checks = append(checks, time.Since(start))
 			if len(checks) == 1 {
 				return false, errors.New("temporary bus failure")
+			}
+			if len(checks) == 2 {
+				return false, &BusNameConflictError{Name: "tray host", OwnerPID: 43}
 			}
 			return len(checks) == 11, nil
 		})
@@ -34,15 +37,19 @@ func TestReadinessBackoffAndSuccess(t *testing.T) {
 }
 
 func TestReadinessDeadlineBeforeUI(t *testing.T) {
-	synctest.Test(t, func(t *testing.T) {
-		start := time.Now()
-		err := NewReadiness().wait(context.Background(), func(context.Context, uint32) (bool, error) {
-			t.Fatal("must not check services before the UI is loaded")
-			return false, nil
+	for _, timeout := range []time.Duration{0, 150 * time.Millisecond, 30 * time.Second, 3 * time.Minute} {
+		t.Run(timeout.String(), func(t *testing.T) {
+			synctest.Test(t, func(t *testing.T) {
+				start := time.Now()
+				err := NewReadiness().wait(context.Background(), timeout, func(context.Context, uint32) (bool, error) {
+					t.Fatal("must not check services before the UI is loaded")
+					return false, nil
+				})
+				require.ErrorIs(t, err, ErrReadinessTimeout)
+				require.Equal(t, timeout, time.Since(start))
+			})
 		})
-		require.ErrorIs(t, err, ErrReadinessTimeout)
-		require.Equal(t, time.Minute, time.Since(start))
-	})
+	}
 }
 
 func TestReadinessLateAndDuplicateUIKeepDeadline(t *testing.T) {
@@ -55,7 +62,7 @@ func TestReadinessLateAndDuplicateUIKeepDeadline(t *testing.T) {
 			time.Sleep(9 * time.Second)
 			r.ShellReady(43)
 		}()
-		err := r.wait(context.Background(), func(_ context.Context, pid uint32) (bool, error) {
+		err := r.wait(context.Background(), time.Minute, func(_ context.Context, pid uint32) (bool, error) {
 			require.Equal(t, uint32(42), pid)
 			return false, nil
 		})
@@ -69,7 +76,7 @@ func TestReadinessDeadlineDuringCheck(t *testing.T) {
 		r := NewReadiness()
 		r.ShellReady(42)
 		start := time.Now()
-		err := r.wait(context.Background(), func(ctx context.Context, _ uint32) (bool, error) {
+		err := r.wait(context.Background(), time.Minute, func(ctx context.Context, _ uint32) (bool, error) {
 			<-ctx.Done()
 			return true, nil
 		})
@@ -91,7 +98,7 @@ func TestReadinessCancellation(t *testing.T) {
 				cancel()
 			}()
 			start := time.Now()
-			err := r.wait(ctx, func(context.Context, uint32) (bool, error) { return false, nil })
+			err := r.wait(ctx, time.Minute, func(context.Context, uint32) (bool, error) { return false, nil })
 			require.NoError(t, err)
 			require.Equal(t, time.Second, time.Since(start))
 		})

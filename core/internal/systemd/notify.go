@@ -38,13 +38,24 @@ func (r *Readiness) ShellReady(pid uint32) {
 	r.once.Do(func() { r.uiReady <- pid })
 }
 
-func (r *Readiness) Wait(ctx context.Context) error {
+func (r *Readiness) Wait(ctx context.Context) {
 	path := os.Getenv("NOTIFY_SOCKET")
 	if path == "" {
-		return nil
+		return
 	}
 	if path[0] != '/' && path[0] != '@' {
-		return fmt.Errorf("invalid NOTIFY_SOCKET address")
+		log.Warn("Could not report shell readiness: invalid NOTIFY_SOCKET address")
+		return
+	}
+
+	started := time.Now()
+	timeout, err := startupTimeout(ctx)
+	if err != nil {
+		if ctx.Err() != nil {
+			return
+		}
+		log.Warnf("Could not read systemd startup timeout; using one minute: %v", err)
+		timeout = max(0, time.Minute-time.Since(started))
 	}
 
 	var conn *dbus.Conn
@@ -53,7 +64,7 @@ func (r *Readiness) Wait(ctx context.Context) error {
 			conn.Close()
 		}
 	}()
-	err := r.wait(ctx, func(ctx context.Context, pid uint32) (bool, error) {
+	err = r.wait(ctx, timeout, func(ctx context.Context, pid uint32) (bool, error) {
 		if conn != nil && !conn.Connected() {
 			conn.Close()
 			conn = nil
@@ -68,8 +79,11 @@ func (r *Readiness) Wait(ctx context.Context) error {
 		checkCtx, cancel := context.WithTimeout(ctx, time.Second)
 		defer cancel()
 		ready, status, err := shellServicesReady(checkCtx, conn, pid)
-		if err != nil || !ready {
+		if err != nil {
 			return false, err
+		}
+		if !ready {
+			return false, errors.New(status)
 		}
 		if err := ctx.Err(); err != nil {
 			return false, err
@@ -86,17 +100,25 @@ func (r *Readiness) Wait(ctx context.Context) error {
 		}
 		return true, nil
 	})
-	if err == nil {
-		return nil
+	if err == nil || ctx.Err() != nil {
+		return
 	}
-	if notifyErr := sendNotification(path, "STATUS=Failed to start: "+err.Error()); notifyErr != nil {
-		return errors.Join(err, fmt.Errorf("report startup failure: %w", notifyErr))
+	status := "Shell started with a readiness warning: " + err.Error()
+	if notifyErr := sendNotification(path, "READY=1\nSTATUS="+status); notifyErr != nil {
+		log.Warnf("Could not report shell readiness: %v; %v", err, notifyErr)
+		return
 	}
-	return err
+	log.Warn(status)
 }
 
-func (r *Readiness) wait(parent context.Context, check func(context.Context, uint32) (bool, error)) error {
-	ctx, cancel := context.WithTimeout(parent, time.Minute)
+func (r *Readiness) wait(parent context.Context, timeout time.Duration, check func(context.Context, uint32) (bool, error)) error {
+	var ctx context.Context
+	var cancel context.CancelFunc
+	if timeout < 0 {
+		ctx, cancel = context.WithCancel(parent)
+	} else {
+		ctx, cancel = context.WithTimeout(parent, timeout)
+	}
 	defer cancel()
 
 	var pid uint32
@@ -130,10 +152,6 @@ func (r *Readiness) wait(parent context.Context, check func(context.Context, uin
 			ready, err := check(ctx, pid)
 			if ctx.Err() != nil {
 				continue
-			}
-			var conflict *BusNameConflictError
-			if errors.As(err, &conflict) {
-				return err
 			}
 			if err == nil && ready {
 				return nil
@@ -169,11 +187,14 @@ func shellServicesReady(ctx context.Context, conn *dbus.Conn, shellPID uint32) (
 	case err != nil:
 		return false, "", err
 	case !ready:
-		return false, "", nil
+		return false, "notification service has no D-Bus owner", nil
 	}
 	ready, err = busNameReady(ctx, conn, "org.kde.StatusNotifierWatcher", 0)
-	if err != nil || !ready {
+	if err != nil {
 		return false, "", err
+	}
+	if !ready {
+		return false, "tray watcher has no D-Bus owner", nil
 	}
 
 	var names []string
@@ -198,15 +219,18 @@ func shellServicesReady(ctx context.Context, conn *dbus.Conn, shellPID uint32) (
 			"org.freedesktop.DBus.Properties.Get", dbus.FlagNoAutoStart,
 			"org.kde.StatusNotifierWatcher", "IsStatusNotifierHostRegistered").Store(&registered)
 		if busNameMissing(err) {
-			return false, "", nil
+			return false, "tray watcher disappeared during startup", nil
 		}
 		if err != nil {
 			return false, "", fmt.Errorf("get tray watcher readiness: %w", err)
 		}
 		ready, _ = registered.Value().(bool)
-		return ready, status, nil
+		if !ready {
+			return false, "tray watcher did not report a registered host", nil
+		}
+		return true, status, nil
 	}
-	return false, "", nil
+	return false, "shell tray host is not registered on D-Bus", nil
 }
 
 func busNameReady(ctx context.Context, conn *dbus.Conn, name string, expectedPID uint32) (bool, error) {

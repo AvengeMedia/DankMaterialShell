@@ -2,6 +2,7 @@ package systemd
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -9,15 +10,18 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"testing/synctest"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/godbus/dbus/v5"
 	"github.com/godbus/dbus/v5/prop"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/sys/unix"
 )
 
 func shellReadyBus(t *testing.T) *dbus.Conn {
@@ -98,7 +102,7 @@ func TestReadinessExternalNotifications(t *testing.T) {
 	socket := notifySocket(t)
 	readiness := NewReadiness()
 	readiness.ShellReady(uint32(os.Getpid()))
-	require.NoError(t, readiness.Wait(context.Background()))
+	readiness.Wait(context.Background())
 	assert.Equal(t, fmt.Sprintf("READY=1\nSTATUS=Ready; notifications handled by external process (PID %d)", pid), readNotification(t, socket))
 }
 
@@ -114,7 +118,7 @@ func TestReadinessForeignOwner(t *testing.T) {
 		_, _ = io.Copy(io.Discard, os.Stdin)
 		return
 	}
-	bus := shellReadyBus(t)
+	bus := readinessSystemdBus(t, 500*time.Millisecond)
 	shellReadyTray(t, bus)
 	_, err := bus.RequestName("org.freedesktop.Notifications", dbus.NameFlagDoNotQueue)
 	require.NoError(t, err)
@@ -125,34 +129,130 @@ func TestReadinessForeignOwner(t *testing.T) {
 	socket := notifySocket(t)
 	readiness := NewReadiness()
 	readiness.ShellReady(uint32(os.Getpid()))
-	err = readiness.Wait(context.Background())
-	var conflict *BusNameConflictError
-	require.ErrorAs(t, err, &conflict)
-	assert.Equal(t, uint32(ownerPID), conflict.OwnerPID)
-	assert.Equal(t, "STATUS=Failed to start: "+err.Error(), readNotification(t, socket))
+	readiness.Wait(context.Background())
+	assert.Equal(t, fmt.Sprintf("READY=1\nSTATUS=Shell started with a readiness warning: shell readiness timed out: %s is already owned by another process (PID %d)", host, ownerPID), readNotification(t, socket))
+}
+
+func TestReadinessCancellationDoesNotNotify(t *testing.T) {
+	t.Setenv("DBUS_SESSION_BUS_ADDRESS", "unix:path=/nonexistent")
+	for _, uiReady := range []bool{false, true} {
+		t.Run(fmt.Sprintf("ui_ready=%t", uiReady), func(t *testing.T) {
+			socket := notifySocket(t)
+			synctest.Test(t, func(t *testing.T) {
+				r := NewReadiness()
+				if uiReady {
+					r.ShellReady(uint32(os.Getpid()))
+				}
+				ctx, cancel := context.WithCancel(context.Background())
+				go func() {
+					time.Sleep(time.Second)
+					cancel()
+				}()
+				r.Wait(ctx)
+			})
+			raw, err := socket.SyscallConn()
+			require.NoError(t, err)
+			require.NoError(t, raw.Control(func(fd uintptr) {
+				var buf [1024]byte
+				_, _, err := unix.Recvfrom(int(fd), buf[:], unix.MSG_DONTWAIT)
+				require.ErrorIs(t, err, unix.EAGAIN, "must not send READY or STATUS while stopping")
+			}))
+		})
+	}
+}
+
+func TestReadinessTimeoutReportsPendingService(t *testing.T) {
+	for _, tc := range []struct {
+		stage  string
+		reason string
+	}{
+		{"notifications", "notification service has no D-Bus owner"},
+		{"watcher", "tray watcher has no D-Bus owner"},
+		{"host", "shell tray host is not registered on D-Bus"},
+		{"registration", "tray watcher did not report a registered host"},
+	} {
+		t.Run(tc.stage, func(t *testing.T) {
+			bus := readinessSystemdBus(t, 150*time.Millisecond)
+			if tc.stage != "notifications" {
+				_, err := bus.RequestName("org.freedesktop.Notifications", dbus.NameFlagDoNotQueue)
+				require.NoError(t, err)
+			}
+			if tc.stage == "host" || tc.stage == "registration" {
+				props := shellReadyTray(t, bus)
+				if tc.stage == "host" {
+					_, err := bus.ReleaseName(fmt.Sprintf("org.kde.StatusNotifierHost-%d-test", os.Getpid()))
+					require.NoError(t, err)
+				} else {
+					props.SetMust("org.kde.StatusNotifierWatcher", "IsStatusNotifierHostRegistered", false)
+				}
+			}
+			socket := notifySocket(t)
+			r := NewReadiness()
+			r.ShellReady(uint32(os.Getpid()))
+			r.Wait(context.Background())
+			require.Equal(t, "READY=1\nSTATUS=Shell started with a readiness warning: shell readiness timed out: "+tc.reason, readNotification(t, socket))
+			require.Eventually(t, func() bool {
+				var names []string
+				if err := bus.BusObject().Call("org.freedesktop.DBus.ListNames", 0).Store(&names); err != nil {
+					return false
+				}
+				for _, name := range names {
+					if strings.HasPrefix(name, ":") && name != bus.Names()[0] {
+						return false
+					}
+				}
+				return true
+			}, time.Second, time.Millisecond, "readiness must close both startup and service-check connections")
+		})
+	}
 }
 
 func TestReadinessWithoutSystemd(t *testing.T) {
 	t.Setenv("NOTIFY_SOCKET", "")
 	t.Setenv("DBUS_SESSION_BUS_ADDRESS", "unix:path=/nonexistent")
-	require.NoError(t, NewReadiness().Wait(context.Background()))
+	NewReadiness().Wait(context.Background())
 }
 
 func TestReadinessReportsTimeoutWithoutUI(t *testing.T) {
-	for _, statusAvailable := range []bool{true, false} {
-		t.Run(fmt.Sprintf("status_available=%t", statusAvailable), func(t *testing.T) {
-			var socket *net.UnixConn
-			if statusAvailable {
-				socket = notifySocket(t)
-			} else {
-				t.Setenv("NOTIFY_SOCKET", filepath.Join(t.TempDir(), "missing"))
-			}
+	t.Setenv("DBUS_SESSION_BUS_ADDRESS", "unix:path=/nonexistent")
+	socket := notifySocket(t)
+	synctest.Test(t, func(t *testing.T) {
+		NewReadiness().Wait(context.Background())
+	})
+	assert.Equal(t, "READY=1\nSTATUS=Shell started with a readiness warning: shell readiness timed out: UI did not report readiness", readNotification(t, socket))
+}
+
+func TestReadinessLogsNotificationFailure(t *testing.T) {
+	t.Setenv("DBUS_SESSION_BUS_ADDRESS", "unix:path=/nonexistent")
+	var output bytes.Buffer
+	logger := log.GetLogger()
+	level := logger.GetLevel()
+	logger.SetOutput(&output)
+	log.SetLevel("warn")
+	t.Cleanup(func() {
+		logger.SetOutput(os.Stderr)
+		logger.SetLevel(level)
+	})
+	for _, tc := range []struct {
+		name string
+		path string
+		want string
+	}{
+		{"invalid_address", "invalid", "invalid NOTIFY_SOCKET address"},
+		{"delivery_failure", filepath.Join(t.TempDir(), "missing"), "shell readiness timed out: UI did not report readiness"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			output.Reset()
+			t.Setenv("NOTIFY_SOCKET", tc.path)
 			synctest.Test(t, func(t *testing.T) {
-				err := NewReadiness().Wait(context.Background())
-				require.ErrorIs(t, err, ErrReadinessTimeout)
+				NewReadiness().Wait(context.Background())
 			})
-			if socket != nil {
-				assert.Equal(t, "STATUS=Failed to start: shell readiness timed out: UI did not report readiness", readNotification(t, socket))
+			message := output.String()
+			require.Equal(t, 1, strings.Count(message, "Could not report shell readiness:"))
+			require.Contains(t, message, tc.want)
+			if tc.name == "delivery_failure" {
+				require.Contains(t, message, "no such file or directory")
+				require.NotContains(t, message, "Shell started with a readiness warning:")
 			}
 		})
 	}
@@ -180,7 +280,7 @@ func TestReadinessReusesBusConnectionWhileWaitingForTray(t *testing.T) {
 	socket := notifySocket(t)
 	r := NewReadiness()
 	r.ShellReady(uint32(os.Getpid()))
-	require.NoError(t, r.Wait(context.Background()))
+	r.Wait(context.Background())
 	require.Equal(t, "READY=1", readNotification(t, socket))
 	watcher.mu.Lock()
 	defer watcher.mu.Unlock()

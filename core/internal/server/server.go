@@ -932,7 +932,7 @@ func New() *Server {
 	return s
 }
 
-func (s *Server) WaitReady(ctx context.Context) error { return s.readiness.Wait(ctx) }
+func (s *Server) WaitReady(ctx context.Context) { s.readiness.Wait(ctx) }
 
 func (s *Server) Listen() error { return s.ipc.Listen() }
 

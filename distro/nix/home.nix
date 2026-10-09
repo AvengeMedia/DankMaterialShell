@@ -99,7 +99,6 @@ in
         Environment = [ "QS_DISABLE_CRASH_HANDLER=1" ];
         ExecStart = lib.getExe cfg.package + " run --session";
         Restart = "on-failure";
-        RestartPreventExitStatus = "CONFIG";
         RestartForceExitStatus = "TEMPFAIL";
         SuccessExitStatus = "TEMPFAIL";
       };

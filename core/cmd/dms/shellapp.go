@@ -63,13 +63,7 @@ func bootBackend(ctx context.Context) (shellapp.Backend, error) {
 
 	ctx, cancel := context.WithCancel(ctx)
 	backend := &dmsBackend{srv: srv, done: make(chan error, 1), cancel: cancel}
-	go func() {
-		if err := srv.WaitReady(ctx); err != nil {
-			log.Errorf("shell readiness failed: %v", err)
-			// systemd stops Quickshell with the control group and preserves the failed state.
-			os.Exit(dmsStartupFailureExitCode)
-		}
-	}()
+	go srv.WaitReady(ctx)
 	go func() {
 		defer cancel()
 		defer func() {

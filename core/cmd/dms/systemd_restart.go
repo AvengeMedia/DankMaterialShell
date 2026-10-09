@@ -8,7 +8,6 @@ import (
 
 const dmsSystemdUnit = "dms.service"
 const dmsSessionRestartExitCode = 75 // EX_TEMPFAIL
-const dmsStartupFailureExitCode = 78 // EX_CONFIG
 
 var runSystemctl = func(args ...string) error {
 	output, err := exec.Command("systemctl", args...).CombinedOutput()

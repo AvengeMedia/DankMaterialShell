@@ -12,7 +12,6 @@ ExecStart=/usr/bin/dms run --session
 ExecReload=/bin/kill -USR1 $MAINPID
 LimitNOFILE=16384:infinity
 Restart=on-failure
-RestartPreventExitStatus=CONFIG
 RestartForceExitStatus=TEMPFAIL
 SuccessExitStatus=TEMPFAIL
 RestartSec=1.23
