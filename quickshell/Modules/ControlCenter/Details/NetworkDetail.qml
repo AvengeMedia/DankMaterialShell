@@ -280,7 +280,7 @@ Item {
                     iconName: "login"
                     active: true
                     clickable: true
-                    title: I18n.tr("Log in to network")
+                    title: I18n.tr("Log in to network", "captive portal: open the login page")
                     onClicked: NetworkService.openCaptivePortal()
                 }
             }

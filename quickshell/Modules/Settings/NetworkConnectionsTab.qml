@@ -87,9 +87,9 @@ Item {
         openEditor("", wired ? I18n.tr("Ethernet") : I18n.tr("Wi-Fi"), wired ? "802-3-ethernet" : "802-11-wireless");
     }
 
-    function reportError(name, response) {
+    function reportError(title, response) {
         if (response?.error)
-            ToastService.showError(name, response.error);
+            ToastService.showError(title, response.error);
     }
 
     ConfirmModal {
@@ -105,7 +105,7 @@ Item {
             const source = root.duplicateSource;
             hide();
             if (source)
-                NetworkService.duplicateConnection(source.uuid, name, response => root.reportError(name, response));
+                NetworkService.duplicateConnection(source.uuid, name, response => root.reportError(I18n.tr("Failed to duplicate %1", "toast title, %1 is a network connection name").arg(name), response));
         }
     }
 
@@ -153,7 +153,7 @@ Item {
                 message: I18n.tr("Forget \"%1\"?").arg(profileRow.profile.id),
                 confirmText: I18n.tr("Forget"),
                 confirmColor: Theme.error,
-                onConfirm: () => NetworkService.deleteConnection(profileRow.profile.uuid, response => root.reportError(profileRow.profile.id, response))
+                onConfirm: () => NetworkService.deleteConnection(profileRow.profile.uuid, response => root.reportError(I18n.tr("Failed to forget %1", "toast title, %1 is a network connection name").arg(profileRow.profile.id), response))
             })
         }
     }

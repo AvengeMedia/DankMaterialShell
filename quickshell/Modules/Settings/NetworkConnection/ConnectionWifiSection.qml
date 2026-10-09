@@ -60,7 +60,7 @@ SettingsCard {
             "value": "a"
         },
         {
-            "label": I18n.tr("6 GHz"),
+            "label": I18n.tr("6 GHz", "WiFi band option"),
             "value": "6GHz"
         }
     ]
@@ -201,7 +201,7 @@ SettingsCard {
     }
 
     SettingsTextFieldRow {
-        text: I18n.tr("MAC address")
+        text: I18n.tr("MAC address", "network hardware setting")
         value: root.wifi["mac-address"] ?? ""
         placeholderText: "AA:BB:CC:DD:EE:FF"
         isError: !root.macValid
@@ -210,7 +210,7 @@ SettingsCard {
 
     SettingsDropdownRow {
         readonly property var choices: CE.withChoice(root.clonedChoices, root.clonedMode)
-        text: I18n.tr("Cloned MAC address")
+        text: I18n.tr("Cloned MAC address", "network hardware setting")
         options: choices.map(c => c.label)
         currentValue: CE.choiceLabel(choices, root.clonedMode)
         onValueChanged: value => {
@@ -230,7 +230,7 @@ SettingsCard {
 
     SettingsTextFieldRow {
         visible: root.clonedMode === "manual"
-        text: I18n.tr("MAC address")
+        text: I18n.tr("Cloned MAC address", "network hardware setting")
         value: root.clonedText
         placeholderText: "AA:BB:CC:DD:EE:FF"
         isError: !root.clonedValid
@@ -252,7 +252,7 @@ SettingsCard {
 
     SettingsDropdownRow {
         readonly property var choices: CE.withChoice(root.powersaveChoices, root.powersave)
-        text: I18n.tr("Power saving")
+        text: I18n.tr("Power saving", "WiFi setting")
         options: choices.map(c => c.label)
         currentValue: CE.choiceLabel(choices, root.powersave)
         onValueChanged: value => {

@@ -175,7 +175,7 @@ SettingsCard {
             onAccepted: paths => {
                 NetworkService.exportConnection(root.uuid, paths[0], r => {
                     if (r?.error)
-                        ToastService.showError(I18n.tr("Failed to export"), r.error);
+                        ToastService.showError(I18n.tr("Failed to export", "toast title when exporting a network connection fails"), r.error);
                     else
                         ToastService.showInfo(I18n.tr("Saved"));
                 });
@@ -249,7 +249,7 @@ SettingsCard {
 
     SettingsDropdownRow {
         enabled: root.editable
-        text: I18n.tr("Metered")
+        text: I18n.tr("Metered", "network connection setting")
         options: root.meteredLabels
         currentValue: {
             root.rev;
@@ -265,7 +265,7 @@ SettingsCard {
     SettingsDropdownRow {
         visible: root.zones.length > 0
         enabled: root.editable
-        text: I18n.tr("Firewall zone")
+        text: I18n.tr("Firewall zone", "network connection setting")
         options: {
             root.rev;
             return root.zoneOptions();
@@ -301,7 +301,12 @@ SettingsCard {
     }
 
     SettingsNoteRow {
-        text: I18n.tr("All users of this computer can use this connection.")
+        visible: {
+            root.rev;
+            const users = root.editor.value("connection", "permissions", []);
+            return !users || users.length === 0;
+        }
+        text: I18n.tr("All users of this computer can use this connection.", "network connection editor note")
         noteIconName: "info"
         tint: Theme.primary
         tintBackground: Theme.primaryHover

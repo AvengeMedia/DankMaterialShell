@@ -178,7 +178,7 @@ Item {
 
             SettingsNoteRow {
                 visible: TailscaleService.available && networkTailscaleTab.profilesLoaded && !networkTailscaleTab.canOperate
-                text: I18n.tr("Changing Tailscale settings from DMS needs operator permission. Grant it with your administrator password, or run this once in a terminal:")
+                text: I18n.tr("Changing Tailscale settings from DMS needs operator permission. Grant it with your administrator password, or run this once in a terminal:", "Tailscale operator permission explanation, followed by a terminal command")
             }
 
             SettingsRow {
@@ -213,7 +213,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         visible: networkTailscaleTab.grantAvailable
                         width: visible ? implicitWidth : 0
-                        text: I18n.tr("Grant permission")
+                        text: I18n.tr("Grant permission", "Tailscale: button to grant operator permission")
                         iconName: "admin_panel_settings"
                         busy: networkTailscaleTab.granting
                         enabled: !networkTailscaleTab.granting
@@ -249,6 +249,7 @@ Item {
             }
 
             SettingsDropdownRow {
+                id: accountRow
                 visible: TailscaleService.available && networkTailscaleTab.profiles.length > 0
                 enabled: networkTailscaleTab.writable
                 text: I18n.tr("Accounts")
@@ -258,7 +259,11 @@ Item {
                     const choice = networkTailscaleTab.profileChoices.find(c => c.label === value);
                     if (!choice || choice.id === networkTailscaleTab.currentProfile)
                         return;
-                    TailscaleService.switchProfile(choice.id, () => networkTailscaleTab.loadProfiles());
+                    TailscaleService.switchProfile(choice.id, response => {
+                        if (response.error)
+                            accountRow.resync();
+                        networkTailscaleTab.loadProfiles();
+                    });
                 }
             }
 
@@ -267,7 +272,7 @@ Item {
                 enabled: networkTailscaleTab.writable
 
                 DButton {
-                    text: I18n.tr("Add account")
+                    text: I18n.tr("Add account", "Tailscale: add another account")
                     iconName: "person_add"
                     enabled: networkTailscaleTab.writable
                     onClicked: TailscaleService.addProfile()
@@ -294,6 +299,7 @@ Item {
             title: I18n.tr("Exit node")
 
             SettingsDropdownRow {
+                id: exitNodeRow
                 enabled: networkTailscaleTab.writable
                 text: I18n.tr("Exit node")
                 options: networkTailscaleTab.exitNodeChoices.map(c => c.label)
@@ -307,10 +313,14 @@ Item {
                     const choice = networkTailscaleTab.exitNodeChoices.find(c => c.label === value);
                     if (!choice)
                         return;
+                    const resyncOnError = response => {
+                        if (response.error)
+                            exitNodeRow.resync();
+                    };
                     if (choice.id === "")
-                        TailscaleService.clearExitNode(null);
+                        TailscaleService.clearExitNode(resyncOnError);
                     else
-                        TailscaleService.setExitNode(choice.id, null);
+                        TailscaleService.setExitNode(choice.id, resyncOnError);
                 }
             }
 
@@ -324,7 +334,7 @@ Item {
 
             SettingsToggleRow {
                 enabled: networkTailscaleTab.writable
-                text: I18n.tr("Run as exit node")
+                text: I18n.tr("Run as exit node", "Tailscale setting")
                 checked: TailscaleService.prefs.advertiseExitNode === true
                 onToggled: value => TailscaleService.setPrefs({
                         "advertiseExitNode": value
@@ -338,7 +348,7 @@ Item {
 
             SettingsToggleRow {
                 enabled: networkTailscaleTab.writable
-                text: I18n.tr("Use Tailscale subnets")
+                text: I18n.tr("Use Tailscale subnets", "Tailscale setting")
                 checked: TailscaleService.prefs.acceptRoutes === true
                 onToggled: value => TailscaleService.setPrefs({
                         "acceptRoutes": value
@@ -347,7 +357,7 @@ Item {
 
             SettingsToggleRow {
                 enabled: networkTailscaleTab.writable
-                text: I18n.tr("Use Tailscale DNS settings")
+                text: I18n.tr("Use Tailscale DNS settings", "Tailscale setting")
                 checked: TailscaleService.prefs.acceptDns === true
                 onToggled: value => TailscaleService.setPrefs({
                         "acceptDns": value
@@ -356,7 +366,7 @@ Item {
 
             SettingsToggleRow {
                 enabled: networkTailscaleTab.writable
-                text: I18n.tr("Allow incoming connections")
+                text: I18n.tr("Allow incoming connections", "Tailscale setting")
                 checked: TailscaleService.prefs.shieldsUp !== true
                 onToggled: value => TailscaleService.setPrefs({
                         "shieldsUp": !value
@@ -365,7 +375,7 @@ Item {
 
             SettingsToggleRow {
                 enabled: networkTailscaleTab.writable
-                text: I18n.tr("Run Tailscale SSH server")
+                text: I18n.tr("Run Tailscale SSH server", "Tailscale setting")
                 checked: TailscaleService.prefs.runSsh === true
                 onToggled: value => TailscaleService.setPrefs({
                         "runSsh": value

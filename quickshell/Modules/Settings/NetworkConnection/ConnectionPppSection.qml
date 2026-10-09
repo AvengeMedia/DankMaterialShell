@@ -106,7 +106,7 @@ SettingsCard {
     }
 
     FlagRow {
-        text: I18n.tr("Use MPPE encryption")
+        text: I18n.tr("Use MPPE encryption", "PPP option")
         flagKey: "require-mppe"
     }
 
@@ -118,30 +118,30 @@ SettingsCard {
 
     FlagRow {
         enabled: root.mppe
-        text: I18n.tr("Stateful MPPE")
+        text: I18n.tr("Stateful MPPE", "PPP option")
         flagKey: "mppe-stateful"
     }
 
     FlagRow {
-        text: I18n.tr("BSD compression")
+        text: I18n.tr("BSD compression", "PPP option")
         flagKey: "nobsdcomp"
         inverted: true
     }
 
     FlagRow {
-        text: I18n.tr("Deflate compression")
+        text: I18n.tr("Deflate compression", "PPP option")
         flagKey: "nodeflate"
         inverted: true
     }
 
     FlagRow {
-        text: I18n.tr("TCP header compression")
+        text: I18n.tr("TCP header compression", "PPP option")
         flagKey: "no-vj-comp"
         inverted: true
     }
 
     SettingsToggleRow {
-        text: I18n.tr("Send PPP echo packets")
+        text: I18n.tr("Send PPP echo packets", "PPP option")
         checked: CE.pppEcho(root.ppp)
         onToggled: checked => root.setEcho(checked)
     }

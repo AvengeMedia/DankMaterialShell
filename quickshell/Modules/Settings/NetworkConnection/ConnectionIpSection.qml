@@ -32,7 +32,7 @@ SettingsCard {
 
     readonly property bool valid: isOff || ((!isManual || (hasAddress && addressRow.ok && gatewayRow.ok)) && (!dnsAllowed || dnsRow.ok) && metricRow.ok && routesOk)
 
-    title: family === 6 ? I18n.tr("IPv6") : I18n.tr("IPv4")
+    title: family === 6 ? I18n.tr("IPv6", "network IP version") : I18n.tr("IPv4", "network IP version")
     enabled: !editor.readOnly
 
     function original(key) {
@@ -54,7 +54,7 @@ SettingsCard {
         case "manual":
             return I18n.tr("Manual");
         case "link-local":
-            return I18n.tr("Link-local");
+            return I18n.tr("Link-local", "network IP method option");
         case "shared":
             return I18n.tr("Shared", "IP method: share this connection with other computers");
         case "ignore":
@@ -217,7 +217,7 @@ SettingsCard {
     TextRow {
         id: gatewayRow
         visible: root.isManual
-        text: I18n.tr("Gateway")
+        text: I18n.tr("Gateway", "network IP setting label")
         source: root.section.gateway ?? ""
         commit: text => {
             const t = text.trim();
@@ -231,7 +231,7 @@ SettingsCard {
     TextRow {
         id: dnsRow
         visible: root.dnsAllowed
-        text: I18n.tr("DNS")
+        text: I18n.tr("DNS", "network IP setting label")
         source: CE.listText(root.section["dns-data"])
         commit: text => {
             const list = CE.serverListFromText(text, root.family);
@@ -245,7 +245,7 @@ SettingsCard {
     TextRow {
         id: searchRow
         visible: root.dnsAllowed
-        text: I18n.tr("Search domains")
+        text: I18n.tr("Search domains", "network DNS setting")
         source: CE.listText(root.section["dns-search"])
         commit: text => {
             root.write("dns-search", CE.domainListFromText(text), []);
@@ -255,14 +255,14 @@ SettingsCard {
 
     SettingsToggleRow {
         visible: root.isAuto
-        text: I18n.tr("Automatic DNS")
+        text: I18n.tr("Automatic DNS", "network IP setting: use DNS servers from DHCP")
         checked: root.section["ignore-auto-dns"] !== true
         onToggled: checked => root.write("ignore-auto-dns", !checked, false)
     }
 
     SettingsToggleRow {
         visible: root.isAuto
-        text: I18n.tr("Automatic routes")
+        text: I18n.tr("Automatic routes", "network IP setting: use routes from DHCP")
         checked: root.section["ignore-auto-routes"] !== true
         onToggled: checked => root.write("ignore-auto-routes", !checked, false)
     }
@@ -296,7 +296,7 @@ SettingsCard {
 
     SettingsToggleRow {
         visible: !root.isOff
-        text: I18n.tr("Use only for resources on its network")
+        text: I18n.tr("Use only for resources on its network", "network IP setting: never use this connection as the default route")
         checked: root.section["never-default"] === true
         onToggled: checked => root.write("never-default", checked, false)
     }
@@ -325,7 +325,7 @@ SettingsCard {
 
     SettingsRow {
         visible: !root.isOff
-        title: I18n.tr("Routes")
+        title: I18n.tr("Routes", "network IP setting label")
 
         DButton {
             text: I18n.tr("Add entry")
@@ -366,7 +366,7 @@ SettingsCard {
 
                 RouteField {
                     fields: routeFields
-                    labelText: I18n.tr("Gateway")
+                    labelText: I18n.tr("Gateway", "network IP setting label")
                     text: routeRow.modelData.nextHop
                     isError: text.trim() !== "" && !CE.isValidIp(text, root.family)
                     onTextEdited: root.editRoute(routeRow.index, "nextHop", text)

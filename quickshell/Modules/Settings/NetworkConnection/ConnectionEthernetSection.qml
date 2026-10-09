@@ -84,7 +84,7 @@ SettingsCard {
         },
         {
             "value": "magic",
-            "label": I18n.tr("Magic packet")
+            "label": I18n.tr("Magic packet", "Wake on LAN option")
         },
         {
             "value": "ignore",
@@ -179,7 +179,7 @@ SettingsCard {
     }
 
     SettingsTextFieldRow {
-        text: I18n.tr("MAC address")
+        text: I18n.tr("MAC address", "network hardware setting")
         enabled: !root.locked
         value: root.macText
         placeholderText: "AA:BB:CC:DD:EE:FF"
@@ -195,7 +195,7 @@ SettingsCard {
     }
 
     SettingsDropdownRow {
-        text: I18n.tr("Cloned MAC address")
+        text: I18n.tr("Cloned MAC address", "network hardware setting")
         enabled: !root.locked
         options: root.clonedOptions.map(c => c.label)
         currentValue: CE.choiceLabel(root.clonedOptions, root.clonedMode)
@@ -216,7 +216,7 @@ SettingsCard {
 
     SettingsTextFieldRow {
         visible: root.clonedMode === "manual"
-        text: I18n.tr("Cloned MAC address")
+        text: I18n.tr("Cloned MAC address", "network hardware setting")
         enabled: !root.locked
         value: root.clonedText
         placeholderText: "AA:BB:CC:DD:EE:FF"
@@ -239,7 +239,7 @@ SettingsCard {
     }
 
     SettingsDropdownRow {
-        text: I18n.tr("Wake on LAN")
+        text: I18n.tr("Wake on LAN", "Ethernet setting")
         enabled: !root.locked
         options: root.wolOptions.map(c => c.label)
         currentValue: CE.choiceLabel(root.wolOptions, root.wolCurrent)
@@ -247,7 +247,7 @@ SettingsCard {
     }
 
     SettingsDropdownRow {
-        text: I18n.tr("Link negotiation")
+        text: I18n.tr("Link negotiation", "Ethernet link setting")
         enabled: !root.locked
         options: root.linkOptions.map(c => c.label)
         currentValue: CE.choiceLabel(root.linkOptions, root.linkMode)
@@ -270,7 +270,7 @@ SettingsCard {
 
     SettingsDropdownRow {
         visible: root.linkMode === "manual"
-        text: I18n.tr("Duplex")
+        text: I18n.tr("Duplex", "Ethernet link setting")
         enabled: !root.locked
         options: root.duplexOptions.map(c => c.label)
         currentValue: CE.choiceLabel(root.duplexOptions, root.duplexCurrent)

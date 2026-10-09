@@ -54,12 +54,11 @@ SettingsCard {
             "id": stored.id ?? editor.profile?.id ?? "",
             "type": controllerType
         }, device, stored.autoconnect !== false);
-        const name = settings.connection.id;
         adding = true;
         NetworkService.addConnection(settings, true, response => {
             adding = false;
             if (response?.error)
-                ToastService.showError(name, response.error);
+                ToastService.showError(I18n.tr("Failed to add port", "toast title when adding a bond, bridge or team port fails"), response.error);
         });
     }
 
@@ -81,10 +80,15 @@ SettingsCard {
 
             DActionButton {
                 visible: !root.locked
-                enabled: !root.editor.dirty
                 iconName: "tune"
                 tooltipText: I18n.tr("Configure")
-                onClicked: SettingsUiState.selectConnection(portRow.modelData.uuid, portRow.modelData.id, "")
+                onClicked: {
+                    if (root.editor.dirty) {
+                        ToastService.showWarning(I18n.tr("Unsaved changes"));
+                        return;
+                    }
+                    SettingsUiState.selectConnection(portRow.modelData.uuid, portRow.modelData.id, "");
+                }
             }
 
             DActionButton {
@@ -101,7 +105,7 @@ SettingsCard {
                         confirmColor: Theme.error,
                         onConfirm: () => NetworkService.deleteConnection(port.uuid, response => {
                             if (response?.error)
-                                ToastService.showError(port.id, response.error);
+                                ToastService.showError(I18n.tr("Failed to forget %1", "toast title, %1 is a network connection name").arg(port.id), response.error);
                         })
                     });
                 }

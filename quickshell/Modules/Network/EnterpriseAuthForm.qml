@@ -14,6 +14,7 @@ Column {
     property string usernameSuffix: ""
     property bool usernameSuffixRequired: false
     property string caDisplayName: ""
+    property string defaultCa: "system"
     // Files NM already holds as blobs (keys ca, clientCert, privateKey): they count as present while their path is empty.
     property var storedFiles: ({})
     readonly property bool valid: CE.enterpriseConfigValid(toConfig(), {
@@ -23,13 +24,14 @@ Column {
     })
 
     signal browseRequested(string target)
+    signal submitRequested
 
     readonly property var methodChoices: [{"label": "PEAP", "value": "peap"}, {"label": "TTLS", "value": "ttls"}, {"label": "TLS", "value": "tls"}, {"label": "PWD", "value": "pwd"}]
     readonly property var innerChoices: ({
             "peap": [{"label": "MSCHAPv2", "value": "mschapv2"}, {"label": "GTC", "value": "gtc"}, {"label": "MD5", "value": "md5"}],
             "ttls": [{"label": "PAP", "value": "pap"}, {"label": "MSCHAP", "value": "mschap"}, {"label": "MSCHAPv2", "value": "mschapv2"}, {"label": "CHAP", "value": "chap"}, {"label": "EAP-MSCHAPv2", "value": "eap-mschapv2"}]
         })
-    readonly property var caChoices: [{"label": I18n.tr("File"), "value": "file"}, {"label": I18n.tr("Use system certificates"), "value": "system"}, {"label": I18n.tr("None"), "value": "none"}]
+    readonly property var caChoices: [{"label": I18n.tr("File"), "value": "file"}, {"label": I18n.tr("Use system certificates", "802.1X CA certificate source option"), "value": "system"}, {"label": I18n.tr("None"), "value": "none"}]
     readonly property var matchChoices: [{"label": I18n.tr("Exact"), "value": false}, {"label": I18n.tr("Suffix", "server name match type"), "value": true}]
     readonly property var peapVersionChoices: [{"label": I18n.tr("Auto"), "value": ""}, {"label": "0", "value": "0"}, {"label": "1", "value": "1"}]
 
@@ -51,7 +53,7 @@ Column {
         draft.password = c.password || "";
         draft.savePassword = !c.askPassword;
         draft.anonymousIdentity = c.anonymousIdentity || "";
-        draft.ca = caChoices.some(a => a.value === c.ca) ? c.ca : "system";
+        draft.ca = caChoices.some(a => a.value === c.ca) ? c.ca : defaultCa;
         draft.caCertPath = c.caCertPath || "";
         draft.caCertPem = c.caCertPem || "";
         draft.serverDomain = c.serverDomain || "";
@@ -62,6 +64,10 @@ Column {
         draft.peapVersion = c.peapVersion === "0" || c.peapVersion === "1" ? c.peapVersion : "";
         draft.authFlags = c.authFlags || 0;
         draft.opensslCiphers = c.opensslCiphers || "";
+    }
+
+    function focusIdentity() {
+        identityField.forceActiveFocus();
     }
 
     function storedLabel(target, path) {
@@ -182,11 +188,17 @@ Column {
             }
 
             DDropdown {
+                id: methodDropdown
                 width: parent.width
                 dropdownWidth: parent.width
                 compactMode: true
                 options: root.methodChoices.map(m => m.label)
-                currentValue: CE.choiceLabel(root.methodChoices, draft.eap)
+                // DDropdown assigns currentValue on pick, which drops a plain binding; this re-applies it on reset.
+                Binding {
+                    target: methodDropdown
+                    property: "currentValue"
+                    value: CE.choiceLabel(root.methodChoices, draft.eap)
+                }
                 onValueChanged: value => {
                     const eap = CE.choiceValue(root.methodChoices, value);
                     if (eap === draft.eap)
@@ -209,18 +221,24 @@ Column {
             }
 
             DDropdown {
+                id: innerDropdown
                 readonly property var choices: root.innerChoices[draft.eap] || []
                 width: parent.width
                 dropdownWidth: parent.width
                 compactMode: true
                 options: choices.map(i => i.label)
-                currentValue: choices.some(c => c.value === draft.phase2) ? CE.choiceLabel(choices, draft.phase2) : ""
+                Binding {
+                    target: innerDropdown
+                    property: "currentValue"
+                    value: innerDropdown.choices.some(c => c.value === draft.phase2) ? CE.choiceLabel(innerDropdown.choices, draft.phase2) : ""
+                }
                 onValueChanged: value => draft.phase2 = CE.choiceValue(choices, value)
             }
         }
     }
 
     DTextField {
+        id: identityField
         width: parent.width
         expressive: root.expressive
         outlined: !root.expressive
@@ -233,9 +251,11 @@ Column {
         isError: root.usernameSuffixRequired && !CE.identityMatchesSuffix(text.trim(), root.usernameSuffix)
         text: draft.identity
         onTextEdited: draft.identity = text
+        onAccepted: passwordField.visible ? passwordField.forceActiveFocus() : root.submitRequested()
     }
 
     DTextField {
+        id: passwordField
         visible: draft.savePassword
         width: parent.width
         expressive: root.expressive
@@ -255,6 +275,7 @@ Column {
             else
                 draft.password = text;
         }
+        onAccepted: anonField.visible ? anonField.forceActiveFocus() : root.submitRequested()
     }
 
     DToggle {
@@ -265,6 +286,7 @@ Column {
     }
 
     DTextField {
+        id: anonField
         visible: root.usesInner
         width: parent.width
         expressive: root.expressive
@@ -276,14 +298,20 @@ Column {
         labelText: I18n.tr("Anonymous Identity (optional)")
         text: draft.anonymousIdentity
         onTextEdited: draft.anonymousIdentity = text
+        onAccepted: root.submitRequested()
     }
 
     DDropdown {
+        id: caDropdown
         visible: root.usesCa
         width: parent.width
-        text: I18n.tr("CA certificate")
+        text: I18n.tr("CA certificate", "network authentication certificate file field")
         options: root.caChoices.map(a => a.label)
-        currentValue: CE.choiceLabel(root.caChoices, draft.ca)
+        Binding {
+            target: caDropdown
+            property: "currentValue"
+            value: CE.choiceLabel(root.caChoices, draft.ca)
+        }
         onValueChanged: value => draft.ca = CE.choiceValue(root.caChoices, value)
     }
 
@@ -297,7 +325,7 @@ Column {
     StyledText {
         visible: root.usesCa && draft.ca === "none"
         width: parent.width
-        text: I18n.tr("Without a CA certificate the server is not verified, and a fake network can capture the password.")
+        text: I18n.tr("Without a CA certificate the server is not verified, and a fake network can capture the password.", "802.1X warning when no CA certificate is set")
         font.pixelSize: Theme.fontSizeSmall
         color: Theme.error
         wrapMode: Text.WordWrap
@@ -330,7 +358,11 @@ Column {
             anchors.verticalCenter: parent.verticalCenter
             compactMode: true
             options: root.matchChoices.map(m => m.label)
-            currentValue: CE.choiceLabel(root.matchChoices, draft.serverDomainSuffix)
+            Binding {
+                target: matchDropdown
+                property: "currentValue"
+                value: CE.choiceLabel(root.matchChoices, draft.serverDomainSuffix)
+            }
             onValueChanged: value => draft.serverDomainSuffix = CE.choiceValue(root.matchChoices, value)
         }
     }
@@ -338,14 +370,14 @@ Column {
     PathField {
         visible: root.isTls
         target: "clientCert"
-        labelText: I18n.tr("Client certificate")
+        labelText: I18n.tr("Client certificate", "network authentication certificate file field")
         text: root.storedLabel("clientCert", draft.clientCertPath)
     }
 
     PathField {
         visible: root.isTls
         target: "privateKey"
-        labelText: I18n.tr("Private key")
+        labelText: I18n.tr("Private key", "network authentication key file field")
         text: root.storedLabel("privateKey", draft.privateKeyPath)
     }
 
@@ -358,25 +390,30 @@ Column {
             spacing: Theme.spacingS
 
             DDropdown {
+                id: peapVersionDropdown
                 visible: draft.eap === "peap"
                 width: parent.width
-                text: I18n.tr("PEAP version")
+                text: I18n.tr("PEAP version", "802.1X advanced option")
                 options: root.peapVersionChoices.map(v => v.label)
-                currentValue: CE.choiceLabel(root.peapVersionChoices, draft.peapVersion)
+                Binding {
+                    target: peapVersionDropdown
+                    property: "currentValue"
+                    value: CE.choiceLabel(root.peapVersionChoices, draft.peapVersion)
+                }
                 onValueChanged: value => draft.peapVersion = CE.choiceValue(root.peapVersionChoices, value)
             }
 
             // phase1-auth-flags: tls-1-0-enable 0x20, tls-1-1-enable 0x40, tls-1-3-disable 0x10
             DToggle {
                 width: parent.width
-                text: I18n.tr("Allow TLS 1.0 and 1.1")
+                text: I18n.tr("Allow TLS 1.0 and 1.1", "802.1X advanced option")
                 checked: (draft.authFlags & 0x60) === 0x60
                 onToggled: checked => draft.authFlags = CE.withFlags(draft.authFlags, 0x60, checked)
             }
 
             DToggle {
                 width: parent.width
-                text: I18n.tr("Disable TLS 1.3")
+                text: I18n.tr("Disable TLS 1.3", "802.1X advanced option")
                 checked: (draft.authFlags & 0x10) !== 0
                 onToggled: checked => draft.authFlags = CE.withFlags(draft.authFlags, 0x10, checked)
             }
@@ -388,7 +425,7 @@ Column {
                 controlHeight: root.expressive ? DCommon.Style.buttonHeightM : Theme.fieldHeightLarge
                 font.pixelSize: Theme.fontSizeMedium
                 textColor: Theme.surfaceText
-                labelText: I18n.tr("OpenSSL ciphers")
+                labelText: I18n.tr("OpenSSL ciphers", "802.1X advanced option")
                 text: draft.opensslCiphers
                 onTextEdited: draft.opensslCiphers = text
             }

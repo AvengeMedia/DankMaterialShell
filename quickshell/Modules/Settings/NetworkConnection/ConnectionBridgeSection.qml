@@ -33,7 +33,7 @@ SettingsCard {
 
     ConnectionSyncedRow {
         id: macRow
-        text: I18n.tr("MAC address")
+        text: I18n.tr("MAC address", "network hardware setting")
         placeholderText: "AA:BB:CC:DD:EE:FF"
         stored: {
             root.rev;

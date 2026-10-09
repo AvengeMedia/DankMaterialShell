@@ -106,6 +106,8 @@ type NetworkManagerBackend struct {
 
 	state      *BackendState
 	stateMutex sync.RWMutex
+	// ethernetProfileFit maps interface name to fitting wired profile UUIDs; guarded by stateMutex.
+	ethernetProfileFit map[string][]string
 
 	lastFailedSSID string
 	lastFailedTime int64

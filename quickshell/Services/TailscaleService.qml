@@ -162,12 +162,12 @@ Singleton {
         peers = data.peers || [];
         exitNodeAllowLanAccess = data.exitNodeAllowLanAccess || false;
         prefs = data.prefs || ({});
-        const newUrl = data.authUrl || "";
-        const urlChanged = newUrl !== authUrl;
-        authUrl = newUrl;
+        authUrl = data.authUrl || "";
         // Only open a login page the user asked for from DMS.
-        if (loginRequested && newUrl !== "" && urlChanged) {
-            Qt.openUrlExternally(newUrl);
+        if (loginRequested && authUrl !== "") {
+            Qt.openUrlExternally(authUrl);
+            loginRequested = false;
+        } else if (backendState === "Running") {
             loginRequested = false;
         }
     }
@@ -236,6 +236,11 @@ Singleton {
     function login() {
         if (!canWritePrefs)
             return false;
+        // tailscaled keeps handing back the same URL until the login finishes.
+        if (authUrl !== "") {
+            Qt.openUrlExternally(authUrl);
+            return true;
+        }
         loginRequested = true;
         sendAction("tailscale.login", {}, r => {
             if (r.error)
@@ -247,6 +252,11 @@ Singleton {
     function addProfile() {
         if (!canWritePrefs)
             return false;
+        // tailscaled keeps handing back the same URL until the login finishes.
+        if (authUrl !== "") {
+            Qt.openUrlExternally(authUrl);
+            return true;
+        }
         loginRequested = true;
         sendAction("tailscale.addProfile", {}, r => {
             if (r.error)

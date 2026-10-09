@@ -42,7 +42,7 @@ SettingsCard {
             "value": "password-tls"
         },
         {
-            "label": I18n.tr("Static key"),
+            "label": I18n.tr("Static key", "OpenVPN key file field"),
             "value": "static-key"
         }
     ]
@@ -220,7 +220,7 @@ SettingsCard {
     TextRow {
         host: root
         dataKey: "remote"
-        text: I18n.tr("Gateway")
+        text: I18n.tr("Gateway", "network IP setting label")
         isError: !root.valid
     }
 
@@ -240,21 +240,21 @@ SettingsCard {
         visible: root.usesCerts || root.type === "password"
         host: root
         dataKey: "ca"
-        text: I18n.tr("CA certificate")
+        text: I18n.tr("CA certificate", "network authentication certificate file field")
     }
 
     PathRow {
         visible: root.usesCerts
         host: root
         dataKey: "cert"
-        text: I18n.tr("Client certificate")
+        text: I18n.tr("Client certificate", "network authentication certificate file field")
     }
 
     PathRow {
         visible: root.usesCerts
         host: root
         dataKey: "key"
-        text: I18n.tr("Private key")
+        text: I18n.tr("Private key", "network authentication key file field")
     }
 
     SecretRow {
@@ -294,7 +294,7 @@ SettingsCard {
         visible: root.type === "static-key"
         host: root
         dataKey: "static-key"
-        text: I18n.tr("Static key")
+        text: I18n.tr("Static key", "OpenVPN key file field")
     }
 
     ChoiceRow {
@@ -309,14 +309,14 @@ SettingsCard {
         visible: root.type === "static-key"
         host: root
         dataKey: "local-ip"
-        text: I18n.tr("Local IP address")
+        text: I18n.tr("Local IP address", "OpenVPN tunnel field")
     }
 
     TextRow {
         visible: root.type === "static-key"
         host: root
         dataKey: "remote-ip"
-        text: I18n.tr("Remote IP address")
+        text: I18n.tr("Remote IP address", "OpenVPN tunnel field")
     }
 
     DCollapsibleSection {
@@ -377,7 +377,7 @@ SettingsCard {
                 width: parent.width
                 host: root
                 dataKey: "ta"
-                text: I18n.tr("TLS authentication key")
+                text: I18n.tr("TLS authentication key", "OpenVPN key file field")
             }
 
             ChoiceRow {

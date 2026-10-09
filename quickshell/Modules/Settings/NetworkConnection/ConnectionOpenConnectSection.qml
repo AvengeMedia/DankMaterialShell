@@ -71,7 +71,7 @@ SettingsCard {
 
     DataRow {
         dataKey: "gateway"
-        text: I18n.tr("Gateway")
+        text: I18n.tr("Gateway", "network IP setting label")
         isError: root.gatewayText.trim() === ""
     }
 
@@ -87,15 +87,15 @@ SettingsCard {
         model: [
             {
                 "key": "cacert",
-                "label": I18n.tr("CA certificate")
+                "label": I18n.tr("CA certificate", "network authentication certificate file field")
             },
             {
                 "key": "usercert",
-                "label": I18n.tr("Client certificate")
+                "label": I18n.tr("Client certificate", "network authentication certificate file field")
             },
             {
                 "key": "userkey",
-                "label": I18n.tr("Private key")
+                "label": I18n.tr("Private key", "network authentication key file field")
             }
         ]
 
@@ -117,6 +117,6 @@ SettingsCard {
 
     DataRow {
         dataKey: "proxy"
-        text: I18n.tr("Proxy")
+        text: I18n.tr("Proxy", "VPN proxy server field")
     }
 }

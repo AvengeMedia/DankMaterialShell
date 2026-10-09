@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Modules.Settings.Widgets
+import qs.Services
 import qs.DCommon.Widgets
 import "../../../Common/ConnectionEditor.js" as CE
 
@@ -32,11 +33,17 @@ SettingsCard {
         subtitle: root.controller?.id ?? root.port?.controller ?? ""
 
         DActionButton {
-            enabled: !root.editor.dirty && root.controller !== null
+            enabled: root.controller !== null
             buttonSize: Theme.iconButtonSize
             iconName: "tune"
             tooltipText: I18n.tr("Configure")
-            onClicked: SettingsUiState.selectConnection(root.controller.uuid, root.controller.id, "")
+            onClicked: {
+                if (root.editor.dirty) {
+                    ToastService.showWarning(I18n.tr("Unsaved changes"));
+                    return;
+                }
+                SettingsUiState.selectConnection(root.controller.uuid, root.controller.id, "");
+            }
         }
     }
 

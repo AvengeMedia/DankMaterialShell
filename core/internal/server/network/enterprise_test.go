@@ -556,7 +556,7 @@ func TestEnterpriseUpdatesKeepUnmodelledKeys(t *testing.T) {
 			})
 			expectGetSecrets(obj, "802-11-wireless-security", nmSettings{})
 			expectGetSecrets(obj, "802-1x", nmSettings{"802-1x": {"password": dbus.MakeVariant("pw")}})
-			got := captureUpdate2(obj, 0, nil)
+			got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 			require.NoError(t, updateConnectionCredentials(backend, conn, ConnectionRequest{SSID: "home", Enterprise: &c}))
 			assertKept(t, *got, tc.keep)

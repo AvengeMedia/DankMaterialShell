@@ -195,6 +195,9 @@ Item {
                                     values.push("wifi");
                                 if ((NetworkService.cellularDevices?.length ?? 0) > 0)
                                     values.push("cellular");
+                                const stored = NetworkService.userPreference;
+                                if (stored && !values.includes(stored))
+                                    values.push(stored);
                                 return values;
                             }
                             readonly property var labelsByValue: ({

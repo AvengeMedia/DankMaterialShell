@@ -772,7 +772,7 @@ Singleton {
             params.hidden = true;
         DMSService.sendRequest("network.wifi.connect", params, response => {
             if (response.error)
-                ToastService.showError(I18n.tr("Connection failed"), response.error);
+                ToastService.showError(I18n.tr("Failed to save profile", "toast title when saving a network or display profile fails"), response.error);
             else
                 ToastService.showInfo(I18n.tr("Saved", "wifi network status, network has a saved profile", true));
             if (callback)
@@ -945,7 +945,7 @@ Singleton {
             if (response.error) {
                 if (previousPreference !== undefined)
                     SettingsData.set("networkPreference", previousPreference);
-                ToastService.showError(I18n.tr("Failed to set network preference"), response.error);
+                ToastService.showError(I18n.tr("Failed to set network preference", "toast title when switching between Ethernet and WiFi preference fails"), response.error);
             }
         });
     }
@@ -980,7 +980,7 @@ Singleton {
 
     function disconnectResponse(response) {
         if (response.error)
-            ToastService.showError(I18n.tr("Failed to disconnect"), response.error);
+            ToastService.showError(I18n.tr("Failed to disconnect", "toast title when disconnecting a network connection fails"), response.error);
     }
 
     function startAutoScan() {
@@ -1016,7 +1016,7 @@ Singleton {
             networkWiredInfoLoading = false;
 
             if (response.error) {
-                networkWiredInfoDetails = I18n.tr("Network information not available");
+                networkWiredInfoDetails = I18n.tr("No information available");
             } else if (response.result) {
                 formatWiredNetworkInfo(response.result);
             }
@@ -1027,32 +1027,32 @@ Singleton {
         let details = "";
 
         if (!info) {
-            details = I18n.tr("Network information not available");
+            details = I18n.tr("No information available");
         } else {
             details += I18n.tr("Interface") + ": " + info.iface + "\\n";
             details += I18n.tr("Driver") + ": " + info.driver + "\\n";
             details += "MAC: " + info.hwAddr + "\\n";
             details += I18n.tr("Speed") + ": " + "%1 Mbps".arg(info.speed) + "\\n" + "\\n";
 
-            details += I18n.tr("IPv4") + ":" + "\\n";
+            details += I18n.tr("IPv4", "network IP version") + ":" + "\\n";
 
             for (const ip4 of info.IPv4s.ips) {
                 details += "    " + I18n.tr("IP address") + ": " + ip4 + "\\n";
             }
-            details += "    " + I18n.tr("Gateway") + ": " + info.IPv4s.gateway + "\\n";
-            details += "    " + I18n.tr("DNS") + ": " + info.IPv4s.dns + "\\n";
+            details += "    " + I18n.tr("Gateway", "network IP setting label") + ": " + info.IPv4s.gateway + "\\n";
+            details += "    " + I18n.tr("DNS", "network IP setting label") + ": " + info.IPv4s.dns + "\\n";
 
             if (info.IPv6s.ips) {
-                details += "\\n" + I18n.tr("IPv6") + ":" + "\\n";
+                details += "\\n" + I18n.tr("IPv6", "network IP version") + ":" + "\\n";
 
                 for (const ip6 of info.IPv6s.ips) {
                     details += "    " + I18n.tr("IP address") + ": " + ip6 + "\\n";
                 }
                 if (info.IPv6s.gateway.length > 0) {
-                    details += "    " + I18n.tr("Gateway") + ": " + info.IPv6s.gateway + "\\n";
+                    details += "    " + I18n.tr("Gateway", "network IP setting label") + ": " + info.IPv6s.gateway + "\\n";
                 }
                 if (info.IPv6s.dns.length > 0) {
-                    details += "    " + I18n.tr("DNS") + ": " + info.IPv6s.dns + "\\n";
+                    details += "    " + I18n.tr("DNS", "network IP setting label") + ": " + info.IPv6s.dns + "\\n";
                 }
             }
         }
@@ -1073,7 +1073,7 @@ Singleton {
             networkInfoLoading = false;
 
             if (response.error) {
-                networkInfoDetails = I18n.tr("Network information not available");
+                networkInfoDetails = I18n.tr("No information available");
             } else if (response.result) {
                 formatNetworkInfo(response.result);
             }
@@ -1084,7 +1084,7 @@ Singleton {
         let details = "";
 
         if (!info || !info.bands || info.bands.length === 0) {
-            details = I18n.tr("Network information not available");
+            details = I18n.tr("No information available");
         } else {
             for (const band of info.bands) {
                 const freqGHz = band.frequency / 1000;
@@ -1396,7 +1396,7 @@ Singleton {
             return unsupportedResponse(callback);
         DMSService.sendRequest("network.connectivity.check", null, response => {
             if (response.error)
-                ToastService.showError(I18n.tr("Connection failed"), response.error);
+                ToastService.showError(I18n.tr("Failed to check connectivity", "toast title when the NetworkManager internet check fails"), response.error);
             if (callback)
                 callback(response);
         });
@@ -1410,7 +1410,7 @@ Singleton {
             enabled: enabled
         }, response => {
             if (response.error)
-                ToastService.showError(I18n.tr("Connectivity checking"), response.error);
+                ToastService.showError(I18n.tr("Failed to update connectivity checking", "toast title when turning NetworkManager internet checks on or off fails"), response.error);
             if (callback)
                 callback(response);
         });
@@ -1499,7 +1499,7 @@ Singleton {
             uuid: uuid
         }, response => {
             if (response.error)
-                ToastService.showError(I18n.tr("Failed to disconnect"), response.error);
+                ToastService.showError(I18n.tr("Failed to disconnect", "toast title when disconnecting a network connection fails"), response.error);
             if (callback)
                 callback(response);
         });

@@ -393,6 +393,7 @@ func (b *NetworkManagerBackend) listEthernetConnections() ([]WiredConnection, er
 	b.stateMutex.Lock()
 	b.state.EthernetConnectionUuid = currentUuid
 	b.state.WiredConnections = wiredConfigs
+	b.ethernetProfileFit = fit
 	for i := range b.state.EthernetDevices {
 		b.state.EthernetDevices[i].ProfileUUIDs = append([]string{}, fit[b.state.EthernetDevices[i].Name]...)
 	}
@@ -410,14 +411,6 @@ func (b *NetworkManagerBackend) GetEthernetDevices() []EthernetDevice {
 func (b *NetworkManagerBackend) updateAllEthernetDevices() {
 	ethernetDevices := b.sortedEthernetDevices()
 	devices := make([]EthernetDevice, 0, len(ethernetDevices))
-
-	// Profile fit is only recomputed by the profile scan in listEthernetConnections.
-	b.stateMutex.RLock()
-	fit := make(map[string][]string, len(b.state.EthernetDevices))
-	for _, d := range b.state.EthernetDevices {
-		fit[d.Name] = d.ProfileUUIDs
-	}
-	b.stateMutex.RUnlock()
 
 	for _, info := range ethernetDevices {
 		name := info.name
@@ -468,11 +461,14 @@ func (b *NetworkManagerBackend) updateAllEthernetDevices() {
 			Driver:    driver,
 
 			ConnectionUUID: activeConnectionUUID(info.device),
-			ProfileUUIDs:   append([]string{}, fit[name]...),
 		})
 	}
 
+	// Read the fit under the write lock so a concurrent profile scan isn't overwritten.
 	b.stateMutex.Lock()
+	for i := range devices {
+		devices[i].ProfileUUIDs = append([]string{}, b.ethernetProfileFit[devices[i].Name]...)
+	}
 	b.state.EthernetDevices = devices
 	b.stateMutex.Unlock()
 }

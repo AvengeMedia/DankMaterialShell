@@ -318,7 +318,7 @@ Item {
             function importEapConfig(path) {
                 NetworkService.parseEapConfig(path, r => {
                     if (r.error || !r.result) {
-                        ToastService.showError(I18n.tr("Failed to import profile"), r.error || "");
+                        ToastService.showError(I18n.tr("Failed to import profile", "toast title when importing a WiFi profile file fails"), r.error || "");
                         return;
                     }
                     PopoutService.showWifiEnterpriseImport(r.result, path.split("/").pop());

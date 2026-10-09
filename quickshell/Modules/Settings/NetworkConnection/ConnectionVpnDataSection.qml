@@ -183,7 +183,7 @@ SettingsCard {
     }
 
     SettingsToggleRow {
-        text: I18n.tr("Stay connected across network changes")
+        text: I18n.tr("Stay connected across network changes", "VPN option")
         checked: root.vpn.persistent === true
         onToggled: checked => {
             const stored = root.editor.original?.[root.sectionKey]?.persistent !== undefined;

@@ -70,7 +70,7 @@ SettingsCard {
             if (editor.draft !== draft)
                 return;
             if (response.error) {
-                ToastService.showError(String(response.error));
+                ToastService.showError(I18n.tr("Failed to generate key", "toast title when generating a WireGuard key pair fails"), String(response.error));
                 return;
             }
             publicKey = response.result.publicKey;
@@ -207,7 +207,7 @@ SettingsCard {
                 id: keyField
                 width: parent.width - generateButton.width - parent.spacing
                 outlined: true
-                labelText: I18n.tr("Private key")
+                labelText: I18n.tr("Private key", "WireGuard interface private key field")
                 echoMode: TextInput.Password
                 showPasswordToggle: true
                 isError: !root.keyValid
@@ -231,7 +231,7 @@ SettingsCard {
 
     SettingsRow {
         visible: root.publicKey !== ""
-        title: I18n.tr("Public key")
+        title: I18n.tr("Public key", "WireGuard key field")
         subtitle: root.publicKey
 
         DActionButton {
@@ -244,7 +244,7 @@ SettingsCard {
 
     NumberRow {
         id: portRow
-        text: I18n.tr("Listen port")
+        text: I18n.tr("Listen port", "WireGuard interface field")
         key: "listen-port"
         max: 65535
     }
@@ -263,7 +263,7 @@ SettingsCard {
     }
 
     SettingsToggleRow {
-        text: I18n.tr("Add routes for allowed IPs")
+        text: I18n.tr("Add routes for allowed IPs", "WireGuard option")
         checked: root.wg["peer-routes"] !== false
         onToggled: checked => {
             const stored = root.editor.original?.[root.sectionKey]?.["peer-routes"] !== undefined;
@@ -309,7 +309,7 @@ SettingsCard {
                 DTextField {
                     width: parent.width
                     outlined: true
-                    labelText: I18n.tr("Public key")
+                    labelText: I18n.tr("Public key", "WireGuard key field")
                     text: peerRow.modelData.publicKey
                     isError: !CE.isValidWgKey(text.trim())
                     onTextEdited: root.editPeer(peerRow.index, "publicKey", text)
@@ -317,7 +317,7 @@ SettingsCard {
                 DTextField {
                     width: parent.width
                     outlined: true
-                    labelText: I18n.tr("Allowed IPs")
+                    labelText: I18n.tr("Allowed IPs", "WireGuard peer field")
                     placeholderText: "0.0.0.0/0, ::/0"
                     text: peerRow.modelData.allowedIps
                     isError: !root.peerIpsValid(text)
@@ -335,7 +335,7 @@ SettingsCard {
                 DTextField {
                     width: parent.width
                     outlined: true
-                    labelText: I18n.tr("Pre-shared key")
+                    labelText: I18n.tr("Pre-shared key", "WireGuard peer field")
                     echoMode: TextInput.Password
                     showPasswordToggle: true
                     text: peerRow.modelData.presharedKey
@@ -345,7 +345,7 @@ SettingsCard {
                 DTextField {
                     width: parent.width
                     outlined: true
-                    labelText: I18n.tr("Persistent keepalive")
+                    labelText: I18n.tr("Persistent keepalive", "WireGuard peer field")
                     placeholderText: I18n.tr("Default")
                     maximumLength: 5
                     text: peerRow.modelData.keepalive

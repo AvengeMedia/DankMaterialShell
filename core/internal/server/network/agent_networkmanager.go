@@ -687,7 +687,7 @@ func (a *SecretAgent) Introspect() (string, *dbus.Error) {
 
 // save8021xIdentity persists a prompted identity into the profile.
 func save8021xIdentity(connObj dbus.BusObject, identity string) {
-	err := updateConnectionSettings(connObj, false, func(s nmSettings) error {
+	err := updateConnectionSettings(connObj, true, func(s nmSettings) error {
 		setSettingValue(s, "802-1x", "identity", identity)
 		return nil
 	})

@@ -68,7 +68,7 @@ func (b *NetworkManagerBackend) ConfigureHotspot(req HotspotRequest) error {
 	}
 
 	if existing != nil {
-		err := updateConnectionSettings(b.nmObject(existing.GetPath()), false, func(s nmSettings) error {
+		err := updateConnectionSettings(b.nmObject(existing.GetPath()), true, func(s nmSettings) error {
 			applyHotspotRequest(s, req)
 			return nil
 		})

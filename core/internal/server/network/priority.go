@@ -190,7 +190,7 @@ func applyPreferenceToProfile(connObj dbus.BusObject, pref ConnectionPreference)
 		return false, nil
 	}
 
-	err := updateConnectionSettings(connObj, false, func(s nmSettings) error {
+	err := updateConnectionSettings(connObj, true, func(s nmSettings) error {
 		for fam, nm := range metrics {
 			setSettingValue(s, fam, "route-metric", nm)
 		}

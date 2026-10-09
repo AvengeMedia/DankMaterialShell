@@ -373,7 +373,7 @@ func TestSetWiFiAutoconnect_KeepsManualDNSAndGateway(t *testing.T) {
 			"dns-data":     dbus.MakeVariant([]string{"1.1.1.1"}),
 		},
 	})
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	require.NoError(t, backend.SetWiFiAutoconnect("home", false))
 
@@ -394,7 +394,7 @@ func TestUpdateConnectionCredentials_NewPSKReplacesStored(t *testing.T) {
 	expectGetSecrets(obj, "802-11-wireless-security", nmSettings{
 		"802-11-wireless-security": {"psk": dbus.MakeVariant("old")},
 	})
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	require.NoError(t, updateConnectionCredentials(backend, conn, ConnectionRequest{Password: "new"}))
 
@@ -521,7 +521,7 @@ func TestSaveOnly_UpdatesExistingProfileInPlace(t *testing.T) {
 	})
 	expectGetSecrets(obj, "802-11-wireless-security", nmSettings{})
 	expectGetSecrets(obj, "802-1x", nmSettings{"802-1x": {"password": dbus.MakeVariant("stored")}})
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	ca := testCertDER(t, "ca")
 	require.NoError(t, backend.ConnectWiFi(ConnectionRequest{SSID: "home", Security: "wpa-eap", SaveOnly: true,
@@ -552,7 +552,7 @@ func TestUpdateConnectionCredentials_SAEToEnterpriseDropsPSKAndPMF(t *testing.T)
 	expectGetSecrets(obj, "802-11-wireless-security", nmSettings{
 		"802-11-wireless-security": {"psk": dbus.MakeVariant("old")},
 	})
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	cfg := ttlsConfig(t, testCertDER(t, "ca"))
 	require.NoError(t, updateConnectionCredentials(backend, conn, ConnectionRequest{SSID: "home", Enterprise: cfg}))
@@ -574,7 +574,7 @@ func TestSaveOnly_ExistingProfileSetsHiddenAndAutoconnect(t *testing.T) {
 	expectGetSecrets(obj, "802-11-wireless-security", nmSettings{
 		"802-11-wireless-security": {"psk": dbus.MakeVariant("old")},
 	})
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	require.NoError(t, backend.ConnectWiFi(ConnectionRequest{SSID: "home", Password: "new", Hidden: true,
 		Security: "wpa-psk", SaveOnly: true}))
@@ -592,7 +592,7 @@ func TestSaveOnly_PSKFamilyIsCompatible(t *testing.T) {
 		"802-11-wireless-security": {"key-mgmt": dbus.MakeVariant("sae")},
 	})
 	expectGetSecrets(obj, "802-11-wireless-security", nmSettings{})
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	require.NoError(t, backend.ConnectWiFi(ConnectionRequest{SSID: "home", Security: "wpa-psk", SaveOnly: true}))
 	assert.Equal(t, true, (*got)["connection"]["autoconnect"].Value())
@@ -614,7 +614,7 @@ func TestSaveOnly_OpenAndOWEProfilesSetAutoconnect(t *testing.T) {
 			if security == "owe" {
 				expectGetSecrets(obj, "802-11-wireless-security", nmSettings{})
 			}
-			got := captureUpdate2(obj, 0, nil)
+			got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 			require.NoError(t, backend.ConnectWiFi(ConnectionRequest{SSID: "home", Password: "unused", Security: security, SaveOnly: true}))
 			assert.Equal(t, true, (*got)["connection"]["autoconnect"].Value())

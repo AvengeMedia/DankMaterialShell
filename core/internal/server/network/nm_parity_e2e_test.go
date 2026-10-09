@@ -142,7 +142,7 @@ func TestE2E_HotspotKeepsEditorKeysAndQRCode(t *testing.T) {
 	expectGetSecrets(obj, "802-11-wireless-security", nmSettings{
 		"802-11-wireless-security": {"psk": dbus.MakeVariant("stored-psk")},
 	})
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	resp := e2eRequest(t, f.backend, "network.hotspot.configure", map[string]any{
 		"ssid": "dms-ap", "password": testHotspotPSK, "band": "a",

@@ -287,17 +287,17 @@ Item {
 
         SettingsNoteRow {
             visible: root.loaded && root.readOnly
-            text: I18n.tr("You don't have permission to change this connection.")
+            text: I18n.tr("You don't have permission to change this connection.", "network connection editor note")
             noteIconName: "lock"
         }
 
         SettingsRow {
             visible: root.loaded && !root.readOnly && !root.isNew && (root.profile?.unsaved ?? false)
-            title: I18n.tr("This connection is temporary and is lost on reboot.")
+            title: I18n.tr("This connection is temporary and is lost on reboot.", "network connection editor note")
             iconName: "info"
 
             DButton {
-                text: I18n.tr("Save permanently")
+                text: I18n.tr("Save permanently", "network connection editor: keep the connection after reboot")
                 iconName: "save"
                 busy: root.saving
                 enabled: !root.saving && root.sectionsValid

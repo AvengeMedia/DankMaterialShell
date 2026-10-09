@@ -340,7 +340,7 @@ func TestUpdateVPNConfig_KeepsIPSectionsAndSecrets(t *testing.T) {
 
 	expectGetSettings(obj, storedVPNProfile())
 	expectGetSecrets(obj, "vpn", nmSettings{"vpn": {"secrets": dbus.MakeVariant(map[string]string{"password": "hunter2"})}})
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	err := backend.UpdateVPNConfig("vpn-uuid", map[string]any{
 		"autoconnect": false,
@@ -361,7 +361,7 @@ func TestSaveVPNCredentials_KeepsIPSections(t *testing.T) {
 
 	expectGetSettings(obj, storedVPNProfile())
 	expectGetSecrets(obj, "vpn", nmSettings{"vpn": {"secrets": dbus.MakeVariant(map[string]string{"cert-pass": "b"})}})
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	backend.saveVPNCredentials(&pendingVPNCredentials{
 		ConnectionPath: string(testVPNPath),
@@ -402,7 +402,7 @@ func TestClearVPNCredentials_DropsSecretsKeepsProfile(t *testing.T) {
 
 	expectGetSettings(obj, storedVPNProfile())
 	expectGetSecrets(obj, "vpn", nmSettings{"vpn": {"secrets": dbus.MakeVariant(map[string]string{"password": "hunter2"})}})
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	require.NoError(t, backend.ClearVPNCredentials("vpn-uuid"))
 

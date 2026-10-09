@@ -501,7 +501,7 @@ func (b *NetworkManagerBackend) ensureOpenConnectAgentFlags(conn gonetworkmanage
 	if !setOpenConnectAgentFlags(data) {
 		return nil
 	}
-	err := updateConnectionSettings(b.nmObject(conn.GetPath()), false, func(s nmSettings) error {
+	err := updateConnectionSettings(b.nmObject(conn.GetPath()), true, func(s nmSettings) error {
 		if _, ok := s["vpn"]; !ok {
 			return fmt.Errorf("VPN settings are missing")
 		}
@@ -701,7 +701,7 @@ func (b *NetworkManagerBackend) handleOpenVPNUsernameAuth(targetConn gonetworkma
 		return nil
 	}
 
-	err = updateConnectionSettings(b.nmObject(targetConn.GetPath()), false, func(s nmSettings) error {
+	err = updateConnectionSettings(b.nmObject(targetConn.GetPath()), true, func(s nmSettings) error {
 		data := vpnStringMap(s, "data")
 		data["username"] = username
 		setSettingValue(s, "vpn", "data", data)
@@ -887,7 +887,7 @@ func (b *NetworkManagerBackend) ClearVPNCredentials(uuidOrName string) error {
 
 		if connUUID == uuidOrName || connID == uuidOrName {
 			if connType == "vpn" {
-				err := updateConnectionSettings(b.nmObject(conn.GetPath()), false, func(s nmSettings) error {
+				err := updateConnectionSettings(b.nmObject(conn.GetPath()), true, func(s nmSettings) error {
 					if _, ok := s["vpn"]; !ok {
 						return nil
 					}
@@ -1036,7 +1036,7 @@ func (b *NetworkManagerBackend) saveVPNCredentials(creds *pendingVPNCredentials)
 	log.Infof("[saveVPNCredentials] Saving credentials for %s (username=%v, savePassword=%v)",
 		creds.ConnectionPath, creds.Username != "", creds.SavePassword)
 
-	err := updateConnectionSettings(b.nmObject(dbus.ObjectPath(creds.ConnectionPath)), false, func(s nmSettings) error {
+	err := updateConnectionSettings(b.nmObject(dbus.ObjectPath(creds.ConnectionPath)), true, func(s nmSettings) error {
 		data := vpnStringMap(s, "data")
 		if creds.Username != "" {
 			data["username"] = creds.Username
@@ -1382,7 +1382,7 @@ func (b *NetworkManagerBackend) renameConnection(uuid, name string) error {
 	if err != nil {
 		return fmt.Errorf("connection %s not found: %w", uuid, err)
 	}
-	return updateConnectionSettings(b.nmObject(conn.GetPath()), false, func(s nmSettings) error {
+	return updateConnectionSettings(b.nmObject(conn.GetPath()), true, func(s nmSettings) error {
 		setSettingValue(s, "connection", "id", name)
 		return nil
 	})
@@ -1502,7 +1502,7 @@ func (b *NetworkManagerBackend) UpdateVPNConfig(connUUID string, updates map[str
 			continue
 		}
 
-		err = updateConnectionSettings(b.nmObject(conn.GetPath()), false, func(s nmSettings) error {
+		err = updateConnectionSettings(b.nmObject(conn.GetPath()), true, func(s nmSettings) error {
 			if name, ok := updates["name"].(string); ok && name != "" {
 				setSettingValue(s, "connection", "id", name)
 			}
@@ -1576,7 +1576,7 @@ func (b *NetworkManagerBackend) SetVPNCredentials(connUUID string, username stri
 			continue
 		}
 
-		err = updateConnectionSettings(b.nmObject(conn.GetPath()), false, func(s nmSettings) error {
+		err = updateConnectionSettings(b.nmObject(conn.GetPath()), true, func(s nmSettings) error {
 			data := vpnStringMap(s, "data")
 			if username != "" {
 				data["username"] = username

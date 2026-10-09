@@ -101,7 +101,7 @@ func TestE2E_EduroamReimportUpdatesInPlace(t *testing.T) {
 	})
 	expectGetSecrets(obj, "802-11-wireless-security", nmSettings{})
 	expectGetSecrets(obj, "802-1x", nmSettings{})
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 	ent, ca := uhhEnterprise(t, f.backend)
 
 	resp := e2eRequest(t, f.backend, "network.wifi.connect", map[string]any{

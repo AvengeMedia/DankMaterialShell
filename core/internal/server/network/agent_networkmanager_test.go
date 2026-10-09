@@ -26,7 +26,7 @@ func TestSave8021xIdentity_WritesIdentityKeepingProfile(t *testing.T) {
 	obj := mock_dbus.NewMockBusObject(t)
 	expectGetSettings(obj, enterpriseProfile())
 	expectGetSecrets(obj, "802-1x", nmSettings{"802-1x": {"password": dbus.MakeVariant("hunter2")}})
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	save8021xIdentity(obj, "alice@example.com")
 

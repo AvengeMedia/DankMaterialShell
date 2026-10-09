@@ -315,6 +315,18 @@ func TestNetworkManagerBackend_EthernetRefresh_SortedWithProfileFit(t *testing.T
 	assert.Empty(t, wired[1].Device)
 }
 
+func TestNetworkManagerBackend_EthernetProfileFitSurvivesStartupOrder(t *testing.T) {
+	f := newEthernetFixture(t, mockWiredProfile(t, "wired-a", "", nil))
+	f.addDevice(t, "enp5s0", hwEnp5s0, gonetworkmanager.NmDeviceStateDisconnected, nil)
+
+	// Initialize scans profiles before the device list exists.
+	_, err := f.backend.listEthernetConnections()
+	require.NoError(t, err)
+	f.backend.updateAllEthernetDevices()
+
+	assert.Equal(t, []string{"wired-a"}, f.backend.GetEthernetDevices()[0].ProfileUUIDs)
+}
+
 func TestNetworkManagerBackend_EthernetProfileFitUsesPermanentMAC(t *testing.T) {
 	const spoofed = "02:00:00:00:00:99"
 	perm, err := net.ParseMAC(hwEnp6s0)

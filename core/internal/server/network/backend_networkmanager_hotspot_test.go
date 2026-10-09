@@ -1018,7 +1018,7 @@ func configureExistingHotspot(t *testing.T, req HotspotRequest) nmSettings {
 	expectGetSecrets(obj, "802-11-wireless-security", nmSettings{
 		"802-11-wireless-security": {"psk": dbus.MakeVariant("stored-psk")},
 	})
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	require.NoError(t, backend.ConfigureHotspot(req))
 	return *got

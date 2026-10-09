@@ -115,7 +115,7 @@ func TestApplyPreferenceToProfile_WritesDefaultsUnderPreference(t *testing.T) {
 	obj := mock_dbus.NewMockBusObject(t)
 	expectGetSettings(obj, wifiProfile(nil))
 	expectGetSettings(obj, wifiProfile(nil))
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	changed, err := applyPreferenceToProfile(obj, PreferenceWiFi)
 	require.NoError(t, err)
@@ -155,7 +155,7 @@ func TestApplyPreferenceToProfile_AutoResetsPriority(t *testing.T) {
 	obj := mock_dbus.NewMockBusObject(t)
 	expectGetSettings(obj, wifiProfile(prio))
 	expectGetSettings(obj, wifiProfile(prio))
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	changed, err := applyPreferenceToProfile(obj, PreferenceAuto)
 	require.NoError(t, err)
@@ -168,7 +168,7 @@ func TestApplyPreferenceToProfile_UpdateErrorNamesProfile(t *testing.T) {
 	obj := mock_dbus.NewMockBusObject(t)
 	expectGetSettings(obj, wifiProfile(nil))
 	expectGetSettings(obj, wifiProfile(nil))
-	captureUpdate2(obj, 0, errors.New("denied"))
+	captureUpdate2(obj, nmUpdate2FlagToDisk, errors.New("denied"))
 
 	changed, err := applyPreferenceToProfile(obj, PreferenceWiFi)
 	require.Error(t, err)

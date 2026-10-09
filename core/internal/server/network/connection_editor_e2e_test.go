@@ -162,7 +162,7 @@ func TestE2E_VPNAutoconnectToggle_KeepsDNSAndAddresses(t *testing.T) {
 	s["connection"]["uuid"] = dbus.MakeVariant("wg-uuid")
 	expectGetSettings(obj, s)
 	expectGetSecrets(obj, "wireguard", nmSettings{"wireguard": {"private-key": dbus.MakeVariant("KEY")}})
-	got := captureUpdate2(obj, 0, nil)
+	got := captureUpdate2(obj, nmUpdate2FlagToDisk, nil)
 
 	resp := e2eRequest(t, f.backend, "network.vpn.updateConfig", map[string]any{"uuid": "wg-uuid", "autoconnect": false})
 

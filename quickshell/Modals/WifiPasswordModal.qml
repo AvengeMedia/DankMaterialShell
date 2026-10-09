@@ -84,6 +84,10 @@ DModal {
             usernameInput.forceActiveFocus();
             return;
         }
+        if (showEnterpriseForm) {
+            enterpriseForm.focusIdentity();
+            return;
+        }
         if (showPasswordField)
             passwordInput.forceActiveFocus();
     }
@@ -339,7 +343,7 @@ DModal {
             if (isWiredPrompt)
                 return I18n.tr("Ethernet");
             if (importProfile)
-                return importProfile.providerName || "";
+                return importProfile.providerName || I18n.tr("Connect to Wi-Fi");
             if (isHiddenNetwork)
                 return I18n.tr("Connect to Hidden Network");
             return I18n.tr("Connect to Wi-Fi");
@@ -354,7 +358,7 @@ DModal {
             if (isVpnPrompt)
                 return I18n.tr("Enter password for ") + wifiPasswordSSID;
             if (isHiddenNetwork)
-                return I18n.tr("Enter network name and password");
+                return hiddenNeedsPassword ? I18n.tr("Enter network name and password") : I18n.tr("Enter network name", "hidden Wi-Fi prompt subtitle when the chosen security needs no password");
             return (requiresEnterprise ? I18n.tr("Enter credentials for ") : I18n.tr("Enter password for ")) + wifiPasswordSSID;
         }
 
@@ -414,11 +418,17 @@ DModal {
         }
 
         DDropdown {
+            id: hiddenSecurityDropdown
             visible: isHiddenNetwork
             width: parent.width
             text: I18n.tr("Security", "noun, settings page name and wifi security type label")
             options: hiddenSecurityChoices.map(c => c[0])
-            currentValue: hiddenSecurityChoices.find(c => c[1] === hiddenSecurity)?.[0] ?? ""
+            // DDropdown assigns currentValue on pick, which drops a plain binding; this re-applies it on reset.
+            Binding {
+                target: hiddenSecurityDropdown
+                property: "currentValue"
+                value: hiddenSecurityChoices.find(c => c[1] === hiddenSecurity)?.[0] ?? ""
+            }
             onValueChanged: value => {
                 hiddenSecurity = hiddenSecurityChoices.find(c => c[0] === value)?.[1] ?? "wpa-psk";
                 requiresEnterprise = hiddenSecurity === "wpa-eap";
@@ -500,8 +510,11 @@ DModal {
         EnterpriseAuthForm {
             id: enterpriseForm
             expressive: true
+            // System CA needs a server domain, which most users don't know when connecting.
+            defaultCa: "none"
             visible: showEnterpriseForm
             width: parent.width
+            onSubmitRequested: submitCredentialsAndClose()
             onBrowseRequested: target => {
                 root.browseTarget = target;
                 certBrowserLoader.active = true;
@@ -556,7 +569,7 @@ DModal {
                     if (showEnterpriseForm)
                         return enterpriseForm.valid;
                     if (isHiddenNetwork)
-                        return !hiddenNeedsPassword || passwordInput.text.length >= 8;
+                        return !hiddenNeedsPassword || passwordInput.text.length >= (hiddenSecurity === "wpa-psk" ? 8 : 1);
                     return showUsernameField ? (usernameInput.text.length > 0 && passwordInput.text.length > 0) : passwordInput.text.length > 0;
                 }
                 onClicked: submitCredentialsAndClose()

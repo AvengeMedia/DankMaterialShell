@@ -995,7 +995,7 @@ func updateConnectionCredentials(b *NetworkManagerBackend, conn gonetworkmanager
 		}
 	}
 
-	err := updateConnectionSettings(b.nmObject(conn.GetPath()), false, func(s nmSettings) error {
+	err := updateConnectionSettings(b.nmObject(conn.GetPath()), true, func(s nmSettings) error {
 		err := applyCredentials(s)
 		if !req.SaveOnly {
 			return err
@@ -1037,7 +1037,7 @@ func (b *NetworkManagerBackend) SetWiFiAutoconnect(ssid string, autoconnect bool
 		return fmt.Errorf("D-Bus connection unavailable")
 	}
 
-	err = updateConnectionSettings(obj, false, func(s nmSettings) error {
+	err = updateConnectionSettings(obj, true, func(s nmSettings) error {
 		if _, ok := s["connection"]; !ok {
 			return fmt.Errorf("connection metadata not found")
 		}
