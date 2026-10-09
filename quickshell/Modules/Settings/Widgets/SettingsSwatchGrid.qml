@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
@@ -42,7 +43,7 @@ Flow {
             width: root.tileWidth
             height: root.compact ? root.compactTileHeight : media.height + label.implicitHeight + Theme.spacingS * 3
             radius: Theme.cornerRadiusM
-            color: Theme.floatingWindowFieldColor
+            color: SettingsMetrics.controlColor
             border.width: isActive ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
             border.color: isActive ? Theme.primary : Theme.outlineMedium
 
@@ -105,7 +106,7 @@ Flow {
                     }
                 }
 
-                DankPaletteSwatch {
+                DPaletteSwatch {
                     anchors.centerIn: parent
                     width: Theme.minimumTouchTargetSize
                     height: Theme.minimumTouchTargetSize
@@ -116,7 +117,7 @@ Flow {
                 }
             }
 
-            DankBadge {
+            DBadge {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: Theme.spacingXS
@@ -126,14 +127,14 @@ Flow {
                 textColor: Theme.onSecondaryContainer
             }
 
-            DankActionButton {
+            DActionButton {
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.margins: Theme.spacingXS
                 visible: tile.deletable && !root.compact && (tile.activeFocus || activeFocus || hovered || tileState.containsMouse)
                 iconName: "delete"
                 iconColor: Theme.error
-                backgroundColor: Theme.floatingWindowFieldColor
+                backgroundColor: SettingsMetrics.controlSurface
                 tooltipText: I18n.tr("Delete")
                 onClicked: root.deleteRequested(tile.modelData.value)
             }

@@ -1,6 +1,7 @@
 package loginctl
 
 import (
+	"context"
 	"time"
 
 	"github.com/AvengeMedia/dankgo/dbusutil"
@@ -29,9 +30,10 @@ func (m *Manager) handleDBusSignal(sig *dbus.Signal) {
 		}
 
 	case dbusSessionInterface + ".Unlock":
+		lockedHint := m.sessionLockedHint()
 		m.stateMutex.Lock()
 		m.state.Locked = false
-		m.state.LockedHint = false
+		m.state.LockedHint = lockedHint
 		m.stateMutex.Unlock()
 		m.notifySubscribers()
 		m.prelockedReady.Store(false)
@@ -107,6 +109,19 @@ func (m *Manager) handleDBusSignal(sig *dbus.Signal) {
 			}
 		}
 	}
+}
+
+// logind's Unlock does not clear LockedHint, the locker does. Report logind's
+// value so a shell restarted while still locked can take the lock back.
+func (m *Manager) sessionLockedHint() bool {
+	if m.sessionObj == nil {
+		return false
+	}
+	props, err := m.getSessionProperties(context.Background())
+	if err != nil {
+		return false
+	}
+	return dbusutil.GetOr(props, "LockedHint", false)
 }
 
 func (m *Manager) handlePropertiesChanged(sig *dbus.Signal) {

@@ -237,7 +237,7 @@ Variants {
                 }
             }
 
-            // Theme changes repaint DankBackdrop but nothing else wakes the render loop
+            // Theme changes repaint DBackdrop but nothing else wakes the render loop
             readonly property color themePrimary: Theme.primary
             readonly property color themeBackground: Theme.background
             readonly property bool idleShellLocked: IdleService.isShellLocked
@@ -280,8 +280,10 @@ Variants {
                 active: root.showsBackdrop
                 asynchronous: true
 
-                sourceComponent: DankBackdrop {
+                sourceComponent: DBackdrop {
                     screenName: modelData.name
+                    blur: Theme.wallpaperBlur
+                    onInvalidated: root.invalidate()
                 }
             }
 

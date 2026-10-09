@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -252,7 +252,7 @@ Item {
                     wrapMode: Text.WordWrap
                 }
 
-                DankToggle {
+                DToggle {
                     width: parent.width
                     text: I18n.tr("All displays")
                     checked: {
@@ -279,7 +279,7 @@ Item {
                     Repeater {
                         model: Quickshell.screens
 
-                        DankToggle {
+                        DToggle {
                             required property var modelData
                             width: parent.width
                             text: SettingsData.getScreenDisplayName(modelData)

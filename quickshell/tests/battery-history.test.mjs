@@ -4,7 +4,7 @@ import vm from "node:vm";
 import test from "node:test";
 
 const history = vm.createContext({});
-vm.runInContext(readFileSync(new URL("../Modules/DankBar/Popouts/BatteryHistory.js", import.meta.url), "utf8"), history);
+vm.runInContext(readFileSync(new URL("../Modules/DBar/Popouts/BatteryHistory.js", import.meta.url), "utf8"), history);
 const plain = value => JSON.parse(JSON.stringify(value));
 
 test("history rejects missing, malformed, and out-of-range readings", () => {

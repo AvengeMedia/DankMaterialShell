@@ -10,6 +10,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/mangoconf"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -175,7 +176,12 @@ func (m Model) configReplacementNote() string {
 		}
 		return `Replacing Hyprland writes the DMS Lua template and starts DMS from Hyprland with hl.exec_cmd("dms run").`
 	case "Mango":
-		return "Replacing Mango writes the DMS Mango template and starts DMS from Mango with exec-once=dms run."
+		if m.useSystemdConfig() && mangoconf.SessionTargetInstalled() {
+			return "Replacing Mango writes the DMS Mango template and starts the user systemd dms service with mango-session.target. Existing binds, monitor and window rules move into the dms/ files."
+		}
+		return "Replacing Mango writes the DMS Mango template and starts DMS from Mango with " + mangoconf.Detect().Key("exec_once") + "=dms run. Existing binds, monitor and window rules move into the dms/ files."
+	case config.MangoBindsConfigType:
+		return "Keep uses your binds as they are; replace starts from the DMS stock binds. A timestamped backup is kept either way."
 	case "Ghostty":
 		return "Replacing Ghostty writes the DMS terminal defaults and theme include."
 	case "Kitty":
@@ -225,7 +231,8 @@ func (m Model) applyConfigCheck(result configCheckResult) (tea.Model, tea.Cmd) {
 		if !cfg.Exists {
 			continue
 		}
-		m.replaceConfigs[cfg.ConfigType] = true
+		// Binds are the user's work; replacing them is opt-in.
+		m.replaceConfigs[cfg.ConfigType] = cfg.ConfigType != config.MangoBindsConfigType
 		if !hasExisting {
 			m.selectedConfig = i
 		}
@@ -287,6 +294,11 @@ func (m Model) terminalConfigInfo() ExistingConfigInfo {
 
 func (m Model) checkExistingConfigurations() tea.Cmd {
 	return func() tea.Msg {
-		return configCheckResult{configs: []ExistingConfigInfo{m.wmConfigInfo(), m.terminalConfigInfo()}}
+		configs := []ExistingConfigInfo{m.wmConfigInfo()}
+		if m.chosenWindowManager() == deps.WindowManagerMango {
+			path, ok := config.MangoExistingBinds()
+			configs = append(configs, ExistingConfigInfo{ConfigType: config.MangoBindsConfigType, Path: path, Exists: ok})
+		}
+		return configCheckResult{configs: append(configs, m.terminalConfigInfo())}
 	}
 }

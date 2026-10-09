@@ -6,7 +6,7 @@ import qs.Common
 import qs.Modals.Common
 import qs.Modals.FileBrowser
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import "../../Common/ThemePalette.js" as ThemePalette
 
@@ -122,13 +122,13 @@ Item {
 
                     Item {
                         width: parent.width
-                        height: themeCategoryGroup.implicitHeight
+                        height: themeCategoryGroup.implicitHeight + Theme.focusRingOffset * 2
                         clip: true
 
-                        DankButtonGroup {
-                            arrowKeysSelect: false
+                        DButtonGroup {
                             id: themeCategoryGroup
-                            anchors.horizontalCenter: parent.horizontalCenter
+                            arrowKeysSelect: false
+                            anchors.centerIn: parent
                             buttonPadding: parent.width < 420 ? Theme.spacingS : Theme.spacingL
                             minButtonWidth: parent.width < 420 ? 44 : 64
                             textSize: parent.width < 420 ? Theme.fontSizeSmall : Theme.fontSizeMedium
@@ -211,7 +211,7 @@ Item {
                         width: 120
                         height: 90
                         radius: Theme.cornerRadius
-                        color: Theme.floatingWindowFieldColor
+                        color: SettingsMetrics.controlColor
                         border.width: Theme.layerOutlineWidth
                         border.color: Theme.outlineMedium
 
@@ -247,7 +247,7 @@ Item {
                             visible: Theme.wallpaperPath && Theme.wallpaperPath.startsWith("#")
                         }
 
-                        DankIcon {
+                        DIcon {
                             anchors.centerIn: parent
                             name: (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing") ? "error" : "palette"
                             size: Theme.iconSizeLarge
@@ -269,7 +269,7 @@ Item {
                                     return I18n.tr("Matugen Missing", "matugen not found status");
                                 if (Theme.wallpaperPath)
                                     return Theme.wallpaperPath.split('/').pop();
-                                return I18n.tr("No wallpaper selected", "no wallpaper status");
+                                return I18n.tr("Material", "wallpaper type");
                             }
                             font.pixelSize: Theme.fontSizeLarge
                             color: Theme.surfaceText
@@ -298,7 +298,7 @@ Item {
                         }
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         buttonSize: 36
                         iconName: "download"
                         iconSize: Theme.iconSize
@@ -313,6 +313,22 @@ Item {
                                 saveBrowserLoader.item.open();
                         }
                     }
+                }
+            }
+
+            SettingsButtonGroupRow {
+                visible: themeColorsTab.dynamicTheme
+                tab: "theme"
+                tags: ["matugen", "spec", "expressive", "vivid", "saturated", "bold", "dynamic"]
+                settingKey: "matugenSpec"
+                text: I18n.tr("Material palette", "theme settings card title, matugen palette options")
+                enabled: Theme.matugenAvailable
+                model: ["2021", "2025", "DMS"]
+                currentIndex: SettingsData.matugenSpec === "dms" ? 2 : SettingsData.matugenSpec === "2025" ? 1 : 0
+                onSelectionChanged: (index, selected) => {
+                    if (!selected)
+                        return;
+                    SettingsData.setMatugenSpec(["2021", "2025", "dms"][index]);
                 }
             }
 
@@ -349,7 +365,7 @@ Item {
                         }
                     }
 
-                    DankSpinner {
+                    DSpinner {
                         anchors.centerIn: parent
                         running: !MatugenPreviewService.ready
                         visible: running
@@ -366,7 +382,7 @@ Item {
                 description: I18n.tr("Which wallpaper color the palette is built from", "matugen source color dropdown description")
                 options: cachedSourceModes
                 currentValue: Theme.getSourceMode(SettingsData.matugenSourceMode).label
-                enabled: Theme.matugenAvailable && !SettingsData.matugenSeedColor
+                enabled: Theme.matugenAvailable && !SettingsData.matugenSeedColor && !!Theme.rawWallpaperPath
                 onValueChanged: value => {
                     for (var i = 0; i < Theme.availableSourceModes.length; i++) {
                         var option = Theme.availableSourceModes[i];
@@ -383,14 +399,14 @@ Item {
                 tab: "theme"
                 tags: ["matugen", "seed", "pick", "eyedropper", "dynamic"]
                 settingKey: "matugenSeedColor"
-                text: I18n.tr("Derived color")
+                text: I18n.tr("Derived color", "matugen dropdown label, which color the palette is derived from")
                 description: I18n.tr("Custom builds the palette from a color you pick", "matugen derived color dropdown description")
                 enabled: Theme.matugenAvailable
                 options: [
                     {
                         "value": "default",
-                        "previewColor": Theme.getMatugenColor("source_color", Theme.primary),
-                        "label": I18n.tr("From wallpaper", "matugen seed color option")
+                        "previewColor": (!Theme.rawWallpaperPath ? Theme.materialWallpaperSeed : Theme.getMatugenColor("source_color", Theme.primary)),
+                        "label": Theme.rawWallpaperPath ? I18n.tr("From wallpaper", "matugen seed color option") : I18n.tr("Material", "wallpaper type")
                     },
                     {
                         "value": "custom",
@@ -398,8 +414,8 @@ Item {
                     }
                 ]
                 currentMode: SettingsData.matugenSeedColor ? "custom" : "default"
-                customColor: SettingsData.matugenSeedColor || Theme.getMatugenColor("source_color", Theme.primary)
-                pickerTitle: I18n.tr("Seed color")
+                customColor: SettingsData.matugenSeedColor || (!Theme.rawWallpaperPath ? Theme.materialWallpaperSeed : Theme.getMatugenColor("source_color", Theme.primary))
+                pickerTitle: I18n.tr("Seed color", "color picker title, the color the dynamic palette is built from")
                 onModeSelected: mode => {
                     if (mode !== "custom") {
                         SettingsData.setMatugenSeedColor("");
@@ -407,26 +423,9 @@ Item {
                     }
                     if (SettingsData.matugenSeedColor)
                         return;
-                    SettingsData.setMatugenSeedColor(Theme.getMatugenColor("source_color", Theme.primary).toString());
+                    SettingsData.setMatugenSeedColor((!Theme.rawWallpaperPath ? Theme.materialWallpaperSeed : Theme.getMatugenColor("source_color", Theme.primary)).toString());
                 }
                 onCustomColorSelected: selectedColor => SettingsData.setMatugenSeedColor(Theme.withAlpha(selectedColor, 1).toString())
-            }
-
-            SettingsButtonGroupRow {
-                visible: themeColorsTab.dynamicTheme
-                tab: "theme"
-                tags: ["matugen", "spec", "expressive", "vivid", "saturated", "bold", "dynamic"]
-                settingKey: "matugenSpec"
-                text: I18n.tr("Material palette")
-                description: I18n.tr("2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder", "material color spec year description")
-                enabled: Theme.matugenAvailable && Theme.getMatugenScheme(SettingsData.matugenScheme).spec2025 === true
-                model: ["2021", "2025"]
-                currentIndex: SettingsData.matugenSpec === "2025" ? 1 : 0
-                onSelectionChanged: (index, selected) => {
-                    if (!selected)
-                        return;
-                    SettingsData.setMatugenSpec(index === 1 ? "2025" : "2021");
-                }
             }
 
             SettingsSliderRow {
@@ -441,7 +440,7 @@ Item {
                 maximum: 100
                 enabled: Theme.matugenAvailable
                 onSliderDragFinished: finalValue => {
-                    const clamped = SettingsData.matugenSpec === "2025" ? Math.max(0, finalValue) : finalValue;
+                    const clamped = SettingsData.matugenSpec !== "2021" ? Math.max(0, finalValue) : finalValue;
                     SettingsData.setMatugenContrast(clamped / 100);
                     if (clamped !== finalValue)
                         contrastRow.resync();
@@ -458,7 +457,7 @@ Item {
                         width: parent.width
                         spacing: Theme.spacingM
 
-                        DankActionButton {
+                        DActionButton {
                             buttonSize: Theme.minimumTouchTargetSize
                             iconName: "folder_open"
                             Accessible.name: I18n.tr("Browse Files")
@@ -468,7 +467,7 @@ Item {
                             onClicked: fileBrowserModal.open()
                         }
 
-                        DankPaletteSwatch {
+                        DPaletteSwatch {
                             id: customSwatch
                             width: Theme.minimumTouchTargetSize
                             height: Theme.minimumTouchTargetSize
@@ -568,7 +567,7 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                     }
 
-                    DankButton {
+                    DButton {
                         text: I18n.tr("Browse Themes", "browse themes button")
                         iconName: "store"
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -661,14 +660,14 @@ Item {
 
                     Item {
                         width: parent.width
-                        height: flavorButtonGroup.implicitHeight
+                        height: flavorButtonGroup.implicitHeight + Theme.focusRingOffset * 2
                         clip: true
                         visible: variantSelector.isMultiVariant && variantSelector.flavorOptions.length > 1
 
-                        DankButtonGroup {
-                            arrowKeysSelect: false
+                        DButtonGroup {
                             id: flavorButtonGroup
-                            anchors.horizontalCenter: parent.horizontalCenter
+                            arrowKeysSelect: false
+                            anchors.centerIn: parent
                             property int _count: variantSelector.flavorNames.length
                             property real _maxPerItem: _count > 1 ? (parent.width - (_count - 1) * spacing) / _count : parent.width
                             buttonPadding: _maxPerItem < 55 ? Theme.spacingXS : (_maxPerItem < 75 ? Theme.spacingS : Theme.spacingL)
@@ -715,7 +714,7 @@ Item {
                             Repeater {
                                 model: variantSelector.activeThemeVariants?.accents || []
 
-                                DankColorButton {
+                                DColorButton {
                                     required property var modelData
                                     required property int index
                                     readonly property string accentId: modelData.id
@@ -738,14 +737,14 @@ Item {
 
                     Item {
                         width: parent.width
-                        height: variantButtonGroup.implicitHeight
+                        height: variantButtonGroup.implicitHeight + Theme.focusRingOffset * 2
                         clip: true
                         visible: !variantSelector.isMultiVariant && variantSelector.variantNames.length > 0
 
-                        DankButtonGroup {
-                            arrowKeysSelect: false
+                        DButtonGroup {
                             id: variantButtonGroup
-                            anchors.horizontalCenter: parent.horizontalCenter
+                            arrowKeysSelect: false
+                            anchors.centerIn: parent
                             property int _count: variantSelector.variantNames.length
                             property real _maxPerItem: _count > 1 ? (parent.width - (_count - 1) * spacing) / _count : parent.width
                             buttonPadding: _maxPerItem < 55 ? Theme.spacingXS : (_maxPerItem < 75 ? Theme.spacingS : Theme.spacingL)
@@ -781,7 +780,7 @@ Item {
         SettingsCard {
             tab: "theme"
             tags: ["matugen", "startup", "theming"]
-            title: I18n.tr("Startup Behavior", "settings card title")
+            title: I18n.tr("Startup Behavior", "theme settings card title, what happens to the dynamic theme when DMS starts")
             settingKey: "themeStartupBehavior"
             iconName: "power_settings_new"
             visible: Theme.matugenAvailable
@@ -790,8 +789,8 @@ Item {
                 tab: "theme"
                 tags: ["matugen", "startup", "generate"]
                 settingKey: "generateThemeAtStartup"
-                text: I18n.tr("Generate Theme at Startup", "toggle label")
-                description: I18n.tr("Regenerate matugen colors when DMS starts, even if nothing changed.", "toggle description")
+                text: I18n.tr("Generate Theme at Startup", "theme settings toggle, rerun matugen on every shell start")
+                description: I18n.tr("Regenerate matugen colors when DMS starts, even if nothing changed.", "generate theme at startup toggle description")
                 checked: SettingsData.generateThemeAtStartup
                 onToggled: checked => SettingsData.set("generateThemeAtStartup", checked)
             }

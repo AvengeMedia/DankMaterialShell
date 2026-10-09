@@ -3,9 +3,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.Common
-import qs.Modals.Settings
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -90,7 +89,7 @@ Item {
                 ancestor = ancestor.parent;
             if (!ancestor)
                 return false;
-        } while (!item.visible || !item.enabled);
+        } while (!item.visible || !item.enabled)
         keyboardHighlightId = "";
         item.forceActiveFocus(forward ? Qt.TabFocusReason : Qt.BacktabFocusReason);
         ensureRowVisible(item);
@@ -179,6 +178,9 @@ Item {
             root.focusAfterNavigation(keyboard);
             return;
         }
+        const islandBar = SettingsSearchService.islandBarFor(result.conditionKey, SettingsUiState.selectedBarId);
+        if (islandBar)
+            SettingsUiState.selectedBarId = islandBar.id;
         if (result.section)
             SettingsSearchService.navigateToSection(result.section);
         const page = result.page || SettingsTabs.pageForTabIndex(result.tabIndex);
@@ -201,16 +203,8 @@ Item {
         if (!result || !contentItem)
             return;
 
-        const mapped = result.mapToItem(contentItem, 0, 0);
-        const margin = Theme.spacingS;
-        const top = mapped.y;
-        const bottom = top + result.height;
-        const maxContentY = Math.max(0, sidebarFlickable.contentHeight - sidebarFlickable.height);
-        if (top < sidebarFlickable.contentY + margin) {
-            sidebarFlickable.contentY = Math.max(0, top - margin);
-        } else if (bottom > sidebarFlickable.contentY + sidebarFlickable.height - margin) {
-            sidebarFlickable.contentY = Math.min(maxContentY, bottom - sidebarFlickable.height + margin);
-        }
+        const top = result.mapToItem(contentItem, 0, 0).y;
+        sidebarFlickable.revealRange(top - Theme.spacingS, top + result.height + Theme.spacingS);
     }
 
     implicitWidth: SettingsMetrics.sidebarWidth
@@ -219,19 +213,10 @@ Item {
 
     Component.onCompleted: GreeterService.refresh()
 
-    Rectangle {
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        width: Theme.dividerWidth
-        color: Theme.outlineVariant
-        visible: !(root.parentModal?.isCompactMode ?? false)
-    }
-
-    DankSearchField {
+    DSearchField {
         id: searchField
 
-        property real sideInset: root.searchActive ? Theme.spacingS : Theme.spacingL
+        property real sideInset: root.searchActive ? Theme.spacingS : SettingsMetrics.paneMargin
 
         Behavior on sideInset {
             enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
@@ -247,9 +232,9 @@ Item {
         anchors.top: parent.top
         anchors.leftMargin: sideInset
         anchors.rightMargin: sideInset
-        anchors.topMargin: SettingsMetrics.searchBarGap
         height: SettingsMetrics.searchBarHeight
         placeholderText: I18n.tr("Search settings", "settings search field placeholder")
+        rightAccessoryWidth: avatarButton.visible ? avatarButton.width + Theme.spacingXS : 0
         onFocusStateChanged: hasFocus => {
             root.searchFocused = hasFocus;
             if (!hasFocus)
@@ -327,9 +312,37 @@ Item {
                 event.accepted = true;
             }
         }
+
+        DActionButton {
+            id: avatarButton
+
+            anchors.right: parent.right
+            anchors.rightMargin: (SettingsMetrics.searchBarHeight - buttonSize) / 2
+            anchors.verticalCenter: parent.verticalCenter
+            visible: !root.searchActive
+            buttonSize: Theme.avatarSize
+            radius: Theme.buttonRadius(width, height, buttonSize, false, circular)
+            focusPolicy: Qt.TabFocus
+            tooltipText: I18n.tr("Users & accounts", "settings sidebar category")
+            onClicked: {
+                root.pageRequested("user_accounts");
+                root.focusAfterNavigation(visualFocus);
+            }
+
+            // Below the state layer so hover, press and focus tint the avatar
+            DCircularImage {
+                z: -1
+                anchors.fill: parent
+                ringWidth: Theme.avatarRingWidth
+                ringColor: Theme.avatarRingColor
+                imageSource: PortalService.profileImage
+                fallbackIcon: imageSource ? "material:person" : ""
+                fallbackText: (UserInfoService.fullName || I18n.tr("User")).charAt(0).toLocaleUpperCase()
+            }
+        }
     }
 
-    DankFlickable {
+    DFlickable {
         id: sidebarFlickable
         anchors.left: parent.left
         anchors.right: parent.right
@@ -338,29 +351,15 @@ Item {
         anchors.topMargin: SettingsMetrics.searchBarGap
         clip: true
         contentHeight: sidebarColumn.height
+        fadeSideInset: SettingsMetrics.paneMargin
 
         Column {
             id: sidebarColumn
             width: parent.width
-            leftPadding: Theme.spacingL
-            rightPadding: Theme.spacingL
-            bottomPadding: Theme.spacingL
+            leftPadding: SettingsMetrics.paneMargin
+            rightPadding: SettingsMetrics.paneMargin
+            bottomPadding: SettingsMetrics.paneMargin
             spacing: SettingsMetrics.sidebarGroupGap
-
-            ProfileSection {
-                id: profileRow
-                width: parent.width - parent.leftPadding - parent.rightPadding
-                visible: !root.searchActive
-                highlighted: activeFocus
-                onActiveFocusChanged: {
-                    if (activeFocus)
-                        root.ensureRowVisible(profileRow);
-                }
-                onNavigationRequested: keyboard => {
-                    root.pageRequested("user_accounts");
-                    root.focusAfterNavigation(keyboard);
-                }
-            }
 
             Column {
                 id: searchResultsColumn
@@ -390,7 +389,10 @@ Item {
                         hint: modelData.category
                         accent: SettingsTabs.accentFor(modelData.page || SettingsTabs.pageForTabIndex(modelData.tabIndex))
                         active: root.searchSelectedIndex === index
-                        onClicked: keyboard => root.selectSearchResult(modelData, keyboard)
+                        onClicked: keyboard => {
+                            root.searchSelectedIndex = index;
+                            root.selectSearchResult(modelData, keyboard);
+                        }
                     }
                 }
 

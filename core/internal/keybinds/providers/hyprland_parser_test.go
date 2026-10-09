@@ -24,12 +24,26 @@ func TestHyprlandAutogenerateComment(t *testing.T) {
 		{"pin", "", "pin (show on all workspaces)"},
 		{"splitratio", "0.5", "Window split ratio 0.5"},
 		{"togglefloating", "", "Float/unfloat window"},
-		{"resizeactive", "10 20", "Resize window by 10 20"},
+		{"resizeactive", "10 20", "Grow window width by 10, grow height by 20"},
+		{"resizeactive", "-100 0", "Shrink window width by 100"},
+		{"resizeactive", "0 -5%", "Shrink window height by 5%"},
+		{"resizeactive", "exact 1280 720", "Resize window to 1280x720"},
+		{"moveactive", "-50 0", "Move window left by 50"},
+		{"movewindow", "mon:l", "move to left monitor"},
+		{"movewindow", "mon:+1", "move to next monitor"},
+		{"movewindow", "mon:DP-1", "move to monitor DP-1"},
+		{"focuswindow", "first", "focus window first"},
+		{"focuswindow", "class:kitty", "focus kitty window"},
+		{"movetoworkspacesilent", "special:magic", "move to special workspace magic"},
+		{"moveintogroup", "l", "move into left group"},
+		{"changegroupactive", "b", "previous window in group"},
+		{"layoutmsg", "togglesplit", "Toggle split"},
+		{"layoutmsg", "splitratio 0.1", "Window split ratio 0.1"},
+		{"fullscreen", "1 set", "Enter maximization"},
 		{"killactive", "", "Close window"},
 		{"fullscreen", "0", "Toggle fullscreen"},
 		{"fullscreen", "1", "Toggle maximization"},
 		{"fullscreen", "2", "Toggle fullscreen on Hyprland's side"},
-		{"fakefullscreen", "", "Toggle fake fullscreen"},
 		{"workspace", "+1", "focus right"},
 		{"workspace", "-1", "focus left"},
 		{"workspace", "5", "focus workspace 5"},
@@ -45,7 +59,7 @@ func TestHyprlandAutogenerateComment(t *testing.T) {
 		{"movetoworkspace", "-1", "move to left workspace (non-silent)"},
 		{"movetoworkspace", "3", "move to workspace 3 (non-silent)"},
 		{"movetoworkspacesilent", "+1", "move to right workspace"},
-		{"movetoworkspacesilent", "-1", "move to right workspace"},
+		{"movetoworkspacesilent", "-1", "move to left workspace"},
 		{"movetoworkspacesilent", "2", "move to workspace 2"},
 		{"togglespecialworkspace", "", "toggle special"},
 		{"exec", "firefox", "firefox"},
@@ -101,6 +115,11 @@ func TestHyprlandLuaBindRoundTripHelpers(t *testing.T) {
 		{`hl.dsp.dpms({ action = "toggle" })`, "dpms", "toggle"},
 		{`hl.dsp.workspace.rename({ workspace = "1", name = "work" })`, "renameworkspace", "1 work"},
 		{`hl.dsp.no_op()`, "hl.dsp.no_op()", ""},
+		{`hl.dsp.exec_cmd(terminal)`, "hl.dsp.exec_cmd(terminal)", ""},
+		{`hl.dsp.window.fullscreen({ mode = "maximized", action = "unset" })`, "fullscreen", "1 unset"},
+		{`hl.dsp.dpms({ action = "disable", monitor = "DP-1" })`, "dpms", "off DP-1"},
+		{`hl.dsp.dpms({ monitor = "DP-1" })`, "dpms", "toggle DP-1"},
+		{`hl.dsp.release_input_capture()`, "releaseinputcapture", ""},
 	}
 
 	for _, tt := range tests {
@@ -160,21 +179,16 @@ hl.bind("SUPER + U", hl.dsp.no_op(), { description = "Custom Lua" })`
 	}
 }
 
-func TestWriteLuaBindLineQuotesUnrecognizedActionWithoutRawLuaFlag(t *testing.T) {
+func TestWriteLuaBindLineCommentsOutUnrecognizedAction(t *testing.T) {
 	var sb strings.Builder
 	writeLuaBindLine(&sb, &hyprlandOverrideBind{
 		Key:    "Super+u",
-		Action: `customdispatcher "),os.execute("id")--`,
+		Action: "customdispatcher x\nos.execute(\"id\")",
 	})
 
-	got := sb.String()
-	if !strings.Contains(got, "hl.exec_cmd(") {
-		t.Fatalf("expected unrecognized action to go through the hyprctl-dispatch wrapper, got %q", got)
-	}
-	// an unpaired bare quote means the action broke out of its string literal
-	withoutEscapedQuotes := strings.ReplaceAll(got, `\"`, "")
-	if n := strings.Count(withoutEscapedQuotes, `"`); n%2 != 0 {
-		t.Fatalf("action broke out of its string literal (%d unpaired quotes): %q", n, got)
+	got := strings.TrimSuffix(sb.String(), "\n")
+	if strings.Contains(got, "\n") || !strings.HasPrefix(got, "-- ") {
+		t.Fatalf("expected a single comment line, got %q", got)
 	}
 }
 
@@ -208,48 +222,98 @@ func TestLuaActionStringFromHyprlangActionUsesNativeDispatchers(t *testing.T) {
 		{"bringactivetotop", `hl.dsp.window.bring_to_top()`},
 		{"toggleswallow", `hl.dsp.window.toggle_swallow()`},
 		{"forceidle 300", `hl.dsp.force_idle(300)`},
+		{"splitratio +0.1", `hl.dsp.layout("splitratio +0.1")`},
+		{"splitratio exact 0.5", `hl.dsp.layout("splitratio 0.5 exact")`},
+		{"fullscreen 0 set", `hl.dsp.window.fullscreen({ mode = "fullscreen", action = "set" })`},
+		{"fullscreen 1 unset", `hl.dsp.window.fullscreen({ mode = "maximized", action = "unset" })`},
+		{"fullscreen", `hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" })`},
+		{"releaseinputcapture", `hl.dsp.release_input_capture()`},
+		{"dpms off DP-1", `hl.dsp.dpms({ action = "disable", monitor = "DP-1" })`},
+		{"pseudo", `hl.dsp.window.pseudo({ action = "toggle" })`},
+		{"moveintoorcreategroup l", `hl.dsp.window.move({ into_or_create_group = "l" })`},
+		{"layoutmsg swapsplit", `hl.dsp.layout("swapsplit")`},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.action, func(t *testing.T) {
-			got := luaActionStringFromHyprlangAction(tt.action)
-			if got != tt.want {
-				t.Fatalf("luaActionStringFromHyprlangAction(%q) = %q, want %q", tt.action, got, tt.want)
+			got, ok := luaActionStringFromHyprlangAction(tt.action)
+			if !ok || got != tt.want {
+				t.Fatalf("luaActionStringFromHyprlangAction(%q) = %q, %v; want %q", tt.action, got, ok, tt.want)
 			}
-			if strings.Contains(got, "hyprctl dispatch") {
-				t.Fatalf("expected native Lua dispatcher, got legacy dispatch wrapper: %q", got)
+			// each mapping must parse back to the same action
+			if again, _ := luaActionStringFromHyprlangAction(strings.Join(nonEmpty(luaExprToDispatcherParams(got)), " ")); again != got {
+				t.Fatalf("round trip of %q produced %q", got, again)
 			}
 		})
 	}
 }
 
-func TestLuaActionStringFallsBackForUnsupportedResizePercentages(t *testing.T) {
-	got := luaActionStringFromHyprlangAction("resizeactive exact 100% 100%")
-	want := `function() hl.exec_cmd("hyprctl dispatch resizeactive exact 100% 100%") end`
-	if got != want {
-		t.Fatalf("luaActionStringFromHyprlangAction() = %q, want %q", got, want)
+func nonEmpty(values ...string) []string {
+	out := values[:0]
+	for _, v := range values {
+		if v != "" {
+			out = append(out, v)
+		}
+	}
+	return out
+}
+
+func TestHyprlandRejectsActionsWithoutLuaDispatcher(t *testing.T) {
+	actions := []string{
+		"resizeactive exact 100% 100%",
+		"fakefullscreen",
+		"focuswindowbyclass kitty",
+		"togglesplit",
+		"swapsplit",
+		"workspaceopt allfloat",
+		"setignoregrouplock on",
+		"fullscreen 2",
+		"pass",
+		"customdispatcher arg",
+	}
+	p := NewHyprlandProvider(t.TempDir())
+	for _, action := range actions {
+		t.Run(action, func(t *testing.T) {
+			if got, ok := luaActionStringFromHyprlangAction(action); ok {
+				t.Fatalf("luaActionStringFromHyprlangAction(%q) = %q, want no mapping", action, got)
+			}
+			if err := p.validateAction(action); err == nil {
+				t.Fatalf("validateAction(%q) = nil, want error", action)
+			}
+		})
+	}
+	for _, action := range []string{"hl.dsp.no_op()", "splitratio -0.1"} {
+		if err := p.validateAction(action); err != nil {
+			t.Fatalf("validateAction(%q) = %v, want nil", action, err)
+		}
 	}
 }
 
-func TestParseLuaBindLineHandlesFunctionDispatcherFallback(t *testing.T) {
-	line := `hl.bind("SUPER + R", function() hl.exec_cmd("hyprctl dispatch resizeactive exact 100% 100%") end, { description = "Unsupported Resize" })`
+func TestParseLuaBindLineKeepsUnmappableDispatchWrapperVerbatim(t *testing.T) {
+	expr := `function() hl.exec_cmd("hyprctl dispatch resizeactive exact 100% 100%") end`
+	line := `hl.bind("SUPER + R", ` + expr + `, { description = "Unsupported Resize" })`
 	got, ok := parseLuaBindOverrideLine(line)
 	if !ok {
 		t.Fatalf("expected line to parse")
 	}
-	if got.Action != "resizeactive exact 100% 100%" {
-		t.Fatalf("Action = %q, want resizeactive exact 100%% 100%%", got.Action)
+	if got.Action != expr || !got.RawLuaAction {
+		t.Fatalf("Action = %q (raw %v), want verbatim %q", got.Action, got.RawLuaAction, expr)
 	}
 	if got.Description != "Unsupported Resize" {
 		t.Fatalf("Description = %q, want Unsupported Resize", got.Description)
 	}
 }
 
-func TestLuaActionStringFromHyprlangActionAlwaysQuotesUnrecognizedText(t *testing.T) {
-	got := luaActionStringFromHyprlangAction("hl.dsp.no_op()")
-	want := `function() hl.exec_cmd("hyprctl dispatch hl.dsp.no_op()") end`
-	if got != want {
-		t.Fatalf("luaActionStringFromHyprlangAction() = %q, want %q", got, want)
+func TestParseLuaBindLineUpgradesMappableDispatchWrapper(t *testing.T) {
+	line := `hl.bind("SUPER + O", function() hl.exec_cmd("hyprctl dispatch splitratio +0.1") end)`
+	got, ok := parseLuaBindOverrideLine(line)
+	if !ok {
+		t.Fatalf("expected line to parse")
+	}
+	var sb strings.Builder
+	writeLuaBindLine(&sb, got)
+	if !strings.Contains(sb.String(), `hl.bind("SUPER + O", hl.dsp.layout("splitratio +0.1"))`) {
+		t.Fatalf("expected native layout dispatcher, got %q", sb.String())
 	}
 }
 
@@ -441,25 +505,6 @@ func TestHyprlandRemoveBindWritesNegativeOverrideForDefault(t *testing.T) {
 	}
 	if strings.Contains(string(data), `hl.bind("SUPER + I"`) {
 		t.Fatalf("expected NO hl.bind for SUPER+I, got:\n%s", string(data))
-	}
-}
-
-func TestHyprlandSetBindLeavesConfOnlyInstallReadOnly(t *testing.T) {
-	tmpDir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.conf"), []byte("bind = SUPER, T, exec, kitty\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	provider := NewHyprlandProvider(tmpDir)
-	err := provider.SetBind("SUPER+N", "workspace 1", "Workspace 1", nil)
-	if err == nil {
-		t.Fatal("expected SetBind to reject conf-only Hyprland config")
-	}
-	if !strings.Contains(err.Error(), "read-only") {
-		t.Fatalf("expected read-only error, got %v", err)
-	}
-	if _, err := os.Stat(filepath.Join(tmpDir, "dms", "binds-user.lua")); !os.IsNotExist(err) {
-		t.Fatalf("expected no Lua override to be created for conf-only config, stat err=%v", err)
 	}
 }
 
@@ -719,6 +764,98 @@ hl.bind("SUPER + Z", hl.dsp.exec_cmd("custom"))`,
 	}
 	if foundZ.HasDefault {
 		t.Fatalf("expected SUPER+Z HasDefault=false (no default), got %+v", foundZ)
+	}
+}
+
+func TestHyprlandBindFlagsRoundTrip(t *testing.T) {
+	tests := []struct {
+		flag string
+		opt  string
+	}{
+		{"l", "locked = true"},
+		{"e", "repeating = true"},
+		{"r", "release = true"},
+		{"n", "non_consuming = true"},
+		{"m", "mouse = true"},
+		{"t", "transparent = true"},
+		{"i", "ignore_mods = true"},
+		{"o", "long_press = true"},
+		{"u", "submap_universal = true"},
+		{"a", "auto_consuming = true"},
+		{"x", "allow_input_capture = true"},
+		{"p", "dont_inhibit = true"},
+		{"c", "click = true"},
+		{"g", "drag = true"},
+		{"k", `device = { inclusive = false, list = { "my-kb", "other" } }`},
+	}
+	for _, tt := range tests {
+		t.Run(tt.flag, func(t *testing.T) {
+			line := `hl.bind("SUPER + X", hl.dsp.window.close(), { ` + tt.opt + ` })`
+			kb, ok := parseLuaBindOverrideLine(line)
+			if !ok {
+				t.Fatalf("parse failed for %q", line)
+			}
+			if kb.Flags != tt.flag {
+				t.Fatalf("Flags = %q, want %q", kb.Flags, tt.flag)
+			}
+			var sb strings.Builder
+			writeLuaBindLine(&sb, kb)
+			if !strings.Contains(sb.String(), line) {
+				t.Fatalf("rewrite = %q, want it to contain %q", sb.String(), line)
+			}
+		})
+	}
+}
+
+func TestHyprlandSetBindKeepsDeviceTable(t *testing.T) {
+	tmpDir := t.TempDir()
+	dmsDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	device := `device = { inclusive = true, list = { "my-kb" } }`
+	if err := os.WriteFile(filepath.Join(dmsDir, "binds-user.lua"), []byte(`hl.bind("SUPER + X", hl.dsp.window.close(), { `+device+` })`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := NewHyprlandProvider(tmpDir).SetBind("SUPER+X", "togglefloating", "", map[string]any{"flags": "k"}); err != nil {
+		t.Fatal(err)
+	}
+	if got := readFile(t, filepath.Join(dmsDir, "binds-user.lua")); !strings.Contains(got, device) {
+		t.Fatalf("expected device table to survive the edit, got:\n%s", got)
+	}
+}
+
+func TestHyprlandSetBindKeepsMainConfigDeviceTable(t *testing.T) {
+	tmpDir := t.TempDir()
+	device := `device = { list = { "my-kb" } }`
+	main := `hl.bind("SUPER + X", hl.dsp.window.close(), { ` + device + ` })` + "\n"
+	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.lua"), []byte(main), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := NewHyprlandProvider(tmpDir).SetBind("SUPER+X", "togglefloating", "", map[string]any{"flags": "k"}); err != nil {
+		t.Fatal(err)
+	}
+	if got := readFile(t, filepath.Join(tmpDir, "dms", "binds-user.lua")); !strings.Contains(got, device) {
+		t.Fatalf("expected the main config device table on the override, got:\n%s", got)
+	}
+}
+
+func TestHyprlandSetBindLeavesConfOnlyInstallReadOnly(t *testing.T) {
+	tmpDir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.conf"), []byte("bind = SUPER, T, exec, kitty\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	provider := NewHyprlandProvider(tmpDir)
+	err := provider.SetBind("SUPER+N", "workspace 1", "Workspace 1", nil)
+	if err == nil {
+		t.Fatal("expected SetBind to reject conf-only Hyprland config")
+	}
+	if !strings.Contains(err.Error(), "read-only") {
+		t.Fatalf("expected read-only error, got %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(tmpDir, "dms", "binds-user.lua")); !os.IsNotExist(err) {
+		t.Fatalf("expected no Lua override to be created for conf-only config, stat err=%v", err)
 	}
 }
 
@@ -1073,17 +1210,24 @@ func TestExtractBindFlags(t *testing.T) {
 		{"bindem", "em"},
 		{"  bind  ", ""},
 		{"  binde  ", "e"},
-		{"notbind", ""},
-		{"", ""},
+		{"bindkd", "kd"},
+		{"bindux", "ux"},
+		{"bindpcg", "pcg"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.bindType, func(t *testing.T) {
-			result := extractBindFlags(tt.bindType)
-			if result != tt.expected {
-				t.Errorf("extractBindFlags(%q) = %q, want %q", tt.bindType, result, tt.expected)
+			result, ok := extractBindFlags(tt.bindType)
+			if !ok || result != tt.expected {
+				t.Errorf("extractBindFlags(%q) = %q, %v, want %q", tt.bindType, result, ok, tt.expected)
 			}
 		})
+	}
+
+	for _, bindType := range []string{"notbind", "", "bindq", "binds:allow_workspace_cycles"} {
+		if flags, ok := extractBindFlags(bindType); ok {
+			t.Errorf("extractBindFlags(%q) = %q, want rejected", bindType, flags)
+		}
 	}
 }
 
@@ -1151,6 +1295,30 @@ func TestHyprlandBindFlags(t *testing.T) {
 			expectedKey:   "XF86AudioRaiseVolume",
 			expectedDisp:  "exec",
 			expectedDesc:  "wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+",
+		},
+		{
+			name:          "bindk (per-device)",
+			line:          "bindk = SUPER, Q, at-translated-set-2-keyboard, killactive",
+			expectedFlags: "k",
+			expectedKey:   "Q",
+			expectedDisp:  "killactive",
+			expectedDesc:  "Close window",
+		},
+		{
+			name:          "binddk (device before description)",
+			line:          "binddk = SUPER, T, !my-macropad, Terminal, exec, kitty",
+			expectedFlags: "dk",
+			expectedKey:   "T",
+			expectedDisp:  "exec",
+			expectedDesc:  "Terminal",
+		},
+		{
+			name:          "bindux (submap-universal, input capture)",
+			line:          "bindux = SUPER, Escape, submap, reset",
+			expectedFlags: "ux",
+			expectedKey:   "Escape",
+			expectedDisp:  "submap",
+			expectedDesc:  "",
 		},
 	}
 

@@ -4,7 +4,7 @@ import qs.Widgets
 import "../utils/widgets.js" as WidgetUtils
 import qs.Modules.ControlCenter
 
-DankGridEditChrome {
+DGridEditChrome {
     id: root
 
     property var widgetData: ({})
@@ -12,6 +12,7 @@ DankGridEditChrome {
     signal configRequested(var anchor)
 
     hasOptions: WidgetUtils.hasOptions(widgetData.id)
+    removable: WidgetUtils.isRemovable(widgetData)
     buttonSize: Theme.iconSize
     hitOverflow: CcMetrics.gridGap / 2
     iconSize: PopoutMetrics.chromeIconSize

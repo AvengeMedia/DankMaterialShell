@@ -6,7 +6,7 @@ import qs.Modals.Clipboard
 import qs.Modals.Common
 import qs.Services
 
-DankModal {
+DModal {
     id: clipboardHistoryModal
 
     layerNamespace: "dms:clipboard"

@@ -35,8 +35,7 @@
       "wallpapers"
     ],
     "page": "personalization",
-    "description": "DMS stops drawing wallpapers on every display",
-    "conditionKey": "isNiri"
+    "description": "DMS stops drawing wallpapers on every display"
   },
   {
     "section": "notificationDndAllowCritical",
@@ -152,6 +151,7 @@
       "apps",
       "autostart",
       "default",
+      "defaults",
       "floating",
       "matching",
       "open",
@@ -163,7 +163,8 @@
       "window",
       "windows"
     ],
-    "icon": "apps"
+    "icon": "apps",
+    "description": "Defaults, autostart, rules"
   },
   {
     "section": "aqueousCursor",
@@ -250,18 +251,18 @@
     "keywords": [
       "background",
       "blur",
-      "compositor",
-      "does",
-      "effect",
       "frosted",
       "glass",
       "interface",
+      "passes",
+      "radius",
+      "reach",
+      "size",
+      "strength",
       "style",
-      "support",
       "transparency"
     ],
-    "page": "theme_surfaces",
-    "description": "Your compositor does not support background blur (ext-background-effect-v1)"
+    "page": "theme_surfaces"
   },
   {
     "section": "wallpaperBackgroundColorMode",
@@ -461,53 +462,22 @@
     "tabIndex": -1,
     "category": "Interface style",
     "keywords": [
-      "border",
-      "edge",
-      "interface",
-      "modal",
-      "outline",
-      "popup",
-      "style",
-      "surface"
-    ],
-    "page": "theme_surfaces"
-  },
-  {
-    "section": "blurBorderColor",
-    "label": "Border color",
-    "tabIndex": -1,
-    "category": "Interface style",
-    "keywords": [
+      "around",
       "border",
       "color",
-      "colour",
       "edge",
-      "hue",
       "interface",
       "modal",
+      "modals",
+      "opacity",
       "outline",
       "popup",
-      "style",
-      "surface",
-      "tint"
-    ],
-    "page": "theme_surfaces"
-  },
-  {
-    "section": "blurBorderOpacity",
-    "label": "Border opacity",
-    "tabIndex": -1,
-    "category": "Interface style",
-    "keywords": [
-      "border",
-      "interface",
-      "modal",
-      "opacity",
-      "popup",
+      "popups",
       "style",
       "surface"
     ],
-    "page": "theme_surfaces"
+    "page": "theme_surfaces",
+    "description": "Edge around popups and modals"
   },
   {
     "section": "buttonColorMode",
@@ -672,6 +642,35 @@
       "style"
     ],
     "page": "theme_surfaces"
+  },
+  {
+    "section": "surfaceCorners",
+    "label": "Corners",
+    "tabIndex": -1,
+    "category": "Interface style",
+    "keywords": [
+      "corner",
+      "corners",
+      "fixed",
+      "higher",
+      "increase",
+      "interface",
+      "lower",
+      "material",
+      "radius",
+      "reduce",
+      "round",
+      "rounded",
+      "shape",
+      "shapes",
+      "square",
+      "style",
+      "uses",
+      "values",
+      "window"
+    ],
+    "page": "theme_surfaces",
+    "description": "50 uses Material shapes. Lower values reduce rounding; higher values increase it."
   },
   {
     "section": "notificationHistorySaveCritical",
@@ -843,15 +842,18 @@
     "category": "Date, time & region",
     "keywords": [
       "climate",
+      "clock",
       "date,",
       "forecast",
       "locale",
       "region",
       "temperature",
       "time",
+      "watch",
       "weather"
     ],
-    "icon": "schedule"
+    "icon": "schedule",
+    "description": "Clock, weather, locale"
   },
   {
     "section": "selectedMonitor",
@@ -895,18 +897,23 @@
       "display",
       "displays",
       "gamma",
+      "layout",
+      "mode",
       "monitor",
       "monitors",
+      "night",
       "night light",
       "output",
       "outputs",
       "redshift",
       "resolution",
+      "scale",
       "screen",
       "screens",
       "setup"
     ],
-    "icon": "monitor"
+    "icon": "monitor",
+    "description": "Layout, scale, night mode"
   },
   {
     "section": "doNotDisturb",
@@ -945,27 +952,20 @@
       "advanced",
       "appearance",
       "apps",
-      "auto-hide",
-      "autohide",
       "components",
       "dock",
       "general",
-      "hidden",
-      "hide",
       "launcher bar",
       "modules",
       "panel",
       "pinned",
       "position",
-      "show",
       "taskbar",
       "trash",
-      "visibility",
-      "visible",
       "widgets"
     ],
     "icon": "dock_to_bottom",
-    "description": "Visibility, position, pinned apps, trash"
+    "description": "Position, pinned apps, trash"
   },
   {
     "section": "dockConfiguration",
@@ -1043,22 +1043,29 @@
     "category": "Interface style",
     "keywords": [
       "authentication",
+      "compositor",
+      "decorate",
       "floating",
       "foreground",
       "interface",
+      "lets",
       "notepad",
       "opacity",
+      "open",
       "override",
       "polkit",
+      "reopened",
       "settings",
       "style",
       "tile",
       "tiling",
       "transparency",
+      "update",
       "window",
       "windows"
     ],
-    "page": "theme_surfaces"
+    "page": "theme_surfaces",
+    "description": "Off lets the compositor decorate DMS windows. Open windows update when reopened."
   },
   {
     "section": "focusRingEnabled",
@@ -1107,8 +1114,6 @@
     "tabIndex": -1,
     "category": "Interface style",
     "keywords": [
-      "background",
-      "backing",
       "blur",
       "cards",
       "contrast",
@@ -1116,15 +1121,13 @@
       "frosted",
       "glass",
       "interface",
-      "keep",
       "layers",
+      "opacity",
       "style",
       "surface",
-      "their",
-      "tiles"
+      "transparency"
     ],
-    "page": "theme_surfaces",
-    "description": "With background blur on, cards and tiles keep their own backing"
+    "page": "theme_surfaces"
   },
   {
     "section": "floatingWindowForegroundLayers",
@@ -1140,7 +1143,9 @@
       "glass",
       "interface",
       "layers",
+      "opacity",
       "style",
+      "transparency",
       "window"
     ],
     "page": "theme_surfaces"
@@ -1168,41 +1173,6 @@
       "toast"
     ],
     "page": "notifications"
-  },
-  {
-    "section": "floatingWindowForegroundTransparency",
-    "label": "Foreground opacity",
-    "tabIndex": -1,
-    "category": "Interface style",
-    "keywords": [
-      "cards",
-      "floating",
-      "foreground",
-      "interface",
-      "layers",
-      "opacity",
-      "style",
-      "transparency",
-      "window"
-    ],
-    "page": "theme_surfaces"
-  },
-  {
-    "section": "foregroundLayerTransparency",
-    "label": "Foreground opacity",
-    "tabIndex": -1,
-    "category": "Interface style",
-    "keywords": [
-      "cards",
-      "contrast",
-      "foreground",
-      "interface",
-      "layers",
-      "opacity",
-      "style",
-      "transparency"
-    ],
-    "page": "theme_surfaces"
   },
   {
     "section": "cursorHideOnTouch",
@@ -1253,7 +1223,7 @@
       "wallpaper"
     ],
     "page": "personalization",
-    "conditionKey": "isNiri"
+    "conditionKey": "isHyprlandOrNiri"
   },
   {
     "section": "notificationHistory",
@@ -1321,6 +1291,37 @@
     ],
     "page": "dankbar_widgets",
     "icon": "view_in_ar"
+  },
+  {
+    "section": "materialSeedHue",
+    "label": "Hue",
+    "tabIndex": -1,
+    "category": "Wallpaper & colors",
+    "keywords": [
+      "around",
+      "background",
+      "bg",
+      "color",
+      "colors",
+      "colour",
+      "colours",
+      "cool",
+      "desktop",
+      "fine",
+      "hue",
+      "image",
+      "material",
+      "palette",
+      "picture",
+      "seed",
+      "tint",
+      "tune",
+      "wallpaper",
+      "warm",
+      "wheel"
+    ],
+    "page": "personalization",
+    "description": "Fine-tune the seed around the color wheel"
   },
   {
     "section": "controlCenterIconScale",
@@ -1409,21 +1410,26 @@
       "shortcuts",
       "touchpad"
     ],
-    "icon": "keyboard"
+    "icon": "keyboard",
+    "description": "Shortcuts, keyboard, mouse"
   },
   {
-    "section": "blurLayerOutlineOpacity",
-    "label": "Layer outline opacity",
+    "section": "blurLayerOutline",
+    "label": "Layer outline",
     "tabIndex": -1,
     "category": "Interface style",
     "keywords": [
       "border",
       "cards",
+      "components",
       "control center",
+      "edge",
+      "faint",
       "foreground",
       "interface",
       "layer",
       "layers",
+      "modules",
       "notifications",
       "opacity",
       "outline",
@@ -1431,7 +1437,8 @@
       "style",
       "widgets"
     ],
-    "page": "theme_surfaces"
+    "page": "theme_surfaces",
+    "description": "Faint edge on cards, pills and widgets"
   },
   {
     "section": "dockPlacement",
@@ -1486,6 +1493,30 @@
     "description": "Requires restart"
   },
   {
+    "section": "lockNotificationsMode",
+    "label": "Lock screen content",
+    "tabIndex": -1,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "alerts",
+      "content",
+      "lock",
+      "lockscreen",
+      "login",
+      "messages",
+      "notif",
+      "notification",
+      "notifications",
+      "notifs",
+      "privacy",
+      "screen",
+      "security",
+      "toast"
+    ],
+    "page": "notifications"
+  },
+  {
     "section": "notificationHistorySaveLow",
     "label": "Low",
     "tabIndex": -1,
@@ -1528,26 +1559,34 @@
     "page": "notifications"
   },
   {
-    "section": "windowRadiusMatch",
-    "label": "Match corner style",
+    "section": "materialPresets",
+    "label": "Material",
     "tabIndex": -1,
-    "category": "Interface style",
+    "category": "Wallpaper & colors",
     "keywords": [
-      "compositor",
-      "corner",
-      "corners",
-      "follow",
-      "interface",
-      "link",
-      "match",
-      "radius",
-      "round",
-      "rounded",
-      "strength",
-      "style",
-      "window"
+      "background",
+      "bg",
+      "bloom",
+      "colors",
+      "colour",
+      "colours",
+      "dank",
+      "desktop",
+      "dune",
+      "garden",
+      "hue",
+      "image",
+      "material",
+      "orbit",
+      "palette",
+      "petal",
+      "picture",
+      "preset",
+      "shape",
+      "tint",
+      "wallpaper"
     ],
-    "page": "theme_surfaces"
+    "page": "personalization"
   },
   {
     "section": "matugenTargetMonitor",
@@ -1631,6 +1670,7 @@
       "wireless"
     ],
     "icon": "wifi",
+    "description": "Wi-Fi, Ethernet, VPN",
     "conditionKey": "networkAvailable"
   },
   {
@@ -1733,6 +1773,7 @@
     "tabIndex": -1,
     "category": "Interface style",
     "keywords": [
+      "adds",
       "compositor",
       "floating",
       "hyprland",
@@ -1741,12 +1782,15 @@
       "niri",
       "open",
       "rule",
+      "settings",
       "style",
       "tile",
       "tiling",
-      "window"
+      "window",
+      "windows"
     ],
-    "page": "theme_surfaces"
+    "page": "theme_surfaces",
+    "description": "Adds a compositor window rule so DMS windows such as Settings open floating"
   },
   {
     "section": "notificationOverlayEnabled",
@@ -1786,6 +1830,60 @@
       "window"
     ],
     "page": "theme_surfaces"
+  },
+  {
+    "section": "windowRadius",
+    "label": "Override window radius",
+    "tabIndex": -1,
+    "category": "Interface style",
+    "keywords": [
+      "compositor",
+      "corner",
+      "follow",
+      "hyprland",
+      "interface",
+      "link",
+      "mango",
+      "match",
+      "menu",
+      "modal",
+      "niri",
+      "override",
+      "popout",
+      "radius",
+      "rounded",
+      "strength",
+      "style",
+      "window"
+    ],
+    "page": "theme_surfaces"
+  },
+  {
+    "section": "paletteStyleNav",
+    "label": "Palette style",
+    "tabIndex": -1,
+    "category": "Wallpaper & colors",
+    "keywords": [
+      "background",
+      "bg",
+      "colors",
+      "colour",
+      "colours",
+      "desktop",
+      "expressive",
+      "hue",
+      "image",
+      "matugen",
+      "neutral",
+      "palette",
+      "picture",
+      "scheme",
+      "style",
+      "tint",
+      "vibrant",
+      "wallpaper"
+    ],
+    "page": "personalization"
   },
   {
     "section": "pluginManagerUnavailable",
@@ -2020,6 +2118,31 @@
     "icon": "lock"
   },
   {
+    "section": "materialSeedColor",
+    "label": "Seed color",
+    "tabIndex": -1,
+    "category": "Wallpaper & colors",
+    "keywords": [
+      "background",
+      "bg",
+      "color",
+      "colors",
+      "colour",
+      "colours",
+      "desktop",
+      "hue",
+      "image",
+      "material",
+      "palette",
+      "picture",
+      "seed",
+      "tint",
+      "wallpaper"
+    ],
+    "page": "personalization",
+    "icon": "colorize"
+  },
+  {
     "section": "perModeWallpaper",
     "label": "Separate light and dark",
     "tabIndex": -1,
@@ -2226,31 +2349,33 @@
     "category": "Interface style",
     "keywords": [
       "background",
-      "backing",
       "blur",
       "cards",
+      "components",
       "corner",
+      "edge",
       "elevation",
+      "faint",
       "foreground",
       "frosted",
       "glass",
       "interface",
-      "keep",
       "layers",
       "modal",
+      "modules",
       "opacity",
+      "pills",
       "popup",
       "radius",
       "shadow",
       "style",
       "surface",
       "surfaces",
-      "their",
-      "tiles",
-      "transparency"
+      "transparency",
+      "widgets"
     ],
     "page": "theme_surfaces",
-    "description": "With background blur on, cards and tiles keep their own backing"
+    "description": "Faint edge on cards, pills and widgets"
   },
   {
     "section": "_hub_system",
@@ -2276,7 +2401,8 @@
       "system",
       "updates"
     ],
-    "icon": "memory"
+    "icon": "memory",
+    "description": "Updates, clipboard, %1"
   },
   {
     "section": "themeNav",
@@ -2307,6 +2433,42 @@
       "wallpaper"
     ],
     "page": "personalization"
+  },
+  {
+    "section": "materialSeed",
+    "label": "Theme color",
+    "tabIndex": -1,
+    "category": "Wallpaper & colors",
+    "keywords": [
+      "appearance",
+      "around",
+      "background",
+      "bg",
+      "color",
+      "colors",
+      "colour",
+      "colours",
+      "desktop",
+      "dynamic",
+      "fine",
+      "hue",
+      "image",
+      "look",
+      "material",
+      "matugen",
+      "palette",
+      "picture",
+      "seed",
+      "style",
+      "theme",
+      "tint",
+      "tune",
+      "wallpaper",
+      "wheel"
+    ],
+    "page": "personalization",
+    "icon": "colorize",
+    "description": "Fine-tune the seed around the color wheel"
   },
   {
     "section": "focusRingWidth",
@@ -2390,6 +2552,39 @@
       "toast"
     ],
     "page": "notifications"
+  },
+  {
+    "section": "floatingWindowTitleBars",
+    "label": "Title bars",
+    "tabIndex": -1,
+    "category": "Interface style",
+    "keywords": [
+      "bar",
+      "bars",
+      "compositor",
+      "controls",
+      "csd",
+      "decorate",
+      "decoration",
+      "floating",
+      "header",
+      "interface",
+      "kwin",
+      "lets",
+      "open",
+      "panel",
+      "reopened",
+      "statusbar",
+      "style",
+      "taskbar",
+      "title",
+      "topbar",
+      "update",
+      "window",
+      "windows"
+    ],
+    "page": "theme_surfaces",
+    "description": "Off lets the compositor decorate DMS windows. Open windows update when reopened."
   },
   {
     "section": "wallpaperTransition",
@@ -2489,28 +2684,6 @@
     "description": "Theme colors come from this display's wallpaper"
   },
   {
-    "section": "windowRadius",
-    "label": "Window radius",
-    "tabIndex": -1,
-    "category": "Interface style",
-    "keywords": [
-      "compositor",
-      "corner",
-      "hyprland",
-      "interface",
-      "mango",
-      "menu",
-      "modal",
-      "niri",
-      "popout",
-      "radius",
-      "rounded",
-      "style",
-      "window"
-    ],
-    "page": "theme_surfaces"
-  },
-  {
     "section": "blurXrayLink",
     "label": "Xray options are in Compositor → Layout",
     "tabIndex": -1,
@@ -2525,7 +2698,7 @@
       "xray"
     ],
     "page": "theme_surfaces",
-    "conditionKey": "isNiri"
+    "conditionKey": "isHyprlandOrNiri"
   },
   {
     "section": "_hub_personalization",
@@ -2561,7 +2734,8 @@
       "tint",
       "wallpaper"
     ],
-    "icon": "wallpaper"
+    "icon": "wallpaper",
+    "description": "Theme, palette, dark mode"
   },
   {
     "section": "clockDateFormat",
@@ -2953,6 +3127,7 @@
       "auto-hide",
       "autohide",
       "bar",
+      "delay",
       "general",
       "hide",
       "intellihide",
@@ -3033,6 +3208,40 @@
     "conditionKey": "islandEnabled"
   },
   {
+    "section": "islandChargingPulse",
+    "label": "Charging",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "battery",
+      "briefly",
+      "charge",
+      "charging",
+      "connected",
+      "general",
+      "hibernate",
+      "island",
+      "panel",
+      "plugged",
+      "power",
+      "pulse",
+      "reboot",
+      "removed",
+      "restart",
+      "show",
+      "shutdown",
+      "sleep",
+      "statusbar",
+      "suspend",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "description": "Show the battery briefly when power is connected or removed",
+    "conditionKey": "islandEnabled"
+  },
+  {
     "section": "islandNotificationBadgeClearOnOpen",
     "label": "Clear badge on open",
     "tabIndex": 3,
@@ -3055,6 +3264,37 @@
     ],
     "parentLabel": "Bar",
     "conditionKey": "islandEnabled"
+  },
+  {
+    "section": "barMouseClickAction",
+    "label": "Click actions",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "actions",
+      "anchored",
+      "bar",
+      "click",
+      "control center",
+      "cursor",
+      "general",
+      "launcher",
+      "middle",
+      "mouse",
+      "open",
+      "panel",
+      "popouts",
+      "right",
+      "settings",
+      "statusbar",
+      "taskbar",
+      "their",
+      "topbar",
+      "widget"
+    ],
+    "parentLabel": "Bar",
+    "icon": "mouse",
+    "description": "Anchored popouts open at the cursor instead of their widget"
   },
   {
     "section": "barClickThrough",
@@ -3227,7 +3467,7 @@
       "topbar"
     ],
     "parentLabel": "Bar",
-    "conditionKey": "islandEnabled"
+    "conditionKey": "islandFree"
   },
   {
     "section": "barExclusiveZone",
@@ -3324,6 +3564,34 @@
     ],
     "parentLabel": "Bar",
     "conditionKey": "frameEnabled"
+  },
+  {
+    "section": "barClickActionFollowMouse",
+    "label": "Follow mouse",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "anchor",
+      "anchored",
+      "bar",
+      "click",
+      "cursor",
+      "follow",
+      "general",
+      "mouse",
+      "open",
+      "panel",
+      "popout",
+      "popouts",
+      "position",
+      "statusbar",
+      "taskbar",
+      "their",
+      "topbar",
+      "widget"
+    ],
+    "parentLabel": "Bar",
+    "description": "Anchored popouts open at the cursor instead of their widget"
   },
   {
     "section": "frameEnabled",
@@ -3585,6 +3853,35 @@
     "conditionKey": "islandEnabled"
   },
   {
+    "section": "barMiddleClickAction",
+    "label": "Middle click",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "choose",
+      "click",
+      "clicking",
+      "close",
+      "control center",
+      "does",
+      "empty",
+      "general",
+      "launcher",
+      "middle",
+      "mouse",
+      "panel",
+      "settings",
+      "space",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "what"
+    ],
+    "parentLabel": "Bar",
+    "description": "Choose what middle-clicking empty bar space does"
+  },
+  {
     "section": "islandMotion",
     "label": "Motion",
     "tabIndex": 3,
@@ -3596,7 +3893,6 @@
       "island",
       "motion",
       "panel",
-      "reduce",
       "spring",
       "statusbar",
       "taskbar",
@@ -3730,7 +4026,7 @@
       "vertical"
     ],
     "parentLabel": "Bar",
-    "conditionKey": "islandEnabled"
+    "conditionKey": "islandFree"
   },
   {
     "section": "islandOuterGap",
@@ -3752,7 +4048,7 @@
       "topbar"
     ],
     "parentLabel": "Bar",
-    "conditionKey": "islandEnabled"
+    "conditionKey": "islandDocked"
   },
   {
     "section": "islandPlacement",
@@ -3805,28 +4101,6 @@
     "icon": "vertical_align_center"
   },
   {
-    "section": "islandReducedMotion",
-    "label": "Reduce motion",
-    "tabIndex": 3,
-    "category": "General",
-    "keywords": [
-      "accessibility",
-      "animation",
-      "bar",
-      "general",
-      "island",
-      "motion",
-      "panel",
-      "reduce",
-      "spring",
-      "statusbar",
-      "taskbar",
-      "topbar"
-    ],
-    "parentLabel": "Bar",
-    "conditionKey": "islandEnabled"
-  },
-  {
     "section": "islandReserveThickness",
     "label": "Reserved width",
     "tabIndex": 3,
@@ -3848,7 +4122,36 @@
       "width"
     ],
     "parentLabel": "Bar",
-    "conditionKey": "islandEnabled"
+    "conditionKey": "islandDocked"
+  },
+  {
+    "section": "barRightClickAction",
+    "label": "Right click",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "choose",
+      "click",
+      "clicking",
+      "close",
+      "control center",
+      "does",
+      "empty",
+      "general",
+      "launcher",
+      "mouse",
+      "panel",
+      "right",
+      "settings",
+      "space",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "what"
+    ],
+    "parentLabel": "Bar",
+    "description": "Choose what right-clicking empty bar space does"
   },
   {
     "section": "barScrollWheel",
@@ -4039,6 +4342,32 @@
     "description": "Hides even while a bar popout or menu is open"
   },
   {
+    "section": "islandNotch",
+    "label": "Style",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "attached",
+      "bar",
+      "corners",
+      "edge",
+      "flush",
+      "general",
+      "island",
+      "macbook",
+      "notch",
+      "panel",
+      "pill",
+      "shape",
+      "statusbar",
+      "style",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "islandDocked"
+  },
+  {
     "section": "frameModeSelector",
     "label": "Surfaces",
     "tabIndex": 3,
@@ -4108,12 +4437,16 @@
     "keywords": [
       "bar",
       "brightness",
+      "caps lock",
       "general",
+      "idle inhibitor",
       "island",
       "level",
+      "microphone",
       "osd",
       "osds",
       "panel",
+      "power profile",
       "standard",
       "statusbar",
       "taskbar",
@@ -4173,7 +4506,7 @@
       "vertical"
     ],
     "parentLabel": "Bar",
-    "conditionKey": "islandEnabled"
+    "conditionKey": "islandDocked"
   },
   {
     "section": "barVisibility",
@@ -4184,6 +4517,7 @@
       "auto-hide",
       "autohide",
       "bar",
+      "delay",
       "even",
       "general",
       "hidden",
@@ -4273,7 +4607,8 @@
       "panel",
       "taskbar"
     ],
-    "parentLabel": "Dock"
+    "parentLabel": "Dock",
+    "conditionKey": "dockEnabled"
   },
   {
     "section": "dockDisplays",
@@ -4340,7 +4675,8 @@
       "widgets"
     ],
     "parentLabel": "Dock",
-    "icon": "edit"
+    "icon": "edit",
+    "conditionKey": "dockEnabled"
   },
   {
     "section": "dockLayout",
@@ -4379,7 +4715,8 @@
       "space",
       "taskbar"
     ],
-    "parentLabel": "Dock"
+    "parentLabel": "Dock",
+    "conditionKey": "dockEnabled"
   },
   {
     "section": "dockSmartAutoHide",
@@ -4435,7 +4772,8 @@
     ],
     "parentLabel": "Dock",
     "icon": "visibility_off",
-    "description": "Hides only while a window overlaps the dock"
+    "description": "Hides only while a window overlaps the dock",
+    "conditionKey": "dockEnabled"
   },
   {
     "section": "barNoBackground",
@@ -4614,61 +4952,6 @@
     "description": "Background, corners, spacing, widget style"
   },
   {
-    "section": "islandBatteryColorMode",
-    "label": "Battery",
-    "tabIndex": 6,
-    "category": "Appearance",
-    "keywords": [
-      "accent",
-      "appearance",
-      "bar",
-      "battery",
-      "charge",
-      "charging",
-      "color",
-      "green",
-      "island",
-      "level",
-      "meter",
-      "panel",
-      "power",
-      "red",
-      "statusbar",
-      "taskbar",
-      "theme",
-      "topbar"
-    ],
-    "parentLabel": "Bar",
-    "conditionKey": "islandEnabled"
-  },
-  {
-    "section": "islandBatteryStyle",
-    "label": "Battery style",
-    "tabIndex": 6,
-    "category": "Appearance",
-    "keywords": [
-      "appearance",
-      "bar",
-      "battery",
-      "charge",
-      "charging",
-      "circle",
-      "gauge",
-      "island",
-      "outline",
-      "panel",
-      "power",
-      "ring",
-      "solid",
-      "statusbar",
-      "style",
-      "taskbar",
-      "topbar"
-    ],
-    "parentLabel": "Bar",
-    "conditionKey": "islandEnabled"
-  },
-  {
     "section": "frameBlurEnabled",
     "label": "Blur",
     "tabIndex": 6,
@@ -4758,25 +5041,29 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "islandHomeCompactTight",
-    "label": "Compact pill",
+    "section": "islandBatteryColorMode",
+    "label": "Color",
     "tabIndex": 6,
     "category": "Appearance",
     "keywords": [
+      "accent",
       "appearance",
       "bar",
-      "clock",
-      "compact",
-      "height",
-      "home",
+      "battery",
+      "color",
+      "colour",
+      "green",
+      "hue",
       "island",
-      "narrow",
+      "level",
+      "meter",
       "panel",
-      "pill",
+      "red",
       "statusbar",
       "taskbar",
-      "topbar",
-      "width"
+      "theme",
+      "tint",
+      "topbar"
     ],
     "parentLabel": "Bar",
     "conditionKey": "islandEnabled"
@@ -4803,33 +5090,7 @@
       "width"
     ],
     "parentLabel": "Bar",
-    "conditionKey": "islandEnabled"
-  },
-  {
-    "section": "islandHomeStatusContent",
-    "label": "Control Center",
-    "tabIndex": 6,
-    "category": "Appearance",
-    "keywords": [
-      "appearance",
-      "bar",
-      "battery",
-      "bluetooth",
-      "center",
-      "compact",
-      "connectivity",
-      "control",
-      "home",
-      "island",
-      "panel",
-      "status",
-      "statusbar",
-      "taskbar",
-      "topbar",
-      "wifi"
-    ],
-    "parentLabel": "Bar",
-    "conditionKey": "islandEnabled"
+    "conditionKey": "islandDocked"
   },
   {
     "section": "barCornerStyle",
@@ -4876,6 +5137,31 @@
       "widget"
     ],
     "parentLabel": "Bar"
+  },
+  {
+    "section": "islandGothCornerRadius",
+    "label": "Custom radius",
+    "tabIndex": 6,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "bar",
+      "corners",
+      "custom",
+      "goth",
+      "island",
+      "notch",
+      "panel",
+      "radius",
+      "satellite",
+      "size",
+      "statusbar",
+      "sweep",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "islandEnabled"
   },
   {
     "section": "barFontScale",
@@ -4935,32 +5221,6 @@
       "taskbar",
       "topbar",
       "widgets"
-    ],
-    "parentLabel": "Bar",
-    "conditionKey": "islandEnabled"
-  },
-  {
-    "section": "islandSatelliteSwoopRadius",
-    "label": "Goth corner radius",
-    "tabIndex": 6,
-    "category": "Appearance",
-    "keywords": [
-      "appearance",
-      "bar",
-      "corner",
-      "corners",
-      "goth",
-      "island",
-      "panel",
-      "radius",
-      "round",
-      "rounded",
-      "satellite",
-      "size",
-      "statusbar",
-      "sweep",
-      "taskbar",
-      "topbar"
     ],
     "parentLabel": "Bar",
     "conditionKey": "islandEnabled"
@@ -5201,6 +5461,7 @@
       "transparency"
     ],
     "parentLabel": "Bar",
+    "description": "Opacity",
     "conditionKey": "islandEnabled"
   },
   {
@@ -5298,6 +5559,7 @@
       "bar",
       "island",
       "left",
+      "opacity",
       "panel",
       "right",
       "satellite",
@@ -5309,6 +5571,7 @@
     ],
     "parentLabel": "Bar",
     "icon": "widgets",
+    "description": "Opacity",
     "conditionKey": "islandEnabled"
   },
   {
@@ -5353,6 +5616,32 @@
     "parentLabel": "Bar"
   },
   {
+    "section": "islandHomeCompactTight",
+    "label": "Size",
+    "tabIndex": 6,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "bar",
+      "clock",
+      "compact",
+      "height",
+      "home",
+      "island",
+      "narrow",
+      "panel",
+      "pill",
+      "size",
+      "statusbar",
+      "taskbar",
+      "tight",
+      "topbar",
+      "width"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "islandEnabled"
+  },
+  {
     "section": "barSpacing",
     "label": "Size & spacing",
     "tabIndex": 6,
@@ -5383,6 +5672,36 @@
     "parentLabel": "Bar",
     "icon": "space_bar",
     "description": "Shortens the bar at both ends"
+  },
+  {
+    "section": "islandHomeStatusContent",
+    "label": "Status",
+    "tabIndex": 6,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "bar",
+      "battery",
+      "bluetooth",
+      "circle",
+      "compact",
+      "connectivity",
+      "duo",
+      "gauge",
+      "home",
+      "island",
+      "outline",
+      "panel",
+      "ring",
+      "solid",
+      "status",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "wifi"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "islandEnabled"
   },
   {
     "section": "barCorners",
@@ -5559,7 +5878,8 @@
       "widgets"
     ],
     "parentLabel": "Bar",
-    "icon": "widgets"
+    "icon": "widgets",
+    "description": "Opacity"
   },
   {
     "section": "frameThickness",
@@ -5894,6 +6214,36 @@
     "icon": "visibility_off"
   },
   {
+    "section": "launcherHistoryEnabled",
+    "label": "History",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "clears",
+      "drawer",
+      "history",
+      "launcher",
+      "menu",
+      "past",
+      "persist",
+      "privacy",
+      "queries",
+      "recent",
+      "record",
+      "save",
+      "start",
+      "start menu",
+      "stored",
+      "turning",
+      "usage",
+      "what"
+    ],
+    "description": "Record app usage and past queries. Turning this off clears what is stored."
+  },
+  {
     "section": "dankLauncherV2IncludeFilesInAll",
     "label": "Include files in All tab",
     "tabIndex": 9,
@@ -5980,13 +6330,12 @@
       "launcher",
       "menu",
       "search",
-      "shortcuts",
       "start",
       "start menu",
       "style"
     ],
     "icon": "grid_view",
-    "description": "Style, shortcuts, search, hidden apps"
+    "description": "Style, search, hidden apps"
   },
   {
     "section": "launcherLaunching",
@@ -6060,7 +6409,8 @@
       "start",
       "start menu",
       "style"
-    ]
+    ],
+    "conditionKey": "isNiri"
   },
   {
     "section": "niriOverviewOverlayEnabled",
@@ -6083,7 +6433,8 @@
       "start menu",
       "typing"
     ],
-    "description": "Typing in the overview opens the launcher"
+    "description": "Typing in the overview opens the launcher",
+    "conditionKey": "isNiri"
   },
   {
     "section": "launcherNiriOverview",
@@ -6539,7 +6890,8 @@
       "wallpaper colors"
     ],
     "parentLabel": "Wallpaper & colors",
-    "description": "Regenerate matugen colors when DMS starts, even if nothing changed."
+    "description": "Regenerate matugen colors when DMS starts, even if nothing changed.",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenSpec",
@@ -6551,13 +6903,9 @@
       "background",
       "bg",
       "bold",
-      "bolder",
       "colors",
       "colour",
       "colours",
-      "dark",
-      "dark mode",
-      "darker",
       "desktop",
       "dynamic",
       "expressive",
@@ -6566,27 +6914,18 @@
       "look",
       "material",
       "matugen",
-      "mode",
-      "neutral",
-      "night",
       "palette",
       "picture",
       "saturated",
       "scheme",
-      "softer",
       "spec",
-      "spot",
       "style",
-      "surfaces",
       "theme",
       "tint",
-      "tonal",
-      "vibrant",
       "vivid",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors",
-    "description": "2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder"
+    "parentLabel": "Wallpaper & colors"
   },
   {
     "section": "matugenScheme",
@@ -6913,26 +7252,6 @@
     "icon": "lock"
   },
   {
-    "section": "lockScreenClockStyle",
-    "label": "Clock style",
-    "tabIndex": 11,
-    "category": "Lock screen",
-    "keywords": [
-      "clock",
-      "lock",
-      "lockscreen",
-      "login",
-      "password",
-      "screen",
-      "security",
-      "style",
-      "time",
-      "vertical",
-      "watch"
-    ],
-    "parentLabel": "Security"
-  },
-  {
     "section": "lockDisplay",
     "label": "Displays",
     "tabIndex": 11,
@@ -6999,33 +7318,6 @@
     "parentLabel": "Security"
   },
   {
-    "section": "lockLayout",
-    "label": "Layout",
-    "tabIndex": 11,
-    "category": "Lock screen",
-    "keywords": [
-      "actions",
-      "appears",
-      "field",
-      "hidden",
-      "layout",
-      "lock",
-      "lockscreen",
-      "login",
-      "password",
-      "power",
-      "pressed",
-      "reboot",
-      "screen",
-      "security",
-      "shutdown",
-      "soon"
-    ],
-    "parentLabel": "Security",
-    "icon": "lock",
-    "description": "A hidden field appears as soon as a key is pressed"
-  },
-  {
     "section": "lockAtStartup",
     "label": "Lock at startup",
     "tabIndex": 11,
@@ -7083,28 +7375,6 @@
     "icon": "lock",
     "parentLabel": "Security",
     "description": "Layout, authentication, screensaver"
-  },
-  {
-    "section": "lockScreenNotificationMode",
-    "label": "Notifications",
-    "tabIndex": 11,
-    "category": "Lock screen",
-    "keywords": [
-      "alert",
-      "alerts",
-      "lock",
-      "lockscreen",
-      "login",
-      "notif",
-      "notification",
-      "notifications",
-      "notifs",
-      "password",
-      "privacy",
-      "screen",
-      "security"
-    ],
-    "parentLabel": "Security"
   },
   {
     "section": "lockScreenVideoEnabled",
@@ -7256,153 +7526,6 @@
     "parentLabel": "Security"
   },
   {
-    "section": "lockScreenShowDate",
-    "label": "Show date",
-    "tabIndex": 11,
-    "category": "Lock screen",
-    "keywords": [
-      "calendar",
-      "date",
-      "display",
-      "lock",
-      "lockscreen",
-      "login",
-      "password",
-      "screen",
-      "security",
-      "show"
-    ],
-    "parentLabel": "Security"
-  },
-  {
-    "section": "lockScreenShowMediaPlayer",
-    "label": "Show media player",
-    "tabIndex": 11,
-    "category": "Lock screen",
-    "keywords": [
-      "audio",
-      "lock",
-      "lockscreen",
-      "login",
-      "media",
-      "mpris",
-      "music",
-      "password",
-      "playback",
-      "player",
-      "screen",
-      "security",
-      "show"
-    ],
-    "parentLabel": "Security"
-  },
-  {
-    "section": "lockScreenShowPasswordField",
-    "label": "Show password field",
-    "tabIndex": 11,
-    "category": "Lock screen",
-    "keywords": [
-      "appears",
-      "field",
-      "hidden",
-      "input",
-      "lock",
-      "lockscreen",
-      "login",
-      "password",
-      "pressed",
-      "screen",
-      "security",
-      "show",
-      "soon",
-      "visible"
-    ],
-    "parentLabel": "Security",
-    "description": "A hidden field appears as soon as a key is pressed"
-  },
-  {
-    "section": "lockScreenShowPowerActions",
-    "label": "Show power actions",
-    "tabIndex": 11,
-    "category": "Lock screen",
-    "keywords": [
-      "actions",
-      "hibernate",
-      "lock",
-      "lockscreen",
-      "login",
-      "password",
-      "power",
-      "reboot",
-      "restart",
-      "screen",
-      "security",
-      "show",
-      "shutdown",
-      "sleep",
-      "suspend"
-    ],
-    "parentLabel": "Security"
-  },
-  {
-    "section": "lockScreenShowProfileImage",
-    "label": "Show profile image",
-    "tabIndex": 11,
-    "category": "Lock screen",
-    "keywords": [
-      "avatar",
-      "image",
-      "lock",
-      "lockscreen",
-      "login",
-      "password",
-      "picture",
-      "profile",
-      "screen",
-      "security",
-      "show"
-    ],
-    "parentLabel": "Security"
-  },
-  {
-    "section": "lockScreenShowSystemIcons",
-    "label": "Show system icons",
-    "tabIndex": 11,
-    "category": "Lock screen",
-    "keywords": [
-      "icons",
-      "lock",
-      "lockscreen",
-      "login",
-      "password",
-      "screen",
-      "security",
-      "show",
-      "status",
-      "system"
-    ],
-    "parentLabel": "Security"
-  },
-  {
-    "section": "lockScreenShowTime",
-    "label": "Show time",
-    "tabIndex": 11,
-    "category": "Lock screen",
-    "keywords": [
-      "clock",
-      "display",
-      "lock",
-      "lockscreen",
-      "login",
-      "password",
-      "screen",
-      "security",
-      "show",
-      "time"
-    ],
-    "parentLabel": "Security"
-  },
-  {
     "section": "lockPamExternallyManaged",
     "label": "Use system PAM authentication",
     "tabIndex": 11,
@@ -7467,23 +7590,25 @@
     "parentLabel": "Security"
   },
   {
-    "section": "lockScreenShowWeather",
-    "label": "Weather",
+    "section": "lockScreenWidgets",
+    "label": "Widgets",
     "tabIndex": 11,
     "category": "Lock screen",
     "keywords": [
-      "climate",
-      "forecast",
+      "clock",
+      "components",
       "lock",
       "lockscreen",
       "login",
+      "modules",
       "password",
+      "plugins",
       "screen",
       "security",
-      "temperature",
-      "weather"
+      "widgets"
     ],
-    "parentLabel": "Security"
+    "parentLabel": "Security",
+    "icon": "widgets"
   },
   {
     "section": "loginctlLockIntegration",
@@ -7587,7 +7712,6 @@
       "fonts",
       "motion",
       "physics",
-      "reduce",
       "ripple",
       "speed",
       "spring",
@@ -7691,17 +7815,14 @@
       "animate",
       "animation",
       "animations",
-      "family",
       "fonts",
       "motion",
       "scale",
-      "speed",
       "text",
-      "transition",
-      "weight"
+      "transition"
     ],
     "icon": "text_fields",
-    "description": "Family, weight, scale, animation speed"
+    "description": "Fonts, scale, animations"
   },
   {
     "section": "modalAnimationDuration",
@@ -8887,6 +9008,29 @@
     "parentLabel": "System & integrations"
   },
   {
+    "section": "systemUpdaterUpgradeInWindow",
+    "label": "Show upgrade in a window",
+    "tabIndex": 20,
+    "category": "Software updates",
+    "keywords": [
+      "floating",
+      "integrations",
+      "live",
+      "log",
+      "opens",
+      "output",
+      "popout",
+      "show",
+      "software",
+      "system",
+      "updates",
+      "upgrade",
+      "window"
+    ],
+    "parentLabel": "System & integrations",
+    "description": "Opens a floating window with the live output"
+  },
+  {
     "section": "_tab_20",
     "label": "Software updates",
     "tabIndex": 20,
@@ -9522,7 +9666,7 @@
     "optionFile": "KeyboardLayoutOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:10",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:13",
     "label": "Advanced",
     "tabIndex": 22,
     "keywords": [],
@@ -9546,7 +9690,7 @@
     "optionFile": "SystemTrayOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:8",
+    "section": "barWidgetOption:IslandOptions.qml:7",
     "label": "Background",
     "tabIndex": 22,
     "keywords": [],
@@ -9565,7 +9709,6 @@
       "configure",
       "modules",
       "panel",
-      "remove",
       "reorder",
       "settings",
       "statusbar",
@@ -9575,7 +9718,7 @@
       "widgets"
     ],
     "icon": "widgets",
-    "description": "Add, remove, reorder and configure"
+    "description": "Add, reorder, configure"
   },
   {
     "section": "barWidgetOption:BatteryOptions.qml:7",
@@ -9594,15 +9737,7 @@
     "optionFile": "BatteryOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:6",
-    "label": "Battery style",
-    "tabIndex": 22,
-    "keywords": [],
-    "runtimeType": "barWidgetOption",
-    "optionFile": "IslandOptions.qml"
-  },
-  {
-    "section": "barWidgetOption:IslandOptions.qml:9",
+    "section": "barWidgetOption:IslandOptions.qml:8",
     "label": "Behavior",
     "tabIndex": 22,
     "keywords": [],
@@ -9642,7 +9777,15 @@
     "optionFile": "PrivacyOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:26",
+    "section": "barWidgetOption:IslandOptions.qml:25",
+    "label": "Charging",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:IslandOptions.qml:27",
     "label": "Clear badge on open",
     "tabIndex": 22,
     "keywords": [],
@@ -9690,6 +9833,14 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:3",
+    "label": "Compact",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "WorkspaceSwitcherOptions.qml"
+  },
+  {
     "section": "barWidgetOption:AppsDockOptions.qml:1",
     "label": "Compact mode",
     "tabIndex": 22,
@@ -9722,20 +9873,20 @@
     "optionFile": "KeyboardLayoutOptions.qml"
   },
   {
+    "section": "barWidgetOption:NetworkMonitorOptions.qml:2",
+    "label": "Compact mode",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "NetworkMonitorOptions.qml"
+  },
+  {
     "section": "barWidgetOption:RunningAppsOptions.qml:1",
     "label": "Compact mode",
     "tabIndex": 22,
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "RunningAppsOptions.qml"
-  },
-  {
-    "section": "barWidgetOption:IslandOptions.qml:7",
-    "label": "Compact pill",
-    "tabIndex": 22,
-    "keywords": [],
-    "runtimeType": "barWidgetOption",
-    "optionFile": "IslandOptions.qml"
   },
   {
     "section": "barWidgetOption:AppsDockOptions.qml:16",
@@ -9754,12 +9905,20 @@
     "optionFile": "LauncherButtonOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:5",
+    "section": "barWidgetOption:IslandOptions.qml:10",
     "label": "Control Center",
     "tabIndex": 22,
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "IslandOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:MusicOptions.qml:4",
+    "label": "Cover art",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "MusicOptions.qml"
   },
   {
     "section": "barWidgetOption:RunningAppsOptions.qml:4",
@@ -9826,7 +9985,7 @@
     "optionFile": "SystemMonitorOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:18",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:20",
     "label": "Drag to reorder",
     "tabIndex": 22,
     "keywords": [],
@@ -9842,15 +10001,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:AppsDockOptions.qml:26",
-    "label": "Enlargement",
-    "tabIndex": 22,
-    "keywords": [],
-    "runtimeType": "barWidgetOption",
-    "optionFile": "AppsDockOptions.qml"
-  },
-  {
-    "section": "barWidgetOption:IslandOptions.qml:25",
+    "section": "barWidgetOption:IslandOptions.qml:26",
     "label": "Expand by default",
     "tabIndex": 22,
     "keywords": [],
@@ -9866,7 +10017,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:16",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:18",
     "label": "Follow display focus",
     "tabIndex": 22,
     "keywords": [],
@@ -9898,7 +10049,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:13",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:15",
     "label": "Group apps",
     "tabIndex": 22,
     "keywords": [],
@@ -9922,7 +10073,7 @@
     "optionFile": "RunningAppsOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:14",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:16",
     "label": "Group on active workspace",
     "tabIndex": 22,
     "keywords": [],
@@ -9938,6 +10089,14 @@
     "optionFile": "IslandOptions.qml"
   },
   {
+    "section": "barWidgetOption:NetworkMonitorOptions.qml:1",
+    "label": "Hide when idle",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "NetworkMonitorOptions.qml"
+  },
+  {
     "section": "barWidgetOption:SystemUpdateOptions.qml:1",
     "label": "Hide when no updates",
     "tabIndex": 22,
@@ -9946,7 +10105,7 @@
     "optionFile": "SystemUpdateOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:15",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:17",
     "label": "Highlight focused app",
     "tabIndex": 22,
     "keywords": [],
@@ -9986,7 +10145,7 @@
     "optionFile": "LauncherButtonOptions.qml"
   },
   {
-    "section": "barWidgetOption:AppsDockOptions.qml:27",
+    "section": "barWidgetOption:AppsDockOptions.qml:26",
     "label": "Icon size",
     "tabIndex": 22,
     "keywords": [],
@@ -9994,7 +10153,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:7",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:10",
     "label": "Icon size",
     "tabIndex": 22,
     "keywords": [],
@@ -10010,7 +10169,7 @@
     "optionFile": "SystemTrayOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:3",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:6",
     "label": "Index numbers",
     "tabIndex": 22,
     "keywords": [],
@@ -10058,7 +10217,7 @@
     "optionFile": "KeyboardLayoutOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:10",
+    "section": "barWidgetOption:IslandOptions.qml:9",
     "label": "Launcher",
     "tabIndex": 22,
     "keywords": [],
@@ -10074,7 +10233,15 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:6",
+    "section": "barWidgetOption:MusicOptions.qml:3",
+    "label": "Lyrics",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "MusicOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:9",
     "label": "Max apps to show",
     "tabIndex": 22,
     "keywords": [],
@@ -10114,7 +10281,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:MusicOptions.qml:4",
+    "section": "barWidgetOption:MusicOptions.qml:6",
     "label": "Media player",
     "tabIndex": 22,
     "keywords": [],
@@ -10130,7 +10297,7 @@
     "optionFile": "PrivacyOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:11",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:14",
     "label": "Minimum workspaces",
     "tabIndex": 22,
     "keywords": [],
@@ -10138,7 +10305,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:27",
+    "section": "barWidgetOption:IslandOptions.qml:28",
     "label": "Motion",
     "tabIndex": 22,
     "keywords": [],
@@ -10154,7 +10321,7 @@
     "optionFile": "SystemMonitorOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:4",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:7",
     "label": "Names",
     "tabIndex": 22,
     "keywords": [],
@@ -10234,16 +10401,24 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:28",
-    "label": "Reduce motion",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:4",
+    "label": "Override",
     "tabIndex": 22,
     "keywords": [],
     "runtimeType": "barWidgetOption",
-    "optionFile": "IslandOptions.qml"
+    "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:17",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:19",
     "label": "Reverse scroll direction",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "WorkspaceSwitcherOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:5",
+    "label": "Roundness",
     "tabIndex": 22,
     "keywords": [],
     "runtimeType": "barWidgetOption",
@@ -10258,7 +10433,7 @@
     "optionFile": "PrivacyOptions.qml"
   },
   {
-    "section": "barWidgetOption:MusicOptions.qml:3",
+    "section": "barWidgetOption:MusicOptions.qml:5",
     "label": "Scroll wheel",
     "tabIndex": 22,
     "keywords": [],
@@ -10282,7 +10457,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:19",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:21",
     "label": "Show all tags",
     "tabIndex": 22,
     "keywords": [],
@@ -10290,7 +10465,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:5",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:8",
     "label": "Show apps",
     "tabIndex": 22,
     "keywords": [],
@@ -10354,7 +10529,7 @@
     "optionFile": "SystemMonitorOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:8",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:11",
     "label": "Show occupied only",
     "tabIndex": 22,
     "keywords": [],
@@ -10378,7 +10553,7 @@
     "optionFile": "BatteryOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:9",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:12",
     "label": "Show scratchpads",
     "tabIndex": 22,
     "keywords": [],
@@ -10408,6 +10583,14 @@
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "FocusedWindowOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:IslandOptions.qml:6",
+    "label": "Size",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
   },
   {
     "section": "barWidgetOption:MusicOptions.qml:1",
@@ -10442,7 +10625,7 @@
     "optionFile": "SystemUpdateOptions.qml"
   },
   {
-    "section": "barWidgetOption:AppsDockOptions.qml:28",
+    "section": "barWidgetOption:AppsDockOptions.qml:27",
     "label": "Spacing",
     "tabIndex": 22,
     "keywords": [],
@@ -10468,6 +10651,14 @@
   {
     "section": "barWidgetOption:IslandOptions.qml:29",
     "label": "Spring stiffness",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:IslandOptions.qml:5",
+    "label": "Status",
     "tabIndex": 22,
     "keywords": [],
     "runtimeType": "barWidgetOption",
@@ -10576,14 +10767,6 @@
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "IslandOptions.qml"
-  },
-  {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:12",
-    "label": "Workspace count",
-    "tabIndex": 22,
-    "keywords": [],
-    "runtimeType": "barWidgetOption",
-    "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
     "section": "clipboardRememberTypeFilter",
@@ -11044,6 +11227,38 @@
     "parentLabel": "Displays"
   },
   {
+    "section": "nightModeExcludeFullscreen",
+    "label": "Fullscreen windows",
+    "tabIndex": 25,
+    "category": "Gamma control",
+    "keywords": [
+      "blue light",
+      "color temperature",
+      "control",
+      "displays",
+      "focus",
+      "fullscreen",
+      "gamma",
+      "mode",
+      "monitor",
+      "monitors",
+      "night",
+      "night light",
+      "output",
+      "outputs",
+      "pause",
+      "redshift",
+      "resolution",
+      "screen",
+      "screens",
+      "while",
+      "window",
+      "windows"
+    ],
+    "parentLabel": "Displays",
+    "description": "Pause night mode while a fullscreen window has focus"
+  },
+  {
     "section": "displayGamma",
     "label": "Gamma control",
     "tabIndex": 25,
@@ -11129,6 +11344,43 @@
     "parentLabel": "Displays"
   },
   {
+    "section": "nightModeExceptions",
+    "label": "Night mode exceptions",
+    "tabIndex": 25,
+    "category": "Gamma control",
+    "keywords": [
+      "app",
+      "blue light",
+      "color temperature",
+      "control",
+      "displays",
+      "exceptions",
+      "exclude",
+      "focus",
+      "fullscreen",
+      "gamma",
+      "ignore",
+      "media",
+      "mode",
+      "monitor",
+      "monitors",
+      "night",
+      "night light",
+      "output",
+      "outputs",
+      "pause",
+      "redshift",
+      "resolution",
+      "screen",
+      "screens",
+      "while",
+      "window"
+    ],
+    "parentLabel": "Displays",
+    "icon": "settings_night_sight",
+    "description": "Pause night mode while a fullscreen window has focus"
+  },
+  {
     "section": "_tab_26",
     "label": "Display assignment",
     "tabIndex": 26,
@@ -11179,14 +11431,40 @@
       "monitors",
       "plugins",
       "settings",
-      "system",
       "time",
       "watch",
       "widget",
       "widgets"
     ],
     "icon": "widgets",
-    "description": "Clocks, system monitors, plugins"
+    "description": "Clocks, monitors, plugins"
+  },
+  {
+    "section": "desktopGeneral",
+    "label": "General",
+    "tabIndex": 27,
+    "category": "Desktop widgets",
+    "keywords": [
+      "auto",
+      "clicks",
+      "components",
+      "compositors",
+      "conky",
+      "context",
+      "desktop",
+      "desktop clock",
+      "empty",
+      "general",
+      "menu",
+      "modules",
+      "right click",
+      "themselves",
+      "turns",
+      "wallpaper",
+      "widgets"
+    ],
+    "icon": "mouse",
+    "description": "Auto turns it off on compositors that use clicks on the empty desktop themselves"
   },
   {
     "section": "desktopWidgetGroups",
@@ -11205,6 +11483,30 @@
       "widgets"
     ],
     "icon": "folder"
+  },
+  {
+    "section": "desktopContextMenu",
+    "label": "Right-click menu",
+    "tabIndex": 27,
+    "category": "Desktop widgets",
+    "keywords": [
+      "auto",
+      "click",
+      "clicks",
+      "components",
+      "compositors",
+      "conky",
+      "desktop",
+      "desktop clock",
+      "empty",
+      "menu",
+      "modules",
+      "right",
+      "themselves",
+      "turns",
+      "widgets"
+    ],
+    "description": "Auto turns it off on compositors that use clicks on the empty desktop themselves"
   },
   {
     "section": "pluginDirectory",
@@ -11437,6 +11739,26 @@
     "parentLabel": "Date, time & region"
   },
   {
+    "section": "greeterAdvanced",
+    "label": "Advanced",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "advanced",
+      "display manager",
+      "greetd",
+      "greeter",
+      "login",
+      "repair",
+      "security",
+      "status",
+      "sync"
+    ],
+    "parentLabel": "Security",
+    "icon": "tune",
+    "conditionKey": "greeterAvailable"
+  },
+  {
     "section": "greeterAppearance",
     "label": "Appearance",
     "tabIndex": 31,
@@ -11546,6 +11868,37 @@
     "conditionKey": "greeterAvailable"
   },
   {
+    "section": "greeterFollowLockScreen",
+    "label": "Follow lock screen",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "arrange",
+      "components",
+      "display manager",
+      "follow",
+      "greetd",
+      "greeter",
+      "layout",
+      "lock",
+      "lockscreen",
+      "login",
+      "modules",
+      "picker",
+      "screen",
+      "security",
+      "separately",
+      "session",
+      "shows",
+      "supports",
+      "turn",
+      "widgets"
+    ],
+    "parentLabel": "Security",
+    "description": "The login screen shows the lock screen widgets it supports and its own session picker. Turn off to arrange it separately.",
+    "conditionKey": "greeterAvailable"
+  },
+  {
     "section": "_tab_31",
     "label": "Greeter",
     "tabIndex": 31,
@@ -11611,12 +11964,46 @@
       "display manager",
       "greetd",
       "greeter",
+      "link",
       "login",
       "security",
-      "status"
+      "status",
+      "sync"
     ],
     "parentLabel": "Security",
     "icon": "info",
+    "conditionKey": "greeterAvailable"
+  },
+  {
+    "section": "greeterWidgets",
+    "label": "Widgets",
+    "tabIndex": 31,
+    "category": "Greeter",
+    "keywords": [
+      "arrange",
+      "clock",
+      "components",
+      "display manager",
+      "greetd",
+      "greeter",
+      "layout",
+      "lock",
+      "lockscreen",
+      "login",
+      "modules",
+      "picker",
+      "screen",
+      "security",
+      "separately",
+      "session",
+      "shows",
+      "supports",
+      "turn",
+      "widgets"
+    ],
+    "parentLabel": "Security",
+    "icon": "widgets",
+    "description": "The login screen shows the lock screen widgets it supports and its own session picker. Turn off to arrange it separately.",
     "conditionKey": "greeterAvailable"
   },
   {
@@ -11995,50 +12382,72 @@
     "runtimeType": "pageLabel"
   },
   {
-    "section": "hyprlandLayoutBorderSize",
-    "label": "Border size",
+    "section": "hyprlandGroupbarBlur",
+    "label": "Background blur",
     "tabIndex": 37,
     "category": "System & integrations",
     "keywords": [
-      "border",
-      "border_size",
+      "background",
+      "blur",
+      "groupbar",
       "hyprland",
       "integrations",
-      "override",
-      "size",
       "system"
     ],
     "conditionKey": "layoutCapable"
   },
   {
-    "section": "mangoLayoutBorderSize",
-    "label": "Border size",
+    "section": "hyprlandBlurVariant",
+    "label": "Blur",
     "tabIndex": 37,
     "category": "System & integrations",
     "keywords": [
-      "border",
-      "borderpx",
+      "acrylic",
+      "aurora",
+      "blur",
+      "default",
+      "frost",
+      "glass",
+      "hyprland",
       "integrations",
-      "mango",
-      "mangowc",
-      "override",
-      "size",
+      "more",
+      "outside",
+      "style",
+      "styles",
+      "system",
+      "variant"
+    ],
+    "description": "Styles outside of Default use more GPU",
+    "conditionKey": "layoutCapable"
+  },
+  {
+    "section": "hyprlandBorderGrabArea",
+    "label": "Border grab area",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "area",
+      "border",
+      "extend_border_grab_area",
+      "grab",
+      "hyprland",
+      "integrations",
+      "resize",
       "system"
     ],
     "conditionKey": "layoutCapable"
   },
   {
-    "section": "niriLayoutBorderSize",
-    "label": "Border size",
+    "section": "hyprlandBlurAcrylicClarity",
+    "label": "Clarity",
     "tabIndex": 37,
     "category": "System & integrations",
     "keywords": [
-      "border",
-      "focus-ring",
+      "acrylic",
+      "blur",
+      "clarity",
+      "hyprland",
       "integrations",
-      "niri",
-      "override",
-      "size",
       "system"
     ],
     "conditionKey": "layoutCapable"
@@ -12275,6 +12684,54 @@
     "conditionKey": "layoutCapable"
   },
   {
+    "section": "hyprlandGlowEnabled",
+    "label": "Glow",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "glow",
+      "hyprland",
+      "inner",
+      "integrations",
+      "range",
+      "system"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
+    "section": "hyprlandGlowRenderPower",
+    "label": "Glow falloff",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "falloff",
+      "glow",
+      "hyprland",
+      "integrations",
+      "render_power",
+      "system"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
+    "section": "hyprlandGroupbarDisableWhenOnly",
+    "label": "Hide with one window",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "disable_when_only",
+      "groupbar",
+      "hide",
+      "hyprland",
+      "integrations",
+      "one",
+      "single",
+      "system",
+      "window"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
     "section": "hyprlandLayoutGapsOverride",
     "label": "Inner gaps",
     "tabIndex": 37,
@@ -12304,6 +12761,53 @@
       "mango",
       "mangowc",
       "override",
+      "system"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
+    "section": "hyprlandBlurAuroraIntensity",
+    "label": "Intensity",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "aurora",
+      "blur",
+      "hyprland",
+      "integrations",
+      "intensity",
+      "system"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
+    "section": "hyprlandBlurHazeIntensity",
+    "label": "Intensity",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "blur",
+      "haze",
+      "hyprland",
+      "integrations",
+      "intensity",
+      "sheen",
+      "system"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
+    "section": "hyprlandBlurHazeIridescence",
+    "label": "Iridescence",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "blur",
+      "color",
+      "haze",
+      "hyprland",
+      "integrations",
+      "iridescence",
       "system"
     ],
     "conditionKey": "layoutCapable"
@@ -12440,6 +12944,45 @@
     "conditionKey": "layoutCapable"
   },
   {
+    "section": "hyprlandGroupbarMiddleClickClose",
+    "label": "Middle click closes",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "click",
+      "close",
+      "closes",
+      "groupbar",
+      "hyprland",
+      "integrations",
+      "middle",
+      "system"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
+    "section": "hyprlandMotionBlurEnabled",
+    "label": "Motion blur",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "blur",
+      "cost",
+      "hyprland",
+      "integrations",
+      "look",
+      "more",
+      "motion",
+      "move",
+      "resize",
+      "samples",
+      "smoother",
+      "system"
+    ],
+    "description": "More samples look smoother and cost more GPU",
+    "conditionKey": "layoutCapable"
+  },
+  {
     "section": "hyprlandMasterNewStatus",
     "label": "New windows",
     "tabIndex": 37,
@@ -12491,7 +13034,7 @@
       "toast"
     ],
     "icon": "notifications",
-    "conditionKey": "isNiri"
+    "conditionKey": "isNiriOrMango"
   },
   {
     "section": "hyprlandLayoutGapsOutOverride",
@@ -12536,6 +13079,7 @@
     "category": "System & integrations",
     "keywords": [
       "border",
+      "border_size",
       "hyprland",
       "integrations",
       "override",
@@ -12551,6 +13095,7 @@
     "category": "System & integrations",
     "keywords": [
       "border",
+      "borderpx",
       "integrations",
       "mango",
       "mangowc",
@@ -12622,6 +13167,38 @@
     "conditionKey": "layoutCapable"
   },
   {
+    "section": "hyprlandBlurRippleStrength",
+    "label": "Refraction",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "blur",
+      "hyprland",
+      "integrations",
+      "refraction",
+      "ripple",
+      "strength",
+      "system"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
+    "section": "hyprlandBlurWaterStrength",
+    "label": "Refraction",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "blur",
+      "hyprland",
+      "integrations",
+      "refraction",
+      "strength",
+      "system",
+      "water"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
     "section": "hyprlandResizeOnBorder",
     "label": "Resize on border",
     "tabIndex": 37,
@@ -12676,6 +13253,22 @@
     "conditionKey": "layoutCapable"
   },
   {
+    "section": "hyprlandBlurAuroraSpeed",
+    "label": "Speed",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "animation",
+      "aurora",
+      "blur",
+      "hyprland",
+      "integrations",
+      "speed",
+      "system"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
     "section": "hyprlandTilingLayout",
     "label": "Tiling layout",
     "tabIndex": 37,
@@ -12702,6 +13295,48 @@
     "conditionKey": "isHyprland"
   },
   {
+    "section": "hyprlandGroupbarTextPadding",
+    "label": "Title padding",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "groupbar",
+      "hyprland",
+      "integrations",
+      "padding",
+      "system",
+      "text",
+      "text_padding",
+      "title"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
+    "section": "hyprlandEffects",
+    "label": "Visual effects",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "blur",
+      "decoration",
+      "default",
+      "effects",
+      "glow",
+      "hyprland",
+      "integrations",
+      "more",
+      "motion",
+      "outside",
+      "styles",
+      "system",
+      "visual",
+      "wobble"
+    ],
+    "icon": "auto_awesome",
+    "description": "Styles outside of Default use more GPU",
+    "conditionKey": "isHyprland"
+  },
+  {
     "section": "niriLayoutGapsOverride",
     "label": "Window gaps",
     "tabIndex": 37,
@@ -12713,6 +13348,70 @@
       "override",
       "system",
       "window"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
+    "section": "hyprlandGroupbar",
+    "label": "Window groups",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "group",
+      "groupbar",
+      "groups",
+      "hyprland",
+      "integrations",
+      "system",
+      "tabs",
+      "window"
+    ],
+    "icon": "tab",
+    "conditionKey": "isHyprland"
+  },
+  {
+    "section": "hyprlandWindowOpacity",
+    "label": "Window opacity",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "hyprland",
+      "integrations",
+      "opacity",
+      "system",
+      "transparency",
+      "window"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
+    "section": "hyprlandWobbleStiffness",
+    "label": "Wobble stiffness",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "hyprland",
+      "integrations",
+      "spring",
+      "stiffness",
+      "system",
+      "wobble"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
+    "section": "hyprlandWobbleEnabled",
+    "label": "Wobbly windows",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "hyprland",
+      "integrations",
+      "intensity",
+      "system",
+      "windows",
+      "wobble",
+      "wobbly"
     ],
     "conditionKey": "layoutCapable"
   },
@@ -13614,7 +14313,7 @@
       "touchpad"
     ],
     "parentLabel": "Input",
-    "conditionKey": "pointerCapable"
+    "conditionKey": "isNiriOrMango"
   },
   {
     "section": "touchpadDragLock",
@@ -13662,7 +14361,7 @@
       "touchpad"
     ],
     "parentLabel": "Input",
-    "conditionKey": "pointerCapable"
+    "conditionKey": "isNiriOrMango"
   },
   {
     "section": "touchpadMiddleEmulation",
@@ -13695,7 +14394,7 @@
     ],
     "parentLabel": "Input",
     "icon": "mouse",
-    "conditionKey": "isNiri"
+    "conditionKey": "inputCapable"
   },
   {
     "section": "_tab_44",
@@ -13713,23 +14412,6 @@
     "icon": "mouse",
     "parentLabel": "Input",
     "description": "Speed, scrolling, tap to click",
-    "conditionKey": "pointerCapable"
-  },
-  {
-    "section": "mangoTrackpadNaturalScrolling",
-    "label": "Natural scrolling",
-    "tabIndex": 44,
-    "category": "Mouse & touchpad",
-    "keywords": [
-      "input",
-      "invert",
-      "mouse",
-      "natural",
-      "scrolling",
-      "touchpad",
-      "trackpad"
-    ],
-    "parentLabel": "Input",
     "conditionKey": "pointerCapable"
   },
   {
@@ -13893,24 +14575,6 @@
     "conditionKey": "pointerCapable"
   },
   {
-    "section": "mangoTouchpadSettings",
-    "label": "Touchpad",
-    "tabIndex": 44,
-    "category": "Mouse & touchpad",
-    "keywords": [
-      "input",
-      "invert",
-      "mouse",
-      "natural",
-      "scrolling",
-      "touchpad",
-      "trackpad"
-    ],
-    "parentLabel": "Input",
-    "icon": "trackpad_input_2",
-    "conditionKey": "isMango"
-  },
-  {
     "section": "touchpadSettings",
     "label": "Touchpad",
     "tabIndex": 44,
@@ -13926,7 +14590,7 @@
     ],
     "parentLabel": "Input",
     "icon": "trackpad_input_2",
-    "conditionKey": "isNiri"
+    "conditionKey": "inputCapable"
   },
   {
     "section": "keyboardBehaviorSettings",
@@ -13944,7 +14608,7 @@
     ],
     "parentLabel": "Input",
     "icon": "settings",
-    "conditionKey": "isNiri"
+    "conditionKey": "inputCapable"
   },
   {
     "section": "_tab_45",
@@ -13962,7 +14626,7 @@
     "icon": "keyboard",
     "parentLabel": "Input",
     "description": "Layouts, repeat rate, num lock",
-    "conditionKey": "isNiri"
+    "conditionKey": "inputCapable"
   },
   {
     "section": "keyboardLayoutsSettings",
@@ -13988,7 +14652,7 @@
     "parentLabel": "Input",
     "icon": "keyboard",
     "description": "Comma-separated list of layout names. Leave empty to use the system keyboard settings.",
-    "conditionKey": "isNiri"
+    "conditionKey": "inputCapable"
   },
   {
     "section": "keyboardNumlock",
@@ -14004,7 +14668,7 @@
       "startup"
     ],
     "parentLabel": "Input",
-    "conditionKey": "isNiri"
+    "conditionKey": "inputCapable"
   },
   {
     "section": "keyboardTrackLayout",
@@ -14034,7 +14698,7 @@
       "speed"
     ],
     "parentLabel": "Input",
-    "conditionKey": "isNiri"
+    "conditionKey": "inputCapable"
   },
   {
     "section": "keyboardRepeatRate",
@@ -14049,7 +14713,7 @@
       "speed"
     ],
     "parentLabel": "Input",
-    "conditionKey": "isNiri"
+    "conditionKey": "inputCapable"
   },
   {
     "section": "keyboardOptions",
@@ -14065,7 +14729,7 @@
       "xkb"
     ],
     "parentLabel": "Input",
-    "conditionKey": "isNiri"
+    "conditionKey": "inputCapable"
   },
   {
     "section": "networkCellular",
@@ -14131,10 +14795,8 @@
     "category": "Interface style",
     "keywords": [
       "blur",
-      "borders",
       "corners",
       "interface",
-      "opacity",
       "radius",
       "round",
       "rounded",
@@ -14142,7 +14804,7 @@
       "style"
     ],
     "icon": "layers",
-    "description": "Opacity, borders, blur, shadows, corners"
+    "description": "Blur, shadows, corners"
   },
   {
     "section": "matugenTemplateAlacritty",
@@ -14169,7 +14831,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "_tab_50",
@@ -14258,7 +14921,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateEmacs",
@@ -14284,7 +14948,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateFcitx5",
@@ -14311,7 +14976,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateFirefox",
@@ -14337,7 +15003,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateNeovimSetBackground",
@@ -14367,7 +15034,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateGtk",
@@ -14393,7 +15061,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "systemAppTheming",
@@ -14448,7 +15117,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateHyprland",
@@ -14474,7 +15144,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateKcolorscheme",
@@ -14501,7 +15172,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplates",
@@ -14632,7 +15304,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "runUserMatugenTemplates",
@@ -14666,7 +15339,8 @@
       "wallpaper colors"
     ],
     "parentLabel": "Wallpaper & colors",
-    "description": "Also runs the templates in your matugen config.toml"
+    "description": "Also runs the templates in your matugen config.toml",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "syncModeWithPortal",
@@ -14770,7 +15444,8 @@
       "wallpaper"
     ],
     "parentLabel": "Wallpaper & colors",
-    "description": "Requires the DMS Theme extension from the editor marketplace"
+    "description": "Requires the DMS Theme extension from the editor marketplace",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateWezterm",
@@ -14797,7 +15472,8 @@
       "wallpaper",
       "wezterm"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateZed",
@@ -14823,7 +15499,8 @@
       "wallpaper",
       "zed"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateDgop",
@@ -14849,7 +15526,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateEquibop",
@@ -14876,7 +15554,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateFoot",
@@ -14903,7 +15582,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateKitty",
@@ -14930,7 +15610,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateMangowc",
@@ -14956,7 +15637,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateNeovim",
@@ -14985,7 +15667,8 @@
       "wallpaper"
     ],
     "parentLabel": "Wallpaper & colors",
-    "description": "Required plugin: "
+    "description": "Required plugin: ",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateNiri",
@@ -15011,7 +15694,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplatePywalfox",
@@ -15037,7 +15721,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateQt5ct",
@@ -15063,7 +15748,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateQt6ct",
@@ -15089,7 +15775,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateQtengine",
@@ -15116,7 +15803,8 @@
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateVencord",
@@ -15143,7 +15831,8 @@
       "vencord",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateVesktop",
@@ -15170,7 +15859,8 @@
       "vesktop",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "matugenTemplateZenBrowser",
@@ -15196,7 +15886,8 @@
       "wallpaper",
       "zenbrowser"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "themeModeAutoEnabled",
@@ -15955,6 +16646,27 @@
     "parentLabel": "Date, time & region"
   },
   {
+    "section": "lockStatusWeather",
+    "label": "Lock screen",
+    "tabIndex": 56,
+    "category": "Weather",
+    "keywords": [
+      "climate",
+      "date,",
+      "forecast",
+      "lock",
+      "lockscreen",
+      "login",
+      "region",
+      "screen",
+      "security",
+      "temperature",
+      "time",
+      "weather"
+    ],
+    "parentLabel": "Date, time & region"
+  },
+  {
     "section": "weatherEnabled",
     "label": "Weather",
     "tabIndex": 56,
@@ -16140,6 +16852,28 @@
       "panel",
       "spacing",
       "taskbar"
+    ],
+    "parentLabel": "Dock"
+  },
+  {
+    "section": "dockMagnificationExpand",
+    "label": "Push neighboring icons",
+    "tabIndex": 58,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "displace",
+      "dock",
+      "expand",
+      "icons",
+      "launcher bar",
+      "magnification",
+      "neighboring",
+      "panel",
+      "push",
+      "shift",
+      "taskbar",
+      "zoom"
     ],
     "parentLabel": "Dock"
   },
@@ -16723,6 +17457,40 @@
     "conditionKey": "dotEnabled"
   },
   {
+    "section": "dotChargingPulse",
+    "label": "Charging",
+    "tabIndex": 65,
+    "category": "Dot",
+    "keywords": [
+      "bar",
+      "battery",
+      "briefly",
+      "charge",
+      "charging",
+      "connected",
+      "dot",
+      "hibernate",
+      "island",
+      "panel",
+      "plugged",
+      "power",
+      "pulse",
+      "reboot",
+      "removed",
+      "restart",
+      "show",
+      "shutdown",
+      "sleep",
+      "statusbar",
+      "suspend",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "description": "Show the battery briefly when power is connected or removed",
+    "conditionKey": "dotEnabled"
+  },
+  {
     "section": "dotNotificationBadgeClearOnOpen",
     "label": "Clear badge on open",
     "tabIndex": 65,
@@ -17054,7 +17822,6 @@
       "island",
       "motion",
       "panel",
-      "reduce",
       "spring",
       "statusbar",
       "taskbar",
@@ -17181,28 +17948,6 @@
       "panel",
       "statusbar",
       "surface",
-      "taskbar",
-      "topbar"
-    ],
-    "parentLabel": "Bar",
-    "conditionKey": "dotEnabled"
-  },
-  {
-    "section": "dotReducedMotion",
-    "label": "Reduce motion",
-    "tabIndex": 65,
-    "category": "Dot",
-    "keywords": [
-      "accessibility",
-      "animation",
-      "bar",
-      "dot",
-      "island",
-      "motion",
-      "panel",
-      "reduce",
-      "spring",
-      "statusbar",
       "taskbar",
       "topbar"
     ],
@@ -17359,12 +18104,16 @@
     "keywords": [
       "bar",
       "brightness",
+      "caps lock",
       "dot",
+      "idle inhibitor",
       "island",
       "level",
+      "microphone",
       "osd",
       "osds",
       "panel",
+      "power profile",
       "standard",
       "statusbar",
       "taskbar",

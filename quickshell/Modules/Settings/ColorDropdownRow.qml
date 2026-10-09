@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
@@ -102,7 +103,7 @@ Column {
 
     Item {
         width: parent.width
-        height: root.currentMode === "custom" ? customChip.height + Theme.spacingM : 0
+        height: root.currentMode === "custom" ? customChip.y + customChip.height + Theme.spacingM : 0
         opacity: root.currentMode === "custom" ? 1 : 0
         clip: true
 
@@ -126,10 +127,11 @@ Column {
             id: customChip
 
             x: SettingsMetrics.rowPaddingH
+            y: Theme.focusRingOffset
             width: parent.width - SettingsMetrics.rowPaddingH * 2
             height: Theme.listItemHeight
             radius: Theme.cornerRadiusM
-            color: Theme.chipSurface
+            color: SettingsMetrics.controlColor
             activeFocusOnTab: root.currentMode === "custom"
             Accessible.role: Accessible.Button
             Accessible.name: I18n.tr("Custom color")
@@ -148,13 +150,13 @@ Column {
                 anchors.rightMargin: SettingsMetrics.rowPaddingH
                 spacing: Theme.spacingM
 
-                DankColorSwatch {
+                DColorSwatch {
                     width: Theme.avatarSize
                     height: Theme.avatarSize
                     swatchColor: root.customColor
                     anchors.verticalCenter: parent.verticalCenter
 
-                    DankIcon {
+                    DIcon {
                         anchors.centerIn: parent
                         name: "colorize"
                         size: Theme.iconSizeSmall
@@ -186,7 +188,7 @@ Column {
                     }
                 }
 
-                DankIcon {
+                DIcon {
                     id: editIcon
                     name: "edit"
                     size: Theme.iconSizeSmall

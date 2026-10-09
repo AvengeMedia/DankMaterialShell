@@ -1,8 +1,8 @@
 import QtQuick
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../../../Common/QmlUtils.js" as QmlUtils
 
-DankReorderList {
+DReorderList {
     id: root
 
     readonly property bool isSettingsRow: true

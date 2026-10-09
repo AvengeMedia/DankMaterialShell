@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell.Widgets
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Rectangle {
@@ -9,11 +10,14 @@ Rectangle {
     property string path: ""
     property string placeholderIcon: "image"
     property string emptyText: I18n.tr("Not set", "wallpaper not set label")
+    property bool showMaterial: false
+    property var materialComposition: null
     property bool allowColor: true
 
     readonly property bool isColor: path.startsWith("#")
     readonly property bool isImage: path !== "" && !isColor
-    readonly property string fileName: path !== "" ? path.split("/").pop() : emptyText
+    readonly property bool isMaterial: showMaterial && path === ""
+    readonly property string fileName: path !== "" ? path.split("/").pop() : (showMaterial ? I18n.tr("Material", "wallpaper type") : emptyText)
 
     signal browse
     signal pickColor
@@ -21,12 +25,20 @@ Rectangle {
 
     height: width * SettingsMetrics.wallpaperThumbRatio
     radius: Theme.cornerRadiusM
-    color: isColor ? path : Theme.chipSurface
+    color: isColor ? path : SettingsMetrics.controlColor
 
     ClippingRectangle {
         anchors.fill: parent
         radius: root.radius
         color: "transparent"
+
+        Loader {
+            anchors.fill: parent
+            active: root.showMaterial && !root.isColor && (!root.isImage || imageLoader.item?.status === Image.Error)
+            sourceComponent: MaterialWallpaper {
+                composition: root.materialComposition
+            }
+        }
 
         Loader {
             id: imageLoader
@@ -42,12 +54,12 @@ Rectangle {
         }
     }
 
-    DankIcon {
+    DIcon {
         anchors.centerIn: parent
         name: root.placeholderIcon
         size: Theme.iconSizeLarge
         color: Theme.surfaceVariantText
-        visible: !root.isColor && (!root.isImage || imageLoader.item?.status === Image.Error)
+        visible: !root.showMaterial && !root.isColor && (!root.isImage || imageLoader.item?.status === Image.Error)
     }
 
     MouseArea {
@@ -75,32 +87,32 @@ Rectangle {
             anchors.centerIn: parent
             spacing: Theme.spacingS
 
-            DankActionButton {
+            DActionButton {
                 buttonSize: Theme.iconButtonSize
                 iconName: "folder_open"
                 iconSize: Theme.iconSizeMedium
-                backgroundColor: Theme.chipSurface
+                backgroundColor: SettingsMetrics.controlSurface
                 iconColor: Theme.surfaceText
                 Accessible.name: I18n.tr("Browse")
                 onClicked: root.browse()
             }
 
-            DankActionButton {
+            DActionButton {
                 buttonSize: Theme.iconButtonSize
                 iconName: "palette"
                 iconSize: Theme.iconSizeMedium
-                backgroundColor: Theme.chipSurface
+                backgroundColor: SettingsMetrics.controlSurface
                 iconColor: Theme.surfaceText
                 visible: root.allowColor
                 tooltipText: I18n.tr("Custom")
                 onClicked: root.pickColor()
             }
 
-            DankActionButton {
+            DActionButton {
                 buttonSize: Theme.iconButtonSize
                 iconName: "close"
                 iconSize: Theme.iconSizeMedium
-                backgroundColor: Theme.chipSurface
+                backgroundColor: SettingsMetrics.controlSurface
                 iconColor: Theme.error
                 visible: root.path !== ""
                 Accessible.name: I18n.tr("Clear")

@@ -92,7 +92,7 @@ func init() {
 	keybindsSetCmd.Flags().Bool("no-repeat", false, "Disable key repeat")
 	keybindsSetCmd.Flags().Bool("no-inhibiting", false, "Keep bind active when shortcuts are inhibited (allow-inhibiting=false)")
 	keybindsSetCmd.Flags().String("replace-key", "", "Original key to replace (removes old key)")
-	keybindsSetCmd.Flags().String("flags", "", "Hyprland bind flags (e.g., 'e' for repeat, 'l' for locked, 'r' for release)")
+	keybindsSetCmd.Flags().String("flags", "", "Hyprland bind flags as letters: e repeat, l locked, r release, o long-press, n non-consuming, m mouse, t transparent, i ignore-mods, u submap-universal, a auto-consuming, x allow-input-capture")
 
 	keybindsCmd.AddCommand(keybindsListCmd)
 	keybindsCmd.AddCommand(keybindsShowCmd)

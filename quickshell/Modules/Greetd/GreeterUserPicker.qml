@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -76,7 +76,7 @@ Item {
                 elide: Text.ElideRight
             }
 
-            DankIcon {
+            DIcon {
                 Layout.alignment: Qt.AlignVCenter
                 name: "expand_more"
                 size: 20
@@ -99,7 +99,7 @@ Item {
         visible: expanded
         spacing: Theme.spacingXS
 
-        DankListView {
+        DListView {
             id: userListView
 
             width: parent.width
@@ -132,7 +132,7 @@ Item {
                         Layout.preferredWidth: 36
                         Layout.preferredHeight: 36
 
-                        DankCircularImage {
+                        DCircularImage {
                             anchors.fill: parent
                             ringWidth: Theme.avatarRingWidth
                             ringColor: Theme.avatarRingColor
@@ -174,7 +174,7 @@ Item {
                 anchors.rightMargin: Theme.spacingS
                 spacing: Theme.spacingM
 
-                DankIcon {
+                DIcon {
                     Layout.alignment: Qt.AlignVCenter
                     name: "person_add"
                     size: 20
@@ -213,7 +213,7 @@ Item {
                 anchors.rightMargin: Theme.spacingS
                 spacing: Theme.spacingM
 
-                DankIcon {
+                DIcon {
                     Layout.alignment: Qt.AlignVCenter
                     name: root.autoLoginChecked ? "check_box" : "check_box_outline_blank"
                     size: 20

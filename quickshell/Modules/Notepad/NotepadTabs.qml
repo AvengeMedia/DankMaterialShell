@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Column {
     id: root
@@ -172,7 +172,7 @@ Column {
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
 
-                                    DankTextField {
+                                    DTextField {
                                         id: renameField
                                         visible: delegateItem.editing
                                         enabled: delegateItem.editing
@@ -231,7 +231,7 @@ Column {
                                         visible: NotepadStorageService.tabs.length > 1 && !delegateItem.editing
                                         anchors.verticalCenter: parent.verticalCenter
 
-                                        DankIcon {
+                                        DIcon {
                                             name: "close"
                                             size: 14
                                             color: Theme.surfaceTextMedium
@@ -338,7 +338,7 @@ Column {
                             }
                         }
 
-                        DankTooltipHost {
+                        DTooltipHost {
                             text: tabText.truncated ? (delegateItem.modelData.title || "Untitled") : ""
                             target: delegateItem
                             hoverArea: tabMouseArea
@@ -348,7 +348,7 @@ Column {
             }
         }
 
-        DankActionButton {
+        DActionButton {
             id: newTabButton
             width: 32
             height: 32

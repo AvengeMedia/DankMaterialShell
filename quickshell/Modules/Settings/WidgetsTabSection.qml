@@ -2,14 +2,16 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Services
 import qs.Modules.Settings.Widgets
-import "../DankBar/OverflowLayout.js" as OverflowLayout
+import "../DBar/OverflowLayout.js" as OverflowLayout
 
 Column {
     id: root
     readonly property var log: Log.scoped("WidgetsTabSection")
+
+    Component.onCompleted: DgopService.ensureMeta()
 
     property var items: []
     property var allWidgets: []
@@ -38,7 +40,9 @@ Column {
     }
 
     function setOverflowOption(name, value) {
-        SettingsData.updateBarConfig(barId, { [sectionId + "Overflow" + name]: value });
+        SettingsData.updateBarConfig(barId, {
+            [sectionId + "Overflow" + name]: value
+        });
     }
 
     signal itemEnabledChanged(string sectionId, string itemId, bool enabled)
@@ -61,7 +65,7 @@ Column {
     SettingsSectionLabel {
         text: root.title
         actions: [
-            DankActionButton {
+            DActionButton {
                 buttonSize: Theme.buttonHeightXXS
                 iconName: "more_horiz"
                 tooltipText: I18n.tr("Overflow")
@@ -71,7 +75,7 @@ Column {
                 visible: root.barId !== ""
                 onClicked: root.overflowSettingsExpanded = !root.overflowSettingsExpanded
             },
-            DankActionButton {
+            DActionButton {
                 buttonSize: Theme.buttonHeightXXS
                 iconName: "format_list_numbered"
                 tooltipText: I18n.tr("Index centering")
@@ -80,7 +84,7 @@ Column {
                 visible: root.sectionId === "center"
                 onClicked: SettingsData.set("centeringMode", "index")
             },
-            DankActionButton {
+            DActionButton {
                 buttonSize: Theme.buttonHeightXXS
                 iconName: "center_focus_weak"
                 tooltipText: I18n.tr("Geometric centering")
@@ -98,7 +102,7 @@ Column {
 
         SettingsToggleRow {
             text: I18n.tr("Auto overflow")
-            description: I18n.tr("Widgets in this section move into overflow when space runs out")
+            description: I18n.tr("Widgets in this section move into overflow when space runs out", "bar section overflow description")
             resetStore: root.overflowStore
             resetKeys: [root.sectionId + "OverflowMode"]
             checked: root.autoOverflow
@@ -107,16 +111,16 @@ Column {
 
         SettingsDropdownRow {
             readonly property var positionLabels: {
-                const labels = [I18n.tr("Start")];
+                const labels = [I18n.tr("Start", "noun, overflow button position before the first widget", true)];
                 const seen = {};
                 for (const item of root.items) {
                     seen[item.text] = (seen[item.text] ?? 0) + 1;
-                    labels.push(I18n.tr("After %1").arg(seen[item.text] > 1 ? item.text + " " + seen[item.text] : item.text));
+                    labels.push(I18n.tr("After %1", "overflow button position option, %1 is a widget name").arg(seen[item.text] > 1 ? item.text + " " + seen[item.text] : item.text));
                 }
                 return labels;
             }
 
-            text: I18n.tr("Overflow button position")
+            text: I18n.tr("Overflow button position", "bar section dropdown label")
             resetStore: root.overflowStore
             resetKeys: [root.sectionId + "OverflowPosition"]
             options: positionLabels
@@ -167,7 +171,7 @@ Column {
                 visible: !!widgetRow.modelData.warning
                 anchors.verticalCenter: parent.verticalCenter
 
-                DankIcon {
+                DIcon {
                     name: "warning"
                     size: Theme.iconSizeMedium
                     color: Theme.error
@@ -180,14 +184,14 @@ Column {
                     hoverEnabled: true
                 }
 
-                DankTooltipHost {
+                DTooltipHost {
                     text: widgetRow.modelData.warning
                     target: parent
                     hoverArea: warningArea
                 }
             }
 
-            DankIcon {
+            DIcon {
                 name: "chevron_right"
                 size: Theme.iconSize
                 color: Theme.onSurfaceVariant
@@ -201,7 +205,7 @@ Column {
                 visible: widgetRow.configurable
             }
 
-            DankNumberStepper {
+            DNumberStepper {
                 visible: widgetRow.modelData.id === "spacer"
                 anchors.verticalCenter: parent.verticalCenter
                 text: (widgetRow.modelData.size || 20).toString()
@@ -211,7 +215,7 @@ Column {
                 onIncrement: () => root.spacerSizeChanged(root.sectionId, widgetRow.index, Math.min(5000, (widgetRow.modelData.size || 20) + 5))
             }
 
-            DankToggle {
+            DToggle {
                 hideText: true
                 visible: widgetRow.modelData.id !== "spacer"
                 checked: widgetRow.modelData.enabled
@@ -219,7 +223,7 @@ Column {
                 onToggled: value => root.itemEnabledChanged(root.sectionId, widgetRow.modelData.id, value)
             }
 
-            DankActionButton {
+            DActionButton {
                 iconName: "close"
                 iconColor: Theme.error
                 Accessible.name: I18n.tr("Remove")
@@ -229,7 +233,7 @@ Column {
         }
     }
 
-    DankButton {
+    DButton {
         anchors.horizontalCenter: parent.horizontalCenter
         text: I18n.tr("Add widget")
         iconName: "add"

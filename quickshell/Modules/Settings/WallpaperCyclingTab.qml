@@ -5,7 +5,7 @@ import Quickshell
 import qs.Common
 import qs.Modals.FileBrowser
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -144,24 +144,24 @@ Item {
                 subtitle: root.wallpaperFolder
                 enabled: root.canCycle
 
-                DankActionButton {
+                DActionButton {
                     buttonSize: Theme.iconButtonSize
                     iconName: "skip_previous"
                     iconSize: Theme.iconSizeMedium
                     iconColor: Theme.surfaceText
-                    backgroundColor: Theme.chipSurface
+                    backgroundColor: SettingsMetrics.controlSurface
                     enabled: root.canCycle
                     Accessible.name: I18n.tr("Previous")
                     anchors.verticalCenter: parent.verticalCenter
                     onClicked: root.cycle(true)
                 }
 
-                DankActionButton {
+                DActionButton {
                     buttonSize: Theme.iconButtonSize
                     iconName: "skip_next"
                     iconSize: Theme.iconSizeMedium
                     iconColor: Theme.surfaceText
-                    backgroundColor: Theme.chipSurface
+                    backgroundColor: SettingsMetrics.controlSurface
                     enabled: root.canCycle
                     Accessible.name: I18n.tr("Next")
                     anchors.verticalCenter: parent.verticalCenter
@@ -185,7 +185,7 @@ Item {
                 title: I18n.tr("Folder")
                 subtitle: root.folderPath || I18n.tr("Use desktop wallpaper")
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Browse")
                     horizontalPadding: Theme.spacingL
                     anchors.verticalCenter: parent.verticalCenter

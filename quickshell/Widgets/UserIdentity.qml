@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Item {
@@ -54,7 +55,7 @@ Item {
         width: root.avatarDiameter
         height: root.avatarDiameter
 
-        DankCircularImage {
+        DCircularImage {
             anchors.fill: parent
             imageSource: root.avatarSource
             fallbackIcon: "material:person"
@@ -124,7 +125,7 @@ Item {
                 spacing: Theme.spacingXS
                 visible: root.showCompositor && !root.stacked
 
-                DankIcon {
+                DIcon {
                     anchors.verticalCenter: parent.verticalCenter
                     name: "select_window"
                     size: Theme.iconSizeSmall
@@ -148,7 +149,7 @@ Item {
                 visible: root.showUptime
                 opacity: DgopService.shortUptime !== "" ? 1 : 0
 
-                DankIcon {
+                DIcon {
                     id: uptimeIcon
                     anchors.verticalCenter: parent.verticalCenter
                     name: "schedule"

@@ -10,6 +10,18 @@ function formatRate(bytesPerSec, gbDecimals) {
     return (bytesPerSec / (1024 * 1024 * 1024)).toFixed(gbDecimals ?? 2) + " GB/s";
 }
 
+function formatRateCompact(bytesPerSec, abbreviated) {
+    const units = ["K", "M", "G", "T"];
+    let value = bytesPerSec / 1024;
+    let unit = 0;
+    while (unit < units.length - 1 && Math.round(value) >= 1000) {
+        value /= 1024;
+        unit++;
+    }
+    const shown = bytesPerSec > 0 ? Math.max(1, Math.round(value)) : 0;
+    return abbreviated ? shown + units[unit] : shown + " " + units[unit] + "B/s";
+}
+
 function formatBytes(bytes) {
     if (bytes < 1024)
         return bytes.toFixed(0) + "B";

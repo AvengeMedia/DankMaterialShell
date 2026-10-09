@@ -7,7 +7,7 @@ import qs.Modules.ControlCenter
 import "../utils/widgets.js" as WidgetUtils
 import "../../../Common/GridLayout.js" as GridUtils
 
-DankEditableGrid {
+DEditableGrid {
     id: root
 
     property var model: null
@@ -24,6 +24,7 @@ DankEditableGrid {
     signal lockRequested
     signal powerRequested
     signal settingsRequested
+    signal editRequested
     signal accountsRequested
     signal closeRequested
     property bool tapToClose: false
@@ -37,11 +38,17 @@ DankEditableGrid {
     readonly property var shownIndices: savedWidgets.reduce((indices, widget, i) => !WidgetUtils.inFooter(widget) && WidgetUtils.isShown(widget) && model?.componentForWidget(widget) ? indices.concat([i]) : indices, [])
 
     sourceItems: shownIndices.map(i => Object.assign({}, savedWidgets[i], sizeWithHiddenTwin(i)))
-    slotLayout: GridUtils.packCards(layoutItems.map(widget => Object.assign({}, widget, WidgetUtils.clampSize(widget, columns, maximumRows))), placementOrder, columns, width, CcMetrics.gridGap, cellWidth - CcMetrics.gridGap, I18n.isRtl, null, CcMetrics.gridStep, true)
-    swapDrags: true
+    slotLayout: GridUtils.packCards(clamped(layoutItems), placementOrder, columns, width, CcMetrics.gridGap, cellWidth - CcMetrics.gridGap, I18n.isRtl, null, CcMetrics.gridStep, true)
+    gravity: true
+    rowStep: CcMetrics.gridStep
+    packer: items => GridUtils.packCells(clamped(items), placementOrder, columns, null, CcMetrics.gridStep, true).cells
     placeholderRadius: draggingSlot?.small ? Theme.fullRadius(draggingSlot.width, draggingSlot.height) : (draggingSlot?.tileItem?.bodyRadius ?? Theme.fullRadius(width, CcMetrics.tileHeight))
 
     onLayoutCommitted: items => model.setLayout(withHidden(items))
+
+    function clamped(items) {
+        return items.map(widget => Object.assign({}, widget, WidgetUtils.clampSize(widget, columns, maximumRows)));
+    }
 
     function sizeWithHiddenTwin(index) {
         const widget = savedWidgets[index];

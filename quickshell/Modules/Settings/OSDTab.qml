@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -98,7 +98,7 @@ Item {
                 onResetRequested: SettingsData.resetOsdPosition(root.positionScope)
 
                 body: [
-                    DankFilterChips {
+                    DFilterChips {
                         model: root.positionScopes
                         Binding on currentIndex {
                             value: Math.max(0, root.positionScopes.findIndex(scope => scope.value === root.positionScope))

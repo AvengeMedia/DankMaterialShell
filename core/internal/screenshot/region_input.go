@@ -728,6 +728,11 @@ func (r *RegionSelector) handleKey(sym string, state uint32) {
 			r.running = false
 		case "Return", "KP_Enter":
 			r.finishScroll()
+		case "c", "C":
+			if r.ctrlHeld {
+				r.copyOnly = true
+				r.finishScroll()
+			}
 		}
 		return
 	}
@@ -749,6 +754,39 @@ func (r *RegionSelector) handleKey(sym string, state uint32) {
 			r.finishSelection()
 		} else if r.selection.hasSelection {
 			r.finishSelection()
+		}
+	case "c", "C":
+		if r.ctrlHeld {
+			if r.clickedTarget != nil {
+				t := r.clickedTarget
+				r.clickedTarget = nil
+				r.hoveredTarget = nil
+				r.snapToTarget(t)
+				r.selection.dragging = false
+				r.copyOnly = true
+				r.finishSelection()
+				return
+			}
+			if r.hoveredTarget != nil && r.activeSurface != nil && (!r.selection.hasSelection || r.selection.fromPreSelect) {
+				t := r.hoveredTarget
+				r.hoveredTarget = nil
+				r.snapToTarget(t)
+				r.copyOnly = true
+				r.finishSelection()
+				return
+			}
+			if r.selection.hasSelection {
+				if _, _, _, w, h := r.selectionDeviceRect(); w > 1 || h > 1 {
+					r.selection.dragging = false
+					r.movingSelection = false
+					r.resizingHandle = handleNone
+					r.copyOnly = true
+					r.finishSelection()
+					return
+				}
+			}
+			r.cancelled = true
+			r.running = false
 		}
 	}
 }
@@ -773,7 +811,7 @@ func (r *RegionSelector) finishSelection() {
 		return
 	}
 
-	scrollMode := r.screenshoter != nil && r.screenshoter.config.Mode == ModeScroll
+	scrollMode := r.screenshoter != nil && r.screenshoter.config.Mode == ModeScroll && !r.copyOnly
 	switch {
 	case scrollMode:
 		r.clampSelectionToSurface()

@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Services
 import qs.Modules.Settings.Widgets
 
@@ -129,7 +129,7 @@ Item {
 
         SettingsCard {
             tab: "typography"
-            tags: ["animation", "motion", "speed", "duration", "spring", "physics", "bounce", "accessibility", "reduce", "ripple", "fluid"]
+            tags: ["animation", "motion", "speed", "duration", "spring", "physics", "bounce", "accessibility", "ripple", "fluid"]
             title: I18n.tr("Animations", "settings card title")
             settingKey: "animations"
             iconName: "auto_awesome_motion"
@@ -167,7 +167,7 @@ Item {
                         width: motionPreview.laneWidth
                         height: parent.height
                         radius: Theme.cornerRadiusM
-                        color: Theme.chipSurface
+                        color: SettingsMetrics.controlColor
 
                         StyledText {
                             x: parent.width - width - Theme.spacingL
@@ -194,7 +194,7 @@ Item {
                             radius: Theme.fullRadius(width, height)
                             color: Theme.primary
 
-                            DankIcon {
+                            DIcon {
                                 anchors.centerIn: parent
                                 name: motionPreview.atEnd ? "arrow_back" : "arrow_forward"
                                 size: Theme.iconSizeMedium

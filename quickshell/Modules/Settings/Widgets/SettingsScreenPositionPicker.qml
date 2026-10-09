@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Item {
@@ -131,7 +132,7 @@ Item {
         width: Math.min(root.width, SettingsMetrics.positionPickerMaxWidth)
         height: Math.round(width * SettingsMetrics.choiceCardPreviewRatio)
         radius: Theme.cornerRadiusM
-        color: Theme.chipSurface
+        color: SettingsMetrics.controlColor
         border.width: Theme.outlineWidth
         border.color: Theme.outlineVariant
 

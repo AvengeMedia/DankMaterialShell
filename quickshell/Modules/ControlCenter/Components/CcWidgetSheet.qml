@@ -4,10 +4,11 @@ import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import "../utils/widgets.js" as WidgetUtils
 
-DankBottomSheet {
+DBottomSheet {
     id: root
 
     property var widgets: []
@@ -99,7 +100,7 @@ DankBottomSheet {
                     radius: item.modelData.id === "user" ? Theme.fullRadius(width, height) : Theme.cornerRadiusLIncreased
                     color: CcMetrics.iconBoxInactiveColor
 
-                    DankIcon {
+                    DIcon {
                         anchors.centerIn: parent
                         name: item.modelData.icon
                         size: Theme.iconSizeLarge
@@ -107,7 +108,7 @@ DankBottomSheet {
                         visible: item.modelData.id !== "user" || PortalService.profileImageUrl === ""
                     }
 
-                    DankCircularImage {
+                    DCircularImage {
                         anchors.fill: parent
                         imageSource: PortalService.profileImageUrl
                         fallbackIcon: "material:person"
@@ -151,10 +152,9 @@ DankBottomSheet {
         signal chosen(string widgetId)
         signal toggleRequested
 
-        height: expanded ? items.y + items.implicitHeight + Theme.spacingL : collapsedHeight
+        height: expanded ? itemsClip.y + items.implicitHeight + Theme.spacingL : collapsedHeight
         radius: Theme.cornerRadiusXL
         color: CcMetrics.rowColor
-        clip: true
 
         Behavior on height {
             enabled: CcMetrics.animationsEnabled
@@ -186,7 +186,7 @@ DankBottomSheet {
                 radius: Theme.fullRadius(width, height)
                 color: CcMetrics.iconBoxInactiveColor
 
-                DankIcon {
+                DIcon {
                     anchors.centerIn: parent
                     name: card.category.icon
                     size: Theme.iconSize
@@ -207,7 +207,7 @@ DankBottomSheet {
                 elide: Text.ElideRight
             }
 
-            DankIcon {
+            DIcon {
                 id: chevron
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.spacingL
@@ -236,19 +236,26 @@ DankBottomSheet {
             }
         }
 
-        PreviewGrid {
-            id: items
+        Item {
+            id: itemsClip
             x: Theme.spacingL
             y: header.height + Theme.spacingM
             width: parent.width - Theme.spacingL * 2
-            entries: card.entries
+            height: Math.max(0, card.height - y)
             visible: card.height > card.collapsedHeight
-            enabled: card.expanded
-            onChosen: widgetId => card.chosen(widgetId)
+            clip: true
+
+            PreviewGrid {
+                id: items
+                width: parent.width
+                entries: card.entries
+                enabled: card.expanded
+                onChosen: widgetId => card.chosen(widgetId)
+            }
         }
     }
 
-    DankSearchField {
+    DSearchField {
         id: searchField
         width: parent.width
         height: Theme.fieldHeightLarge

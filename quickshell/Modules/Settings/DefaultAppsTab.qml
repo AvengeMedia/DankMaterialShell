@@ -3,7 +3,6 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
-import qs.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -105,10 +104,34 @@ Item {
         const filtered = (entries || []).filter(e => e.value !== root.dmsChooserId && e.value !== "dms-open");
         return [
             {
-                text: root.dmsChooserLabel,
-                value: root.dmsChooserId
+                name: root.dmsChooserLabel,
+                value: root.dmsChooserId,
+                icon: "material:apps"
             }
         ].concat(filtered);
+    }
+
+    function getAppIcon(appId) {
+        const entry = DesktopEntries.heuristicLookup(appId) || DesktopEntries.heuristicLookup(stripDesktopSuffix(appId));
+        return entry?.icon || "";
+    }
+
+    function stripDesktopSuffix(id) {
+        return (id || "").replace(/\.desktop$/, "");
+    }
+
+    function labeled(entries) {
+        const counts = {};
+        entries.forEach(e => counts[e.name] = (counts[e.name] || 0) + 1);
+        return entries.map(e => Object.assign({}, e, {
+                text: counts[e.name] > 1 ? `${e.name} (${stripDesktopSuffix(e.value)})` : e.name
+            }));
+    }
+
+    function labelFor(category, id) {
+        const wanted = stripDesktopSuffix(id);
+        const found = (root.categoryModels[category] || []).find(opt => stripDesktopSuffix(opt.value) === wanted);
+        return found ? found.text : root.getAppDisplayName(id);
     }
 
     function loadCategoryModel(categoryKey, categorySearchName) {
@@ -116,10 +139,11 @@ Item {
         const appIds = apps.map(app => app.id || app.execString || "").filter(id => id);
         let models = Object.assign({}, root.categoryModels);
         const entries = appIds.map(id => ({
-                    text: root.getAppDisplayName(id),
-                    value: id
+                    name: root.getAppDisplayName(id),
+                    value: id,
+                    icon: root.getAppIcon(id)
                 }));
-        models[categoryKey] = categoryKey === root.appCategory.Terminal ? entries : root.withDmsChooser(entries);
+        models[categoryKey] = labeled(categoryKey === root.appCategory.Terminal ? entries : root.withDmsChooser(entries));
         root.categoryModels = models;
     }
 
@@ -222,11 +246,12 @@ Item {
             let models = Object.assign({}, root.categoryModels);
 
             const entries = (appIds || []).map(id => ({
-                        text: root.getAppDisplayName(id),
-                        value: id
+                        name: root.getAppDisplayName(id),
+                        value: id,
+                        icon: root.getAppIcon(id)
                     }));
 
-            models[categoryIndex] = root.withDmsChooser(entries);
+            models[categoryIndex] = root.labeled(root.withDmsChooser(entries));
             root.categoryModels = models;
         }
 
@@ -234,15 +259,16 @@ Item {
             const categoryIndex = parseInt(callbackId);
             let models = Object.assign({}, root.categoryModels);
             const existing = models[categoryIndex] || root.withDmsChooser([]);
-            const known = new Set(existing.map(opt => opt.value));
-            const extra = (apps || []).filter(app => app.id && !known.has(app.id)).map(app => ({
-                        text: app.name || root.getAppDisplayName(app.id),
-                        value: app.id
+            const known = new Set(existing.map(opt => root.stripDesktopSuffix(opt.value)));
+            const extra = (apps || []).filter(app => app.id && !known.has(root.stripDesktopSuffix(app.id))).map(app => ({
+                        name: app.name || root.getAppDisplayName(app.id),
+                        value: app.id,
+                        icon: app.icon || root.getAppIcon(app.id)
                     }));
             if (extra.length === 0) {
                 return;
             }
-            models[categoryIndex] = existing.concat(extra);
+            models[categoryIndex] = root.labeled(existing.concat(extra));
             root.categoryModels = models;
         }
 
@@ -258,15 +284,16 @@ Item {
     component AppSelector: SettingsDropdownRow {
         property int category: -1
         options: (root.categoryModels[category] || []).map(opt => opt.text)
+        optionImages: (root.categoryModels[category] || []).map(opt => opt.icon || "")
         enabled: options.length > 0
         emptyText: options.length > 0 ? I18n.tr("Unset", "Unset") : ""
         opacity: options.length > 0 ? 1 : 0.5
         currentValue: {
-            let id = root[propertyName(category)];
-            if (!id || id.length === 0) {
+            const id = root[propertyName(category)];
+            if (!id) {
                 return "";
             }
-            return root.getAppDisplayName(id);
+            return root.labelFor(category, id);
         }
         onValueChanged: val => {
             let model = root.categoryModels[category] || [];

@@ -1,9 +1,9 @@
 import QtQuick
 import QtQuick.Effects
 import qs.Common
-import qs.DankCommon.Common as DankCommon
+import qs.DCommon.Common as DCommon
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -70,7 +70,7 @@ Item {
         if (isMiracle)
             return "https://github.com/miracle-wm-org/miracle-wm";
         if (isMango)
-            return "https://github.com/DreamMaoMao/mangowc";
+            return "https://github.com/mangowm/mango";
         if (isLabwc)
             return "https://labwc.github.io/";
         if (isAqueous)
@@ -176,7 +176,7 @@ Item {
                             text: "DANK LINUX"
                             font.pixelSize: parent.compactLogo ? 32 : 48
                             font.weight: Theme.fontWeightMedium
-                            font.family: DankCommon.Fonts.sans
+                            font.family: DCommon.Fonts.sans
                             color: Theme.surfaceText
                             antialiasing: true
                         }
@@ -217,40 +217,40 @@ Item {
 
                         property bool compactMode: parent.width < 450
 
-                        DankButton {
+                        DButton {
                             id: docsButton
                             tooltipText: resourceButtonsRow.compactMode ? I18n.tr("Docs") + " - " + Site.domain + "/docs" : Site.domain + "/docs"
                             text: resourceButtonsRow.compactMode ? "" : I18n.tr("Docs")
                             iconName: "menu_book"
                             iconSize: 18
-                            backgroundColor: Theme.chipSurface
+                            backgroundColor: SettingsMetrics.controlSurface
                             textColor: Theme.surfaceText
                             onClicked: Qt.openUrlExternally(Site.docs)
                         }
 
-                        DankButton {
+                        DButton {
                             id: pluginsButton
                             tooltipText: resourceButtonsRow.compactMode ? I18n.tr("Plugins") + " - plugins." + Site.domain : "plugins." + Site.domain
                             text: resourceButtonsRow.compactMode ? "" : I18n.tr("Plugins")
                             iconName: "extension"
                             iconSize: 18
-                            backgroundColor: Theme.chipSurface
+                            backgroundColor: SettingsMetrics.controlSurface
                             textColor: Theme.surfaceText
                             onClicked: Qt.openUrlExternally(Site.plugins)
                         }
 
-                        DankButton {
+                        DButton {
                             id: githubButton
                             tooltipText: resourceButtonsRow.compactMode ? "GitHub - AvengeMedia/DankMaterialShell" : "github.com/AvengeMedia/DankMaterialShell"
                             text: resourceButtonsRow.compactMode ? "" : "GitHub"
                             iconName: "code"
                             iconSize: 18
-                            backgroundColor: Theme.chipSurface
+                            backgroundColor: SettingsMetrics.controlSurface
                             textColor: Theme.surfaceText
                             onClicked: Qt.openUrlExternally("https://github.com/AvengeMedia/DankMaterialShell")
                         }
 
-                        DankButton {
+                        DButton {
                             id: kofiButton
                             tooltipText: resourceButtonsRow.compactMode ? "Ko-fi" + " - ko-fi.com/danklinux" : "ko-fi.com/danklinux"
                             text: resourceButtonsRow.compactMode ? "" : "Ko-fi"
@@ -267,7 +267,7 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                         spacing: Theme.spacingXS
 
-                        DankActionButton {
+                        DActionButton {
                             tooltipText: compositorTooltip
                             tooltipSide: "top"
                             onClicked: {
@@ -287,7 +287,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             visible: showMatrix
                             tooltipText: I18n.tr("niri Matrix chat")
                             tooltipSide: "top"
@@ -309,7 +309,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             visible: showIrc
                             iconName: "forum"
                             iconSize: Theme.iconSizeMedium
@@ -319,7 +319,7 @@ Item {
                             onClicked: Qt.openUrlExternally(ircUrl)
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             tooltipText: dmsDiscordTooltip
                             tooltipSide: "top"
                             onClicked: Qt.openUrlExternally(dmsDiscordUrl)
@@ -335,7 +335,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             visible: showCompositorDiscord
                             tooltipText: compositorDiscordTooltip
                             tooltipSide: "top"
@@ -352,7 +352,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             visible: showReddit
                             tooltipText: redditTooltip
                             tooltipSide: "top"
@@ -415,7 +415,7 @@ Item {
                 title: I18n.tr("Status")
                 trailingBadge: I18n.tr("Connected")
 
-                DankBadge {
+                DBadge {
                     color: Theme.success
                 }
             }
@@ -430,7 +430,7 @@ Item {
                     Repeater {
                         model: DMSService.capabilities
 
-                        DankBadge {
+                        DBadge {
                             text: modelData
                             color: Theme.primaryHover
                             textColor: Theme.primary

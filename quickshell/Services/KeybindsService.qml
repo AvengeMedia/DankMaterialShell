@@ -103,13 +103,13 @@ Singleton {
         case "hyprland":
             return configDir + "/hypr";
         case "mangowc":
-            return configDir + "/mango";
+            return MangoService.configDir + "/mango";
         default:
             return "";
         }
     }
     readonly property string includeCompositor: currentProvider === "mangowc" ? "mango" : currentProvider
-    readonly property var includePaths: ConfigIncludeResolve.includePaths("binds", includeCompositor, configDir)
+    readonly property var includePaths: ConfigIncludeResolve.includePaths("binds", includeCompositor, includeCompositor === "mango" ? MangoService.configDir : configDir)
     readonly property string dmsBindsPath: includePaths?.fragmentFiles[0] ?? ""
     readonly property string mainConfigPath: includePaths?.configFile ?? ""
     readonly property bool readOnly: currentProvider === "hyprland" && dmsStatus.readOnly === true
@@ -132,10 +132,29 @@ Singleton {
         }
     }
 
+    property int _consumers: 0
+    property bool _bindsStale: false
+
+    function addRef() {
+        _consumers++;
+        if (!_bindsStale)
+            return;
+        _bindsStale = false;
+        loadBinds(false);
+    }
+
+    function removeRef() {
+        _consumers = Math.max(0, _consumers - 1);
+    }
+
     Connections {
         target: NiriService
         enabled: CompositorService.isNiri
         function onConfigReloaded() {
+            if (root._consumers === 0) {
+                root._bindsStale = true;
+                return;
+            }
             Qt.callLater(root.loadBinds, false);
         }
     }
@@ -349,21 +368,24 @@ Singleton {
         cheatsheetProcess.running = true;
     }
 
-    function canExecuteAction(action) {
+    function canExecuteAction(action, luaAction) {
         if (!action)
             return false;
         if (action.startsWith("spawn ") || action.startsWith("spawn_shell ") || action.startsWith("spawn-sh ") || action.startsWith("exec "))
             return true;
         const provider = currentProvider || cheatsheetProvider;
-        if (provider === "niri") {
-            const base = action.trim().split(/\s+/)[0];
-            if (base === "next-window" || base === "previous-window")
-                return false;
-        }
+        const base = action.trim().split(/\s+/)[0];
+        if (provider === "niri" && (base === "next-window" || base === "previous-window"))
+            return false;
+        // Mouse-drag dispatchers do nothing without a pointer, and exit would end the session.
+        if (provider === "hyprland" && (action.trim() === "movewindow" || action.trim() === "resizewindow" || base === "exit"))
+            return false;
+        if (provider === "hyprland" && !luaAction && HyprlandService.luaConfigActive)
+            return false;
         return provider === "niri" || provider === "hyprland" || provider === "mangowc";
     }
 
-    function executeAction(action) {
+    function executeAction(action, luaAction) {
         if (!action)
             return false;
         log.info("Executing keybind action:", action);
@@ -412,12 +434,20 @@ Singleton {
             return true;
         }
         if (provider === "hyprland") {
-            Quickshell.execDetached(["sh", "-c", "hyprctl dispatch " + action]);
+            if (!HyprlandService.luaConfigActive) {
+                Quickshell.execDetached(["sh", "-c", "hyprctl dispatch " + action]);
+                return true;
+            }
+            // Lua-config Hyprland rejects legacy dispatcher text as a syntax error.
+            if (!luaAction)
+                return false;
+            Quickshell.execDetached(["hyprctl", "dispatch", luaAction]);
             return true;
         }
         if (provider === "mangowc") {
-            const mmsgParams = action.trim().split(/\s+/).join(",");
-            Quickshell.execDetached(["sh", "-c", "mmsg -d " + mmsgParams]);
+            const trimmed = action.trim();
+            const space = trimmed.indexOf(" ");
+            MangoService.dispatch(space < 0 ? trimmed : trimmed.slice(0, space) + "," + trimmed.slice(space + 1).trim());
             return true;
         }
 

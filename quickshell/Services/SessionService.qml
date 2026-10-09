@@ -43,6 +43,8 @@ Singleton {
     signal sessionLocked
     signal sessionUnlocked
     signal sessionResumed
+    signal lockEditorRequested
+    signal greeterEditorRequested
     signal lidOpened
     signal loginctlStateChanged
 
@@ -62,12 +64,7 @@ Singleton {
         running: true
         repeat: false
         onTriggered: {
-            detectUwsmProcess.running = true;
-            detectElogindProcess.running = true;
-            detectLoginctlProcess.running = true;
-            detectSystemctlProcess.running = true;
-            detectHibernateProcess.running = true;
-            detectPrimeRunProcess.running = true;
+            detectEnvironmentProcess.running = true;
             if (!SettingsData.loginctlLockIntegration) {
                 log.debug("loginctl lock integration disabled by user");
                 return;
@@ -89,54 +86,49 @@ Singleton {
     }
 
     Process {
-        id: detectUwsmProcess
+        id: detectEnvironmentProcess
         running: false
-        command: ["sh", "-c", "command -v uwsm > /dev/null 2>&1 && systemctl --user is-active --quiet 'wayland-wm@*.service' 2> /dev/null"]
+        command: ["sh", "-c", `uwsm=0; command -v uwsm >/dev/null 2>&1 && systemctl --user is-active --quiet 'wayland-wm@*.service' 2>/dev/null && uwsm=1
+elogind=0; ps -eo comm= | grep -qE '^(elogind|elogind-daemon)$' && elogind=1
+loginctl=0; command -v loginctl >/dev/null 2>&1 && loginctl=1
+systemctl=0; usermgr=0
+if command -v systemctl >/dev/null 2>&1; then systemctl=1; systemctl --user --no-pager show-environment >/dev/null 2>&1 && usermgr=1; fi
+hibernate=0; grep -q disk /sys/power/state 2>/dev/null && hibernate=1
+nvidia=; command -v prime-run >/dev/null 2>&1 && nvidia=prime-run
+[ -z "$nvidia" ] && command -v nvidia-offload >/dev/null 2>&1 && nvidia=nvidia-offload
+printf 'uwsm=%s\nelogind=%s\nloginctl=%s\nsystemctl=%s\nusermgr=%s\nhibernate=%s\nnvidia=%s\n' "$uwsm" "$elogind" "$loginctl" "$systemctl" "$usermgr" "$hibernate" "$nvidia"`]
 
-        onExited: function (exitCode) {
-            hasUwsm = (exitCode === 0);
-        }
-    }
-
-    Process {
-        id: detectElogindProcess
-        running: false
-        command: ["sh", "-c", "ps -eo comm= | grep -E '^(elogind|elogind-daemon)$'"]
-
-        onExited: function (exitCode) {
-            log.debug("Elogind detection exited with code", exitCode);
-            isElogind = (exitCode === 0);
-        }
-    }
-
-    Process {
-        id: detectLoginctlProcess
-        running: false
-        command: ["sh", "-c", "command -v loginctl"]
-
-        onExited: function (exitCode) {
-            loginctlCommandAvailable = (exitCode === 0);
-        }
-    }
-
-    Process {
-        id: detectSystemctlProcess
-        running: false
-        command: ["sh", "-c", "command -v systemctl > /dev/null || exit 1; systemctl --user show-environment > /dev/null 2>&1 || exit 2"]
-
-        onExited: function (exitCode) {
-            systemctlCommandAvailable = (exitCode === 0 || exitCode === 2);
-            userManagerAvailable = (exitCode === 0);
-        }
-    }
-
-    Process {
-        id: detectHibernateProcess
-        running: false
-        command: ["grep", "-q", "disk", "/sys/power/state"]
-
-        onExited: function (exitCode) {
-            hibernateSupported = (exitCode === 0);
+        stdout: SplitParser {
+            splitMarker: "\n"
+            onRead: line => {
+                const eq = line.indexOf("=");
+                if (eq <= 0)
+                    return;
+                const value = line.substring(eq + 1).trim();
+                switch (line.substring(0, eq)) {
+                case "uwsm":
+                    root.hasUwsm = value === "1";
+                    return;
+                case "elogind":
+                    root.isElogind = value === "1";
+                    return;
+                case "loginctl":
+                    root.loginctlCommandAvailable = value === "1";
+                    return;
+                case "systemctl":
+                    root.systemctlCommandAvailable = value === "1";
+                    return;
+                case "usermgr":
+                    root.userManagerAvailable = value === "1";
+                    return;
+                case "hibernate":
+                    root.hibernateSupported = !root.isBSD && value === "1";
+                    return;
+                case "nvidia":
+                    root.nvidiaCommand = value;
+                    return;
+                }
+            }
         }
     }
 
@@ -158,32 +150,6 @@ Singleton {
             }
             ToastService.showError(I18n.tr("Hibernate failed"), errorOutput);
             errorOutput = "";
-        }
-    }
-
-    Process {
-        id: detectPrimeRunProcess
-        running: false
-        command: ["sh", "-c", "command -v prime-run"]
-
-        onExited: function (exitCode) {
-            if (exitCode === 0) {
-                nvidiaCommand = "prime-run";
-            } else {
-                detectNvidiaOffloadProcess.running = true;
-            }
-        }
-    }
-
-    Process {
-        id: detectNvidiaOffloadProcess
-        running: false
-        command: ["sh", "-c", "command -v nvidia-offload"]
-
-        onExited: function (exitCode) {
-            if (exitCode === 0) {
-                nvidiaCommand = "nvidia-offload";
-            }
         }
     }
 

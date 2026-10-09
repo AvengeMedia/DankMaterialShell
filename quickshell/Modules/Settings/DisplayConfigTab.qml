@@ -3,6 +3,7 @@ import qs.Common
 import qs.Modals
 import qs.Modals.FileBrowser
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 import qs.Modules.Settings.DisplayConfig
@@ -102,7 +103,7 @@ Item {
                 subtitle: DisplayConfigState.validationError
                 subtitleColor: Theme.error
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Discard draft and reload", "Discard unsaved Aqueous display settings and refresh the current display state")
                     enabled: !DisplayConfigState.validatingConfig
                     onClicked: DisplayConfigState.discardAqueousPreview()
@@ -138,9 +139,10 @@ Item {
                     spacing: Theme.spacingS
                     opacity: SettingsData.displayProfileAutoSelect ? 0.4 : 1.0
 
-                    DankDropdown {
+                    DDropdown {
                         id: profileDropdown
                         downKeyOpens: false
+                        backgroundColor: SettingsMetrics.controlSurface
                         width: parent.width - newButton.width - editMonitorsButton.width - deleteButton.width - Theme.spacingS * 3
                         compactMode: true
                         dropdownWidth: width
@@ -160,13 +162,13 @@ Item {
                         value: SettingsData.displayProfileAutoSelect ? I18n.tr("Auto") : root.getProfileNameById(root.selectedProfileId)
                     }
 
-                    DankButton {
+                    DButton {
                         id: newButton
                         tooltipText: I18n.tr("New profile")
                         iconName: "add"
                         text: ""
                         horizontalPadding: Theme.spacingM
-                        backgroundColor: Theme.chipSurface
+                        backgroundColor: SettingsMetrics.controlSurface
                         textColor: Theme.surfaceText
                         enabled: !SettingsData.displayProfileAutoSelect
                         onClicked: {
@@ -175,25 +177,25 @@ Item {
                         }
                     }
 
-                    DankButton {
+                    DButton {
                         id: editMonitorsButton
                         tooltipText: I18n.tr("Edit monitors")
                         iconName: "edit"
                         text: ""
                         horizontalPadding: Theme.spacingM
-                        backgroundColor: Theme.chipSurface
+                        backgroundColor: SettingsMetrics.controlSurface
                         textColor: Theme.surfaceText
                         enabled: root.selectedProfileId !== "" && !SettingsData.displayProfileAutoSelect
                         onClicked: root.openEditMonitorsDialog()
                     }
 
-                    DankButton {
+                    DButton {
                         id: deleteButton
                         Accessible.name: I18n.tr("Delete profile")
                         iconName: "delete"
                         text: ""
                         horizontalPadding: Theme.spacingM
-                        backgroundColor: Theme.chipSurface
+                        backgroundColor: SettingsMetrics.controlSurface
                         textColor: Theme.error
                         enabled: root.selectedProfileId !== "" && !SettingsData.displayProfileAutoSelect
                         onClicked: root.showDeleteConfirmDialog = true
@@ -207,7 +209,7 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingS
 
-                    DankTextField {
+                    DTextField {
                         id: newProfileField
                         outlined: true
                         leftIconName: "badge"
@@ -223,7 +225,7 @@ Item {
                         Component.onCompleted: forceActiveFocus()
                     }
 
-                    DankButton {
+                    DButton {
                         id: createButton
                         text: I18n.tr("Create")
                         enabled: root.newProfileName.trim() !== ""
@@ -233,7 +235,7 @@ Item {
                         }
                     }
 
-                    DankButton {
+                    DButton {
                         id: cancelNewButton
                         text: I18n.tr("Cancel")
                         backgroundColor: "transparent"
@@ -247,7 +249,7 @@ Item {
                 visible: root.showDeleteConfirmDialog
                 title: I18n.tr("Delete profile \"%1\"?", "delete confirmation, %1 is the display profile name").arg(root.getProfileNameById(root.selectedProfileId))
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Delete")
                     backgroundColor: Theme.error
                     textColor: Theme.primaryText
@@ -257,7 +259,7 @@ Item {
                     }
                 }
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Cancel")
                     backgroundColor: "transparent"
                     textColor: Theme.surfaceText
@@ -295,7 +297,7 @@ Item {
             SettingsRow {
                 visible: root.showEditMonitorsDialog
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Save")
                     enabled: Object.values(root.editMonitorSelection).some(v => v)
                     onClicked: {
@@ -305,7 +307,7 @@ Item {
                     }
                 }
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Cancel")
                     backgroundColor: "transparent"
                     textColor: Theme.surfaceText
@@ -372,7 +374,7 @@ Item {
                     return I18n.tr("%1 disconnected (hidden)", "displays row title, %1 is a count of disconnected monitors").arg(disconnected.length);
                 }
 
-                DankButton {
+                DButton {
                     text: SettingsData.displayShowDisconnected ? I18n.tr("Hide") : I18n.tr("Show")
                     backgroundColor: "transparent"
                     textColor: Theme.primary
@@ -415,14 +417,14 @@ Item {
             id: pendingChangesBar
             shown: DisplayConfigState.hasOutputBackend && DisplayConfigState.hasPendingChanges
 
-            DankFab {
+            DFab {
                 text: I18n.tr("Discard", "verb, button to discard pending changes")
                 iconName: "undo"
                 colorRole: "secondaryContainer"
                 onClicked: DisplayConfigState.discardChanges()
             }
 
-            DankFab {
+            DFab {
                 text: I18n.tr("Apply changes")
                 iconName: "check"
                 colorRole: "primary"
@@ -456,7 +458,7 @@ Item {
     readonly property bool identifyConfigured: {
         if (!DisplayConfigState.hasOutputBackend || DisplayConfigState.readOnly)
             return false;
-        if (!["niri", "hyprland", "mango"].includes(CompositorService.compositor))
+        if (!DisplayConfigState.include.compositorSupported)
             return true;
         return DisplayConfigState.includeStatus.included;
     }

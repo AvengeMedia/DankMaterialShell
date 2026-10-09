@@ -4,7 +4,7 @@ import QtQuick
 import qs.Common
 import qs.Modals.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -142,7 +142,7 @@ Item {
                 title: I18n.tr("Status", "noun, settings row or section title showing current state")
                 trailingBadge: CupsService.cupsAvailable ? I18n.tr("Available") : I18n.tr("Unavailable")
 
-                DankBadge {
+                DBadge {
                     color: CupsService.cupsAvailable ? Theme.success : Theme.error
                 }
             }
@@ -168,7 +168,7 @@ Item {
                 iconName: "add_circle"
                 title: I18n.tr("Configure a new printer")
 
-                DankActionButton {
+                DActionButton {
                     iconName: "close"
                     Accessible.name: I18n.tr("Cancel")
                     onClicked: {
@@ -225,7 +225,7 @@ Item {
                         printerTab.selectDevice(device);
                 }
 
-                DankRefreshButton {
+                DRefreshButton {
                     buttonSize: 32
                     anchors.verticalCenter: parent.verticalCenter
                     busy: CupsService.loadingDevices
@@ -285,12 +285,12 @@ Item {
                     const error = result?.data?.error || result?.error || "";
                     return [details, error].filter(line => line !== "").join("\n");
                 }
-                leading: DankBadge {
+                leading: DBadge {
                     visible: printerTab.testConnectionResult !== null
                     color: printerTab.testConnectionResult?.success ? Theme.success : Theme.error
                 }
 
-                DankButton {
+                DButton {
                     text: printerTab.testingConnection ? I18n.tr("Testing...", "Button state while testing printer connection") : I18n.tr("Test connection", "Button to test connection to a printer by IP address")
                     iconName: printerTab.testingConnection ? "sync" : "lan"
                     buttonHeight: 36
@@ -359,7 +359,7 @@ Item {
                         printerTab.selectedPpd = ppd.name;
                 }
 
-                DankRefreshButton {
+                DRefreshButton {
                     buttonSize: 32
                     anchors.verticalCenter: parent.verticalCenter
                     busy: CupsService.loadingPPDs
@@ -401,7 +401,7 @@ Item {
                     width: parent.width
                     layoutDirection: Qt.RightToLeft
 
-                    DankButton {
+                    DButton {
                         text: CupsService.creatingPrinter ? I18n.tr("Creating...", "create printer button label while the printer is being added") : I18n.tr("Create printer")
                         iconName: CupsService.creatingPrinter ? "sync" : "add"
                         buttonHeight: 36
@@ -437,7 +437,7 @@ Item {
                     color: Theme.surfaceVariantText
                     anchors.verticalCenter: parent.verticalCenter
                 },
-                DankActionButton {
+                DActionButton {
                     iconName: "refresh"
                     Accessible.name: I18n.tr("Refresh")
                     buttonSize: 32
@@ -451,7 +451,7 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingS
 
-                    DankIcon {
+                    DIcon {
                         name: "print_disabled"
                         size: 32
                         color: Theme.surfaceVariantText
@@ -506,7 +506,7 @@ Item {
                         clickable: true
                         onClicked: CupsService.setSelectedPrinter(printerDelegate.modelData)
 
-                        DankActionButton {
+                        DActionButton {
                             iconName: printerDelegate.isExpanded ? "expand_less" : "expand_more"
                             Accessible.name: printerDelegate.isExpanded ? I18n.tr("Collapse") : I18n.tr("Expand")
                             onClicked: {
@@ -514,7 +514,7 @@ Item {
                             }
                         }
 
-                        DankActionButton {
+                        DActionButton {
                             iconName: "delete"
                             Accessible.name: I18n.tr("Delete")
                             onClicked: {
@@ -573,7 +573,7 @@ Item {
                                         return fields;
                                     }
 
-                                    delegate: DankDetailChip {
+                                    delegate: DDetailChip {
                                         required property var modelData
 
                                         label: modelData.label
@@ -586,11 +586,11 @@ Item {
                                 width: parent.width
                                 spacing: Theme.spacingS
 
-                                DankButton {
+                                DButton {
                                     text: printerDelegate.isStopped ? I18n.tr("Resume", "verb, button that resumes a paused printer") : I18n.tr("Pause")
                                     iconName: printerDelegate.isStopped ? "play_arrow" : "pause"
                                     buttonHeight: Theme.buttonHeightXS
-                                    backgroundColor: Theme.chipSurface
+                                    backgroundColor: SettingsMetrics.controlSurface
                                     textColor: Theme.surfaceText
                                     onClicked: {
                                         if (printerDelegate.isStopped) {
@@ -601,20 +601,20 @@ Item {
                                     }
                                 }
 
-                                DankButton {
+                                DButton {
                                     text: I18n.tr("Test page")
                                     iconName: "description"
                                     buttonHeight: Theme.buttonHeightXS
-                                    backgroundColor: Theme.chipSurface
+                                    backgroundColor: SettingsMetrics.controlSurface
                                     textColor: Theme.surfaceText
                                     onClicked: CupsService.printTestPage(printerDelegate.modelData)
                                 }
 
-                                DankButton {
+                                DButton {
                                     text: printerDelegate.printerData?.accepting ? I18n.tr("Reject jobs") : I18n.tr("Accept jobs")
                                     iconName: printerDelegate.printerData?.accepting ? "block" : "check_circle"
                                     buttonHeight: Theme.buttonHeightXS
-                                    backgroundColor: Theme.chipSurface
+                                    backgroundColor: SettingsMetrics.controlSurface
                                     textColor: Theme.surfaceText
                                     onClicked: {
                                         if (printerDelegate.printerData?.accepting) {
@@ -639,11 +639,11 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
 
-                                DankButton {
+                                DButton {
                                     text: I18n.tr("Clear All")
                                     iconName: "delete_sweep"
                                     buttonHeight: Theme.buttonHeightXS
-                                    backgroundColor: Theme.chipSurface
+                                    backgroundColor: SettingsMetrics.controlSurface
                                     textColor: Theme.surfaceText
                                     onClicked: {
                                         purgeJobsConfirm.showWithOptions({
@@ -677,21 +677,21 @@ Item {
                                 return size + " KB • " + date.toLocaleString(Qt.locale(), Locale.ShortFormat);
                             }
 
-                            DankActionButton {
+                            DActionButton {
                                 visible: jobRow.modelData.state === "pending"
                                 iconName: "pause"
                                 Accessible.name: I18n.tr("Pause")
                                 onClicked: CupsService.holdJob(jobRow.modelData.id)
                             }
 
-                            DankActionButton {
+                            DActionButton {
                                 visible: jobRow.modelData.state === "pending-held" || jobRow.modelData.state === "completed" || jobRow.modelData.state === "aborted"
                                 iconName: "replay"
                                 tooltipText: I18n.tr("Retry")
                                 onClicked: CupsService.restartJob(jobRow.modelData.id)
                             }
 
-                            DankActionButton {
+                            DActionButton {
                                 iconName: "close"
                                 Accessible.name: I18n.tr("Cancel")
                                 onClicked: CupsService.cancelJob(printerDelegate.modelData, jobRow.modelData.id)
@@ -715,7 +715,7 @@ Item {
                     color: Theme.surfaceVariantText
                     anchors.verticalCenter: parent.verticalCenter
                 },
-                DankActionButton {
+                DActionButton {
                     iconName: "refresh"
                     Accessible.name: I18n.tr("Refresh")
                     buttonSize: 32
@@ -736,7 +736,7 @@ Item {
                     title: modelData.name || I18n.tr("Unknown")
                     subtitle: ((modelData.members?.length ?? 0) === 1 ? I18n.tr("%1 printer") : I18n.tr("%1 printers")).arg(modelData.members?.length ?? 0)
 
-                    DankActionButton {
+                    DActionButton {
                         iconName: "delete"
                         Accessible.name: I18n.tr("Delete")
                         onClicked: {
@@ -756,7 +756,7 @@ Item {
         SettingsFabBar {
             shown: CupsService.cupsAvailable && !printerTab.showAddPrinter
 
-            DankFab {
+            DFab {
                 text: I18n.tr("Add printer")
                 iconName: "add"
                 onClicked: {

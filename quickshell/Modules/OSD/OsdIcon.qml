@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Loader {
     id: root
@@ -24,7 +24,7 @@ Loader {
     Component {
         id: action
 
-        DankActionButton {
+        DActionButton {
             buttonSize: root.width
             iconName: root.iconName
             iconSize: root.glyphSize
@@ -43,7 +43,7 @@ Loader {
             radius: Theme.fullRadius(width, height)
             color: !root.tonal ? "transparent" : root.available ? root.backgroundColor : Theme.onSurface_12
 
-            DankIcon {
+            DIcon {
                 anchors.centerIn: parent
                 name: root.iconName
                 size: root.glyphSize

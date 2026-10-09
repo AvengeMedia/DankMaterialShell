@@ -14,6 +14,7 @@ Singleton {
     property int indexVersion: 0
     property bool supportsTypeFilter: false
     property bool versionChecked: false
+    property bool _checked: false
 
     signal searchResultsReceived(var results)
     signal statsReceived(var stats)
@@ -22,7 +23,7 @@ Singleton {
     Process {
         id: checkProcess
         command: ["sh", "-c", "command -v dsearch"]
-        running: true
+        running: false
 
         stdout: SplitParser {
             onRead: line => {
@@ -52,7 +53,14 @@ Singleton {
         });
     }
 
+    function ensureChecked() {
+        if (_checked)
+            return;
+        rediscover();
+    }
+
     function ping(callback) {
+        ensureChecked();
         if (!dsearchAvailable) {
             if (callback) {
                 callback({
@@ -94,6 +102,7 @@ Singleton {
             return;
         }
 
+        ensureChecked();
         if (!dsearchAvailable) {
             if (callback) {
                 callback({
@@ -179,6 +188,7 @@ Singleton {
     }
 
     function rediscover() {
+        _checked = true;
         checkProcess.running = true;
     }
 }

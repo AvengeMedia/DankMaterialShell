@@ -76,7 +76,7 @@ func init() {
 		cmd.Flags().Float64("contrast", 0, "Contrast value from -1 to 1 (0 = standard)")
 		cmd.Flags().String("source-mode", "", "Source color selection: dominant, colorful, darkness, lightness, saturation, less-saturation, value")
 		cmd.Flags().String("seed-color", "", "Hex color to build the palette from instead of extracting one from the wallpaper")
-		cmd.Flags().String("spec", "", "Material color spec: 2021 (matugen native, default) or 2025 (Material 3 Expressive)")
+		cmd.Flags().String("spec", "", "Material color spec: 2021 (matugen native, default), 2025 (Material 3 Expressive) or dms (2025 accents on neutral surfaces)")
 	}
 
 	matugenQueueCmd.Flags().Bool("wait", true, "Wait for completion")
@@ -84,7 +84,7 @@ func init() {
 	matugenPreviewCmd.Flags().String("source-color", "", "Source color used to generate previews")
 	matugenPreviewCmd.Flags().String("image", "", "Wallpaper image used to resolve the scheme-smart preview")
 	matugenPreviewCmd.Flags().Float64("contrast", 0, "Contrast value from -1 to 1 (0 = standard)")
-	matugenPreviewCmd.Flags().String("spec", "", "Material color spec: 2021 (matugen native, default) or 2025 (Material 3 Expressive)")
+	matugenPreviewCmd.Flags().String("spec", "", "Material color spec: 2021 (matugen native, default), 2025 (Material 3 Expressive) or dms (2025 accents on neutral surfaces)")
 	matugenQtengineCmd.Flags().String("config-dir", "", "User config directory")
 	matugenQtengineCmd.Flags().String("icon-theme", "", "Icon theme name")
 }

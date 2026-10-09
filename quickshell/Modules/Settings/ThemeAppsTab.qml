@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -65,7 +65,7 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingM
 
-                    DankButton {
+                    DButton {
                         width: (parent.width - Theme.spacingM) / 2
                         iconName: "settings"
                         text: I18n.tr("Apply GTK colors")
@@ -74,7 +74,7 @@ Item {
                         onClicked: Theme.applyGtkColors()
                     }
 
-                    DankButton {
+                    DButton {
                         width: (parent.width - Theme.spacingM) / 2
                         iconName: "settings"
                         text: I18n.tr("Apply Qt colors")

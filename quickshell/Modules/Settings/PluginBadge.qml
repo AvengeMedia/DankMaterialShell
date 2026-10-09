@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
+import qs.Modules.Settings.Widgets
 
 Rectangle {
     id: root
@@ -12,7 +13,7 @@ Rectangle {
     height: Theme.iconSize
     width: content.implicitWidth + Theme.spacingS * 2
     radius: Theme.cornerRadiusS
-    color: Theme.chipSurface
+    color: SettingsMetrics.controlColor
     border.color: Theme.outlineVariant
     border.width: Theme.outlineWidth
 
@@ -21,7 +22,7 @@ Rectangle {
         anchors.centerIn: parent
         spacing: Theme.spacingXXS
 
-        DankIcon {
+        DIcon {
             name: root.iconName
             size: Theme.iconSizeSmall
             color: root.tone

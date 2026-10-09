@@ -1,9 +1,10 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
-DankFloatingWindow {
+DFloatingWindow {
     id: root
 
     readonly property int modalWidth: 680
@@ -43,7 +44,7 @@ DankFloatingWindow {
             }
         }
 
-        DankWindowHeader {
+        DWindowHeader {
             id: headerRow
             anchors.left: parent.left
             anchors.right: parent.right
@@ -52,12 +53,11 @@ DankFloatingWindow {
             onCloseRequested: root.dismiss()
         }
 
-        DankFlickable {
+        DFlickable {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: headerRow.bottom
             anchors.bottom: footerRow.top
-            anchors.topMargin: Theme.spacingS
             clip: true
             contentHeight: mainColumn.height + Theme.spacingL * 2
             contentWidth: width
@@ -91,8 +91,8 @@ DankFloatingWindow {
                 anchors.centerIn: parent
                 spacing: Theme.spacingM
 
-                DankButton {
-                    text: I18n.tr("Release notes")
+                DButton {
+                    text: I18n.tr("Release notes", "settings page and card title, notes for a DMS release")
                     iconName: "auto_awesome"
                     backgroundColor: Theme.chipSurface
                     textColor: Theme.surfaceText
@@ -102,7 +102,7 @@ DankFloatingWindow {
                     }
                 }
 
-                DankButton {
+                DButton {
                     text: I18n.tr("OK")
                     iconName: "check"
                     backgroundColor: Theme.primary

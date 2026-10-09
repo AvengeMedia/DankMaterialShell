@@ -1,12 +1,14 @@
 package providers
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/mangoconf"
 )
 
 func TestMangoWCProviderDefaultPath(t *testing.T) {
@@ -472,6 +474,77 @@ func TestMangoWCRemoveBindPreservesNonBindLines(t *testing.T) {
 	} {
 		if !strings.Contains(content, want) {
 			t.Fatalf("expected non-bind line %q to be preserved\ncontent:\n%s", want, content)
+		}
+	}
+}
+
+func TestMangoWCCheatSheetFirstBindWins(t *testing.T) {
+	tmpDir := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(tmpDir, "dms"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	main := "bind=SUPER,q,killclient\nsource=./dms/binds.conf\nbind=SUPER,w,spawn,late\n"
+	dms := "bind=SUPER,q,spawn,dmsq\nbind=SUPER,w,spawn,dmsw\n"
+	if err := os.WriteFile(filepath.Join(tmpDir, "config.conf"), []byte(main), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(tmpDir, "dms", "binds.conf"), []byte(dms), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	sheet, err := NewMangoWCProvider(tmpDir).GetCheatSheet()
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]string{}
+	for _, binds := range sheet.Binds {
+		for _, b := range binds {
+			conflict := ""
+			if b.Conflict != nil {
+				conflict = " <- " + b.Conflict.Action
+			}
+			got[strings.ToLower(b.Key)] = b.Action + conflict
+		}
+	}
+	if got["super+q"] != "spawn dmsq <- killclient" {
+		t.Errorf("super+q = %q: the earlier config bind shadows the DMS one", got["super+q"])
+	}
+	if got["super+w"] != "spawn dmsw" {
+		t.Errorf("super+w = %q: a config bind after the DMS one is ignored by Mango", got["super+w"])
+	}
+	if sheet.DMSStatus == nil || sheet.DMSStatus.OverriddenBy != 1 {
+		t.Errorf("DMSStatus = %+v, want OverriddenBy 1", sheet.DMSStatus)
+	}
+}
+
+func TestMangoWCSetBindEditsUserBindsInPlace(t *testing.T) {
+	stock := "bind=SUPER,t,spawn,ghostty\nbind=SUPER,space,spawn,dms ipc call spotlight toggle\n"
+	for i := 0; i < 10; i++ {
+		stock += fmt.Sprintf("bind=SUPER,%d,view,%d\n", i, i)
+	}
+	for name, content := range map[string]string{
+		"kept":      mangoconf.BindsKeptHeader + "\n" + stock,
+		"moved":     mangoconf.BindsMovedHeader + "\n" + stock,
+		"mousebind": stock + "mousebind=SUPER,btn_left,moveresize,curmove\n",
+		"keymode":   stock + "keymode=resize\nbind=NONE,h,resizewin,-10,0\n",
+	} {
+		tmpDir := t.TempDir()
+		bindsPath := filepath.Join(tmpDir, "dms", "binds.conf")
+		if err := os.MkdirAll(filepath.Dir(bindsPath), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(bindsPath, []byte(content), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		if err := NewMangoWCProvider(tmpDir).SetBind("SUPER+SHIFT+S", "spawn dms screenshot", "", nil); err != nil {
+			t.Fatalf("%s: SetBind failed: %v", name, err)
+		}
+		got, _ := os.ReadFile(bindsPath)
+		if strings.Contains(string(got), "# DMS default keybinds") || strings.Contains(string(got), "gesturebind=") {
+			t.Fatalf("%s: user binds were rebuilt from the stock template:\n%s", name, got)
+		}
+		if !strings.HasPrefix(strings.ToLower(string(got)), strings.ToLower(content)) {
+			t.Fatalf("%s: existing lines changed:\n%s", name, got)
 		}
 	}
 }

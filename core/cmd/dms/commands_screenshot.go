@@ -378,6 +378,12 @@ func runScreenshot(config screenshot.Config) {
 		}
 	}
 
+	if result.CopyOnly {
+		config.SaveFile = false
+		config.Clipboard = true
+		config.Stdout = false
+	}
+
 	if config.Stdout {
 		if err := writeImageToStdout(result.Buffer, config.Format, config.Quality, result.Format, result.CICP); err != nil {
 			exitScreenshotError(" writing to stdout", err)
@@ -408,27 +414,44 @@ func runScreenshot(config screenshot.Config) {
 	}
 
 	if config.Clipboard {
-		if err := copyImageToClipboard(result.Buffer, config.Format, config.Quality, result.Format, result.CICP); err != nil {
+		var err error
+		if filePath != "" && config.Format != screenshot.FormatPPM {
+			err = copyFileToClipboard(filePath)
+		} else {
+			err = copyImageToClipboard(result.Buffer, config.Format, config.Quality, result.Format, result.CICP)
+		}
+		if err != nil {
 			exitScreenshotError(" copying to clipboard", err)
 		}
 		if !ssJSON && !config.SaveFile {
-			fmt.Println("Copied to clipboard")
+			if ssStdout {
+				fmt.Fprintln(os.Stderr, "Copied to clipboard")
+			} else {
+				fmt.Println("Copied to clipboard")
+			}
 		}
 	}
 
 	if ssJSON {
-		scale := result.Scale
-		if scale <= 0 {
-			scale = 1.0
+		if result.CopyOnly {
+			writeScreenshotJSON(screenshotMetadata{
+				Status: "aborted",
+				Error:  "User copied to clipboard",
+			})
+		} else {
+			scale := result.Scale
+			if scale <= 0 {
+				scale = 1.0
+			}
+			writeScreenshotJSON(screenshotMetadata{
+				Status: "success",
+				Path:   filePath,
+				Width:  result.Buffer.Width,
+				Height: result.Buffer.Height,
+				Scale:  scale,
+				Mime:   formatMime(config.Format),
+			})
 		}
-		writeScreenshotJSON(screenshotMetadata{
-			Status: "success",
-			Path:   filePath,
-			Width:  result.Buffer.Width,
-			Height: result.Buffer.Height,
-			Scale:  scale,
-			Mime:   formatMime(config.Format),
-		})
 	}
 
 	if config.Notify {

@@ -7,6 +7,8 @@ import qs.Widgets
 CcTile {
     id: root
 
+    property bool live: Window.window?.visible ?? false
+    property bool batteryRefHeld: false
     readonly property bool available: BatteryService.batteryAvailable
     readonly property bool profileMode: !available && PowerProfileWatcher.available
 
@@ -28,6 +30,21 @@ CcTile {
         return `${BatteryService.batteryLevel}%`;
     }
     dockedText: available || profileMode ? subtitle : title
+
+    function syncBatteryRef(wanted) {
+        if (wanted === batteryRefHeld)
+            return;
+        batteryRefHeld = wanted;
+        if (wanted) {
+            BatteryService.addRef();
+            return;
+        }
+        BatteryService.removeRef();
+    }
+
+    onLiveChanged: syncBatteryRef(live)
+    Component.onCompleted: syncBatteryRef(live)
+    Component.onDestruction: syncBatteryRef(false)
     active: available && (BatteryService.isCharging || BatteryService.isPluggedIn)
     opensPage: !profileMode
     showExpand: profileMode

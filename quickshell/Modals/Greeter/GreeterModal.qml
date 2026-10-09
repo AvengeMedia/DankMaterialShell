@@ -2,9 +2,10 @@ import QtQuick
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
-DankFloatingWindow {
+DFloatingWindow {
     id: root
     readonly property var log: Log.scoped("GreeterModal")
 
@@ -144,7 +145,7 @@ DankFloatingWindow {
             }
         }
 
-        DankWindowHeader {
+        DWindowHeader {
             id: headerRow
             anchors.left: parent.left
             anchors.right: parent.right
@@ -185,7 +186,7 @@ DankFloatingWindow {
                             color: dotColor.value
                             anchors.verticalCenter: parent.verticalCenter
 
-                            DankColorAnimation {
+                            DColorAnimation {
                                 id: dotColor
                                 to: isActive ? Theme.primary : Theme.surfaceTextAlpha
                                 duration: Theme.shortDuration
@@ -208,7 +209,6 @@ DankFloatingWindow {
             anchors.right: parent.right
             anchors.top: headerRow.bottom
             anchors.bottom: footerRow.top
-            anchors.topMargin: Theme.spacingS
 
             Loader {
                 id: pageLoader
@@ -239,11 +239,11 @@ DankFloatingWindow {
 
             Row {
                 anchors.right: parent.right
-                anchors.rightMargin: Theme.spacingL
+                anchors.rightMargin: Theme.windowInset
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacingM
 
-                DankButton {
+                DButton {
                     visible: root.currentPage < root.totalPages - 1
                     text: I18n.tr("Skip", "greeter skip button")
                     backgroundColor: "transparent"
@@ -251,7 +251,7 @@ DankFloatingWindow {
                     onClicked: root.currentPage === 1 ? root.nextPage() : root.skip()
                 }
 
-                DankButton {
+                DButton {
                     visible: root.currentPage > 0
                     text: I18n.tr("Back", "greeter back button")
                     iconName: "arrow_back"
@@ -260,7 +260,7 @@ DankFloatingWindow {
                     onClicked: root.prevPage()
                 }
 
-                DankButton {
+                DButton {
                     visible: root.currentPage < root.totalPages - 1
                     enabled: !(root.currentPage === 1 && pageLoader.item && pageLoader.item.isRunning)
                     text: root.currentPage === 0 ? I18n.tr("Get Started", "greeter first page button") : I18n.tr("Next", "greeter next button")
@@ -270,7 +270,7 @@ DankFloatingWindow {
                     onClicked: root.nextPage()
                 }
 
-                DankButton {
+                DButton {
                     visible: root.currentPage === root.totalPages - 1
                     text: I18n.tr("Finish", "greeter finish button")
                     iconName: "check"

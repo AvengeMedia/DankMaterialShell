@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Rectangle {
     id: root
@@ -37,7 +37,7 @@ Rectangle {
     radius: Theme.cornerRadius
     color: Theme.withAlpha(statusColor, 0.08)
 
-    DankIcon {
+    DIcon {
         id: statusIcon
         anchors.left: parent.left
         anchors.leftMargin: Theme.spacingM
@@ -95,7 +95,7 @@ Rectangle {
         }
     }
 
-    DankActionButton {
+    DActionButton {
         id: urlButton
         anchors.right: parent.right
         anchors.rightMargin: Theme.spacingM

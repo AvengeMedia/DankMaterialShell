@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"math"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -18,6 +20,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/dank16"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/mangoconf"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/godbus/dbus/v5"
 	"github.com/lucasb-eyer/go-colorful"
@@ -41,6 +44,7 @@ const (
 	TemplateKindGTK
 	TemplateKindVSCode
 	TemplateKindEmacs
+	TemplateKindMango
 )
 
 type TemplateDef struct {
@@ -59,7 +63,7 @@ var templateRegistry = []TemplateDef{
 	{ID: "gtk", Kind: TemplateKindGTK, RunUnconditionally: true},
 	{ID: "niri", Commands: []string{"niri"}, ConfigFile: "niri.toml"},
 	{ID: "hyprland", Commands: []string{"Hyprland"}, ConfigFile: "hyprland.toml"},
-	{ID: "mangowc", Commands: []string{"mango"}, ConfigFile: "mangowc.toml", RequiredEnv: "MANGO_INSTANCE_SIGNATURE"},
+	{ID: "mangowc", Commands: []string{"mango"}, ConfigFile: "mangowc.toml", RequiredEnv: "MANGO_INSTANCE_SIGNATURE", Kind: TemplateKindMango},
 	{ID: "qt5ct", Commands: []string{"qt5ct"}, ConfigFile: "qt5ct.toml"},
 	{ID: "qt6ct", Commands: []string{"qt6ct"}, ConfigFile: "qt6ct.toml"},
 	{ID: "fcitx5", Commands: []string{"fcitx5"}, ConfigDirs: []string{"fcitx5"}, ConfigFile: "fcitx5.toml"},
@@ -88,6 +92,19 @@ func (c *ColorMode) GTKTheme() string {
 		return "adw-gtk3-dark"
 	default:
 		return "adw-gtk3"
+	}
+}
+
+// GTKRefreshTheme is the built-in theme the gtk-theme round trip passes through
+// to make GTK3 reload gtk.css. It must match the mode's polarity: an empty or
+// light name resolves to Adwaita, and toolkit-following apps (Chromium/Electron
+// without a settings portal) latch light when the restore lands mid-repaint.
+func (c *ColorMode) GTKRefreshTheme() string {
+	switch *c {
+	case ColorModeDark:
+		return "HighContrastInverse"
+	default:
+		return "Adwaita"
 	}
 }
 
@@ -178,8 +195,8 @@ func PreviewSchemes(sourceColor string, contrast float64, imagePath, spec string
 
 	previews := make(map[string]SchemePreview, len(previewSchemeTypes)+1)
 	for _, schemeType := range previewSchemeTypes {
-		if spec == Spec2025 && SpecSupportsScheme(schemeType) {
-			colors, err := GenerateSpecColors(sourceColor, schemeType, contrast, ColorModeDark, Spec2025)
+		if UsesSpecGenerator(spec, schemeType) {
+			colors, err := GenerateSpecColors(sourceColor, schemeType, contrast, ColorModeDark, spec)
 			if err != nil {
 				return nil, fmt.Errorf("preview %s: %w", schemeType, err)
 			}
@@ -465,14 +482,14 @@ func buildOnce(opts *Options) (bool, error) {
 		// overrides matugen's own roles through the import, so templates,
 		// {{image}} and the user's own config keep working unchanged.
 		var specColors string
-		if opts.Spec == Spec2025 && SpecSupportsScheme(opts.MatugenType) {
+		if UsesSpecGenerator(opts.Spec, opts.MatugenType) {
 			seed := opts.Value
 			if opts.Kind != "hex" {
 				seed = extractMatugenColor(matJSON, "source_color", "dark")
 			}
-			specColors, err = GenerateSpecColors(seed, opts.MatugenType, opts.Contrast, opts.Mode, Spec2025)
+			specColors, err = GenerateSpecColors(seed, opts.MatugenType, opts.Contrast, opts.Mode, opts.Spec)
 			if err != nil {
-				return false, fmt.Errorf("spec 2025 palette failed: %w", err)
+				return false, fmt.Errorf("spec %s palette failed: %w", opts.Spec, err)
 			}
 		}
 
@@ -708,6 +725,12 @@ output_path = '%s'
 			for _, editor := range vscodeEditors {
 				appendVSCodeConfig(cfgFile, editor.name, editor.extensionsDir(homeDir), opts.ShellDir)
 			}
+		case TemplateKindMango:
+			configFile := tmpl.ConfigFile
+			if mangoconf.Detect() == mangoconf.Snake {
+				configFile = "mangowc-snake.toml"
+			}
+			appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigDirs, configFile)
 		case TemplateKindEmacs:
 			if utils.EmacsConfigDir() != "" {
 				appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigDirs, tmpl.ConfigFile)
@@ -1113,12 +1136,7 @@ func runMatugen(baseArgs []string, sourceMode string) error {
 		return err
 	}
 
-	args := buildMatugenArgs(baseArgs, flags, sourceMode)
-	cmd := exec.Command("matugen", args...)
-	cmd.Env = utils.EnvWithUserBinPath(nil)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	runErr := cmd.Run()
+	runErr := execMatugen(buildMatugenArgs(baseArgs, flags, sourceMode))
 	if runErr == nil {
 		return nil
 	}
@@ -1131,12 +1149,41 @@ func runMatugen(baseArgs []string, sourceMode string) error {
 	}
 
 	log.Warnf("Matugen version changed (v4: %v -> %v), retrying", flags.isV4, newFlags.isV4)
-	args = buildMatugenArgs(baseArgs, newFlags, sourceMode)
-	retryCmd := exec.Command("matugen", args...)
-	retryCmd.Env = utils.EnvWithUserBinPath(nil)
-	retryCmd.Stdout = os.Stdout
-	retryCmd.Stderr = os.Stderr
-	return retryCmd.Run()
+	return execMatugen(buildMatugenArgs(baseArgs, newFlags, sourceMode))
+}
+
+// matugen's stderr is echoed as before and its tail travels in the error, so a failure
+// reaching the shell through the socket still names the broken template or option.
+func execMatugen(args []string) error {
+	cmd := exec.Command("matugen", args...)
+	cmd.Env = utils.EnvWithUserBinPath(nil)
+	cmd.Stdout = os.Stdout
+	var stderr bytes.Buffer
+	cmd.Stderr = io.MultiWriter(os.Stderr, &stderr)
+	err := cmd.Run()
+	if err == nil {
+		return nil
+	}
+	tail := stderrTail(stderr.String(), 6)
+	if tail == "" {
+		return fmt.Errorf("matugen: %w", err)
+	}
+	return fmt.Errorf("matugen: %w\n%s", err, tail)
+}
+
+var ansiEscapeRe = regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
+
+func stderrTail(output string, maxLines int) string {
+	var lines []string
+	for _, line := range strings.Split(ansiEscapeRe.ReplaceAllString(output, ""), "\n") {
+		if line = strings.TrimSpace(line); line != "" {
+			lines = append(lines, line)
+		}
+	}
+	if len(lines) > maxLines {
+		lines = lines[len(lines)-maxLines:]
+	}
+	return strings.Join(lines, "\n")
 }
 
 func runMatugenDryRun(opts *Options) (string, error) {
@@ -1207,12 +1254,22 @@ func execDryRun(opts *Options, flags matugenFlags) (string, error) {
 	cmd.Stderr = &stderr
 	output, err := cmd.Output()
 	if err != nil {
-		if stderr.Len() > 0 {
-			return "", fmt.Errorf("matugen %v failed (v4=%v): %s", baseArgs, flags.isV4, strings.TrimSpace(stderr.String()))
+		if tail := stderrTail(stderr.String(), 6); tail != "" {
+			return "", fmt.Errorf("matugen %v failed (v4=%v): %s", baseArgs, flags.isV4, tail)
 		}
 		return "", fmt.Errorf("matugen %v failed (v4=%v): %w", baseArgs, flags.isV4, err)
 	}
-	return strings.ReplaceAll(string(output), "\n", ""), nil
+	clean := string(output)
+	// Some matugen builds print a warning line to stdout (e.g. scheme-smart
+	// falling back to defaults for a non-image source) ahead of the JSON
+	// payload. The pretty-printed JSON always opens with a line containing
+	// only '{', so drop anything before that
+	if !strings.HasPrefix(clean, "{") {
+		if idx := strings.Index(clean, "\n{\n"); idx != -1 {
+			clean = clean[idx+1:]
+		}
+	}
+	return strings.ReplaceAll(clean, "\n", ""), nil
 }
 
 func extractMatugenColor(jsonStr, colorName, variant string) string {
@@ -1405,7 +1462,7 @@ func refreshGTKTheme(mode ColorMode) {
 		log.Infof("Skipping gtk-theme refresh: %s is not installed", theme)
 		return
 	}
-	if err := utils.GsettingsSet("org.gnome.desktop.interface", "gtk-theme", ""); err != nil {
+	if err := utils.GsettingsSet("org.gnome.desktop.interface", "gtk-theme", mode.GTKRefreshTheme()); err != nil {
 		log.Warnf("Failed to reset gtk-theme: %v", err)
 	}
 	if err := utils.GsettingsSet("org.gnome.desktop.interface", "gtk-theme", theme); err != nil {
@@ -1475,7 +1532,7 @@ func refreshFcitx5() {
 	defer conn.Close()
 
 	obj := conn.Object("org.fcitx.Fcitx5", dbus.ObjectPath("/controller"))
-	if err := obj.Call("org.fcitx.Fcitx.Controller1.ReloadAddonConfig", 0, "classicui").Err; err != nil {
+	if err := obj.Call("org.fcitx.Fcitx.Controller1.ReloadAddonConfig", dbus.FlagNoAutoStart, "classicui").Err; err != nil {
 		log.Debugf("Failed to refresh Fcitx5 theme: %v", err)
 	}
 }

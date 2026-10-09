@@ -44,6 +44,9 @@ Singleton {
     readonly property var swipeDetachSpring: swipeSpring(800, 0.95)
     readonly property var swipeSnapSpring: swipeSpring(550, 0.6)
     readonly property var swipeAttachSpring: swipeSpring(850, 0.95)
+    readonly property real swipeWheelEngageDistance: 12
+    readonly property int swipeWheelSettleMs: 500
+    readonly property int swipeFlingProjectionMs: 200
     readonly property int expandedLimit: 10
     readonly property int collapsedLines: compact ? 1 : 2
     readonly property real summarySize: SettingsData.notificationSummaryFontSize || Theme.fontSizeMedium

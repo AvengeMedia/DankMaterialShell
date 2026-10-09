@@ -1,8 +1,9 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
-import qs.Modules.DankBar
+import qs.Modules.DBar
 
 Item {
     id: root
@@ -42,6 +43,7 @@ Item {
     readonly property real visualWidth: Theme.snap(isVerticalOrientation ? widgetThickness : (contentLoader.item ? (contentLoader.item.implicitWidth + horizontalPadding * 2) : 0), dpr)
     readonly property real visualHeight: Theme.snap(isVerticalOrientation ? (contentLoader.item ? (contentLoader.item.implicitHeight + horizontalPadding * 2) : 0) : widgetThickness, dpr)
     readonly property alias visualContent: visualContent
+    readonly property alias contentItem: contentLoader.item
     readonly property real barEdgeExtension: BarMetrics.fittsReach
     readonly property real gapExtension: sectionSpacing
     readonly property real leftMargin: !isVerticalOrientation ? (isLeftBarEdge && isFirst ? barEdgeExtension : (isFirst ? gapExtension : gapExtension / 2)) : 0
@@ -279,7 +281,7 @@ Item {
             }
         }
 
-        DankRipple {
+        DRipple {
             id: rippleLayer
             rippleColor: Theme.surfaceText
             topLeftRadius: root.topLeftRadius

@@ -4,7 +4,7 @@ import QtQuick
 import qs.Common
 import qs.Modules.Settings.Widgets
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: networkCellularTab
@@ -62,7 +62,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: Theme.spacingS
 
-                            DankToggle {
+                            DToggle {
                                 checked: NetworkService.cellularEnabled
                                 enabled: NetworkService.cellularHardwareEnabled && !NetworkService.cellularToggling
                                 onToggled: NetworkService.toggleCellularRadio()
@@ -96,7 +96,7 @@ Item {
                                 width: parent.width
                                 height: 56
                                 radius: Theme.cornerRadius
-                                color: isConnected ? Theme.selectedContainer : modemMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowFieldColor
+                                color: isConnected ? Theme.selectedContainer : modemMouseArea.containsMouse ? Theme.primaryHoverLight : SettingsMetrics.controlColor
                                 border.width: Theme.layerOutlineWidth
                                 border.color: Theme.outlineMedium
 
@@ -108,7 +108,7 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     spacing: Theme.spacingS
 
-                                    DankIcon {
+                                    DIcon {
                                         name: "network_cell"
                                         size: 20
                                         color: modemDelegate.isConnected ? Theme.accentOnSelectedContainer : Theme.surfaceText
@@ -152,7 +152,7 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     spacing: Theme.spacingXS
 
-                                    DankActionButton {
+                                    DActionButton {
                                         buttonSize: Theme.buttonHeightXXS
                                         iconName: modemDelegate.isConnected ? "link_off" : "link"
                                         iconColor: Theme.surfaceVariantText
@@ -212,7 +212,7 @@ Item {
                             width: parent.width
                             height: 56
                             radius: Theme.cornerRadius
-                            color: isActive ? Theme.selectedContainer : profileMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowFieldColor
+                            color: isActive ? Theme.selectedContainer : profileMouseArea.containsMouse ? Theme.primaryHoverLight : SettingsMetrics.controlColor
                             border.color: Theme.outlineMedium
                             border.width: Theme.layerOutlineWidth
 
@@ -224,7 +224,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 spacing: Theme.spacingS
 
-                                DankIcon {
+                                DIcon {
                                     name: "sim_card"
                                     size: 20
                                     color: profileDelegate.isActive ? Theme.accentOnSelectedContainer : Theme.surfaceText
@@ -256,7 +256,7 @@ Item {
                                 }
                             }
 
-                            DankActionButton {
+                            DActionButton {
                                 id: profileAction
                                 anchors.right: parent.right
                                 anchors.rightMargin: Theme.spacingS

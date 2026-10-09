@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 SettingsRow {
     id: root
@@ -21,7 +21,7 @@ SettingsRow {
     subtitle: deleteButton.confirming ? I18n.tr("Confirm Delete") : summary
     subtitleColor: deleteButton.confirming ? Theme.error : Theme.surfaceVariantText
 
-    DankToggle {
+    DToggle {
         visible: root.toggleVisible
         hideText: true
         text: root.title

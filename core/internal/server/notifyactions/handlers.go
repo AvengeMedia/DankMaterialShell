@@ -47,6 +47,7 @@ func handleSend(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 		Summary: summary,
 		Body:    params.StringOpt(req.Params, "body", ""),
 		Icon:    params.StringOpt(req.Params, "icon", ""),
+		Timeout: 5000,
 	}
 	label := params.StringOpt(req.Params, "actionLabel", "")
 	var argv []string

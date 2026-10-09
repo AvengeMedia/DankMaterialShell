@@ -12,6 +12,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/mangoconf"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/spf13/cobra"
@@ -129,7 +130,7 @@ var dmsConfigSpecs = map[string]dmsConfigSpec{
 		mangoFile:    "layout.conf",
 		niriContent:  func(_ string) string { return config.NiriLayoutConfig },
 		hyprContent:  func(_ string) string { return config.DMSLayoutLuaConfig },
-		mangoContent: func(_ string) string { return config.MangoLayoutConfig },
+		mangoContent: func(_ string) string { return mangoconf.Detect().Translate(config.MangoLayoutConfig) },
 	},
 	"colors": {
 		niriFile:     "colors.kdl",
@@ -137,15 +138,19 @@ var dmsConfigSpecs = map[string]dmsConfigSpec{
 		mangoFile:    "colors.conf",
 		niriContent:  func(_ string) string { return config.NiriColorsConfig },
 		hyprContent:  func(_ string) string { return config.DMSColorsLuaConfig },
-		mangoContent: func(_ string) string { return config.MangoColorsConfig },
+		mangoContent: func(_ string) string { return mangoconf.Detect().Translate(config.MangoColorsConfig) },
 	},
 	"alttab": {
 		niriFile:    "alttab.kdl",
 		niriContent: func(_ string) string { return config.NiriAlttabConfig },
 	},
 	"input": {
-		niriFile:    "input.kdl",
-		niriContent: func(_ string) string { return config.NiriInputConfig },
+		niriFile:     "input.kdl",
+		hyprFile:     "input.lua",
+		mangoFile:    "input.conf",
+		niriContent:  func(_ string) string { return config.NiriInputConfig },
+		hyprContent:  func(_ string) string { return config.DMSInputLuaConfig },
+		mangoContent: func(_ string) string { return "" },
 	},
 	"outputs": {
 		niriFile:     "outputs.kdl",
@@ -173,15 +178,43 @@ var dmsConfigSpecs = map[string]dmsConfigSpec{
 	},
 }
 
-func detectTerminal() (string, error) {
-	terminals := []string{"ghostty", "foot", "kitty", "alacritty"}
+var knownTerminals = []string{"ghostty", "foot", "kitty", "alacritty"}
+
+func terminalFromEnv() string {
+	return strings.TrimSpace(os.Getenv("TERMINAL"))
+}
+
+func installedTerminals() []string {
 	var found []string
-	for _, t := range terminals {
+	for _, t := range knownTerminals {
 		if utils.CommandExists(t) {
 			found = append(found, t)
 		}
 	}
+	return found
+}
 
+func installedHyprlandVersion() string {
+	_, ver := getVersionFromCommand("Hyprland", "--version", distros.ParseHyprlandVersion)
+	return ver
+}
+
+func defaultTerminalCommand() string {
+	if env := terminalFromEnv(); env != "" {
+		return env
+	}
+	if found := installedTerminals(); len(found) > 0 {
+		return found[0]
+	}
+	return "ghostty"
+}
+
+func detectTerminal() (string, error) {
+	if env := terminalFromEnv(); env != "" {
+		return env, nil
+	}
+
+	found := installedTerminals()
 	switch len(found) {
 	case 0:
 		return "ghostty", nil
@@ -276,7 +309,7 @@ func runSetupDmsConfig(name string) error {
 	case "hyprland":
 		dmsDir = filepath.Join(utils.XDGConfigHome(), "hypr", "dms")
 	case "mango", "mangowc":
-		dmsDir = filepath.Join(utils.XDGConfigHome(), "mango", "dms")
+		dmsDir = filepath.Join(mangoconf.Dir(), "dms")
 	}
 
 	if err := os.MkdirAll(dmsDir, 0o755); err != nil {
@@ -314,8 +347,9 @@ func runSetup() error {
 	terminal, terminalSelected := promptTerminal()
 	useSystemd := true
 	if wmSelected {
-		if wm == deps.WindowManagerMango {
+		if wm == deps.WindowManagerMango && !mangoconf.SessionTargetInstalled() {
 			useSystemd = false
+			fmt.Println("\nThis Mango has no mango-session.target (added in 0.17.1); DMS will start from the Mango config.")
 		} else if isVoidSetup() {
 			useSystemd = false
 			fmt.Println("\nVoid Linux detected; deploying non-systemd session config.")
@@ -327,6 +361,13 @@ func runSetup() error {
 	if !wmSelected && !terminalSelected {
 		fmt.Println("No configurations selected. Exiting.")
 		return nil
+	}
+
+	replaceMangoBinds := false
+	if wmSelected && wm == deps.WindowManagerMango {
+		if path, ok := config.MangoExistingBinds(); ok {
+			replaceMangoBinds = promptMangoBinds(path)
+		}
 	}
 
 	if wmSelected || terminalSelected {
@@ -349,6 +390,7 @@ func runSetup() error {
 	fmt.Println("\nDeploying configurations...")
 	logChan := make(chan string, 100)
 	deployer := config.NewConfigDeployer(logChan)
+	deployer.SetReplaceMangoBinds(replaceMangoBinds)
 
 	go func() {
 		for msg := range logChan {
@@ -360,8 +402,15 @@ func runSetup() error {
 	var err error
 
 	if wmSelected {
+		terminalCommand := defaultTerminalCommand()
+		if terminalSelected {
+			terminalCommand = terminal.Command()
+		}
+		if wm == deps.WindowManagerHyprland {
+			deployer.SetHyprlandVersion(installedHyprlandVersion())
+		}
 		var result config.DeploymentResult
-		result, err = deployer.DeployCompositor(wm, terminal, useSystemd)
+		result, err = deployer.DeployCompositor(wm, terminalCommand, useSystemd)
 		results = append(results, result)
 	}
 	if err == nil && terminalSelected {
@@ -475,6 +524,17 @@ func promptTerminal() (deps.Terminal, bool) {
 	default:
 		return deps.TerminalGhostty, false
 	}
+}
+
+func promptMangoBinds(path string) bool {
+	fmt.Printf("\nFound your Mango keybinds in %s.\n", path)
+	fmt.Println("  1) Keep my binds as they are")
+	fmt.Println("  2) Start from the DMS stock binds")
+	fmt.Println("Either way a timestamped backup is kept.")
+	fmt.Print("Choice (1-2) [1]: ")
+	var response string
+	fmt.Scanln(&response)
+	return strings.TrimSpace(response) == "2"
 }
 
 func promptSystemd() bool {

@@ -27,7 +27,7 @@ Rectangle {
         anchors.margins: Theme.spacingM
         active: root.visible
 
-        sourceComponent: DankKeyHints {
+        sourceComponent: DKeyHints {
             hints: {
                 const listHints = root.historyTab ? [] : [
                     {

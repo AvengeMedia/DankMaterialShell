@@ -3,9 +3,9 @@ import QtQuick.Layouts
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
-DankCard {
+DCard {
     id: root
 
     pad: Theme.spacingS
@@ -182,7 +182,7 @@ DankCard {
     function ensureVisible() {
         if (selectedIndex < 0)
             return;
-        processListView.positionViewAtIndex(selectedIndex, ListView.Contain);
+        processListView.revealIndex(selectedIndex);
     }
 
     function handleKey(event) {
@@ -285,7 +285,7 @@ DankCard {
             Layout.preferredHeight: ProcessListMetrics.headerHeight
             spacing: Theme.spacingS
 
-            DankButtonGroup {
+            DButtonGroup {
                 id: sortChips
                 Layout.fillWidth: true
                 readonly property var sortKeys: ["name", "cpu", "memory", "pid"]
@@ -309,7 +309,7 @@ DankCard {
                 }
             }
 
-            DankActionButton {
+            DActionButton {
                 id: sortDirection
                 KeyNavigation.tab: processListView.currentItem ?? processListView
                 iconName: parent.ascending ? "arrow_upward" : "arrow_downward"
@@ -318,7 +318,7 @@ DankCard {
             }
         }
 
-        DankListView {
+        DListView {
             id: processListView
             Layout.fillWidth: true
             Layout.fillHeight: true

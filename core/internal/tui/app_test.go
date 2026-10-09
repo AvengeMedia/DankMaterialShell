@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"testing"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
@@ -200,5 +201,18 @@ func TestConfigCheckDefaultsToReplace(t *testing.T) {
 	}
 	if m.selectedConfig != 1 {
 		t.Fatalf("selectedConfig = %d, want first existing config", m.selectedConfig)
+	}
+}
+
+func TestConfigCheckKeepsMangoBindsByDefault(t *testing.T) {
+	m := archModel()
+	m.state = StateConfigConfirmation
+	updated, _ := m.Update(configCheckResult{configs: []ExistingConfigInfo{
+		{ConfigType: "Mango", Path: "/tmp/config.conf", Exists: true},
+		{ConfigType: config.MangoBindsConfigType, Path: "/tmp/binds.conf", Exists: true},
+	}})
+	m = updated.(Model)
+	if !m.replaceConfigs["Mango"] || m.replaceConfigs[config.MangoBindsConfigType] {
+		t.Fatalf("replaceConfigs = %v, want Mango replaced and its binds kept", m.replaceConfigs)
 	}
 }

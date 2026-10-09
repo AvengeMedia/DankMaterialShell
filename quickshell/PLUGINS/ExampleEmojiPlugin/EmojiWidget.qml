@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Plugins
 
 PluginComponent {
@@ -90,7 +90,7 @@ PluginComponent {
                 width: parent.width
                 implicitHeight: root.popoutHeight - popoutColumn.headerHeight - popoutColumn.detailsHeight - Theme.spacingXL
 
-                DankGridView {
+                DGridView {
                     id: emojiGrid
                     anchors.horizontalCenter: parent.horizontalCenter
                     width: Math.floor(parent.width / 50) * 50

@@ -251,16 +251,12 @@ func filterUpdateTargets(pkgs []sysupdate.Package) []sysupdate.Package {
 	if !sysUpdateNoAUR && len(sysUpdateIgnore) == 0 {
 		return pkgs
 	}
-	ignored := make(map[string]bool, len(sysUpdateIgnore))
-	for _, name := range sysUpdateIgnore {
-		ignored[name] = true
-	}
 	out := pkgs[:0]
 	for _, p := range pkgs {
 		if sysUpdateNoAUR && p.Repo == sysupdate.RepoAUR {
 			continue
 		}
-		if ignored[p.Name] {
+		if sysupdate.IsPackageIgnored(p.Name, sysUpdateIgnore) {
 			continue
 		}
 		out = append(out, p)

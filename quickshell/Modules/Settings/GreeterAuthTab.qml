@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -20,7 +19,7 @@ Item {
 
         switch (SettingsData.greeterFingerprintReason) {
         case "ready":
-            return I18n.tr("Applies on the next greeter sync", "greeter auth setting description");
+            return I18n.tr("Press Apply changes to update the login screen", "greeter auth setting description");
         case "missing_enrollment":
             return I18n.tr("Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.", "greeter fingerprint login setting");
         case "missing_reader":
@@ -40,7 +39,7 @@ Item {
 
         switch (SettingsData.greeterU2fReason) {
         case "ready":
-            return I18n.tr("Applies on the next greeter sync", "greeter auth setting description");
+            return I18n.tr("Press Apply changes to update the login screen", "greeter auth setting description");
         case "missing_key_registration":
             return I18n.tr("Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.", "security key setting status");
         case "missing_pam_support":

@@ -4,7 +4,7 @@ import QtQuick
 import qs.Common
 import qs.Modules.Settings.Widgets
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: networkEthernetTab
@@ -84,7 +84,7 @@ Item {
                                 width: parent.width
                                 height: isExpanded ? 56 + ethExpandedContent.height : 56
                                 radius: Theme.cornerRadius
-                                color: isConnected ? Theme.selectedContainer : ethDeviceMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowFieldColor
+                                color: isConnected ? Theme.selectedContainer : ethDeviceMouseArea.containsMouse ? Theme.primaryHoverLight : SettingsMetrics.controlColor
                                 border.width: Theme.layerOutlineWidth
                                 border.color: Theme.outlineMedium
                                 clip: true
@@ -105,7 +105,7 @@ Item {
                                             anchors.rightMargin: Theme.spacingS
                                             spacing: Theme.spacingS
 
-                                            DankIcon {
+                                            DIcon {
                                                 name: "lan"
                                                 size: 20
                                                 color: isConnected ? Theme.accentOnSelectedContainer : Theme.surfaceText
@@ -172,7 +172,7 @@ Item {
                                             anchors.verticalCenter: parent.verticalCenter
                                             spacing: Theme.spacingXS
 
-                                            DankActionButton {
+                                            DActionButton {
                                                 buttonSize: Theme.buttonHeightXXS
                                                 iconName: isExpanded ? "expand_less" : "expand_more"
                                                 iconColor: Theme.surfaceText
@@ -188,7 +188,7 @@ Item {
                                                 }
                                             }
 
-                                            DankActionButton {
+                                            DActionButton {
                                                 buttonSize: Theme.buttonHeightXXS
                                                 iconName: "link_off"
                                                 iconColor: Theme.surfaceVariantText
@@ -261,7 +261,7 @@ Item {
                                                             return fields;
                                                         }
 
-                                                        delegate: DankDetailChip {
+                                                        delegate: DDetailChip {
                                                             required property var modelData
 
                                                             label: modelData.label
@@ -275,7 +275,7 @@ Item {
                                                     height: NetworkService.networkWiredInfoLoading ? 40 : 0
                                                     visible: NetworkService.networkWiredInfoLoading
 
-                                                    DankSpinner {
+                                                    DSpinner {
                                                         anchors.centerIn: parent
                                                         size: 20
                                                     }
@@ -312,7 +312,7 @@ Item {
                                 width: parent.width
                                 height: 48
                                 radius: Theme.cornerRadius
-                                color: modelData.isActive ? Theme.selectedContainer : wiredMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowFieldColor
+                                color: modelData.isActive ? Theme.selectedContainer : wiredMouseArea.containsMouse ? Theme.primaryHoverLight : SettingsMetrics.controlColor
                                 border.width: Theme.layerOutlineWidth
                                 border.color: Theme.outlineMedium
 
@@ -322,7 +322,7 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     spacing: Theme.spacingS
 
-                                    DankIcon {
+                                    DIcon {
                                         name: "lan"
                                         size: 20
                                         color: modelData.isActive ? Theme.accentOnSelectedContainer : Theme.surfaceText
