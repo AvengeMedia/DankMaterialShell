@@ -165,7 +165,7 @@ Item {
                 allowEmpty: true
                 showLastDisplay: true
                 showOnLastDisplay: dot.config?.showOnLastDisplay ?? true
-                onPreferencesChanged: prefs => dot.apply("screenPreferences", prefs)
+                preferencesHandler: prefs => dot.apply("screenPreferences", prefs)
                 onLastDisplayToggled: checked => dot.apply("showOnLastDisplay", checked)
             }
         }

@@ -667,7 +667,7 @@ Item {
             SettingsDisplayPicker {
                 width: parent.width
                 displayPreferences: SettingsData.screenPreferences?.lockScreen || ["all"]
-                onPreferencesChanged: prefs => {
+                preferencesHandler: prefs => {
                     var p = SettingsData.screenPreferences || {};
                     var updated = Object.assign({}, p);
                     updated["lockScreen"] = prefs;

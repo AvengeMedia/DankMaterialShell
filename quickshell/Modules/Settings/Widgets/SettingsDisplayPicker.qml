@@ -14,7 +14,8 @@ Column {
     property bool showOnLastDisplay: false
     readonly property bool localAllDisplays: !Array.isArray(displayPreferences) || displayPreferences.includes("all") || (emptyMeansAll && displayPreferences.length === 0)
 
-    signal preferencesChanged(var preferences)
+    // A callback, not a signal: Qt 6.12 hands signal array parameters over as a V4Sequence that fails Array.isArray.
+    property var preferencesHandler: null
     signal lastDisplayToggled(bool checked)
 
     width: parent?.width ?? 0
@@ -34,7 +35,7 @@ Column {
     SettingsToggleRow {
         text: I18n.tr("All displays")
         checked: root.localAllDisplays
-        onToggled: checked => root.preferencesChanged(checked ? ["all"] : Quickshell.screens.map(screen => root.screenPref(screen)))
+        onToggled: checked => root.preferencesHandler?.(checked ? ["all"] : Quickshell.screens.map(screen => root.screenPref(screen)))
     }
 
     SettingsToggleRow {
@@ -61,7 +62,7 @@ Column {
                     prefs.push(root.screenPref(modelData));
                 if (!root.allowEmpty && prefs.length === 0)
                     return;
-                root.preferencesChanged(prefs);
+                root.preferencesHandler?.(prefs);
             }
         }
     }

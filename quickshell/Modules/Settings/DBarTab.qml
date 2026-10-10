@@ -222,7 +222,7 @@ Item {
                 allowEmpty: true
                 showLastDisplay: true
                 showOnLastDisplay: bar.selectedBarConfig?.showOnLastDisplay ?? true
-                onPreferencesChanged: prefs => dankBarTab.setBarScreenPreferences(bar.selectedBarId, prefs)
+                preferencesHandler: prefs => dankBarTab.setBarScreenPreferences(bar.selectedBarId, prefs)
                 onLastDisplayToggled: checked => dankBarTab.setBarShowOnLastDisplay(bar.selectedBarId, checked)
             }
         }
@@ -412,7 +412,7 @@ Item {
 
             SettingsDisplayPicker {
                 displayPreferences: SettingsData.frameScreenPreferences
-                onPreferencesChanged: prefs => SettingsData.set("frameScreenPreferences", prefs)
+                preferencesHandler: prefs => SettingsData.set("frameScreenPreferences", prefs)
             }
         }
 

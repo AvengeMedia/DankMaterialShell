@@ -24,7 +24,7 @@ Item {
             SettingsDisplayPicker {
                 displayPreferences: dock.screenPreferences
                 emptyMeansAll: false
-                onPreferencesChanged: preferences => dock.setOption("screenPreferences", preferences)
+                preferencesHandler: preferences => dock.setOption("screenPreferences", preferences)
             }
 
             SettingsToggleRow {

@@ -154,7 +154,7 @@ Item {
                     allowEmpty: true
                     showLastDisplay: ["notifications", "osd", "toast", "notepad"].includes(componentCard.modelData.id) || componentCard.modelData.id.startsWith("bar:")
                     showOnLastDisplay: root.getShowOnLastDisplay(componentCard.modelData.id)
-                    onPreferencesChanged: prefs => root.setScreenPreferences(componentCard.modelData.id, prefs)
+                    preferencesHandler: prefs => root.setScreenPreferences(componentCard.modelData.id, prefs)
                     onLastDisplayToggled: checked => root.setShowOnLastDisplay(componentCard.modelData.id, checked)
                 }
 

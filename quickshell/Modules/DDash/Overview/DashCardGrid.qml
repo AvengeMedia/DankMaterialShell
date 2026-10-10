@@ -41,7 +41,7 @@ DEditableGrid {
     minimumHeight: DashMetrics.tabMinHeight
     placeholderRadius: DashMetrics.cardRadius
 
-    onLayoutCommitted: items => {
+    commitHandler: items => {
         commitPanelPreview();
         CardUtils.setLayout(items);
     }

@@ -46,7 +46,7 @@ DEditableGrid {
     packer: items => GridUtils.packCells(clamped(items), placementOrder, columns, null, CcMetrics.gridStep, true).cells
     placeholderRadius: draggingSlot?.small ? Theme.fullRadius(draggingSlot.width, draggingSlot.height) : (draggingSlot?.tileItem?.bodyRadius ?? Theme.fullRadius(width, CcMetrics.tileHeight))
 
-    onLayoutCommitted: items => model.setLayout(withHidden(items))
+    commitHandler: items => model.setLayout(withHidden(items))
 
     function clamped(items) {
         return items.map(widget => Object.assign({}, widget, WidgetUtils.clampSize(widget, columns, maximumRows)));
