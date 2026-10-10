@@ -57,6 +57,7 @@ Item {
     property bool _contentRenderActive: Theme.isDirectionalEffect || shouldBeVisible
     // Keyboard focus grabbed one tick after emerge starts, to avoid stalling first frames.
     property bool _keyboardReady: false
+    readonly property bool contentActive: focusHelper.Window.active
     property bool _resizeActive: false
     property real _chromeAnimTravelX: 1
     property real _chromeAnimTravelY: 1
