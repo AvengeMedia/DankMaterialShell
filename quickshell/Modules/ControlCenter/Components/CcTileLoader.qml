@@ -1,4 +1,5 @@
 import QtQuick
+import "../utils/widgets.js" as WidgetUtils
 
 Loader {
     id: root
@@ -46,7 +47,7 @@ Loader {
     Binding {
         target: root.item
         property: "interactive"
-        value: !root.grid.editMode
+        value: !root.grid.editMode || root.widgetData.id === WidgetUtils.EDIT_ID
         when: root.item !== null
     }
 

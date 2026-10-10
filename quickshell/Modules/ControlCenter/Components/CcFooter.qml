@@ -53,7 +53,9 @@ Item {
     // Grid columns, so footer widths line up with the tiles above.
     readonly property real spacing: CcMetrics.gridGap
     readonly property real pitch: grid.cellWidth
-    readonly property real editActionsWidth: Theme.iconButtonSize * 3 + spacing * 2
+    readonly property real editActionsWidth: Theme.iconButtonSize * 2 + spacing
+    // The pencil turns into the check, so the row shrinks away from it and the same spot leaves edit mode.
+    readonly property bool editAtEnd: items.some(item => item.widget.id === WidgetUtils.EDIT_ID && WidgetUtils.footerEnds(item.widget))
     // The row owns its full width in both modes, so capacity never changes under the user's feet; edit mode
     // shows the whole row scaled into the room beside the edit buttons, so every width stays reachable.
     readonly property real trackWidth: width
@@ -233,7 +235,7 @@ Item {
         transform: Scale {
             id: trackScale
 
-            origin.x: I18n.isRtl ? track.width - track.overhang : track.overhang
+            origin.x: I18n.isRtl !== root.editAtEnd ? track.width - track.overhang : track.overhang
             origin.y: track.height / 2
             xScale: root.trackScale
             yScale: root.trackScale
@@ -433,7 +435,8 @@ Item {
     Item {
         id: editActions
 
-        anchors.right: parent.right
+        anchors.left: root.editAtEnd ? parent.left : undefined
+        anchors.right: root.editAtEnd ? undefined : parent.right
         anchors.verticalCenter: parent.verticalCenter
         width: root.editActionsWidth
         height: CcMetrics.footerHeight
@@ -497,18 +500,6 @@ Item {
                 filled: root.overTrash
                 color: root.overTrash ? Theme.onErrorContainer : CcMetrics.tileInactiveContent
             }
-        }
-
-        DActionButton {
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            buttonSize: Theme.iconButtonSize
-            iconName: "check"
-            iconSize: CcMetrics.iconBoxIconSize
-            iconColor: Theme.onPrimary
-            backgroundColor: Theme.primary
-            tooltipText: I18n.tr("Save")
-            onClicked: root.finishRequested()
         }
     }
 

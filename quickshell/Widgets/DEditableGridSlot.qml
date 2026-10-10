@@ -14,11 +14,13 @@ Item {
     property var resizeOrigin: null
     property var dragOrigin: null
     property Item passthrough: null
+    property int restCursor: Qt.OpenHandCursor
     property bool raised: dragging || resizing
     readonly property bool interactionEnabled: resizeOrigin !== null || dragOrigin !== null || !grid.interacting
 
     signal resizeRequested(real requestedWidth, real requestedHeight)
     signal pressAndHold
+    signal clicked
 
     function moveDrag(scenePosition) {
         if (!dragOrigin || !dragging)
@@ -160,9 +162,10 @@ Item {
         enabled: visible && (root.dragOrigin !== null || !root.grid.interacting)
         hoverEnabled: enabled
         acceptedButtons: Qt.LeftButton
-        cursorShape: root.dragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+        cursorShape: root.dragging ? Qt.ClosedHandCursor : root.restCursor
         containmentMask: root.passthrough ? passthroughMask : null
         onPressAndHold: root.pressAndHold()
+        onClicked: root.clicked()
         onWheel: wheel => wheel.accepted = true
     }
 

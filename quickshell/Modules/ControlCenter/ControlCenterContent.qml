@@ -464,7 +464,7 @@ FocusScope {
                     onColorPickerRequested: root.host.openColorPicker()
                     onCloseRequested: root.host.close()
                     onSettingsRequested: root.host.openSettings()
-                    onEditRequested: root.host.editMode = true
+                    onEditRequested: root.host.editMode = !root.host.editMode
                     onAccountsRequested: root.host.openAccounts()
                     onLockRequested: {
                         root.host.close();
