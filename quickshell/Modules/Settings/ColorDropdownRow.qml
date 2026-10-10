@@ -48,7 +48,10 @@ Column {
 
     property alias resetStore: modeRow.resetStore
     property alias resetKeys: modeRow.resetKeys
+    property alias modified: modeRow.modified
+    property alias resetByKeys: modeRow.resetByKeys
 
+    signal resetRequested
     signal modeSelected(string mode)
     signal customColorSelected(color selectedColor)
 
@@ -88,6 +91,7 @@ Column {
     SettingsDropdownRow {
         id: modeRow
         groupItem: root
+        onResetRequested: root.resetRequested()
         text: root.text
         description: root.description
         tab: root.tab

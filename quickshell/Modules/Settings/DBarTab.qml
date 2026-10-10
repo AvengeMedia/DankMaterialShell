@@ -673,7 +673,7 @@ Item {
                 text: I18n.tr("Auto popup gaps")
                 description: I18n.tr("Gap between the bar and its popouts follows edge spacing", "bar auto popup gaps toggle description")
                 tags: ["popup", "gaps", "auto"]
-                visible: !bar.popupGapsZeroed
+                visible: !dankBarTab.popupGapsZeroed
                 checked: bar.selectedBarConfig?.popupGapsAuto ?? true
                 onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
                         popupGapsAuto: checked
@@ -681,7 +681,7 @@ Item {
             }
 
             SettingsSliderRow {
-                visible: !bar.popupGapsZeroed && !(bar.selectedBarConfig?.popupGapsAuto ?? true)
+                visible: !dankBarTab.popupGapsZeroed && !(bar.selectedBarConfig?.popupGapsAuto ?? true)
                 text: I18n.tr("Gap size")
                 tags: ["popup", "gaps", "size"]
                 resetStore: bar
