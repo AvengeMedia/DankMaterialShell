@@ -60,7 +60,7 @@ RegistryBrowserWindow {
         },
         {
             value: "official",
-            label: I18n.tr("Official", "plugin browser filter chip, first party plugins"),
+            label: I18n.tr("Official only", "plugin browser filter chip, first party plugins"),
             icon: "verified"
         }
     ]
@@ -133,7 +133,7 @@ RegistryBrowserWindow {
         case "similar":
             return I18n.tr("Like your plugins", "plugin recommendation reason, similar to installed plugins");
         case "featured":
-            return I18n.tr("Featured", "plugin recommendation reason");
+            return I18n.tr("Featured plugin", "plugin recommendation reason");
         case "new":
             return I18n.tr("New", "plugin recommendation reason, recently published");
         case "trending":

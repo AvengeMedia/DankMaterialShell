@@ -145,7 +145,7 @@ DCard {
             anchors.right: parent.right
             anchors.margins: Theme.spacingXS
             iconName: root.installed ? "check_circle" : "desktop_windows"
-            label: root.installed ? I18n.tr("installed", "adjective, lowercase plugin badge") : I18n.tr("%1 only", "lowercase plugin badge, compositors the plugin is limited to").arg(root.otherCompositors.join(", "))
+            label: root.installed ? I18n.tr("Installed", "adjective, plugin or theme is already installed, button state and filter chip") : I18n.tr("%1 only", "lowercase plugin badge, compositors the plugin is limited to").arg(root.otherCompositors.join(", "))
             tone: root.installed ? Theme.primary : Theme.warning
             visible: root.installed || root.otherCompositors.length > 0
         }
