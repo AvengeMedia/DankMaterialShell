@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import Quickshell.Widgets
 import qs.Common
 import qs.Modals.Common
@@ -28,16 +27,13 @@ RegistryBrowserWindow {
     property var discoverPicks: []
     // Quick filters of this visit: usable (on the running compositor), fresh (new or updated), official.
     property var quickFilters: ({})
-    // Set by a click on an author in a plugin's detail: only that author's plugins are listed.
-    property string authorFilter: ""
     property var searchSuggestions: []
-    property var foundCommands: []
     property var discoverShelves: []
 
     readonly property var detailPlugin: resolveDetailPlugin(detailPluginId, allPlugins)
     property bool discoverCollapsed: false
     readonly property bool discoverVisible: {
-        if (isLoading || loadError !== "" || searchQuery !== "" || typeFilter !== "" || authorFilter !== "")
+        if (isLoading || loadError !== "" || searchQuery !== "" || typeFilter !== "")
             return false;
         if (discoverPicks.length === 0 && discoverShelves.length === 0)
             return false;
@@ -398,9 +394,6 @@ RegistryBrowserWindow {
             if (PluginRanking.searchRank(plugin, plan) > 0)
                 baseFiltered.push(plugin);
         }
-        if (authorFilter !== "")
-            baseFiltered = PluginRanking.byAuthor(baseFiltered, authorFilter);
-
         var compositor = rankingCompositor();
         var filterNow = Date.now();
         baseFiltered = baseFiltered.filter(p => PluginRanking.matchesFilters(p, quickFilters, compositor, filterNow));
@@ -524,93 +517,6 @@ RegistryBrowserWindow {
 
     function closePluginDetail() {
         detailPluginId = "";
-    }
-
-    function showAuthor(author) {
-        authorFilter = author || "";
-        closePluginDetail();
-        updateFilteredPlugins();
-    }
-
-    function permissionLabel(id) {
-        switch (id) {
-        case "settings_read":
-            return I18n.tr("Reads its own settings", "plugin permission");
-        case "settings_write":
-            return I18n.tr("Saves its own settings", "plugin permission");
-        case "process":
-            return I18n.tr("Runs programs on your computer", "plugin permission");
-        case "process_read":
-            return I18n.tr("Reads the list of running programs", "plugin permission");
-        case "shell_execute":
-            return I18n.tr("Runs shell commands", "plugin permission");
-        case "network":
-            return I18n.tr("Connects to the internet", "plugin permission");
-        case "clipboard_read":
-            return I18n.tr("Reads the clipboard", "plugin permission");
-        case "filesystem_read":
-            return I18n.tr("Reads your files", "plugin permission");
-        case "filesystem_write":
-            return I18n.tr("Writes to your files", "plugin permission");
-        case "state_read":
-            return I18n.tr("Reads its saved state", "plugin permission");
-        case "state_write":
-            return I18n.tr("Saves its state", "plugin permission");
-        case "audio_read":
-            return I18n.tr("Reads audio devices and volume", "plugin permission");
-        case "audio_control":
-            return I18n.tr("Changes volume and audio devices", "plugin permission");
-        case "mpris_control":
-            return I18n.tr("Controls media players", "plugin permission");
-        default:
-            return id;
-        }
-    }
-
-    function permissionIcon(id) {
-        switch (id) {
-        case "process":
-        case "shell_execute":
-            return "terminal";
-        case "network":
-            return "public";
-        case "clipboard_read":
-            return "content_paste";
-        case "filesystem_read":
-        case "filesystem_write":
-            return "folder";
-        case "audio_read":
-        case "audio_control":
-            return "volume_up";
-        case "mpris_control":
-            return "play_circle";
-        case "process_read":
-            return "list";
-        default:
-            return "tune";
-        }
-    }
-
-    function checkDependencies(plugin) {
-        var commands = [];
-        var deps = plugin ? (plugin.dependencies || []) : [];
-        for (var i = 0; i < deps.length; i++)
-            commands = commands.concat(PluginRanking.dependencyCommands(deps[i]));
-        if (commands.length === 0)
-            return;
-        var script = 'for c in "$@"; do command -v "$c" >/dev/null 2>&1 && echo "$c"; done; true';
-        Proc.runCommand("plugin-browser-dependencies", ["sh", "-c", script, "sh"].concat(commands), (output, exitCode) => {
-            var found = String(output || "").split("\n").map(line => line.trim()).filter(line => line.length > 0);
-            foundCommands = foundCommands.concat(found.filter(c => foundCommands.indexOf(c) < 0));
-        }, 0);
-    }
-
-    function copyLink(plugin) {
-        var url = PluginRanking.shareUrl(plugin);
-        if (!url)
-            return;
-        Quickshell.execDetached(["dms", "cl", "copy", url]);
-        ToastService.showInfo(I18n.tr("Link copied", "plugin browser, link copied to clipboard"));
     }
 
     function formatUpdatedDate(iso) {
@@ -913,16 +819,6 @@ RegistryBrowserWindow {
                     }
                     root.updateFilteredPlugins();
                 }
-            }
-            DButton {
-                visible: root.authorFilter !== ""
-                text: I18n.tr("Plugins by %1", "plugin browser author filter, %1 is the author").arg(root.authorFilter)
-                iconName: "close"
-                backgroundColor: Theme.primaryContainer
-                textColor: Theme.onPrimaryContainer
-                tooltipText: I18n.tr("Show every author", "plugin browser, clears the author filter")
-                Accessible.name: tooltipText
-                onClicked: root.showAuthor("")
             }
         },
         Item {
@@ -1268,7 +1164,6 @@ RegistryBrowserWindow {
             function onDetailPluginIdChanged() {
                 detailPane.heroFallback = false;
                 detailFlickable.contentY = 0;
-                root.checkDependencies(root.detailPlugin);
             }
         }
 
@@ -1308,7 +1203,7 @@ RegistryBrowserWindow {
             StyledText {
                 anchors.left: detailIcon.right
                 anchors.leftMargin: Theme.spacingS
-                anchors.right: detailUpvoteButton.visible ? detailUpvoteButton.left : detailInstallButton.left
+                anchors.right: detailInstallButton.left
                 anchors.rightMargin: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter
                 text: detailPane.plugin.name || ""
@@ -1317,23 +1212,6 @@ RegistryBrowserWindow {
                 color: Theme.surfaceText
                 elide: Text.ElideRight
                 maximumLineCount: 1
-            }
-
-            DButton {
-                id: detailUpvoteButton
-                anchors.right: detailInstallButton.left
-                anchors.rightMargin: Theme.spacingS
-                anchors.verticalCenter: parent.verticalCenter
-                visible: !!detailPane.plugin.issueUrl
-                readonly property bool upvoted: !!PluginService.upvotedPlugins[detailPane.plugin.id]
-                text: PluginService.upvoteCount(detailPane.plugin)
-                iconName: "thumb_up"
-                enabled: !PluginService.upvotingPlugins[detailPane.plugin.id]
-                backgroundColor: upvoted ? Theme.primaryContainer : SettingsMetrics.controlSurface
-                textColor: upvoted ? Theme.onPrimaryContainer : Theme.surfaceText
-                tooltipText: upvoted ? I18n.tr("Remove upvote", "plugin upvote button tooltip") : I18n.tr("Upvote on GitHub", "plugin upvote button tooltip")
-                Accessible.name: tooltipText
-                onClicked: PluginService.upvotePlugin(detailPane.plugin)
             }
 
             DButton {
@@ -1436,6 +1314,13 @@ RegistryBrowserWindow {
                         }
                     }
 
+                    PluginBadge {
+                        iconName: "thumb_up"
+                        label: detailPane.plugin.upvotes || 0
+                        tone: Theme.primary
+                        visible: !!detailPane.plugin.issueUrl
+                    }
+
                     Repeater {
                         model: root.detailMetaBadges(detailPane.plugin)
 
@@ -1452,31 +1337,16 @@ RegistryBrowserWindow {
                     width: parent.width
                     text: {
                         const plugin = detailPane.plugin;
-                        const link = (href, label) => ` • <a href="${href}" style="text-decoration:none; color:${Theme.primary};">${label}</a>`;
-                        const authorName = plugin.author ? `<a href="author:" style="text-decoration:none; color:${Theme.primary};">${String(plugin.author).replace(/&/g, "&amp;").replace(/</g, "&lt;")}</a>` : I18n.tr("Unknown", "unknown author");
-                        const author = I18n.tr("by %1", "author attribution").arg(authorName);
-                        const reportUrl = PluginRanking.issueReportUrl(plugin, {
-                            "dms": ShellVersionService.shellVersion || DMSService.cliVersion,
-                            "compositor": root.rankingCompositor()
-                        });
-                        const report = reportUrl ? link(reportUrl, I18n.tr("report a problem", "plugin detail link, opens a prefilled issue")) : "";
-                        const copy = PluginRanking.shareUrl(plugin) ? link("copy:", I18n.tr("copy link", "plugin detail link, copies the plugin page address")) : "";
+                        const author = I18n.tr("by %1", "author attribution").arg(plugin.author || I18n.tr("Unknown", "unknown author"));
                         const source = plugin.repo ? ` • <a href="${plugin.repo}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("source", "source code link")}</a>` : "";
                         const discuss = plugin.issueUrl ? ` • <a href="${plugin.issueUrl}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("discuss", "plugin discussion link")}</a>` : "";
-                        return author + source + discuss + report + copy;
+                        return author + source + discuss;
                     }
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.onSurfaceVariant
                     linkColor: Theme.primary
                     textFormat: Text.RichText
-                    onLinkActivated: url => {
-                        if (url === "author:")
-                            root.showAuthor(detailPane.plugin.author);
-                        else if (url === "copy:")
-                            root.copyLink(detailPane.plugin);
-                        else
-                            Qt.openUrlExternally(url);
-                    }
+                    onLinkActivated: url => Qt.openUrlExternally(url)
 
                     MouseArea {
                         anchors.fill: parent
@@ -1523,71 +1393,55 @@ RegistryBrowserWindow {
                     }
                 }
 
-                Column {
+                Row {
                     width: parent.width
                     spacing: Theme.spacingS
                     visible: (detailPane.plugin.permissions || []).length > 0
 
-                    StyledText {
-                        text: I18n.tr("This plugin can", "plugin detail section, introduces the permission list")
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Theme.fontWeightMedium
+                    DIcon {
+                        name: "security"
+                        size: Theme.iconSizeSmall
                         color: Theme.surfaceVariantText
                     }
 
-                    Repeater {
-                        model: PluginRanking.sortPermissions(detailPane.plugin.permissions)
+                    Flow {
+                        width: parent.width - Theme.iconSize - Theme.spacingS
+                        spacing: Theme.spacingXS
 
-                        Row {
-                            id: permissionRow
-                            required property string modelData
-                            readonly property bool sensitive: PluginRanking.permissionIsSensitive(modelData)
-                            width: parent.width
-                            spacing: Theme.spacingS
+                        Repeater {
+                            model: detailPane.plugin.permissions || []
 
-                            DIcon {
-                                anchors.verticalCenter: parent.verticalCenter
-                                name: root.permissionIcon(permissionRow.modelData)
-                                size: Theme.iconSizeSmall
-                                color: permissionRow.sensitive ? Theme.warning : Theme.surfaceVariantText
-                            }
-
-                            StyledText {
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: parent.width - Theme.iconSizeSmall - Theme.spacingS
-                                text: root.permissionLabel(permissionRow.modelData)
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: permissionRow.sensitive ? Theme.surfaceText : Theme.surfaceVariantText
-                                wrapMode: Text.WordWrap
+                            PluginBadge {
+                                required property string modelData
+                                label: modelData
+                                tone: Theme.secondary
                             }
                         }
                     }
                 }
 
-                Column {
+                Row {
                     width: parent.width
                     spacing: Theme.spacingS
                     visible: (detailPane.plugin.dependencies || []).length > 0
 
-                    StyledText {
-                        text: I18n.tr("Needs", "plugin detail section, introduces the programs a plugin depends on")
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Theme.fontWeightMedium
+                    DIcon {
+                        name: "package_2"
+                        size: Theme.iconSizeSmall
                         color: Theme.surfaceVariantText
                     }
 
                     Flow {
-                        width: parent.width
+                        width: parent.width - Theme.iconSize - Theme.spacingS
                         spacing: Theme.spacingXS
 
                         Repeater {
-                            model: PluginRanking.dependencyStates(detailPane.plugin.dependencies, root.foundCommands)
+                            model: detailPane.plugin.dependencies || []
 
                             PluginBadge {
-                                required property var modelData
-                                label: modelData.state === "missing" ? I18n.tr("%1 not found", "plugin dependency missing, %1 is a program name").arg(modelData.name) : modelData.name
-                                iconName: modelData.state === "ok" ? "check_circle" : modelData.state === "missing" ? "warning" : "package_2"
-                                tone: modelData.state === "ok" ? Theme.primary : modelData.state === "missing" ? Theme.warning : Theme.outline
+                                required property string modelData
+                                label: modelData
+                                tone: Theme.outline
                             }
                         }
                     }
