@@ -218,6 +218,7 @@ Singleton {
 
     property bool wallpaperCyclingEnabled: false
     property bool wallpaperCyclingRandom: false
+    property bool wallpaperCyclingRecursive: false
     property string wallpaperCyclingMode: "interval"
     property int wallpaperCyclingInterval: 300
     property string wallpaperCyclingTime: "06:00"
@@ -1243,6 +1244,11 @@ Singleton {
         saveSettings();
     }
 
+    function setWallpaperCyclingRecursive(recursive) {
+        wallpaperCyclingRecursive = recursive;
+        saveSettings();
+    }
+
     function setWallpaperCyclingMode(mode) {
         wallpaperCyclingMode = mode;
         saveSettings();
@@ -1285,6 +1291,10 @@ Singleton {
 
     function setMonitorCyclingRandom(screenName, random) {
         updateMonitorCyclingSetting(screenName, "random", random);
+    }
+
+    function setMonitorCyclingRecursive(screenName, recursive) {
+        updateMonitorCyclingSetting(screenName, "recursive", recursive);
     }
 
     function setMonitorCyclingMode(screenName, mode) {
@@ -1852,6 +1862,7 @@ Singleton {
         var defaults = {
             "enabled": false,
             "random": false,
+            "recursive": false,
             "mode": "interval",
             "interval": 300,
             "time": "06:00",

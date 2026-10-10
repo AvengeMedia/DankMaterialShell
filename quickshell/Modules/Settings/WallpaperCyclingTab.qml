@@ -21,6 +21,7 @@ Item {
     }
     readonly property bool enabled: perMonitor ? monitorSettings.enabled : SessionData.wallpaperCyclingEnabled
     readonly property bool random: perMonitor ? monitorSettings.random : SessionData.wallpaperCyclingRandom
+    readonly property bool recursive: perMonitor ? monitorSettings.recursive : SessionData.wallpaperCyclingRecursive
     readonly property string mode: perMonitor ? monitorSettings.mode : SessionData.wallpaperCyclingMode
     readonly property int interval: perMonitor ? monitorSettings.interval : SessionData.wallpaperCyclingInterval
     readonly property string time: perMonitor ? monitorSettings.time : SessionData.wallpaperCyclingTime
@@ -82,6 +83,14 @@ Item {
             return;
         }
         SessionData.setWallpaperCyclingRandom(value);
+    }
+
+    function setRecursive(value) {
+        if (perMonitor) {
+            SessionData.setMonitorCyclingRecursive(selectedScreen, value);
+            return;
+        }
+        SessionData.setWallpaperCyclingRecursive(value);
     }
 
     function setMode(value) {
@@ -195,6 +204,15 @@ Item {
                             folderBrowserLoader.item.open();
                     }
                 }
+            }
+
+            SettingsToggleRow {
+                tab: "wallpaper"
+                tags: ["cycling", "subfolders", "recursive", "directories", "folders"]
+                settingKey: "wallpaperCyclingRecursive"
+                text: I18n.tr("Include subfolders")
+                checked: root.recursive
+                onToggled: toggled => root.setRecursive(toggled)
             }
 
             SettingsToggleRow {

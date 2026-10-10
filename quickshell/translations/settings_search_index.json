@@ -16040,6 +16040,34 @@
     "parentLabel": "Wallpaper & colors"
   },
   {
+    "section": "wallpaperCyclingRecursive",
+    "label": "Include subfolders",
+    "tabIndex": 52,
+    "category": "Automatic cycling",
+    "keywords": [
+      "automatic",
+      "background",
+      "bg",
+      "colors",
+      "colour",
+      "colours",
+      "cycling",
+      "desktop",
+      "directories",
+      "folders",
+      "hue",
+      "image",
+      "include",
+      "palette",
+      "picture",
+      "recursive",
+      "subfolders",
+      "tint",
+      "wallpaper"
+    ],
+    "parentLabel": "Wallpaper & colors"
+  },
+  {
     "section": "wallpaperCyclingInterval",
     "label": "Interval",
     "tabIndex": 52,
