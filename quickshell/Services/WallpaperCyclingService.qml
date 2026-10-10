@@ -168,6 +168,8 @@ Singleton {
                 wallpaperDir = monitorSettings.folderPath;
             } else {
                 wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
+                if (recursive && wallpaperDir)
+                    SessionData.setMonitorCyclingFolderPath(screenName, wallpaperDir);
             }
         } else {
             recursive = !!SessionData.wallpaperCyclingRecursive;
@@ -175,6 +177,10 @@ Singleton {
                 wallpaperDir = SessionData.wallpaperCyclingFolderPath;
             } else {
                 wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
+                if (recursive && wallpaperDir) {
+                    SessionData.wallpaperCyclingFolderPath = wallpaperDir;
+                    SessionData.saveSettings();
+                }
             }
         }
 
