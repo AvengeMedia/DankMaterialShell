@@ -62,7 +62,6 @@ FocusScope {
     readonly property int gridColumnCap: host.gridColumnCap ?? CcMetrics.columnCapFor((host.triggerScreen?.width ?? CcMetrics.sheetWidthDefault + Theme.spacingL * 2) - Theme.spacingL * 2)
     readonly property int gridColumns: host.gridColumns ?? Math.min(CcMetrics.gridColumns, gridColumnCap)
     readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - footerReserve
-    readonly property vector4d chromeRoom: host.chromeRoom ?? Qt.vector4d(Infinity, Infinity, Infinity, Infinity)
     readonly property DPanelResizer panelResizer: DPanelResizer {
         popout: root.host
         stepWidth: CcMetrics.columnWidth + CcMetrics.gridGap
@@ -361,32 +360,28 @@ FocusScope {
     DGridEditChrome {
         id: panelChrome
 
-        readonly property real screenWidth: root.host.triggerScreen?.width ?? Infinity
-        readonly property real screenHeight: root.host.triggerScreen?.height ?? Infinity
-
-        function ringOffset(room) {
-            return Math.min(Theme.spacingS, room - handleThickness / 2 - Theme.outlineWidthFocused);
-        }
+        property int resizeSide: 0
 
         anchors.fill: parent
-        anchors.leftMargin: -(contentInset + ringOffset(Math.min(root.host.alignedX, root.chromeRoom.x)))
-        anchors.rightMargin: -(contentInset + ringOffset(Math.min(screenWidth - root.host.alignedX - root.width, root.chromeRoom.z)))
-        anchors.topMargin: -(contentInset + ringOffset(Math.min(root.host.alignedY, root.chromeRoom.y)))
-        anchors.bottomMargin: -(contentInset + ringOffset(Math.min(screenHeight - root.host.alignedY - root.height, root.chromeRoom.w)))
+        anchors.margins: -contentInset
         z: 1
         visible: root.host.editMode
         enabled: detailPage.shownSection === "" && !root.widgetSheetOpen
-        edgeResize: root.panelResizing || root.panelResizer.sideMovable(-1, root.gridColumns)
-        cornerResize: root.panelResizing || root.panelResizer.sideMovable(1, root.gridColumns)
+        edgeResize: root.panelResizing ? resizeSide < 0 : root.panelResizer.sideMovable(-1, root.gridColumns)
+        cornerResize: root.panelResizing ? resizeSide > 0 : root.panelResizer.sideMovable(1, root.gridColumns)
         horizontalResize: true
         removable: false
-        cornerRadius: Theme.windowRadius + Theme.spacingS
+        cornerRadius: Theme.windowRadius
+        cornerRadii: root.surfaceCornerRadii
         buttonSize: Theme.iconSize
         iconSize: PopoutMetrics.chromeIconSize
         resizing: root.panelResizing
         atDefault: root.gridColumns === Math.min(CcMetrics.defaultColumns, root.gridColumnCap)
         sizeText: root.gridColumns + "×" + widgetGrid.slotLayout.rows
-        onResizeStarted: (px, py, signX) => root.panelResizer.begin(px, py, signX)
+        onResizeStarted: (px, py, signX) => {
+            resizeSide = signX;
+            root.panelResizer.begin(px, py, signX);
+        }
         onResizeMoved: (px, py) => root.panelResizer.move(px, py)
         onResizeEnded: root.panelResizer.end()
         onResizeCanceled: root.panelResizer.cancel()

@@ -12,7 +12,7 @@ CcTile {
     readonly property bool available: BatteryService.batteryAvailable
     readonly property bool profileMode: !available && PowerProfileWatcher.available
     readonly property string meterStyle: widgetData?.batteryStyle ?? "icon"
-    readonly property bool showsMeter: available && meterStyle !== "icon" && (small || compact) && !docked
+    readonly property bool showsMeter: available && meterStyle !== "icon"
     property real meterWidth: 0
 
     iconName: profileMode ? Theme.getPowerProfileIcon(PowerProfileWatcher.currentProfile) : BatteryService.getBatteryIcon()
@@ -48,12 +48,23 @@ CcTile {
     onLiveChanged: syncBatteryRef(live)
     Component.onCompleted: syncBatteryRef(live)
     Component.onDestruction: syncBatteryRef(false)
-    // The meter carries its own charging bolt and would vanish into an active body.
     active: available && (BatteryService.isCharging || BatteryService.isPluggedIn) && !showsMeter
-    bodyContent: showsMeter ? meterPill : null
+    bodyContent: showsMeter && compact ? meterPill : null
+    iconContent: showsMeter && !compact ? meterIcon : null
     quickContentWidth: showsMeter ? meterWidth : 0
     opensPage: !profileMode
     showExpand: profileMode
+
+    Component {
+        id: meterIcon
+
+        BatteryMeter {
+            meterStyle: root.meterStyle
+            levelColors: true
+            thickness: CcMetrics.pillMeterThickness
+            scale: Math.min(1, Math.max(0, root.iconExtent - Theme.spacingXS * 2) / Math.max(1, implicitWidth, implicitHeight))
+        }
+    }
 
     Component {
         id: meterPill
@@ -83,6 +94,7 @@ CcTile {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 thickness: CcMetrics.tallMeterThickness
+                meterStyle: root.showsMeter ? root.meterStyle : "solid"
                 levelColors: true
                 showNumber: false
                 visible: root.available

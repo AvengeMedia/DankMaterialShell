@@ -16,6 +16,7 @@ Item {
     property bool atDefault: false
     property bool snapped: false
     property bool removable: true
+    property string removeIcon: "close"
     property bool horizontalResize: false
     property bool edgeResize: false
     property bool cornerResize: true
@@ -24,6 +25,7 @@ Item {
     // A child of the tile that keeps its own input in edit mode; resize bands never claim points over it.
     property Item passthrough: null
     property real cornerRadius: Theme.cornerRadiusXL
+    property vector4d cornerRadii: Qt.vector4d(cornerRadius, cornerRadius, cornerRadius, cornerRadius)
     property real buttonSize: Theme.iconSizeLarge
     property real iconSize: Theme.iconSizeSmall
     readonly property real handleThickness: Theme.spacingM
@@ -56,7 +58,10 @@ Item {
     Rectangle {
         anchors.fill: parent
         anchors.margins: root.contentInset
-        radius: root.cornerRadius
+        topLeftRadius: root.cornerRadii.x
+        topRightRadius: root.cornerRadii.y
+        bottomRightRadius: root.cornerRadii.z
+        bottomLeftRadius: root.cornerRadii.w
         color: root.dragging || root.resizing ? Theme.withAlpha(Theme.primary, Theme.stateLayerDrag) : "transparent"
         border.color: Theme.primary
         border.width: Theme.outlineWidthFocused
@@ -97,7 +102,7 @@ Item {
         height: root.touchTargetSize
         buttonSize: root.buttonSize
         iconSize: root.iconSize
-        iconName: "close"
+        iconName: root.removeIcon
         iconColor: Theme.error
         tooltipText: I18n.tr("Remove")
         visible: root.removable
@@ -241,8 +246,14 @@ Item {
             QtObject {
                 id: bandMask
 
+                function overButton(button: Item, point: point): bool {
+                    return button.visible && button.contains(band.mapToItem(button, point.x, point.y));
+                }
+
                 function contains(point: point): bool {
                     if (root.hitOverflow >= 0 && (point.x < handleMask.x || point.y < handleMask.y || point.x >= handleMask.x + handleMask.width || point.y >= handleMask.y + handleMask.height))
+                        return false;
+                    if (overButton(removeButton, point) || overButton(optionsButton, point))
                         return false;
                     if (root.resizeEdgeWidth >= 0 && !root.horizontalResize) {
                         const local = band.mapToItem(root, point.x, point.y);

@@ -252,6 +252,11 @@ Item {
                                 root.moveLifted(member, centroid.scenePosition);
                         }
                     }
+
+                    HoverHandler {
+                        enabled: root.editMode
+                        cursorShape: member.lifted ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+                    }
                 }
             }
         }

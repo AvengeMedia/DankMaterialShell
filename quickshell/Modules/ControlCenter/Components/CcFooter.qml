@@ -391,6 +391,11 @@ Item {
                     onConfigRequested: anchor => root.configRequested(footerItem.entry.index, footerItem.entry.widget, anchor)
                 }
 
+                HoverHandler {
+                    enabled: root.editMode && root.resizePreview === null
+                    cursorShape: footerItem.lifted ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+                }
+
                 DragHandler {
                     id: dragHandler
 

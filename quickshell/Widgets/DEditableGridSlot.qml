@@ -14,6 +14,7 @@ Item {
     property var resizeOrigin: null
     property var dragOrigin: null
     property Item passthrough: null
+    property bool raised: dragging || resizing
     readonly property bool interactionEnabled: resizeOrigin !== null || dragOrigin !== null || !grid.interacting
 
     signal resizeRequested(real requestedWidth, real requestedHeight)
@@ -77,7 +78,7 @@ Item {
     visible: slot !== null
     width: slot ? slot.w : 0
     height: slot ? slot.h : 0
-    z: dragging || resizing ? 1 : 0
+    z: raised ? 2 : hoverTracker.hovered ? 1 : 0
 
     QtObject {
         id: passthroughMask
@@ -142,6 +143,12 @@ Item {
             easing.type: Easing.BezierSpline
             easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
         }
+    }
+
+    // Edit chrome overhangs the gap; the hovered slot paints over its neighbours so its badges stay whole.
+    HoverHandler {
+        id: hoverTracker
+        enabled: root.grid.editMode
     }
 
     MouseArea {

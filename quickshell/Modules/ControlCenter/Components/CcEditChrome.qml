@@ -13,6 +13,7 @@ DGridEditChrome {
 
     hasOptions: WidgetUtils.hasOptions(widgetData.id)
     removable: WidgetUtils.isRemovable(widgetData)
+    removeIcon: "remove"
     buttonSize: Theme.iconSize
     hitOverflow: CcMetrics.gridGap / 2
     iconSize: PopoutMetrics.chromeIconSize
