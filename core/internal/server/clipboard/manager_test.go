@@ -20,6 +20,7 @@ import (
 	mocks_wlcontext "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/wlcontext"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/dankgo/ipc"
+	"github.com/AvengeMedia/dankgo/wayland/ext_data_control"
 )
 
 type clipboardTestConn struct {
@@ -48,14 +49,14 @@ func newTestManagerWithDB(t *testing.T) *Manager {
 	})
 
 	mockCtx := mocks_wlcontext.NewMockWaylandContext(t)
-	mockCtx.EXPECT().Post(mock.AnythingOfType("func()")).Run(func(fn func()) {
-		fn()
-	}).Maybe()
+	mockCtx.EXPECT().Post(mock.AnythingOfType("func()")).Return().Maybe()
 
 	return &Manager{
-		config: DefaultConfig(),
-		db:     db,
-		wlCtx:  mockCtx,
+		config:         DefaultConfig(),
+		db:             db,
+		wlCtx:          mockCtx,
+		dataControlMgr: &ext_data_control.ExtDataControlManagerV1{},
+		dataDevice:     &ext_data_control.ExtDataControlDeviceV1{},
 	}
 }
 
@@ -1014,4 +1015,28 @@ func TestHandleCopyEntry_OversizedFileEntryRestoresExactPath(t *testing.T) {
 	require.Empty(t, resp.Error)
 	require.NotNil(t, resp.Result)
 	assert.Equal(t, path, (*resp.Result)["filePath"])
+}
+
+// A manager built with tracking disabled never binds data control but still
+// serves clipboard.copyFile; answering success there made dms screenshot skip
+// its local copy and leave the clipboard empty.
+func TestCopyFile_DisabledTrackingRefusesCopy(t *testing.T) {
+	t.Setenv("XDG_CACHE_HOME", t.TempDir())
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+
+	mockCtx := mocks_wlcontext.NewMockWaylandContext(t)
+	mockCtx.EXPECT().Display().Return(nil).Maybe()
+	mockCtx.EXPECT().Post(mock.AnythingOfType("func()")).Run(func(fn func()) { fn() }).Maybe()
+
+	cfg := DefaultConfig()
+	cfg.Disabled = true
+	m, err := NewManager(mockCtx, cfg)
+	require.NoError(t, err)
+	t.Cleanup(m.Close)
+
+	path := filepath.Join(t.TempDir(), "shot.png")
+	require.NoError(t, os.WriteFile(path, []byte("png-bytes"), 0o644))
+
+	require.ErrorIs(t, m.CopyFile(path), errSelectionUnavailable)
+	assert.Empty(t, m.GetHistory())
 }

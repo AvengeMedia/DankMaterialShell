@@ -1336,7 +1336,18 @@ func (m *Manager) reopenDB() {
 	m.db = db
 }
 
+var errSelectionUnavailable = errors.New("clipboard selection unavailable: tracking disabled or no data control protocol")
+
+// Both are bound once in NewManager; a disabled manager never binds them but
+// still serves copy requests, so callers must fail before touching history.
+func (m *Manager) canTakeSelection() bool {
+	return m.dataControlMgr != nil && m.dataDevice != nil
+}
+
 func (m *Manager) SetClipboard(data []byte, mimeType string) error {
+	if !m.canTakeSelection() {
+		return errSelectionUnavailable
+	}
 	if int64(len(data)) > m.config.MaxEntrySize {
 		return fmt.Errorf("data too large")
 	}
@@ -1352,6 +1363,9 @@ func (m *Manager) SetClipboard(data []byte, mimeType string) error {
 // representation plus its stored alternate, so history restores keep
 // both the text and image sides pasteable.
 func (m *Manager) SetClipboardEntry(entry *Entry) error {
+	if !m.canTakeSelection() {
+		return errSelectionUnavailable
+	}
 	if int64(len(entry.Data)) > m.config.MaxEntrySize {
 		return fmt.Errorf("data too large")
 	}
@@ -2157,6 +2171,9 @@ func (m *Manager) GetPinnedCount() int {
 }
 
 func (m *Manager) CopyFile(filePath string) error {
+	if !m.canTakeSelection() {
+		return errSelectionUnavailable
+	}
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
 		return fmt.Errorf("file not found: %w", err)

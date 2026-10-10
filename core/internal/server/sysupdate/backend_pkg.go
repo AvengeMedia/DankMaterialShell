@@ -5,23 +5,26 @@ import (
 	"errors"
 	"os/exec"
 	"regexp"
+	"runtime"
 	"strings"
 )
 
 func init() {
-	// FreeBSD's pkg(8) is the native binary package manager. Register it after
-	// the Linux backends; IsAvailable keeps this harmless on other systems.
 	RegisterSystemBackend(func() Backend { return &pkgBackend{} })
 }
 
 type pkgBackend struct{}
 
-func (pkgBackend) ID() string                         { return "pkg" }
-func (pkgBackend) DisplayName() string                { return "FreeBSD pkg" }
-func (pkgBackend) Repo() RepoKind                     { return RepoSystem }
-func (pkgBackend) NeedsAuth() bool                    { return true }
-func (pkgBackend) RunsInTerminal() bool               { return false }
-func (pkgBackend) IsAvailable(_ context.Context) bool { return commandExists("pkg") }
+func (pkgBackend) ID() string           { return "pkg" }
+func (pkgBackend) DisplayName() string  { return "FreeBSD pkg" }
+func (pkgBackend) Repo() RepoKind       { return RepoSystem }
+func (pkgBackend) NeedsAuth() bool      { return true }
+func (pkgBackend) RunsInTerminal() bool { return false }
+
+// Gentoo's mgorny-dev-scripts and other distros ship an unrelated pkg binary.
+func (pkgBackend) IsAvailable(_ context.Context) bool {
+	return runtime.GOOS == "freebsd" && commandExists("pkg")
+}
 
 // pkg upgrade -n prints upgrade rows like:
 //
