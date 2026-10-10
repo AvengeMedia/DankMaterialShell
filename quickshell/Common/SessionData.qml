@@ -1530,7 +1530,7 @@ Singleton {
     function setPluginBrowserSortMode(mode) {
         if (mode === "type" || mode === "contributor")
             mode = "author";
-        if (mode !== "default" && mode !== "name" && mode !== "author" && mode !== "category")
+        if (mode !== "default" && mode !== "recommended" && mode !== "name" && mode !== "author" && mode !== "category")
             mode = "default";
         pluginBrowserSortMode = mode;
         saveSettings();

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Widgets
 import qs.Common
 import qs.Modals.Common
@@ -7,6 +8,7 @@ import qs.Services
 import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
+import "../../Common/PluginRanking.js" as PluginRanking
 
 RegistryBrowserWindow {
     id: root
@@ -23,14 +25,50 @@ RegistryBrowserWindow {
     property string operationMessage: ""
     property bool operationFailed: false
     property bool operationPending: false
+    property var discoverPicks: []
+    // Quick filters of this visit: usable (on the running compositor), fresh (new or updated), official.
+    property var quickFilters: ({})
+    // Set by a click on an author in a plugin's detail: only that author's plugins are listed.
+    property string authorFilter: ""
+    property var searchSuggestions: []
+    property var foundCommands: []
+    property var discoverShelves: []
 
     readonly property var detailPlugin: resolveDetailPlugin(detailPluginId, allPlugins)
+    property bool discoverCollapsed: false
+    readonly property bool discoverVisible: {
+        if (isLoading || loadError !== "" || searchQuery !== "" || typeFilter !== "" || authorFilter !== "")
+            return false;
+        if (discoverPicks.length === 0 && discoverShelves.length === 0)
+            return false;
+        var mode = normalizedSortMode(SessionData.pluginBrowserSortMode);
+        return mode === "default" || mode === "recommended";
+    }
     readonly property bool activeCategorySort: normalizedSortMode(SessionData.pluginBrowserSortMode) === "category"
     readonly property bool showCategoryFilters: activeCategorySort && categoryFilterOptions.length > 1
     readonly property bool showLetterIndex: {
         var mode = normalizedSortMode(SessionData.pluginBrowserSortMode);
         return (mode === "name" || mode === "author") && availableLetters.length > 1;
     }
+
+    readonly property var quickFilterOptions: [
+        {
+            value: "usable",
+            label: I18n.tr("Works here", "plugin browser filter chip, plugins that run on the current compositor"),
+            icon: "desktop_windows"
+        },
+        {
+            value: "fresh",
+            label: I18n.tr("New & updated", "plugin browser filter chip"),
+            icon: "fiber_new"
+        },
+        {
+            value: "official",
+            label: I18n.tr("Official", "plugin browser filter chip, first party plugins"),
+            icon: "verified"
+        }
+    ]
+    showLoadingSpinner: false
 
     readonly property var sortChipOptions: [
         {
@@ -46,6 +84,11 @@ RegistryBrowserWindow {
         {
             id: "default",
             label: I18n.tr("Votes", "plugin browser sort option"),
+            toggle: false
+        },
+        {
+            id: "recommended",
+            label: I18n.tr("For you", "plugin browser sort option, plugins ranked for this user"),
             toggle: false
         },
         {
@@ -68,9 +111,95 @@ RegistryBrowserWindow {
     function normalizedSortMode(mode) {
         if (mode === "type" || mode === "contributor")
             return "author";
-        if (mode === "name" || mode === "author" || mode === "category")
+        if (mode === "name" || mode === "author" || mode === "category" || mode === "recommended")
             return mode;
         return "default";
+    }
+
+    function rankingCompositor() {
+        if (CompositorService.isNiri)
+            return "niri";
+        if (CompositorService.isHyprland)
+            return "hyprland";
+        if (CompositorService.isSway)
+            return "sway";
+        if (CompositorService.isMango)
+            return "mangowc";
+        if (CompositorService.isLabwc)
+            return "labwc";
+        if (CompositorService.isMiracle)
+            return "miracle-wm";
+        return "";
+    }
+
+    function recommendationReason(key) {
+        switch (key) {
+        case "similar":
+            return I18n.tr("Like your plugins", "plugin recommendation reason, similar to installed plugins");
+        case "featured":
+            return I18n.tr("Featured", "plugin recommendation reason");
+        case "new":
+            return I18n.tr("New", "plugin recommendation reason, recently published");
+        case "trending":
+            return I18n.tr("Trending", "plugin recommendation reason, gaining votes quickly");
+        case "category":
+            return I18n.tr("Fits your setup", "plugin recommendation reason, same category as installed plugins");
+        default:
+            return I18n.tr("Popular", "plugin recommendation reason, many votes");
+        }
+    }
+
+    function updateDiscover(pool) {
+        var now = Date.now();
+        var taste = PluginRanking.buildTaste(allPlugins);
+        var options = {
+            now: now,
+            taste: taste,
+            compositor: rankingCompositor(),
+            limit: 6
+        };
+
+        var picks = [];
+        var week = PluginRanking.pickOfTheWeek(pool, now);
+        if (week)
+            picks.push({
+                label: I18n.tr("Pick of the week", "plugin browser highlighted plugin"),
+                plugin: week
+            });
+        var day = PluginRanking.pickOfTheDay(pool, now);
+        if (day)
+            picks.push({
+                label: I18n.tr("Pick of the day", "plugin browser highlighted plugin"),
+                plugin: day
+            });
+
+        options.exclude = picks.map(pick => pick.plugin.id);
+
+        var shelves = [];
+        var recommended = PluginRanking.recommend(pool, options);
+        if (recommended.length > 0)
+            shelves.push({
+                label: taste.count > 0 ? I18n.tr("For you", "plugin browser shelf, plugins ranked for this user") : I18n.tr("Popular", "plugin browser shelf"),
+                plugins: recommended,
+                captions: recommended.map(p => recommendationReason(PluginRanking.reason(p, taste, now)))
+            });
+        var trending = PluginRanking.trendingNow(pool, options);
+        if (trending.length > 0)
+            shelves.push({
+                label: I18n.tr("Trending", "plugin browser shelf, gaining votes quickly"),
+                plugins: trending,
+                captions: []
+            });
+        var arrivals = PluginRanking.newArrivals(pool, options);
+        if (arrivals.length > 0)
+            shelves.push({
+                label: I18n.tr("New", "plugin browser shelf, recently published"),
+                plugins: arrivals,
+                captions: []
+            });
+
+        discoverPicks = picks;
+        discoverShelves = shelves;
     }
 
     function isSortChipSelected(chipId, toggle) {
@@ -230,7 +359,8 @@ RegistryBrowserWindow {
         if (!pluginGrid)
             return;
         pluginGrid.cancelFlick();
-        pluginGrid.contentY = 0;
+        discoverCollapsed = false;
+        pluginGrid.positionViewAtBeginning();
         Qt.callLater(() => {
             if (pluginGrid)
                 pluginGrid.forceLayout();
@@ -250,7 +380,8 @@ RegistryBrowserWindow {
 
     function updateFilteredPlugins() {
         var baseFiltered = [];
-        var query = searchQuery ? searchQuery.toLowerCase() : "";
+        var visiblePlugins = SessionData.showThirdPartyPlugins ? allPlugins : allPlugins.filter(p => p.firstParty || false);
+        var plan = PluginRanking.searchPlan(visiblePlugins, searchQuery);
 
         for (var i = 0; i < allPlugins.length; i++) {
             var plugin = allPlugins[i];
@@ -264,19 +395,17 @@ RegistryBrowserWindow {
                     continue;
             }
 
-            if (query.length === 0) {
-                baseFiltered.push(plugin);
-                continue;
-            }
-
-            var name = plugin.name ? plugin.name.toLowerCase() : "";
-            var description = plugin.description ? plugin.description.toLowerCase() : "";
-            var author = plugin.author ? plugin.author.toLowerCase() : "";
-
-            if (name.indexOf(query) !== -1 || description.indexOf(query) !== -1 || author.indexOf(query) !== -1)
+            if (PluginRanking.searchRank(plugin, plan) > 0)
                 baseFiltered.push(plugin);
         }
+        if (authorFilter !== "")
+            baseFiltered = PluginRanking.byAuthor(baseFiltered, authorFilter);
 
+        var compositor = rankingCompositor();
+        var filterNow = Date.now();
+        baseFiltered = baseFiltered.filter(p => PluginRanking.matchesFilters(p, quickFilters, compositor, filterNow));
+
+        updateDiscover(baseFiltered);
         categoryFilterOptions = buildCategoryFilterOptions(baseFiltered);
         if (categoryFilter !== "all") {
             var filterStillValid = false;
@@ -290,7 +419,7 @@ RegistryBrowserWindow {
                 categoryFilter = "all";
         }
 
-        var filtered = baseFiltered.slice();
+        var filtered = baseFiltered;
         if (SessionData.pluginBrowserHideInstalled)
             filtered = filtered.filter(p => !(p.installed || false));
         if (activeCategorySort && categoryFilter !== "all") {
@@ -302,6 +431,15 @@ RegistryBrowserWindow {
             });
         }
 
+        var sortMode = normalizedSortMode(SessionData.pluginBrowserSortMode);
+        var scores = {};
+        if (sortMode === "recommended") {
+            var now = Date.now();
+            var taste = PluginRanking.buildTaste(allPlugins);
+            for (var s = 0; s < filtered.length; s++)
+                scores[filtered[s].id] = PluginRanking.score(filtered[s], taste, now);
+        }
+
         filtered.sort((a, b) => {
             if (SessionData.pluginBrowserInstalledFirst) {
                 var instA = a.installed || false;
@@ -309,7 +447,13 @@ RegistryBrowserWindow {
                 if (instA !== instB)
                     return instA ? -1 : 1;
             }
-            var sortMode = normalizedSortMode(SessionData.pluginBrowserSortMode);
+            if (sortMode === "recommended") {
+                var scoreA = scores[a.id] || 0;
+                var scoreB = scores[b.id] || 0;
+                if (scoreA !== scoreB)
+                    return scoreB - scoreA;
+                return comparePluginName(a, b);
+            }
             if (sortMode === "name")
                 return comparePluginName(a, b);
             if (sortMode === "author")
@@ -328,6 +472,7 @@ RegistryBrowserWindow {
         });
 
         filteredPlugins = filtered;
+        searchSuggestions = filtered.length === 0 && plan.length > 0 ? PluginRanking.closest(visiblePlugins, searchQuery, 4) : [];
         updateAvailableLetters(filtered);
         selectedIndex = -1;
         keyboardNavigationActive = false;
@@ -379,6 +524,93 @@ RegistryBrowserWindow {
 
     function closePluginDetail() {
         detailPluginId = "";
+    }
+
+    function showAuthor(author) {
+        authorFilter = author || "";
+        closePluginDetail();
+        updateFilteredPlugins();
+    }
+
+    function permissionLabel(id) {
+        switch (id) {
+        case "settings_read":
+            return I18n.tr("Reads its own settings", "plugin permission");
+        case "settings_write":
+            return I18n.tr("Saves its own settings", "plugin permission");
+        case "process":
+            return I18n.tr("Runs programs on your computer", "plugin permission");
+        case "process_read":
+            return I18n.tr("Reads the list of running programs", "plugin permission");
+        case "shell_execute":
+            return I18n.tr("Runs shell commands", "plugin permission");
+        case "network":
+            return I18n.tr("Connects to the internet", "plugin permission");
+        case "clipboard_read":
+            return I18n.tr("Reads the clipboard", "plugin permission");
+        case "filesystem_read":
+            return I18n.tr("Reads your files", "plugin permission");
+        case "filesystem_write":
+            return I18n.tr("Writes to your files", "plugin permission");
+        case "state_read":
+            return I18n.tr("Reads its saved state", "plugin permission");
+        case "state_write":
+            return I18n.tr("Saves its state", "plugin permission");
+        case "audio_read":
+            return I18n.tr("Reads audio devices and volume", "plugin permission");
+        case "audio_control":
+            return I18n.tr("Changes volume and audio devices", "plugin permission");
+        case "mpris_control":
+            return I18n.tr("Controls media players", "plugin permission");
+        default:
+            return id;
+        }
+    }
+
+    function permissionIcon(id) {
+        switch (id) {
+        case "process":
+        case "shell_execute":
+            return "terminal";
+        case "network":
+            return "public";
+        case "clipboard_read":
+            return "content_paste";
+        case "filesystem_read":
+        case "filesystem_write":
+            return "folder";
+        case "audio_read":
+        case "audio_control":
+            return "volume_up";
+        case "mpris_control":
+            return "play_circle";
+        case "process_read":
+            return "list";
+        default:
+            return "tune";
+        }
+    }
+
+    function checkDependencies(plugin) {
+        var commands = [];
+        var deps = plugin ? (plugin.dependencies || []) : [];
+        for (var i = 0; i < deps.length; i++)
+            commands = commands.concat(PluginRanking.dependencyCommands(deps[i]));
+        if (commands.length === 0)
+            return;
+        var script = 'for c in "$@"; do command -v "$c" >/dev/null 2>&1 && echo "$c"; done; true';
+        Proc.runCommand("plugin-browser-dependencies", ["sh", "-c", script, "sh"].concat(commands), (output, exitCode) => {
+            var found = String(output || "").split("\n").map(line => line.trim()).filter(line => line.length > 0);
+            foundCommands = foundCommands.concat(found.filter(c => foundCommands.indexOf(c) < 0));
+        }, 0);
+    }
+
+    function copyLink(plugin) {
+        var url = PluginRanking.shareUrl(plugin);
+        if (!url)
+            return;
+        Quickshell.execDetached(["dms", "cl", "copy", url]);
+        ToastService.showInfo(I18n.tr("Link copied", "plugin browser, link copied to clipboard"));
     }
 
     function formatUpdatedDate(iso) {
@@ -546,6 +778,8 @@ RegistryBrowserWindow {
     function resetContent() {
         allPlugins = [];
         filteredPlugins = [];
+        discoverPicks = [];
+        discoverShelves = [];
         loadError = "";
         detailPluginId = "";
     }
@@ -664,16 +898,31 @@ RegistryBrowserWindow {
                 model: root.sortChipOptions.slice(0, 2).map(option => ({
                             label: option.label,
                             value: option.id
-                        }))
+                        })).concat(root.quickFilterOptions)
                 multiSelect: true
-                selectedValues: [SessionData.pluginBrowserHideInstalled ? "hideInstalled" : "", SessionData.pluginBrowserInstalledFirst ? "installed" : ""]
+                selectedValues: [SessionData.pluginBrowserHideInstalled ? "hideInstalled" : "", SessionData.pluginBrowserInstalledFirst ? "installed" : ""].concat(Object.keys(root.quickFilters).filter(key => root.quickFilters[key]))
                 onSelectionToggled: (index, selected) => {
-                    if (index === 0)
+                    if (index === 0) {
                         SessionData.setPluginBrowserHideInstalled(selected);
-                    else
+                    } else if (index === 1) {
                         SessionData.setPluginBrowserInstalledFirst(selected);
+                    } else {
+                        var next = Object.assign({}, root.quickFilters);
+                        next[model[index].value] = selected;
+                        root.quickFilters = next;
+                    }
                     root.updateFilteredPlugins();
                 }
+            }
+            DButton {
+                visible: root.authorFilter !== ""
+                text: I18n.tr("Plugins by %1", "plugin browser author filter, %1 is the author").arg(root.authorFilter)
+                iconName: "close"
+                backgroundColor: Theme.primaryContainer
+                textColor: Theme.onPrimaryContainer
+                tooltipText: I18n.tr("Show every author", "plugin browser, clears the author filter")
+                Accessible.name: tooltipText
+                onClicked: root.showAuthor("")
             }
         },
         Item {
@@ -717,6 +966,39 @@ RegistryBrowserWindow {
     ]
 
     listContent: [
+        Item {
+            id: discoverPane
+
+            readonly property bool fits: discover.height + pluginGrid.cellHeight / 3 <= parent.height
+            readonly property bool shown: root.discoverVisible && fits && !root.discoverCollapsed
+
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.rightMargin: pluginGrid.anchors.rightMargin
+            height: shown ? discover.height + Theme.spacingM : 0
+            clip: true
+            visible: height > 0 && pluginGrid.visible
+
+            Behavior on height {
+                NumberAnimation {
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
+                }
+            }
+
+            PluginDiscover {
+                id: discover
+                x: pluginGrid.cardSpacing / 2
+                width: pluginGrid.cellWidth * pluginGrid.columns - pluginGrid.cardSpacing
+                picks: root.discoverPicks
+                shelves: root.discoverShelves
+                columns: pluginGrid.columns
+                cardSpacing: pluginGrid.cardSpacing
+                onPluginOpened: plugin => root.openPluginDetail(plugin)
+                onInstallRequested: plugin => root.installPlugin(plugin.id, plugin.name, plugin.type === "desktop")
+            }
+        },
         DGridView {
             id: pluginGrid
 
@@ -726,6 +1008,7 @@ RegistryBrowserWindow {
             readonly property int infoHeight: Theme.iconButtonSize + Theme.fontSizeSmall * 4 + Theme.spacingS
 
             anchors.fill: parent
+            anchors.topMargin: discoverPane.height
             anchors.rightMargin: root.showLetterIndex ? Theme.iconButtonSize : 0
             cellWidth: Math.floor(width / columns)
             cellHeight: previewHeight + infoHeight + Math.round(cardSpacing) + Theme.spacingS * 2 + Theme.spacingM
@@ -733,6 +1016,15 @@ RegistryBrowserWindow {
             clip: true
             visible: !root.isLoading && root.loadError === ""
             cacheBuffer: cellHeight * 2
+            onContentYChanged: {
+                if (!root.discoverCollapsed) {
+                    if (contentY > cellHeight / 4)
+                        root.discoverCollapsed = true;
+                    return;
+                }
+                if (contentY <= 0 && contentHeight > height + cellHeight)
+                    root.discoverCollapsed = false;
+            }
 
             delegate: Item {
                 id: cardCell
@@ -751,10 +1043,89 @@ RegistryBrowserWindow {
                     plugin: cardCell.modelData
                     busy: !!PluginService.installingPlugins[cardCell.modelData.id]
                     previewHeight: pluginGrid.previewHeight
+                    compositor: root.rankingCompositor()
                     installed: cardCell.modelData.installed || false
                     selected: root.keyboardNavigationActive && cardCell.index === root.selectedIndex
                     onClicked: root.openPluginDetail(cardCell.modelData)
                     onInstallRequested: root.installPlugin(cardCell.modelData.id, cardCell.modelData.name, cardCell.modelData.type === "desktop")
+                }
+            }
+        },
+        Grid {
+            id: loadingGrid
+            anchors.fill: pluginGrid
+            columns: pluginGrid.columns
+            clip: true
+            visible: root.isLoading
+
+            SequentialAnimation on opacity {
+                running: loadingGrid.visible && Theme.longDuration > 0
+                loops: Animation.Infinite
+                onRunningChanged: {
+                    if (!running)
+                        loadingGrid.opacity = 1;
+                }
+
+                NumberAnimation {
+                    to: 0.45
+                    duration: Theme.longDuration
+                    easing.type: Theme.standardEasing
+                }
+                NumberAnimation {
+                    to: 1
+                    duration: Theme.longDuration
+                    easing.type: Theme.standardEasing
+                }
+            }
+
+            Repeater {
+                model: root.isLoading ? pluginGrid.columns * Math.max(1, Math.ceil(pluginGrid.height / pluginGrid.cellHeight)) : 0
+
+                Item {
+                    width: pluginGrid.cellWidth
+                    height: pluginGrid.cellHeight
+
+                    Rectangle {
+                        anchors.fill: parent
+                        anchors.margins: pluginGrid.cardSpacing / 2
+                        radius: Theme.cornerRadiusM
+                        color: SettingsMetrics.rowColor
+                        border.color: Theme.outlineMedium
+                        border.width: Theme.layerOutlineWidth
+
+                        Rectangle {
+                            id: ghostPreview
+                            anchors.top: parent.top
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.margins: Theme.spacingS
+                            height: pluginGrid.previewHeight
+                            radius: Theme.cornerRadiusS
+                            color: SettingsMetrics.controlColor
+                        }
+
+                        Column {
+                            anchors.top: ghostPreview.bottom
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.topMargin: Theme.spacingM
+                            anchors.leftMargin: Theme.spacingM
+                            anchors.rightMargin: Theme.spacingM
+                            spacing: Theme.spacingS
+
+                            Repeater {
+                                model: [0.55, 0.3, 0.9]
+
+                                Rectangle {
+                                    required property real modelData
+                                    width: parent.width * modelData
+                                    height: Theme.fontSizeSmall
+                                    radius: height / 2
+                                    color: SettingsMetrics.controlColor
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -805,6 +1176,33 @@ RegistryBrowserWindow {
                 text: I18n.tr("No plugins found", "empty plugin list")
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText
+            }
+
+            StyledText {
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: root.searchSuggestions.length > 0
+                text: I18n.tr("Did you mean", "plugin search, introduces plugins with a close name")
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceVariantText
+            }
+
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: Theme.spacingXS
+                visible: root.searchSuggestions.length > 0
+
+                Repeater {
+                    model: root.searchSuggestions
+
+                    DButton {
+                        required property var modelData
+                        text: modelData.name || modelData.id
+                        iconName: modelData.icon || "extension"
+                        backgroundColor: Theme.secondaryContainer
+                        textColor: Theme.onSecondaryContainer
+                        onClicked: root.openPluginDetail(modelData)
+                    }
+                }
             }
         },
         Column {
@@ -870,6 +1268,7 @@ RegistryBrowserWindow {
             function onDetailPluginIdChanged() {
                 detailPane.heroFallback = false;
                 detailFlickable.contentY = 0;
+                root.checkDependencies(root.detailPlugin);
             }
         }
 
@@ -909,7 +1308,7 @@ RegistryBrowserWindow {
             StyledText {
                 anchors.left: detailIcon.right
                 anchors.leftMargin: Theme.spacingS
-                anchors.right: detailInstallButton.left
+                anchors.right: detailUpvoteButton.visible ? detailUpvoteButton.left : detailInstallButton.left
                 anchors.rightMargin: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter
                 text: detailPane.plugin.name || ""
@@ -918,6 +1317,23 @@ RegistryBrowserWindow {
                 color: Theme.surfaceText
                 elide: Text.ElideRight
                 maximumLineCount: 1
+            }
+
+            DButton {
+                id: detailUpvoteButton
+                anchors.right: detailInstallButton.left
+                anchors.rightMargin: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+                visible: !!detailPane.plugin.issueUrl
+                readonly property bool upvoted: !!PluginService.upvotedPlugins[detailPane.plugin.id]
+                text: PluginService.upvoteCount(detailPane.plugin)
+                iconName: "thumb_up"
+                enabled: !PluginService.upvotingPlugins[detailPane.plugin.id]
+                backgroundColor: upvoted ? Theme.primaryContainer : SettingsMetrics.controlSurface
+                textColor: upvoted ? Theme.onPrimaryContainer : Theme.surfaceText
+                tooltipText: upvoted ? I18n.tr("Remove upvote", "plugin upvote button tooltip") : I18n.tr("Upvote on GitHub", "plugin upvote button tooltip")
+                Accessible.name: tooltipText
+                onClicked: PluginService.upvotePlugin(detailPane.plugin)
             }
 
             DButton {
@@ -1020,13 +1436,6 @@ RegistryBrowserWindow {
                         }
                     }
 
-                    PluginBadge {
-                        iconName: "thumb_up"
-                        label: detailPane.plugin.upvotes || 0
-                        tone: Theme.primary
-                        visible: !!detailPane.plugin.issueUrl
-                    }
-
                     Repeater {
                         model: root.detailMetaBadges(detailPane.plugin)
 
@@ -1043,16 +1452,31 @@ RegistryBrowserWindow {
                     width: parent.width
                     text: {
                         const plugin = detailPane.plugin;
-                        const author = I18n.tr("by %1", "author attribution").arg(plugin.author || I18n.tr("Unknown", "unknown author"));
+                        const link = (href, label) => ` • <a href="${href}" style="text-decoration:none; color:${Theme.primary};">${label}</a>`;
+                        const authorName = plugin.author ? `<a href="author:" style="text-decoration:none; color:${Theme.primary};">${String(plugin.author).replace(/&/g, "&amp;").replace(/</g, "&lt;")}</a>` : I18n.tr("Unknown", "unknown author");
+                        const author = I18n.tr("by %1", "author attribution").arg(authorName);
+                        const reportUrl = PluginRanking.issueReportUrl(plugin, {
+                            "dms": ShellVersionService.shellVersion || DMSService.cliVersion,
+                            "compositor": root.rankingCompositor()
+                        });
+                        const report = reportUrl ? link(reportUrl, I18n.tr("report a problem", "plugin detail link, opens a prefilled issue")) : "";
+                        const copy = PluginRanking.shareUrl(plugin) ? link("copy:", I18n.tr("copy link", "plugin detail link, copies the plugin page address")) : "";
                         const source = plugin.repo ? ` • <a href="${plugin.repo}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("source", "source code link")}</a>` : "";
                         const discuss = plugin.issueUrl ? ` • <a href="${plugin.issueUrl}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("discuss", "plugin discussion link")}</a>` : "";
-                        return author + source + discuss;
+                        return author + source + discuss + report + copy;
                     }
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.onSurfaceVariant
                     linkColor: Theme.primary
                     textFormat: Text.RichText
-                    onLinkActivated: url => Qt.openUrlExternally(url)
+                    onLinkActivated: url => {
+                        if (url === "author:")
+                            root.showAuthor(detailPane.plugin.author);
+                        else if (url === "copy:")
+                            root.copyLink(detailPane.plugin);
+                        else
+                            Qt.openUrlExternally(url);
+                    }
 
                     MouseArea {
                         anchors.fill: parent
@@ -1099,55 +1523,71 @@ RegistryBrowserWindow {
                     }
                 }
 
-                Row {
+                Column {
                     width: parent.width
                     spacing: Theme.spacingS
                     visible: (detailPane.plugin.permissions || []).length > 0
 
-                    DIcon {
-                        name: "security"
-                        size: Theme.iconSizeSmall
+                    StyledText {
+                        text: I18n.tr("This plugin can", "plugin detail section, introduces the permission list")
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceVariantText
                     }
 
-                    Flow {
-                        width: parent.width - Theme.iconSize - Theme.spacingS
-                        spacing: Theme.spacingXS
+                    Repeater {
+                        model: PluginRanking.sortPermissions(detailPane.plugin.permissions)
 
-                        Repeater {
-                            model: detailPane.plugin.permissions || []
+                        Row {
+                            id: permissionRow
+                            required property string modelData
+                            readonly property bool sensitive: PluginRanking.permissionIsSensitive(modelData)
+                            width: parent.width
+                            spacing: Theme.spacingS
 
-                            PluginBadge {
-                                required property string modelData
-                                label: modelData
-                                tone: Theme.secondary
+                            DIcon {
+                                anchors.verticalCenter: parent.verticalCenter
+                                name: root.permissionIcon(permissionRow.modelData)
+                                size: Theme.iconSizeSmall
+                                color: permissionRow.sensitive ? Theme.warning : Theme.surfaceVariantText
+                            }
+
+                            StyledText {
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: parent.width - Theme.iconSizeSmall - Theme.spacingS
+                                text: root.permissionLabel(permissionRow.modelData)
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: permissionRow.sensitive ? Theme.surfaceText : Theme.surfaceVariantText
+                                wrapMode: Text.WordWrap
                             }
                         }
                     }
                 }
 
-                Row {
+                Column {
                     width: parent.width
                     spacing: Theme.spacingS
                     visible: (detailPane.plugin.dependencies || []).length > 0
 
-                    DIcon {
-                        name: "package_2"
-                        size: Theme.iconSizeSmall
+                    StyledText {
+                        text: I18n.tr("Needs", "plugin detail section, introduces the programs a plugin depends on")
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceVariantText
                     }
 
                     Flow {
-                        width: parent.width - Theme.iconSize - Theme.spacingS
+                        width: parent.width
                         spacing: Theme.spacingXS
 
                         Repeater {
-                            model: detailPane.plugin.dependencies || []
+                            model: PluginRanking.dependencyStates(detailPane.plugin.dependencies, root.foundCommands)
 
                             PluginBadge {
-                                required property string modelData
-                                label: modelData
-                                tone: Theme.outline
+                                required property var modelData
+                                label: modelData.state === "missing" ? I18n.tr("%1 not found", "plugin dependency missing, %1 is a program name").arg(modelData.name) : modelData.name
+                                iconName: modelData.state === "ok" ? "check_circle" : modelData.state === "missing" ? "warning" : "package_2"
+                                tone: modelData.state === "ok" ? Theme.primary : modelData.state === "missing" ? Theme.warning : Theme.outline
                             }
                         }
                     }

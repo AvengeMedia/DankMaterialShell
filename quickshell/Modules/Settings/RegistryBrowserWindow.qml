@@ -14,6 +14,7 @@ DFloatingWindow {
     property int selectedIndex: -1
     property bool keyboardNavigationActive: false
     property bool isLoading: false
+    property bool showLoadingSpinner: true
     property bool pendingInstallHandled: false
     property string headerTitle: title
     property string searchPlaceholder: ""
@@ -243,11 +244,11 @@ DFloatingWindow {
 
                     Item {
                         anchors.fill: parent
-                        visible: root.isLoading
+                        visible: root.isLoading && root.showLoadingSpinner
 
                         DSpinner {
                             anchors.centerIn: parent
-                            running: root.isLoading
+                            running: root.isLoading && root.showLoadingSpinner
                         }
                     }
                 }
