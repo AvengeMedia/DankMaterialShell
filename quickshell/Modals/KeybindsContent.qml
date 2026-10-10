@@ -526,7 +526,7 @@ FocusScope {
     Item {
         anchors.fill: parent
         anchors.margins: Theme.windowInset
-        anchors.topMargin: 0
+        anchors.topMargin: content.floating ? 0 : Theme.windowInset
 
         // Sidebar
         Item {
