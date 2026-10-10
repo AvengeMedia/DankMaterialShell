@@ -34,13 +34,9 @@ func HandleList(conn *ipc.ConnWriter, req ipc.Request) {
 	result := make([]PluginInfo, len(pluginList))
 	for i, p := range pluginList {
 		installed, _ := manager.IsInstalled(p)
-		fb := feedback[p.ID]
 		info := pluginInfoFromPlugin(p)
 		info.Installed = installed
-		info.Upvotes = fb.Upvotes
-		info.Status = fb.Status
-		info.IssueURL = fb.IssueURL
-		info.Similar = fb.Similar
+		applyFeedback(&info, feedback[p.ID])
 		result[i] = info
 	}
 
