@@ -58,6 +58,7 @@ Item {
     property bool available: true
     property bool interactive: true
     property bool iconBlinking: false
+    property bool tooltips: true
     property real iconRotation: 0
 
     signal clicked
@@ -207,7 +208,7 @@ Item {
             anchors.bottomMargin: root.expanded ? root.height - root.headerHeight - root.tilePadding * 2 : 0
             stateColor: root.contentColor
             cornerRadius: root.bodyRadius
-            tooltipText: root.compact || root.docked ? [root.title, root.subtitle].filter(text => text !== "").join(" · ") : ""
+            tooltipText: root.tooltips && (root.compact || root.docked) ? [root.title, root.subtitle].filter(text => text !== "").join(" · ") : ""
             onClicked: root.activate()
             onPressAndHold: root.expand()
             onWheel: wheelEvent => {

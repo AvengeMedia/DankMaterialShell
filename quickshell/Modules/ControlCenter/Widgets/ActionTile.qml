@@ -10,6 +10,7 @@ CcTile {
 
     toggle: false
     active: finishing
+    tooltips: !finishing
     iconName: finishing ? "check" : widgetDef?.icon ?? ""
     title: widgetDef?.text ?? ""
     restIconColor: action === "power" ? Theme.error : CcMetrics.tileInactiveIcon
