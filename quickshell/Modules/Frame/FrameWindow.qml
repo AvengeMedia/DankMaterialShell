@@ -334,7 +334,7 @@ PanelWindow {
     readonly property real _surfaceRadius: Theme.connectedSurfaceRadius
     readonly property real _seamOverlap: Theme.hairline(win._dpr)
     readonly property bool _disableLayer: Quickshell.env("DMS_DISABLE_LAYER") === "true" || Quickshell.env("DMS_DISABLE_LAYER") === "1"
-    readonly property bool _elevationShadow: win._connectedActive && Theme.elevationEnabled && (SettingsData.barElevationEnabled ?? true) && !win._disableLayer
+    readonly property bool _elevationShadow: win._connectedActive && Theme.elevationEnabled && (SettingsData.barElevationEnabled || SettingsData.popoutElevationEnabled || SettingsData.modalElevationEnabled) && !win._disableLayer
     function _clampNear(side, b) {
         const r = {
             "x": b.x,

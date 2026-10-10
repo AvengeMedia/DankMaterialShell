@@ -28,7 +28,9 @@ PanelWindow {
     property real edgeGap: 0
     property string slideEdge: "right"
     readonly property bool slideFromLeft: slideEdge === "left"
-    readonly property bool frameOwnsConnectedChrome: CompositorService.canShareConnectedFrameChromeForScreen(modelData)
+    // Opt-in: the frame has a single slideout slot per screen.
+    property bool frameSurfaceEnabled: false
+    readonly property bool frameOwnsConnectedChrome: frameSurfaceEnabled && mappedVisible && CompositorService.canShareConnectedFrameChromeForScreen(modelData)
     readonly property int frameInsetTop: _frameInset("top")
     readonly property int frameInsetBottom: _frameInset("bottom")
     readonly property int frameInsetEdge: _frameInset(slideEdge)
@@ -81,10 +83,9 @@ PanelWindow {
     }
 
     function _frameInset(edge) {
-        SettingsData.barConfigs;
         if (!frameOwnsConnectedChrome)
             return 0;
-        return Math.max(0, Math.round(Theme.px(SettingsData.frameEdgeReservation(modelData, edge), dpr)));
+        return Math.max(0, Math.round(Theme.px(SettingsData.frameEdgeReservation(modelData, edge) + SettingsData.dockReservationForEdge(modelData, edge), dpr)));
     }
 
     readonly property string _frameSlot: ConnectedModeState.surfaceSlot("slideout")
@@ -387,6 +388,7 @@ PanelWindow {
 
     WindowBlur {
         targetWindow: root
+        blurEnabled: root.slideoutBlurActive
         surfaceColor: contentRect.slideoutSurfaceColor
         blurX: root.slideoutBlurActive ? slideContainer.x + root.slideoutSlideSnapX : 0
         blurY: root.slideoutBlurActive ? slideContainer.y : 0

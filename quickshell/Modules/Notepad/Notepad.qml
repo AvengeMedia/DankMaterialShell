@@ -544,6 +544,7 @@ Item {
         id: notepadSettings
         anchors.fill: parent
         isVisible: showSettingsMenu
+        frameManagesGap: root.slideout?.frameOwnsConnectedChrome ?? false
         onSettingsRequested: showSettingsMenu = !showSettingsMenu
         onFindRequested: {
             showSettingsMenu = false;
