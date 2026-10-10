@@ -125,9 +125,15 @@ DCard {
             anchors.right: parent.right
             anchors.margins: Theme.spacingXS
             iconName: "thumb_up"
-            label: root.plugin.upvotes || 0
+            label: PluginService.upvoteCount(root.plugin)
             tone: Theme.primary
             visible: !!root.plugin.issueUrl
+            interactive: !PluginService.upvotingPlugins[root.plugin.id]
+            active: !!PluginService.upvotedPlugins[root.plugin.id]
+            tooltipText: active ? I18n.tr("Remove upvote", "plugin upvote button tooltip") : I18n.tr("Upvote on GitHub", "plugin upvote button tooltip")
+            Accessible.role: Accessible.Button
+            Accessible.name: tooltipText
+            onClicked: PluginService.upvotePlugin(root.plugin)
         }
 
         PluginBadge {

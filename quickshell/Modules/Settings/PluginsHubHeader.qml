@@ -231,6 +231,7 @@ Column {
 
     function uninstall(row) {
         const id = row.pluginId;
+        const wasEnabled = PluginService.isPluginLoaded(id);
         uninstalling = Object.assign({}, uninstalling, {
             [id]: true
         });
@@ -248,6 +249,7 @@ Column {
                 return;
             }
             PluginService.scanPlugins();
+            PluginService.noteUninstalled(id, row.text, wasEnabled);
         });
     }
 
@@ -429,6 +431,37 @@ Column {
         text: [root.actionError, DMSService.pluginUpdateCheckError].filter(Boolean).join("\n")
         color: Theme.error
         wrapMode: Text.Wrap
+    }
+
+    DCard {
+        color: SettingsMetrics.rowColor
+        width: parent.width
+        implicitHeight: undoRow.implicitHeight + pad * 2
+        visible: PluginService.lastUninstalledPlugin !== null && DMSService.dmsAvailable
+        pad: Theme.spacingS
+
+        RowLayout {
+            id: undoRow
+            width: parent.width
+            spacing: Theme.spacingM
+
+            StyledText {
+                Layout.fillWidth: true
+                Layout.leftMargin: Theme.spacingS
+                text: I18n.tr("%1 uninstalled", "plugin removed notice, %1 is the plugin name").arg(PluginService.lastUninstalledPlugin?.name ?? "")
+                color: Theme.surfaceText
+                elide: Text.ElideRight
+            }
+
+            DButton {
+                text: I18n.tr("Undo", "reinstall the plugin that was just uninstalled")
+                buttonHeight: Theme.buttonHeightXS
+                horizontalPadding: Theme.spacingS
+                backgroundColor: "transparent"
+                textColor: Theme.primary
+                onClicked: PluginService.undoUninstall()
+            }
+        }
     }
 
     DCard {

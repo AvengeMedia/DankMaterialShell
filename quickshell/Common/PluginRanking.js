@@ -302,6 +302,28 @@ function pickOfTheDay(plugins, now) {
     return _pick(plugins, t, "day:" + _dayNumber(t), 30, week ? week.id : "");
 }
 
+// Id of the reaction in a `gh api --include` reply (headers, blank line, JSON), 0 when there is none.
+function reactionId(output) {
+    const text = String(output || "");
+    const blank = text.search(/\r?\n\r?\n/);
+    const start = text.indexOf("{", blank < 0 ? 0 : blank);
+    if (start < 0)
+        return 0;
+    try {
+        const reply = JSON.parse(text.slice(start));
+        return reply && reply.content === "+1" && reply.id > 0 ? reply.id : 0;
+    } catch (e) {
+        return 0;
+    }
+}
+
+// "https://github.com/owner/repo/issues/12" -> "repos/owner/repo/issues/12/reactions",
+// the GitHub API path an upvote is posted to. Empty for anything else.
+function issueReactionsPath(url) {
+    const m = /^https:\/\/github\.com\/([\w.-]+)\/([\w.-]+)\/issues\/(\d+)\/?(?:[?#].*)?$/.exec(url || "");
+    return m ? "repos/" + m[1] + "/" + m[2] + "/issues/" + m[3] + "/reactions" : "";
+}
+
 // --- Search -----------------------------------------------------------------
 
 function _fold(text) {
@@ -427,4 +449,97 @@ function closest(plugins, query, limit) {
     });
     rows.sort((a, b) => a.distance - b.distance || (b.plugin.upvotes || 0) - (a.plugin.upvotes || 0) || String(a.plugin.id).localeCompare(String(b.plugin.id)));
     return rows.slice(0, limit || 4).map(r => r.plugin);
+}
+
+function byAuthor(plugins, author) {
+    const wanted = _fold(author).trim();
+    if (!wanted)
+        return [];
+    return _list(plugins).filter(p => _fold(p.author).trim() === wanted);
+}
+
+// --- Detail pane ------------------------------------------------------------
+
+// Permissions that reach outside the plugin's own settings come first.
+function sortPermissions(permissions) {
+    const order = ["shell_execute", "process", "network", "filesystem_write", "filesystem_read", "clipboard_read"];
+    const rank = id => {
+        const i = order.indexOf(id);
+        return i < 0 ? order.length : i;
+    };
+    return _list(permissions).map((id, i) => ({
+            id: id,
+            i: i
+        })).sort((a, b) => rank(a.id) - rank(b.id) || a.i - b.i).map(r => r.id);
+}
+
+function permissionIsSensitive(id) {
+    return ["process", "shell_execute", "network", "clipboard_read", "filesystem_read", "filesystem_write"].indexOf(id) >= 0;
+}
+
+const _DEPENDENCY_COMMANDS = {
+    "wl-clipboard": ["wl-copy"],
+    "imagemagick": ["magick", "convert"],
+    "libnotify": ["notify-send"],
+    "iproute2": ["ip"],
+    "python": ["python3", "python"],
+    "systemd": ["systemctl"],
+    "pipewire": ["pw-cli"],
+    "pulseaudio": ["pactl"],
+    "networkmanager": ["nmcli"],
+    "bluez": ["bluetoothctl"],
+    "playerctl": ["playerctl"],
+    "secret-tool": ["secret-tool"],
+    "libsecret": ["secret-tool"],
+    "tesseract": ["tesseract"],
+    "zbar": ["zbarimg", "zbarcam"],
+    "docker": ["docker", "podman"]
+};
+
+// The commands whose presence proves a dependency is installed. Empty when
+// the name is a library or a package that ships no command to look for.
+function dependencyCommands(name) {
+    const dep = String(name || "").trim().toLowerCase();
+    if (!dep)
+        return [];
+    if (_DEPENDENCY_COMMANDS[dep])
+        return _DEPENDENCY_COMMANDS[dep];
+    if (!/^[a-z0-9][a-z0-9._+-]*$/.test(dep) || /^(lib|qt[56]-|qml-|python3?-|kf[56]-|gst-|ttf-|font)/.test(dep))
+        return [];
+    return [dep];
+}
+
+// "ok", "missing" or "unknown" for each dependency, from the commands found.
+function dependencyStates(dependencies, found) {
+    const have = _list(found);
+    return _list(dependencies).map(name => {
+        const commands = dependencyCommands(name);
+        return {
+            name: name,
+            state: commands.length === 0 ? "unknown" : commands.some(c => have.indexOf(c) >= 0) ? "ok" : "missing"
+        };
+    });
+}
+
+// A new-issue link on the plugin's own repository, with what a maintainer
+// asks first already filled in. Nothing is posted: the user reviews and sends.
+function issueReportUrl(plugin, info) {
+    const p = plugin || {};
+    const m = /^https:\/\/github\.com\/([\w.-]+)\/([\w.-]+?)(?:\.git)?\/?$/.exec(p.repo || "");
+    if (!m)
+        return "";
+    const env = info || {};
+    const lines = ["**Plugin:** " + (p.name || p.id || "") + (p.id ? " (`" + p.id + "`)" : "") + (p.version ? " v" + p.version : "")];
+    if (env.dms)
+        lines.push("**DMS:** " + env.dms);
+    if (env.compositor)
+        lines.push("**Compositor:** " + env.compositor);
+    lines.push("", "**What happened:**", "", "", "**What I expected:**", "");
+    return "https://github.com/" + m[1] + "/" + m[2] + "/issues/new?title=" + encodeURIComponent("[" + (p.name || p.id || "plugin") + "] ") + "&body=" + encodeURIComponent(lines.join("\n"));
+}
+
+// The page to share for a plugin: its registry thread when it has one, else its repository.
+function shareUrl(plugin) {
+    const p = plugin || {};
+    return /^https:\/\//.test(p.issueUrl || "") ? p.issueUrl : /^https:\/\//.test(p.repo || "") ? p.repo : "";
 }

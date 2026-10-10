@@ -95,11 +95,27 @@ test("no taste, no dates, no votes: still a deterministic order", () => {
     assert.deepEqual(ids(rank.recommend(list, { now: NOW })), ["c", "a", "b"]);
 });
 
+test("an upvote is posted to the reactions of the plugin's GitHub issue only", () => {
+    assert.equal(rank.issueReactionsPath("https://github.com/AvengeMedia/dms-plugin-registry/issues/42"), "repos/AvengeMedia/dms-plugin-registry/issues/42/reactions");
+    assert.equal(rank.issueReactionsPath("https://github.com/a/b.c/issues/7#issuecomment-1"), "repos/a/b.c/issues/7/reactions");
+    for (const url of ["", undefined, "https://example.com/a/b/issues/1", "https://github.com/a/b/pull/1", "https://github.com/a/b/issues/1/../../x", "https://github.com/a/b/issues/1 -f x=y", "http://github.com/a/b/issues/1"])
+        assert.equal(rank.issueReactionsPath(url), "");
+});
+
 test("a card is marked new for two weeks, then updated for a week after a release", () => {
     assert.equal(rank.recency(plugin("a", { created_at: ago(3), updated_at: ago(1) }), NOW), "new");
     assert.equal(rank.recency(plugin("b", { created_at: ago(90), updated_at: ago(2) }), NOW), "updated");
     assert.equal(rank.recency(plugin("c", { created_at: ago(90), updated_at: ago(30) }), NOW), "");
     assert.equal(rank.recency(plugin("d", { created_at: undefined, updated_at: undefined }), NOW), "");
+});
+
+test("the reaction id is read from a gh reply, so the vote can be taken back", () => {
+    const body = JSON.stringify({ id: 987, node_id: "x", user: { login: "someone", id: 5 }, content: "+1" });
+    assert.equal(rank.reactionId("HTTP/2.0 201 Created\r\nEtag: \"a{b\"\r\n\r\n" + body), 987);
+    assert.equal(rank.reactionId("HTTP/2.0 201 Created\r\nServer: github.com\r\n\r\n" + body), 987);
+    assert.equal(rank.reactionId("HTTP/2.0 200 OK\n\n" + body), 987);
+    for (const reply of ["", undefined, "HTTP/2.0 401 Unauthorized\n\n{\"message\":\"Bad credentials\"}", "HTTP/2.0 200 OK\n\n{\"id\":3,\"content\":\"heart\"}", "{not json"])
+        assert.equal(rank.reactionId(reply), 0);
 });
 
 test("a plugin limited to other compositors names them, a portable one names none", () => {
@@ -166,4 +182,32 @@ test("closest proposes the nearest names when nothing matches", () => {
     assert.deepEqual(ids(rank.closest(list, "qqqqqqqq", 3)), []);
     assert.deepEqual(ids(rank.closest(list, "", 3)), []);
     assert.equal(rank.closest(list, "eather", 1).length, 1);
+});
+
+test("byAuthor lists one author's plugins whatever the case", () => {
+    const list = [plugin("a", { author: "Loc Huynh" }), plugin("b", { author: "loc huynh " }), plugin("c", { author: "Other" })];
+    assert.deepEqual(ids(rank.byAuthor(list, "Loc Huynh")), ["a", "b"]);
+    assert.deepEqual(ids(rank.byAuthor(list, "")), []);
+});
+
+test("permissions that reach outside the plugin come first", () => {
+    assert.deepEqual(Array.from(rank.sortPermissions(["settings_read", "settings_write", "network", "process"])), ["process", "network", "settings_read", "settings_write"]);
+    assert.equal(rank.permissionIsSensitive("shell_execute"), true);
+    assert.equal(rank.permissionIsSensitive("settings_read"), false);
+});
+
+test("dependencies are checked by command, libraries stay unknown", () => {
+    const states = rank.dependencyStates(["curl", "jq", "wl-clipboard", "qt6-websockets", "imagemagick"], ["curl", "wl-copy", "convert"]);
+    assert.deepEqual(Array.from(states, s => s.name + ":" + s.state), ["curl:ok", "jq:missing", "wl-clipboard:ok", "qt6-websockets:unknown", "imagemagick:ok"]);
+    assert.deepEqual(Array.from(rank.dependencyCommands("lib; rm -rf")), []);
+});
+
+test("the report link is prefilled and only built for GitHub repositories", () => {
+    const url = rank.issueReportUrl({ id: "clock", name: "World Clock", version: "1.2.0", repo: "https://github.com/ada/clock" }, { dms: "1.4.0", compositor: "niri" });
+    assert.ok(url.startsWith("https://github.com/ada/clock/issues/new?title=%5BWorld%20Clock%5D%20&body="));
+    const body = decodeURIComponent(url.split("&body=")[1]);
+    assert.ok(body.includes("World Clock (`clock`) v1.2.0") && body.includes("**DMS:** 1.4.0") && body.includes("**Compositor:** niri"));
+    assert.equal(rank.issueReportUrl({ id: "x", repo: "https://example.org/x" }, {}), "");
+    assert.equal(rank.shareUrl({ issueUrl: "https://github.com/a/b/issues/1", repo: "https://github.com/a/b" }), "https://github.com/a/b/issues/1");
+    assert.equal(rank.shareUrl({ repo: "javascript:alert(1)" }), "");
 });
