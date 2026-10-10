@@ -589,7 +589,8 @@ PanelWindow {
         readonly property real swipeTravelDistance: width
         readonly property real swipeFadeStartOffset: swipeTravelDistance * swipeFadeStartRatio
         readonly property real swipeFadeDistance: Math.max(1, swipeTravelDistance - swipeFadeStartOffset)
-        readonly property bool swipeActive: swipeDragHandler.active
+        property bool swipeWheelActive: false
+        readonly property bool swipeActive: swipeDragHandler.active || swipeWheelActive
         property bool swipeDismissing: false
         onSwipeDismissingChanged: {
             if (!win.connectedFrameMode)
@@ -600,6 +601,19 @@ PanelWindow {
         onSwipeOffsetChanged: {
             if (win.connectedFrameMode)
                 win.popupChromeGeometryChanged();
+        }
+
+        function releaseSwipe(velocity = 0) {
+            if (win.exiting || swipeDismissing)
+                return;
+            const projected = swipeOffset + velocity * NotificationMetrics.swipeFlingProjectionMs / 1000;
+            if (Math.abs(projected) <= dismissThreshold) {
+                swipeOffset = 0;
+                return;
+            }
+            swipeDismissDirection = projected < 0 ? -1 : 1;
+            swipeDismissing = true;
+            swipeDismissAnim.start();
         }
 
         readonly property bool shadowsAllowed: win.popupWindowShadowActive
@@ -817,16 +831,9 @@ PanelWindow {
             yAxis.enabled: false
 
             onActiveChanged: {
-                if (active || win.exiting || content.swipeDismissing)
+                if (active)
                     return;
-
-                if (Math.abs(content.swipeOffset) > content.dismissThreshold) {
-                    content.swipeDismissDirection = content.swipeOffset < 0 ? -1 : 1;
-                    content.swipeDismissing = true;
-                    swipeDismissAnim.start();
-                } else {
-                    content.swipeOffset = 0;
-                }
+                content.releaseSwipe();
             }
 
             onTranslationChanged: {
@@ -891,6 +898,27 @@ PanelWindow {
                 }
             }
         ]
+    }
+
+    // Sits on the untranslated card footprint: inside content the handler would lose the pointer once the card slides past it,
+    // and above content so it sees the gesture before DFlickable's blocking vertical handler
+    Item {
+        parent: slideClip
+        x: content.x
+        y: content.y
+        width: content.width
+        height: content.height
+        visible: content.visible
+
+        NotificationSwipeWheel {
+            enabled: !win.exiting && !content.swipeDismissing
+            onBegan: content.swipeWheelActive = true
+            onMoved: travel => content.swipeOffset = travel
+            onEnded: velocity => {
+                content.swipeWheelActive = false;
+                content.releaseSwipe(velocity);
+            }
+        }
     }
 
     DCommon.DAnim {

@@ -18,11 +18,7 @@ SettingsRow {
     subtitle: description
     subtitleColor: descriptionColor
     clickable: true
-    resetByKeys: false
-    onResetRequested: {
-        if (!resetByKeys)
-            toggled(!checked);
-    }
+    resetKeys: []
     Accessible.role: Accessible.CheckBox
     Accessible.checkable: true
     Accessible.checked: checked

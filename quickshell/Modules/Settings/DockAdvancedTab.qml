@@ -24,8 +24,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "dockUseOverlayLayer"
                 tags: ["dock", "fullscreen", "overlay", "layer"]
-                resetStore: dock
-                resetKeys: ["useOverlayLayer"]
                 text: I18n.tr("Use overlay layer")
                 checked: dock.config?.useOverlayLayer ?? false
                 onToggled: checked => dock.setOption("useOverlayLayer", checked)
@@ -34,8 +32,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "dockShowOnFullscreen"
                 tags: ["dock", "fullscreen", "overlay", "show", "visibility"]
-                resetStore: dock
-                resetKeys: ["showOnFullscreen"]
                 text: I18n.tr("Over fullscreen")
                 description: I18n.tr("Keeps the dock showing over fullscreen windows", "dock over fullscreen toggle description")
                 enabled: dock.config?.useOverlayLayer ?? false
@@ -46,8 +42,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "dockOpenOnOverview"
                 tags: ["dock", "overview", "niri"]
-                resetStore: dock
-                resetKeys: ["openOnOverview"]
                 text: I18n.tr("Show on overview")
                 visible: CompositorService.isNiri
                 checked: dock.config?.openOnOverview ?? false
@@ -81,8 +75,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "dockIsolateDisplays"
                 tags: ["dock", "isolate", "monitor", "multi-monitor"]
-                resetStore: dock
-                resetKeys: ["isolateDisplays"]
                 text: I18n.tr("Isolate displays")
                 description: I18n.tr("Shows only windows from the dock's own display", "dock isolate displays toggle description")
                 checked: dock.config?.isolateDisplays ?? false
@@ -92,8 +84,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "dockRestoreSpecialWorkspaceOnClick"
                 tags: ["dock", "hyprland", "special", "workspace", "restore"]
-                resetStore: dock
-                resetKeys: ["restoreSpecialWorkspaceOnClick"]
                 text: I18n.tr("Restore special workspace")
                 description: I18n.tr("Clicking a window in a special workspace opens that workspace", "dock restore special workspace toggle description")
                 visible: CompositorService.isHyprland

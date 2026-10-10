@@ -159,7 +159,6 @@ Item {
                 }
 
                 SettingsToggleRow {
-                    resetKeys: ["notificationFocusedMonitor"]
                     visible: componentCard.modelData.id === "notifications"
                     text: I18n.tr("Focused display only")
                     checked: SettingsData.notificationFocusedMonitor

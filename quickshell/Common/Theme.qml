@@ -2108,7 +2108,9 @@ Singleton {
         const theme = isLight ? "adw-gtk3" : "adw-gtk3-dark";
         const schema = "org.gnome.desktop.interface";
         const key = "gtk-theme";
-        const reset = GSettings.setCmd(schema, key, "");
+        // Same-polarity built-in intermediate: "" resolves to light Adwaita and
+        // toolkit-following apps (Chromium without a portal) latch on it.
+        const reset = GSettings.setCmd(schema, key, isLight ? "Adwaita" : "HighContrastInverse");
         const apply = GSettings.setCmd(schema, key, theme);
 
         Proc.runCommand("gtkRefresher", ["sh", "-c", `${reset}; ${apply}`], (output, exitCode) => {
@@ -2195,15 +2197,11 @@ Singleton {
     }
 
     function withAlpha(c, a) {
-        if (!c || c.r === undefined)
-            return Qt.rgba(0, 0, 0, 0);
-        return Qt.rgba(c.r, c.g, c.b, a);
+        return DCommon.Style.withAlpha(c, a);
     }
 
     function blendAlpha(c, a) {
-        if (!c || c.r === undefined)
-            return Qt.rgba(0, 0, 0, 0);
-        return Qt.rgba(c.r, c.g, c.b, c.a * a);
+        return DCommon.Style.blendAlpha(c, a);
     }
 
     function hoverTint(base) {

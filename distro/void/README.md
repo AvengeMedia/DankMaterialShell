@@ -90,8 +90,6 @@ xlint srcpkgs/dms/template
 sudo xbps-install --repository=hostdir/binpkgs dms dgop
 ```
 
-`dms` requires Go ≥ 1.26 in the build environment (per `core/go.mod`).
-
 ## Running the shell
 
 DMS is a user-level Wayland shell with **no system service** — start it from your
@@ -101,7 +99,13 @@ compositor's autostart, e.g. niri:
 spawn-at-startup "dms" "run"
 ```
 
-or Hyprland: `exec-once = dms run`.
+or Hyprland (`~/.config/hypr/hyprland.lua`):
+
+```lua
+hl.on("hyprland.start", function()
+	hl.exec_cmd("dms run")
+end)
+```
 
 From a TTY on Void without a greeter, start your compositor through a D-Bus
 session:

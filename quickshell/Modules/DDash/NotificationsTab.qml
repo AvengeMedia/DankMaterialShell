@@ -76,6 +76,10 @@ FocusScope {
 
     function revealInViewport(item, viewport) {
         const point = item.mapToItem(viewport.contentItem, 0, 0);
+        if (typeof viewport.revealRange === "function") {
+            viewport.revealRange(point.y, point.y + item.height);
+            return;
+        }
         if (point.y < viewport.contentY) {
             viewport.contentY = Math.max(0, point.y);
             return;

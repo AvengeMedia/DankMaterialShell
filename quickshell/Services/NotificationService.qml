@@ -1049,6 +1049,17 @@ Singleton {
             dismissNotification(w);
     }
 
+    function invokeLastNotification() {
+        const w = notifications[notifications.length - 1];
+        const actions = w?.actions || [];
+        const action = actions.find(a => a.identifier === "default") || actions[0];
+        if (!action?.invoke)
+            return false;
+        action.invoke();
+        dismissNotification(w);
+        return true;
+    }
+
     function dismissAllPopups() {
         for (const w of visibleNotifications) {
             if (w) {

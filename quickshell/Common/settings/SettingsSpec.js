@@ -163,6 +163,94 @@ var LOCAL_SPEC = {
         def: false,
         onChange: "updateCompositorLayout"
     },
+    hyprlandWindowOpacity: {
+        def: 100,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandBorderGrabArea: {
+        def: 15,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandBlurVariant: {
+        def: "kawase",
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandBlurAcrylicClarity: {
+        def: 82,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandBlurAuroraIntensity: {
+        def: 35,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandBlurAuroraSpeed: {
+        def: 1,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandBlurHazeIntensity: {
+        def: 35,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandBlurHazeIridescence: {
+        def: 70,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandBlurRippleStrength: {
+        def: 30,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandBlurWaterStrength: {
+        def: 32,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandGlowEnabled: {
+        def: false,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandGlowRange: {
+        def: 10,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandGlowRenderPower: {
+        def: 3,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandWobbleEnabled: {
+        def: false,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandWobbleIntensity: {
+        def: 20,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandWobbleStiffness: {
+        def: 200,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandMotionBlurEnabled: {
+        def: false,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandMotionBlurSamples: {
+        def: 7,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandGroupbarBlur: {
+        def: false,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandGroupbarTextPadding: {
+        def: 0,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandGroupbarMiddleClickClose: {
+        def: true,
+        onChange: "updateCompositorLayout"
+    },
+    hyprlandGroupbarDisableWhenOnly: {
+        def: false,
+        onChange: "updateCompositorLayout"
+    },
     hyprlandTilingLayout: {
         def: "",
         onChange: "updateCompositorLayout"
@@ -226,10 +314,6 @@ var LOCAL_SPEC = {
     mangoLayoutBorderSize: {
         def: -1,
         onChange: "updateCompositorLayout"
-    },
-    mangoTrackpadNaturalScrolling: {
-        def: true,
-        onChange: "updateCompositorCursor"
     },
     mouseAccelProfile: {
         def: "default",
@@ -408,6 +492,10 @@ var LOCAL_SPEC = {
     },
     blurEnabled: {
         def: false
+    },
+    blurStrength: {
+        def: 0,
+        onChange: "updateBlurStrength"
     },
     blurBorderSeeded: {
         def: false
@@ -738,7 +826,7 @@ var LOCAL_SPEC = {
         def: "full"
     },
     avatarRing: {
-        def: "outline"
+        def: "none"
     },
     spotlightBarShowModeChips: {
         def: false
@@ -1465,7 +1553,7 @@ var LOCAL_SPEC = {
                 maximizeDetection: true,
                 useOverlayLayer: false,
                 scrollEnabled: true,
-                scrollXBehavior: "column",
+                scrollXBehavior: "focusWindow",
                 scrollYBehavior: "workspace",
                 middleClickAction: "none",
                 rightClickAction: "none",
@@ -1488,6 +1576,9 @@ var LOCAL_SPEC = {
     },
     desktopWidgetGroups: {
         def: []
+    },
+    desktopContextMenu: {
+        def: "auto"
     },
     builtInPluginSettings: {
         def: {}

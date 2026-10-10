@@ -2,6 +2,7 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 
 import QtCore
+import Qt.labs.folderlistmodel
 import QtQuick
 import "../DCommon/Common/Shape.js" as Shape
 import Quickshell
@@ -22,7 +23,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 38
+    readonly property int settingsConfigVersion: 40
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -88,10 +89,8 @@ Singleton {
     property bool _parseError: false
     property bool _pluginParseError: false
     property bool _hasLoaded: false
-    property bool _isReadOnly: false
-    property bool _hasUnsavedChanges: false
-    property bool _selfWrite: false
-    property var _loadedSettingsSnapshot: null
+    property bool isReadOnly: false
+    property bool unsavedUserChanges: false
     property var pluginSettings: ({})
     property var builtInPluginSettings: Spec.SPEC.builtInPluginSettings.def
 
@@ -208,6 +207,28 @@ Singleton {
     property int hyprlandLayoutRadiusOverride: Spec.SPEC.hyprlandLayoutRadiusOverride.def
     property int hyprlandLayoutBorderSize: Spec.SPEC.hyprlandLayoutBorderSize.def
     property bool hyprlandResizeOnBorder: Spec.SPEC.hyprlandResizeOnBorder.def
+    property int hyprlandWindowOpacity: Spec.SPEC.hyprlandWindowOpacity.def
+    property int hyprlandBorderGrabArea: Spec.SPEC.hyprlandBorderGrabArea.def
+    property string hyprlandBlurVariant: Spec.SPEC.hyprlandBlurVariant.def
+    property int hyprlandBlurAcrylicClarity: Spec.SPEC.hyprlandBlurAcrylicClarity.def
+    property int hyprlandBlurAuroraIntensity: Spec.SPEC.hyprlandBlurAuroraIntensity.def
+    property int hyprlandBlurAuroraSpeed: Spec.SPEC.hyprlandBlurAuroraSpeed.def
+    property int hyprlandBlurHazeIntensity: Spec.SPEC.hyprlandBlurHazeIntensity.def
+    property int hyprlandBlurHazeIridescence: Spec.SPEC.hyprlandBlurHazeIridescence.def
+    property int hyprlandBlurRippleStrength: Spec.SPEC.hyprlandBlurRippleStrength.def
+    property int hyprlandBlurWaterStrength: Spec.SPEC.hyprlandBlurWaterStrength.def
+    property bool hyprlandGlowEnabled: Spec.SPEC.hyprlandGlowEnabled.def
+    property int hyprlandGlowRange: Spec.SPEC.hyprlandGlowRange.def
+    property int hyprlandGlowRenderPower: Spec.SPEC.hyprlandGlowRenderPower.def
+    property bool hyprlandWobbleEnabled: Spec.SPEC.hyprlandWobbleEnabled.def
+    property int hyprlandWobbleIntensity: Spec.SPEC.hyprlandWobbleIntensity.def
+    property int hyprlandWobbleStiffness: Spec.SPEC.hyprlandWobbleStiffness.def
+    property bool hyprlandMotionBlurEnabled: Spec.SPEC.hyprlandMotionBlurEnabled.def
+    property int hyprlandMotionBlurSamples: Spec.SPEC.hyprlandMotionBlurSamples.def
+    property bool hyprlandGroupbarBlur: Spec.SPEC.hyprlandGroupbarBlur.def
+    property int hyprlandGroupbarTextPadding: Spec.SPEC.hyprlandGroupbarTextPadding.def
+    property bool hyprlandGroupbarMiddleClickClose: Spec.SPEC.hyprlandGroupbarMiddleClickClose.def
+    property bool hyprlandGroupbarDisableWhenOnly: Spec.SPEC.hyprlandGroupbarDisableWhenOnly.def
     property string hyprlandTilingLayout: Spec.SPEC.hyprlandTilingLayout.def
     property bool hyprlandDwindlePreserveSplit: Spec.SPEC.hyprlandDwindlePreserveSplit.def
     property bool hyprlandDwindleSmartSplit: Spec.SPEC.hyprlandDwindleSmartSplit.def
@@ -224,7 +245,6 @@ Singleton {
     property int mangoLayoutGapsOutOverride: Spec.SPEC.mangoLayoutGapsOutOverride.def
     property int mangoLayoutRadiusOverride: Spec.SPEC.mangoLayoutRadiusOverride.def
     property int mangoLayoutBorderSize: Spec.SPEC.mangoLayoutBorderSize.def
-    property bool mangoTrackpadNaturalScrolling: Spec.SPEC.mangoTrackpadNaturalScrolling.def
     property string mouseAccelProfile: Spec.SPEC.mouseAccelProfile.def
     property real mouseAccelSpeed: Spec.SPEC.mouseAccelSpeed.def
     property bool mouseLeftHanded: Spec.SPEC.mouseLeftHanded.def
@@ -307,6 +327,7 @@ Singleton {
 
     property bool blurEnabled: Spec.SPEC.blurEnabled.def
     onBlurEnabledChanged: saveSettings()
+    property int blurStrength: Spec.SPEC.blurStrength.def
     property bool blurBorderSeeded: Spec.SPEC.blurBorderSeeded.def
     onBlurBorderSeededChanged: saveSettings()
     property bool blurForegroundLayers: Spec.SPEC.blurForegroundLayers.def
@@ -856,6 +877,7 @@ Singleton {
         return (barConfigs || []).filter(cfg => isIslandBarConfig(cfg));
     }
     readonly property bool dankIslandEnabled: (barConfigs || []).some(cfg => (cfg.enabled ?? false) && hostsIsland(cfg))
+    readonly property var enabledIslandBarConfigs: (barConfigs || []).filter(cfg => cfg?.island === true && (cfg.enabled ?? false))
     // Session-only: which bar, island or dot last-used shared shortcuts follow on each screen.
     property var lastUsedBarByScreen: ({})
     // One slot per edge; a dot floats, so it never takes one.
@@ -1138,6 +1160,7 @@ Singleton {
 
     property var desktopWidgetInstances: Spec.SPEC.desktopWidgetInstances.def
     property var desktopWidgetGroups: Spec.SPEC.desktopWidgetGroups.def
+    property string desktopContextMenu: Spec.SPEC.desktopContextMenu.def
     property var lockScreenWidgetInstances: Spec.SPEC.lockScreenWidgetInstances.def
     property var greeterWidgetInstances: Spec.SPEC.greeterWidgetInstances.def
     property bool greeterFollowLockScreen: Spec.SPEC.greeterFollowLockScreen.def
@@ -1404,6 +1427,7 @@ Singleton {
     signal widgetDataChanged
     signal workspaceIconsUpdated
     signal compositorLayoutRefreshNeeded(bool frame)
+    signal blurStrengthRefreshNeeded
     signal compositorInputRefreshNeeded
     signal compositorCursorRefreshNeeded
     signal notificationPopupsInvalidated
@@ -1414,12 +1438,11 @@ Singleton {
         Processes.detectAuthCapabilities();
     }
 
-    Component.onCompleted: {
-        if (isGreeterMode)
-            return;
+    function _runStartSequence() {
         Processes.settingsRoot = root;
-        loadSettings();
+        const unsaved = _loadSettings();
         initializeListModels();
+        return unsaved;
     }
 
     function applyStoredTheme() {
@@ -1448,6 +1471,10 @@ Singleton {
 
     function updateCompositorInput() {
         compositorInputRefreshNeeded();
+    }
+
+    function updateBlurStrength() {
+        blurStrengthRefreshNeeded();
     }
 
     function updateFrameCompositorLayout() {
@@ -1710,6 +1737,7 @@ Singleton {
             "regenSystemThemes": regenSystemThemes,
             "updateCompositorLayout": updateCompositorLayout,
             "updateCompositorInput": updateCompositorInput,
+            "updateBlurStrength": updateBlurStrength,
             "applyStoredIconTheme": applyStoredIconTheme,
             "updateBarConfigs": updateBarConfigs,
             "updateCompositorCursor": updateCompositorCursor,
@@ -1803,99 +1831,103 @@ Singleton {
         _commitBarConfigs(configs);
     }
 
-    function loadSettings() {
-        _loading = true;
-        _parseError = false;
-        _hasUnsavedChanges = false;
-        _pendingMigration = null;
+    function _loadSettings() {
+        const isInitial = !_hasLoaded || _settingsStage === SettingsData.Stage.Partial;
+        let unsavedChanges;
+        let obj = _getSettingsObjectFromFiles();
+        let loadedSettings = JSON.stringify(obj);
 
-        try {
-            const txt = settingsFile.text();
-            let obj = (txt && txt.trim()) ? JSON.parse(txt) : null;
-
-            const oldVersion = obj?.configVersion ?? 0;
-            const legacyPins = oldVersion < 13 ? Store.extractPins(obj) : null;
-            const sessionPayload = oldVersion < 15 ? Store.extractSessionPayload(obj) : null;
-            const cachePayload = oldVersion < 15 ? Store.extractCachePayload(obj) : null;
-            if (oldVersion < settingsConfigVersion) {
-                const migrated = Store.migrateToVersion(obj, settingsConfigVersion);
-                if (migrated) {
-                    _pendingMigration = migrated;
-                    obj = migrated;
-                }
+        const oldVersion = obj?.configVersion ?? 0;
+        const legacyPins = oldVersion < 13 ? Store.extractPins(obj) : null;
+        const sessionPayload = oldVersion < 15 ? Store.extractSessionPayload(obj) : null;
+        const cachePayload = oldVersion < 15 ? Store.extractCachePayload(obj) : null;
+        let migrationRan = false;
+        if (oldVersion < settingsConfigVersion) {
+            const migrated = Store.migrateToVersion(obj, settingsConfigVersion);
+            if (migrated) {
+                obj = migrated;
+                migrationRan = true;
             }
-            if (legacyPins)
-                Qt.callLater(() => CacheData.migratePins(legacyPins));
-            if (cachePayload)
-                Qt.callLater(() => CacheData.migrateUsageHistories(cachePayload));
-            if (sessionPayload) {
-                Qt.callLater(() => {
-                    SessionData.importFromSettings(sessionPayload);
-                    _mergeSessionState();
-                });
-            }
-
-            if (obj?.lockScreenActiveMonitor !== undefined) {
-                var oldVal = obj.lockScreenActiveMonitor;
-                if (oldVal && oldVal !== "all") {
-                    if (!obj.screenPreferences)
-                        obj.screenPreferences = {};
-                    if (obj.screenPreferences.lockScreen === undefined) {
-                        obj.screenPreferences.lockScreen = [oldVal];
-                    }
-                }
-                delete obj.lockScreenActiveMonitor;
-            }
-
-            if (obj?.use24HourClock !== undefined && obj?.clockFormat === undefined) {
-                obj.clockFormat = obj.use24HourClock ? "24h" : "12h";
-                delete obj.use24HourClock;
-            }
-
-            Store.parse(root, obj);
-
-            // set() enforces this pair, but a hand-edited settings.json bypasses set() entirely.
-            if (frameEnabled)
-                clearIslandBars();
-
-            if (obj?.directionalAnimationMode === 3 && frameMode !== "connected")
-                frameMode = "connected";
-
-            if (obj?.iconTheme !== undefined && obj?.iconThemeDark === undefined)
-                iconThemeDark = obj.iconTheme;
-
-            if (obj?.weatherLocation !== undefined)
-                _legacyWeatherLocation = obj.weatherLocation;
-            if (obj?.weatherCoordinates !== undefined)
-                _legacyWeatherCoordinates = obj.weatherCoordinates;
-            if (obj?.vpnLastConnected !== undefined && obj.vpnLastConnected !== "") {
-                _legacyVpnLastConnected = obj.vpnLastConnected;
-                SessionData.vpnLastConnected = _legacyVpnLastConnected;
-                SessionData.saveSettings();
-            }
-
-            _loadedSettingsSnapshot = JSON.stringify(Store.toJson(root));
-            _hasLoaded = true;
-            _mergeSessionState();
-            applyStoredTheme();
-            updateCompositorCursor();
-            Qt.callLater(checkIconThemeDrift);
-
-            _checkSettingsWritable();
-        } catch (e) {
-            _parseError = true;
-            const msg = e.message;
-            log.error("Failed to parse settings.json - file will not be overwritten. Error:", msg);
-            Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse %1", "error toast, %1 is a settings file name").arg("settings.json"), msg));
-            applyStoredTheme();
-        } finally {
-            _loading = false;
         }
-        loadPluginSettings();
-        Qt.callLater(() => _reconcileConnectedFrameBarStyles());
-    }
+        if (legacyPins) {
+            Qt.callLater(() => CacheData.migratePins(legacyPins));
+        }
+        if (cachePayload) {
+            Qt.callLater(() => CacheData.migrateUsageHistories(cachePayload));
+        }
+        if (sessionPayload) {
+            Qt.callLater(() => {
+                SessionData.importFromSettings(sessionPayload);
+                _mergeSessionState();
+            });
+        }
+        if (obj?.lockScreenActiveMonitor !== undefined) {
+            var oldVal = obj.lockScreenActiveMonitor;
+            if (oldVal && oldVal !== "all") {
+                if (!obj.screenPreferences) {
+                    obj.screenPreferences = {};
+                }
+                if (obj.screenPreferences.lockScreen === undefined) {
+                    obj.screenPreferences.lockScreen = [oldVal];
+                }
+            }
+            delete obj.lockScreenActiveMonitor;
+        }
+        if (obj?.use24HourClock !== undefined && obj?.clockFormat === undefined) {
+            obj.clockFormat = obj.use24HourClock ? "24h" : "12h";
+            delete obj.use24HourClock;
+        }
 
-    property var _pendingMigration: null
+        const prevFrameEnabled = frameEnabled;
+        const prevFrameMode = frameMode;
+        unsavedChanges = loadedSettings !== JSON.stringify(obj);
+        Store.parse(root, obj);
+
+        // set() enforces this pair, but a hand-edited settings bypass set() entirely.
+        if (frameEnabled)
+            clearIslandBars();
+
+        if (obj?.directionalAnimationMode === 3 && frameMode !== "connected")
+            frameMode = "connected";
+
+        if (obj?.iconTheme !== undefined && obj?.iconThemeDark === undefined)
+            iconThemeDark = obj.iconTheme;
+
+        if (obj?.weatherLocation !== undefined)
+            _legacyWeatherLocation = obj.weatherLocation;
+        if (obj?.weatherCoordinates !== undefined)
+            _legacyWeatherCoordinates = obj.weatherCoordinates;
+        if (obj?.vpnLastConnected !== undefined && obj.vpnLastConnected !== "") {
+            _legacyVpnLastConnected = obj.vpnLastConnected;
+            SessionData.vpnLastConnected = _legacyVpnLastConnected;
+            SessionData.saveSettings();
+        }
+
+        _hasLoaded = true;
+        if (!_parseError) {
+            _settingsStage = SettingsData.Stage.Ready;
+        }
+
+        if (isInitial) {
+            _mergeSessionState();
+            Qt.callLater(checkIconThemeDrift);
+        }
+        applyStoredTheme();
+        updateCompositorCursor();
+        if (!isInitial) {
+            // External edits reload under _loading, which skips the per-property transition triggers
+            const frameChanged = (frameEnabled !== prevFrameEnabled || (frameEnabled && frameMode !== prevFrameMode));
+            if (!_parseError && frameChanged) {
+                updateFrameCompositorLayout();
+            }
+        }
+
+        if (isInitial && _settingsStage === SettingsData.Stage.Ready) {
+            loadPluginSettings();
+            Qt.callLater(() => _reconcileConnectedFrameBarStyles());
+        }
+        return unsavedChanges;
+    }
 
     function _mergeSessionState() {
         if (!_hasLoaded || !SessionData._hasLoaded)
@@ -1920,39 +1952,18 @@ Singleton {
         }
     }
 
-    function _checkSettingsWritable() {
-        settingsWritableCheckProcess.running = true;
-    }
-
-    function _onWritableCheckComplete(writable) {
-        const wasReadOnly = _isReadOnly;
-        _isReadOnly = !writable;
-        if (_isReadOnly) {
-            _hasUnsavedChanges = _checkForUnsavedChanges();
-            if (!wasReadOnly)
-                log.info("settings.json is now read-only");
-        } else {
-            _loadedSettingsSnapshot = JSON.stringify(Store.toJson(root));
-            _hasUnsavedChanges = false;
-            if (wasReadOnly)
-                log.info("settings.json is now writable");
-            if (_pendingMigration) {
-                _selfWrite = true;
-                settingsFile.setText(JSON.stringify(_pendingMigration, null, 2));
+    function _getCurrentSettings() {
+        const setKeys = new Set();
+        for (const path of _settingsFilesPaths) {
+            const file = _settingsFiles.get(path);
+            for (const key in file.settings) {
+                setKeys.add(key);
             }
         }
-        _pendingMigration = null;
+        return Store.toJson(root, setKeys);
     }
-
-    function _checkForUnsavedChanges() {
-        if (!_hasLoaded || !_loadedSettingsSnapshot)
-            return false;
-        const current = JSON.stringify(Store.toJson(root));
-        return current !== _loadedSettingsSnapshot;
-    }
-
     function getCurrentSettingsJson() {
-        return JSON.stringify(Store.toJson(root), null, 2);
+        return JSON.stringify(_getCurrentSettings(), null, 2);
     }
 
     function _resetPluginSettings() {
@@ -2016,16 +2027,62 @@ Singleton {
         }
     }
 
+    function _splitSettingsByFile(settings) {
+        const savedSettings = new Set();
+        const splitSettings = {};
+
+        for (let i = _settingsFilesPaths.length - 1; i >= 0; i--) {
+            const path = _settingsFilesPaths[i];
+            const file = _settingsFiles.get(path);
+            const fileSettings = file.getSettings();
+            for (const setting in fileSettings) {
+                if (!(setting in settings)) {
+                    delete fileSettings[setting];
+                    continue;
+                }
+                if (savedSettings.has(setting)) {
+                    continue;
+                }
+                fileSettings[setting] = settings[setting];
+                savedSettings.add(setting);
+            }
+            splitSettings[path] = fileSettings;
+        }
+
+        for (const setting in settings) {
+            if (!savedSettings.has(setting)) {
+                splitSettings[defaultSettingsFile.filePath][setting] = settings[setting];
+            }
+        }
+        return splitSettings;
+    }
     function saveSettings() {
-        if (isGreeterMode || _loading || _parseError || !_hasLoaded)
+        if (isGreeterMode || _loading || !_hasLoaded)
             return;
-        const json = JSON.stringify(Store.toJson(root), null, 2);
-        if (json === settingsFile.text())
+        unsavedUserChanges = true;
+        settingsSaveDebounce.restart();
+    }
+    function _saveSettings(userChanges) {
+        let reason = null;
+        if (isGreeterMode) {
+            reason = "running in greeter mode.";
+        } else if (_loading) {
+            reason = "some files are being loaded";
+        } else if (_parseError) {
+            reason = "failed to parse settings.";
+        }
+        if (reason !== null) {
+            log.warn("Refusing to save settings, recent changes may be lost: " + reason);
             return;
-        _selfWrite = true;
-        settingsFile.setText(json);
-        if (_isReadOnly)
-            _checkSettingsWritable();
+        }
+        const settings = _getCurrentSettings();
+        const splitSettings = _splitSettingsByFile(settings);
+        for (const path in splitSettings) {
+            const fileSettings = splitSettings[path];
+            const file = _settingsFiles.get(path);
+            file.setSettings(fileSettings, userChanges);
+        }
+        unsavedUserChanges = _anySettingsFile(file => file.fileUnsavedUserChanges);
     }
 
     function savePluginSettings() {
@@ -3633,82 +3690,327 @@ Singleton {
         id: rightWidgetsModel
     }
 
-    property alias settingsFile: settingsFile
-
-    Timer {
-        id: settingsFileReloadDebounce
-        interval: 50
-        onTriggered: settingsFile.reload()
-        repeat: false
-    }
-
-    FileView {
+    component SettingsFile: QtObject {
         id: settingsFile
 
-        path: isGreeterMode ? "" : StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/DankMaterialShell/settings.json"
-        blockLoading: true
-        blockWrites: true
-        atomicWrites: true
-        watchChanges: !isGreeterMode
-        onFileChanged: {
-            if (_selfWrite) {
-                _selfWrite = false;
+        required property string filePath
+        property var settings: ({})
+        property bool isLoading: false
+        property bool hasLoaded: false
+        property bool hasParseFailed: false
+        property bool fileUnsavedUserChanges: false
+        property bool isFileReadOnly: false
+        property bool selfWrite: false
+        function setSettings(newSettings, userChanges) {
+            const newSettingsJson = JSON.stringify(newSettings, null, 2);
+            if (JSON.stringify(settings, null, 2) === newSettingsJson) {
                 return;
             }
-            settingsFileReloadDebounce.restart();
+
+            settings = newSettings;
+            fileUnsavedUserChanges = fileUnsavedUserChanges || userChanges;
+
+            selfWrite = true;
+            settingsFileView.setText(newSettingsJson);
         }
-        onLoaded: {
-            if (isGreeterMode)
-                return;
-            const wasLoaded = _hasLoaded;
-            const prevFrameEnabled = frameEnabled;
-            const prevFrameMode = frameMode;
-            _loading = true;
-            _hasUnsavedChanges = false;
-            try {
-                const txt = settingsFile.text();
-                if (!txt || !txt.trim()) {
-                    _parseError = true;
+        function getSettings() {
+            return Object.assign({}, settings);
+        }
+
+        property Timer timer: Timer {
+            id: settingsFileReloadDebounce
+            interval: 50
+            onTriggered: settingsFileView.reload()
+            repeat: false
+        }
+
+        property FileView fileView: FileView {
+            id: settingsFileView
+
+            path: isGreeterMode ? "" : filePath
+            blockLoading: false
+            blockWrites: true
+            atomicWrites: true
+            watchChanges: !isGreeterMode
+            onFileChanged: {
+                if (selfWrite) {
+                    selfWrite = false;
+                } else {
+                    isLoading = true;
+                    _loading = true;
+                    settingsFileReloadDebounce.restart();
+                }
+            }
+            onLoaded: {
+                if (isGreeterMode) {
                     return;
                 }
-                const obj = JSON.parse(txt);
-                _parseError = false;
-                Store.parse(root, obj);
+                isLoading = true;
+                _loading = true;
+                const hadParseFailed = hasParseFailed;
+                hasParseFailed = false;
+                fileUnsavedUserChanges = false;
+                if (unsavedUserChanges) {
+                    unsavedUserChanges = _anySettingsFile(file => file.fileUnsavedUserChanges);
+                }
+                const fileName = filePath?.split("/").pop();
+                try {
+                    let txt = settingsFileView.text();
+                    if (!txt || !txt.trim()) {
+                        txt = "{}";
+                    }
+                    settings = JSON.parse(txt);
+                    hasLoaded = true;
+                } catch (error) {
+                    hasParseFailed = true;
+                    _parseError = true;
 
-                if (obj.weatherLocation !== undefined)
-                    _legacyWeatherLocation = obj.weatherLocation;
-                if (obj.weatherCoordinates !== undefined)
-                    _legacyWeatherCoordinates = obj.weatherCoordinates;
-                if (obj.vpnLastConnected !== undefined && obj.vpnLastConnected !== "") {
-                    _legacyVpnLastConnected = obj.vpnLastConnected;
-                    SessionData.vpnLastConnected = _legacyVpnLastConnected;
-                    SessionData.saveSettings();
+                    const msg = error.message;
+                    log.error(`Failed to reload ${fileName} - file will not be overwritten. Error:`, msg);
+                    Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse %1").arg(fileName), msg));
+                } finally {
+                    isLoading = false;
+                    if (hadParseFailed && !hasParseFailed) {
+                        _parseError = _anySettingsFile(file => file.hasParseFailed);
+                    }
+                    _tryCompleteLoading();
+                    _loadSettingsOrStartIfReady();
+                }
+            }
+            onLoadFailed: error => {
+                if (isGreeterMode) {
+                    return;
+                }
+                isLoading = false;
+                _loading = _anySettingsFile(file => file.isLoading);
+                if (error === FileViewError.FileNotFound) {
+                    // Fake that the file has been loaded so that it gets created after a save.
+                    hasLoaded = true;
+                }
+                applyStoredTheme();
+                _tryCompleteLoading();
+                _loadSettingsOrStartIfReady();
+            }
+            onSaved: {
+                isFileReadOnly = false;
+                isReadOnly = isReadOnly ? _anySettingsFile(file => file.isFileReadOnly) : false;
+
+                fileUnsavedUserChanges = false;
+                if (unsavedUserChanges) {
+                    unsavedUserChanges = _anySettingsFile(file => file.fileUnsavedUserChanges);
+                }
+            }
+            onSaveFailed: error => {
+                selfWrite = false;
+                if (error === FileViewError.PermissionDenied) {
+                    isFileReadOnly = true;
+                    isReadOnly = true;
+                }
+                if (fileUnsavedUserChanges) {
+                    const fileName = filePath?.split("/").pop() || "unknown";
+                    log.warn(`Failed to save ${fileName}`);
+                }
+            }
+        }
+    }
+
+    enum Stage {
+        Discovering = 0,
+        Loading = 1,
+        Partial = 2,
+        Ready = 3
+    }
+    property int _settingsStage: SettingsData.Stage.Discovering
+
+    property var _settingsFiles: new Map()
+    property var _settingsFilesPaths: ([])
+    function _registerSettingsFile(file) {
+        const filePath = file.filePath;
+        if (_settingsFiles.has(filePath)) {
+            return;
+        }
+        let index;
+        if (file === defaultSettingsFile) {
+            index = 0;
+        } else {
+            index = _settingsFilesPaths.findIndex((path, i) => {
+                return path > filePath && i > 0;
+            });
+        }
+        _settingsFiles.set(filePath, file);
+        if (index >= 0) {
+            _settingsFilesPaths.splice(index, 0, filePath);
+        } else {
+            _settingsFilesPaths.push(filePath);
+        }
+        _tryCompleteDiscovery();
+    }
+    function _unregisterSettingsFile(file) {
+        _settingsFiles.delete(file.filePath);
+        _settingsFilesPaths = _settingsFilesPaths.filter(path => path != file.filePath);
+    }
+    function _tryCompleteDiscovery() {
+        if (_settingsStage !== SettingsData.Stage.Discovering || !_settingsFolderChecked) {
+            return;
+        }
+        let expectedCount = 1;
+        if (_settingsFolderExists) {
+            expectedCount += settingsFolderLoader.item.count;
+        }
+        if (_settingsFilesPaths.length == expectedCount) {
+            _settingsStage = SettingsData.Stage.Loading;
+            _tryCompleteLoading();
+            _loadSettingsOrStartIfReady();
+        }
+    }
+    function _tryCompleteLoading() {
+        if (_settingsStage !== SettingsData.Stage.Loading) {
+            return;
+        }
+        if (_everySettingsFile(file => file.hasLoaded || file.hasParseFailed)) {
+            _settingsStage = _parseError ? SettingsData.Stage.Partial : SettingsData.Stage.Ready;
+        }
+    }
+    function _loadSettingsOrStartIfReady() {
+        if (_settingsStage < SettingsData.Stage.Partial || _anySettingsFile(file => file.isLoading)) {
+            return;
+        }
+        let unsaved;
+        _loading = true;
+        if (!_hasLoaded || _settingsStage === SettingsData.Stage.Partial) {
+            unsaved = _runStartSequence();
+        } else {
+            unsaved = _loadSettings();
+        }
+        _loading = false;
+        if (unsaved) {
+            _saveSettings(false);
+        }
+    }
+    function _getSettingsObjectFromFiles() {
+        const settingsObject = {};
+        for (const path of _settingsFilesPaths) {
+            const settingsFile = _settingsFiles.get(path);
+            Object.assign(settingsObject, settingsFile.getSettings());
+        }
+        return settingsObject;
+    }
+
+    function _anySettingsFile(predicate) {
+        for (const file of _settingsFiles.values()) {
+            if (predicate(file)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    function _everySettingsFile(predicate) {
+        for (const file of _settingsFiles.values()) {
+            if (!predicate(file)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    SettingsFile {
+        id: defaultSettingsFile
+
+        filePath: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/DankMaterialShell/settings.json"
+
+        Component.onCompleted: {
+            _registerSettingsFile(defaultSettingsFile);
+        }
+    }
+
+    property bool _settingsFolderExists: false
+    property bool _settingsFolderChecked: isGreeterMode
+    function _syncSettingsFilesModels() {
+        if (!_settingsFolderChecked) {
+            settingsFilesModelSyncDebounce.restart();
+            return;
+        }
+        if (!_settingsFolderExists) {
+            return;
+        }
+        const listModel = settingsFilesListModel;
+        const folderModel = settingsFolderLoader.item;
+
+        const folderPathsSet = new Set();
+        for (let i = 0; i < folderModel.count; i++) {
+            const filePath = folderModel.get(i, "filePath");
+            folderPathsSet.add(filePath);
+            if (!_settingsFiles.has(filePath)) {
+                listModel.append({
+                    filePath
+                });
+            }
+        }
+        for (let i = listModel.count - 1; i >= 0; i--) {
+            const filePath = listModel.get(i).filePath;
+            if (!folderPathsSet.has(filePath)) {
+                listModel.remove(i);
+            }
+        }
+    }
+    Timer {
+        id: settingsFilesModelSyncDebounce
+        interval: 50
+        repeat: false
+        running: false
+        onTriggered: _syncSettingsFilesModels()
+    }
+    ListModel {
+        id: settingsFilesListModel
+    }
+    Loader {
+        id: settingsFolderLoader
+        active: !isGreeterMode
+        function unloadModel() {
+            active = false;
+        }
+        sourceComponent: FolderListModel {
+            id: settingsFolderModel
+
+            property url dir: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/DankMaterialShell/config.d"
+
+            folder: dir
+            showDirs: false
+            nameFilters: ["*.json"]
+            onStatusChanged: {
+                // Folder gets reset to the CWD if the directory doesn't exist.
+                _settingsFolderExists = folder == dir;
+                if (status !== FolderListModel.Ready) {
+                    return;
+                }
+                _settingsFolderChecked = true;
+                if (!_settingsFolderExists) {
+                    Qt.callLater(() => settingsFolderLoader.unloadModel());
                 }
 
-                _loadedSettingsSnapshot = JSON.stringify(Store.toJson(root));
-                _hasLoaded = true;
-                applyStoredTheme();
-                updateCompositorCursor();
-            } catch (e) {
-                _parseError = true;
-                const msg = e.message;
-                log.error("Failed to reload settings.json - file will not be overwritten. Error:", msg);
-                Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse %1").arg("settings.json"), msg));
-            } finally {
-                _loading = false;
+                if (_hasLoaded) {
+                    settingsFilesModelSyncDebounce.restart();
+                } else {
+                    _syncSettingsFilesModels();
+                }
+                _tryCompleteDiscovery();
             }
-            // External edits reload under _loading, which skips the per-property transition triggers
-            if (wasLoaded && !_parseError && (frameEnabled !== prevFrameEnabled || (frameEnabled && frameMode !== prevFrameMode)))
-                updateFrameCompositorLayout();
         }
-        onLoadFailed: error => {
-            if (isGreeterMode)
-                return;
-            applyStoredTheme();
+    }
+
+    Instantiator {
+        id: settingsLoader
+
+        model: settingsFilesListModel
+        onObjectAdded: (_, file) => {
+            _registerSettingsFile(file);
         }
-        onSaveFailed: error => {
-            root._isReadOnly = true;
-            root._hasUnsavedChanges = root._checkForUnsavedChanges();
+        onObjectRemoved: (_, file) => {
+            _unregisterSettingsFile(file);
+            _loadSettingsOrStartIfReady();
+        }
+        delegate: SettingsFile {
+            id: settingsFile
         }
     }
 
@@ -3792,21 +4094,13 @@ Singleton {
         }
     }
 
-    property bool pluginSettingsFileExists: false
-
-    Process {
-        id: settingsWritableCheckProcess
-
-        property string settingsPath: Paths.strip(settingsFile.path)
-
-        command: ["sh", "-c", "[ ! -f \"" + settingsPath + "\" ] || [ -w \"" + settingsPath + "\" ] && echo 'writable' || echo 'readonly'"]
+    Timer {
+        id: settingsSaveDebounce
+        interval: 50
+        repeat: false
         running: false
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const result = text.trim();
-                root._onWritableCheckComplete(result === "writable");
-            }
-        }
+        onTriggered: _saveSettings(true)
     }
+
+    property bool pluginSettingsFileExists: false
 }

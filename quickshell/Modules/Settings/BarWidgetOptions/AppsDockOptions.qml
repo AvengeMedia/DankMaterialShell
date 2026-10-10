@@ -56,8 +56,6 @@ Column {
         settingKey: "barWidgetAppsDock"
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["runningAppsCompactMode"]
             text: I18n.tr("Compact mode")
             visible: !root.dockHosted
             checked: root.page.value("runningAppsCompactMode")
@@ -65,16 +63,12 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["runningAppsCurrentWorkspace"]
             text: I18n.tr("Current workspace", "Running apps filter: only show apps from the active workspace")
             checked: root.page.value("runningAppsCurrentWorkspace")
             onToggled: checked => root.page.set("runningAppsCurrentWorkspace", checked)
         }
 
         SettingsToggleRow {
-            resetStore: root.apps
-            resetKeys: ["groupByApp"]
             text: I18n.tr("Group by app")
             visible: root.dockHosted
             checked: root.apps.get("groupByApp")
@@ -82,8 +76,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.apps
-            resetKeys: ["separatePinnedAndRunningApps"]
             text: I18n.tr("Separate pinned and running apps")
             visible: root.dockHosted
             checked: root.apps.get("separatePinnedAndRunningApps")
@@ -118,8 +110,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.apps
-            resetKeys: ["showOverflowBadge"]
             text: I18n.tr("Show badge")
             checked: root.apps.get("showOverflowBadge")
             onToggled: checked => root.apps.set("showOverflowBadge", checked)
@@ -132,8 +122,6 @@ Column {
         visible: root.dockHosted
 
         SettingsToggleRow {
-            resetStore: root.apps
-            resetKeys: ["launcherEnabled"]
             text: I18n.tr("Show")
             checked: root.apps.get("launcherEnabled")
             onToggled: checked => root.apps.set("launcherEnabled", checked)
@@ -251,8 +239,6 @@ Column {
         visible: root.dockHosted
 
         SettingsToggleRow {
-            resetStore: root.apps
-            resetKeys: ["showTrash"]
             text: I18n.tr("Show")
             checked: root.apps.get("showTrash")
             onToggled: checked => root.apps.set("showTrash", checked)
@@ -284,8 +270,6 @@ Column {
         settingKey: "barWidgetAppsDockEffects"
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["appsDockHideIndicators"]
             text: I18n.tr("Indicators")
             checked: !root.page.value("appsDockHideIndicators")
             onToggled: checked => root.page.set("appsDockHideIndicators", !checked)
@@ -308,8 +292,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["appsDockColorizeActive"]
             text: I18n.tr("Colorize active")
             checked: root.page.value("appsDockColorizeActive")
             onToggled: checked => root.page.set("appsDockColorizeActive", checked)
@@ -327,7 +309,6 @@ Column {
 
         SettingsToggleSliderRow {
             resetStore: root.page
-            resetKeys: ["appsDockEnlargeOnHover"]
             valueKeys: ["appsDockEnlargePercentage"]
             text: I18n.tr("Enlarge on hover")
             checked: root.page.value("appsDockEnlargeOnHover")

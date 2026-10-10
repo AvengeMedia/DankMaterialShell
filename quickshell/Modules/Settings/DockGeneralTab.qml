@@ -28,8 +28,6 @@ Item {
             }
 
             SettingsToggleRow {
-                resetStore: dock
-                resetKeys: ["showOnLastDisplay"]
                 text: I18n.tr("Show on last display")
                 checked: dock.config?.showOnLastDisplay ?? true
                 onToggled: checked => dock.setOption("showOnLastDisplay", checked)
@@ -84,8 +82,6 @@ Item {
 
             SettingsToggleRow {
                 settingKey: "dockAutoHide"
-                resetStore: dock
-                resetKeys: ["autoHide"]
                 tags: ["dock", "autohide", "hide", "hover"]
                 text: I18n.tr("Auto-hide")
                 checked: dock.config?.autoHide ?? false
@@ -98,8 +94,6 @@ Item {
 
             SettingsToggleRow {
                 settingKey: "dockSmartAutoHide"
-                resetStore: dock
-                resetKeys: ["smartAutoHide"]
                 tags: ["dock", "smart", "autohide", "windows", "overlap", "intelligent", "floating"]
                 text: I18n.tr("Smart auto-hide")
                 description: I18n.tr("Hides only while a window overlaps the dock", "dock smart auto-hide toggle description")
@@ -123,8 +117,6 @@ Item {
 
             SettingsToggleRow {
                 settingKey: "dockEditOnRightClick"
-                resetStore: dock
-                resetKeys: ["editOnRightClick"]
                 tags: ["dock", "edit", "right-click", "context"]
                 text: I18n.tr("Right-click empty space to edit")
                 checked: dock.config?.editOnRightClick ?? false

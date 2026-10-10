@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import "../../Common/WindowRuleSize.js" as WindowRuleSize
+import "../../Common/WindowRuleMerge.js" as WindowRuleMerge
 import qs.Services
 import qs.DCommon.Widgets
 import qs.Widgets
@@ -19,6 +20,7 @@ DDialog {
     readonly property bool isHyprland: CompositorService.isHyprland
     readonly property bool isMango: CompositorService.isMango
     readonly property bool fieldsEnabled: !submitting
+    readonly property bool halfPair: isHyprland && (!!moveXInput.text.trim() !== !!moveYInput.text.trim() || !!sizeWInput.text.trim() !== !!sizeHInput.text.trim())
 
     property int floatingTri: 0
     property var openingFlags: []
@@ -40,8 +42,65 @@ DDialog {
     property string floatingRelativeValue: "top-left"
     property string columnWidthUnit: WindowRuleSize.PIXELS
     property string windowHeightUnit: WindowRuleSize.PIXELS
+    property var storedMatch: ({})
+    property var storedActions: ({})
+    property var hyprEffectFlags: []
+    property int focusOnActivateTri: 0
+    property bool scrollingWidthOn: false
+    property int scrollingWidthValue: 50
+    property string tonemapValue: ""
+    property string contentValue: ""
+    property int fullscreenInternalValue: -1
+    property int fullscreenClientValue: -1
 
     readonly property var triLabels: [I18n.tr("Default"), I18n.tr("On"), I18n.tr("Off")]
+    readonly property var tonemapOptions: root.withCurrent(["", "off", "on", "clamp", "limited"], root.tonemapValue)
+    readonly property var contentOptions: root.withCurrent(["", "none", "photo", "video", "game"], root.contentValue)
+    // Index is the Hyprland state + 1; 0 leaves the match unset.
+    readonly property var fullscreenStateLabels: [I18n.tr("Default"), I18n.tr("None"), I18n.tr("Maximized", "adjective, Hyprland window fullscreen state 1"), I18n.tr("Fullscreen"), I18n.tr("Maximized and fullscreen", "Hyprland window fullscreen state 3")]
+    readonly property var hyprMatchKeys: ["initialClass", "initialTitle", "tag", "workspace", "content", "xdgTag", "fullscreenStateInternal", "fullscreenStateClient"]
+    readonly property var hyprFocusOptions: [
+        {
+            "label": I18n.tr("No initial focus"),
+            "value": "noInitialFocus",
+            "tooltip": I18n.tr("Opens without taking keyboard focus", "window rule option tooltip")
+        },
+        {
+            "label": I18n.tr("Stay focused"),
+            "value": "stayFocused",
+            "tooltip": I18n.tr("Keeps focus while the window is open", "window rule option tooltip")
+        }
+    ]
+    readonly property var hyprPointerOptions: [
+        {
+            "label": I18n.tr("Confine pointer"),
+            "value": "confinePointer",
+            "tooltip": I18n.tr("Keeps the pointer inside the window", "window rule option tooltip")
+        },
+        {
+            "label": I18n.tr("No XDG drags"),
+            "value": "noXdgDrags",
+            "tooltip": I18n.tr("Ignores drag and drop started by the window", "window rule option tooltip")
+        }
+    ]
+    readonly property var hyprRenderOptions: [
+        {
+            "label": I18n.tr("No glow"),
+            "value": "noGlow",
+            "needs": "decoration:glow:enabled"
+        },
+        {
+            "label": I18n.tr("No wobble"),
+            "value": "noWobble",
+            "needs": "decoration:wobble:enabled"
+        },
+        {
+            "label": I18n.tr("No auto HDR"),
+            "value": "noAutoHdr",
+            "tooltip": I18n.tr("Never switches the monitor to HDR for this window", "window rule option tooltip")
+        }
+    ].filter(option => !option.needs || HyprlandService.hyprSupports(option.needs))
+    readonly property var hyprEffectOptions: root.hyprFocusOptions.concat(root.hyprPointerOptions, root.hyprRenderOptions)
     readonly property var blockOutOptions: ["", "screencast", "screen-capture"]
     readonly property var columnDisplayOptions: ["", "tabbed"]
     readonly property var anchorOptions: ["top-left", "top-right", "bottom-left", "bottom-right", "top", "bottom", "left", "right"]
@@ -164,7 +223,7 @@ DDialog {
     surfaceColor: Theme.hostSurface
     title: isEditMode ? I18n.tr("Edit Window Rule") : I18n.tr("New Window Rule")
     closeEnabled: !submitting
-    acceptEnabled: !submitting
+    acceptEnabled: !submitting && !halfPair
     onAccepted: submit()
 
     ListModel {
@@ -242,6 +301,15 @@ DDialog {
         return value === "" ? I18n.tr("Normal") : value;
     }
 
+    function defaultLabel(value) {
+        return value === "" ? I18n.tr("Default") : value;
+    }
+
+    // A value written by hand that the list does not know must still show and save.
+    function withCurrent(values, current) {
+        return values.includes(current) ? values : values.concat([current]);
+    }
+
     function resetForm() {
         nameInput.text = "";
         appIdInput.text = "";
@@ -271,7 +339,19 @@ DDialog {
         windowHeightUnit = WindowRuleSize.PIXELS;
         blurCond.triState = 0;
         xrayCond.triState = 0;
-        for (const field of [outputInput, workspaceInput, columnWidthInput, windowHeightInput, floatingXInput, floatingYInput, minWidthInput, maxWidthInput, minHeightInput, maxHeightInput, moveXInput, moveYInput, sizeWInput, sizeHInput, monitorInput, hyprWorkspaceInput, mangoTagsInput, mangoMonitorInput, mangoSizeInput])
+        storedMatch = {};
+        storedActions = {};
+        hyprEffectFlags = [];
+        focusOnActivateTri = 0;
+        scrollingWidthOn = false;
+        scrollingWidthValue = 50;
+        tonemapValue = "";
+        contentValue = "";
+        fullscreenInternalValue = -1;
+        fullscreenClientValue = -1;
+        hyprMatchCard.expanded = false;
+        hyprEffectsCard.expanded = false;
+        for (const field of [outputInput, workspaceInput, columnWidthInput, windowHeightInput, floatingXInput, floatingYInput, minWidthInput, maxWidthInput, minHeightInput, maxHeightInput, moveXInput, moveYInput, sizeWInput, sizeHInput, monitorInput, hyprWorkspaceInput, mangoTagsInput, mangoMonitorInput, mangoSizeInput, initialClassInput, initialTitleInput, matchTagInput, xdgTagInput, matchWorkspaceInput, borderColorInput, suppressEventInput])
             field.text = "";
     }
 
@@ -279,17 +359,29 @@ DDialog {
         nameInput.text = rule.name || "";
         const matchList = (rule.matches && rule.matches.length > 0) ? rule.matches : [rule.matchCriteria || {}];
         const match = matchList[0] || {};
+        storedMatch = match;
         appIdInput.text = match.appId || "";
         titleInput.text = match.title || "";
         for (let i = 1; i < matchList.length; i++)
             extraMatchModel.append({
                 "rowAppId": matchList[i].appId || "",
-                "rowTitle": matchList[i].title || ""
+                "rowTitle": matchList[i].title || "",
+                "rowStored": JSON.stringify(matchList[i])
             });
         for (const cond of matchConditions)
             cond.triState = triFromBool(match[cond.key]);
+        initialClassInput.text = match.initialClass || "";
+        initialTitleInput.text = match.initialTitle || "";
+        matchTagInput.text = match.tag || "";
+        xdgTagInput.text = match.xdgTag || "";
+        matchWorkspaceInput.text = match.workspace || "";
+        contentValue = match.content || "";
+        fullscreenInternalValue = match.fullscreenStateInternal ?? -1;
+        fullscreenClientValue = match.fullscreenStateClient ?? -1;
+        hyprMatchCard.expanded = hyprMatchKeys.some(key => match[key] !== undefined && match[key] !== "");
 
         const actions = rule.actions || {};
+        storedActions = actions;
         const flags = [];
         if (!isNiri && actions.openFloating)
             flags.push("float");
@@ -354,6 +446,15 @@ DDialog {
         monitorInput.text = actions.monitor || "";
         hyprWorkspaceInput.text = actions.workspace || "";
 
+        hyprEffectFlags = hyprEffectOptions.map(option => option.value).filter(value => actions[value] === true);
+        focusOnActivateTri = triFromBool(actions.focusOnActivate);
+        scrollingWidthOn = actions.scrollingWidth !== undefined && actions.scrollingWidth !== null;
+        scrollingWidthValue = scrollingWidthOn ? Math.round(actions.scrollingWidth * 100) : 50;
+        tonemapValue = actions.tonemap || "";
+        borderColorInput.text = actions.borderColor || "";
+        suppressEventInput.text = actions.suppressEvent || "";
+        hyprEffectsCard.expanded = hyprEffectFlags.length > 0 || focusOnActivateTri !== 0 || scrollingWidthOn || !!tonemapValue || !!borderColorInput.text || !!suppressEventInput.text;
+
         mangoFlags = mangoOptions.map(option => option.value).filter(value => actions[value]);
         mangoTagsInput.text = actions.workspace || "";
         mangoMonitorInput.text = actions.monitor || "";
@@ -361,14 +462,32 @@ DDialog {
     }
 
     function collectMatches() {
-        const matchCriteria = {};
+        const conds = matchConditions.filter(cond => cond.visible);
+        const owned = ["appId", "title"].concat(conds.map(cond => cond.key), isHyprland ? hyprMatchKeys : []);
+        const matchCriteria = WindowRuleMerge.carry(storedMatch, owned);
         if (appIdInput.text.trim())
             matchCriteria.appId = appIdInput.text.trim();
         if (titleInput.text.trim())
             matchCriteria.title = titleInput.text.trim();
-        for (const cond of matchConditions) {
-            if (cond.visible)
-                applyCond(matchCriteria, cond.key, cond.triState);
+        for (const cond of conds)
+            applyCond(matchCriteria, cond.key, cond.triState);
+        if (isHyprland) {
+            const texts = {
+                "initialClass": initialClassInput.text.trim(),
+                "initialTitle": initialTitleInput.text.trim(),
+                "tag": matchTagInput.text.trim(),
+                "xdgTag": xdgTagInput.text.trim(),
+                "workspace": matchWorkspaceInput.text.trim(),
+                "content": contentValue
+            };
+            for (const key in texts) {
+                if (texts[key])
+                    matchCriteria[key] = texts[key];
+            }
+            if (fullscreenInternalValue >= 0)
+                matchCriteria.fullscreenStateInternal = fullscreenInternalValue;
+            if (fullscreenClientValue >= 0)
+                matchCriteria.fullscreenStateClient = fullscreenClientValue;
         }
         const matches = [];
         if (Object.keys(matchCriteria).length > 0)
@@ -380,7 +499,7 @@ DDialog {
             };
         for (let i = 0; i < extraMatchModel.count; i++) {
             const row = extraMatchModel.get(i);
-            const extra = {};
+            const extra = WindowRuleMerge.carry(JSON.parse(row.rowStored || "{}"), ["appId", "title"]);
             if ((row.rowAppId || "").trim())
                 extra.appId = row.rowAppId.trim();
             if ((row.rowTitle || "").trim())
@@ -394,8 +513,19 @@ DDialog {
         };
     }
 
+    function ownedActionKeys() {
+        const keys = ["opacity", "openFloating", "openMaximized", "openFullscreen", "cornerRadius"];
+        if (isNiri)
+            return keys.concat(["openMaximizedToEdges", "openFocused", "openOnOutput", "openOnWorkspace", "minWidth", "maxWidth", "minHeight", "maxHeight", "defaultColumnWidth", "defaultWindowHeight", "variableRefreshRate", "clipToGeometry", "tiledState", "drawBorderWithBackground", "blockOutFrom", "defaultColumnDisplay", "scrollFactor", "backgroundBlur", "backgroundXray", "backgroundNoise", "backgroundSaturation", "defaultFloatingX", "defaultFloatingY", "defaultFloatingRelativeTo"]);
+        if (isHyprland)
+            return keys.concat(hyprOptions.map(option => option.value), hyprEffectOptions.map(option => option.value), ["sizeWidth", "sizeHeight", "moveX", "moveY", "monitor", "workspace", "focusOnActivate", "scrollingWidth", "tonemap", "borderColor", "suppressEvent"]);
+        if (isMango)
+            return keys.concat(mangoOptions.map(option => option.value), ["workspace", "monitor", "sizeWidth", "sizeHeight"]);
+        return keys;
+    }
+
     function collectActions() {
-        const actions = {};
+        const actions = WindowRuleMerge.carry(storedActions, ownedActionKeys());
         const has = value => openingFlags.includes(value);
         if (opacityOn)
             actions.opacity = opacityValue / 100;
@@ -411,9 +541,9 @@ DDialog {
             actions.openFullscreen = true;
         if (has("focus") && isNiri)
             actions.openFocused = true;
-        if (outputInput.text.trim())
+        if (isNiri && outputInput.text.trim())
             actions.openOnOutput = outputInput.text.trim();
-        if (workspaceInput.text.trim())
+        if (isNiri && workspaceInput.text.trim())
             actions.openOnWorkspace = workspaceInput.text.trim();
         if (cornerRadiusOn)
             actions.cornerRadius = cornerRadiusValue;
@@ -422,14 +552,16 @@ DDialog {
         const maxW = parseInt(maxWidthInput.text);
         const minH = parseInt(minHeightInput.text);
         const maxH = parseInt(maxHeightInput.text);
-        if (!isNaN(minW))
-            actions.minWidth = minW;
-        if (!isNaN(maxW))
-            actions.maxWidth = maxW;
-        if (!isNaN(minH))
-            actions.minHeight = minH;
-        if (!isNaN(maxH))
-            actions.maxHeight = maxH;
+        if (isNiri) {
+            if (!isNaN(minW))
+                actions.minWidth = minW;
+            if (!isNaN(maxW))
+                actions.maxWidth = maxW;
+            if (!isNaN(minH))
+                actions.minHeight = minH;
+            if (!isNaN(maxH))
+                actions.maxHeight = maxH;
+        }
 
         if (isNiri) {
             const columnWidth = WindowRuleSize.format(columnWidthUnit, columnWidthInput.text);
@@ -483,6 +615,17 @@ DDialog {
                 actions.monitor = monitorInput.text.trim();
             if (hyprWorkspaceInput.text.trim())
                 actions.workspace = hyprWorkspaceInput.text.trim();
+            for (const flag of hyprEffectFlags)
+                actions[flag] = true;
+            applyCond(actions, "focusOnActivate", focusOnActivateTri);
+            if (scrollingWidthOn)
+                actions.scrollingWidth = scrollingWidthValue / 100;
+            if (tonemapValue)
+                actions.tonemap = tonemapValue;
+            if (borderColorInput.text.trim())
+                actions.borderColor = borderColorInput.text.trim();
+            if (suppressEventInput.text.trim())
+                actions.suppressEvent = suppressEventInput.text.trim();
         }
 
         if (isMango) {
@@ -502,7 +645,7 @@ DDialog {
     }
 
     function submit() {
-        if (submitting)
+        if (submitting || !acceptEnabled)
             return;
         const {
             matchCriteria,
@@ -528,10 +671,7 @@ DDialog {
             root.submitting = false;
             if (exitCode !== 0)
                 return;
-            if (CompositorService.isNiri)
-                NiriService.validate();
-            if (CompositorService.isMango)
-                MangoService.reloadConfig();
+            CompositorService.reloadAfterWindowRuleWrite();
             root.ruleSubmitted();
         });
     }
@@ -647,7 +787,7 @@ DDialog {
         }
     }
 
-    readonly property var matchConditions: [condFloating, condActive, condFocused, condActiveInColumn, condCastTarget, condUrgent, condAtStartup, condXwayland, condFullscreen, condPinned, condInitialised]
+    readonly property var matchConditions: [condFloating, condActive, condFocused, condActiveInColumn, condCastTarget, condUrgent, condAtStartup, condXwayland, condFullscreen, condPinned, condGroup, condModal]
 
     actions: [
         DButton {
@@ -691,7 +831,8 @@ DDialog {
             enabled: root.fieldsEnabled
             onClicked: extraMatchModel.append({
                 "rowAppId": "",
-                "rowTitle": ""
+                "rowTitle": "",
+                "rowStored": "{}"
             })
         }
 
@@ -795,7 +936,7 @@ DDialog {
                     id: condFocused
                     key: "isFocused"
                     label: I18n.tr("Focused", "adjective, window rule match condition for the focused window")
-                    visible: root.isNiri
+                    visible: root.isNiri || root.isHyprland
                 }
                 MatchCond {
                     id: condActiveInColumn
@@ -840,12 +981,97 @@ DDialog {
                     visible: root.isHyprland
                 }
                 MatchCond {
-                    id: condInitialised
-                    key: "initialised"
-                    label: I18n.tr("Initialised", "adjective, hyprland window rule match condition")
+                    id: condGroup
+                    key: "group"
+                    label: I18n.tr("Group", "noun, window rule match condition for windows in a Hyprland group")
+                    visible: root.isHyprland
+                }
+                MatchCond {
+                    id: condModal
+                    key: "modal"
+                    label: I18n.tr("Modal", "adjective, window rule match condition for modal dialogs")
                     visible: root.isHyprland
                 }
             }
+        }
+    }
+
+    SettingsCard {
+        id: hyprMatchCard
+        title: I18n.tr("Advanced Matching")
+        visible: root.isHyprland
+        collapsible: true
+        expanded: false
+
+        SettingsRow {
+            subtitle: I18n.tr("Prefix a tag with negative: to match windows without it.", "window rule editor hint, negative: is literal syntax")
+        }
+
+        FieldRow {
+            Field {
+                id: initialClassInput
+                leftIconName: "apps"
+                labelText: I18n.tr("Initial class")
+                placeholderText: "^steam$"
+            }
+
+            Field {
+                id: initialTitleInput
+                leftIconName: "title"
+                labelText: I18n.tr("Initial title")
+                placeholderText: "^Login$"
+            }
+        }
+
+        FieldRow {
+            Field {
+                id: matchTagInput
+                leftIconName: "sell"
+                labelText: I18n.tr("Tag", "noun, Hyprland window tag in window rule match")
+                placeholderText: "games"
+            }
+
+            Field {
+                id: xdgTagInput
+                leftIconName: "label"
+                labelText: I18n.tr("XDG tag")
+                placeholderText: "^portal$"
+            }
+        }
+
+        FieldRow {
+            Field {
+                id: matchWorkspaceInput
+                shares: 1
+                leftIconName: "view_module"
+                labelText: I18n.tr("Workspace")
+                placeholderText: "w[tv1]"
+            }
+        }
+
+        SettingsDropdownRow {
+            text: I18n.tr("Content", "noun, window content type match: photo, video or game")
+            options: root.contentOptions.map(root.defaultLabel)
+            currentValue: root.defaultLabel(root.contentValue)
+            enabled: root.fieldsEnabled
+            onValueChanged: value => root.contentValue = root.contentOptions.find(option => root.defaultLabel(option) === value) ?? ""
+        }
+
+        SettingsDropdownRow {
+            text: I18n.tr("Fullscreen state")
+            options: root.fullscreenStateLabels
+            currentValue: root.fullscreenStateLabels[root.fullscreenInternalValue + 1] ?? root.fullscreenStateLabels[0]
+            enabled: root.fieldsEnabled
+            onValueChanged: value => root.fullscreenInternalValue = root.fullscreenStateLabels.indexOf(value) - 1
+        }
+
+        SettingsDropdownRow {
+            text: I18n.tr("Client fullscreen state")
+            description: I18n.tr("The state the app believes it is in", "window rule match, Hyprland client fullscreen state")
+            options: root.fullscreenStateLabels
+            currentValue: root.fullscreenStateLabels[root.fullscreenClientValue + 1] ?? root.fullscreenStateLabels[0]
+            enabled: root.fieldsEnabled
+            onValueChanged: value => root.fullscreenClientValue = root.fullscreenStateLabels.indexOf(value) - 1
         }
     }
 
@@ -878,7 +1104,7 @@ DDialog {
         }
 
         FieldRow {
-            visible: root.isNiri || root.isHyprland
+            visible: root.isNiri
 
             Field {
                 id: outputInput
@@ -937,7 +1163,7 @@ DDialog {
             text: I18n.tr("Corner radius")
             checked: root.cornerRadiusOn
             value: root.cornerRadiusValue
-            maximum: 24
+            maximum: 20
             unit: "px"
             enabled: root.fieldsEnabled
             onToggled: checked => root.cornerRadiusOn = checked
@@ -1074,7 +1300,7 @@ DDialog {
 
     SettingsCard {
         title: I18n.tr("Size Constraints")
-        visible: root.isNiri || root.isHyprland
+        visible: root.isNiri
 
         FieldRow {
             Field {
@@ -1170,6 +1396,105 @@ DDialog {
                 leftIconName: "view_module"
                 labelText: I18n.tr("Workspace")
                 placeholderText: "1"
+            }
+        }
+    }
+
+    SettingsCard {
+        id: hyprEffectsCard
+        title: I18n.tr("Advanced")
+        visible: root.isHyprland
+        collapsible: true
+        expanded: false
+
+        SettingsRow {
+            title: I18n.tr("Focus", "noun, window rule editor group of keyboard focus options")
+
+            body: DFilterChips {
+                width: parent.width
+                multiSelect: true
+                showCounts: false
+                enabled: root.fieldsEnabled
+                model: root.hyprFocusOptions
+                selectedValues: root.hyprEffectFlags
+                onSelectionToggled: (index, selected) => root.hyprEffectFlags = root.flagSet(root.hyprEffectFlags, root.hyprFocusOptions[index].value, selected)
+            }
+        }
+
+        SettingsButtonGroupRow {
+            text: I18n.tr("Focus on activate")
+            description: I18n.tr("Focus the window when it asks to be activated", "window rule option, Hyprland focus_on_activate")
+            model: root.triLabels
+            currentIndex: root.focusOnActivateTri
+            enabled: root.fieldsEnabled
+            onSelectionChanged: (index, selected) => {
+                if (selected)
+                    root.focusOnActivateTri = index;
+            }
+        }
+
+        SettingsRow {
+            title: I18n.tr("Pointer")
+
+            body: DFilterChips {
+                width: parent.width
+                multiSelect: true
+                showCounts: false
+                enabled: root.fieldsEnabled
+                model: root.hyprPointerOptions
+                selectedValues: root.hyprEffectFlags
+                onSelectionToggled: (index, selected) => root.hyprEffectFlags = root.flagSet(root.hyprEffectFlags, root.hyprPointerOptions[index].value, selected)
+            }
+        }
+
+        SettingsRow {
+            title: I18n.tr("Rendering", "window rule editor group of render options")
+
+            body: DFilterChips {
+                width: parent.width
+                multiSelect: true
+                showCounts: false
+                enabled: root.fieldsEnabled
+                model: root.hyprRenderOptions
+                selectedValues: root.hyprEffectFlags
+                onSelectionToggled: (index, selected) => root.hyprEffectFlags = root.flagSet(root.hyprEffectFlags, root.hyprRenderOptions[index].value, selected)
+            }
+        }
+
+        SettingsDropdownRow {
+            text: I18n.tr("Tone mapping")
+            options: root.tonemapOptions.map(root.defaultLabel)
+            currentValue: root.defaultLabel(root.tonemapValue)
+            enabled: root.fieldsEnabled
+            onValueChanged: value => root.tonemapValue = root.tonemapOptions.find(option => root.defaultLabel(option) === value) ?? ""
+        }
+
+        SettingsToggleSliderRow {
+            text: I18n.tr("Column Width")
+            description: I18n.tr("Scrolling", "Hyprland tiling layout name")
+            checked: root.scrollingWidthOn
+            value: root.scrollingWidthValue
+            minimum: 10
+            maximum: 100
+            unit: "%"
+            enabled: root.fieldsEnabled
+            onToggled: checked => root.scrollingWidthOn = checked
+            onSliderValueChanged: newValue => root.scrollingWidthValue = newValue
+        }
+
+        FieldRow {
+            Field {
+                id: borderColorInput
+                leftIconName: "border_color"
+                labelText: I18n.tr("Border color")
+                placeholderText: "rgb(ff0000) rgb(880808)"
+            }
+
+            Field {
+                id: suppressEventInput
+                leftIconName: "block"
+                labelText: I18n.tr("Suppress events")
+                placeholderText: "maximize fullscreen"
             }
         }
     }

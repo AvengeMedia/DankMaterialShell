@@ -60,7 +60,6 @@ Item {
     readonly property real currentVisualY: surface.currentVisualY
     readonly property real currentVisualWidth: surface.currentVisualWidth
     readonly property real currentVisualHeight: surface.currentVisualHeight
-    readonly property real currentSurfaceRadius: surface.currentSurfaceRadius
     readonly property color surfaceColor: surface.surfaceColor
     readonly property real surfaceOpacity: surface.surfaceOpacity
     readonly property bool inputSuspended: controller.inputSuspended
@@ -134,6 +133,7 @@ Item {
     readonly property int compactThickness: root.embedded ? root.bandFit.compact : root.dotMode ? Math.max(24, Math.min(72, root.dotSize)) : root.islandMetrics.compact
     readonly property string screenName: root.screen?.name ?? ""
     readonly property bool floating: root.setting("islandFloating")
+    readonly property bool notch: !root.embedded && !root.freeMode && !root.dotMode && root.setting("islandNotch")
     readonly property bool usesOverlayLayer: root.dotMode || CompositorService.framePeerSurfacesUseOverlayForScreen(root.screen) || LayerShell.envUsesOverlay("DMS_DANKISLAND_LAYER", root.setting("islandUseOverlayLayer"))
     // A free island's position only picks the orientation; a dot is always a circle.
     readonly property bool isVertical: !root.dotMode && SettingsData.islandVertical(root.barConfig)
@@ -377,6 +377,7 @@ Item {
         freeMode: root.freeMode
         dotMode: root.dotMode
         embedded: root.embedded
+        notch: root.notch
         dotSize: root.dotSize * root.freeScale
         interactionMode: !root.freeMode && root.setting("islandInteractionMode") === "hybrid" ? "hybrid" : "click"
         inputSuspended: PopoutManager.screenshotActive
@@ -461,11 +462,13 @@ Item {
         freeMargin: root.freeMargin
         compactFaceOverride: root.dotMode ? dotFaceComponent : null
         chrome: root.chrome
+        notch: root.notch
+        notchRadius: BarMetrics.gothRadius(root.barConfig)
         bandColor: root.bandColor
         compactBackground: root.embedded && root.setting("islandWidgetBackground") === true && !(root.barConfig?.noBackground ?? false)
         compactBackgroundColor: BarMetrics.widgetFill(root.barConfig)
         opacity: root.freeOpacity
-        reducedMotion: root.setting("islandReducedMotion") || SettingsData.reduceMotion || SettingsData.animationDuration <= 0
+        reducedMotion: SettingsData.reduceMotion || SettingsData.animationDuration <= 0
         springStiffness: Math.max(root.springStiffnessRange[0], Math.min(root.springStiffnessRange[1], root.setting("islandSpringStiffness")))
         springDamping: Math.max(root.springDampingRange[0], Math.min(root.springDampingRange[1], root.setting("islandSpringDamping")))
         springMass: Math.max(root.springMassRange[0], Math.min(root.springMassRange[1], root.setting("islandSpringMass")))

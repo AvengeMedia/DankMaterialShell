@@ -62,6 +62,14 @@ test("edge insets count against the available length", () => {
     assert.deepEqual(plain(solve(...sections, { start: 6, end: 6 }).hidden.left), [1]);
 });
 
+test("a reserved range overflows both sides clear of it", () => {
+    const sections = [[entry(100), entry(60, "auto")], [], [entry(60, "auto"), entry(100)]];
+    assert.deepEqual(plain(solve(...sections).hidden), { left: [], center: [], right: [] });
+    const result = solve(...sections, { reserve: { start: 150, end: 250 } });
+    assert.deepEqual(plain(result.hidden), { left: [1], center: [], right: [0] });
+    assert.equal(result.fits, true);
+});
+
 test("a center holder does not replace the configured middle-widget anchor", () => {
     for (const position of [0, 1, 2, 3]) {
         const result = solve([], [entry(40, "always"), entry(80), entry(70)], [], { length: 600, centeringMode: "index", positions: { center: position } });

@@ -9,6 +9,7 @@ import qs.Modules.Plugins
 import qs.Services
 import qs.DCommon.Widgets
 import qs.Widgets
+import "../../../DCommon/Common/WheelInput.js" as WheelInput
 
 BasePill {
     id: root
@@ -230,7 +231,7 @@ BasePill {
     }
 
     onWheel: wheel => {
-        if (Math.abs(wheel.angleDelta.x) > Math.abs(wheel.angleDelta.y))
+        if (WheelInput.isHorizontal(wheel))
             return;
         wheel.accepted = true;
         workspaces.handleWheel(wheel);
@@ -258,7 +259,7 @@ BasePill {
         // mango reports active_tags=0 while the overview is open; surface it as a pill
         Item {
             id: overviewPill
-            visible: CompositorService.workspacesHiddenByOverview(CompositorService.getFocusedScreenName())
+            visible: CompositorService.workspacesHiddenByOverview(root.effectiveScreenName)
             width: root.isVertical ? root.widgetThickness : overviewBg.width
             height: root.isVertical ? overviewBg.height : root.widgetThickness
 

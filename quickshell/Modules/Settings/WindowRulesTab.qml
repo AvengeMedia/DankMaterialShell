@@ -59,7 +59,17 @@ Item {
             "xwayland": "XWayland",
             "fullscreen": I18n.tr("Fullscreen"),
             "pinned": I18n.tr("Pinned"),
-            "initialised": I18n.tr("Initialised")
+            "initialised": I18n.tr("Initialised"),
+            "initialClass": I18n.tr("Initial class"),
+            "initialTitle": I18n.tr("Initial title"),
+            "tag": I18n.tr("Tag"),
+            "xdgTag": I18n.tr("XDG tag"),
+            "workspace": I18n.tr("Workspace"),
+            "content": I18n.tr("Content"),
+            "group": I18n.tr("Group"),
+            "modal": I18n.tr("Modal"),
+            "fullscreenStateInternal": I18n.tr("Fullscreen state"),
+            "fullscreenStateClient": I18n.tr("Client fullscreen state")
         })
 
     function matchesOf(rule) {
@@ -158,7 +168,18 @@ Item {
             "focusRingOff": I18n.tr("Focus ring off"),
             "borderOff": I18n.tr("Border off"),
             "forcergbx": I18n.tr("Force RGBX"),
-            "idleinhibit": I18n.tr("Idle inhibitor", "feature that keeps the session from going idle")
+            "idleinhibit": I18n.tr("Idle inhibitor", "feature that keeps the session from going idle"),
+            "noInitialFocus": I18n.tr("No initial focus"),
+            "focusOnActivate": I18n.tr("Focus on activate"),
+            "stayFocused": I18n.tr("Stay focused"),
+            "confinePointer": I18n.tr("Confine pointer"),
+            "noXdgDrags": I18n.tr("No XDG drags"),
+            "noAutoHdr": I18n.tr("No auto HDR"),
+            "noGlow": I18n.tr("No glow"),
+            "noWobble": I18n.tr("No wobble"),
+            "scrollingWidth": I18n.tr("Column Width"),
+            "tonemap": I18n.tr("Tone mapping"),
+            "suppressEvent": I18n.tr("Suppress events")
         })
 
     signal rulesChanged
@@ -199,7 +220,7 @@ Item {
                 const result = JSON.parse(output.trim());
                 const allRules = result.rules || [];
                 CompositorService.syncDmsWindowFloatingRule(allRules);
-                windowRules = allRules.filter(r => (r.source || "").includes("dms/windowrules"));
+                windowRules = allRules.filter(r => (r.source || "").includes("dms/windowrules") && r.id !== CompositorService.dmsOpaqueRuleId);
                 externalRules = allRules.filter(r => !(r.source || "").includes("dms/windowrules"));
                 windowRulesInclude.applyStatus(result.dmsStatus);
             } catch (e) {
@@ -220,8 +241,7 @@ Item {
 
         Proc.runCommand("remove-windowrule", [Proc.dmsBin, "config", "windowrules", "remove", compositor, ruleId], (output, exitCode) => {
             if (exitCode === 0) {
-                if (CompositorService.isMango)
-                    MangoService.reloadConfig();
+                CompositorService.reloadAfterWindowRuleWrite();
                 loadWindowRules();
                 rulesChanged();
             }
@@ -250,8 +270,7 @@ Item {
                 windowRules = previous;
                 return;
             }
-            if (CompositorService.isMango)
-                MangoService.reloadConfig();
+            CompositorService.reloadAfterWindowRuleWrite();
             loadWindowRules();
             rulesChanged();
         });
@@ -422,7 +441,6 @@ Item {
                     readonly property var liveRuleData: (root.windowRules || []).find(rule => rule.id === ruleIdRef) ?? modelData
 
                     title: liveRuleData.name || liveRuleData.matchCriteria?.appId || liveRuleData.matchCriteria?.title || I18n.tr("Unnamed rule")
-                    titleColor: liveRuleData.enabled !== false ? Theme.surfaceText : Theme.surfaceVariantText
                     subtitle: {
                         const criteria = liveRuleData.matchCriteria || {};
                         const parts = [];

@@ -12,6 +12,7 @@ Rectangle {
 
     signal triggered
 
+    implicitWidth: contentRow.implicitWidth + Theme.spacingS * 2
     height: 28
     radius: Theme.cornerRadius
     opacity: enabled ? 1 : 0.4
@@ -24,6 +25,7 @@ Rectangle {
     }
 
     Row {
+        id: contentRow
         anchors.left: parent.left
         anchors.leftMargin: Theme.spacingS
         anchors.right: parent.right

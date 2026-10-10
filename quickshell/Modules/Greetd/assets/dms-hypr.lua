@@ -4,5 +4,5 @@
 hl.env("DMS_RUN_GREETER", "1")
 
 hl.on("hyprland.start", function()
-	hl.exec_cmd('sh -c "qs -p _DMS_PATH_; hyprctl dispatch exit"')
+	hl.exec_cmd("sh -c \"qs -p _DMS_PATH_; hyprctl dispatch 'hl.dsp.exit()'\"")
 end)

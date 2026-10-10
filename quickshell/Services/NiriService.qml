@@ -9,6 +9,7 @@ import qs.Common
 import qs.Services
 import qs.DCommon.Common as DCommon
 import "../Common/OutputModel.js" as OutputModel
+import "../Common/BlurStrength.js" as BlurStrength
 
 Singleton {
     id: root
@@ -501,6 +502,11 @@ Singleton {
 
         setWorkspaces(updatedWorkspaces);
 
+        if (!data.focused) {
+            updateCurrentOutputWorkspaces();
+            return;
+        }
+
         focusedWorkspaceId = data.id;
         focusedWorkspaceIndex = allWorkspaces.findIndex(w => w.id === data.id);
 
@@ -830,7 +836,7 @@ Singleton {
         });
     }
 
-    function moveColumnLeft(outputName) {
+    function focusColumnLeft(outputName) {
         if (outputName && outputName !== currentOutput)
             focusMonitor(outputName);
         return send({
@@ -840,7 +846,7 @@ Singleton {
         });
     }
 
-    function moveColumnRight(outputName) {
+    function focusColumnRight(outputName) {
         if (outputName && outputName !== currentOutput)
             focusMonitor(outputName);
         return send({
@@ -1209,6 +1215,19 @@ Singleton {
         configGenerationAction.schedule();
     }
 
+    // niri's own defaults stay untouched until the user moves the shell-wide slider
+    function niriBlurBlock(strength) {
+        if (!(strength > 0))
+            return "";
+        const blur = BlurStrength.niriBlur(strength);
+        return `
+
+blur {
+    passes ${blur.passes}
+    offset ${blur.offset}
+}`;
+    }
+
     function doGenerateNiriLayoutConfig() {
         if (writeConfigProcess.running || _awaitingLayoutReloadRevision > _layoutAppliedRevision)
             return;
@@ -1280,7 +1299,7 @@ window-rule {
     clip-to-geometry true
     tiled-state true
     draw-border-with-background false
-}` + xrayRules;
+}` + niriBlurBlock(typeof SettingsData !== "undefined" ? SettingsData.blurStrength : 0) + xrayRules;
 
         const alttabContent = dmsWarning + `recent-windows {
     highlight {

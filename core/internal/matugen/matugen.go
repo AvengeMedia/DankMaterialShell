@@ -20,6 +20,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/dank16"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/mangoconf"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/godbus/dbus/v5"
 	"github.com/lucasb-eyer/go-colorful"
@@ -43,6 +44,7 @@ const (
 	TemplateKindGTK
 	TemplateKindVSCode
 	TemplateKindEmacs
+	TemplateKindMango
 )
 
 type TemplateDef struct {
@@ -61,7 +63,7 @@ var templateRegistry = []TemplateDef{
 	{ID: "gtk", Kind: TemplateKindGTK, RunUnconditionally: true},
 	{ID: "niri", Commands: []string{"niri"}, ConfigFile: "niri.toml"},
 	{ID: "hyprland", Commands: []string{"Hyprland"}, ConfigFile: "hyprland.toml"},
-	{ID: "mangowc", Commands: []string{"mango"}, ConfigFile: "mangowc.toml", RequiredEnv: "MANGO_INSTANCE_SIGNATURE"},
+	{ID: "mangowc", Commands: []string{"mango"}, ConfigFile: "mangowc.toml", RequiredEnv: "MANGO_INSTANCE_SIGNATURE", Kind: TemplateKindMango},
 	{ID: "qt5ct", Commands: []string{"qt5ct"}, ConfigFile: "qt5ct.toml"},
 	{ID: "qt6ct", Commands: []string{"qt6ct"}, ConfigFile: "qt6ct.toml"},
 	{ID: "fcitx5", Commands: []string{"fcitx5"}, ConfigDirs: []string{"fcitx5"}, ConfigFile: "fcitx5.toml"},
@@ -90,6 +92,19 @@ func (c *ColorMode) GTKTheme() string {
 		return "adw-gtk3-dark"
 	default:
 		return "adw-gtk3"
+	}
+}
+
+// GTKRefreshTheme is the built-in theme the gtk-theme round trip passes through
+// to make GTK3 reload gtk.css. It must match the mode's polarity: an empty or
+// light name resolves to Adwaita, and toolkit-following apps (Chromium/Electron
+// without a settings portal) latch light when the restore lands mid-repaint.
+func (c *ColorMode) GTKRefreshTheme() string {
+	switch *c {
+	case ColorModeDark:
+		return "HighContrastInverse"
+	default:
+		return "Adwaita"
 	}
 }
 
@@ -706,6 +721,12 @@ output_path = '%s'
 			for _, editor := range vscodeEditors {
 				appendVSCodeConfig(cfgFile, editor.name, editor.extensionsDir(homeDir), opts.ShellDir)
 			}
+		case TemplateKindMango:
+			configFile := tmpl.ConfigFile
+			if mangoconf.Detect() == mangoconf.Snake {
+				configFile = "mangowc-snake.toml"
+			}
+			appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigDirs, configFile)
 		case TemplateKindEmacs:
 			if utils.EmacsConfigDir() != "" {
 				appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigDirs, tmpl.ConfigFile)
@@ -1405,7 +1426,7 @@ func refreshGTKTheme(mode ColorMode) {
 		log.Infof("Skipping gtk-theme refresh: %s is not installed", theme)
 		return
 	}
-	if err := utils.GsettingsSet("org.gnome.desktop.interface", "gtk-theme", ""); err != nil {
+	if err := utils.GsettingsSet("org.gnome.desktop.interface", "gtk-theme", mode.GTKRefreshTheme()); err != nil {
 		log.Warnf("Failed to reset gtk-theme: %v", err)
 	}
 	if err := utils.GsettingsSet("org.gnome.desktop.interface", "gtk-theme", theme); err != nil {
@@ -1475,7 +1496,7 @@ func refreshFcitx5() {
 	defer conn.Close()
 
 	obj := conn.Object("org.fcitx.Fcitx5", dbus.ObjectPath("/controller"))
-	if err := obj.Call("org.fcitx.Fcitx.Controller1.ReloadAddonConfig", 0, "classicui").Err; err != nil {
+	if err := obj.Call("org.fcitx.Fcitx.Controller1.ReloadAddonConfig", dbus.FlagNoAutoStart, "classicui").Err; err != nil {
 		log.Debugf("Failed to refresh Fcitx5 theme: %v", err)
 	}
 }

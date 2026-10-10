@@ -50,7 +50,7 @@ RegistryBrowserWindow {
 
     function ensureSelectedVisible() {
         if (selectedIndex >= 0)
-            themeGrid.positionViewAtIndex(selectedIndex, GridView.Contain);
+            themeGrid.revealIndex(selectedIndex);
     }
 
     function selectNext() {

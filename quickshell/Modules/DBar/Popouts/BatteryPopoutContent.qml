@@ -179,11 +179,7 @@ Item {
             if (!ancestor)
                 return;
             const position = focusedItem.mapToItem(contentItem, 0, 0);
-            const bottom = position.y + focusedItem.height + Theme.spacingS;
-            if (position.y < contentY + Theme.spacingS)
-                contentY = Math.max(0, position.y - Theme.spacingS);
-            if (bottom > contentY + height)
-                contentY = Math.min(contentHeight - height, bottom - height);
+            revealRange(position.y - Theme.spacingS, position.y + focusedItem.height + Theme.spacingS);
         }
 
         Column {

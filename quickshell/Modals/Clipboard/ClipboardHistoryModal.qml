@@ -76,8 +76,6 @@ DModal {
     modalWidth: Math.min(ClipboardConstants.sizeWidth(SettingsData.clipboardSize), screenWidth - Theme.spacingXL * 2)
     modalHeight: Math.min(ClipboardConstants.sizeHeight(SettingsData.clipboardSize), screenHeight - Theme.spacingXL * 2)
     backgroundColor: Theme.floatingWindowSurface
-    borderColor: Theme.outlineVariant
-    borderWidth: Theme.outlineWidth
     enableShadow: true
     closeOnEscapeKey: (contentLoader.item?.mode ?? "history") === "history"
     onBackgroundClicked: hide()

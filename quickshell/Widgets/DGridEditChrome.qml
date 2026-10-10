@@ -29,8 +29,10 @@ Item {
     readonly property real handleThickness: Theme.spacingM
     readonly property real touchTargetSize: Math.max(Theme.minimumTouchTargetSize, buttonSize)
     readonly property real contentInset: touchTargetSize / 2
-    readonly property bool showOptionsButton: hasOptions && width - contentInset * 2 >= touchTargetSize * (1 + (removable ? 1 : 0) + (horizontalResize ? 1 : 0))
-    readonly property int chromeButtons: (removable ? 1 : 0) + (showOptionsButton ? 1 : 0)
+    readonly property bool showOptionsButton: hasOptions
+    // Too narrow to sit beside the remove button: both move onto the top corners instead.
+    readonly property bool cornerButtons: hasOptions && width - contentInset * 2 < touchTargetSize * (1 + (removable ? 1 : 0) + (horizontalResize ? 1 : 0))
+    readonly property int chromeButtons: (removable ? 1 : 0) + (showOptionsButton && !cornerButtons ? 1 : 0)
     readonly property rect hitBounds: Qt.rect(contentInset - hitOverflow, contentInset - hitOverflow, width - (contentInset - hitOverflow) * 2, height - (contentInset - hitOverflow) * 2)
 
     signal removeRequested
@@ -60,22 +62,36 @@ Item {
         border.width: Theme.outlineWidthFocused
     }
 
-    Rectangle {
-        x: I18n.isRtl ? root.width - root.contentInset - width - (root.touchTargetSize - root.buttonSize) / 2 : root.contentInset + (root.touchTargetSize - root.buttonSize) / 2
-        y: root.contentInset - height / 2
-        width: root.buttonSize + root.touchTargetSize * Math.max(0, root.chromeButtons - 1)
+    component ButtonChip: Rectangle {
         height: root.buttonSize
         radius: Theme.fullRadius(width, height)
         color: Theme.chipSurface
         border.color: Theme.primary
         border.width: Theme.outlineWidth
+    }
+
+    ButtonChip {
+        x: root.cornerButtons ? removeButton.x + (root.touchTargetSize - root.buttonSize) / 2 : I18n.isRtl ? root.width - root.contentInset - width - (root.touchTargetSize - root.buttonSize) / 2 : root.contentInset + (root.touchTargetSize - root.buttonSize) / 2
+        y: root.contentInset - height / 2
+        width: root.buttonSize + root.touchTargetSize * Math.max(0, root.chromeButtons - 1)
         visible: root.chromeButtons > 0
+    }
+
+    ButtonChip {
+        x: optionsButton.x + (root.touchTargetSize - root.buttonSize) / 2
+        y: root.contentInset - height / 2
+        width: root.buttonSize
+        visible: root.cornerButtons
     }
 
     DActionButton {
         id: removeButton
 
-        x: I18n.isRtl ? root.width - root.contentInset - width : root.contentInset
+        x: {
+            if (root.cornerButtons)
+                return I18n.isRtl ? root.width - width : 0;
+            return I18n.isRtl ? root.width - root.contentInset - width : root.contentInset;
+        }
         y: 0
         width: root.touchTargetSize
         height: root.touchTargetSize
@@ -109,7 +125,11 @@ Item {
 
         readonly property real slotOffset: root.removable ? root.touchTargetSize : 0
 
-        x: I18n.isRtl ? root.width - root.contentInset - slotOffset - width : root.contentInset + slotOffset
+        x: {
+            if (root.cornerButtons)
+                return I18n.isRtl ? 0 : root.width - width;
+            return I18n.isRtl ? root.width - root.contentInset - slotOffset - width : root.contentInset + slotOffset;
+        }
         y: 0
         width: root.touchTargetSize
         height: root.touchTargetSize

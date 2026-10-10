@@ -81,7 +81,10 @@ FocusScope {
     }
 
     focus: true
-    Component.onCompleted: forceActiveFocus()
+    Component.onCompleted: {
+        libraryOpen = DesktopWidgetRegistry.libraryScreen === editLayer.screenName;
+        forceActiveFocus();
+    }
     Keys.onEscapePressed: dismiss()
 
     MouseArea {

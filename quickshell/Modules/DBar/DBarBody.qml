@@ -39,6 +39,7 @@ Item {
     readonly property bool islandSatellitesHugIsland: isIsland && islandSatellitePosition === "island"
     readonly property real islandSatelliteGap: isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteGap") : 0
     readonly property bool islandSatelliteBackground: isIsland && SettingsData.islandSetting(barConfig, "islandSatelliteBackground")
+    readonly property real islandGothRadius: isIsland ? _wingR : 0
     readonly property color islandSurfaceColor: {
         if (islandHost)
             return islandHost.surfaceColor;
@@ -52,6 +53,9 @@ Item {
     readonly property real islandSatelliteOpacity: isIsland ? SettingsData.islandSatelliteTransparency(barConfig) : 1
     readonly property real islandChromePad: isIsland ? Theme.snap((barConfig?.innerPadding ?? 4) + Theme.spacingXS, _dpr) : 0
     readonly property real islandChromeInset: islandSatelliteBackground ? islandChromePad : 0
+    readonly property real islandSatelliteSweep: islandSatelliteBackground && SettingsData.islandSetting(barConfig, "islandSatelliteGothCorners") ? islandGothRadius : 0
+    readonly property real islandFlareClearance: ((islandHost?.notch ?? false) ? islandHost.surface.joinRadius * 2.5 : 0) + islandSatelliteSweep
+    readonly property bool islandSatellitesClipToIsland: islandSatelliteBackground && !islandSatellitesHugIsland && !!islandHost
     readonly property bool islandMotionRunning: islandHost?.motionRunning ?? false
     onIslandMotionRunningChanged: {
         if (islandMotionRunning)
@@ -64,16 +68,21 @@ Item {
     readonly property real islandAlongEnd: islandSatellitesHugIsland && islandHost ? Math.round(islandHost.currentAlongPos + islandHost.currentVisualAlong) : 0
     readonly property real islandFrozenStart: !islandHost ? 0 : Math.min(isVertical ? islandHost.motionStartBounds.y : islandHost.motionStartBounds.x, islandHost.targetAlongPos)
     readonly property real islandFrozenEnd: !islandHost ? 0 : Math.max((isVertical ? islandHost.motionStartBounds.y + islandHost.motionStartBounds.height : islandHost.motionStartBounds.x + islandHost.motionStartBounds.width), islandHost.targetAlongPos + islandHost.targetVisualAlong)
+    readonly property bool islandReservesStrip: isIsland && !!islandHost
+    readonly property real islandStripClearance: islandSatelliteGap + islandFlareClearance + islandChromeInset
+    // Target, not live extent, so widgets return as the sheet starts closing rather than after the spring settles.
+    readonly property real islandReachStart: islandReservesStrip ? islandHost.targetAlongPos : 0
+    readonly property real islandReachEnd: islandReservesStrip ? islandHost.targetAlongPos + islandHost.targetVisualAlong : 0
     readonly property real islandLeadingSpread: islandMotionRunning ? Math.max(0, islandAlongStart - islandFrozenStart) : 0
     readonly property real islandTrailingSpread: islandMotionRunning ? Math.max(0, islandFrozenEnd - islandAlongEnd) : 0
     readonly property real contentAlongStart: (isVertical ? barUnitInset.y + topBarContent.anchors.topMargin : barUnitInset.x + topBarContent.anchors.leftMargin)
     readonly property real contentAlongEnd: (isVertical ? barUnitInset.y + barUnitInset.height - topBarContent.anchors.bottomMargin : barUnitInset.x + barUnitInset.width - topBarContent.anchors.rightMargin)
     readonly property real leadingSectionSize: _leftSection ? (isVertical ? _leftSection.implicitHeight : _leftSection.implicitWidth) : 0
     readonly property real trailingSectionSize: _rightSection ? (isVertical ? _rightSection.implicitHeight : _rightSection.implicitWidth) : 0
-    readonly property real freeSatelliteSeparation: leadingSectionSize > 0 && trailingSectionSize > 0 ? islandSatelliteGap + islandChromeInset * 2 : 0
+    readonly property real freeSatelliteSeparation: leadingSectionSize > 0 && trailingSectionSize > 0 ? islandSatelliteGap + (islandChromeInset + islandSatelliteSweep) * 2 : 0
     readonly property real freeSatelliteStart: ((isVertical ? height : width) - leadingSectionSize - freeSatelliteSeparation - trailingSectionSize) / 2
-    readonly property real islandLeadingOffset: !islandSatellitesHugIsland ? 0 : Math.max(0, islandFree ? freeSatelliteStart - contentAlongStart : islandAlongStart - islandSatelliteGap - islandChromeInset - leadingSectionSize - contentAlongStart)
-    readonly property real islandTrailingOffset: !islandSatellitesHugIsland ? 0 : Math.max(0, contentAlongEnd - (islandFree ? freeSatelliteStart + leadingSectionSize + freeSatelliteSeparation + trailingSectionSize : islandAlongEnd + islandSatelliteGap + islandChromeInset + trailingSectionSize))
+    readonly property real islandLeadingOffset: !islandSatellitesHugIsland ? 0 : Math.max(0, islandFree ? freeSatelliteStart - contentAlongStart : islandAlongStart - islandSatelliteGap - islandFlareClearance - islandChromeInset - leadingSectionSize - contentAlongStart)
+    readonly property real islandTrailingOffset: !islandSatellitesHugIsland ? 0 : Math.max(0, contentAlongEnd - (islandFree ? freeSatelliteStart + leadingSectionSize + freeSatelliteSeparation + trailingSectionSize : islandAlongEnd + islandSatelliteGap + islandFlareClearance + islandChromeInset + trailingSectionSize))
     // The band moves inside the window when a far-edge bar grows for the sheet; mapToItem alone would not notice.
     readonly property real _bandOrigin: topBarMouseArea.x + topBarMouseArea.y
     // Section rects feed the input masks and the dismiss-window holes; nothing reads them while neither is live.
@@ -328,7 +337,37 @@ Item {
             y: topBarMouseArea.y + islandLoader.y + topBarSlide.y + (barWindow.islandHost?.currentVisualY ?? 0)
             width: barWindow.islandHost?.currentVisualWidth ?? 0
             height: barWindow.islandHost?.currentVisualHeight ?? 0
-            radius: barWindow.islandHost?.currentSurfaceRadius ?? 0
+            topLeftRadius: barWindow.islandHost?.surface.surfaceMotion.currentTopLeftRadius ?? 0
+            topRightRadius: barWindow.islandHost?.surface.surfaceMotion.currentTopRightRadius ?? 0
+            bottomLeftRadius: barWindow.islandHost?.surface.surfaceMotion.currentBottomLeftRadius ?? 0
+            bottomRightRadius: barWindow.islandHost?.surface.surfaceMotion.currentBottomRightRadius ?? 0
+        }
+    }
+
+    Component {
+        id: blurIslandJoinRegionComp
+
+        Region {
+            id: joinRegion
+
+            property Item corner
+
+            readonly property real sx: topBarMouseArea.x + islandLoader.x + topBarSlide.x
+            readonly property real sy: topBarMouseArea.y + islandLoader.y + topBarSlide.y
+
+            x: sx + corner.x
+            y: sy + corner.y
+            width: corner.width
+            height: corner.height
+
+            Region {
+                intersection: Intersection.Subtract
+                shape: RegionShape.Ellipse
+                x: joinRegion.x + joinRegion.corner.discRect.x
+                y: joinRegion.y + joinRegion.corner.discRect.y
+                width: joinRegion.corner.discRect.width
+                height: joinRegion.corner.discRect.height
+            }
         }
     }
 
@@ -419,6 +458,7 @@ Item {
 
         readonly property bool barHasTransparency: !barWindow.isIsland && barWindow._backgroundAlpha > 0 && barWindow._backgroundAlpha < 1
         readonly property bool islandTranslucent: !!barWindow.islandHost && barWindow.islandHost.surfaceOpacity > 0 && barWindow.islandHost.surfaceOpacity < 1
+        readonly property bool islandNotch: barWindow.islandHost?.notch ?? false
         readonly property bool satelliteTranslucent: barWindow.islandSatelliteBackground && barWindow.islandSatellitesEnabled && barWindow.islandSatelliteOpacity > 0 && barWindow.islandSatelliteOpacity < 1
 
         function rebuild() {
@@ -455,6 +495,13 @@ Item {
                 const islandSub = blurIslandRegionComp.createObject(region);
                 if (islandSub)
                     subRegions.push(islandSub);
+                for (const corner of barWindow.islandHost.notch ? barWindow.islandHost.surface.joinCorners : []) {
+                    const sub = blurIslandJoinRegionComp.createObject(region, {
+                        corner: corner
+                    });
+                    if (sub)
+                        subRegions.push(sub);
+                }
             }
             if (satelliteTranslucent) {
                 for (const surface of [leadingSatelliteSurface, trailingSatelliteSurface]) {
@@ -513,6 +560,7 @@ Item {
 
         onBarHasTransparencyChanged: _blurRebuildTimer.restart()
         onIslandTranslucentChanged: _blurRebuildTimer.restart()
+        onIslandNotchChanged: _blurRebuildTimer.restart()
         onSatelliteTranslucentChanged: _blurRebuildTimer.restart()
 
         readonly property bool blurServiceEnabled: BlurService.enabled
@@ -560,8 +608,7 @@ Item {
     readonly property var renderBarConfig: SettingsData.effectiveBarConfigForRender(barConfig, usesFrameBarChrome)
 
     property bool gothCornersEnabled: renderBarConfig?.gothCornersEnabled ?? false
-    property real wingtipsRadius: renderBarConfig?.gothCornerRadiusOverride ? (renderBarConfig?.gothCornerRadiusValue ?? 12) : Theme.windowRadius
-    readonly property real _wingR: Math.max(0, wingtipsRadius)
+    readonly property real _wingR: BarMetrics.gothRadius(renderBarConfig)
 
     // Shadow buffer: extra window space for shadow to render beyond bar bounds
     readonly property bool _shadowActive: Theme.elevationEnabled && (typeof SettingsData !== "undefined" ? (SettingsData.barElevationEnabled ?? true) : false)
@@ -1071,9 +1118,11 @@ Item {
                         crossFar: axis.edge === "bottom" || axis.edge === "right"
                         edgeAligned: !barWindow.islandSatellitesHugIsland
                         pad: barWindow.islandChromePad
-                        sweep: barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteSwoopRadius") : 0
+                        sweep: barWindow.islandGothRadius
                         gothEnabled: barWindow.isIsland && SettingsData.islandSetting(barConfig, "islandSatelliteGothCorners")
                         fillColor: Theme.withAlpha(barWindow.islandSurfaceColor, barWindow.islandSatelliteOpacity)
+                        dpr: barWindow._dpr
+                        clearEdge: barWindow.islandSatellitesClipToIsland ? barWindow.islandHost.currentAlongPos - barWindow.islandSatelliteGap - barWindow.islandFlareClearance - (barWindow.isVertical ? barUnitInset.y : barUnitInset.x) : NaN
                     }
 
                     SectionSurface {
@@ -1088,9 +1137,11 @@ Item {
                         crossFar: axis.edge === "bottom" || axis.edge === "right"
                         edgeAligned: !barWindow.islandSatellitesHugIsland
                         pad: barWindow.islandChromePad
-                        sweep: barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteSwoopRadius") : 0
+                        sweep: barWindow.islandGothRadius
                         gothEnabled: barWindow.isIsland && SettingsData.islandSetting(barConfig, "islandSatelliteGothCorners")
                         fillColor: Theme.withAlpha(barWindow.islandSurfaceColor, barWindow.islandSatelliteOpacity)
+                        dpr: barWindow._dpr
+                        clearEdge: barWindow.islandSatellitesClipToIsland ? barWindow.islandHost.currentAlongPos + barWindow.islandHost.currentVisualAlong + barWindow.islandSatelliteGap + barWindow.islandFlareClearance - (barWindow.isVertical ? barUnitInset.y : barUnitInset.x) : NaN
                     }
 
                     MouseArea {
@@ -1111,7 +1162,7 @@ Item {
                         propagateComposedEvents: true
                         z: -1
                         scrollEnabled: barWindow.barConfig?.scrollEnabled ?? true
-                        xBehavior: barWindow.barConfig?.scrollXBehavior ?? "column"
+                        xBehavior: barWindow.barConfig?.scrollXBehavior ?? "focusWindow"
                         yBehavior: barWindow.barConfig?.scrollYBehavior ?? "workspace"
                         screenName: barWindow.screenName
                         barConfig: barWindow.barConfig
@@ -1129,6 +1180,8 @@ Item {
                         visible: barWindow.islandSatellitesEnabled
                         leadingSectionOffset: barWindow.islandLeadingOffset
                         trailingSectionOffset: barWindow.islandTrailingOffset
+                        reservedStart: barWindow.islandReservesStrip ? barWindow.islandReachStart - barWindow.islandStripClearance - barWindow.contentAlongStart : NaN
+                        reservedEnd: barWindow.islandReservesStrip ? barWindow.islandReachEnd + barWindow.islandStripClearance - barWindow.contentAlongStart : NaN
                     }
 
                     // Passive: tracks cursor without intercepting clicks or scroll

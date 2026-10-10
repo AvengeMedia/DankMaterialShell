@@ -1004,19 +1004,25 @@ func downloadToTempFile(rawURL string) (string, error) {
 	return filePath, nil
 }
 
+// copyFileToClipboard copies through the server so the entry lands in
+// history, and serves the same offers itself when the server is down or
+// refuses (e.g. file over the history size limit).
 func copyFileToClipboard(filePath string) error {
-	req := ipc.Request{
+	if abs, err := filepath.Abs(filePath); err == nil {
+		filePath = abs
+	}
+	resp, ok := tryServerRequest(ipc.Request{
 		ID:     1,
 		Method: "clipboard.copyFile",
 		Params: map[string]any{"filePath": filePath},
+	})
+	if ok && resp.Error == "" {
+		return nil
 	}
 
-	resp, err := sendServerRequest(req)
+	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return fmt.Errorf("server request: %w", err)
+		return fmt.Errorf("read file: %w", err)
 	}
-	if resp.Error != "" {
-		return fmt.Errorf("server error: %s", resp.Error)
-	}
-	return nil
+	return clipboard.CopyMulti(clipboard.FileOffers(filePath, filePath, data), false, false)
 }

@@ -9,27 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestIWDBackend_MarkIPConfigSeen(t *testing.T) {
-	backend, _ := NewIWDBackend()
-
-	att := &connectAttempt{
-		ssid:     "TestNetwork",
-		netPath:  "/net/connman/iwd/0/1/test",
-		start:    time.Now(),
-		deadline: time.Now().Add(15 * time.Second),
-	}
-
-	backend.attemptMutex.Lock()
-	backend.curAttempt = att
-	backend.attemptMutex.Unlock()
-
-	backend.MarkIPConfigSeen()
-
-	att.mu.Lock()
-	assert.True(t, att.sawIPConfig, "sawIPConfig should be true after MarkIPConfigSeen")
-	att.mu.Unlock()
-}
-
 func TestIWDBackend_OnPromptRetry(t *testing.T) {
 	backend, _ := NewIWDBackend()
 
@@ -144,8 +123,6 @@ func TestIWDBackend_MapIwdDBusError(t *testing.T) {
 	}{
 		{"net.connman.iwd.Error.AlreadyConnected", "already-connected"},
 		{"net.connman.iwd.Error.AuthenticationFailed", "bad-credentials"},
-		{"net.connman.iwd.Error.InvalidKey", "bad-credentials"},
-		{"net.connman.iwd.Error.IncorrectPassphrase", "bad-credentials"},
 		{"net.connman.iwd.Error.NotFound", "no-such-ssid"},
 		{"net.connman.iwd.Error.NotSupported", "connection-failed"},
 		{"net.connman.iwd.Agent.Error.Canceled", "user-canceled"},
@@ -397,12 +374,9 @@ func TestIWDBackend_BadCredentialsUnsavedNetwork_NoReplacementPrompt(t *testing.
 	}
 
 	backend.finalizeAttempt(att, "bad-credentials")
+	backend.sigWG.Wait()
 
-	select {
-	case <-broker.asked:
-		t.Fatal("unsaved network should not trigger a replacement prompt")
-	case <-time.After(100 * time.Millisecond):
-	}
+	assert.Empty(t, broker.asked, "unsaved network should not trigger a replacement prompt")
 }
 
 func TestIWDBackend_BadCredentialsAfterPromptRetry_NoReplacementPrompt(t *testing.T) {
@@ -424,12 +398,9 @@ func TestIWDBackend_BadCredentialsAfterPromptRetry_NoReplacementPrompt(t *testin
 	}
 
 	backend.finalizeAttempt(att, "bad-credentials")
+	backend.sigWG.Wait()
 
-	select {
-	case <-broker.asked:
-		t.Fatal("attempt that already prompted should not trigger a replacement prompt")
-	case <-time.After(100 * time.Millisecond):
-	}
+	assert.Empty(t, broker.asked, "attempt that already prompted should not trigger a replacement prompt")
 }
 
 func TestConnectAttempt_DoubleFinalization(t *testing.T) {

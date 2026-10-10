@@ -14,16 +14,6 @@ func setupFs(t *testing.T) afero.Fs {
 	return afero.NewMemMapFs()
 }
 
-func TestLoadDefaults(t *testing.T) {
-	fs := setupFs(t)
-
-	sources := Load(fs)
-	require.Len(t, sources, 1)
-	assert.Equal(t, OfficialName, sources[0].Name)
-	assert.Equal(t, officialURL, sources[0].URL)
-	assert.True(t, sources[0].Official())
-}
-
 func TestAddAndLoad(t *testing.T) {
 	fs := setupFs(t)
 

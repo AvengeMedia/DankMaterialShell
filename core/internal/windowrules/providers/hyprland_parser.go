@@ -2,35 +2,23 @@ package providers
 
 import (
 	"fmt"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/configfrag"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/configfrag"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/luaconfig"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/windowrules"
 )
 
 type HyprlandWindowRule struct {
-	MatchClass       string
-	MatchTitle       string
-	MatchXWayland    *bool
-	MatchFloating    *bool
-	MatchFullscreen  *bool
-	MatchPinned      *bool
-	MatchInitialised *bool
-	Rule             string
-	Value            string
-	Source           string
-	RawLine          string
-
-	// CombinedActions is populated from single hl.window_rule({ … }) Lua calls where
-	// multiple actions apply together. When non-nil it takes precedence over Rule/Value
-	// in ConvertHyprlandRulesToWindowRules.
-	CombinedActions *windowrules.Actions `json:"-"`
+	Match   windowrules.MatchCriteria
+	Actions windowrules.Actions
+	Source  string
+	RawLine string
 }
 
 type HyprlandRulesParser struct {
@@ -68,7 +56,6 @@ func (p *HyprlandRulesParser) Parse() ([]HyprlandWindowRule, error) {
 
 	dmsLua := filepath.Join(expandedDir, "dms", "windowrules.lua")
 	dmsConf := filepath.Join(expandedDir, "dms", "windowrules.conf")
-
 	if _, err := os.Stat(dmsLua); err == nil {
 		p.dmsRulesExists = true
 		p.dmsPrimaryPath = dmsLua
@@ -84,7 +71,6 @@ func (p *HyprlandRulesParser) Parse() ([]HyprlandWindowRule, error) {
 
 	if strings.EqualFold(filepath.Ext(mainConfig), ".lua") {
 		p.configFormat = "lua"
-		p.readOnly = false
 		p.probeRequireWindowrulesLine(mainConfig)
 		if ap, err := filepath.Abs(mainConfig); err == nil {
 			p.primaryHyprLua = ap
@@ -116,19 +102,11 @@ func (p *HyprlandRulesParser) parseDMSRulesDirectly(dmsRulesPath string) {
 		abs = dmsRulesPath
 	}
 
-	prevSource := p.currentSource
-	p.currentSource = abs
-
 	if strings.EqualFold(filepath.Ext(abs), ".lua") {
 		p.parseLuaWindowRules(string(data), filepath.Dir(abs), abs, false)
 	} else {
-		lines := strings.SplitSeq(string(data), "\n")
-		for line := range lines {
-			p.parseLine(line)
-		}
+		p.parseHyprlangContent(string(data), filepath.Dir(abs), abs, false)
 	}
-
-	p.currentSource = prevSource
 	p.dmsProcessed = true
 }
 
@@ -152,24 +130,27 @@ func (p *HyprlandRulesParser) parseFile(filePath string) error {
 		p.parseLuaWindowRules(string(data), filepath.Dir(absPath), absPath, true)
 		return nil
 	}
+	p.parseHyprlangContent(string(data), filepath.Dir(absPath), absPath, true)
+	return nil
+}
 
+func (p *HyprlandRulesParser) parseHyprlangContent(content, baseDir, absPath string, allowSource bool) {
 	prevSource := p.currentSource
 	p.currentSource = absPath
+	defer func() { p.currentSource = prevSource }()
 
-	lines := strings.SplitSeq(string(data), "\n")
-	for line := range lines {
-		trimmed := strings.TrimSpace(line)
-
-		if strings.HasPrefix(trimmed, "source") {
-			p.handleSource(trimmed, filepath.Dir(absPath))
-			continue
+	lines := strings.Split(content, "\n")
+	for i := 0; i < len(lines); i++ {
+		trimmed := strings.TrimSpace(lines[i])
+		switch {
+		case allowSource && strings.HasPrefix(trimmed, "source"):
+			p.handleSource(trimmed, baseDir)
+		case windowRuleBlockRegex.MatchString(strings.TrimSpace(stripHyprlangComment(trimmed))):
+			i = p.parseWindowRuleBlock(lines, i)
+		default:
+			p.parseLine(trimmed)
 		}
-
-		p.parseLine(line)
 	}
-
-	p.currentSource = prevSource
-	return nil
 }
 
 func (p *HyprlandRulesParser) handleSource(line string, baseDir string) {
@@ -183,34 +164,57 @@ func (p *HyprlandRulesParser) handleSource(line string, baseDir string) {
 
 func (p *HyprlandRulesParser) parseLine(line string) {
 	trimmed := strings.TrimSpace(line)
-
-	if strings.HasPrefix(trimmed, "windowrule") {
-		rule := p.parseWindowRuleLine(trimmed)
-		if rule != nil {
-			rule.Source = p.currentSource
-			p.rules = append(p.rules, *rule)
-		}
+	if !strings.HasPrefix(trimmed, "windowrule") {
+		return
 	}
+	rule := p.parseWindowRuleLine(trimmed)
+	if rule == nil {
+		return
+	}
+	rule.Source = p.currentSource
+	p.rules = append(p.rules, *rule)
 }
 
 var windowRuleV2Regex = regexp.MustCompile(`^windowrulev?2?\s*=\s*(.+)$`)
+var windowRuleBlockRegex = regexp.MustCompile(`^windowrule\s*\{$`)
+
+// stripHyprlangComment cuts at the first `#` the way hyprlang does; `##` is a literal `#`.
+func stripHyprlangComment(line string) string {
+	if !strings.Contains(line, "#") {
+		return line
+	}
+	var sb strings.Builder
+	for i := 0; i < len(line); i++ {
+		if line[i] != '#' {
+			sb.WriteByte(line[i])
+			continue
+		}
+		if i+1 < len(line) && line[i+1] == '#' {
+			sb.WriteByte('#')
+			i++
+			continue
+		}
+		break
+	}
+	return sb.String()
+}
 
 func (p *HyprlandRulesParser) parseWindowRuleLine(line string) *HyprlandWindowRule {
+	rule := &HyprlandWindowRule{RawLine: line}
+	line = strings.TrimSpace(stripHyprlangComment(line))
 	matches := windowRuleV2Regex.FindStringSubmatch(line)
 	if len(matches) < 2 {
 		return nil
 	}
 
 	content := strings.TrimSpace(matches[1])
-	isV2 := strings.HasPrefix(line, "windowrulev2")
 
-	rule := &HyprlandWindowRule{
-		RawLine: line,
-	}
-
-	if isV2 {
+	switch {
+	case strings.HasPrefix(line, "windowrulev2"):
 		p.parseWindowRuleV2(content, rule)
-	} else {
+	case strings.Contains(content, "match:"):
+		parseWindowRuleMatchSyntax(content, rule)
+	default:
 		p.parseWindowRuleV1(content, rule)
 	}
 
@@ -223,8 +227,8 @@ func (p *HyprlandRulesParser) parseWindowRuleV1(content string, rule *HyprlandWi
 		return
 	}
 
-	rule.Rule = strings.TrimSpace(parts[0])
-	rule.MatchClass = strings.TrimSpace(parts[1])
+	rule.Match.AppID = strings.TrimSpace(parts[1])
+	applyHyprlandRuleAction(&rule.Actions, strings.TrimSpace(parts[0]), "")
 }
 
 func (p *HyprlandRulesParser) parseWindowRuleV2(content string, rule *HyprlandWindowRule) {
@@ -233,46 +237,94 @@ func (p *HyprlandRulesParser) parseWindowRuleV2(content string, rule *HyprlandWi
 		return
 	}
 
-	ruleAndValue := strings.TrimSpace(parts[0])
-	matchPart := strings.TrimSpace(parts[1])
+	ruleName, value, _ := strings.Cut(strings.TrimSpace(parts[0]), " ")
+	applyHyprlandRuleAction(&rule.Actions, ruleName, strings.TrimSpace(value))
 
-	if idx := strings.Index(ruleAndValue, " "); idx > 0 {
-		rule.Rule = ruleAndValue[:idx]
-		rule.Value = strings.TrimSpace(ruleAndValue[idx+1:])
-	} else {
-		rule.Rule = ruleAndValue
-	}
+	for pair := range strings.SplitSeq(parts[1], ",") {
+		key, value, ok := strings.Cut(strings.TrimSpace(pair), ":")
+		if !ok || key == "" {
+			continue
+		}
+		key = strings.TrimSpace(key)
+		value = strings.TrimSpace(value)
+		b := value == "1" || value == "true"
 
-	matchPairs := strings.SplitSeq(matchPart, ",")
-	for pair := range matchPairs {
-		pair = strings.TrimSpace(pair)
-		if colonIdx := strings.Index(pair, ":"); colonIdx > 0 {
-			key := strings.TrimSpace(pair[:colonIdx])
-			value := strings.TrimSpace(pair[colonIdx+1:])
-
-			switch key {
-			case "class":
-				rule.MatchClass = value
-			case "title":
-				rule.MatchTitle = value
-			case "xwayland":
-				b := value == "1" || value == "true"
-				rule.MatchXWayland = &b
-			case "floating":
-				b := value == "1" || value == "true"
-				rule.MatchFloating = &b
-			case "fullscreen":
-				b := value == "1" || value == "true"
-				rule.MatchFullscreen = &b
-			case "pinned":
-				b := value == "1" || value == "true"
-				rule.MatchPinned = &b
-			case "initialised", "initialized":
-				b := value == "1" || value == "true"
-				rule.MatchInitialised = &b
-			}
+		switch key {
+		case "class":
+			rule.Match.AppID = value
+		case "title":
+			rule.Match.Title = value
+		case "xwayland":
+			rule.Match.XWayland = &b
+		case "floating":
+			rule.Match.IsFloating = &b
+		case "fullscreen":
+			rule.Match.Fullscreen = &b
+		case "pinned":
+			rule.Match.Pinned = &b
+		case "initialised", "initialized":
+			rule.Match.Initialised = &b
 		}
 	}
+}
+
+// 0.53+ hyprlang: `windowrule = match:class kitty, float on`; keys share the Lua names.
+func parseWindowRuleMatchSyntax(content string, rule *HyprlandWindowRule) {
+	for seg := range strings.SplitSeq(content, ",") {
+		seg = strings.TrimSpace(seg)
+		key, value, _ := strings.Cut(seg, " ")
+		applyHyprlangRuleField(rule, key, value)
+	}
+}
+
+func (p *HyprlandRulesParser) parseWindowRuleBlock(lines []string, start int) int {
+	rule := HyprlandWindowRule{Source: p.currentSource}
+	end := start + 1
+	for ; end < len(lines); end++ {
+		trimmed := strings.TrimSpace(stripHyprlangComment(lines[end]))
+		if trimmed == "}" {
+			break
+		}
+		if key, value, ok := strings.Cut(trimmed, "="); ok {
+			applyHyprlangRuleField(&rule, key, value)
+		}
+	}
+	rule.RawLine = strings.TrimSpace(strings.Join(lines[start:min(end+1, len(lines))], "\n"))
+	p.rules = append(p.rules, rule)
+	return end
+}
+
+func applyHyprlangRuleField(rule *HyprlandWindowRule, key, value string) {
+	key = strings.ToLower(strings.TrimSpace(key))
+	raw := hyprlangValueToLua(key, strings.TrimSpace(value))
+	if matchKey, ok := strings.CutPrefix(key, "match:"); ok {
+		applyLuaMatchKey(&rule.Match, matchKey, raw)
+		return
+	}
+	applyLuaActionKey(&rule.Actions, key, raw)
+}
+
+func hyprlangValueToLua(key, value string) string {
+	// Actions has one opacity, so `opacity active inactive` keeps only the active value.
+	if f := strings.Fields(value); len(f) > 1 && key == "opacity" {
+		value = f[0]
+	}
+	switch strings.ToLower(value) {
+	case "", "on":
+		return "true"
+	case "off":
+		return "false"
+	}
+	if _, ok := luaBoolLike(value); ok {
+		return value
+	}
+	if _, err := strconv.ParseFloat(value, 64); err == nil {
+		return value
+	}
+	if f := strings.Fields(value); len(f) == 2 && (key == "size" || key == "move") {
+		return fmt.Sprintf("{ %s, %s }", strconv.Quote(f[0]), strconv.Quote(f[1]))
+	}
+	return strconv.Quote(value)
 }
 
 func (p *HyprlandRulesParser) HasDMSRulesIncluded() bool {
@@ -360,26 +412,13 @@ func applyHyprlandRuleAction(actions *windowrules.Actions, rule, value string) {
 func ConvertHyprlandRulesToWindowRules(hyprRules []HyprlandWindowRule) []windowrules.WindowRule {
 	result := make([]windowrules.WindowRule, 0, len(hyprRules))
 	for i, hr := range hyprRules {
-		wr := windowrules.WindowRule{
-			ID:      strconv.Itoa(i),
-			Enabled: true,
-			Source:  hr.Source,
-			MatchCriteria: windowrules.MatchCriteria{
-				AppID:       hr.MatchClass,
-				Title:       hr.MatchTitle,
-				XWayland:    hr.MatchXWayland,
-				IsFloating:  hr.MatchFloating,
-				Fullscreen:  hr.MatchFullscreen,
-				Pinned:      hr.MatchPinned,
-				Initialised: hr.MatchInitialised,
-			},
-		}
-		if hr.CombinedActions != nil {
-			wr.Actions = *hr.CombinedActions
-		} else {
-			applyHyprlandRuleAction(&wr.Actions, hr.Rule, hr.Value)
-		}
-		result = append(result, wr)
+		result = append(result, windowrules.WindowRule{
+			ID:            strconv.Itoa(i),
+			Enabled:       true,
+			Source:        hr.Source,
+			MatchCriteria: hr.Match,
+			Actions:       hr.Actions,
+		})
 	}
 	return result
 }
@@ -453,6 +492,51 @@ func (p *HyprlandWritableProvider) isLegacyConfigReadOnly() bool {
 var dmsRuleCommentRegex = regexp.MustCompile(`^#\s*DMS-RULE:\s*id=([^,]+),\s*name=(.*)$`)
 var dmsRuleLuaHDRRegex = regexp.MustCompile(`^\s*--\s*DMS-RULE:\s*id=([^,]+),\s*name=(.*)$`)
 
+// 0.55/0.56 reject rounding above 20 and drop the rule; main allows 100. Raise after 0.57 ships.
+const hyprlandMaxRounding = 20
+
+type luaField[S, V any] struct {
+	key   string
+	field func(*S) *V
+}
+
+var hyprBoolMatches = []luaField[windowrules.MatchCriteria, *bool]{
+	{"focus", func(m *windowrules.MatchCriteria) **bool { return &m.IsFocused }},
+	{"group", func(m *windowrules.MatchCriteria) **bool { return &m.Grouped }},
+	{"modal", func(m *windowrules.MatchCriteria) **bool { return &m.Modal }},
+}
+
+var hyprStringMatches = []luaField[windowrules.MatchCriteria, string]{
+	{"initial_class", func(m *windowrules.MatchCriteria) *string { return &m.InitialClass }},
+	{"initial_title", func(m *windowrules.MatchCriteria) *string { return &m.InitialTitle }},
+	{"tag", func(m *windowrules.MatchCriteria) *string { return &m.Tag }},
+	{"workspace", func(m *windowrules.MatchCriteria) *string { return &m.Workspace }},
+	{"content", func(m *windowrules.MatchCriteria) *string { return &m.Content }},
+	{"xdg_tag", func(m *windowrules.MatchCriteria) *string { return &m.XdgTag }},
+}
+
+var hyprIntMatches = []luaField[windowrules.MatchCriteria, *int]{
+	{"fullscreen_state_internal", func(m *windowrules.MatchCriteria) **int { return &m.FullscreenStateInternal }},
+	{"fullscreen_state_client", func(m *windowrules.MatchCriteria) **int { return &m.FullscreenStateClient }},
+}
+
+var hyprBoolEffects = []luaField[windowrules.Actions, *bool]{
+	{"no_initial_focus", func(a *windowrules.Actions) **bool { return &a.NoInitialFocus }},
+	{"focus_on_activate", func(a *windowrules.Actions) **bool { return &a.FocusOnActivate }},
+	{"stay_focused", func(a *windowrules.Actions) **bool { return &a.StayFocused }},
+	{"confine_pointer", func(a *windowrules.Actions) **bool { return &a.ConfinePointer }},
+	{"no_xdg_drags", func(a *windowrules.Actions) **bool { return &a.NoXdgDrags }},
+	{"no_auto_hdr", func(a *windowrules.Actions) **bool { return &a.NoAutoHDR }},
+	{"no_glow", func(a *windowrules.Actions) **bool { return &a.NoGlow }},
+	{"no_wobble", func(a *windowrules.Actions) **bool { return &a.NoWobble }},
+}
+
+var hyprStringEffects = []luaField[windowrules.Actions, string]{
+	{"border_color", func(a *windowrules.Actions) *string { return &a.BorderColor }},
+	{"tonemap", func(a *windowrules.Actions) *string { return &a.Tonemap }},
+	{"suppress_event", func(a *windowrules.Actions) *string { return &a.SuppressEvent }},
+}
+
 func hyprLuaBoolStr(b bool) string {
 	if b {
 		return "true"
@@ -478,16 +562,28 @@ func luaAppendMatch(mc windowrules.MatchCriteria, dst *[]string) {
 		*dst = append(*dst, fmt.Sprintf(`xwayland = %s`, hyprLuaBoolStr(*mc.XWayland)))
 	}
 	if mc.IsFloating != nil {
-		*dst = append(*dst, fmt.Sprintf(`floating = %s`, hyprLuaBoolStr(*mc.IsFloating)))
+		*dst = append(*dst, fmt.Sprintf(`float = %s`, hyprLuaBoolStr(*mc.IsFloating)))
 	}
 	if mc.Fullscreen != nil {
 		*dst = append(*dst, fmt.Sprintf(`fullscreen = %s`, hyprLuaBoolStr(*mc.Fullscreen)))
 	}
 	if mc.Pinned != nil {
-		*dst = append(*dst, fmt.Sprintf(`pinned = %s`, hyprLuaBoolStr(*mc.Pinned)))
+		*dst = append(*dst, fmt.Sprintf(`pin = %s`, hyprLuaBoolStr(*mc.Pinned)))
 	}
-	if mc.Initialised != nil {
-		*dst = append(*dst, fmt.Sprintf(`initialised = %s`, hyprLuaBoolStr(*mc.Initialised)))
+	for _, f := range hyprBoolMatches {
+		if v := *f.field(&mc); v != nil {
+			*dst = append(*dst, fmt.Sprintf(`%s = %s`, f.key, hyprLuaBoolStr(*v)))
+		}
+	}
+	for _, f := range hyprStringMatches {
+		if v := *f.field(&mc); v != "" {
+			*dst = append(*dst, fmt.Sprintf(`%s = %s`, f.key, strconv.Quote(v)))
+		}
+	}
+	for _, f := range hyprIntMatches {
+		if v := *f.field(&mc); v != nil {
+			*dst = append(*dst, fmt.Sprintf(`%s = %d`, f.key, *v))
+		}
 	}
 }
 
@@ -508,7 +604,7 @@ func luaAppendActions(a windowrules.Actions, dst *[]string) {
 		*dst = append(*dst, `no_focus = true`)
 	}
 	if a.NoBorder != nil && *a.NoBorder {
-		*dst = append(*dst, `noborder = true`)
+		*dst = append(*dst, `border_size = 0`)
 	}
 	if a.NoShadow != nil && *a.NoShadow {
 		*dst = append(*dst, `no_shadow = true`)
@@ -523,7 +619,7 @@ func luaAppendActions(a windowrules.Actions, dst *[]string) {
 		*dst = append(*dst, `no_anim = true`)
 	}
 	if a.NoRounding != nil && *a.NoRounding {
-		*dst = append(*dst, `norounding = true`)
+		*dst = append(*dst, `rounding = 0`)
 	}
 	if a.Pin != nil && *a.Pin {
 		*dst = append(*dst, `pin = true`)
@@ -549,11 +645,24 @@ func luaAppendActions(a windowrules.Actions, dst *[]string) {
 	if a.Workspace != "" {
 		*dst = append(*dst, fmt.Sprintf(`workspace = %s`, strconv.Quote(a.Workspace)))
 	}
-	if a.CornerRadius != nil {
-		*dst = append(*dst, fmt.Sprintf(`rounding = %d`, *a.CornerRadius))
+	if a.CornerRadius != nil && (a.NoRounding == nil || !*a.NoRounding) {
+		*dst = append(*dst, fmt.Sprintf(`rounding = %d`, min(*a.CornerRadius, hyprlandMaxRounding)))
 	}
 	if a.Idleinhibit != "" {
 		*dst = append(*dst, fmt.Sprintf(`idle_inhibit = %s`, strconv.Quote(a.Idleinhibit)))
+	}
+	for _, f := range hyprBoolEffects {
+		if v := *f.field(&a); v != nil {
+			*dst = append(*dst, fmt.Sprintf(`%s = %s`, f.key, hyprLuaBoolStr(*v)))
+		}
+	}
+	if a.ScrollingWidth != nil {
+		*dst = append(*dst, fmt.Sprintf(`scrolling_width = %s`, strconv.FormatFloat(*a.ScrollingWidth, 'g', -1, 64)))
+	}
+	for _, f := range hyprStringEffects {
+		if v := *f.field(&a); v != "" {
+			*dst = append(*dst, fmt.Sprintf(`%s = %s`, f.key, strconv.Quote(v)))
+		}
 	}
 }
 
@@ -578,39 +687,31 @@ func formatLuaManagedHyprRule(rule windowrules.WindowRule) []string {
 
 func (p *HyprlandWritableProvider) LoadDMSRules() ([]windowrules.WindowRule, error) {
 	luaPath := p.GetOverridePath()
-	expanded, err := utils.ExpandPath(p.configDir)
+	data, err := os.ReadFile(luaPath)
+	if err == nil {
+		return p.loadDMSRulesFromLua(data, luaPath)
+	}
+	if !os.IsNotExist(err) {
+		return nil, err
+	}
+
+	confPath := filepath.Join(filepath.Dir(luaPath), "windowrules.conf")
+	data, err = os.ReadFile(confPath)
+	if os.IsNotExist(err) {
+		return []windowrules.WindowRule{}, nil
+	}
 	if err != nil {
 		return nil, err
 	}
-	confPath := filepath.Join(expanded, "dms", "windowrules.conf")
-
-	var data []byte
-	var loadedFrom string
-
-	if data, err = os.ReadFile(luaPath); err == nil {
-		loadedFrom = luaPath
-	} else if !os.IsNotExist(err) {
-		return nil, err
-	} else if data, err = os.ReadFile(confPath); err == nil {
-		loadedFrom = confPath
-	} else if os.IsNotExist(err) {
-		return []windowrules.WindowRule{}, nil
-	} else {
-		return nil, err
-	}
-
-	if strings.EqualFold(filepath.Ext(loadedFrom), ".lua") {
-		return p.loadDMSRulesFromLua(data, luaPath)
-	}
-	return p.loadDMSRulesFromConf(data, loadedFrom)
+	return p.loadDMSRulesFromConf(data, confPath)
 }
 
 func (p *HyprlandWritableProvider) loadDMSRulesFromConf(data []byte, rulesPath string) ([]windowrules.WindowRule, error) {
 	var rules []windowrules.WindowRule
 	var currentID, currentName string
-	lines := strings.SplitSeq(string(data), "\n")
+	parser := NewHyprlandRulesParser(p.configDir)
 
-	for line := range lines {
+	for line := range strings.SplitSeq(string(data), "\n") {
 		trimmed := strings.TrimSpace(line)
 
 		if matches := dmsRuleCommentRegex.FindStringSubmatch(trimmed); matches != nil {
@@ -619,41 +720,32 @@ func (p *HyprlandWritableProvider) loadDMSRulesFromConf(data []byte, rulesPath s
 			continue
 		}
 
-		if strings.HasPrefix(trimmed, "windowrulev2") {
-			parser := NewHyprlandRulesParser(p.configDir)
-			hrule := parser.parseWindowRuleLine(trimmed)
-			if hrule == nil {
-				continue
-			}
-
-			wr := windowrules.WindowRule{
-				ID:      currentID,
-				Name:    currentName,
-				Enabled: true,
-				Source:  rulesPath,
-				MatchCriteria: windowrules.MatchCriteria{
-					AppID:       hrule.MatchClass,
-					Title:       hrule.MatchTitle,
-					XWayland:    hrule.MatchXWayland,
-					IsFloating:  hrule.MatchFloating,
-					Fullscreen:  hrule.MatchFullscreen,
-					Pinned:      hrule.MatchPinned,
-					Initialised: hrule.MatchInitialised,
-				},
-			}
-			applyHyprlandRuleAction(&wr.Actions, hrule.Rule, hrule.Value)
-
-			if wr.ID == "" {
-				wr.ID = hrule.MatchClass
-				if wr.ID == "" {
-					wr.ID = hrule.MatchTitle
-				}
-			}
-
-			rules = append(rules, wr)
-			currentID = ""
-			currentName = ""
+		if !strings.HasPrefix(trimmed, "windowrule") {
+			continue
 		}
+		hrule := parser.parseWindowRuleLine(trimmed)
+		if hrule == nil {
+			continue
+		}
+
+		wr := windowrules.WindowRule{
+			ID:            currentID,
+			Name:          currentName,
+			Enabled:       true,
+			Source:        rulesPath,
+			MatchCriteria: hrule.Match,
+			Actions:       hrule.Actions,
+		}
+		if wr.ID == "" {
+			wr.ID = hrule.Match.AppID
+			if wr.ID == "" {
+				wr.ID = hrule.Match.Title
+			}
+		}
+
+		rules = append(rules, wr)
+		currentID = ""
+		currentName = ""
 	}
 
 	return rules, nil
@@ -698,7 +790,7 @@ func (p *HyprlandWritableProvider) loadDMSRulesFromLua(data []byte, rulesPath st
 					Name:          nameSnap,
 					Enabled:       true,
 					Source:        rulesPath,
-					MatchCriteria: luaMatchFieldsToCriteria(mf),
+					MatchCriteria: mf,
 					Actions:       *acts,
 				}
 				if wr.ID == "" {
@@ -789,13 +881,6 @@ func (p *HyprlandRulesParser) probeRequireWindowrulesLine(mainLua string) {
 	}
 }
 
-// luaMatchFields collects fields from Lua match={...} subtrees before copying into HyprlandWindowRule.
-type luaMatchFields struct {
-	class                                               string
-	title                                               string
-	xwayland, floating, fullscreen, pinned, initialised *bool
-}
-
 func (p *HyprlandRulesParser) parseLuaWindowRules(content, baseDir, absPath string, allowRequires bool) {
 	prev := p.currentSource
 	p.currentSource = absPath
@@ -865,14 +950,12 @@ func (p *HyprlandRulesParser) parseLuaWindowRules(content, baseDir, absPath stri
 				if len(raw) > 240 {
 					raw = raw[:240] + "…"
 				}
-				hr := HyprlandWindowRule{
-					Source:          curAbs,
-					RawLine:         raw,
-					CombinedActions: acts,
-				}
-				fillRuleFromLuaMatch(&hr, mf)
-
-				p.rules = append(p.rules, hr)
+				p.rules = append(p.rules, HyprlandWindowRule{
+					Match:   mf,
+					Actions: *acts,
+					Source:  curAbs,
+					RawLine: raw,
+				})
 
 				if p.requireLineInMain > 0 && mainAbs != "" && curAbs == mainAbs && startLine > p.requireLineInMain {
 					p.rulesAfterDMS++
@@ -888,28 +971,6 @@ func (p *HyprlandRulesParser) parseLuaWindowRules(content, baseDir, absPath stri
 		}
 
 		i++
-	}
-}
-
-func fillRuleFromLuaMatch(hr *HyprlandWindowRule, m luaMatchFields) {
-	hr.MatchClass = m.class
-	hr.MatchTitle = m.title
-	hr.MatchXWayland = m.xwayland
-	hr.MatchFloating = m.floating
-	hr.MatchFullscreen = m.fullscreen
-	hr.MatchPinned = m.pinned
-	hr.MatchInitialised = m.initialised
-}
-
-func luaMatchFieldsToCriteria(m luaMatchFields) windowrules.MatchCriteria {
-	return windowrules.MatchCriteria{
-		AppID:       m.class,
-		Title:       m.title,
-		XWayland:    m.xwayland,
-		IsFloating:  m.floating,
-		Fullscreen:  m.fullscreen,
-		Pinned:      m.pinned,
-		Initialised: m.initialised,
 	}
 }
 
@@ -1106,46 +1167,106 @@ func luaBoolLike(s string) (val bool, ok bool) {
 	}
 }
 
-func parseMatchLua(val string, m *luaMatchFields) {
+func parseMatchLua(val string, m *windowrules.MatchCriteria) {
 	body := trimOuterBraces(val)
-	segs := splitTopLevelCommaLua(body)
-	for _, seg := range segs {
-		k, v, ok := splitLuaKeyVal(seg)
-		if !ok {
-			continue
-		}
-		switch strings.TrimSpace(strings.ToLower(k)) {
-		case "class":
-			m.class = luaStringValue(v)
-		case "title":
-			m.title = luaStringValue(v)
-		case "xwayland":
-			if b, okb := luaBoolLike(v); okb {
-				m.xwayland = new(b)
-			}
-		case "floating":
-			if b, okb := luaBoolLike(v); okb {
-				m.floating = new(b)
-			}
-		case "fullscreen":
-			if b, okb := luaBoolLike(v); okb {
-				m.fullscreen = new(b)
-			}
-		case "pinned":
-			if b, okb := luaBoolLike(v); okb {
-				m.pinned = new(b)
-			}
-		case "initialised", "initialized":
-			if b, okb := luaBoolLike(v); okb {
-				m.initialised = new(b)
-			}
+	for _, seg := range splitTopLevelCommaLua(body) {
+		if k, v, ok := splitLuaKeyVal(seg); ok {
+			applyLuaMatchKey(m, strings.TrimSpace(strings.ToLower(k)), v)
 		}
 	}
+}
+
+func applyLuaMatchKey(m *windowrules.MatchCriteria, key, v string) {
+	if applyLuaMatchTableKey(m, key, v) {
+		return
+	}
+	switch key {
+	case "class":
+		m.AppID = luaStringValue(v)
+	case "title":
+		m.Title = luaStringValue(v)
+	case "xwayland":
+		if b, okb := luaBoolLike(v); okb {
+			m.XWayland = new(b)
+		}
+	case "float", "floating":
+		if b, okb := luaBoolLike(v); okb {
+			m.IsFloating = new(b)
+		}
+	case "fullscreen":
+		if b, okb := luaBoolLike(v); okb {
+			m.Fullscreen = new(b)
+		}
+	case "pin", "pinned":
+		if b, okb := luaBoolLike(v); okb {
+			m.Pinned = new(b)
+		}
+	case "initialised", "initialized":
+		if b, okb := luaBoolLike(v); okb {
+			m.Initialised = new(b)
+		}
+	}
+}
+
+func applyLuaMatchTableKey(m *windowrules.MatchCriteria, key, raw string) bool {
+	for _, f := range hyprBoolMatches {
+		if f.key != key {
+			continue
+		}
+		if b, ok := luaBoolLike(raw); ok {
+			*f.field(m) = new(b)
+		}
+		return true
+	}
+	for _, f := range hyprStringMatches {
+		if f.key == key {
+			*f.field(m) = luaStringValue(raw)
+			return true
+		}
+	}
+	for _, f := range hyprIntMatches {
+		if f.key != key {
+			continue
+		}
+		if n, err := strconv.Atoi(luaStringValue(raw)); err == nil {
+			*f.field(m) = new(n)
+		}
+		return true
+	}
+	return false
+}
+
+func applyLuaActionTableKey(a *windowrules.Actions, key, raw string) (handled bool, known bool) {
+	for _, f := range hyprBoolEffects {
+		if f.key != key {
+			continue
+		}
+		b, ok := luaBoolLike(raw)
+		if ok {
+			*f.field(a) = new(b)
+		}
+		return ok, true
+	}
+	for _, f := range hyprStringEffects {
+		if f.key != key {
+			continue
+		}
+		v := strings.TrimSpace(raw)
+		if !strings.HasPrefix(v, `"`) && !strings.HasPrefix(v, `'`) {
+			return false, true
+		}
+		*f.field(a) = luaStringValue(v)
+		return true, true
+	}
+	return false, false
 }
 
 func applyLuaActionKey(a *windowrules.Actions, key, raw string) bool {
 	k := strings.TrimSpace(strings.ToLower(key))
 	raw = strings.TrimSpace(raw)
+	if handled, known := applyLuaActionTableKey(a, k, raw); known {
+		return handled
+	}
 	switch k {
 	case "float":
 		if b, ok := luaBoolLike(raw); ok && b {
@@ -1171,7 +1292,7 @@ func applyLuaActionKey(a *windowrules.Actions, key, raw string) bool {
 			a.OpenMaximized = &t
 			return true
 		}
-	case "nofocus", "no_focus", "no_initial_focus":
+	case "nofocus", "no_focus":
 		if b, ok := luaBoolLike(raw); ok && b {
 			t := true
 			a.NoFocus = &t
@@ -1213,6 +1334,12 @@ func applyLuaActionKey(a *windowrules.Actions, key, raw string) bool {
 			a.NoRounding = &t
 			return true
 		}
+	case "border_size":
+		if n, err := strconv.Atoi(luaStringValue(raw)); err == nil && n == 0 {
+			t := true
+			a.NoBorder = &t
+			return true
+		}
 	case "pin":
 		if b, ok := luaBoolLike(raw); ok && b {
 			t := true
@@ -1239,6 +1366,11 @@ func applyLuaActionKey(a *windowrules.Actions, key, raw string) bool {
 	case "rounding":
 		if v := luaStringValue(raw); v != "" {
 			if n, err := strconv.Atoi(strings.TrimSpace(v)); err == nil {
+				if n == 0 {
+					t := true
+					a.NoRounding = &t
+					return true
+				}
 				a.CornerRadius = &n
 				return true
 			}
@@ -1273,6 +1405,11 @@ func applyLuaActionKey(a *windowrules.Actions, key, raw string) bool {
 	case "workspace":
 		a.Workspace = strings.TrimSpace(luaStringValue(raw))
 		return true
+	case "scrolling_width":
+		if f, err := strconv.ParseFloat(luaStringValue(raw), 64); err == nil {
+			a.ScrollingWidth = &f
+			return true
+		}
 	case "idleinhibit", "idle_inhibit":
 		a.Idleinhibit = strings.TrimSpace(luaStringValue(raw))
 		return true
@@ -1282,34 +1419,30 @@ func applyLuaActionKey(a *windowrules.Actions, key, raw string) bool {
 	return false
 }
 
-func parseHlWindowRuleLuaTable(inner string) (*windowrules.Actions, luaMatchFields, bool) {
+func parseHlWindowRuleLuaTable(inner string) (*windowrules.Actions, windowrules.MatchCriteria, bool) {
 	body := trimOuterBraces(strings.TrimSpace(inner))
 	if body == "" {
-		return nil, luaMatchFields{}, false
+		return nil, windowrules.MatchCriteria{}, false
 	}
-	segs := splitTopLevelCommaLua(body)
-	var match luaMatchFields
+	var match windowrules.MatchCriteria
 	var a windowrules.Actions
-	matchParsed := false
 	haveActions := false
 
-	for _, seg := range segs {
+	for _, seg := range splitTopLevelCommaLua(body) {
 		k, v, ok := splitLuaKeyVal(seg)
 		if !ok {
 			continue
 		}
-		switch strings.TrimSpace(strings.ToLower(k)) {
-		case "match":
+		if strings.TrimSpace(strings.ToLower(k)) == "match" {
 			parseMatchLua(v, &match)
-			matchParsed = true
-		default:
-			if applyLuaActionKey(&a, k, v) {
-				haveActions = true
-			}
+			continue
+		}
+		if applyLuaActionKey(&a, k, v) {
+			haveActions = true
 		}
 	}
 	if !haveActions {
-		return nil, luaMatchFields{}, false
+		return nil, windowrules.MatchCriteria{}, false
 	}
-	return &a, match, matchParsed || haveActions
+	return &a, match, true
 }

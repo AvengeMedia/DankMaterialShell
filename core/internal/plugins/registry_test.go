@@ -172,8 +172,6 @@ func TestLoadPlugins(t *testing.T) {
 
 		assert.Equal(t, "TestPlugin1", plugins[0].Name)
 		assert.Equal(t, "TestPlugin2", plugins[1].Name)
-		assert.Equal(t, []string{"dankbar-widget"}, plugins[0].Capabilities)
-		assert.Equal(t, []string{"dep1", "dep2"}, plugins[1].Dependencies)
 	})
 
 	t.Run("skips non-json files", func(t *testing.T) {

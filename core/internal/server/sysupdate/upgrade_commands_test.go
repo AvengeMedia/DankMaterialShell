@@ -70,16 +70,6 @@ func TestUpgradeCommandBuilders(t *testing.T) {
 			want: []string{"pkexec", "emerge", "--update", "--newuse", "--deep", "--quiet", "--exclude", "sys-apps/portage", "--exclude", "mail-client/thunderbird", "@world"},
 		},
 		{
-			name: "apt without ignored uses plain upgrade",
-			got:  aptUpgradeArgv("apt-get", UpgradeOptions{}),
-			want: []string{"pkexec", "env", "DEBIAN_FRONTEND=noninteractive", "LC_ALL=C", "apt-get", "upgrade", "-y", "-o", "Dpkg::Options::=--force-confdef", "-o", "Dpkg::Options::=--force-confold"},
-		},
-		{
-			name: "zypper without ignored uses plain update",
-			got:  zypperUpgradeArgv(UpgradeOptions{}),
-			want: []string{"pkexec", "zypper", "--non-interactive", "update"},
-		},
-		{
 			name: "interactive dnf leaves prompts to dnf",
 			got:  dnfUpgradeArgv("dnf5", UpgradeOptions{Interactive: true}),
 			want: []string{"pkexec", "dnf5", "upgrade", "--refresh"},

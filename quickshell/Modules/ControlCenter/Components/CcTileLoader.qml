@@ -11,6 +11,7 @@ Loader {
     property bool compact: false
     property bool small: false
     property bool docked: false
+    property bool bare: false
 
     sourceComponent: grid.model ? grid.model.componentForWidget(widgetData) : null
 
@@ -82,6 +83,13 @@ Loader {
         property: "docked"
         value: root.docked
         when: root.item !== null && "docked" in root.item
+    }
+
+    Binding {
+        target: root.item
+        property: "bare"
+        value: root.bare
+        when: root.item !== null && "bare" in root.item
     }
 
     Connections {

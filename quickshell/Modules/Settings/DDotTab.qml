@@ -147,8 +147,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "dotHighContrast"
                 tags: ["dot", "contrast", "accessibility", "outline"]
-                resetStore: dot
-                resetKeys: ["islandHighContrast"]
                 text: I18n.tr("High contrast", "island settings: high contrast toggle")
                 checked: dot.setting("islandHighContrast")
                 onToggled: checked => dot.apply("islandHighContrast", checked)

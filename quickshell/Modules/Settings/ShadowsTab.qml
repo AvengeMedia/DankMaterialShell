@@ -32,7 +32,6 @@ Item {
                 tab: "theme"
                 tags: ["elevation", "shadow", "lift", "m3", "material"]
                 settingKey: "m3ElevationToggle"
-                resetKeys: ["m3ElevationEnabled"]
                 text: I18n.tr("Shadows", "noun, settings page name and toggle for surface shadows")
                 checked: SettingsData.m3ElevationEnabled ?? true
                 onToggled: checked => SettingsData.set("m3ElevationEnabled", checked)
@@ -240,8 +239,6 @@ Item {
             SettingsToggleRow {
                 tags: ["shadow", "override", "custom"]
                 text: I18n.tr("Override")
-                resetStore: bar
-                resetKeys: ["shadowIntensity"]
                 checked: shadowCard.shadowActive
                 onToggled: checked => {
                     if (checked) {

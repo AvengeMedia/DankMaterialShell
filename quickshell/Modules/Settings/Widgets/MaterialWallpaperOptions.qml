@@ -4,32 +4,14 @@ import QtQuick
 import qs.Common
 
 QtObject {
-    readonly property var presets: [
-        {
-            value: "dank",
-            label: I18n.tr("Dank", "Material wallpaper preset")
-        },
-        {
-            value: "bloom",
-            label: I18n.tr("Bloom", "Material wallpaper preset")
-        },
-        {
-            value: "orbit",
-            label: I18n.tr("Orbit", "Material wallpaper preset")
-        },
-        {
-            value: "garden",
-            label: I18n.tr("Garden", "Material wallpaper preset")
-        },
-        {
-            value: "petal",
-            label: I18n.tr("Petal", "Material wallpaper preset")
-        },
-        {
-            value: "dune",
-            label: I18n.tr("Dune", "Material wallpaper preset")
-        }
-    ]
+    readonly property var builtinLabels: ({
+            "dank": I18n.tr("Dank", "Material wallpaper preset"),
+            "bloom": I18n.tr("Bloom", "Material wallpaper preset"),
+            "orbit": I18n.tr("Orbit", "Material wallpaper preset"),
+            "garden": I18n.tr("Garden", "Material wallpaper preset"),
+            "petal": I18n.tr("Petal", "Material wallpaper preset"),
+            "dune": I18n.tr("Dune", "Material wallpaper preset")
+        })
     readonly property var seedHues: [
         {
             value: "red",
@@ -64,6 +46,9 @@ QtObject {
             label: I18n.tr("Pink", "seed color hue")
         }
     ]
+    function profileLabel(profile) {
+        return profile.builtin ? builtinLabels[profile.id] ?? profile.id : profile.name;
+    }
     function label(options, value) {
         return options.find(option => option.value === value)?.label ?? "";
     }

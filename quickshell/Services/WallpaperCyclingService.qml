@@ -139,8 +139,9 @@ Singleton {
         }, null);
     }
 
-    function findCommand(wallpaperDir) {
-        return ["sh", "-c", `find -L "${wallpaperDir}" -maxdepth 1 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.bmp" -o -iname "*.gif" -o -iname "*.webp" -o -iname "*.jxl" -o -iname "*.avif" -o -iname "*.heif" -o -iname "*.exr" -o -iname "*.svg" \\) 2>/dev/null | sort`];
+    function findCommand(wallpaperDir, recursive) {
+        const depthArg = recursive ? "" : "-maxdepth 1 ";
+        return ["sh", "-c", `find -L "${wallpaperDir}" ${depthArg}-type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.bmp" -o -iname "*.gif" -o -iname "*.webp" -o -iname "*.jxl" -o -iname "*.avif" -o -iname "*.heif" -o -iname "*.exr" -o -iname "*.svg" \\) 2>/dev/null | sort`];
     }
 
     function monitorProcessFor(screenName) {
@@ -158,25 +159,34 @@ Singleton {
         if (!currentWallpaper || currentWallpaper.startsWith("#"))
             return;
         let wallpaperDir;
+        let recursive = false;
 
         if (screenName) {
             const monitorSettings = SessionData.getMonitorCyclingSettings(screenName);
+            recursive = !!monitorSettings.recursive;
             if (monitorSettings.folderPath && currentWallpaper.startsWith(monitorSettings.folderPath + "/")) {
                 wallpaperDir = monitorSettings.folderPath;
             } else {
                 wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
+                if (recursive && wallpaperDir)
+                    SessionData.setMonitorCyclingFolderPath(screenName, wallpaperDir);
             }
         } else {
+            recursive = !!SessionData.wallpaperCyclingRecursive;
             if (SessionData.wallpaperCyclingFolderPath && currentWallpaper.startsWith(SessionData.wallpaperCyclingFolderPath + "/")) {
                 wallpaperDir = SessionData.wallpaperCyclingFolderPath;
             } else {
                 wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
+                if (recursive && wallpaperDir) {
+                    SessionData.wallpaperCyclingFolderPath = wallpaperDir;
+                    SessionData.saveSettings();
+                }
             }
         }
 
         if (screenName && monitorProcessComponent.status === Component.Ready) {
             var process = monitorProcessFor(screenName);
-            process.command = findCommand(wallpaperDir);
+            process.command = findCommand(wallpaperDir, recursive);
             process.targetScreenName = screenName;
             process.currentWallpaper = currentWallpaper;
             process.goToPrevious = goToPrevious;
@@ -186,7 +196,7 @@ Singleton {
         }
 
         var globalProcess = goToPrevious ? prevCyclingProcess : cyclingProcess;
-        globalProcess.command = findCommand(wallpaperDir);
+        globalProcess.command = findCommand(wallpaperDir, recursive);
         globalProcess.targetScreenName = screenName || "";
         globalProcess.currentWallpaper = currentWallpaper;
         globalProcess.revision = SessionData.wallpaperRequestRevision(screenName || "");
@@ -205,16 +215,19 @@ Singleton {
         if (!folderPath)
             return;
 
+        let recursive = false;
         if (screenName) {
             SessionData.setMonitorCyclingFolderPath(screenName, folderPath);
+            recursive = !!SessionData.getMonitorCyclingSettings(screenName).recursive;
         } else {
             SessionData.wallpaperCyclingFolderPath = folderPath;
             SessionData.saveSettings();
+            recursive = !!SessionData.wallpaperCyclingRecursive;
         }
 
         if (screenName && monitorProcessComponent.status === Component.Ready) {
             var process = monitorProcessFor(screenName);
-            process.command = findCommand(folderPath);
+            process.command = findCommand(folderPath, recursive);
             process.targetScreenName = screenName;
             process.currentWallpaper = "";
             process.goToPrevious = false;
@@ -224,7 +237,7 @@ Singleton {
         }
 
         var globalProcess = cyclingProcess;
-        globalProcess.command = findCommand(folderPath);
+        globalProcess.command = findCommand(folderPath, recursive);
         globalProcess.targetScreenName = screenName || "";
         globalProcess.currentWallpaper = "";
         globalProcess.goToPrevious = false;

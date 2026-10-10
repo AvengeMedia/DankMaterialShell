@@ -61,9 +61,10 @@ Loader {
 
     readonly property bool widgetEnabled: widgetData?.enabled !== false
     readonly property bool loadedOnDemand: BarWidgetService.onDemandWidgetIds.includes(widgetId)
+    readonly property string componentKey: widgetId === "music" && SettingsData.widgetOption("music", widgetData, "mediaStyle") === "activity" ? "music:activity" : widgetId
 
-    active: (widgetEnabled || loadedOnDemand) && orientationMatches && getWidgetVisible(widgetId, DgopService.dgopAvailable) && (!["music", "mediaActivity"].includes(widgetId) || MprisController.activePlayer !== null)
-    sourceComponent: getWidgetComponent(widgetId, components)
+    active: (widgetEnabled || loadedOnDemand) && orientationMatches && getWidgetVisible(widgetId, DgopService.dgopAvailable) && (widgetId !== "music" || MprisController.activePlayer !== null)
+    sourceComponent: getWidgetComponent(componentKey, components)
 
     signal contentItemReady(var item)
 
@@ -93,6 +94,14 @@ Loader {
             value: root[modelData]
             restoreMode: Binding.RestoreNone
         }
+    }
+
+    Binding {
+        target: root.item
+        when: root.item && "widgetBackground" in root.item && root.widgetData?.background !== undefined
+        property: "widgetBackground"
+        value: root.widgetData?.background === true
+        restoreMode: Binding.RestoreBinding
     }
 
     Binding {

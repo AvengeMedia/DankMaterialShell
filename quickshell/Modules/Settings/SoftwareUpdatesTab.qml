@@ -1,8 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Effects
-import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
@@ -63,11 +61,6 @@ Item {
     readonly property bool upgradeFailed: SystemUpdateService.hasError && !busy && (SystemUpdateService.recentLog || []).length > 0
     readonly property var installablePackages: SystemUpdateService.availableUpdates.filter(p => SettingsData.updaterIncludeFlatpak || p.repo !== "flatpak")
     readonly property bool anythingToInstall: installablePackages.length > 0 && SystemUpdateService.helperAvailable
-    readonly property string displayVersion: {
-        const semver = ShellVersionService.semverVersion.replace(/^v/, "");
-        const base = semver.match(/^\d+\.\d+/);
-        return base ? base[0] : semver || SystemUpdateService.shellRunning.replace(/^v/, "");
-    }
     readonly property var notesRelease: SystemUpdateService.notesRelease
     readonly property int serviceLastCheckUnix: SystemUpdateService.lastCheckUnix
 
@@ -272,83 +265,15 @@ Item {
     SettingsPage {
         id: mainColumn
 
-        DCard {
-            id: hero
-            width: parent.width
-            height: heroColumn.implicitHeight + SettingsMetrics.pagePaddingV * 2
-            restRadius: Theme.groupedListOuterRadius
-            color: SettingsMetrics.rowColor
-            pad: 0
-            showFocusRing: false
-
-            // Clips the image only: text inside a ClippingRectangle is drawn from a texture and blurs at fractional scales.
-            ClippingRectangle {
-                anchors.fill: parent
-                radius: hero.bodyRadius
-                color: "transparent"
-
-                Image {
-                    anchors.fill: parent
-                    source: "file://" + Theme.shellDir + "/assets/release-banner.svg"
-                    fillMode: Image.Stretch
-                    asynchronous: true
-                    cache: false
-                    sourceSize.width: SettingsMetrics.windowWidth
-                    opacity: Theme.pendingOpacity
-                    layer.enabled: true
-                    layer.effect: MultiEffect {
-                        colorization: 1
-                        colorizationColor: Theme.primary
-                    }
-                }
-            }
-
-            Column {
-                id: heroColumn
-                anchors.centerIn: parent
-                width: parent.width - SettingsMetrics.heroPadding * 2
-                spacing: Theme.spacingS
-
-                Row {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: Theme.spacingS
-
-                    StyledText {
-                        id: heroBrand
-                        text: "DMS"
-                        font.pixelSize: Theme.fontSizeDisplayLarge
-                        font.weight: Theme.fontWeightBold
-                        color: Theme.surfaceText
-                    }
-
-                    StyledText {
-                        text: root.displayVersion
-                        font: heroBrand.font
-                        color: Theme.primary
-                    }
-                }
-
-                StyledText {
-                    width: parent.width
-                    visible: ShellVersionService.shellCodename !== ""
-                    text: ShellVersionService.shellCodename.toUpperCase()
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Theme.fontWeightMedium
-                    color: Theme.primary
-                    horizontalAlignment: Text.AlignHCenter
-                    elide: Text.ElideRight
-                }
-
-                M3WaveProgress {
-                    id: upgradeWave
-                    width: parent.width
-                    height: Theme.spacingM
-                    visible: SystemUpdateService.isUpgrading
-                    isPlaying: visible
-                    value: 1
-                    trackColor: "transparent"
-                    playheadColor: "transparent"
-                }
+        SettingsHeroCard {
+            M3WaveProgress {
+                width: parent.width
+                height: Theme.spacingM
+                visible: SystemUpdateService.isUpgrading
+                isPlaying: visible
+                value: 1
+                trackColor: "transparent"
+                playheadColor: "transparent"
             }
         }
 
@@ -658,7 +583,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "systemUpdaterCheckOnStart"
                 tags: ["startup", "check", "boot"]
-                resetKeys: ["updaterCheckOnStart"]
                 text: I18n.tr("Check on startup")
                 checked: SettingsData.updaterCheckOnStart
                 onToggled: checked => SettingsData.set("updaterCheckOnStart", checked)
@@ -667,7 +591,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "systemUpdaterPauseOnBattery"
                 tags: ["battery", "power", "pause"]
-                resetKeys: ["updaterPauseOnBattery"]
                 visible: BatteryService.batteryAvailable
                 text: I18n.tr("Pause checks on battery", "software updates toggle, skip background checks on battery power")
                 checked: SettingsData.updaterPauseOnBattery
@@ -677,7 +600,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "systemUpdaterNotify"
                 tags: ["notify", "notification", "alert"]
-                resetKeys: ["updaterNotify"]
                 text: I18n.tr("Notify me on new updates", "software updates toggle")
                 description: I18n.tr("Checks in the background at the check interval. Notifies only when the count grows.", "notify on new updates toggle description")
                 checked: SettingsData.updaterNotify
@@ -702,7 +624,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "systemUpdaterFlatpak"
                 tags: ["flatpak", "include"]
-                resetKeys: ["updaterIncludeFlatpak"]
                 text: I18n.tr("Include Flatpak updates")
                 visible: (SystemUpdateService.backends || []).some(b => b.repo === "flatpak")
                 checked: SettingsData.updaterIncludeFlatpak
@@ -712,7 +633,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "systemUpdaterAUR"
                 tags: ["aur", "paru", "yay", "shelly"]
-                resetKeys: ["updaterAllowAUR"]
                 text: I18n.tr("Include AUR updates")
                 visible: (SystemUpdateService.backends || []).some(b => ["paru", "yay", "shelly"].includes(b.id))
                 checked: SettingsData.updaterAllowAUR
@@ -722,7 +642,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "systemUpdaterReopenAfterUpgrade"
                 tags: ["reopen", "popout", "terminal", "upgrade"]
-                resetKeys: ["updaterReopenAfterUpgrade"]
                 text: I18n.tr("Reopen panel after update")
                 visible: root.upgradeRunsInTerminal
                 checked: SettingsData.updaterReopenAfterUpgrade
@@ -732,7 +651,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "systemUpdaterUpgradeInWindow"
                 tags: ["window", "popout", "floating", "log", "output"]
-                resetKeys: ["updaterUpgradeInWindow"]
                 text: I18n.tr("Show upgrade in a window", "software updates toggle")
                 description: I18n.tr("Opens a floating window with the live output", "show upgrade in a window toggle description")
                 visible: !root.upgradeRunsInTerminal

@@ -9,7 +9,6 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/lowprio"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/plugins"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/AvengeMedia/dankgo/ipc/params"
@@ -21,7 +20,7 @@ func HandleRequest(conn *ipc.ConnWriter, req ipc.Request) {
 	case "lyrics.get":
 		handleGet(conn, req)
 	default:
-		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
+		conn.RespondError(req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
 }
 
@@ -80,10 +79,10 @@ func handleGet(conn *ipc.ConnWriter, req ipc.Request) {
 		Providers: providers,
 	})
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, result)
+	conn.Respond(req.ID, result)
 	client.Prune()
 }

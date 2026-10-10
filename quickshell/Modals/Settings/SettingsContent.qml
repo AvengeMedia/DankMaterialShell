@@ -18,12 +18,11 @@ FocusScope {
     readonly property list<string> pagePath: (parentModal?.pageHistory ?? []).concat([currentPage])
     readonly property Item currentPageItem: pageStack.currentItem?.item ?? null
     readonly property bool currentPageSettled: pageStack.currentItem?.page === currentPage && pageStack.currentItem.settled
-    property Item pendingPage: null
     readonly property bool isPluginPage: SettingsTabs.isPluginPage(currentPage)
     readonly property bool isCompactMode: parentModal?.isCompactMode ?? false
     readonly property bool menuHidden: isCompactMode && !(parentModal?.menuVisible ?? true)
     readonly property bool showBack: (parentModal?.canGoBack ?? false) || isPluginPage || menuHidden
-    readonly property bool animationsEnabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+    readonly property bool animationsEnabled: !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
     // Mouse navigation lands parked; only keyboard navigation highlights a control on the page
     property bool keyboardNavigation: true
 
@@ -146,6 +145,10 @@ FocusScope {
                 continue;
             const top = item.mapToItem(f.contentItem, 0, 0).y - Theme.spacingL;
             const bottom = top + item.height + Theme.spacingL * 2;
+            if (typeof f.revealRange === "function") {
+                f.revealRange(top, bottom);
+                return;
+            }
             if (top < f.contentY)
                 f.contentY = Math.max(f.originY, top);
             else if (bottom > f.contentY + f.height)
@@ -205,13 +208,6 @@ FocusScope {
         return properties;
     }
 
-    function _discardPendingPage() {
-        if (!pendingPage)
-            return;
-        pendingPage.destroy();
-        pendingPage = null;
-    }
-
     function _createPage(page, index) {
         return pageComponent.createObject(pageStack, {
             page,
@@ -219,73 +215,104 @@ FocusScope {
         });
     }
 
+    // A navigation that lands mid-transition cuts in rather than queueing behind it
+    function _operation(transition) {
+        const animate = animationsEnabled && pageStack.depth > 0 && !pageStack.busy && (parentModal?.visible ?? false);
+        return animate ? transition : StackView.Immediate;
+    }
+
     function _syncPages() {
         if (!sessionVisible) {
-            _discardPendingPage();
             pageStack.clear(StackView.Immediate);
             return;
         }
-        if (!currentPage || pageStack.busy)
+        if (!currentPage)
             return;
-        if (pendingPage && (pendingPage.page !== currentPage || pendingPage.pathIndex !== pagePath.length - 1))
-            _discardPendingPage();
         let shared = 0;
         while (shared < Math.min(pageStack.depth, pagePath.length) && pageStack.get(shared).page === pagePath[shared])
             shared++;
         if (shared === pagePath.length) {
-            _discardPendingPage();
             if (shared < pageStack.depth)
-                pageStack.pop(pageStack.get(shared - 1), animationsEnabled ? StackView.PopTransition : StackView.Immediate);
+                pageStack.pop(pageStack.get(shared - 1), _operation(StackView.PopTransition));
             return;
         }
-        if (!pendingPage) {
-            pendingPage = _createPage(currentPage, pagePath.length - 1);
-            pendingPage.load(parentModal?.visible ?? false);
-        }
-        if (!pendingPage.settled)
-            return;
-        const animate = animationsEnabled && pageStack.depth > 0 && (parentModal?.visible ?? false);
+        const deferred = parentModal?.visible ?? false;
         const pages = [];
-        for (let index = shared; index < pagePath.length - 1; index++) {
+        for (let index = shared; index < pagePath.length; index++) {
+            const top = index === pagePath.length - 1;
             const page = _createPage(pagePath[index], index);
-            page.load(false);
+            // StackView only transitions the top of a multi-item push; pages beneath stay painted until hidden here
+            page.visible = top;
+            page.load(deferred && top);
             pages.push(page);
         }
-        pages.push(pendingPage);
-        pendingPage = null;
         if (shared < pageStack.depth) {
-            pageStack.replace(pageStack.get(shared), pages, animate ? StackView.ReplaceTransition : StackView.Immediate);
+            pageStack.replace(pageStack.get(shared), pages, _operation(StackView.ReplaceTransition));
             return;
         }
-        pageStack.push(pages, animate ? StackView.PushTransition : StackView.Immediate);
+        pageStack.push(pages, _operation(StackView.PushTransition));
     }
 
     onPagePathChanged: Qt.callLater(_syncPages)
     onSessionVisibleChanged: Qt.callLater(_syncPages)
 
-    component PageTransition: Transition {
-        id: transition
+    // Fade through the pane: the leaving page is gone before the next one starts to show, so nothing blends mid-way
+    component PageExit: Transition {
+        id: exit
 
-        property bool entering: true
-        property real fromX: 0
         property real toX: 0
 
         NumberAnimation {
             property: "x"
-            from: transition.fromX
-            to: transition.toX
-            duration: SettingsMetrics.transitionDuration
+            to: exit.toX
+            duration: SettingsMetrics.exitDuration
             easing.type: Easing.BezierSpline
             easing.bezierCurve: Theme.expressiveCurves.standard
         }
 
         NumberAnimation {
             property: "opacity"
-            from: transition.entering ? 0 : 1
-            to: transition.entering ? 1 : 0
-            duration: SettingsMetrics.fadeDuration
+            to: 0
+            duration: SettingsMetrics.exitDuration
             easing.type: Easing.BezierSpline
             easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
+        }
+    }
+
+    component PageEnter: Transition {
+        id: enter
+
+        property real fromX: 0
+
+        SequentialAnimation {
+            PropertyAction {
+                property: "opacity"
+                value: 0
+            }
+
+            PauseAnimation {
+                duration: SettingsMetrics.exitDuration
+            }
+
+            ParallelAnimation {
+                NumberAnimation {
+                    property: "x"
+                    from: enter.fromX
+                    to: 0
+                    duration: SettingsMetrics.transitionDuration
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: Theme.expressiveCurves.standard
+                }
+
+                NumberAnimation {
+                    property: "opacity"
+                    from: 0
+                    to: 1
+                    duration: SettingsMetrics.fadeDuration
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
+                }
+            }
         }
     }
 
@@ -332,18 +359,19 @@ FocusScope {
             readonly property string parentId: SettingsTabs.parentOf(page)
             readonly property bool canGoBack: pathIndex > 0 || (parentId !== "" && (SettingsTabs.isPluginPage(page) || SettingsTabs.visibleLeaves(parentId).length > 1 || !!SettingsTabs.page(parentId)?.hubHeader))
             property Item rememberedFocus: null
+            property Item scroller: null
             property bool pending: true
             property bool presented: false
 
             width: pageStack.width
             height: pageStack.height
-            opacity: 0
             enabled: pageActive && presented
 
             StackView.onRemoved: destroy()
-            onSettledChanged: {
-                if (settled && root.pendingPage === host)
-                    Qt.callLater(root._syncPages);
+            // An immediate operation skips the nested enter animation, so the final pose is written here
+            StackView.onActivated: {
+                opacity = 1;
+                x = 0;
             }
 
             function load(deferred) {
@@ -406,12 +434,23 @@ FocusScope {
                 anchors.bottom: parent.bottom
                 anchors.leftMargin: SettingsMetrics.panePadding
                 anchors.rightMargin: SettingsMetrics.panePadding
+                opacity: host.presented ? 1 : 0
                 enabled: host.presented
+
+                Behavior on opacity {
+                    enabled: root.animationsEnabled
+                    NumberAnimation {
+                        duration: SettingsMetrics.fadeDuration
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
+                    }
+                }
 
                 onLoaded: {
                     if (item.pageActive !== undefined)
                         item.pageActive = Qt.binding(() => host.pageActive);
                     const scroller = root._scrollerOf(item);
+                    host.scroller = scroller;
                     if (scroller)
                         scrollerTap.createObject(scroller, {
                             "parent": scroller
@@ -519,7 +558,29 @@ FocusScope {
             "plugins_manage": "PluginsManageTab.qml"
         })
 
-    readonly property var pagesWithParentModal: ["dankbar_widgets", "window_rules", "notification_rules", "display_config", "users", "time_weather", "weather", "lock_screen", "greeter", "dank_dash", "wallpaper_cycling", "theme_schedule", "surface_shadows", "keybinds", "dankbar_settings", "dankbar_appearance", "bar_widget", "dock_general", "dock_widgets", "dock_appearance", "dock_advanced", "launcher", "theme", "theme_apps", "media_player", "desktop_widgets", "desktop_widget", "autostart", "compositor_layout", "updater", "display_gamma"]
+    readonly property var pagesWithParentModal: ["dankbar_widgets", "window_rules", "notification_rules", "display_config", "users", "time_weather", "weather", "lock_screen", "greeter", "dank_dash", "wallpaper_cycling", "theme_schedule", "surface_shadows", "keybinds", "dankbar_settings", "dankbar_appearance", "bar_widget", "dock_general", "dock_widgets", "dock_appearance", "dock_advanced", "launcher", "theme", "theme_apps", "media_player", "desktop_widgets", "desktop_widget", "autostart", "compositor_layout", "updater", "display_gamma", "about"]
+
+    // The page scroller stops at the Loader edges; wheel over the header and gutters lands here instead
+    WheelHandler {
+        acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+
+        onWheel: event => {
+            const scroller = pageStack.currentItem?.scroller;
+            if (!scroller?.forwardWheel || !scroller.enabled) {
+                event.accepted = false;
+                return;
+            }
+            scroller.forwardWheel(event);
+        }
+
+        onActiveChanged: {
+            if (active)
+                return;
+            const scroller = pageStack.currentItem?.scroller;
+            if (scroller?.forwardWheelEnd)
+                scroller.forwardWheelEnd();
+        }
+    }
 
     StackView {
         id: pageStack
@@ -527,36 +588,27 @@ FocusScope {
         anchors.fill: parent
         clip: true
 
-        readonly property real pageOffset: SettingsData.reduceMotion ? 0 : (I18n.isRtl ? -Theme.spacingXL : Theme.spacingXL)
+        readonly property real pageOffset: I18n.isRtl ? -Theme.spacingXL : Theme.spacingXL
 
-        onBusyChanged: {
-            if (!busy)
-                Qt.callLater(root._syncPages);
-        }
-
-        pushEnter: PageTransition {
+        pushEnter: PageEnter {
             fromX: pageStack.pageOffset
         }
-        pushExit: PageTransition {
-            entering: false
+        pushExit: PageExit {
             toX: -pageStack.pageOffset
         }
-        popEnter: PageTransition {
+        popEnter: PageEnter {
             fromX: -pageStack.pageOffset
         }
-        popExit: PageTransition {
-            entering: false
+        popExit: PageExit {
             toX: pageStack.pageOffset
         }
-        replaceEnter: PageTransition {}
-        replaceExit: PageTransition {
-            entering: false
-        }
+        replaceEnter: PageEnter {}
+        replaceExit: PageExit {}
 
         DSpinner {
             id: pageSpinner
 
-            readonly property bool loading: root.pendingPage !== null
+            readonly property bool loading: pageStack.currentItem?.presented === false
 
             anchors.centerIn: parent
             z: pageStack.depth
@@ -572,7 +624,7 @@ FocusScope {
 
             Timer {
                 id: spinnerDelay
-                interval: SettingsMetrics.pageSettleDeadline + SettingsMetrics.fadeDuration
+                interval: SettingsMetrics.pageSpinnerDelay
                 onTriggered: pageSpinner.visible = pageSpinner.loading
             }
         }

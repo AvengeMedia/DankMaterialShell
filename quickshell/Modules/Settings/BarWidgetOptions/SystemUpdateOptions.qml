@@ -14,8 +14,6 @@ Column {
         settingKey: "barWidgetSystemUpdate"
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["hideWhenIdle"]
             text: I18n.tr("Hide when no updates")
             checked: root.page.value("hideWhenIdle")
             onToggled: checked => root.page.set("hideWhenIdle", checked)

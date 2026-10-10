@@ -24,6 +24,10 @@ Item {
     property bool small: false
     property bool docked: false
     property string dockedText: title
+    // Set by a background-less Quick tiles group.
+    property bool bare: false
+    property real quickContentWidth: 0
+    readonly property real quickWidth: Math.max(bare ? CcMetrics.quickBareWidth : CcMetrics.iconBoxSize, quickContentWidth + (bare ? CcMetrics.quickBarePadding : Theme.spacingM * 2))
     readonly property real bodyInset: small ? Math.max(0, (height - CcMetrics.iconBoxSize) / 2) : 0
     readonly property real bodyHeight: height - bodyInset * 2
     property bool toggle: !opensPage
@@ -69,8 +73,10 @@ Item {
         return tall ? Math.min(CcMetrics.tallTileRadius, width / 2, height / 2) : Theme.fullRadius(width, bodyHeight);
     }
     property bool acceptsInput: interactive && enabled
-    readonly property bool bodyActive: showsActive && !hasIconBox
+    readonly property bool bodyActive: showsActive && !hasIconBox && !bare
     readonly property color bodyColor: {
+        if (bare)
+            return "transparent";
         if (!available)
             return Theme.onSurface_12;
         return bodyActive ? CcMetrics.tileActiveColor : CcMetrics.tileInactiveColor;
@@ -90,6 +96,11 @@ Item {
             return Theme.onSurface_38;
         if (hasIconBox)
             return showsActive ? CcMetrics.tileActiveContent : CcMetrics.tileInactiveContent;
+        // Without a body, toggles show their state in the icon tint alone.
+        if (bare && showsActive)
+            return CcMetrics.bareActiveIcon;
+        if (bare && toggle)
+            return CcMetrics.tileInactiveContent;
         return bodyActive ? CcMetrics.tileActiveContent : root.restIconColor;
     }
     readonly property color iconBoxColor: {
@@ -177,7 +188,7 @@ Item {
         anchors.bottomMargin: root.bodyInset
         radius: root.bodyRadius
         color: root.bodyColor
-        border.width: Theme.layerOutlineWidth
+        border.width: root.bare ? 0 : Theme.layerOutlineWidth
         border.color: Theme.outlineMedium
 
         Behavior on color {

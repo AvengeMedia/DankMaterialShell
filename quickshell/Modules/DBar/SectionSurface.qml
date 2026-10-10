@@ -14,27 +14,40 @@ Item {
     property bool trailing: false
     property bool edgeAligned: false
     property real pad: 0
-    property real cornerRadius: Theme.cornerRadius
+    property real cornerRadius: Theme.windowRadius
     property real sweep: 0
     property bool gothEnabled: false
     property color fillColor: "transparent"
+    property real clearEdge: NaN
+    property real dpr: 1
 
-    readonly property real chromeAlongPos: edgeAligned && !trailing ? 0 : alongPos - pad
-    readonly property real chromeAlongSize: alongSize <= 0 ? 0 : edgeAligned ? (trailing ? alongExtent - chromeAlongPos : alongPos + alongSize + pad) : alongSize + pad * 2
+    readonly property real fullAlongStart: edgeAligned && !trailing ? 0 : alongPos - pad
+    readonly property real fullAlongEnd: edgeAligned && trailing ? alongExtent : alongPos + alongSize + pad
+    readonly property real alongStart: trailing && !isNaN(clearEdge) ? Math.max(fullAlongStart, clearEdge) : fullAlongStart
+    readonly property real alongEnd: !trailing && !isNaN(clearEdge) ? Math.min(fullAlongEnd, clearEdge) : fullAlongEnd
+    readonly property real chromeAlongPos: Theme.snap(alongStart, dpr)
+    readonly property real chromeAlongSize: alongSize <= 0 ? 0 : Math.max(0, Theme.snap(alongEnd, dpr) - chromeAlongPos)
     readonly property real cornerR: Math.max(0, Math.min(cornerRadius, crossSize / 2))
-    readonly property real sweepR: gothEnabled ? Math.max(0, Math.min(sweep, crossSize - cornerR, chromeAlongSize - cornerR)) : 0
+    readonly property real sweepR: gothEnabled ? Math.max(0, sweep) : 0
+    // Same clamps as BarSurface wings: free ends lose depth to the strip, attached ends lose reach to the body.
+    readonly property real freeCrossR: Math.min(sweepR, Math.max(0, crossSize - cornerR))
+    readonly property real attachedAlongR: Math.min(sweepR, Math.max(0, chromeAlongSize - cornerR))
     readonly property bool canonicalBottomEdge: !isVertical && crossFar
     readonly property bool canonicalRightSide: isVertical ? (crossFar ? trailing : !trailing) : trailing
     readonly property bool startAttached: edgeAligned && !canonicalRightSide
     readonly property bool endAttached: edgeAligned && canonicalRightSide
     readonly property alias body: body
+    readonly property real startAlongR: startAttached ? attachedAlongR : sweepR
+    readonly property real endAlongR: endAttached ? attachedAlongR : sweepR
+    readonly property real startCrossR: startAttached ? sweepR : freeCrossR
+    readonly property real endCrossR: endAttached ? sweepR : freeCrossR
 
     readonly property real alongStartRadius: edgeAligned && !trailing ? 0 : cornerR
     readonly property real alongEndRadius: edgeAligned && trailing ? 0 : cornerR
-    readonly property rect startSweepRect: localRect(startAttached ? 0 : -sweepR, startAttached ? crossSize : 0, sweepR, sweepR)
-    readonly property rect startSweepDisc: localRect(startAttached ? 0 : -sweepR * 2, startAttached ? crossSize : 0, sweepR * 2, sweepR * 2)
-    readonly property rect endSweepRect: localRect(endAttached ? chromeAlongSize - sweepR : chromeAlongSize, endAttached ? crossSize : 0, sweepR, sweepR)
-    readonly property rect endSweepDisc: localRect(endAttached ? chromeAlongSize - sweepR * 2 : chromeAlongSize, endAttached ? crossSize : 0, sweepR * 2, sweepR * 2)
+    readonly property rect startSweepRect: localRect(startAttached ? 0 : -startAlongR, startAttached ? crossSize : 0, startAlongR, startCrossR)
+    readonly property rect startSweepDisc: localRect(startAttached ? 0 : -startAlongR * 2, startAttached ? crossSize : 0, startAlongR * 2, startCrossR * 2)
+    readonly property rect endSweepRect: localRect(endAttached ? chromeAlongSize - endAlongR : chromeAlongSize, endAttached ? crossSize : 0, endAlongR, endCrossR)
+    readonly property rect endSweepDisc: localRect(endAttached ? chromeAlongSize - endAlongR * 2 : chromeAlongSize, endAttached ? crossSize : 0, endAlongR * 2, endCrossR * 2)
 
     function localRect(cx, cy, cw, ch) {
         const along = chromeAlongSize;
@@ -73,17 +86,19 @@ Item {
         }
 
         GothCorner {
-            visible: !root.startAttached && radius > 0
-            radius: root.sweepR
+            visible: !root.startAttached && root.startAlongR > 0 && root.startCrossR > 0
+            radiusX: root.startAlongR
+            radiusY: root.startCrossR
             color: root.fillColor
-            x: -radius
+            x: -radiusX
             y: 0
             corner: "bottomLeft"
         }
 
         GothCorner {
-            visible: !root.endAttached && radius > 0
-            radius: root.sweepR
+            visible: !root.endAttached && root.endAlongR > 0 && root.endCrossR > 0
+            radiusX: root.endAlongR
+            radiusY: root.endCrossR
             color: root.fillColor
             x: canvas.width
             y: 0
@@ -91,8 +106,9 @@ Item {
         }
 
         GothCorner {
-            visible: root.startAttached && radius > 0
-            radius: root.sweepR
+            visible: root.startAttached && root.startAlongR > 0 && root.startCrossR > 0
+            radiusX: root.startAlongR
+            radiusY: root.startCrossR
             color: root.fillColor
             x: 0
             y: canvas.height
@@ -100,10 +116,11 @@ Item {
         }
 
         GothCorner {
-            visible: root.endAttached && radius > 0
-            radius: root.sweepR
+            visible: root.endAttached && root.endAlongR > 0 && root.endCrossR > 0
+            radiusX: root.endAlongR
+            radiusY: root.endCrossR
             color: root.fillColor
-            x: canvas.width - radius
+            x: canvas.width - radiusX
             y: canvas.height
             corner: "bottomLeft"
         }

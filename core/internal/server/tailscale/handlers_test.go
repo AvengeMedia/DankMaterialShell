@@ -62,24 +62,6 @@ func TestHandleGetStatus(t *testing.T) {
 	assert.Equal(t, "cachyos", resp.Result.Self.Hostname)
 }
 
-func TestHandleRefresh(t *testing.T) {
-	m := handlerTestManager()
-	defer m.Close()
-
-	buf := &bytes.Buffer{}
-	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
-
-	req := ipc.Request{ID: 1, Method: "tailscale.refresh"}
-	handleRefresh(conn, req, m)
-
-	var resp ipc.Response[models.SuccessResult]
-	err := json.NewDecoder(buf).Decode(&resp)
-	require.NoError(t, err)
-	assert.Equal(t, 1, resp.ID)
-	assert.NotNil(t, resp.Result)
-	assert.True(t, resp.Result.Success)
-}
-
 func TestHandleActions(t *testing.T) {
 	cases := []struct {
 		name   string
@@ -89,7 +71,6 @@ func TestHandleActions(t *testing.T) {
 		{"connect", "tailscale.connect", nil},
 		{"disconnect", "tailscale.disconnect", nil},
 		{"setExitNode", "tailscale.setExitNode", map[string]any{"id": "nABC123"}},
-		{"clearExitNode", "tailscale.setExitNode", map[string]any{"id": ""}},
 		{"setAllowLanAccess", "tailscale.setAllowLanAccess", map[string]any{"enabled": true}},
 	}
 

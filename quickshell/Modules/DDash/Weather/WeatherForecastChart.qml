@@ -5,6 +5,7 @@ import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
 import qs.Modules.DDash
+import "../../../DCommon/Common/WheelInput.js" as WheelInput
 
 Item {
     id: root
@@ -60,15 +61,16 @@ Item {
         anchors.fill: parent
         acceptedButtons: Qt.NoButton
         onWheel: wheel => {
-            const delta = wheel.angleDelta.x || wheel.angleDelta.y;
-            if (wheel.angleDelta.x === 0 && !(wheel.modifiers & Qt.ShiftModifier)) {
+            if (!WheelInput.isHorizontal(wheel) || root.maxStart === 0) {
                 wheel.accepted = false;
                 return;
             }
+            const delta = WheelInput.dominantDelta(wheel.angleDelta);
             const step = delta > 0 ? -1 : 1;
-            wheel.accepted = delta !== 0 && root.start + step >= 0 && root.start + step <= root.maxStart;
-            if (wheel.accepted)
+            const next = root.start + step;
+            if (delta !== 0 && next >= 0 && next <= root.maxStart)
                 root.pageRequested(step);
+            wheel.accepted = true;
         }
     }
 

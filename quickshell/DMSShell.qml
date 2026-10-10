@@ -61,6 +61,10 @@ Item {
 
     DesktopWidgetEditor {}
 
+    DesktopContextMenu {
+        Component.onCompleted: PopoutService.desktopContextMenu = this
+    }
+
     Lock {
         id: lock
     }
@@ -888,7 +892,7 @@ Item {
         target: DMSService
         function onOpenUrlRequested(url) {
             if (url.startsWith("dms://theme/install/")) {
-                var themeId = url.replace("dms://theme/install/", "").split(/[?#]/)[0];
+                const themeId = url.replace("dms://theme/install/", "").split(/[?#]/)[0];
                 if (themeId) {
                     PopoutService.pendingThemeInstall = themeId;
                     PopoutService.openSettingsWithTab("theme");
@@ -896,10 +900,18 @@ Item {
                 return;
             }
             if (url.startsWith("dms://plugin/install/")) {
-                var pluginId = url.replace("dms://plugin/install/", "").split(/[?#]/)[0];
+                const pluginId = url.replace("dms://plugin/install/", "").split(/[?#]/)[0];
                 if (pluginId) {
                     PopoutService.pendingPluginInstall = pluginId;
                     PopoutService.openSettingsWithTab("plugins");
+                }
+                return;
+            }
+            if (url.startsWith("dms://wallpaper/install/")) {
+                const payload = url.replace("dms://wallpaper/install/", "").split(/[?#]/)[0];
+                if (payload) {
+                    PopoutService.pendingWallpaperInstall = payload;
+                    PopoutService.openSettingsWithTab("wallpaper");
                 }
                 return;
             }
@@ -955,8 +967,6 @@ Item {
         id: workspaceRenameModalLoader
 
         active: false
-
-        Component.onCompleted: PopoutService.workspaceRenameModalLoader = workspaceRenameModalLoader
 
         WorkspaceRenameModal {
             id: workspaceRenameModal
@@ -1207,12 +1217,12 @@ Item {
 
         active: false
 
+        Component.onCompleted: PopoutService.keybindsModalLoader = hyprKeybindsModalLoader
+
         KeybindsModal {
             id: keybindsModal
 
-            Component.onCompleted: {
-                PopoutService.hyprKeybindsModal = keybindsModal;
-            }
+            Component.onCompleted: PopoutService.keybindsModal = keybindsModal
         }
     }
 
@@ -1235,16 +1245,16 @@ Item {
     }
 
     DMSShellIPC {
-        powerMenuModalLoader: powerMenuModalLoader
-        processListModalLoader: processListModalLoader
-        controlCenterLoader: controlCenterLoader
-        dankDashPopoutLoader: dankDashPopoutLoader
-        notepadSlideoutVariants: notepadSlideoutVariants
-        hyprKeybindsModalLoader: hyprKeybindsModalLoader
+        powerMenuModalLoaderRef: powerMenuModalLoader
+        processListModalLoaderRef: processListModalLoader
+        controlCenterLoaderRef: controlCenterLoader
+        dankDashPopoutLoaderRef: dankDashPopoutLoader
+        notepadSlideoutVariantsRef: notepadSlideoutVariants
+        hyprKeybindsModalLoaderRef: hyprKeybindsModalLoader
         dankBarRepeater: root.core?.dankBarRepeater ?? null
         hyprlandOverviewLoader: root.core?.hyprlandOverviewLoader ?? null
-        workspaceRenameModalLoader: workspaceRenameModalLoader
-        windowRuleModalLoader: windowRuleModalLoader
+        workspaceRenameModalLoaderRef: workspaceRenameModalLoader
+        windowRuleModalLoaderRef: windowRuleModalLoader
     }
 
     Variants {

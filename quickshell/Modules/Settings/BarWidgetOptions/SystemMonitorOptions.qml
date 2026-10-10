@@ -26,8 +26,6 @@ Column {
         settingKey: "barWidgetSystemMonitor"
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["minimumWidth"]
             text: I18n.tr("Force padding")
             description: I18n.tr("Dynamic width")
             checked: root.page.value("minimumWidth") !== false
@@ -35,8 +33,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["showSwap"]
             text: I18n.tr("Show swap")
             visible: root.type === "memUsage"
             checked: root.page.value("showSwap") === true
@@ -44,8 +40,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["showInGb"]
             text: I18n.tr("Show in GB")
             visible: root.type === "memUsage"
             checked: root.page.value("showInGb") === true
@@ -78,8 +72,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["showMountPath"]
             text: I18n.tr("Show mount path")
             visible: root.type === "diskUsage"
             checked: root.page.value("showMountPath") === true

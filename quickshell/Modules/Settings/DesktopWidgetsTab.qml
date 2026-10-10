@@ -98,6 +98,24 @@ Item {
         id: mainColumn
 
         SettingsCard {
+            settingKey: "desktopGeneral"
+            tags: ["desktop", "context", "menu", "right click", "wallpaper"]
+            width: parent.width
+            iconName: "mouse"
+            title: I18n.tr("General")
+
+            SettingsDropdownRow {
+                settingKey: "desktopContextMenu"
+                text: I18n.tr("Right-click menu")
+                description: I18n.tr("Auto turns it off on compositors that use clicks on the empty desktop themselves", "desktop context menu dropdown description")
+                options: [I18n.tr("Auto"), I18n.tr("On"), I18n.tr("Off")]
+                readonly property var values: ["auto", "on", "off"]
+                currentValue: options[Math.max(0, values.indexOf(SettingsData.desktopContextMenu))]
+                onValueChanged: value => SettingsData.set("desktopContextMenu", values[options.indexOf(value)])
+            }
+        }
+
+        SettingsCard {
             settingKey: "desktopWidgetGroups"
             tags: ["groups", "profiles", "layouts"]
             width: parent.width

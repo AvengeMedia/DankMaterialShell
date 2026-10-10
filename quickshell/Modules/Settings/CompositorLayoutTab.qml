@@ -8,6 +8,7 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    readonly property var log: Log.scoped("CompositorLayoutTab")
     property var parentModal: null
 
     LayoutMirroring.enabled: I18n.isRtl
@@ -141,7 +142,6 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
             SettingsToggleSliderRow {
                 tags: ["niri", "border", "override", "focus-ring"]
                 settingKey: "niriLayoutBorderSizeEnabled"
-                resetKeys: ["niriLayoutBorderSize"]
                 text: I18n.tr("Override border size")
                 checked: SettingsData.niriLayoutBorderSize >= 0
                 value: Math.max(0, SettingsData.niriLayoutBorderSize)
@@ -428,7 +428,6 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
             SettingsToggleSliderRow {
                 tags: ["hyprland", "border", "override", "border_size"]
                 settingKey: "hyprlandLayoutBorderSizeEnabled"
-                resetKeys: ["hyprlandLayoutBorderSize"]
                 text: I18n.tr("Override border size")
                 checked: SettingsData.hyprlandLayoutBorderSize >= 0
                 value: Math.max(0, SettingsData.hyprlandLayoutBorderSize)
@@ -439,12 +438,29 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 onSliderValueChanged: newValue => SettingsData.set("hyprlandLayoutBorderSize", newValue)
             }
 
-            SettingsToggleRow {
-                tags: ["hyprland", "resize", "border", "mouse", "drag"]
+            SettingsToggleSliderRow {
+                tags: ["hyprland", "resize", "border", "mouse", "drag", "grab", "area", "extend_border_grab_area"]
                 settingKey: "hyprlandResizeOnBorder"
+                valueKeys: ["hyprlandBorderGrabArea"]
                 text: I18n.tr("Resize on border")
                 checked: SettingsData.hyprlandResizeOnBorder
+                value: SettingsData.hyprlandBorderGrabArea
+                minimum: 0
+                maximum: 100
+                unit: "px"
                 onToggled: checked => SettingsData.set("hyprlandResizeOnBorder", checked)
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandBorderGrabArea", newValue)
+            }
+
+            SettingsSliderRow {
+                tags: ["hyprland", "opacity", "transparency", "window"]
+                settingKey: "hyprlandWindowOpacity"
+                text: I18n.tr("Window opacity", "Hyprland opacity applied to app windows")
+                value: SettingsData.hyprlandWindowOpacity
+                minimum: 10
+                maximum: 100
+                unit: "%"
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandWindowOpacity", newValue)
             }
 
             SettingsToggleRow {
@@ -465,6 +481,224 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 description: I18n.tr("Blur against the wallpaper even with xray off")
                 checked: HyprlandService.layoutBarXrayEnabled
                 onToggled: checked => HyprlandService.setLayoutBarXray(checked)
+            }
+        }
+
+        SettingsCard {
+            id: hyprEffectsCard
+            width: parent.width
+            tags: ["hyprland", "effects", "blur", "glow", "wobble", "motion", "decoration"]
+            title: I18n.tr("Visual effects")
+            settingKey: "hyprlandEffects"
+            iconName: "auto_awesome"
+            visible: CompositorService.isHyprland && (HyprlandService.hyprSupports("decoration:blur:variant") || HyprlandService.hyprSupports("decoration:glow:enabled") || HyprlandService.hyprSupports("decoration:wobble:enabled") || HyprlandService.hyprSupports("decoration:motion_blur:enabled"))
+
+            readonly property var blurVariantIds: ["kawase", "frost", "ripple", "drops", "water", "fluid_jar", "prism", "heat_shimmer", "acrylic", "aurora", "haze"]
+
+            SettingsDropdownRow {
+                tags: ["hyprland", "blur", "variant", "style", "acrylic", "aurora", "frost", "glass"]
+                settingKey: "hyprlandBlurVariant"
+                visible: HyprlandService.hyprSupports("decoration:blur:variant")
+                text: I18n.tr("Blur")
+                description: I18n.tr("Styles outside of Default use more GPU", "Hyprland blur variant dropdown description")
+                options: [I18n.tr("Default"), I18n.tr("Frost", "Hyprland blur variant"), I18n.tr("Ripple", "Hyprland blur variant"), I18n.tr("Drops", "Hyprland blur variant"), I18n.tr("Water", "Hyprland blur variant"), I18n.tr("Fluid jar", "Hyprland blur variant"), I18n.tr("Prism", "Hyprland blur variant"), I18n.tr("Heat shimmer", "Hyprland blur variant"), I18n.tr("Acrylic", "Hyprland blur variant"), I18n.tr("Aurora", "Hyprland blur variant"), I18n.tr("Haze", "Hyprland blur variant")]
+                currentValue: options[Math.max(0, hyprEffectsCard.blurVariantIds.indexOf(SettingsData.hyprlandBlurVariant))]
+                onValueChanged: value => SettingsData.set("hyprlandBlurVariant", hyprEffectsCard.blurVariantIds[Math.max(0, options.indexOf(value))])
+            }
+
+            SettingsSliderRow {
+                tags: ["hyprland", "blur", "ripple", "strength", "refraction"]
+                settingKey: "hyprlandBlurRippleStrength"
+                visible: SettingsData.hyprlandBlurVariant === "ripple"
+                text: I18n.tr("Refraction", "Hyprland blur slider, how far ripple or water waves bend the backdrop")
+                value: SettingsData.hyprlandBlurRippleStrength
+                minimum: 0
+                maximum: 32
+                unit: "px"
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandBlurRippleStrength", newValue)
+            }
+
+            SettingsSliderRow {
+                tags: ["hyprland", "blur", "water", "strength", "refraction"]
+                settingKey: "hyprlandBlurWaterStrength"
+                visible: SettingsData.hyprlandBlurVariant === "water"
+                text: I18n.tr("Refraction", "Hyprland blur slider, how far ripple or water waves bend the backdrop")
+                value: SettingsData.hyprlandBlurWaterStrength
+                minimum: 0
+                maximum: 32
+                unit: "px"
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandBlurWaterStrength", newValue)
+            }
+
+            SettingsSliderRow {
+                tags: ["hyprland", "blur", "acrylic", "clarity"]
+                settingKey: "hyprlandBlurAcrylicClarity"
+                visible: SettingsData.hyprlandBlurVariant === "acrylic"
+                text: I18n.tr("Clarity", "Hyprland acrylic blur slider, how much sharp backdrop shows through")
+                value: SettingsData.hyprlandBlurAcrylicClarity
+                minimum: 0
+                maximum: 100
+                unit: "%"
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandBlurAcrylicClarity", newValue)
+            }
+
+            SettingsSliderRow {
+                tags: ["hyprland", "blur", "aurora", "intensity"]
+                settingKey: "hyprlandBlurAuroraIntensity"
+                visible: SettingsData.hyprlandBlurVariant === "aurora"
+                text: I18n.tr("Intensity")
+                value: SettingsData.hyprlandBlurAuroraIntensity
+                minimum: 0
+                maximum: 100
+                unit: "%"
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandBlurAuroraIntensity", newValue)
+            }
+
+            SettingsSliderRow {
+                tags: ["hyprland", "blur", "aurora", "speed", "animation"]
+                settingKey: "hyprlandBlurAuroraSpeed"
+                visible: SettingsData.hyprlandBlurVariant === "aurora"
+                text: I18n.tr("Speed")
+                value: SettingsData.hyprlandBlurAuroraSpeed
+                minimum: 0
+                maximum: 10
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandBlurAuroraSpeed", newValue)
+            }
+
+            SettingsSliderRow {
+                tags: ["hyprland", "blur", "haze", "intensity", "sheen"]
+                settingKey: "hyprlandBlurHazeIntensity"
+                visible: SettingsData.hyprlandBlurVariant === "haze"
+                text: I18n.tr("Intensity")
+                value: SettingsData.hyprlandBlurHazeIntensity
+                minimum: 0
+                maximum: 100
+                unit: "%"
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandBlurHazeIntensity", newValue)
+            }
+
+            SettingsSliderRow {
+                tags: ["hyprland", "blur", "haze", "iridescence", "color"]
+                settingKey: "hyprlandBlurHazeIridescence"
+                visible: SettingsData.hyprlandBlurVariant === "haze"
+                text: I18n.tr("Iridescence", "Hyprland haze blur slider, strength of the pearlescent color shift")
+                value: SettingsData.hyprlandBlurHazeIridescence
+                minimum: 0
+                maximum: 100
+                unit: "%"
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandBlurHazeIridescence", newValue)
+            }
+
+            SettingsToggleSliderRow {
+                tags: ["hyprland", "glow", "inner", "range"]
+                settingKey: "hyprlandGlowEnabled"
+                valueKeys: ["hyprlandGlowRange"]
+                visible: HyprlandService.hyprSupports("decoration:glow:enabled")
+                text: I18n.tr("Glow", "Hyprland toggle, inner glow along window edges in the theme color")
+                checked: SettingsData.hyprlandGlowEnabled
+                value: SettingsData.hyprlandGlowRange
+                minimum: 1
+                maximum: 50
+                unit: "px"
+                onToggled: checked => SettingsData.set("hyprlandGlowEnabled", checked)
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandGlowRange", newValue)
+            }
+
+            SettingsSliderRow {
+                tags: ["hyprland", "glow", "falloff", "render_power"]
+                settingKey: "hyprlandGlowRenderPower"
+                visible: SettingsData.hyprlandGlowEnabled && HyprlandService.hyprSupports("decoration:glow:enabled")
+                text: I18n.tr("Glow falloff", "Hyprland slider, higher values fade the glow faster")
+                value: SettingsData.hyprlandGlowRenderPower
+                minimum: 1
+                maximum: 4
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandGlowRenderPower", newValue)
+            }
+
+            SettingsToggleSliderRow {
+                tags: ["hyprland", "wobble", "wobbly", "windows", "intensity"]
+                settingKey: "hyprlandWobbleEnabled"
+                valueKeys: ["hyprlandWobbleIntensity"]
+                visible: HyprlandService.hyprSupports("decoration:wobble:enabled")
+                text: I18n.tr("Wobbly windows", "Hyprland toggle, windows flex while moving and resizing")
+                checked: SettingsData.hyprlandWobbleEnabled
+                value: SettingsData.hyprlandWobbleIntensity
+                minimum: 0
+                maximum: 200
+                unit: "%"
+                onToggled: checked => SettingsData.set("hyprlandWobbleEnabled", checked)
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandWobbleIntensity", newValue)
+            }
+
+            SettingsSliderRow {
+                tags: ["hyprland", "wobble", "stiffness", "spring"]
+                settingKey: "hyprlandWobbleStiffness"
+                visible: SettingsData.hyprlandWobbleEnabled && HyprlandService.hyprSupports("decoration:wobble:enabled")
+                text: I18n.tr("Wobble stiffness", "Hyprland slider, higher values settle wobbly windows faster")
+                value: SettingsData.hyprlandWobbleStiffness
+                minimum: 10
+                maximum: 1000
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandWobbleStiffness", newValue)
+            }
+
+            SettingsToggleSliderRow {
+                tags: ["hyprland", "motion", "blur", "samples", "move", "resize"]
+                settingKey: "hyprlandMotionBlurEnabled"
+                valueKeys: ["hyprlandMotionBlurSamples"]
+                visible: HyprlandService.hyprSupports("decoration:motion_blur:enabled")
+                text: I18n.tr("Motion blur", "Hyprland toggle, blur windows while they move or resize")
+                description: I18n.tr("More samples look smoother and cost more GPU", "Hyprland motion blur sample count description")
+                checked: SettingsData.hyprlandMotionBlurEnabled
+                value: SettingsData.hyprlandMotionBlurSamples
+                minimum: 1
+                maximum: 64
+                onToggled: checked => SettingsData.set("hyprlandMotionBlurEnabled", checked)
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandMotionBlurSamples", newValue)
+            }
+        }
+
+        SettingsCard {
+            width: parent.width
+            tags: ["hyprland", "group", "groupbar", "tabs"]
+            title: I18n.tr("Window groups", "Hyprland settings card title, tabbed window groups")
+            settingKey: "hyprlandGroupbar"
+            iconName: "tab"
+            visible: CompositorService.isHyprland
+
+            SettingsToggleRow {
+                tags: ["hyprland", "groupbar", "blur"]
+                settingKey: "hyprlandGroupbarBlur"
+                text: I18n.tr("Background blur")
+                checked: SettingsData.hyprlandGroupbarBlur
+                onToggled: checked => SettingsData.set("hyprlandGroupbarBlur", checked)
+            }
+
+            SettingsSliderRow {
+                tags: ["hyprland", "groupbar", "text", "padding", "text_padding"]
+                settingKey: "hyprlandGroupbarTextPadding"
+                text: I18n.tr("Title padding", "Hyprland groupbar slider, horizontal padding around tab titles")
+                value: SettingsData.hyprlandGroupbarTextPadding
+                minimum: 0
+                maximum: 22
+                unit: "px"
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandGroupbarTextPadding", newValue)
+            }
+
+            SettingsToggleRow {
+                tags: ["hyprland", "groupbar", "middle", "click", "close"]
+                settingKey: "hyprlandGroupbarMiddleClickClose"
+                text: I18n.tr("Middle click closes", "Hyprland groupbar toggle, middle clicking a tab closes that window")
+                checked: SettingsData.hyprlandGroupbarMiddleClickClose
+                onToggled: checked => SettingsData.set("hyprlandGroupbarMiddleClickClose", checked)
+            }
+
+            SettingsToggleRow {
+                tags: ["hyprland", "groupbar", "single", "hide", "disable_when_only"]
+                settingKey: "hyprlandGroupbarDisableWhenOnly"
+                visible: HyprlandService.hyprSupports("group:groupbar:disable_when_only")
+                text: I18n.tr("Hide with one window", "Hyprland groupbar toggle, no tab bar when the group holds a single window")
+                checked: SettingsData.hyprlandGroupbarDisableWhenOnly
+                onToggled: checked => SettingsData.set("hyprlandGroupbarDisableWhenOnly", checked)
             }
         }
 
@@ -540,7 +774,6 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
             SettingsToggleSliderRow {
                 tags: ["mangowc", "mango", "border", "override", "borderpx"]
                 settingKey: "mangoLayoutBorderSizeEnabled"
-                resetKeys: ["mangoLayoutBorderSize"]
                 text: I18n.tr("Override border size")
                 checked: SettingsData.mangoLayoutBorderSize >= 0
                 value: Math.max(0, SettingsData.mangoLayoutBorderSize)

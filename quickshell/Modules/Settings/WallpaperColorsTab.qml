@@ -2,7 +2,9 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import qs.Common
+import qs.Modals.Common
 import qs.Modals.FileBrowser
 import qs.Services
 import qs.DCommon.Widgets
@@ -27,7 +29,9 @@ Column {
     }
     readonly property var materialTarget: SessionData.materialWallpaperTarget(selectedScreen)
     readonly property var materialEntry: SessionData.materialWallpaperEntry(materialTarget)
+    readonly property string materialPreset: Art.resolvePreset(materialEntry.preset, SessionData.materialWallpaperProfiles)
     readonly property bool materialWallpaper: currentWallpaper === ""
+    readonly property string pendingWallpaperInstall: PopoutService.pendingWallpaperInstall
     readonly property bool dynamicTheme: Theme.currentTheme === Theme.dynamic
     readonly property var selectedDisplay: Quickshell.screens.find(screen => screen.name === selectedScreen) ?? Quickshell.screens[0]
     readonly property real displayAspectRatio: selectedDisplay ? selectedDisplay.width / selectedDisplay.height : Art.designWidth / Art.designHeight
@@ -128,6 +132,59 @@ Column {
 
     function clearWallpaper() {
         SessionData.setMaterialWallpaper(materialTarget, materialEntry);
+    }
+
+    onPendingWallpaperInstallChanged: Qt.callLater(offerPendingInstall)
+
+    function offerPendingInstall() {
+        const payload = PopoutService.pendingWallpaperInstall;
+        if (!payload)
+            return;
+        PopoutService.pendingWallpaperInstall = "";
+        const layout = Art.parseInstallPayload(payload);
+        if (!layout) {
+            ToastService.showError(I18n.tr("Invalid wallpaper layout", "material wallpaper import error"));
+            return;
+        }
+        const name = layout.name || Art.profileId("", SessionData.materialWallpaperProfiles);
+        profileConfirm.showWithOptions({
+            "title": I18n.tr("Install wallpaper", "material wallpaper install dialog title"),
+            "message": I18n.tr("Install wallpaper '%1'?", "material wallpaper install confirmation").arg(name),
+            "confirmText": I18n.tr("Install", "install action button"),
+            "cancelText": I18n.tr("Cancel"),
+            "onConfirm": () => root.installLayout(layout, "")
+        });
+    }
+
+    function installLayout(layout, fallbackName) {
+        const id = SessionData.addMaterialWallpaperProfile(layout, fallbackName);
+        if (!id) {
+            ToastService.showError(I18n.tr("Invalid wallpaper layout", "material wallpaper import error"));
+            return;
+        }
+        SessionData.setMaterialWallpaperPreset(materialTarget, id);
+    }
+
+    function importLayoutFile(path) {
+        layoutFile.path = "";
+        layoutFile.path = path;
+    }
+
+    function openLayoutBrowser() {
+        layoutBrowserLoader.active = true;
+        if (layoutBrowserLoader.item)
+            layoutBrowserLoader.item.open();
+    }
+
+    function confirmRemoveProfile(id, label) {
+        profileConfirm.showWithOptions({
+            "title": I18n.tr("Delete"),
+            "message": I18n.tr("Delete wallpaper '%1'?", "material wallpaper delete confirmation").arg(label),
+            "confirmText": I18n.tr("Delete"),
+            "cancelText": I18n.tr("Cancel"),
+            "confirmColor": Theme.error,
+            "onConfirm": () => SessionData.removeMaterialWallpaperProfile(id)
+        });
     }
 
     function selectSeed(seed) {
@@ -311,13 +368,22 @@ Column {
             visible: root.materialWallpaper
             title: I18n.tr("Material", "wallpaper type")
             subtitle: I18n.tr("Shown while no image or color is set", "Material wallpaper presets description")
-            modified: root.materialEntry.preset !== Art.defaultPreset
+            modified: root.materialPreset !== Art.defaultPreset
             onResetRequested: SessionData.setMaterialWallpaperPreset(root.materialTarget, Art.defaultPreset)
             body: MaterialWallpaperPresets {
-                preset: root.materialEntry.preset
+                preset: root.materialPreset
                 seed: root.materialEntry.seed
                 aspectRatio: root.displayAspectRatio
                 onSelected: preset => SessionData.setMaterialWallpaperPreset(root.materialTarget, preset)
+                onRemoveRequested: (preset, label) => root.confirmRemoveProfile(preset, label)
+                onImportRequested: root.openLayoutBrowser()
+            }
+
+            DButton {
+                visible: Art.hiddenBuiltins(SessionData.materialWallpaperProfiles).length > 0
+                text: I18n.tr("Restore")
+                iconName: "restore"
+                onClicked: SessionData.restoreMaterialWallpaperProfiles()
             }
         }
 
@@ -1012,6 +1078,37 @@ Column {
             description: I18n.tr("Layer namespace dms:blurwallpaper, needs a niri blur rule")
             checked: SettingsData.blurredWallpaperLayer
             onToggled: checked => SettingsData.set("blurredWallpaperLayer", checked)
+        }
+    }
+
+    ConfirmModal {
+        id: profileConfirm
+    }
+
+    FileView {
+        id: layoutFile
+        blockLoading: false
+        onLoaded: {
+            try {
+                root.installLayout(JSON.parse(text()), Paths.strip(path).split("/").pop().replace(/\.json$/i, ""));
+            } catch (error) {
+                ToastService.showError(I18n.tr("Invalid JSON format: %1", "custom theme file error toast, %1 is the error message").arg(error.message));
+            }
+        }
+        onLoadFailed: error => ToastService.showError(I18n.tr("Invalid wallpaper layout", "material wallpaper import error"))
+    }
+
+    LazyLoader {
+        id: layoutBrowserLoader
+        active: false
+
+        FileBrowserModal {
+            parentModal: root.parentModal
+            browserTitle: I18n.tr("Import")
+            bucket: "wallpaper"
+            showHiddenFiles: true
+            filters: ["*.json"]
+            onAccepted: paths => root.importLayoutFile(paths[0])
         }
     }
 

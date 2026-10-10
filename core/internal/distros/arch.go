@@ -105,6 +105,7 @@ func (a *ArchDistribution) DetectDependenciesWithTerminal(ctx context.Context, w
 	// Hyprland-specific tools
 	if wm == deps.WindowManagerHyprland {
 		dependencies = append(dependencies, a.detectHyprlandTools()...)
+		dependencies = append(dependencies, a.detectHyprlandGuiutils())
 	}
 
 	// Niri-specific tools
@@ -232,6 +233,7 @@ func (a *ArchDistribution) GetPackageMappingWithVariants(wm deps.WindowManager, 
 		packages["hyprland"] = a.getHyprlandMapping(variants["hyprland"])
 		packages["hyprctl"] = a.getHyprlandMapping(variants["hyprland"])
 		packages["jq"] = PackageMapping{Name: "jq", Repository: RepoTypeSystem}
+		packages["hyprland-guiutils"] = PackageMapping{Name: "hyprland-guiutils", Repository: RepoTypeSystem}
 	case deps.WindowManagerNiri:
 		packages["niri"] = a.getNiriMapping(variants["niri"])
 		packages["xwayland-satellite"] = PackageMapping{Name: "xwayland-satellite", Repository: RepoTypeSystem}

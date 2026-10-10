@@ -178,6 +178,9 @@ Item {
             root.focusAfterNavigation(keyboard);
             return;
         }
+        const islandBar = SettingsSearchService.islandBarFor(result.conditionKey, SettingsUiState.selectedBarId);
+        if (islandBar)
+            SettingsUiState.selectedBarId = islandBar.id;
         if (result.section)
             SettingsSearchService.navigateToSection(result.section);
         const page = result.page || SettingsTabs.pageForTabIndex(result.tabIndex);
@@ -200,16 +203,8 @@ Item {
         if (!result || !contentItem)
             return;
 
-        const mapped = result.mapToItem(contentItem, 0, 0);
-        const margin = Theme.spacingS;
-        const top = mapped.y;
-        const bottom = top + result.height;
-        const maxContentY = Math.max(0, sidebarFlickable.contentHeight - sidebarFlickable.height);
-        if (top < sidebarFlickable.contentY + margin) {
-            sidebarFlickable.contentY = Math.max(0, top - margin);
-        } else if (bottom > sidebarFlickable.contentY + sidebarFlickable.height - margin) {
-            sidebarFlickable.contentY = Math.min(maxContentY, bottom - sidebarFlickable.height + margin);
-        }
+        const top = result.mapToItem(contentItem, 0, 0).y;
+        sidebarFlickable.revealRange(top - Theme.spacingS, top + result.height + Theme.spacingS);
     }
 
     implicitWidth: SettingsMetrics.sidebarWidth
@@ -322,10 +317,10 @@ Item {
             id: avatarButton
 
             anchors.right: parent.right
-            anchors.rightMargin: Theme.spacingXS
+            anchors.rightMargin: (SettingsMetrics.searchBarHeight - buttonSize) / 2
             anchors.verticalCenter: parent.verticalCenter
             visible: !root.searchActive
-            buttonSize: SettingsMetrics.searchBarHeight - Theme.spacingXS * 2
+            buttonSize: Theme.avatarSize
             radius: Theme.buttonRadius(width, height, buttonSize, false, circular)
             focusPolicy: Qt.TabFocus
             tooltipText: I18n.tr("Users & accounts", "settings sidebar category")
@@ -356,6 +351,7 @@ Item {
         anchors.topMargin: SettingsMetrics.searchBarGap
         clip: true
         contentHeight: sidebarColumn.height
+        fadeSideInset: SettingsMetrics.paneMargin
 
         Column {
             id: sidebarColumn
@@ -393,7 +389,10 @@ Item {
                         hint: modelData.category
                         accent: SettingsTabs.accentFor(modelData.page || SettingsTabs.pageForTabIndex(modelData.tabIndex))
                         active: root.searchSelectedIndex === index
-                        onClicked: keyboard => root.selectSearchResult(modelData, keyboard)
+                        onClicked: keyboard => {
+                            root.searchSelectedIndex = index;
+                            root.selectSearchResult(modelData, keyboard);
+                        }
                     }
                 }
 

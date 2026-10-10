@@ -56,9 +56,10 @@ QtObject {
     property bool dotMode: false
     // Hosted in a bar: the sheet is flush with the band, so its near corners stay square.
     property bool embedded: false
+    property bool notch: false
     property real dotSize: 48
     property real compactThickness: 38
-    property string batteryStyle: "solid"
+    property string batteryStyle: "duo"
     property bool mediaClockVisible: true
     property int transientTimeout: 2200
     property int notificationTimeout: 5000
@@ -382,8 +383,11 @@ QtObject {
     function sheetRadii() {
         if (root.freeMode)
             return [root.cornerRadius, root.cornerRadius, root.cornerRadius, root.cornerRadius];
-        const near = root.embedded ? 0 : root.edgeCornerRadius;
-        const far = root.cornerRadius;
+        return root.edgeRadii(root.embedded || root.notch ? 0 : root.edgeCornerRadius, root.cornerRadius);
+    }
+
+    // [topLeft, topRight, bottomLeft, bottomRight] with `near` on the corners touching the edge.
+    function edgeRadii(near, far) {
         switch (root.edge) {
         case "bottom":
             return [far, far, near, near];
@@ -397,15 +401,16 @@ QtObject {
 
     function pillTarget(alongSize, crossSize) {
         const radius = Math.min(crossSize / 2, root.pillRadius);
+        const radii = root.edgeRadii(root.notch ? 0 : radius, radius);
         return {
             "width": root.isVertical ? crossSize : alongSize,
             "height": root.isVertical ? alongSize : crossSize,
             "offsetAlong": root.alongOffset,
             "offsetCross": root.outerGap,
-            "topLeftRadius": radius,
-            "topRightRadius": radius,
-            "bottomLeftRadius": radius,
-            "bottomRightRadius": radius
+            "topLeftRadius": radii[0],
+            "topRightRadius": radii[1],
+            "bottomLeftRadius": radii[2],
+            "bottomRightRadius": radii[3]
         };
     }
 

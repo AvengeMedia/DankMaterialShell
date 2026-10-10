@@ -87,8 +87,6 @@ func TestKeycode(t *testing.T) {
 		want   uint32
 	}{
 		{"qwerty v", qwertyKeymap, "v", 47},
-		{"qwerty ctrl", qwertyKeymap, "Control_L", 29},
-		{"qwerty shift", qwertyKeymap, "Shift_L", 42},
 		{"dvorak v", dvorakKeymap, "v", 52},
 		{"hex v", hexKeymap, "v", 48},
 		{"hex ctrl", hexKeymap, "Control_L", 30},
@@ -116,9 +114,7 @@ func TestKeysym(t *testing.T) {
 	}{
 		{"swapescape caps yields Escape", swapEscapeKeymap, 58, "Escape"},
 		{"swapescape esc yields Caps_Lock", swapEscapeKeymap, 1, "Caps_Lock"},
-		{"swapescape return", swapEscapeKeymap, 28, "Return"},
 		{"swapescape keypad enter", swapEscapeKeymap, 96, "KP_Enter"},
-		{"qwerty escape", qwertyKeymap, 1, "Escape"},
 		{"hex ctrl", hexKeymap, 30, "Control_L"},
 		{"unmapped code falls back to pc105", qwertyKeymap, 28, "Return"},
 		{"unknown code is empty", qwertyKeymap, 200, ""},

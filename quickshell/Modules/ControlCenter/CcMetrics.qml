@@ -53,6 +53,7 @@ Singleton {
     readonly property real iconBoxActiveRadius: Theme.cornerRadiusL
     readonly property real iconBoxIconSize: Theme.iconSize * iconScale
     readonly property real tallMeterThickness: 28
+    readonly property real pillMeterThickness: Math.round(18 * iconScale)
     readonly property real tileTextGap: Theme.spacingM
     readonly property real footerHeight: iconBoxSize
     readonly property real footerGap: Theme.spacingS
@@ -120,6 +121,10 @@ Singleton {
     readonly property color tileInactiveContent: Theme.surfaceText
     readonly property color tileInactiveSubtitle: Theme.surfaceVariantText
     readonly property color tileInactiveIcon: Theme.primary
+    readonly property color bareActiveIcon: Theme.primary
+    readonly property real quickBarePadding: Theme.spacingL
+    readonly property real quickBareWidth: iconBoxIconSize + quickBarePadding
+    readonly property real quickTileGap: Theme.spacingXS
 
     readonly property bool animationsEnabled: !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
 

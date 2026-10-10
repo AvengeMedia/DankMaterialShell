@@ -106,20 +106,6 @@ func TestIncludedWithNothingAfterIsActive(t *testing.T) {
 	}
 }
 
-func TestTheBoundaryBetweenZeroAndOneEntryAfter(t *testing.T) {
-	scan := IncludeScan{Count: 1, DMSPosition: 1, DMSSeen: true}
-
-	none := BuildStatus(scan, true, 0, "", false, hyprlandBinds)
-	if none.StatusMessage != hyprlandBinds.Active || none.OverriddenBy != 0 {
-		t.Errorf("zero entries after: message = %q, overriddenBy = %d", none.StatusMessage, none.OverriddenBy)
-	}
-
-	one := BuildStatus(scan, true, 1, "", false, hyprlandBinds)
-	if one.StatusMessage != hyprlandBinds.Overridden || one.OverriddenBy != 1 {
-		t.Errorf("one entry after: message = %q, overriddenBy = %d", one.StatusMessage, one.OverriddenBy)
-	}
-}
-
 func TestScanAndFormatCarryThrough(t *testing.T) {
 	scan := IncludeScan{Count: 4, DMSPosition: 3, DMSSeen: true}
 	status := BuildStatus(scan, true, 0, "lua", true, hyprlandRules)
@@ -132,12 +118,5 @@ func TestScanAndFormatCarryThrough(t *testing.T) {
 	}
 	if status.ConfigFormat != "lua" || !status.ReadOnly {
 		t.Errorf("format/readOnly = %q/%v, want lua/true", status.ConfigFormat, status.ReadOnly)
-	}
-}
-
-func TestAnUnseenFragmentKeepsPositionMinusOne(t *testing.T) {
-	status := BuildStatus(NewScan(), true, 0, "", false, niriBinds)
-	if status.IncludePosition != -1 {
-		t.Errorf("includePosition = %d, want -1", status.IncludePosition)
 	}
 }

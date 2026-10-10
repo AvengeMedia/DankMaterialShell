@@ -108,9 +108,10 @@ function measure(sections, hidden, options) {
         }
     };
     const collisions = new Set();
+    const reserve = options.reserve;
     for (const name of names) {
         const interval = intervals[name];
-        if (interval.size > 0 && (interval.start < min || interval.end > max))
+        if (interval.size > 0 && (interval.start < min || interval.end > max || (reserve && interval.start < reserve.end && interval.end > reserve.start)))
             collisions.add(name);
     }
     const live = names.filter(name => intervals[name].size > 0);

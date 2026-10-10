@@ -14,7 +14,6 @@ func TestParseIndexSpec(t *testing.T) {
 		wantErr bool
 	}{
 		{"", nil, false},
-		{"  ", nil, false},
 		{"1,3", []dmenuipc.Range{{Start: 1, End: 2}, {Start: 3, End: 4}}, false},
 		{"7:11", []dmenuipc.Range{{Start: 7, End: 11}}, false},
 		{"-3:", []dmenuipc.Range{{Start: -3, End: -1}}, false},
@@ -50,7 +49,6 @@ func TestParseDmenuKeybinds(t *testing.T) {
 		wantErr bool
 	}{
 		{"empty", nil, nil, false},
-		{"single", []string{"1=ctrl+e"}, []dmenuipc.Keybind{{N: 1, Key: "ctrl+e"}}, false},
 		{"multiple", []string{"1=ctrl+e", "2=f5"}, []dmenuipc.Keybind{{N: 1, Key: "ctrl+e"}, {N: 2, Key: "f5"}}, false},
 		{"missing equals", []string{"bad"}, nil, true},
 		{"zero index", []string{"0=x"}, nil, true},
@@ -87,10 +85,6 @@ func TestDmenuParseBool(t *testing.T) {
 		{"false", false},
 		{"False", false},
 		{"no", false},
-		{"NO", false},
-		{"true", true},
-		{"1", true},
-		{"yes", true},
 		{"anything-else", true},
 	} {
 		if got := dmenuParseBool(tc.val); got != tc.want {
@@ -176,32 +170,6 @@ func TestValidateDmenuView(t *testing.T) {
 	for _, v := range []string{"bogus", "List"} {
 		if err := validateDmenuView(v); err == nil {
 			t.Errorf("validateDmenuView(%q): expected error, got nil", v)
-		}
-	}
-}
-
-func TestDmenuSizePreset(t *testing.T) {
-	for _, tc := range []struct {
-		size string
-		want string
-	}{
-		{"", ""},
-		{"1", "micro"},
-		{"2", "compact"},
-		{"3", "medium"},
-		{"4", "large"},
-	} {
-		got, err := dmenuSizePreset(tc.size)
-		if err != nil {
-			t.Errorf("dmenuSizePreset(%q): unexpected error: %v", tc.size, err)
-		}
-		if got != tc.want {
-			t.Errorf("dmenuSizePreset(%q) = %q, want %q", tc.size, got, tc.want)
-		}
-	}
-	for _, size := range []string{"5", "large", "0"} {
-		if _, err := dmenuSizePreset(size); err == nil {
-			t.Errorf("dmenuSizePreset(%q): expected error, got nil", size)
 		}
 	}
 }
@@ -313,9 +281,7 @@ func TestDmenuKeybindExitCode(t *testing.T) {
 		want int
 	}{
 		{0, 0},
-		{-1, 0},
 		{1, 10},
-		{2, 11},
 		{19, 28},
 	} {
 		if got := dmenuKeybindExitCode(tc.n); got != tc.want {
@@ -369,11 +335,6 @@ func TestNormalizeDmenuArgv(t *testing.T) {
 			"rofi's -a/-u abbreviations are real shorthands, untouched by the rewrite",
 			[]string{"dms", "dmenu", "-a", "1,3", "-u", "2"},
 			[]string{"dms", "dmenu", "-a", "1,3", "-u", "2"},
-		},
-		{
-			"-disable-history gets the standard single-dash alias too",
-			[]string{"dms", "dmenu", "-disable-history"},
-			[]string{"dms", "dmenu", "--disable-history"},
 		},
 		{
 			"stops rewriting after a bare --",

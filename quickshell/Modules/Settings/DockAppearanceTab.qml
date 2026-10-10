@@ -80,8 +80,6 @@ Item {
             iconName: "zoom_in"
             settingKey: "dockMagnification"
             tags: ["dock", "zoom", "magnification", "hover", "scale", "fisheye"]
-            resetStore: dock
-            resetKeys: ["magnification"]
             title: I18n.tr("Magnification", "dock setting: enlarge icons near the cursor")
             checked: dock.config?.magnification ?? false
             onToggled: checked => dock.setOption("magnification", checked)
@@ -131,8 +129,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "dockMagnificationExpand"
                 tags: ["dock", "zoom", "magnification", "expand", "displace", "shift"]
-                resetStore: dock
-                resetKeys: ["magnificationExpand"]
                 text: I18n.tr("Push neighboring icons", "dock setting: shift adjacent icons and expand dock to avoid overlap")
                 checked: dock.config?.magnificationExpand ?? false
                 onToggled: checked => dock.setOption("magnificationExpand", checked)
@@ -153,8 +149,6 @@ Item {
             iconName: "border_style"
             settingKey: "dockBorder"
             tags: ["dock", "border", "outline"]
-            resetStore: dock
-            resetKeys: ["borderEnabled"]
             title: I18n.tr("Border")
             checked: dock.config?.borderEnabled ?? false
             onToggled: checked => dock.setOption("borderEnabled", checked)

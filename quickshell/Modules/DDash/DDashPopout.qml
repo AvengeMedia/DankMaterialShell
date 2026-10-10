@@ -377,12 +377,7 @@ DPopout {
                 if (!ancestor)
                     return;
                 const point = item.mapToItem(pages.contentItem, 0, 0);
-                let target = pages.contentY;
-                if (point.y < target)
-                    target = point.y;
-                else if (point.y + item.height > target + pages.height)
-                    target = Math.min(point.y, point.y + item.height - pages.height);
-                pages.contentY = Math.max(0, Math.min(target, pages.contentHeight - pages.height));
+                pages.revealRange(point.y, point.y + item.height);
             }
 
             readonly property Item windowFocusItem: Window.activeFocusItem

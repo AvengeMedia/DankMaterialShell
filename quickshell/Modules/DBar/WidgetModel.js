@@ -24,7 +24,7 @@ var componentNames = {
     "runningApps": "runningAppsComponent",
     "clock": "clockComponent",
     "music": "mediaComponent",
-    "mediaActivity": "mediaActivityComponent",
+    "music:activity": "mediaActivityComponent",
     "weather": "weatherComponent",
     "systemTray": "systemTrayComponent",
     "privacyIndicator": "privacyIndicatorComponent",

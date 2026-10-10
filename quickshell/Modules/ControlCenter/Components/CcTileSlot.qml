@@ -20,6 +20,7 @@ DEditableGridSlot {
     readonly property real smallSpanLimit: (1 + CcMetrics.smallRowFraction) / 2
 
     passthrough: tileItem?.passthrough ?? null
+    z: dragging || resizing || (tileItem?.memberDragging ?? false) ? 1 : 0
 
     function reanchor(small) {
         const shift = ((small ? CcMetrics.smallRowFraction : 1) - smallSpanLimit) * grid.cellWidth;

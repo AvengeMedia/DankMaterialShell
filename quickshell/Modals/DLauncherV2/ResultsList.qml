@@ -222,15 +222,7 @@ Item {
         if (rowIndex === undefined)
             return;
 
-        mainListView.positionViewAtIndex(rowIndex, ListView.Contain);
-
-        if (stickyHeader.visible && rowIndex < _cumulativeHeights.length) {
-            var rowY = _cumulativeHeights[rowIndex];
-            var scrollY = mainListView.contentY - mainListView.originY;
-            if (rowY < scrollY + stickyHeader.height) {
-                mainListView.contentY = Math.max(mainListView.originY, rowY - stickyHeader.height + mainListView.originY);
-            }
-        }
+        mainListView.revealIndex(rowIndex);
     }
 
     function getSelectedItemPosition() {
@@ -295,6 +287,7 @@ Item {
             y: -listClip.anchors.topMargin
             width: parent.width
             height: parent.height + listClip.anchors.topMargin
+            fadeTopInset: listClip.anchors.topMargin
             clip: true
             scrollBarTopMargin: (root.controller?.sections?.length > 0) ? LauncherMetrics.sectionBand : 0
 
@@ -302,11 +295,6 @@ Item {
                 values: root._visualRows
                 objectProp: "_rowId"
             }
-
-            add: ListViewTransitions.add
-            remove: ListViewTransitions.remove
-            displaced: null
-            move: null
 
             currentIndex: root._flatIndexToRowMap[root.controller?.selectedFlatIndex] ?? -1
             highlightFollowsCurrentItem: false
@@ -335,6 +323,8 @@ Item {
                 z: 1
                 width: mainListView.width
                 height: modelData?.height ?? LauncherMetrics.rowHeight
+
+                Component.onCompleted: mainListView.fadeIn(delegateRoot, index)
 
                 Loader {
                     active: delegateRoot.rowType === "list_item"

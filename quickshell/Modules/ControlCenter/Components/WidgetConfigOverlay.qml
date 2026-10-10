@@ -31,6 +31,15 @@ Item {
     readonly property bool isDisk: widgetId === "diskUsage"
     readonly property bool isIdleInhibitor: widgetId === "idleInhibitor"
     readonly property bool isUser: widgetId === "user"
+    readonly property bool isGroup: widgetId === WidgetUtils.GROUP_ID
+    // Grouped tiles have no menu of their own, so the group's menu styles its battery.
+    readonly property int batteryIndex: {
+        if (widgetId === "battery")
+            return widgetIndex;
+        if (!isGroup)
+            return -1;
+        return WidgetUtils.groupMembers(SettingsData.controlCenterWidgets || [], widgetData.instanceId).find(member => member.widget.id === "battery")?.index ?? -1;
+    }
 
     visible: widgetIndex >= 0 || contextMenu.renderActive
 
@@ -101,10 +110,30 @@ Item {
                 }
 
                 CcToggleRow {
-                    visible: root.isUser
+                    visible: root.isUser || root.isGroup
                     text: I18n.tr("Background")
-                    checked: root.widgetData?.background === true
+                    checked: root.isUser ? root.widgetData?.background === true : root.widgetData?.background !== false
                     onToggled: checked => root.persistOption("background", checked)
+                }
+
+                CcListRow {
+                    visible: root.batteryIndex >= 0
+                    iconName: "battery_std"
+                    title: I18n.tr("Battery style")
+                    body: DDropdown {
+                        readonly property var labels: [I18n.tr("Icon", "battery widget: system battery glyph"), I18n.tr("Solid", "island settings: filled battery meter style"), I18n.tr("Outline", "island settings: outlined battery meter style"), I18n.tr("Circle", "island settings: circular battery meter style"), I18n.tr("Duo", "battery meter style: open battery arc around the network glyph")]
+
+                        compactMode: true
+                        dropdownWidth: parent.width
+                        transientSurfaceTracker: contextMenu.transientSurfaceTracker
+                        currentValue: labels[Math.max(0, WidgetUtils.BATTERY_STYLES.indexOf(SettingsData.controlCenterWidgets[root.batteryIndex]?.batteryStyle ?? "icon"))]
+                        options: labels
+                        onValueChanged: value => {
+                            const style = WidgetUtils.BATTERY_STYLES[labels.indexOf(value)];
+                            if (style)
+                                WidgetUtils.setOption(root.batteryIndex, "batteryStyle", style);
+                        }
+                    }
                 }
 
                 Repeater {

@@ -26,7 +26,7 @@ Item {
 
         SettingsCard {
             width: parent.width
-            visible: CompositorService.isNiri
+            visible: CompositorService.supportsInputConfig
             tags: ["mouse", "input", "sensitivity", "acceleration", "pointer"]
             title: I18n.tr("Mouse", "mouse input settings card title")
             settingKey: "mouseSettings"
@@ -113,6 +113,7 @@ Item {
             }
 
             SettingsToggleRow {
+                visible: CompositorService.isNiri || CompositorService.isMango
                 tags: ["mouse", "middle", "click", "emulation"]
                 settingKey: "mouseMiddleEmulation"
                 text: I18n.tr("Middle click emulation")
@@ -123,24 +124,7 @@ Item {
 
         SettingsCard {
             width: parent.width
-            visible: CompositorService.isMango
-            tags: ["touchpad", "trackpad", "natural", "scrolling", "invert"]
-            title: I18n.tr("Touchpad")
-            settingKey: "mangoTouchpadSettings"
-            iconName: "trackpad_input_2"
-
-            SettingsToggleRow {
-                tags: ["touchpad", "trackpad", "natural", "scrolling", "invert"]
-                settingKey: "mangoTrackpadNaturalScrolling"
-                text: I18n.tr("Natural scrolling")
-                checked: SettingsData.mangoTrackpadNaturalScrolling
-                onToggled: checked => SettingsData.set("mangoTrackpadNaturalScrolling", checked)
-            }
-        }
-
-        SettingsCard {
-            width: parent.width
-            visible: CompositorService.isNiri
+            visible: CompositorService.supportsInputConfig
             tags: ["touchpad", "input", "sensitivity", "tap", "click", "natural"]
             title: I18n.tr("Touchpad", "touchpad input settings card title")
             settingKey: "touchpadSettings"
@@ -269,6 +253,7 @@ Item {
             }
 
             SettingsToggleRow {
+                visible: CompositorService.isNiri || CompositorService.isMango
                 tags: ["touchpad", "disable", "external", "mouse"]
                 settingKey: "touchpadDisableOnExternalMouse"
                 text: I18n.tr("Disable with external mouse")

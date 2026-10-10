@@ -242,7 +242,7 @@ Item {
                 if (index < 0 || index >= count) {
                     return;
                 }
-                positionViewAtIndex(index, ListView.Contain);
+                revealIndex(index);
             }
 
             onCurrentIndexChanged: {

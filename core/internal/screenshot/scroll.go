@@ -74,6 +74,7 @@ type scrollSession struct {
 
 	sigCh     chan os.Signal
 	keysBound bool
+	hyprLua   bool
 
 	st *stitcher
 }
@@ -140,20 +141,7 @@ func (r *RegionSelector) enterScrollPhase(os *OutputSurface, x, y, w, h int) {
 		interval = r.screenshoter.config.IntervalMs
 	}
 
-	capX, capY, capW, capH := x, y, w, h
-	switch DetectCompositor() {
-	case CompositorHyprland, CompositorMango:
-		// both take device pixels, deviating from spec (observed)
-	default:
-		// spec: logical coordinates, scaled by the compositor
-		// https://wayland.app/protocols/wlr-screencopy-unstable-v1#zwlr_screencopy_manager_v1:request:capture_output_region
-		if scale := os.output.fractionalScale; scale > 1 {
-			capX = int(float64(x)/scale + 0.5)
-			capY = int(float64(y)/scale + 0.5)
-			capW = int(float64(w)/scale + 0.5)
-			capH = int(float64(h)/scale + 0.5)
-		}
-	}
+	capX, capY, capW, capH := scrollCaptureRect(DetectCompositor(), os.output.fractionalScale, x, y, w, h)
 
 	r.scroll = &scrollSession{
 		output:   os.output,
@@ -186,6 +174,17 @@ func (r *RegionSelector) enterScrollPhase(os *OutputSurface, x, y, w, h int) {
 	for _, surf := range r.surfaces {
 		r.redrawSurface(surf)
 	}
+}
+
+func scrollCaptureRect(comp Compositor, scale float64, x, y, w, h int) (int, int, int, int) {
+	// mango takes device pixels, deviating from spec (observed); Hyprland scales the box itself, so it stays on the spec path
+	if comp == CompositorMango || scale <= 1 {
+		return x, y, w, h
+	}
+	// spec: logical coordinates, scaled by the compositor
+	// https://wayland.app/protocols/wlr-screencopy-unstable-v1#zwlr_screencopy_manager_v1:request:capture_output_region
+	return int(float64(x)/scale + 0.5), int(float64(y)/scale + 0.5),
+		int(float64(w)/scale + 0.5), int(float64(h)/scale + 0.5)
 }
 
 // sized for the worst-case counter so the input region is set once
@@ -358,14 +357,28 @@ func (r *RegionSelector) enterHyprlandScrollInput(osurf *OutputSurface) {
 	}
 	cx := int(float64(osurf.output.x) + float64(s.holeX+s.holeW/2)/scale)
 	cy := int(float64(osurf.output.y) + float64(s.holeY+s.holeH/2)/scale)
-	hyprlandFocusWindowAt(cx, cy)
+	s.hyprLua = hyprlandLuaConfigActive()
+	hyprlandFocusWindowAt(s.hyprLua, cx, cy)
 
 	s.sigCh = make(chan os.Signal, 2)
 	signal.Notify(s.sigCh, unix.SIGUSR1, unix.SIGUSR2)
-	s.keysBound = hyprlandBindScrollKeys(os.Getpid())
+	s.keysBound = exec.Command("hyprctl", hyprlandBindScrollKeysArgs(s.hyprLua, os.Getpid())...).Run() == nil
 }
 
-func hyprlandFocusWindowAt(x, y int) {
+// `status` exists since 0.55; older builds answer "unknown request" and have no Lua
+func hyprlandLuaConfigActive() bool {
+	out, err := exec.Command("hyprctl", "-j", "status").Output()
+	return err == nil && hyprlandStatusIsLua(out)
+}
+
+func hyprlandStatusIsLua(out []byte) bool {
+	var status struct {
+		ConfigProvider string `json:"configProvider"`
+	}
+	return json.Unmarshal(out, &status) == nil && status.ConfigProvider == "lua"
+}
+
+func hyprlandFocusWindowAt(lua bool, x, y int) {
 	out, err := exec.Command("hyprctl", "-j", "clients").Output()
 	if err != nil {
 		return
@@ -397,16 +410,28 @@ func hyprlandFocusWindowAt(x, y int) {
 	if best < 0 {
 		return
 	}
-	_ = exec.Command("hyprctl", "dispatch", "focuswindow", "address:"+clients[best].Address).Run()
+	_ = exec.Command("hyprctl", hyprlandFocusArgs(lua, clients[best].Address)...).Run()
 }
 
-func hyprlandBindScrollKeys(pid int) bool {
-	batch := fmt.Sprintf("keyword bind ,Return,exec,kill -USR1 %d ; keyword bind ,Escape,exec,kill -USR2 %d", pid, pid)
-	return exec.Command("hyprctl", "--batch", batch).Run() == nil
+func hyprlandFocusArgs(lua bool, address string) []string {
+	if !lua {
+		return []string{"dispatch", "focuswindow", "address:" + address}
+	}
+	return []string{"dispatch", fmt.Sprintf("hl.dsp.focus({ window = %q })", "address:"+address)}
 }
 
-func hyprlandUnbindScrollKeys() {
-	_ = exec.Command("hyprctl", "--batch", "keyword unbind ,Return ; keyword unbind ,Escape").Run()
+func hyprlandBindScrollKeysArgs(lua bool, pid int) []string {
+	if !lua {
+		return []string{"--batch", fmt.Sprintf("keyword bind ,Return,exec,kill -USR1 %d ; keyword bind ,Escape,exec,kill -USR2 %d", pid, pid)}
+	}
+	return []string{"eval", fmt.Sprintf(`hl.bind("Return", hl.dsp.exec_cmd("kill -USR1 %d")); hl.bind("Escape", hl.dsp.exec_cmd("kill -USR2 %d"))`, pid, pid)}
+}
+
+func hyprlandUnbindScrollKeysArgs(lua bool) []string {
+	if !lua {
+		return []string{"--batch", "keyword unbind ,Return ; keyword unbind ,Escape"}
+	}
+	return []string{"eval", `hl.unbind("Return"); hl.unbind("Escape")`}
 }
 
 func (r *RegionSelector) scrollBarHit(x, y float64) string {
@@ -676,7 +701,7 @@ func (r *RegionSelector) cleanupScroll() {
 		return
 	}
 	if s.keysBound {
-		hyprlandUnbindScrollKeys()
+		_ = exec.Command("hyprctl", hyprlandUnbindScrollKeysArgs(s.hyprLua)...).Run()
 	}
 	if s.sigCh != nil {
 		signal.Stop(s.sigCh)

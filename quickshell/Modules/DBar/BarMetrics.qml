@@ -95,6 +95,12 @@ Singleton {
     readonly property real islandMinFace: 16
     readonly property real islandMinBandFace: 20
 
+    function gothRadius(barConfig) {
+        if (barConfig?.gothCornerRadiusOverride ?? false)
+            return Math.max(0, barConfig.gothCornerRadiusValue ?? SettingsData.barConfigDefault("gothCornerRadiusValue"));
+        return Theme.windowRadius;
+    }
+
     function widgetFill(barConfig) {
         const transparency = SettingsData.barWidgetTransparency(barConfig);
         return Theme.widgetBackgroundHasAlpha ? Theme.blendAlpha(Theme.widgetBaseBackgroundColor, transparency) : Theme.withAlpha(Theme.widgetBaseBackgroundColor, transparency);

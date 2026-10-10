@@ -70,6 +70,7 @@ Item {
     readonly property real effectiveCornerRadius: frameOwnsConnectedChrome ? Theme.connectedSurfaceRadius : cornerRadius
     property bool enableShadow: modalHandle.enableShadow
     property alias modalFocusScope: focusScope
+    property Item handleFocusScope: null
     property bool shouldBeVisible: false
     property bool isClosing: false
     property bool shouldHaveFocus: shouldBeVisible
@@ -850,6 +851,7 @@ Item {
                             anchors.fill: parent
                             focus: root.shouldBeVisible
                             clip: false
+                            Keys.forwardTo: root.handleFocusScope ? [root.handleFocusScope, focusScope] : [focusScope]
 
                             Item {
                                 id: directContentWrapper

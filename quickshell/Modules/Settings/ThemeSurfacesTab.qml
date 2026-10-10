@@ -108,7 +108,6 @@ Column {
             tab: "theme"
             tags: ["foreground", "layers", "outline", "border", "opacity", "cards", "pills", "widgets", "notifications", "control center"]
             settingKey: "blurLayerOutline"
-            resetKeys: ["blurLayerOutlineOpacity"]
             text: I18n.tr("Layer outline")
             description: I18n.tr("Faint edge on cards, pills and widgets", "surface layer outline toggle description")
             checked: root.layerOutlineEnabled
@@ -186,14 +185,18 @@ Column {
             }
         }
 
-        SettingsToggleRow {
+        SettingsToggleSliderRow {
             tab: "theme"
-            tags: ["blur", "background", "transparency", "glass", "frosted"]
+            tags: ["blur", "background", "transparency", "glass", "frosted", "strength", "radius", "size", "passes", "reach"]
             settingKey: "blurEnabled"
+            valueKeys: ["blurStrength"]
             text: I18n.tr("Background blur")
-            description: BlurService.available ? "" : I18n.tr("Your compositor does not support background blur (ext-background-effect-v1)")
+            visible: BlurService.available
             checked: SettingsData.blurEnabled ?? false
-            enabled: BlurService.available
+            value: BlurService.strength
+            minimum: 16
+            maximum: 160
+            unit: "px"
             onToggled: checked => {
                 SettingsData.set("blurEnabled", checked);
                 if (!checked || SettingsData.blurBorderSeeded)
@@ -202,13 +205,22 @@ Column {
                 SettingsData.set("blurBorderEnabled", true);
                 SettingsSearchService.navigateToSection("blurBorderEnabled");
             }
+            onSliderValueChanged: newValue => SettingsData.set("blurStrength", newValue)
+        }
+
+        SettingsNoteRow {
+            visible: BlurService.probed && !BlurService.available
+            noteIconName: "info"
+            tint: Theme.surfaceVariantText
+            tintBackground: Theme.surfaceVariantAlpha
+            text: I18n.tr("Your compositor does not support ext-background blur")
         }
 
         SettingsNavRow {
             tab: "theme"
             tags: ["blur", "xray", "compositor", "layout"]
             settingKey: "blurXrayLink"
-            visible: CompositorService.isNiri || CompositorService.isHyprland
+            visible: BlurService.available && (CompositorService.isNiri || CompositorService.isHyprland)
             title: I18n.tr("Xray options are in Compositor → Layout")
             onClicked: keyboard => root.parentModal?.navigateTo("compositor_layout", keyboard)
         }
@@ -280,7 +292,6 @@ Column {
             settingKey: "windowRadius"
             text: I18n.tr("Override window radius", "toggle: stop the window radius following the corner style setting")
             visible: root.windowRadiusKey !== ""
-            resetKeys: root.windowRadiusKey !== "" ? [root.windowRadiusKey] : []
             checked: Theme.compositorRadiusOverride >= 0
             value: Theme.windowRadius
             minimum: 0
@@ -444,7 +455,6 @@ Column {
             maximum: 100
             modified: target?.override ?? false
             valueModified: (target?.transparency ?? 1) !== 1
-            resetByKeys: true
             onResetRequested: root.setOpacityOverride(target, {
                 followInterfaceStyle: true,
                 transparency: 1

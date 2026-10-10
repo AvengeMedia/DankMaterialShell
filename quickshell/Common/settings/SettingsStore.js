@@ -51,7 +51,6 @@ var ISLAND_KEY_MOVES = {
     dankIslandSatelliteBackground: "islandSatelliteBackground",
     dankIslandSatelliteGothCorners: "islandSatelliteGothCorners",
     dankIslandSatelliteTransparency: "islandSatelliteTransparency",
-    dankIslandSatelliteSwoopRadius: "islandSatelliteSwoopRadius",
     dankIslandReducedMotion: "islandReducedMotion",
     dankIslandSpringStiffness: "islandSpringStiffness",
     dankIslandSpringDamping: "islandSpringDamping",
@@ -194,7 +193,7 @@ function parse(root, jsonObj) {
     }
 }
 
-function toJson(root) {
+function toJson(root, setKeys) {
     var SPEC = SpecModule.SPEC;
     var out = {};
     for (var k in SPEC) {
@@ -207,7 +206,7 @@ function toJson(root) {
             value = withoutInstancePositions(value);
         if (k === "builtInPluginSettings")
             value = withoutSessionBackedPluginState(value);
-        if (Util.isDefault(value, SPEC[k].def))
+        if (!setKeys.has(k) && Util.isDefault(value, SPEC[k].def))
             continue;
         out[k] = value;
     }
@@ -518,6 +517,7 @@ function migrateToVersion(obj, targetVersion) {
         for (var dropKey in ISLAND_KEY_MOVES)
             delete settings[dropKey];
         delete settings.dankIslandBarId;
+        delete settings.dankIslandSatelliteSwoopRadius;
 
         settings.configVersion = 18;
     }
@@ -718,7 +718,45 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 38;
     }
 
+    if (currentVersion < 39 && targetVersion >= 39) {
+        migrateIslandReducedMotion(settings);
+        settings.configVersion = 39;
+    }
+
+    if (currentVersion < 40 && targetVersion >= 40) {
+        migrateScrollColumnBehavior(settings);
+        settings.configVersion = 40;
+    }
+
     return settings;
+}
+
+// v40: the niri-only "column" scroll behavior became the compositor-neutral "focusWindow"
+function migrateScrollColumnBehavior(settings) {
+    for (const bar of Array.isArray(settings.barConfigs) ? settings.barConfigs : []) {
+        if (!bar || typeof bar !== "object")
+            continue;
+        for (const key of ["scrollXBehavior", "scrollYBehavior"]) {
+            if (bar[key] === "column")
+                bar[key] = "focusWindow";
+        }
+    }
+}
+
+// v39: the per-island toggle folded into the global reduceMotion; any bar that had it on turns the global one on
+function migrateIslandReducedMotion(settings) {
+    for (const bar of Array.isArray(settings.barConfigs) ? settings.barConfigs : []) {
+        if (!bar || typeof bar !== "object")
+            continue;
+        const holders = [bar];
+        for (const sectionId of ["leftWidgets", "centerWidgets", "rightWidgets"])
+            holders.push(...(Array.isArray(bar[sectionId]) ? bar[sectionId] : []).filter(entry => entry && typeof entry === "object" && entry.id === "island"));
+        for (const holder of holders) {
+            if (holder.islandReducedMotion === true)
+                settings.reduceMotion = true;
+            delete holder.islandReducedMotion;
+        }
+    }
 }
 
 var LOCK_WIDGET_MOVED_KEYS = ["lockScreenShowSystemIcons", "lockScreenShowTime", "lockScreenClockStyle", "lockScreenShowDate", "lockScreenShowPasswordField", "lockScreenShowMediaPlayer", "lockScreenNotificationMode"];

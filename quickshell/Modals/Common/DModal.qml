@@ -63,7 +63,7 @@ Item {
     // Hyprland OnDemand grab delivers keyboard focus to the modal content surface.
     DFocusGrab {
         windows: (root.contentWindow ? [root.contentWindow] : []).concat(root.transientSurfaceTracker?.focusWindows ?? [])
-        wanted: KeyboardFocus.wantsGrab(root.shouldHaveFocus, root.customKeyboardFocus)
+        wanted: KeyboardFocus.wantsGrab(root.shouldBeVisible && root.shouldHaveFocus, root.customKeyboardFocus)
     }
     readonly property var contentWindow: impl.item ? impl.item.contentWindow : null
     readonly property var effectiveScreen: impl.item ? impl.item.effectiveScreen : null
@@ -135,6 +135,7 @@ Item {
 
             modalHandle: root
             connected: root._resolvedConnected
+            handleFocusScope: _modalFocusScope
 
             onShouldBeVisibleChanged: {
                 if (root.shouldBeVisible !== host.shouldBeVisible)

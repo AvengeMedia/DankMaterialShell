@@ -59,7 +59,7 @@ BasePill {
     enableBackgroundHover: false
     enableCursor: false
     // Dock apps sit straight on the dock surface; a widget pill around them would read as a second dock.
-    noBackground: dockHosted || (barConfig?.noBackground ?? false)
+    noBackground: dockHosted || !widgetBackground
 
     content: Component {
         ApplicationStrip {

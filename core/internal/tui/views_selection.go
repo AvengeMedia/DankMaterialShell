@@ -32,6 +32,13 @@ func (m Model) windowManagerChoices() []wmChoice {
 	if m.osInfo == nil || m.osInfo.Distribution.ID != "debian" {
 		choices = append(choices, wmChoice{deps.WindowManagerHyprland, "Hyprland", "Dynamic tiling Wayland compositor."})
 	}
+	if m.osInfo != nil {
+		// No mango package mapping exists for these families; offering it would deploy a config with no compositor.
+		switch distros.Registry[m.osInfo.Distribution.ID].Family {
+		case distros.FamilyDebian, distros.FamilyUbuntu, distros.FamilySUSE:
+			return choices
+		}
+	}
 	return append(choices, wmChoice{deps.WindowManagerMango, "mango", "dwl-based dynamic tiling Wayland compositor."})
 }
 

@@ -61,63 +61,42 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["workspaceIndicatorCompact"]
             tags: ["workspace", "compact", "small", "size", "dense"]
             text: I18n.tr("Compact")
             checked: root.page.value("workspaceIndicatorCompact")
             onToggled: checked => root.page.set("workspaceIndicatorCompact", checked)
         }
 
-        SettingsToggleRow {
-            id: roundnessRow
-
-            readonly property bool overridden: root.page.value("workspaceIndicatorRoundness") >= 0
-
+        SettingsToggleSliderRow {
             resetStore: root.page
-            resetKeys: ["workspaceIndicatorRoundness"]
-            tags: ["workspace", "corner", "radius", "rounded", "square", "circle", "override"]
+            tags: ["workspace", "corner", "radius", "rounded", "square", "circle", "override", "roundness"]
             text: I18n.tr("Override", "verb, toggle to override the global setting for this item")
-            description: I18n.tr("Follows the theme radius strength until overridden", "workspace indicator roundness override description")
-            checked: overridden
+            checked: root.page.value("workspaceIndicatorRoundness") >= 0
+            value: root.indicatorRoundness
+            minimum: 0
+            maximum: 100
+            unit: ""
             onToggled: checked => root.page.set("workspaceIndicatorRoundness", checked ? root.indicatorRoundness : -1)
-
-            body: SettingsSliderRow {
-                width: parent.width
-                enabled: roundnessRow.overridden
-                text: I18n.tr("Roundness", "workspace indicator corner rounding")
-                minimumLabel: I18n.tr("Square")
-                value: root.indicatorRoundness
-                minimum: 0
-                maximum: 100
-                unit: ""
-                onSliderValueChanged: newValue => root.draftRoundness = newValue
-                onSliderDragFinished: finalValue => {
-                    root.page.set("workspaceIndicatorRoundness", finalValue);
-                    root.draftRoundness = -1;
-                }
+            onSliderValueChanged: newValue => root.draftRoundness = newValue
+            onSliderDragFinished: finalValue => {
+                root.page.set("workspaceIndicatorRoundness", finalValue);
+                root.draftRoundness = -1;
             }
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["showWorkspaceIndex"]
             text: I18n.tr("Index numbers")
             checked: root.page.value("showWorkspaceIndex")
             onToggled: checked => root.page.set("showWorkspaceIndex", checked)
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["showWorkspaceName"]
             text: I18n.tr("Names", "toggle to show workspace names")
             checked: root.page.value("showWorkspaceName")
             onToggled: checked => root.page.set("showWorkspaceName", checked)
         }
 
         SettingsToggleCard {
-            resetStore: root.page
-            resetKeys: ["showWorkspaceApps"]
             title: I18n.tr("Show apps")
             visible: CompositorService.supportsWorkspaces
             enabled: !CompositorService.isAqueous || (AqueousService.available && Quickshell.env("DMS_FORCE_EXTWS") !== "1")
@@ -148,8 +127,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["showOccupiedWorkspacesOnly"]
             text: I18n.tr("Show occupied only")
             visible: CompositorService.supportsWorkspaces
             enabled: !CompositorService.isAqueous || (AqueousService.available && Quickshell.env("DMS_FORCE_EXTWS") !== "1")
@@ -158,8 +135,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["showSpecialWorkspaces"]
             text: I18n.tr("Show scratchpads", "workspace switcher toggle, special workspaces as entries")
             description: I18n.tr("Special workspaces appear last; click to show or hide", "workspace switcher show scratchpads toggle description")
             visible: CompositorService.isHyprland
@@ -180,7 +155,6 @@ Column {
 
         SettingsToggleSliderRow {
             resetStore: root.page
-            resetKeys: ["showWorkspacePadding"]
             valueKeys: ["workspacePaddingCount"]
             text: I18n.tr("Minimum workspaces", "workspace switcher slider label")
             description: CompositorService.supportsPersistentWorkspaces ? I18n.tr("Workspaces up to the count are always shown and can be opened", "workspace switcher minimum workspaces description on compositors with persistent workspaces") : I18n.tr("Empty placeholders fill the switcher up to the count", "workspace switcher minimum workspaces description")
@@ -194,8 +168,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["groupWorkspaceApps"]
             enabled: root.showApps
             text: I18n.tr("Group apps")
             checked: root.page.value("groupWorkspaceApps")
@@ -203,8 +175,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["groupActiveWorkspaceApps"]
             enabled: root.showApps && root.page.value("groupWorkspaceApps")
             text: I18n.tr("Group on active workspace")
             checked: root.page.value("groupActiveWorkspaceApps")
@@ -212,8 +182,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["workspaceActiveAppHighlightEnabled"]
             enabled: root.showApps
             text: I18n.tr("Highlight focused app")
             checked: root.page.value("workspaceActiveAppHighlightEnabled")
@@ -221,8 +189,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["workspaceFollowFocus"]
             text: I18n.tr("Follow display focus")
             description: I18n.tr("Lists workspaces from whichever display has focus", "workspace switcher follow display focus toggle description")
             visible: CompositorService.supportsWorkspaceFollowFocus
@@ -231,8 +197,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["reverseScrolling"]
             text: I18n.tr("Reverse scroll direction")
             visible: CompositorService.supportsWorkspaces
             checked: root.page.value("reverseScrolling")
@@ -240,8 +204,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["workspaceDragReorder"]
             text: I18n.tr("Drag to reorder")
             visible: CompositorService.isNiri
             checked: root.page.value("workspaceDragReorder")
@@ -249,8 +211,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["dwlShowAllTags"]
             text: I18n.tr("Show all tags")
             visible: CompositorService.isMango
             checked: root.page.value("dwlShowAllTags")

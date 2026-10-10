@@ -223,7 +223,7 @@ FocusScope {
                             tooltipText: I18n.tr("Ignore package", "tooltip, exclude a package from system updates")
                             onActiveFocusChanged: {
                                 if (activeFocus)
-                                    packagesList.positionViewAtIndex(packageRow.index, ListView.Contain);
+                                    packagesList.revealIndex(packageRow.index);
                             }
                             onClicked: SystemUpdateService.ignorePackage(packageRow.modelData.name)
                         }
@@ -379,7 +379,7 @@ FocusScope {
                         tooltipText: I18n.tr("Stop ignoring %1").arg(ignoredRow.modelData)
                         onActiveFocusChanged: {
                             if (activeFocus)
-                                ignoredList.positionViewAtIndex(ignoredRow.index, ListView.Contain);
+                                ignoredList.revealIndex(ignoredRow.index);
                         }
                         onClicked: SystemUpdateService.unignorePackage(ignoredRow.modelData)
                     }

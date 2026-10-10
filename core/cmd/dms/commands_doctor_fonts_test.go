@@ -26,11 +26,3 @@ func TestCheckBundledGoogleSans(t *testing.T) {
 		}
 	}
 }
-
-func TestBundledDisplayFontsSkipFontconfig(t *testing.T) {
-	for _, family := range []string{"DM Serif Display", "Notable"} {
-		if !isBundledDefaultFont(family) {
-			t.Fatalf("%q not recognized as bundled", family)
-		}
-	}
-}

@@ -18,7 +18,7 @@ Singleton {
             "hint": I18n.tr("Theme, palette, dark mode", "settings sidebar hint for the wallpaper and colors page"),
             "tabIndex": 0,
             "hubHeader": "WallpaperColorsTab",
-            "aliases": ["wallpaper", "theme_cursor_icons"],
+            "aliases": ["wallpaper", "colors", "wallpaper_colors", "theme_cursor_icons"],
             "children": [
                 {
                     "id": "theme",
@@ -64,6 +64,7 @@ Singleton {
         },
         {
             "id": "theme_surfaces",
+            "aliases": ["interface", "interface_style"],
             "text": I18n.tr("Interface style"),
             "icon": "layers",
             "tabIndex": 48,
@@ -82,6 +83,7 @@ Singleton {
         },
         {
             "id": "typography",
+            "aliases": ["fonts", "fonts_motion"],
             "text": I18n.tr("Fonts & motion"),
             "icon": "text_fields",
             "tabIndex": 14,
@@ -93,6 +95,7 @@ Singleton {
         },
         {
             "id": "dankbar",
+            "aliases": ["bar"],
             "text": I18n.tr("Bar"),
             "icon": "toolbar",
             "hint": I18n.tr("Layout, position, appearance", "settings hub hint for the bar pages"),
@@ -133,7 +136,7 @@ Singleton {
             "icon": "widgets",
             "tabIndex": 22,
             "hubHeader": "WidgetsTab",
-            "aliases": ["workspaces", "workspaces_widgets"],
+            "aliases": ["bar_widgets", "workspaces", "workspaces_widgets"],
             "hint": I18n.tr("Add, reorder, configure", "settings sidebar hint for the bar widgets page"),
             "children": [
                 {
@@ -198,7 +201,7 @@ Singleton {
             "text": I18n.tr("Dashboard", "settings page name for the dank dash popout"),
             "icon": "space_dashboard",
             "tabIndex": 43,
-            "aliases": ["dashboards_osd"],
+            "aliases": ["dashboard", "dashboards_osd"],
             "hint": I18n.tr("Tabs and weather")
         },
         {
@@ -259,6 +262,7 @@ Singleton {
         },
         {
             "id": "sound_media",
+            "aliases": ["sound", "media"],
             "text": I18n.tr("Sound & media"),
             "icon": "volume_up",
             "children": [
@@ -338,7 +342,7 @@ Singleton {
                     "text": I18n.tr("Keyboard", "settings page name"),
                     "icon": "keyboard",
                     "tabIndex": 45,
-                    "niriOnly": true,
+                    "inputCapable": true,
                     "hint": I18n.tr("Layouts, repeat rate, num lock")
                 },
                 {
@@ -355,7 +359,7 @@ Singleton {
             "id": "power_battery",
             "text": I18n.tr("Power & battery"),
             "icon": "power_settings_new",
-            "aliases": ["power_security"],
+            "aliases": ["power", "power_security"],
             "children": [
                 {
                     "id": "power_sleep",
@@ -448,6 +452,7 @@ Singleton {
         },
         {
             "id": "security_accounts",
+            "aliases": ["security"],
             "text": I18n.tr("Security"),
             "icon": "lock",
             "children": [
@@ -522,6 +527,7 @@ Singleton {
         },
         {
             "id": "date_time_region",
+            "aliases": ["datetime", "region"],
             "text": I18n.tr("Date, time & region"),
             "icon": "schedule",
             "hint": I18n.tr("Clock, weather, locale", "settings sidebar hint for the date, time and region page"),
@@ -761,13 +767,13 @@ Singleton {
             return false;
         if (entry.soundsOnly && MultimediaService.unavailable)
             return false;
-        if (entry.hyprlandNiriOnly && !CompositorService.isNiri && !CompositorService.isHyprland)
+        if (entry.hyprlandNiriOnly && !CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
             return false;
         if (entry.windowRulesCapable && !CompositorService.supportsWindowRules)
             return false;
         if (entry.layoutCapable && !CompositorService.supportsLayoutConfig)
             return false;
-        if (entry.niriOnly && !CompositorService.supportsInputConfig)
+        if (entry.inputCapable && !CompositorService.supportsInputConfig)
             return false;
         if (entry.pointerCapable && !CompositorService.supportsPointerConfig)
             return false;

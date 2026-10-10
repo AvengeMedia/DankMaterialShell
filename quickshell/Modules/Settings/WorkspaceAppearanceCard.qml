@@ -115,8 +115,6 @@ SettingsCard {
     SettingsToggleRow {
         visible: workspaceTabBar.currentIndex === 0
         settingKey: "workspaceFocusedBorderEnabled"
-        resetStore: root.store
-        resetKeys: ["workspaceFocusedBorderEnabled"]
         tags: ["workspace", "border", "outline", "focused", "ring"]
         text: I18n.tr("Focused border")
         checked: root.store.get("workspaceFocusedBorderEnabled")
@@ -146,8 +144,6 @@ SettingsCard {
     SettingsToggleRow {
         visible: (workspaceTabBar.currentIndex === 1) && (BarWidgetService.focusedScreenDetectionSupported)
         settingKey: "workspaceUnfocusedMonitorSeparateAppearance"
-        resetStore: root.store
-        resetKeys: ["workspaceUnfocusedMonitorSeparateAppearance"]
         tags: ["workspace", "unfocused", "monitor", "display", "separate", "color"]
         text: I18n.tr("Separate appearance")
         checked: root.store.get("workspaceUnfocusedMonitorSeparateAppearance")
@@ -179,8 +175,6 @@ SettingsCard {
         enabled: root.store.get("workspaceUnfocusedMonitorSeparateAppearance")
         visible: (workspaceTabBar.currentIndex === 1) && (BarWidgetService.focusedScreenDetectionSupported)
         settingKey: "workspaceUnfocusedMonitorBorderEnabled"
-        resetStore: root.store
-        resetKeys: ["workspaceUnfocusedMonitorBorderEnabled"]
         tags: ["workspace", "border", "outline", "focused", "ring", "unfocused", "monitor", "display"]
         text: I18n.tr("Focused border")
         checked: root.store.get("workspaceUnfocusedMonitorBorderEnabled")

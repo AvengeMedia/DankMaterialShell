@@ -6,6 +6,7 @@ import Quickshell.Wayland
 import qs.Common
 import qs.Widgets
 import qs.Services
+import "../Common/WorkspaceModel.js" as WorkspaceModel
 
 Variants {
     id: variants
@@ -13,6 +14,16 @@ Variants {
     // An entry present in PanelWindow.onCompleted means we're recreating
     // after a wl_output rebind, not at initial startup.
     property var _seenScreens: ({})
+    readonly property bool desktopMenuEnabled: {
+        switch (SettingsData.desktopContextMenu) {
+        case "on":
+            return true;
+        case "off":
+            return false;
+        default:
+            return !CompositorService.reservesDesktopInput;
+        }
+    }
     model: SettingsData.getFilteredScreens("wallpaper")
 
     PanelWindow {
@@ -36,8 +47,18 @@ Variants {
 
         updatesEnabled: root.renderActive || root._settleFrames > 0
 
-        mask: Region {
-            item: Item {}
+        Region {
+            id: emptyRegion
+        }
+
+        mask: variants.desktopMenuEnabled ? null : emptyRegion
+
+        MouseArea {
+            anchors.fill: parent
+            z: 1
+            enabled: variants.desktopMenuEnabled
+            acceptedButtons: Qt.RightButton
+            onClicked: mouse => PopoutService.desktopContextMenu?.open(wallpaperWindow.screen, mouse.x, mouse.y, false)
         }
 
         Item {
@@ -140,7 +161,7 @@ Variants {
             readonly property var backingWindow: Window.window
             readonly property bool showsBackdrop: !source || isColorSource || currentWallpaper.status === Image.Error
             readonly property bool backdropBusy: showsBackdrop && !(backdropLoader.item?.ready ?? false)
-            readonly property bool renderActive: backdropBusy || effectActive || overviewBlurActive || pendingWallpaper !== "" || _deferredSource !== "" || changePending || _freezeWaitFrames > 0 || frameAnim.running || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading
+            readonly property bool renderActive: backdropBusy || effectActive || overviewBlurActive || pendingWallpaper !== "" || _deferredSource !== "" || changePending || _freezeWaitFrames > 0 || frameAnim.running || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading || parallaxImage.status === Image.Loading
             property int _settleFrames: 3
 
             function invalidate() {
@@ -401,8 +422,8 @@ Variants {
                     const monitorWorkspaces = workspaces.filter(ws => ws.monitor?.name === modelData.name).sort((a, b) => a.id - b.id);
 
                     totalWorkspaces = monitorWorkspaces.length;
-                    const focusedId = Hyprland.focusedWorkspace?.id;
-                    currentWorkspaceIndex = monitorWorkspaces.findIndex(ws => ws.id === focusedId);
+                    const focusedKey = WorkspaceModel.hyprlandKey(Hyprland.focusedWorkspace);
+                    currentWorkspaceIndex = monitorWorkspaces.findIndex(ws => WorkspaceModel.hyprlandKey(ws) === focusedKey);
 
                     if (currentWorkspaceIndex < 0)
                         currentWorkspaceIndex = 0;
