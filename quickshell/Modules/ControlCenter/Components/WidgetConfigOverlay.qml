@@ -136,6 +136,22 @@ Item {
                     }
                 }
 
+                CcListRow {
+                    visible: root.batteryIndex >= 0 && (SettingsData.controlCenterWidgets[root.batteryIndex]?.batteryStyle ?? "icon") !== "icon"
+                    iconName: "palette"
+                    title: I18n.tr("Color")
+                    body: DDropdown {
+                        readonly property var labels: [I18n.tr("Theme", "battery settings: theme accent indicator colors"), I18n.tr("Level", "battery settings: charge level indicator colors")]
+
+                        compactMode: true
+                        dropdownWidth: parent.width
+                        transientSurfaceTracker: contextMenu.transientSurfaceTracker
+                        currentValue: labels[(SettingsData.controlCenterWidgets[root.batteryIndex]?.batteryColorMode ?? "level") === "level" ? 1 : 0]
+                        options: labels
+                        onValueChanged: value => WidgetUtils.setOption(root.batteryIndex, "batteryColorMode", labels.indexOf(value) === 1 ? "level" : "theme")
+                    }
+                }
+
                 Repeater {
                     model: root.isUser ? DashRegistry.sheetOptionSpecs("user") : []
 

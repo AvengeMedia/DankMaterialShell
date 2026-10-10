@@ -12,6 +12,7 @@ CcTile {
     readonly property bool available: BatteryService.batteryAvailable
     readonly property bool profileMode: !available && PowerProfileWatcher.available
     readonly property string meterStyle: widgetData?.batteryStyle ?? "icon"
+    readonly property bool levelColors: (widgetData?.batteryColorMode ?? "level") === "level"
     readonly property bool showsMeter: available && meterStyle !== "icon"
     property real meterWidth: 0
 
@@ -60,7 +61,7 @@ CcTile {
 
         BatteryMeter {
             meterStyle: root.meterStyle
-            levelColors: true
+            levelColors: root.levelColors
             thickness: CcMetrics.pillMeterThickness
             scale: Math.min(1, Math.max(0, root.iconExtent - Theme.spacingXS * 2) / Math.max(1, implicitWidth, implicitHeight))
         }
@@ -75,7 +76,7 @@ CcTile {
 
                 anchors.centerIn: parent
                 meterStyle: root.meterStyle
-                levelColors: true
+                levelColors: root.levelColors
                 thickness: CcMetrics.pillMeterThickness
                 scale: Math.min(1, (parent.width - Theme.spacingXS * 2) / Math.max(1, implicitWidth))
             }
@@ -95,7 +96,7 @@ CcTile {
                 anchors.verticalCenter: parent.verticalCenter
                 thickness: CcMetrics.tallMeterThickness
                 meterStyle: root.showsMeter ? root.meterStyle : "solid"
-                levelColors: true
+                levelColors: root.levelColors
                 showNumber: false
                 visible: root.available
             }

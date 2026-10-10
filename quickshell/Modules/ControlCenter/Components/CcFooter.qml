@@ -39,7 +39,10 @@ Item {
     readonly property bool dragRemovable: liftedIndex >= 0 ? WidgetUtils.isRemovable(items.find(item => item.index === liftedIndex)?.widget) : incomingRemovable
     readonly property bool overTrash: trashContains(liftedIndex >= 0 ? liftedPoint : gridDragPoint)
 
+    property bool canUndo: false
+
     signal addWidgetRequested
+    signal undoRequested
     signal resetRequested
     signal clearRequested
     signal moveRequested
@@ -215,6 +218,29 @@ Item {
             "end": end,
             "at": groups()[end ? "ends" : "starts"].filter(i => i < at).length
         };
+    }
+
+    Rectangle {
+        readonly property real inset: CcMetrics.dropZoneInset
+        readonly property bool receiving: root.incoming !== null || (root.liftedIndex >= 0 && root.liftedSlot !== null)
+
+        x: (I18n.isRtl !== root.editAtEnd ? root.trackWidth * (1 - trackScale.xScale) : 0) - inset
+        y: -inset
+        width: root.trackWidth * trackScale.xScale + inset * 2
+        height: CcMetrics.footerHeight + inset * 2
+        radius: CcMetrics.dropZoneRadius
+        color: "transparent"
+        border.width: Theme.outlineWidth
+        border.color: receiving ? Theme.primary : Theme.outlineVariant
+        visible: root.editMode
+
+        Behavior on border.color {
+            enabled: CcMetrics.animationsEnabled
+            ColorAnimation {
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
     }
 
     Item {
@@ -435,8 +461,8 @@ Item {
     Item {
         id: editActions
 
-        anchors.left: root.editAtEnd ? parent.left : undefined
-        anchors.right: root.editAtEnd ? undefined : parent.right
+        // A side anchor set to undefined is never released, so flipping sides stretched the block across the row.
+        x: root.editAtEnd !== I18n.isRtl ? 0 : root.width - width
         anchors.verticalCenter: parent.verticalCenter
         width: root.editActionsWidth
         height: CcMetrics.footerHeight
@@ -464,10 +490,8 @@ Item {
                 buttonSize: Theme.iconButtonSize
                 iconName: "more_horiz"
                 iconSize: CcMetrics.iconBoxIconSize
-                iconColor: CcMetrics.tileInactiveContent
-                backgroundColor: CcMetrics.tileInactiveColor
-                border.width: Theme.layerOutlineWidth
-                border.color: Theme.outlineMedium
+                iconColor: Theme.onSecondaryContainer
+                backgroundColor: Theme.secondaryContainer
                 tooltipText: I18n.tr("More")
                 onClicked: editMenu.openAt(moreButton)
             }
@@ -476,12 +500,11 @@ Item {
         StyledRect {
             id: trash
 
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            width: root.editActionsWidth - Theme.iconButtonSize - root.spacing
-            height: CcMetrics.footerHeight
+            anchors.fill: parent
             radius: Theme.fullRadius(width, height)
             color: root.overTrash ? Theme.errorContainer : CcMetrics.tileInactiveColor
+            border.width: Theme.outlineWidth
+            border.color: root.overTrash ? Theme.error : Theme.outlineVariant
             visible: root.dragging && root.dragRemovable
             Accessible.role: Accessible.Graphic
             Accessible.name: I18n.tr("Remove")
@@ -508,6 +531,12 @@ Item {
 
         transientSurfaceTracker: root.transientSurfaceTracker
         items: [
+            {
+                "iconName": "undo",
+                "label": I18n.tr("Undo"),
+                "enabled": root.canUndo,
+                "action": () => root.undoRequested()
+            },
             {
                 "iconName": root.onTop ? "vertical_align_bottom" : "vertical_align_top",
                 "label": root.onTop ? I18n.tr("Move row to footer", "control center edit menu, moves the row from the header to the footer") : I18n.tr("Move row to header", "control center edit menu, moves the row from the footer to the header"),

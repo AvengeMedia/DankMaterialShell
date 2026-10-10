@@ -29,6 +29,8 @@ DEditableGrid {
     signal closeRequested
     property bool tapToClose: false
     property var runningToplevels: []
+    // A member drag inside a quick-tiles group never reaches the grid's own interaction state.
+    property bool memberDragging: false
 
     readonly property real gridHeight: layoutHeight
     readonly property real cellWidth: (width + CcMetrics.gridGap) / columns
@@ -47,6 +49,10 @@ DEditableGrid {
     placeholderRadius: draggingSlot?.small ? Theme.fullRadius(draggingSlot.width, draggingSlot.height) : (draggingSlot?.tileItem?.bodyRadius ?? Theme.fullRadius(width, CcMetrics.tileHeight))
 
     commitHandler: items => model.setLayout(withHidden(items))
+    onEditModeChanged: {
+        if (!editMode)
+            memberDragging = false;
+    }
 
     function clamped(items) {
         return items.map(widget => Object.assign({}, widget, WidgetUtils.clampSize(widget, columns, maximumRows)));

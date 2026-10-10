@@ -71,9 +71,15 @@ Item {
         return others()[slot]?.modelData.index ?? -1;
     }
 
+    Component.onDestruction: {
+        if (liftedIndex >= 0)
+            host.memberDragging = false;
+    }
+
     function lift(member, scenePoint) {
         liftedWidth = member.ownWidth;
         liftedIndex = member.modelData.index;
+        host.memberDragging = true;
         moveLifted(member, scenePoint);
     }
 
@@ -103,6 +109,7 @@ Item {
         const unchanged = before === (members[position + 1]?.index ?? -1);
         liftedIndex = -1;
         dropSlot = -1;
+        host.memberDragging = false;
         if (slot >= 0) {
             host.clearExternal();
             if (!unchanged)
