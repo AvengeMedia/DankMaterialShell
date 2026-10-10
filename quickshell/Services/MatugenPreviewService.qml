@@ -97,8 +97,8 @@ Singleton {
         seedRequestKey = key;
         const [source, contrast, spec] = key.split("|");
         const args = [Proc.dmsBin, "matugen", "preview", "--source-color", source, "--contrast", contrast];
-        if (spec === "2025")
-            args.push("--spec", "2025");
+        if (spec !== "2021")
+            args.push("--spec", spec);
         Proc.runCommand("", args, (output, exitCode) => {
             if (root.seedRequestKey !== key)
                 return;
@@ -136,7 +136,11 @@ Singleton {
         if (!Theme.matugenAvailable)
             return;
         const wanted = key;
-        if (wanted === loadedKey || wanted === requestKey)
+        if (wanted === loadedKey) {
+            requestKey = "";
+            return;
+        }
+        if (wanted === requestKey)
             return;
         requestKey = wanted;
         failed = false;
@@ -144,8 +148,8 @@ Singleton {
         const args = [Proc.dmsBin, "matugen", "preview", "--source-color", source, "--contrast", String(SettingsData.matugenContrast ?? 0)];
         if (image)
             args.push("--image", image);
-        if (SettingsData.matugenSpec === "2025")
-            args.push("--spec", "2025");
+        if (SettingsData.matugenSpec !== "2021")
+            args.push("--spec", SettingsData.matugenSpec);
         Proc.runCommand("", args, (output, exitCode) => {
             if (wanted !== root.requestKey)
                 return;
