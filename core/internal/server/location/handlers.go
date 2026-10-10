@@ -3,7 +3,6 @@ package location
 import (
 	"fmt"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/dankgo/ipc"
 )
 
@@ -20,12 +19,12 @@ func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 		handleSubscribe(conn, req, manager)
 
 	default:
-		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
+		conn.RespondError(req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
 }
 
 func handleGetState(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
-	models.Respond(conn, req.ID, manager.GetState())
+	conn.Respond(req.ID, manager.GetState())
 }
 
 func handleSubscribe(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {

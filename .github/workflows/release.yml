@@ -304,7 +304,7 @@ jobs:
           - **`dankinstall-arm64.gz`** - Installer binary for ARM64 systems
           - **`dms-cli-<version>.tar.gz`** - Go source code with vendored modules (for distro packaging)
           - **`dms-qml.tar.gz`** - QML source code only
-          - **`dms-source.tar.gz`** - Full repository source with bundled DankCommon (for distro packaging)
+          - **`dms-source.tar.gz`** - Full repository source with bundled DCommon (for distro packaging)
 
           ### Checksums
           - **`*.sha256`** - SHA256 checksums for verifying download integrity
@@ -352,9 +352,9 @@ jobs:
           # Copy completions
           cp _core_assets/completion.* _release_assets/ 2>/dev/null || true
 
-          # Replace the DankCommon symlink with real submodule content for packaging
-          rm quickshell/DankCommon
-          cp -r dank-qml-common/DankCommon quickshell/DankCommon
+          # Replace the DCommon symlink with real submodule content for packaging
+          rm quickshell/DCommon
+          cp -r dank-qml-common/DCommon quickshell/DCommon
 
           # Create full source tarball (GitHub tag archives never contain submodule content)
           VERSION_NUM=${TAG#v}

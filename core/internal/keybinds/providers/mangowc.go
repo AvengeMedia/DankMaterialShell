@@ -5,11 +5,13 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/mangoconf"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
 
@@ -29,11 +31,7 @@ func NewMangoWCProvider(configPath string) *MangoWCProvider {
 }
 
 func defaultMangoWCConfigDir() string {
-	configDir, err := os.UserConfigDir()
-	if err != nil {
-		return ""
-	}
-	return filepath.Join(configDir, "mango")
+	return mangoconf.Dir()
 }
 
 func (m *MangoWCProvider) Name() string {
@@ -237,13 +235,24 @@ func (m *MangoWCProvider) SetBind(key, action, description string, options map[s
 		prefix = mangowcAxisBindPrefix
 	}
 
-	existingBinds[normalizedKey] = &mangowcOverrideBind{
+	bind := &mangowcOverrideBind{
 		Key:         key,
 		Action:      action,
 		Description: description,
 		Options:     options,
 		Prefix:      prefix,
 	}
+	var line strings.Builder
+	m.writeBindLine(&line, bind)
+	for l := range strings.SplitSeq(line.String(), "\n") {
+		if strings.HasPrefix(l, "#") {
+			continue
+		}
+		if err := mangoconf.CheckLine(l); err != nil {
+			return err
+		}
+	}
+	existingBinds[normalizedKey] = bind
 
 	return m.writeOverrideBinds(existingBinds)
 }
@@ -489,15 +498,21 @@ func (m *MangoWCProvider) generatePreservedBindsContent(existingContent string, 
 	return strings.Join(lines, "\n") + "\n"
 }
 
+// Only a stripped stock file is rebuilt; a file setup kept or moved, or with keymodes or mouse binds, is the user's.
 func (m *MangoWCProvider) shouldUseStockScaffold(content string) bool {
 	if strings.TrimSpace(content) == "" {
 		return true
+	}
+	if mangoconf.HasUserBindsHeader(content) || mangoUserBindLine.MatchString(content) {
+		return false
 	}
 	if strings.Contains(content, "gesturebind=") && strings.Contains(content, "# ===") {
 		return false
 	}
 	return !strings.Contains(content, "gesturebind=") && (strings.Count(content, "\nbind=")+strings.Count(content, "\nbindl=")+strings.Count(content, "\nbinds=")+strings.Count(content, "\nbindr=")+strings.Count(content, "\nbindp=") >= 10 || strings.Contains(content, "dms ipc call"))
 }
+
+var mangoUserBindLine = regexp.MustCompile(`(?m)^\s*(keymode|key_mode|mousebind|mouse_bind|axisbind|axis_bind|switchbind|switch_bind)\s*=`)
 
 func (m *MangoWCProvider) stockBindsScaffold(binds map[string]*mangowcOverrideBind) string {
 	terminalCommand := "ghostty"

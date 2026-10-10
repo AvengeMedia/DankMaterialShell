@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 SettingsReorderRow {
@@ -14,7 +14,8 @@ SettingsReorderRow {
     readonly property string instanceId: instanceData?.id ?? ""
     readonly property string widgetType: instanceData?.widgetType ?? ""
     readonly property var widgetDef: DesktopWidgetRegistry.getWidget(widgetType)
-    readonly property string widgetName: instanceData?.name ?? widgetDef?.name ?? widgetType
+    readonly property string widgetName: instanceData?.name || widgetDef?.name || widgetType
+    property bool fixed: false
 
     signal configureRequested
     signal deleteRequested
@@ -28,7 +29,7 @@ SettingsReorderRow {
     onClicked: configureRequested()
 
     trailing: [
-        DankIcon {
+        DIcon {
             anchors.verticalCenter: parent.verticalCenter
             name: "chevron_right"
             size: Theme.iconSize
@@ -38,8 +39,9 @@ SettingsReorderRow {
         SettingsDivider {
             vertical: true
         },
-        DankToggle {
+        DToggle {
             anchors.verticalCenter: parent.verticalCenter
+            visible: !root.fixed
             hideText: true
             text: root.title
             checked: root.instanceData?.enabled ?? true
@@ -49,8 +51,9 @@ SettingsReorderRow {
                 });
             }
         },
-        DankActionButton {
+        DActionButton {
             anchors.verticalCenter: parent.verticalCenter
+            visible: !root.fixed
             iconName: "content_copy"
             tooltipText: I18n.tr("Duplicate", "verb, desktop widget menu action")
             onClicked: root.duplicateRequested()
@@ -58,6 +61,7 @@ SettingsReorderRow {
         SettingsDeleteButton {
             id: deleteButton
             anchors.verticalCenter: parent.verticalCenter
+            visible: !root.fixed
             onDeleteRequested: root.deleteRequested()
         }
     ]

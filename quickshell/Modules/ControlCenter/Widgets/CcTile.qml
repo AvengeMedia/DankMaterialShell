@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Item {
@@ -23,6 +24,10 @@ Item {
     property bool small: false
     property bool docked: false
     property string dockedText: title
+    // Set by a background-less Quick tiles group.
+    property bool bare: false
+    property real quickContentWidth: 0
+    readonly property real quickWidth: Math.max(bare ? CcMetrics.quickBareWidth : CcMetrics.iconBoxSize, quickContentWidth + (bare ? CcMetrics.quickBarePadding : Theme.spacingM * 2))
     readonly property real bodyInset: small ? Math.max(0, (height - CcMetrics.iconBoxSize) / 2) : 0
     readonly property real bodyHeight: height - bodyInset * 2
     property bool toggle: !opensPage
@@ -49,6 +54,8 @@ Item {
     property bool opensPage: false
     property color restIconColor: CcMetrics.tileInactiveIcon
     property Component tallContent: null
+    // The tile's own state. The island disables a face while it fades in, and that must not restyle the tile.
+    property bool available: true
     property bool interactive: true
     property bool iconBlinking: false
     property real iconRotation: 0
@@ -66,31 +73,38 @@ Item {
         return tall ? Math.min(CcMetrics.tallTileRadius, width / 2, height / 2) : Theme.fullRadius(width, bodyHeight);
     }
     property bool acceptsInput: interactive && enabled
-    readonly property bool bodyActive: showsActive && !hasIconBox
+    readonly property bool bodyActive: showsActive && !hasIconBox && !bare
     readonly property color bodyColor: {
-        if (!enabled)
+        if (bare)
+            return "transparent";
+        if (!available)
             return Theme.onSurface_12;
         return bodyActive ? CcMetrics.tileActiveColor : CcMetrics.tileInactiveColor;
     }
     readonly property color contentColor: {
-        if (!enabled)
+        if (!available)
             return Theme.onSurface_38;
         return bodyActive ? CcMetrics.tileActiveContent : CcMetrics.tileInactiveContent;
     }
     readonly property color subtitleColor: {
-        if (!enabled)
+        if (!available)
             return Theme.onSurface_38;
         return bodyActive ? CcMetrics.tileActiveContent : CcMetrics.tileInactiveSubtitle;
     }
     readonly property color iconColor: {
-        if (!enabled)
+        if (!available)
             return Theme.onSurface_38;
         if (hasIconBox)
             return showsActive ? CcMetrics.tileActiveContent : CcMetrics.tileInactiveContent;
+        // Without a body, toggles show their state in the icon tint alone.
+        if (bare && showsActive)
+            return CcMetrics.bareActiveIcon;
+        if (bare && toggle)
+            return CcMetrics.tileInactiveContent;
         return bodyActive ? CcMetrics.tileActiveContent : root.restIconColor;
     }
     readonly property color iconBoxColor: {
-        if (!enabled)
+        if (!available)
             return Theme.onSurface_12;
         return showsActive ? CcMetrics.tileActiveColor : CcMetrics.iconBoxInactiveColor;
     }
@@ -106,6 +120,7 @@ Item {
 
     width: parent?.width ?? 0
     height: CcMetrics.tileHeight
+    enabled: available
     activeFocusOnTab: acceptsInput
     Accessible.role: toggle && (!showExpand || compact) && !opensPage ? Accessible.CheckBox : Accessible.Button
     Accessible.checkable: toggle && (!showExpand || compact) && !opensPage
@@ -126,6 +141,12 @@ Item {
             return;
         }
         clicked();
+    }
+
+    function expand() {
+        if (!showExpand && !opensPage)
+            return;
+        expandClicked();
     }
 
     Keys.onPressed: event => {
@@ -167,7 +188,7 @@ Item {
         anchors.bottomMargin: root.bodyInset
         radius: root.bodyRadius
         color: root.bodyColor
-        border.width: Theme.layerOutlineWidth
+        border.width: root.bare ? 0 : Theme.layerOutlineWidth
         border.color: Theme.outlineMedium
 
         Behavior on color {
@@ -186,16 +207,9 @@ Item {
             anchors.bottomMargin: root.expanded ? root.height - root.headerHeight - root.tilePadding * 2 : 0
             stateColor: root.contentColor
             cornerRadius: root.bodyRadius
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
             tooltipText: root.compact || root.docked ? [root.title, root.subtitle].filter(text => text !== "").join(" · ") : ""
-            onClicked: mouse => {
-                if (mouse.button === Qt.RightButton) {
-                    if (root.showExpand || root.opensPage)
-                        root.expandClicked();
-                    return;
-                }
-                root.activate();
-            }
+            onClicked: root.activate()
+            onPressAndHold: root.expand()
             onWheel: wheelEvent => {
                 wheelEvent.accepted = false;
                 root.wheel(wheelEvent);
@@ -207,7 +221,7 @@ Item {
             visible: root.activeFocus
         }
 
-        DankIcon {
+        DIcon {
             id: compactIcon
             anchors.centerIn: parent
             name: root.iconName
@@ -217,7 +231,7 @@ Item {
             rotation: root.iconRotation
             visible: root.compact && root.bodyContent === null && root.iconContent === null
 
-            DankBlink {
+            DBlink {
                 target: compactIcon
                 running: root.iconBlinking && root.compact && root.visible && root.live
             }
@@ -282,7 +296,7 @@ Item {
                     }
                 }
 
-                DankIcon {
+                DIcon {
                     id: tileIcon
                     anchors.centerIn: parent
                     name: root.iconName
@@ -292,7 +306,7 @@ Item {
                     rotation: root.iconRotation
                     visible: root.iconContent === null
 
-                    DankBlink {
+                    DBlink {
                         target: tileIcon
                         running: root.iconBlinking && !root.compact && root.visible && root.live
                     }
@@ -368,7 +382,7 @@ Item {
                 }
             }
 
-            DankIcon {
+            DIcon {
                 id: chevron
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.spacingXS

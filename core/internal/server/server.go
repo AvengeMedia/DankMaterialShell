@@ -22,7 +22,6 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/location"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/notifyactions"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/sysupdate"
@@ -406,7 +405,7 @@ func subscribeHandler(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request
 	case "subscribe":
 		routeRequestRecovered(ctx, conn, req)
 	default:
-		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
+		conn.RespondError(req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
 }
 
@@ -415,7 +414,7 @@ func routeRequestRecovered(ctx context.Context, conn *ipc.ConnWriter, req ipc.Re
 	defer func() {
 		if r := recover(); r != nil {
 			log.Errorf("RouteRequest panic recovered: method=%s panic=%v\n%s", req.Method, r, debug.Stack())
-			models.RespondError(conn, req.ID, "internal server error")
+			conn.RespondError(req.ID, "internal server error")
 		}
 	}()
 	RouteRequest(ctx, conn, req)
@@ -530,12 +529,12 @@ func handleSubscribe(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request)
 	clientID := fmt.Sprintf("meta-client-%p", conn)
 
 	dbusClient := dbusClientID
-	if id, ok := models.Get[string](req, "clientId"); ok && id != "" {
+	if id, ok := req.Get[string]("clientId"); ok && id != "" {
 		dbusClient = id
 	}
 
 	var services []string
-	if servicesParam, ok := models.Get[[]any](req, "services"); ok {
+	if servicesParam, ok := req.Get[[]any]("services"); ok {
 		for _, s := range servicesParam {
 			if str, ok := s.(string); ok {
 				services = append(services, str)

@@ -3,8 +3,8 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
-import qs.Modals.DankLauncherV2
-import qs.Modals.DankLauncherV2.Components
+import qs.Modals.DLauncherV2
+import qs.Modals.DLauncherV2.Components
 import qs.Services
 import qs.Widgets
 
@@ -208,13 +208,13 @@ Scope {
                         }
 
                         if (event.key === Qt.Key_Left) {
-                            NiriService.moveColumnLeft();
+                            NiriService.focusColumnLeft();
                             event.accepted = true;
                             return;
                         }
 
                         if (event.key === Qt.Key_Right) {
-                            NiriService.moveColumnRight();
+                            NiriService.focusColumnRight();
                             event.accepted = true;
                             return;
                         }

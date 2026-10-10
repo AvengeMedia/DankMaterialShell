@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Services
 
 SettingsCard {
     id: root
@@ -17,8 +18,6 @@ SettingsCard {
     SettingsToggleRow {
         settingKey: root.keyPrefix + "NotificationPopups"
         tags: ["island", "notifications", "popup", "standard", "bar", "stack", "arrival"]
-        resetStore: root.store
-        resetKeys: ["islandNotificationPopups"]
         text: I18n.tr("Use standard popups", "island settings: show arriving notifications as stacked popups instead of in the island")
         description: I18n.tr("New notifications show as regular popups", "island standard popups toggle description")
         checked: root.store.setting("islandNotificationPopups")
@@ -27,19 +26,25 @@ SettingsCard {
 
     SettingsToggleRow {
         settingKey: root.keyPrefix + "SystemOsd"
-        tags: ["island", "volume", "brightness", "osd", "level", "standard"]
-        resetStore: root.store
-        resetKeys: ["islandSystemOsd"]
+        tags: ["island", "volume", "brightness", "microphone", "caps lock", "power profile", "idle inhibitor", "osd", "level", "standard"]
         text: I18n.tr("Use standard OSDs", "island settings: show volume and brightness changes as the regular on-screen displays instead of in the island")
         checked: !root.store.setting("islandSystemOsd")
         onToggled: checked => root.store.apply("islandSystemOsd", !checked)
     }
 
     SettingsToggleRow {
+        settingKey: root.keyPrefix + "ChargingPulse"
+        tags: ["island", "battery", "charging", "plugged", "power", "pulse"]
+        text: I18n.tr("Charging", "island settings: pulse the island when power is connected or removed")
+        description: I18n.tr("Show the battery briefly when power is connected or removed", "island settings: charging pulse toggle description")
+        visible: root.store.setting("islandSystemOsd") && BatteryService.batteryAvailable
+        checked: root.store.setting("islandChargingPulse")
+        onToggled: checked => root.store.apply("islandChargingPulse", checked)
+    }
+
+    SettingsToggleRow {
         settingKey: root.keyPrefix + "NotificationExpand"
         tags: ["island", "notifications", "expand", "arrival", "size"]
-        resetStore: root.store
-        resetKeys: ["islandNotificationExpand"]
         text: I18n.tr("Expand by default", "island settings: expanded notification toggle")
         checked: root.store.setting("islandNotificationExpand")
         onToggled: checked => root.store.apply("islandNotificationExpand", checked)
@@ -48,8 +53,6 @@ SettingsCard {
     SettingsToggleRow {
         settingKey: root.keyPrefix + "NotificationBadgeClearOnOpen"
         tags: ["island", "home", "notifications", "badge", "unread", "clear", "dismiss", "open"]
-        resetStore: root.store
-        resetKeys: ["islandNotificationBadgeClearOnOpen"]
         text: I18n.tr("Clear badge on open", "island settings: clear the notification badge when the center opens")
         checked: root.store.setting("islandNotificationBadgeClearOnOpen")
         enabled: !root.badgeGated || SettingsData.islandHomeGroupEnabled(root.store.config, "notifications")

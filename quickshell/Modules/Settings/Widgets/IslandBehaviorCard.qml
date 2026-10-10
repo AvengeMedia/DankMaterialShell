@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 SettingsCard {
     id: root
@@ -10,7 +10,7 @@ SettingsCard {
     property bool hosted: false
     property bool docked: true
     // A dot's compact face is a circle, so it never shows the media face.
-    property bool dot: false
+    property bool isDot: false
 
     readonly property var routingValues: ["normal", "always", "last-used"]
     readonly property var interactionModeValues: ["click", "hybrid"]
@@ -29,9 +29,9 @@ SettingsCard {
         visible: !root.hosted
         resetStore: root.store
         resetKeys: ["islandSharedRouting"]
-        text: I18n.tr("Shared shortcuts")
-        description: I18n.tr("Routes launcher, dash, control center and notification shortcuts")
-        options: [I18n.tr("Normal routing"), I18n.tr("Always here"), I18n.tr("Last used on this screen")]
+        text: I18n.tr("Shared shortcuts", "island settings dropdown label, which island handles global shortcuts")
+        description: I18n.tr("Routes launcher, dash, control center and notification shortcuts", "shared shortcuts dropdown description")
+        options: [I18n.tr("Normal routing", "shared shortcuts option, shortcuts open where they normally would"), I18n.tr("Always here", "shared shortcuts option, shortcuts always open on this island"), I18n.tr("Last used on this screen", "shared shortcuts option, shortcuts open on the island last used on this display")]
         dropdownWidth: Theme.smallBreakpoint / 2
         currentValue: options[Math.max(0, root.routingValues.indexOf(root.sharedRouting))]
         onValueChanged: value => SettingsData.setIslandSharedRouting(root.store.config?.id ?? "", root.routingValues[options.indexOf(value)] ?? "normal")
@@ -169,9 +169,7 @@ SettingsCard {
     SettingsToggleRow {
         settingKey: root.keyPrefix + "MediaClockVisible"
         tags: ["island", "media", "clock", "compact", "time"]
-        visible: !root.dot
-        resetStore: root.store
-        resetKeys: ["islandMediaClockVisible"]
+        visible: !root.isDot
         text: I18n.tr("Keep clock with media", "island settings: clock in media face toggle")
         checked: root.store.setting("islandMediaClockVisible")
         onToggled: checked => root.store.apply("islandMediaClockVisible", checked)

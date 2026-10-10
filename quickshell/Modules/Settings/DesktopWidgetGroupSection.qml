@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Column {
@@ -38,7 +38,7 @@ Column {
         clickable: true
         onClicked: section.collapseToggled(section.sectionKey)
 
-        DankIcon {
+        DIcon {
             anchors.verticalCenter: parent.verticalCenter
             name: section.collapsed ? "expand_more" : "expand_less"
             size: Theme.iconSize

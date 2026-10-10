@@ -95,7 +95,7 @@ func newManager(client tailscaleClient) *Manager {
 func (m *Manager) watchLoop(ctx context.Context) {
 	defer m.watchWG.Done()
 
-	mask := ipn.NotifyInitialState | ipn.NotifyInitialPrefs | ipn.NotifyInitialNetMap | ipn.NotifyRateLimit
+	mask := ipn.NotifyInitialState | ipn.NotifyInitialPrefs | ipn.NotifyPeerChanges | ipn.NotifyPeerPatches
 	backoff := time.Second
 	unreachableSent := false
 
@@ -109,6 +109,7 @@ func (m *Manager) watchLoop(ctx context.Context) {
 		watcher, err := m.client.WatchIPNBus(ctx, mask)
 		if err != nil {
 			if !unreachableSent {
+				log.Warnf("[Tailscale] IPN bus subscribe failed: %v", err)
 				m.updateState(&TailscaleState{Connected: false, BackendState: "Unreachable"})
 				unreachableSent = true
 			}

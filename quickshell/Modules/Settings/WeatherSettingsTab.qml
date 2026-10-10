@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -70,7 +70,7 @@ Item {
             SettingsRow {
                 enabled: !SettingsData.useAutoLocation
                 title: I18n.tr("Location search")
-                body: DankLocationSearch {
+                body: DLocationSearch {
                     width: parent.width
                     currentLocation: SettingsData.weatherLocation
                     placeholderText: I18n.tr("New York, NY")
@@ -89,7 +89,7 @@ Item {
                         width: parent.width
                         spacing: Theme.spacingM
 
-                        DankTextField {
+                        DTextField {
                             id: latitude
                             outlined: true
                             leftIconName: "location_on"
@@ -100,7 +100,7 @@ Item {
                             onAccepted: root.saveCoordinates()
                         }
 
-                        DankTextField {
+                        DTextField {
                             id: longitude
                             outlined: true
                             leftIconName: "location_on"
@@ -112,7 +112,7 @@ Item {
                         }
                     }
 
-                    DankButton {
+                    DButton {
                         text: I18n.tr("Apply", "verb, button that saves custom weather coordinates")
                         enabled: root.validCoordinates
                         onClicked: root.saveCoordinates()
@@ -127,12 +127,17 @@ Item {
             settingKey: "weatherDisplay"
 
             SettingsToggleRow {
+                readonly property var lockStatus: SettingsData.lockWidgetInstance("lockStatus")
+
                 tab: "weather"
-                settingKey: "lockScreenShowWeather"
+                settingKey: "lockStatusWeather"
                 tags: ["weather", "lock", "screen"]
+                visible: lockStatus !== null
                 text: I18n.tr("Lock screen")
-                checked: SettingsData.lockScreenShowWeather
-                onToggled: checked => SettingsData.set("lockScreenShowWeather", checked)
+                checked: lockStatus?.config?.showWeather ?? true
+                onToggled: checked => SettingsData.updateDesktopWidgetInstanceConfig(lockStatus.id, {
+                        showWeather: checked
+                    })
             }
 
             SettingsNavRow {

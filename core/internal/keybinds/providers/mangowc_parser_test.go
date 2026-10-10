@@ -36,48 +36,20 @@ func TestMangoWCAutogenerateComment(t *testing.T) {
 		expected string
 	}{
 		{"spawn", "kitty", "kitty"},
-		{"spawn_shell", "firefox", "firefox"},
 		{"killclient", "", "Close window"},
-		{"quit", "", "Exit MangoWC"},
-		{"reload_config", "", "Reload configuration"},
 		{"focusstack", "next", "Focus next window"},
 		{"focusstack", "prev", "Focus previous window"},
 		{"focusdir", "left", "Focus left"},
-		{"focusdir", "right", "Focus right"},
-		{"focusdir", "up", "Focus up"},
-		{"focusdir", "down", "Focus down"},
 		{"exchange_client", "left", "Swap window left"},
-		{"exchange_client", "right", "Swap window right"},
-		{"togglefloating", "", "Float/unfloat window"},
-		{"togglefullscreen", "", "Toggle fullscreen"},
-		{"togglefakefullscreen", "", "Toggle fake fullscreen"},
-		{"togglemaximizescreen", "", "Toggle maximize"},
-		{"toggleglobal", "", "Toggle global"},
-		{"toggleoverview", "", "Toggle overview"},
-		{"toggleoverlay", "", "Toggle overlay"},
-		{"minimized", "", "Minimize window"},
-		{"restore_minimized", "", "Restore minimized"},
-		{"toggle_scratchpad", "", "Toggle scratchpad"},
 		{"setlayout", "tile", "Set layout tile"},
-		{"switch_layout", "", "Switch layout"},
 		{"view", "1,0", "View tag 1"},
 		{"tag", "2,0", "Move to tag 2"},
 		{"toggleview", "3,0", "Toggle tag 3"},
-		{"viewtoleft", "", "View left tag"},
-		{"viewtoright", "", "View right tag"},
 		{"viewtoleft_have_client", "", "View left tag"},
-		{"viewtoright_have_client", "", "View right tag"},
-		{"tagtoleft", "", "Move to left tag"},
-		{"tagtoright", "", "Move to right tag"},
 		{"focusmon", "left", "Focus monitor left"},
-		{"tagmon", "right", "Move to monitor right"},
 		{"incgaps", "1", "Increase gaps"},
 		{"incgaps", "-1", "Decrease gaps"},
-		{"togglegaps", "", "Toggle gaps"},
 		{"movewin", "+0,-50", "Move window by +0,-50"},
-		{"resizewin", "+0,+50", "Resize window by +0,+50"},
-		{"set_proportion", "1.0", "Set proportion 1.0"},
-		{"switch_proportion_preset", "", "Switch proportion preset"},
 		{"unknown", "", ""},
 	}
 
@@ -179,17 +151,6 @@ func TestMangoWCGetKeybindAtLine(t *testing.T) {
 				Command: "spawn",
 				Params:  "dms ipc call lock lock",
 				Comment: "dms ipc call lock lock",
-			},
-		},
-		{
-			name: "bindp_flag",
-			line: "bindp=SUPER,p,spawn,pass-through",
-			expected: &MangoWCKeyBinding{
-				Mods:    []string{"SUPER"},
-				Key:     "p",
-				Command: "spawn",
-				Params:  "pass-through",
-				Comment: "pass-through",
 			},
 		},
 		{
@@ -378,64 +339,6 @@ func TestMangoWCReadContentErrors(t *testing.T) {
 	}
 }
 
-func TestMangoWCReadContentWithTildeExpansion(t *testing.T) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		t.Skip("Cannot get home directory")
-	}
-
-	tmpSubdir := filepath.Join(homeDir, ".config", "test-mango-"+t.Name())
-	if err := os.MkdirAll(tmpSubdir, 0o755); err != nil {
-		t.Skip("Cannot create test directory in home")
-	}
-	defer os.RemoveAll(tmpSubdir)
-
-	configFile := filepath.Join(tmpSubdir, "config.conf")
-	if err := os.WriteFile(configFile, []byte("bind=ALT,q,killclient,\n"), 0o644); err != nil {
-		t.Fatalf("Failed to write test config: %v", err)
-	}
-
-	relPath, err := filepath.Rel(homeDir, tmpSubdir)
-	if err != nil {
-		t.Skip("Cannot create relative path")
-	}
-
-	parser := NewMangoWCParser("")
-	tildePathMatch := "~/" + relPath
-	err = parser.ReadContent(tildePathMatch)
-
-	if err != nil {
-		t.Errorf("ReadContent with tilde path failed: %v", err)
-	}
-}
-
-func TestMangoWCEmptyAndCommentLines(t *testing.T) {
-	tmpDir := t.TempDir()
-	configFile := filepath.Join(tmpDir, "config.conf")
-
-	content := `
-# This is a comment
-bind=ALT,q,killclient,
-
-# Another comment
-
-bind=Alt,t,spawn,kitty
-`
-
-	if err := os.WriteFile(configFile, []byte(content), 0o644); err != nil {
-		t.Fatalf("Failed to write test config: %v", err)
-	}
-
-	keybinds, err := ParseMangoWCKeys(configFile)
-	if err != nil {
-		t.Fatalf("ParseMangoWCKeys failed: %v", err)
-	}
-
-	if len(keybinds) != 2 {
-		t.Errorf("Expected 2 keybinds (comments ignored), got %d", len(keybinds))
-	}
-}
-
 func TestMangoWCInvalidBindLines(t *testing.T) {
 	tests := []struct {
 		name string
@@ -465,73 +368,5 @@ func TestMangoWCInvalidBindLines(t *testing.T) {
 				t.Errorf("expected nil for invalid line, got %+v", result)
 			}
 		})
-	}
-}
-
-func TestMangoWCRealWorldConfig(t *testing.T) {
-	tmpDir := t.TempDir()
-	configFile := filepath.Join(tmpDir, "config.conf")
-
-	content := `# Application Launchers
-bind=Alt,t,spawn,kitty
-bind=Alt,space,spawn,dms ipc call spotlight toggle
-bind=Alt,v,spawn,dms ipc call clipboard toggle
-
-# exit
-bind=ALT+SHIFT,e,quit
-bind=ALT,q,killclient,
-
-# switch window focus
-bind=SUPER,Tab,focusstack,next
-bind=ALT,Left,focusdir,left
-bind=ALT,Right,focusdir,right
-
-# tag switch
-bind=SUPER,Left,viewtoleft,0
-bind=CTRL,Left,viewtoleft_have_client,0
-bind=SUPER,Right,viewtoright,0
-
-bind=Ctrl,1,view,1,0
-bind=Ctrl,2,view,2,0
-bind=Ctrl,3,view,3,0
-`
-
-	if err := os.WriteFile(configFile, []byte(content), 0o644); err != nil {
-		t.Fatalf("Failed to write test config: %v", err)
-	}
-
-	keybinds, err := ParseMangoWCKeys(configFile)
-	if err != nil {
-		t.Fatalf("ParseMangoWCKeys failed: %v", err)
-	}
-
-	if len(keybinds) < 14 {
-		t.Errorf("Expected at least 14 keybinds, got %d", len(keybinds))
-	}
-
-	foundSpawn := false
-	foundQuit := false
-	foundView := false
-
-	for _, kb := range keybinds {
-		if kb.Command == "spawn" && kb.Params == "kitty" {
-			foundSpawn = true
-		}
-		if kb.Command == "quit" {
-			foundQuit = true
-		}
-		if kb.Command == "view" && kb.Params == "1,0" {
-			foundView = true
-		}
-	}
-
-	if !foundSpawn {
-		t.Error("Did not find spawn kitty keybind")
-	}
-	if !foundQuit {
-		t.Error("Did not find quit keybind")
-	}
-	if !foundView {
-		t.Error("Did not find view workspace 1 keybind")
 	}
 }

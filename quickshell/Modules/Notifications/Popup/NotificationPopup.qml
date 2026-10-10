@@ -6,7 +6,9 @@ import Quickshell.Services.Notifications
 import qs.Common
 import qs.Modules.Notifications
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
+import qs.DCommon.Common as DCommon
 
 PanelWindow {
     id: win
@@ -587,7 +589,8 @@ PanelWindow {
         readonly property real swipeTravelDistance: width
         readonly property real swipeFadeStartOffset: swipeTravelDistance * swipeFadeStartRatio
         readonly property real swipeFadeDistance: Math.max(1, swipeTravelDistance - swipeFadeStartOffset)
-        readonly property bool swipeActive: swipeDragHandler.active
+        property bool swipeWheelActive: false
+        readonly property bool swipeActive: swipeDragHandler.active || swipeWheelActive
         property bool swipeDismissing: false
         onSwipeDismissingChanged: {
             if (!win.connectedFrameMode)
@@ -598,6 +601,19 @@ PanelWindow {
         onSwipeOffsetChanged: {
             if (win.connectedFrameMode)
                 win.popupChromeGeometryChanged();
+        }
+
+        function releaseSwipe(velocity = 0) {
+            if (win.exiting || swipeDismissing)
+                return;
+            const projected = swipeOffset + velocity * NotificationMetrics.swipeFlingProjectionMs / 1000;
+            if (Math.abs(projected) <= dismissThreshold) {
+                swipeOffset = 0;
+                return;
+            }
+            swipeDismissDirection = projected < 0 ? -1 : 1;
+            swipeDismissing = true;
+            swipeDismissAnim.start();
         }
 
         readonly property bool shadowsAllowed: win.popupWindowShadowActive
@@ -667,7 +683,7 @@ PanelWindow {
             anchors.fill: parent
             anchors.margins: content.cardInset
             radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : NotificationMetrics.popupRadius
-            color: Theme.notificationFloatingSurface
+            color: "transparent"
 
             HoverHandler {
                 id: cardHoverHandler
@@ -690,7 +706,7 @@ PanelWindow {
                 radius: cardSurface.radius
                 color: "transparent"
 
-                DankFlickable {
+                DFlickable {
                     anchors.fill: parent
                     anchors.bottomMargin: win.timeoutRailClearance
                     contentHeight: notificationCard.targetHeight
@@ -708,10 +724,11 @@ PanelWindow {
                         bodyInvokesAction: win.bodyClickInvokesAction
                         persistImage: true
                         showClose: true
+                        revealControls: win.hovered || win.contextMenuActive
                         dismissText: I18n.tr("Clear")
                         animateHeight: false
                         outerRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : NotificationMetrics.popupRadius
-                        color: Theme.notificationFloatingSurface
+                        color: "transparent"
                         onExpandRequested: win.descriptionExpanded = !win.descriptionExpanded
                         onCloseRequested: win.dismissPopupReliably()
                         onDismissRequested: {
@@ -814,16 +831,9 @@ PanelWindow {
             yAxis.enabled: false
 
             onActiveChanged: {
-                if (active || win.exiting || content.swipeDismissing)
+                if (active)
                     return;
-
-                if (Math.abs(content.swipeOffset) > content.dismissThreshold) {
-                    content.swipeDismissDirection = content.swipeOffset < 0 ? -1 : 1;
-                    content.swipeDismissing = true;
-                    swipeDismissAnim.start();
-                } else {
-                    content.swipeOffset = 0;
-                }
+                content.releaseSwipe();
             }
 
             onTranslationChanged: {
@@ -890,7 +900,28 @@ PanelWindow {
         ]
     }
 
-    DankAnim {
+    // Sits on the untranslated card footprint: inside content the handler would lose the pointer once the card slides past it,
+    // and above content so it sees the gesture before DFlickable's blocking vertical handler
+    Item {
+        parent: slideClip
+        x: content.x
+        y: content.y
+        width: content.width
+        height: content.height
+        visible: content.visible
+
+        NotificationSwipeWheel {
+            enabled: !win.exiting && !content.swipeDismissing
+            onBegan: content.swipeWheelActive = true
+            onMoved: travel => content.swipeOffset = travel
+            onEnded: velocity => {
+                content.swipeWheelActive = false;
+                content.releaseSwipe(velocity);
+            }
+        }
+    }
+
+    DCommon.DAnim {
         id: enterAnimation
         target: win
         property: "presentationProgress"
@@ -906,7 +937,7 @@ PanelWindow {
     SequentialAnimation {
         id: exitAnim
 
-        DankAnim {
+        DCommon.DAnim {
             target: win
             property: "presentationProgress"
             to: 0
@@ -914,7 +945,7 @@ PanelWindow {
             easing.bezierCurve: NotificationMetrics.exitCurve
         }
 
-        DankAnim {
+        DCommon.DAnim {
             target: win
             property: "chromeRelease"
             to: 1
@@ -996,6 +1027,7 @@ PanelWindow {
             appName: notificationData?.appName ?? ""
             desktopEntry: notificationData?.desktopEntry ?? ""
             dismissText: notificationCard.dismissText
+            notification: notificationData
             onAppMuted: {
                 if (notificationData && !win.exiting)
                     NotificationService.dismissNotification(notificationData);

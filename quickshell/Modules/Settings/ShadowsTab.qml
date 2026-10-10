@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -32,7 +32,6 @@ Item {
                 tab: "theme"
                 tags: ["elevation", "shadow", "lift", "m3", "material"]
                 settingKey: "m3ElevationToggle"
-                resetKeys: ["m3ElevationEnabled"]
                 text: I18n.tr("Shadows", "noun, settings page name and toggle for surface shadows")
                 checked: SettingsData.m3ElevationEnabled ?? true
                 onToggled: checked => SettingsData.set("m3ElevationEnabled", checked)
@@ -119,7 +118,7 @@ Item {
                 clickable: true
                 onClicked: root.openShadowColorPicker()
 
-                DankColorSwatch {
+                DColorSwatch {
                     width: Theme.iconSizeMedium
                     height: width
                     swatchColor: SettingsData.m3ElevationCustomColor ?? "#000000"
@@ -174,14 +173,6 @@ Item {
             title: I18n.tr("Apply to")
             settingKey: "m3ElevationTargets"
 
-            SettingsControlledBy {
-                visible: SettingsData.connectedFrameModeActive
-                parentModal: root.parentModal
-                section: "frameBorder"
-                settingLabel: I18n.tr("Apply to")
-                reason: I18n.tr("Managed by Frame in Connected Mode")
-            }
-
             SettingsToggleRow {
                 tab: "theme"
                 tags: ["elevation", "shadow", "modal", "dialog", "m3"]
@@ -230,10 +221,11 @@ Item {
             iconName: "toolbar"
             title: I18n.tr("Bar")
             settingKey: "barShadow"
-            visible: bars.length > 0 && !SettingsData.connectedFrameModeActive
+            visible: bars.length > 0
 
             readonly property var bars: SettingsData.barConfigs.filter(config => !SettingsData.isIslandBarConfig(config))
             readonly property bool shadowActive: (bar.selectedBarConfig?.shadowIntensity ?? 0) > 0
+            readonly property bool editable: shadowActive && !bar.selectedBarFrameSanitized
             readonly property bool isCustomColor: (bar.selectedBarConfig?.shadowColorMode ?? "default") === "custom"
             readonly property string directionSource: bar.selectedBarConfig?.shadowDirectionMode ?? "inherit"
 
@@ -245,11 +237,18 @@ Item {
                 onValueChanged: value => bar.select(shadowCard.bars.find(config => (config.name || config.id) === value)?.id ?? bar.selectedBarId)
             }
 
+            SettingsControlledBy {
+                visible: bar.selectedBarFrameSanitized
+                parentModal: root.parentModal
+                section: "frameBorder"
+                settingLabel: I18n.tr("Bar")
+                reason: I18n.tr("Disabled by Frame Mode")
+            }
+
             SettingsToggleRow {
                 tags: ["shadow", "override", "custom"]
                 text: I18n.tr("Override")
-                resetStore: bar
-                resetKeys: ["shadowIntensity"]
+                enabled: !bar.selectedBarFrameSanitized
                 checked: shadowCard.shadowActive
                 onToggled: checked => {
                     if (checked) {
@@ -266,7 +265,7 @@ Item {
             }
 
             SettingsSliderRow {
-                enabled: shadowCard.shadowActive
+                enabled: shadowCard.editable
                 tags: ["shadow", "blur", "radius"]
                 text: I18n.tr("Intensity", "shadow intensity slider")
                 minimum: 0
@@ -279,7 +278,7 @@ Item {
             }
 
             SettingsSliderRow {
-                enabled: shadowCard.shadowActive
+                enabled: shadowCard.editable
                 text: I18n.tr("Opacity")
                 resetStore: bar
                 resetKeys: ["shadowOpacity"]
@@ -292,7 +291,7 @@ Item {
             }
 
             SettingsDropdownRow {
-                enabled: shadowCard.shadowActive
+                enabled: shadowCard.editable
                 text: I18n.tr("Direction source", "bar shadow direction source")
                 settingKey: "barShadowDirectionSource"
                 resetStore: bar
@@ -325,7 +324,7 @@ Item {
             }
 
             SettingsDropdownRow {
-                enabled: shadowCard.shadowActive
+                enabled: shadowCard.editable
                 visible: shadowCard.directionSource === "manual"
                 text: I18n.tr("Direction", "bar manual shadow direction")
                 settingKey: "barShadowDirectionManual"
@@ -364,7 +363,7 @@ Item {
             }
 
             ColorDropdownRow {
-                enabled: shadowCard.shadowActive
+                enabled: shadowCard.editable
                 tags: ["shadow", "color", "custom"]
                 settingKey: "barShadowColor"
                 resetStore: bar
@@ -404,14 +403,6 @@ Item {
                         shadowCustomColor: selectedColor.toString()
                     })
             }
-        }
-
-        SettingsControlledBy {
-            visible: SettingsData.connectedFrameModeActive && shadowCard.bars.length > 0
-            parentModal: root.parentModal
-            section: "frameBorder"
-            settingLabel: I18n.tr("Bar")
-            reason: I18n.tr("Disabled by Frame Mode")
         }
     }
 }

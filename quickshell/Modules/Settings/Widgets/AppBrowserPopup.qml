@@ -1,8 +1,9 @@
 import QtQuick
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 
-DankFloatingWindow {
+DFloatingWindow {
     id: root
 
     property string searchQuery: ""
@@ -58,7 +59,7 @@ DankFloatingWindow {
             anchors.fill: parent
             spacing: 0
 
-            DankWindowHeader {
+            DWindowHeader {
                 id: titleBar
                 width: parent.width
                 controls: windowControls
@@ -72,10 +73,11 @@ DankFloatingWindow {
 
                 Column {
                     anchors.fill: parent
-                    anchors.margins: Theme.spacingL
+                    anchors.margins: Theme.windowInset
+                    anchors.topMargin: 0
                     spacing: Theme.spacingM
 
-                    DankSearchField {
+                    DSearchField {
                         id: searchField
                         width: parent.width
                         height: Theme.fieldHeightLarge
@@ -89,7 +91,7 @@ DankFloatingWindow {
                         }
                     }
 
-                    DankListView {
+                    DListView {
                         id: appList
                         width: parent.width
                         height: parent.height - searchField.height - Theme.spacingM
@@ -158,7 +160,7 @@ DankFloatingWindow {
                                     }
                                 }
 
-                                DankIcon {
+                                DIcon {
                                     name: "add"
                                     size: Theme.iconSizeMedium
                                     color: Theme.primary

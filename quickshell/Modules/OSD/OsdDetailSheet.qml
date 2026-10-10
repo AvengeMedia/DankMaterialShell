@@ -5,7 +5,7 @@ import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Details
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 FocusScope {
     id: root
@@ -47,7 +47,7 @@ FocusScope {
             horizontalAlignment: Text.AlignLeft
         }
 
-        DankActionButton {
+        DActionButton {
             id: settingsButton
 
             anchors.right: parent.right

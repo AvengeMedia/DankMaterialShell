@@ -32,6 +32,7 @@ type CaptureResult struct {
 	Format    uint32
 	Scale     float64
 	CICP      *CICP
+	CopyOnly  bool
 }
 
 func (o *WaylandOutput) effectiveScale() float64 {
@@ -52,16 +53,15 @@ func (o *WaylandOutput) bounds() Region {
 	x, y, w, h := o.x, o.y, o.width, o.height
 	if DetectCompositor() == CompositorHyprland {
 		if hx, hy, hw, hh, ok := GetHyprlandMonitorGeometry(o.name); ok {
-			x, y, w, h = hx, hy, hw, hh
+			return Region{X: hx, Y: hy, Width: hw, Height: hh, Output: o.name}
 		}
-	} else {
-		if o.transform == 1 || o.transform == 3 || o.transform == 5 || o.transform == 7 {
-			w, h = h, w
-		}
-		if scale := o.effectiveScale(); scale > 0 {
-			w = int32(math.Round(float64(w) / scale))
-			h = int32(math.Round(float64(h) / scale))
-		}
+	}
+	if o.transform == 1 || o.transform == 3 || o.transform == 5 || o.transform == 7 {
+		w, h = h, w
+	}
+	if scale := o.effectiveScale(); scale > 0 {
+		w = int32(math.Round(float64(w) / scale))
+		h = int32(math.Round(float64(h) / scale))
 	}
 	return Region{
 		X:      x,

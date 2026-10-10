@@ -24,7 +24,6 @@ const (
 	EDID_ADDR       = 0x50
 )
 
-// ddcutil's DEFAULT_FLOCK_POLL_MILLISEC and DEFAULT_FLOCK_MAX_WAIT_MILLISEC (src/base/parms.h).
 const (
 	ddcBusLockPoll = 100 * time.Millisecond
 	ddcBusLockWait = 3 * time.Second
@@ -178,8 +177,7 @@ func (b *DDCBackend) probeDDCDevice(bus int, readEDID bool) (*ddcDevice, error) 
 	return dev, nil
 }
 
-// Based on ddcutil's i2c_open_bus() cross-instance lock (src/base/flock.c): ddcutil, other dms
-// processes and this one take turns on a bus.
+// flock on the device node is how ddc tools and other dms processes take turns on a bus.
 func openDDCBus(bus int) (int, error) {
 	// Without O_CLOEXEC a process spawned mid-probe inherits the fd and the flock with it.
 	fd, err := syscall.Open(fmt.Sprintf("/dev/i2c-%d", bus), syscall.O_RDWR|syscall.O_CLOEXEC, 0)
@@ -207,7 +205,6 @@ func setI2CAddr(fd, addr int) error {
 	return nil
 }
 
-// Based on ddcutil's i2c_detect_x37() (src/i2c/i2c_x37.c).
 func detectX37(fd int) bool {
 	if n, err := syscall.Read(fd, make([]byte, 1)); err == nil && n == 1 {
 		return true
@@ -216,7 +213,6 @@ func detectX37(fd int) bool {
 	return err == nil
 }
 
-// Based on ddcutil's i2c_get_raw_edid_by_fd() with the fileio reader (src/i2c/i2c_edid.c).
 func readBusEDID(fd int) ([]byte, error) {
 	if err := setI2CAddr(fd, EDID_ADDR); err != nil {
 		return nil, err
@@ -507,8 +503,7 @@ func (b *DDCBackend) setBrightnessImmediateWithExponent(id string, value int) er
 	return nil
 }
 
-// Based on ddcutil's i2c_check_open_bus_alive() (src/i2c/i2c_bus_core.c), sysfs side only. Known
-// devices are keyed by bus number, which the kernel hands to the next adapter once one goes away.
+// Known devices are keyed by bus number, which the kernel hands to the next adapter once one goes away.
 func (b *DDCBackend) checkBusAlive(dev *ddcDevice) error {
 	if isIgnorableI2CBus(dev.bus) || getI2CDeviceSysfsName(dev.bus) != dev.adapter {
 		return errBusReused

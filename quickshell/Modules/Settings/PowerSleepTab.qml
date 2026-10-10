@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 import "../../Services/BootEntries.js" as BootEntries
@@ -299,9 +300,10 @@ Item {
                 visible: BootEntryService.status === "ready"
                 title: I18n.tr("Add entry", "settings row that adds an EFI boot entry to the power menu")
 
-                DankDropdown {
+                DDropdown {
                     id: bootEntryDropdown
                     downKeyOpens: false
+                    backgroundColor: SettingsMetrics.controlSurface
                     enabled: bootEntryPicker.options.length > 0
                     Accessible.name: bootEntryPicker.title
                     width: Math.min(dropdownWidth, bootEntryPicker.width - SettingsMetrics.rowPaddingH * 2)
@@ -335,7 +337,7 @@ Item {
                     subtitle: "Boot" + modelData.id
                     iconName: "restart_alt"
 
-                    DankActionButton {
+                    DActionButton {
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "delete"
                         iconColor: Theme.error

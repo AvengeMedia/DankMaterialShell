@@ -94,43 +94,6 @@ layout {
 			wantContains: []string{"gaps 5"}, // Should keep new config
 		},
 		{
-			name: "merge single output",
-			newConfig: `input {
-    keyboard {
-        xkb {
-        }
-    }
-}
-/-output "eDP-2" {
-    mode "2560x1600@239.998993"
-    position x=2560 y=0
-}
-layout {
-    gaps 5
-}`,
-			existingConfig: `input {
-    keyboard {
-        xkb {
-        }
-    }
-}
-output "eDP-1" {
-    mode "1920x1080@60.000000"
-    position x=0 y=0
-    scale 1.0
-}
-layout {
-    gaps 10
-}`,
-			wantError: false,
-			wantContains: []string{
-				"gaps 5",                              // New config preserved
-				`output "eDP-1"`,                      // Existing output merged
-				"1920x1080@60.000000",                 // Existing output details
-				"Outputs from existing configuration", // Comment added
-			},
-		},
-		{
 			name: "merge multiple outputs",
 			newConfig: `input {
     keyboard {
@@ -165,46 +128,11 @@ layout {
 }`,
 			wantError: false,
 			wantContains: []string{
-				"gaps 5",              // New config preserved
-				`output "eDP-1"`,      // First existing output
-				`/-output "HDMI-1"`,   // Second existing output (commented)
-				"1920x1080@60.000000", // Output details
-			},
-		},
-		{
-			name: "merge commented outputs",
-			newConfig: `input {
-    keyboard {
-        xkb {
-        }
-    }
-}
-/-output "eDP-2" {
-    mode "2560x1600@239.998993"
-    position x=2560 y=0
-}
-layout {
-    gaps 5
-}`,
-			existingConfig: `input {
-    keyboard {
-        xkb {
-        }
-    }
-}
-/-output "eDP-1" {
-    mode "1920x1080@60.000000"
-    position x=0 y=0
-    scale 1.0
-}
-layout {
-    gaps 10
-}`,
-			wantError: false,
-			wantContains: []string{
-				"gaps 5",              // New config preserved
-				`/-output "eDP-1"`,    // Commented output preserved
-				"1920x1080@60.000000", // Output details
+				"gaps 5",                              // New config preserved
+				`output "eDP-1"`,                      // First existing output
+				`/-output "HDMI-1"`,                   // Second existing output (commented)
+				"1920x1080@60.000000",                 // Output details
+				"Outputs from existing configuration", // Comment added
 			},
 		},
 	}
@@ -377,7 +305,7 @@ func TestHyprlandConfigDeployment(t *testing.T) {
 		require.NoError(t, err)
 		defer os.RemoveAll(td)
 		os.Setenv("HOME", td)
-		result, err := cd.deployHyprlandConfig(deps.TerminalGhostty, true)
+		result, err := cd.deployHyprlandConfig("ghostty", true)
 		require.NoError(t, err)
 
 		assert.Equal(t, "Hyprland", result.ConfigType)
@@ -418,7 +346,7 @@ general {
 		require.NoError(t, os.WriteFile(filepath.Join(filepath.Dir(hyprPath), "hyprland.conf.backup.old"), []byte("old backup\n"), 0o644))
 		require.NoError(t, os.WriteFile(filepath.Join(dmsDir, "binds.conf.backup.old"), []byte("old dms backup\n"), 0o644))
 
-		result, err := cd.deployHyprlandConfig(deps.TerminalKitty, true)
+		result, err := cd.deployHyprlandConfig("kitty", true)
 		require.NoError(t, err)
 
 		assert.Equal(t, "Hyprland", result.ConfigType)
@@ -469,7 +397,7 @@ general {
 		require.NoError(t, os.WriteFile(luaPath, []byte(`require("dms.binds")`+"\n"), 0o644))
 		require.NoError(t, os.Symlink(filepath.Join(configDir, "missing-legacy.conf"), confPath))
 
-		result, err := cd.deployHyprlandConfig(deps.TerminalKitty, true)
+		result, err := cd.deployHyprlandConfig("kitty", true)
 		require.NoError(t, err)
 
 		assert.Equal(t, luaPath, result.Path)
@@ -491,7 +419,7 @@ general {
 		userBinds := "-- custom user binds\n"
 		require.NoError(t, os.WriteFile(filepath.Join(dmsDir, "binds-user.lua"), []byte(userBinds), 0o644))
 
-		_, err = cd.deployHyprlandConfig(deps.TerminalKitty, true)
+		_, err = cd.deployHyprlandConfig("kitty", true)
 		require.NoError(t, err)
 
 		managed, err := os.ReadFile(filepath.Join(dmsDir, "binds.lua"))
@@ -866,7 +794,7 @@ func TestDeployHyprlandConfigWritesLuaBeforeRemovingLegacyConf(t *testing.T) {
 	}()
 	defer close(logChan)
 
-	result, err := cd.deployHyprlandConfig(deps.TerminalGhostty, true)
+	result, err := cd.deployHyprlandConfig("ghostty", true)
 	require.NoError(t, err)
 
 	assert.NoFileExists(t, confPath)
@@ -874,4 +802,15 @@ func TestDeployHyprlandConfigWritesLuaBeforeRemovingLegacyConf(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, userConfig, string(backup))
 	assert.Equal(t, filepath.Join(filepath.Dir(result.BackupPath), "hyprland.conf"), result.BackupPath)
+}
+
+func TestHyprlandLuaUnsupported(t *testing.T) {
+	for ver, refuse := range map[string]bool{
+		"0.54.2": true,
+		"0.55.0": false,
+		"":       false,
+	} {
+		err := hyprlandLuaUnsupported(ver)
+		assert.Equal(t, refuse, err != nil, ver)
+	}
 }

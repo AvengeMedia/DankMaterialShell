@@ -5,6 +5,7 @@ import qs.Common
 import qs.Services
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.BuiltinPlugins
+import qs.Modules.ControlCenter.Components
 import qs.Modules.ControlCenter.Widgets
 import "../utils/widgets.js" as WidgetUtils
 
@@ -113,6 +114,9 @@ QtObject {
     readonly property Component runningAppsTile: Component {
         RunningAppsTile {}
     }
+    readonly property Component quickTilesGroup: Component {
+        QuickTilesGroup {}
+    }
     readonly property Component pluginTile: Component {
         PluginTile {}
     }
@@ -171,9 +175,12 @@ QtObject {
         case "lock":
         case "power":
         case "settings":
+        case "edit":
             return actionTile;
         case "runningApps":
             return runningAppsTile;
+        case "quickTiles":
+            return quickTilesGroup;
         default:
             return null;
         }
@@ -229,6 +236,15 @@ QtObject {
             "enabled": true
         },
         {
+            "id": "edit",
+            "text": I18n.tr("Edit"),
+            "description": I18n.tr("Edit widgets"),
+            "icon": "edit",
+            "type": "action",
+            "category": "system",
+            "enabled": true
+        },
+        {
             "id": "runningApps",
             "text": I18n.tr("Running apps"),
             "description": "",
@@ -236,6 +252,16 @@ QtObject {
             "type": "action",
             "category": "system",
             "enabled": true
+        },
+        {
+            "id": "quickTiles",
+            "text": I18n.tr("Quick tiles", "control center widget that holds small tiles in one row"),
+            "description": I18n.tr("Drag small tiles in to group them", "control center quick tiles widget description"),
+            "icon": "view_module",
+            "type": "action",
+            "category": "system",
+            "enabled": true,
+            "allowMultiple": true
         },
         {
             "id": "nightMode",

@@ -6,6 +6,7 @@ import qs.Services
 import qs.Modules.ControlCenter.Components
 import qs.Modules.ControlCenter.Models
 import qs.Modules.ControlCenter.Details
+import qs.DCommon.Widgets
 import qs.Widgets
 import "./utils/sections.js" as Sections
 import "./utils/widgets.js" as WidgetUtils
@@ -15,12 +16,18 @@ FocusScope {
 
     required property var host
 
+    property bool live: Window.window?.visible ?? false
+    property bool audioRefHeld: false
+
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
     readonly property bool pageOpen: (host.expandedSection ?? "") !== ""
     readonly property real gridHeight: widgetGrid.gridHeight
-    readonly property real chromeHeight: Theme.spacingS + footer.height
+    // The row cap always reserves the footer so showing it in edit mode never reflows tiles.
+    readonly property real footerReserve: Theme.spacingS + CcMetrics.footerHeight
+    readonly property bool footerShown: root.host.editMode || footerItems.length > 0
+    readonly property real chromeHeight: footerShown ? footerReserve : 0
     readonly property bool widgetSheetOpen: widgetSheetLoader.item?.active ?? false
     readonly property real coveredAmount: Math.max(detailPage.opacity, widgetSheetLoader.item?.progress ?? 0)
     property bool widgetSheetRequested: false
@@ -54,9 +61,9 @@ FocusScope {
     readonly property vector4d surfaceCornerRadii: host.surfaceCornerRadii ?? Qt.vector4d(Theme.windowRadius, Theme.windowRadius, Theme.windowRadius, Theme.windowRadius)
     readonly property int gridColumnCap: host.gridColumnCap ?? CcMetrics.columnCapFor((host.triggerScreen?.width ?? CcMetrics.sheetWidthDefault + Theme.spacingL * 2) - Theme.spacingL * 2)
     readonly property int gridColumns: host.gridColumns ?? Math.min(CcMetrics.gridColumns, gridColumnCap)
-    readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - chromeHeight
+    readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - footerReserve
     readonly property vector4d chromeRoom: host.chromeRoom ?? Qt.vector4d(Infinity, Infinity, Infinity, Infinity)
-    readonly property DankPanelResizer panelResizer: DankPanelResizer {
+    readonly property DPanelResizer panelResizer: DPanelResizer {
         popout: root.host
         stepWidth: CcMetrics.columnWidth + CcMetrics.gridGap
         widthFor: columns => CcMetrics.sheetWidthFor(columns) + root.sheetContentWidth - CcMetrics.sheetWidthFor(root.gridColumns)
@@ -73,6 +80,25 @@ FocusScope {
 
     implicitHeight: targetImplicitHeight
     focus: true
+
+    function syncAudioRef(wanted) {
+        if (wanted === audioRefHeld)
+            return;
+        audioRefHeld = wanted;
+        if (wanted) {
+            AudioService.addRef();
+            return;
+        }
+        AudioService.removeRef();
+    }
+
+    onLiveChanged: syncAudioRef(live)
+    Component.onCompleted: {
+        WidgetUtils.ensureEditButton();
+        syncAudioRef(live);
+    }
+    Component.onDestruction: syncAudioRef(false)
+    onPlacedWidgetIdsChanged: WidgetUtils.ensureEditButton()
 
     function navigateTo(section) {
         if (section === host.expandedSection)
@@ -161,12 +187,22 @@ FocusScope {
     }
 
     // Goes by the dragged tile, not the pointer: the middle of its top row has to cross the grid's edge as it
-    // was at drag start, which the grid growing under the drag cannot move.
+    // was at drag start, which the grid growing under the drag cannot move. Below the grid that edge sits one
+    // row lower while the panel has room to grow, so a tile can still be dropped into a new bottom row.
     function footerTakesGridDrag(tile) {
-        if (gridDragWidget === null || footer.freeCells() < WidgetUtils.footerMinCells(gridDragWidget.id))
+        if (gridDragWidget === null || gridDragWidget.id === WidgetUtils.GROUP_ID || footer.freeCells() < WidgetUtils.footerMinCells(gridDragWidget.id))
             return false;
-        const anchor = tile.y + Math.min(tile.height, widgetGrid.slotLayout.rowUnit) / 2;
-        return footerOnTop ? anchor < -CcMetrics.gridGap / 2 : anchor > widgetGrid.pinnedHeight + CcMetrics.gridGap / 2;
+        const rowUnit = widgetGrid.slotLayout.rowUnit;
+        const anchor = tile.y + Math.min(tile.height, rowUnit) / 2;
+        if (footerOnTop)
+            return anchor < -CcMetrics.gridGap / 2;
+        const newRow = CcMetrics.gridGap + rowUnit;
+        const room = widgetGrid.pinnedHeight + newRow <= availableGridHeight ? newRow : 0;
+        return anchor > widgetGrid.pinnedHeight + room + CcMetrics.gridGap / 2;
+    }
+
+    function groupTakesGridDrag(scenePoint) {
+        return WidgetUtils.canGroup(gridDragWidget) && widgetGrid.groupAt(scenePoint, widgetGrid.draggingSourceIndex) !== null;
     }
 
     // Drops commit a tick later: committing inside the release handler would destroy the dragged item mid-signal.
@@ -177,6 +213,16 @@ FocusScope {
         if (footer.trashContains(scenePoint)) {
             Qt.callLater(() => {
                 widgetModel.removeWidget(savedIndex);
+                widgetGrid.cancelInteraction();
+            });
+            return true;
+        }
+        const group = widgetGrid.hoverGroup !== "" ? widgetGrid.groupAt(scenePoint, index) : null;
+        if (group) {
+            const groupId = group.groupId;
+            const before = group.savedIndexAtSlot(group.incomingSlot);
+            Qt.callLater(() => {
+                WidgetUtils.moveToGroup(savedIndex, groupId, before);
                 widgetGrid.cancelInteraction();
             });
             return true;
@@ -279,6 +325,13 @@ FocusScope {
         event.accepted = true;
     }
 
+    Shortcut {
+        sequences: ["F2", "Ctrl+E"]
+        enabled: root.host.shouldBeVisible && !root.host.editMode && !root.pageOpen
+        context: Qt.WindowShortcut
+        onActivated: root.host.editMode = true
+    }
+
     readonly property string expandedSection: host.expandedSection ?? ""
     readonly property bool editMode: host.editMode
 
@@ -305,7 +358,7 @@ FocusScope {
             forceActiveFocus();
     }
 
-    DankGridEditChrome {
+    DGridEditChrome {
         id: panelChrome
 
         readonly property real screenWidth: root.host.triggerScreen?.width ?? Infinity
@@ -366,15 +419,15 @@ FocusScope {
         }
     }
 
-    DankFlickable {
+    DFlickable {
         id: contentFlickable
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: root.footerOnTop ? footer.bottom : parent.top
-        anchors.topMargin: root.footerOnTop ? Theme.spacingS : 0
+        anchors.topMargin: root.footerOnTop && root.footerShown ? Theme.spacingS : 0
         anchors.bottom: root.footerOnTop ? parent.bottom : footer.top
-        anchors.bottomMargin: root.footerOnTop ? 0 : Theme.spacingS
+        anchors.bottomMargin: !root.footerOnTop && root.footerShown ? Theme.spacingS : 0
         clip: contentHeight > height
         contentWidth: width
         contentHeight: Math.max(height, mainColumn.implicitHeight + CcMetrics.sheetPadding)
@@ -408,7 +461,7 @@ FocusScope {
                     screenName: root.host.triggerScreen?.name || ""
                     tapToClose: root.host.headerTogglesClose ?? false
                     runningToplevels: root.runningToplevels
-                    dragsOutside: (index, scenePoint, tile) => footer.trashContains(scenePoint) || root.footerTakesGridDrag(tile)
+                    dragsOutside: (index, scenePoint, tile) => footer.trashContains(scenePoint) || root.groupTakesGridDrag(scenePoint) || root.footerTakesGridDrag(tile)
                     dropHandler: (index, scenePoint) => root.dropFromGrid(index, scenePoint)
                     onExpandClicked: widgetData => root.openWidgetPage(widgetData)
                     onRemoveWidget: index => widgetModel.removeWidget(index)
@@ -416,6 +469,7 @@ FocusScope {
                     onColorPickerRequested: root.host.openColorPicker()
                     onCloseRequested: root.host.close()
                     onSettingsRequested: root.host.openSettings()
+                    onEditRequested: root.host.editMode = true
                     onAccountsRequested: root.host.openAccounts()
                     onLockRequested: {
                         root.host.close();
@@ -442,6 +496,8 @@ FocusScope {
         x: CcMetrics.sheetPadding
         y: root.footerOnTop ? CcMetrics.sheetPadding : root.height - CcMetrics.sheetPadding - height
         width: root.sheetContentWidth - CcMetrics.sheetPadding * 2
+        height: root.footerShown ? implicitHeight : 0
+        visible: root.footerShown
         grid: widgetGrid
         editMode: root.host.editMode
         onTop: root.footerOnTop
@@ -449,7 +505,8 @@ FocusScope {
         items: root.footerItems
         gridDragging: root.gridDragWidget !== null
         gridDragPoint: widgetGrid.dragScenePoint
-        incoming: root.gridDragWidget !== null && widgetGrid.heldOutside && !footer.overTrash ? Object.assign({
+        incomingRemovable: WidgetUtils.isRemovable(root.gridDragWidget)
+        incoming: root.gridDragWidget !== null && widgetGrid.heldOutside && widgetGrid.hoverGroup === "" && !footer.overTrash ? Object.assign({
             "cells": Math.min(WidgetUtils.footerCells(root.gridDragWidget), footer.freeCells())
         }, footer.gridSlot) : null
         dropHandler: (index, cells, scenePoint) => root.dropFromFooter(index, scenePoint)
@@ -463,7 +520,7 @@ FocusScope {
         onConfigRequested: (index, widgetData, anchor) => root.openConfigOverlay(index, widgetData, anchor)
         onItemMoved: (index, sceneRect, leaving) => root.previewFooterDrag(index, sceneRect, leaving)
         onResized: (index, cells, fill) => WidgetUtils.setFooterSize(index, cells, fill)
-        onEditToggled: root.host.editMode = !root.host.editMode
+        onFinishRequested: root.host.editMode = false
         onCancelRequested: root.cancelEdit()
     }
 

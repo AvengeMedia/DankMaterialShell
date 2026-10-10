@@ -3,7 +3,7 @@ import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 CcListRow {
     id: root
@@ -76,7 +76,7 @@ CcListRow {
     clickable: true
     onClicked: DMSNetworkService.toggle(profile.uuid)
 
-    leading: DankSpinner {
+    leading: DSpinner {
         size: Theme.iconSizeMedium
         strokeWidth: CcMetrics.spinnerStroke
         color: Theme.warning
@@ -84,7 +84,7 @@ CcListRow {
         running: visible
     }
 
-    DankActionButton {
+    DActionButton {
         anchors.verticalCenter: parent.verticalCenter
         visible: root.isActive
         buttonSize: Theme.buttonHeightXS
@@ -96,7 +96,7 @@ CcListRow {
         onClicked: DMSNetworkService.toggle(root.profile.uuid)
     }
 
-    DankActionButton {
+    DActionButton {
         anchors.verticalCenter: parent.verticalCenter
         visible: root.canExpand
         buttonSize: Theme.buttonHeightXS
@@ -107,7 +107,7 @@ CcListRow {
         onClicked: root.toggleExpand()
     }
 
-    DankActionButton {
+    DActionButton {
         anchors.verticalCenter: parent.verticalCenter
         visible: root.canDelete
         buttonSize: Theme.buttonHeightXS
@@ -123,7 +123,7 @@ CcListRow {
         spacing: Theme.spacingS
         visible: root.isExpanded
 
-        DankSpinner {
+        DSpinner {
             anchors.horizontalCenter: parent.horizontalCenter
             size: Theme.iconSizeMedium
             strokeWidth: CcMetrics.spinnerStroke
@@ -139,7 +139,7 @@ CcListRow {
             Repeater {
                 model: root.configFields
 
-                DankDetailChip {
+                DDetailChip {
                     required property var modelData
 
                     label: modelData.label
@@ -150,7 +150,7 @@ CcListRow {
             }
         }
 
-        DankToggle {
+        DToggle {
             width: parent.width
             text: I18n.tr("Autoconnect")
             checked: root.configData ? (root.configData.autoconnect || false) : false
@@ -171,23 +171,27 @@ CcListRow {
                 color: root.hasError ? Theme.error : Theme.surfaceVariantText
             }
 
-            DankTextField {
+            DTextField {
                 id: usernameField
                 width: parent.width
+                expressive: true
+                leftIconName: "person"
                 placeholderText: I18n.tr("Username")
                 text: (root.configData && (root.configData.username || (root.configData.data && root.configData.data.username))) || ""
             }
 
-            DankTextField {
+            DTextField {
                 id: passwordField
                 width: parent.width
+                expressive: true
+                leftIconName: "lock"
                 placeholderText: I18n.tr("Password")
                 echoMode: TextInput.Password
                 showPasswordToggle: true
-                normalBorderColor: root.hasError ? Theme.error : Theme.outlineMedium
+                isError: root.hasError
             }
 
-            DankButton {
+            DButton {
                 text: I18n.tr("Save credentials")
                 buttonHeight: Theme.buttonHeightXS
                 enabled: passwordField.text.length > 0

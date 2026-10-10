@@ -3,7 +3,6 @@ import Quickshell
 import qs.Common
 import qs.Modules.Settings.Widgets
 import qs.Services
-import qs.Widgets
 
 Item {
     id: root
@@ -160,7 +159,6 @@ Item {
                 }
 
                 SettingsToggleRow {
-                    resetKeys: ["notificationFocusedMonitor"]
                     visible: componentCard.modelData.id === "notifications"
                     text: I18n.tr("Focused display only")
                     checked: SettingsData.notificationFocusedMonitor

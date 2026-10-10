@@ -5,7 +5,7 @@ import Quickshell
 import qs.Common
 import qs.Modals.FileBrowser
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -21,6 +21,7 @@ Item {
     }
     readonly property bool enabled: perMonitor ? monitorSettings.enabled : SessionData.wallpaperCyclingEnabled
     readonly property bool random: perMonitor ? monitorSettings.random : SessionData.wallpaperCyclingRandom
+    readonly property bool recursive: perMonitor ? monitorSettings.recursive : SessionData.wallpaperCyclingRecursive
     readonly property string mode: perMonitor ? monitorSettings.mode : SessionData.wallpaperCyclingMode
     readonly property int interval: perMonitor ? monitorSettings.interval : SessionData.wallpaperCyclingInterval
     readonly property string time: perMonitor ? monitorSettings.time : SessionData.wallpaperCyclingTime
@@ -84,6 +85,14 @@ Item {
         SessionData.setWallpaperCyclingRandom(value);
     }
 
+    function setRecursive(value) {
+        if (perMonitor) {
+            SessionData.setMonitorCyclingRecursive(selectedScreen, value);
+            return;
+        }
+        SessionData.setWallpaperCyclingRecursive(value);
+    }
+
     function setMode(value) {
         if (perMonitor) {
             SessionData.setMonitorCyclingMode(selectedScreen, value);
@@ -144,24 +153,24 @@ Item {
                 subtitle: root.wallpaperFolder
                 enabled: root.canCycle
 
-                DankActionButton {
+                DActionButton {
                     buttonSize: Theme.iconButtonSize
                     iconName: "skip_previous"
                     iconSize: Theme.iconSizeMedium
                     iconColor: Theme.surfaceText
-                    backgroundColor: Theme.chipSurface
+                    backgroundColor: SettingsMetrics.controlSurface
                     enabled: root.canCycle
                     Accessible.name: I18n.tr("Previous")
                     anchors.verticalCenter: parent.verticalCenter
                     onClicked: root.cycle(true)
                 }
 
-                DankActionButton {
+                DActionButton {
                     buttonSize: Theme.iconButtonSize
                     iconName: "skip_next"
                     iconSize: Theme.iconSizeMedium
                     iconColor: Theme.surfaceText
-                    backgroundColor: Theme.chipSurface
+                    backgroundColor: SettingsMetrics.controlSurface
                     enabled: root.canCycle
                     Accessible.name: I18n.tr("Next")
                     anchors.verticalCenter: parent.verticalCenter
@@ -185,7 +194,7 @@ Item {
                 title: I18n.tr("Folder")
                 subtitle: root.folderPath || I18n.tr("Use desktop wallpaper")
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Browse")
                     horizontalPadding: Theme.spacingL
                     anchors.verticalCenter: parent.verticalCenter
@@ -195,6 +204,15 @@ Item {
                             folderBrowserLoader.item.open();
                     }
                 }
+            }
+
+            SettingsToggleRow {
+                tab: "wallpaper"
+                tags: ["cycling", "subfolders", "recursive", "directories", "folders"]
+                settingKey: "wallpaperCyclingRecursive"
+                text: I18n.tr("Include subfolders")
+                checked: root.recursive
+                onToggled: toggled => root.setRecursive(toggled)
             }
 
             SettingsToggleRow {

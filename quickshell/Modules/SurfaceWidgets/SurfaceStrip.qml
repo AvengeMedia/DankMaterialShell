@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../../Common/settings/DockConfig.js" as DockConfig
 
 FocusScope {
@@ -32,7 +32,9 @@ FocusScope {
         return sourceOrder;
     }
     readonly property var positions: layoutPositions(sourceOrder)
-    readonly property var previewPositions: layoutPositions(visualOrder)
+    readonly property var restPositions: layoutPositions(visualOrder)
+    readonly property var unalignedPositions: layoutPositions(visualOrder, undefined, 0)
+    readonly property var previewPositions: magnificationExpand ? layoutPositions(visualOrder, magnificationScales) : restPositions
     readonly property var unitIds: DockConfig.units(model)
     readonly property var unitSpans: {
         const spans = [];
@@ -55,13 +57,16 @@ FocusScope {
         return spans;
     }
 
-    function layoutPositions(order) {
+    // `scales` widens each slot's footprint so magnified neighbours are pushed apart instead of overlapping.
+    function layoutPositions(order, scales, startOffset) {
         const result = [];
-        let offset = alignOffset;
+        let offset = startOffset ?? alignOffset;
         for (const index of order) {
-            result[index] = offset;
+            const scale = scales?.[index] ?? 1.0;
+            const extra = scales ? (scale - 1.0) * allocatedSizes[index] * expansionRatio : 0;
+            result[index] = offset + extra / 2;
             if (participating[index])
-                offset += allocatedSizes[index] + spacing;
+                offset += allocatedSizes[index] + extra + spacing;
         }
         return result;
     }
@@ -116,6 +121,7 @@ FocusScope {
     }
     readonly property bool vertical: surfaceContext.isVertical
     readonly property bool magnificationEnabled: (root.surfaceContext.config?.magnification ?? false) && !root.surfaceContext.editMode
+    readonly property bool magnificationExpand: (root.surfaceContext.config?.magnificationExpand ?? false) && root.magnificationEnabled && !root.fillAvailable
     readonly property string magnificationProfile: root.surfaceContext.config?.magnificationProfile ?? "parabolic"
     readonly property real maxMagnification: Math.max(1.05, Math.min(2.0, (root.surfaceContext.config?.magnificationScale ?? 130) / 100))
     readonly property real baseSlotSize: {
@@ -140,6 +146,25 @@ FocusScope {
     }
     readonly property real hoverCursorX: stripHoverHandler.point.position.x + scroll.contentX - (root.vertical ? root.crossOverflow : 0)
     readonly property real hoverCursorY: stripHoverHandler.point.position.y + scroll.contentY - (root.vertical ? 0 : root.crossOverflow)
+    // Strip origin in scene coordinates, latched while the dock is at rest; the dock moves its origin as it grows.
+    property real restOriginX: 0
+    property real restOriginY: 0
+    readonly property real restCursorX: stripHoverHandler.point.scenePosition.x - restOriginX + scroll.contentX - (root.vertical ? root.crossOverflow : 0)
+    readonly property real restCursorY: stripHoverHandler.point.scenePosition.y - restOriginY + scroll.contentY - (root.vertical ? 0 : root.crossOverflow)
+    Binding {
+        target: root
+        property: "restOriginX"
+        value: stripHoverHandler.point.scenePosition.x - stripHoverHandler.point.position.x
+        when: root.magnificationProgress <= 0.001
+        restoreMode: Binding.RestoreNone
+    }
+    Binding {
+        target: root
+        property: "restOriginY"
+        value: stripHoverHandler.point.scenePosition.y - stripHoverHandler.point.position.y
+        when: root.magnificationProgress <= 0.001
+        restoreMode: Binding.RestoreNone
+    }
     readonly property bool hoverActive: stripHoverHandler.hovered && !root.dragActive
     property real magnificationProgress: 0.0
     Binding {
@@ -165,9 +190,31 @@ FocusScope {
     readonly property var flexible: model.map(item => item.widgetId === "flexibleSpacer" && item.enabled !== false)
     readonly property var participating: sizes.map((size, index) => size > 0 || flexible[index])
     readonly property real gapSpace: Math.max(0, participating.filter(Boolean).length - 1) * spacing
-    readonly property real preferredLength: sizes.reduce((sum, size) => sum + size, 0) + gapSpace
     readonly property var allocatedSizes: DockConfig.allocation(sizes, flexible, fillAvailable ? Math.max(0, availableSize - gapSpace) : 0, 0)
-    readonly property real contentLength: allocatedSizes.reduce((sum, size) => sum + size, 0) + gapSpace
+    // Scales depend only on the pointer in the rest frame (strip origin latched before the dock grows)
+    // and on unaligned rest positions, so the displaced layout cannot feed back into them.
+    readonly property var magnificationScales: {
+        if (!magnificationExpand || magnificationProgress <= 0.001)
+            return allocatedSizes.map(() => 1.0);
+        const cursor = vertical ? restCursorY : restCursorX;
+        return allocatedSizes.map((size, i) => {
+            if (flexible[i] || !participating[i])
+                return 1.0;
+            const center = (unalignedPositions[i] ?? 0) + size / 2;
+            const factor = DockConfig.magnificationFactor(Math.abs(center - cursor), influenceRadius, magnificationProfile);
+            return 1.0 + (maxMagnification - 1.0) * factor * magnificationProgress;
+        });
+    }
+    // Upper bound for the expansion, set by hosts that have a finite amount of room to grow into.
+    property real expansionLimit: Infinity
+    readonly property real uncappedMagnificationExpansion: magnificationScales.reduce((sum, scale, i) => sum + (scale - 1.0) * (allocatedSizes[i] ?? 0), 0)
+    readonly property real totalMagnificationExpansion: Math.min(expansionLimit, uncappedMagnificationExpansion)
+    // Shrinks each slot's extra so the displaced icons fit the capped expansion.
+    readonly property real expansionRatio: uncappedMagnificationExpansion > 0 ? totalMagnificationExpansion / uncappedMagnificationExpansion : 1.0
+    readonly property real restLength: sizes.reduce((sum, size) => sum + size, 0) + gapSpace
+    readonly property real preferredLength: restLength + totalMagnificationExpansion
+    readonly property real baseContentLength: allocatedSizes.reduce((sum, size) => sum + size, 0) + gapSpace
+    readonly property real contentLength: baseContentLength + totalMagnificationExpansion
     readonly property bool interactionActive: {
         layoutRevision;
         if (dragActive)
@@ -249,7 +296,7 @@ FocusScope {
         id: updateLayout
         onTriggered: root.layoutRevision++
     }
-    DankFlickable {
+    DFlickable {
         id: scroll
         x: root.vertical ? -root.crossOverflow : 0
         y: root.vertical ? 0 : -root.crossOverflow
@@ -288,6 +335,8 @@ FocusScope {
                 readonly property real targetScale: {
                     if (!root.magnificationEnabled || root.magnificationProgress <= 0.001 || slot.flexible)
                         return 1.0;
+                    if (root.magnificationExpand)
+                        return root.magnificationScales[index] ?? 1.0;
                     const center = root.vertical ? (slot.y + slot.height / 2) : (slot.x + slot.width / 2);
                     const cursor = root.vertical ? root.hoverCursorY : root.hoverCursorX;
                     const dist = Math.abs(center - cursor);
@@ -450,7 +499,7 @@ FocusScope {
                     onCanceled: root.cancelDrag()
                     onWheel: wheel => wheel.accepted = false
                 }
-                DankActionButton {
+                DActionButton {
                     visible: root.surfaceContext.editMode && slot.modelData.widgetId !== "application" && (root.participating[slot.index] ?? false)
                     z: 2
                     anchors.top: parent.top

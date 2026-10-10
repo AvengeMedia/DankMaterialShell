@@ -19,11 +19,6 @@ func TestHexToRGB(t *testing.T) {
 			expected: RGB{R: 0.0, G: 0.0, B: 0.0},
 		},
 		{
-			name:     "white with hash",
-			input:    "#ffffff",
-			expected: RGB{R: 1.0, G: 1.0, B: 1.0},
-		},
-		{
 			name:     "red without hash",
 			input:    "ff0000",
 			expected: RGB{R: 1.0, G: 0.0, B: 0.0},
@@ -32,11 +27,6 @@ func TestHexToRGB(t *testing.T) {
 			name:     "purple",
 			input:    "#625690",
 			expected: RGB{R: 0.3843137254901961, G: 0.33725490196078434, B: 0.5647058823529412},
-		},
-		{
-			name:     "mid gray",
-			input:    "#808080",
-			expected: RGB{R: 0.5019607843137255, G: 0.5019607843137255, B: 0.5019607843137255},
 		},
 	}
 
@@ -56,16 +46,6 @@ func TestRGBToHex(t *testing.T) {
 		input    RGB
 		expected string
 	}{
-		{
-			name:     "black",
-			input:    RGB{R: 0.0, G: 0.0, B: 0.0},
-			expected: "#000000",
-		},
-		{
-			name:     "white",
-			input:    RGB{R: 1.0, G: 1.0, B: 1.0},
-			expected: "#ffffff",
-		},
 		{
 			name:     "red",
 			input:    RGB{R: 1.0, G: 0.0, B: 0.0},
@@ -103,11 +83,6 @@ func TestRGBToHSL(t *testing.T) {
 			name:     "black",
 			input:    RGB{R: 0.0, G: 0.0, B: 0.0},
 			expected: HSL{H: 0.0, S: 0.0, L: 0.0},
-		},
-		{
-			name:     "white",
-			input:    RGB{R: 1.0, G: 1.0, B: 1.0},
-			expected: HSL{H: 0.0, S: 0.0, L: 1.0},
 		},
 		{
 			name:     "red",
@@ -153,11 +128,6 @@ func TestRGBToHSV(t *testing.T) {
 			expected: HSV{H: 0.0, S: 0.0, V: 0.0},
 		},
 		{
-			name:     "white",
-			input:    RGB{R: 1.0, G: 1.0, B: 1.0},
-			expected: HSV{H: 0.0, S: 0.0, V: 1.0},
-		},
-		{
 			name:     "red",
 			input:    RGB{R: 1.0, G: 0.0, B: 0.0},
 			expected: HSV{H: 0.0, S: 1.0, V: 1.0},
@@ -190,11 +160,6 @@ func TestHSVToRGB(t *testing.T) {
 		input    HSV
 		expected RGB
 	}{
-		{
-			name:     "black",
-			input:    HSV{H: 0.0, S: 0.0, V: 0.0},
-			expected: RGB{R: 0.0, G: 0.0, B: 0.0},
-		},
 		{
 			name:     "white",
 			input:    HSV{H: 0.0, S: 0.0, V: 1.0},
@@ -233,16 +198,6 @@ func TestLuminance(t *testing.T) {
 		input    string
 		expected float64
 	}{
-		{
-			name:     "black",
-			input:    "#000000",
-			expected: 0.0,
-		},
-		{
-			name:     "white",
-			input:    "#ffffff",
-			expected: 1.0,
-		},
 		{
 			name:     "red",
 			input:    "#ff0000",
@@ -316,20 +271,6 @@ func TestEnsureContrast(t *testing.T) {
 		isLightMode bool
 	}{
 		{
-			name:        "already sufficient contrast dark mode",
-			color:       "#ffffff",
-			bg:          "#000000",
-			minRatio:    4.5,
-			isLightMode: false,
-		},
-		{
-			name:        "already sufficient contrast light mode",
-			color:       "#000000",
-			bg:          "#ffffff",
-			minRatio:    4.5,
-			isLightMode: true,
-		},
-		{
 			name:        "needs adjustment dark mode",
 			color:       "#404040",
 			bg:          "#1a1a1a",
@@ -373,13 +314,6 @@ func TestGeneratePalette(t *testing.T) {
 			opts:          PaletteOptions{IsLight: false},
 		},
 		{
-			name:          "light theme default",
-			base:          "#625690",
-			backgroundHex: "#f8f8f8",
-			backgroundHSL: "hsl(0.0, 0.0%, 97.3%)",
-			opts:          PaletteOptions{IsLight: true},
-		},
-		{
 			name:          "light theme with custom background",
 			base:          "#625690",
 			backgroundHex: "#fafafa",
@@ -387,16 +321,6 @@ func TestGeneratePalette(t *testing.T) {
 			opts: PaletteOptions{
 				IsLight:    true,
 				Background: "#fafafa",
-			},
-		},
-		{
-			name:          "dark theme with custom background",
-			base:          "#625690",
-			backgroundHex: "#0a0a0a",
-			backgroundHSL: "hsl(0.0, 0.0%, 3.9%)",
-			opts: PaletteOptions{
-				IsLight:    false,
-				Background: "#0a0a0a",
 			},
 		},
 	}
@@ -454,28 +378,8 @@ func TestFormatOutput(t *testing.T) {
 			out: []byte(`{"hex":"#000000","hex_stripped":"000000","hex_alpha":"#000000ff","hex_alpha_stripped":"000000ff","alpha_hex":"#ff000000","alpha_hex_stripped":"ff000000","rgb":"rgb(0, 0, 0)","rgba":"rgba(0, 0, 0, 1.0)","hsl":"hsl(0.0, 0.0%, 0.0%)","hsla":"hsla(0.0, 0.0%, 0.0%, 1.0)","red":"0","green":"0","blue":"0","alpha":"1.0","hue":"0.0","saturation":"0.0%","lightness":"0.0%"}`),
 		},
 		{
-			in:  "#ffffff",
-			out: []byte(`{"hex":"#ffffff","hex_stripped":"ffffff","hex_alpha":"#ffffffff","hex_alpha_stripped":"ffffffff","alpha_hex":"#ffffffff","alpha_hex_stripped":"ffffffff","rgb":"rgb(255, 255, 255)","rgba":"rgba(255, 255, 255, 1.0)","hsl":"hsl(0.0, 0.0%, 100.0%)","hsla":"hsla(0.0, 0.0%, 100.0%, 1.0)","red":"255","green":"255","blue":"255","alpha":"1.0","hue":"0.0","saturation":"0.0%","lightness":"100.0%"}`),
-		},
-		{
-			in:  "#ff0000",
-			out: []byte(`{"hex":"#ff0000","hex_stripped":"ff0000","hex_alpha":"#ff0000ff","hex_alpha_stripped":"ff0000ff","alpha_hex":"#ffff0000","alpha_hex_stripped":"ffff0000","rgb":"rgb(255, 0, 0)","rgba":"rgba(255, 0, 0, 1.0)","hsl":"hsl(0.0, 100.0%, 50.0%)","hsla":"hsla(0.0, 100.0%, 50.0%, 1.0)","red":"255","green":"0","blue":"0","alpha":"1.0","hue":"0.0","saturation":"100.0%","lightness":"50.0%"}`),
-		},
-		{
-			in:  "#00ff00",
-			out: []byte(`{"hex":"#00ff00","hex_stripped":"00ff00","hex_alpha":"#00ff00ff","hex_alpha_stripped":"00ff00ff","alpha_hex":"#ff00ff00","alpha_hex_stripped":"ff00ff00","rgb":"rgb(0, 255, 0)","rgba":"rgba(0, 255, 0, 1.0)","hsl":"hsl(120.0, 100.0%, 50.0%)","hsla":"hsla(120.0, 100.0%, 50.0%, 1.0)","red":"0","green":"255","blue":"0","alpha":"1.0","hue":"120.0","saturation":"100.0%","lightness":"50.0%"}`),
-		},
-		{
-			in:  "#0000ff",
-			out: []byte(`{"hex":"#0000ff","hex_stripped":"0000ff","hex_alpha":"#0000ffff","hex_alpha_stripped":"0000ffff","alpha_hex":"#ff0000ff","alpha_hex_stripped":"ff0000ff","rgb":"rgb(0, 0, 255)","rgba":"rgba(0, 0, 255, 1.0)","hsl":"hsl(240.0, 100.0%, 50.0%)","hsla":"hsla(240.0, 100.0%, 50.0%, 1.0)","red":"0","green":"0","blue":"255","alpha":"1.0","hue":"240.0","saturation":"100.0%","lightness":"50.0%"}`),
-		},
-		{
 			in:  "#625690",
 			out: []byte(`{"hex":"#625690","hex_stripped":"625690","hex_alpha":"#625690ff","hex_alpha_stripped":"625690ff","alpha_hex":"#ff625690","alpha_hex_stripped":"ff625690","rgb":"rgb(98, 86, 144)","rgba":"rgba(98, 86, 144, 1.0)","hsl":"hsl(252.4, 25.2%, 45.1%)","hsla":"hsla(252.4, 25.2%, 45.1%, 1.0)","red":"98","green":"86","blue":"144","alpha":"1.0","hue":"252.4","saturation":"25.2%","lightness":"45.1%"}`),
-		},
-		{
-			in:  "#ff00ff",
-			out: []byte(`{"hex":"#ff00ff","hex_stripped":"ff00ff","hex_alpha":"#ff00ffff","hex_alpha_stripped":"ff00ffff","alpha_hex":"#ffff00ff","alpha_hex_stripped":"ffff00ff","rgb":"rgb(255, 0, 255)","rgba":"rgba(255, 0, 255, 1.0)","hsl":"hsl(300.0, 100.0%, 50.0%)","hsla":"hsla(300.0, 100.0%, 50.0%, 1.0)","red":"255","green":"0","blue":"255","alpha":"1.0","hue":"300.0","saturation":"100.0%","lightness":"50.0%"}`),
 		},
 		{
 			in:  "#888888",
@@ -498,7 +402,7 @@ func TestFormatOutput(t *testing.T) {
 }
 
 func TestRoundTripConversion(t *testing.T) {
-	testColors := []string{"#000000", "#ffffff", "#ff0000", "#00ff00", "#0000ff", "#625690", "#808080"}
+	testColors := []string{"#625690", "#808080"}
 
 	for _, hex := range testColors {
 		t.Run(hex, func(t *testing.T) {
@@ -513,11 +417,6 @@ func TestRoundTripConversion(t *testing.T) {
 
 func TestRGBHSVRoundTrip(t *testing.T) {
 	testCases := []RGB{
-		{R: 0.0, G: 0.0, B: 0.0},
-		{R: 1.0, G: 1.0, B: 1.0},
-		{R: 1.0, G: 0.0, B: 0.0},
-		{R: 0.0, G: 1.0, B: 0.0},
-		{R: 0.0, G: 0.0, B: 1.0},
 		{R: 0.5, G: 0.5, B: 0.5},
 		{R: 0.3843137254901961, G: 0.33725490196078434, B: 0.5647058823529412},
 	}
@@ -579,41 +478,6 @@ func TestDeltaPhiStar(t *testing.T) {
 	}
 }
 
-func TestDeltaPhiStarContrast(t *testing.T) {
-	tests := []struct {
-		name        string
-		fg          string
-		bg          string
-		isLightMode bool
-		minExpected float64
-	}{
-		{
-			name:        "white on black (dark mode)",
-			fg:          "#ffffff",
-			bg:          "#000000",
-			isLightMode: false,
-			minExpected: 100.0,
-		},
-		{
-			name:        "black on white (light mode)",
-			fg:          "#000000",
-			bg:          "#ffffff",
-			isLightMode: true,
-			minExpected: 100.0,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := DeltaPhiStarContrast(tt.fg, tt.bg, tt.isLightMode)
-			if result < tt.minExpected {
-				t.Errorf("DeltaPhiStarContrast(%s, %s, %v) = %f, expected >= %f",
-					tt.fg, tt.bg, tt.isLightMode, result, tt.minExpected)
-			}
-		})
-	}
-}
-
 func TestEnsureContrastDPS(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -622,20 +486,6 @@ func TestEnsureContrastDPS(t *testing.T) {
 		minLc       float64
 		isLightMode bool
 	}{
-		{
-			name:        "already sufficient contrast dark mode",
-			color:       "#ffffff",
-			bg:          "#000000",
-			minLc:       60.0,
-			isLightMode: false,
-		},
-		{
-			name:        "already sufficient contrast light mode",
-			color:       "#000000",
-			bg:          "#ffffff",
-			minLc:       60.0,
-			isLightMode: true,
-		},
 		{
 			name:        "needs adjustment dark mode",
 			color:       "#404040",

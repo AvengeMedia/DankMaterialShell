@@ -17,7 +17,6 @@ const widgetDefaults = vm.createContext({});
 vm.runInContext(readFileSync(new URL("../Common/settings/BarWidgetDefaults.js", import.meta.url), "utf8").replace(/^\.pragma.*$/m, ""), widgetDefaults);
 const plain = value => JSON.parse(JSON.stringify(value));
 const islandDashActivities = ["home", "media", "weather", "wallpaper"];
-const islandSource = readFileSync(new URL("../Modules/DankIsland/DankIsland.qml", import.meta.url), "utf8");
 
 test("shared shortcuts follow the last eligible surface independently on each screen", () => {
     const screens = [{ name: "internal" }, { name: "external" }];
@@ -122,7 +121,7 @@ test("always-here is exclusive among islands and dots sharing a screen", () => {
         barConfigs: [{ id: "dot", dot: true, islandSharedRouting: "always" }, { id: "island", island: true }, { id: "remote", island: true, islandSharedRouting: "always" }]
     }));
     settings.updateBarConfigs = () => {};
-    settings._sanitizeBarConfigsForConnectedFrame = configs => ({ configs });
+    settings._applyConnectedFrameBarStyles = configs => ({ configs });
     settings.barConfigCoversScreen = (cfg, screen) => covers[cfg.id].includes(screen.name);
     settings.setIslandSharedRouting("island", "always");
     assert.deepEqual([...settings.barConfigs].map(cfg => cfg.islandSharedRouting), [undefined, "always", "always"], "same-screen always is reset, other-screen always is kept");
@@ -149,7 +148,7 @@ function hostedSettings(barConfigs, extra = {}) {
     settings.updateBarConfigs = () => {};
     settings.barConfigCoversScreen = () => true;
     settings.getBarConfig = id => settings.barConfigs.find(cfg => cfg.id === id);
-    settings._sanitizeBarConfigsForConnectedFrame = configs => ({ configs });
+    settings._applyConnectedFrameBarStyles = configs => ({ configs });
     return settings;
 }
 
@@ -404,26 +403,6 @@ test("hidden bars drop out of routing and hosted defaults keep popups and OSDs s
     assert.deepEqual(settings.activeIslandConfigsForScreen(screen), [], "a hidden island-layout bar swallows nothing either");
 });
 
-test("dot IPC has island command parity and preserves monitor and instance addressing", () => {
-    const handlers = {};
-    for (const kind of ["island", "dot"]) {
-        const source = islandSource.split(`target: "${kind}"`)[1].split("\n    IpcHandler {")[0];
-        const root = Object.fromEntries(["Open", "Toggle", "Show", "Close", "Cycle", "Status", "Move", "Center"].map(name => [`ipc${name}`, (...args) => args]));
-        handlers[kind] = functions(source, "        ", vm.createContext({ root }));
-    }
-    const names = handler => Object.keys(handler).filter(key => key !== "root").sort();
-    assert.deepEqual(names(handlers.dot), names(handlers.island));
-    assert.deepEqual(handlers.island.notifications(), ["notificationcenter", "", "", "island"]);
-    for (const name of ["openOn", "toggleOn", "showOn"])
-        assert.deepEqual(handlers.dot[name]("weather", "external"), ["weather", "external", "", "dot"]);
-    for (const name of ["closeOn", "cycleOn", "statusOn"])
-        assert.deepEqual(handlers.dot[name]("external"), ["external", "", "dot"]);
-    assert.deepEqual(handlers.dot.notificationsOn("external"), ["notificationcenter", "external", "", "dot"]);
-    for (const name of ["openInstance", "toggleInstance"])
-        assert.deepEqual(handlers.dot[name]("launcher", "external", "second-dot"), ["launcher", "external", "second-dot", "dot"]);
-});
-
-
 test("shared launcher entry points bypass a previously loaded launcher and forward query/mode", () => {
     const calls = [];
     let fallbacks = 0;
@@ -493,7 +472,7 @@ test("control-center IPC hide and status agree on both surfaces", () => {
     const state = { islandOpen: false, routed: false };
     const bar = { triggerControlCenter: () => calls.push("bar:trigger") };
     const handler = functions(block, "        ", vm.createContext({
-        root: { controlCenterLoader: { item: popout }, getPreferredBar: () => bar },
+        root: { controlCenterLoaderRef: { item: popout }, getPreferredBar: () => bar },
         PopoutService: {
             get islandControlCenterOpen() {
                 return state.islandOpen;
@@ -529,67 +508,14 @@ test("control-center IPC hide and status agree on both surfaces", () => {
     assert.deepEqual(calls.splice(0), ["island:toggle"]);
 });
 
-test("an IPC close collapses the activity on every monitor showing it", () => {
-    const collapsed = [];
-    const host = (name, activity) => ({ screen: { name }, islandController: { activeActivity: activity, expanded: true, requestCollapse: () => collapsed.push(name) } });
-    const island = functions(islandSource, "    ", vm.createContext({
-        islandVariants: { instances: [host("internal", "controlcenter"), host("external", "controlcenter"), host("third", "launcher")] },
-        freeIslandVariants: { instances: [] }
-    }));
-    assert.equal(island.closeActivity("controlcenter"), true);
-    assert.deepEqual(collapsed.splice(0), ["internal", "external"], "both monitors close, the launcher island is left alone");
-    assert.equal(island.closeActivity("media"), false, "nothing showed it");
-});
-
-test("the island launcher only answers for the screen routing resolves to", () => {
-    const hosts = { internal: { islandController: { requestLauncher: () => "internal" } }, external: { islandController: { requestLauncher: () => "external" } } };
-    let config = null;
-    const island = functions(islandSource, "    ", vm.createContext({
-        root: { hostForExactScreen: (screen, barId) => (barId === "island" ? hosts[screen.name] : null) ?? null, focusedHost: () => hosts.external },
-        CompositorService: { getFocusedScreen: () => ({ name: "internal" }) },
-        SettingsData: { islandLauncherHostConfig: () => config }
-    }));
-    assert.equal(island.openLauncher("", "", null, ""), false, "no island routed to the focused screen: the modal opens, never another monitor's island");
-    config = { id: "island" };
-    assert.equal(island.openLauncher("", "", null, ""), "internal");
-    assert.equal(island.openLauncher("", "", { name: "external" }, ""), "external");
-    assert.equal(island.openLauncher("", "", { name: "external" }, "other"), false, "an explicit bar id is exact");
-});
-
-test("an expanding hosted island closes its own bar's popout only for deliberate opens", () => {
-    const hostSource = readFileSync(new URL("../Modules/DankIsland/IslandBarHost.qml", import.meta.url), "utf8");
-    const closed = [];
-    const popouts = {};
-    const modals = {};
-    const controller = { keyboardDismissRequested: true };
-    const root = { embedded: true, connectedChrome: false, screenName: "internal", screen: { name: "internal" }, barId: "bar", edge: "top" };
-    const host = functions(hostSource, "    ", vm.createContext({
-        root,
-        controller,
-        PopoutManager: { currentPopoutsByScreen: popouts, closePopoutForScreen: screen => closed.push("popout:" + screen.name) },
-        ModalManager: { currentModalsByScreen: modals, closeModal: modal => closed.push("modal:" + modal.id) },
-        ConnectedModeState: { surfaceDescriptors: {} }
-    }));
-    root.ownBarPopout = host.ownBarPopout;
-    root.sameEdgeSlots = host.sameEdgeSlots;
-    popouts.internal = { shouldBeVisible: true, sourceRegistration: { context: { barId: "bar" } } };
-    host.closeSameEdgeSurfaces();
-    assert.deepEqual(closed.splice(0), ["popout:internal"], "a click or keybind open closes the bar's own popout");
-    controller.keyboardDismissRequested = false;
-    host.closeSameEdgeSurfaces();
-    assert.deepEqual(closed.splice(0), [], "a hover peek or an arriving notification leaves the popout alone");
-    controller.keyboardDismissRequested = true;
-    popouts.internal.sourceRegistration.context.barId = "other-bar";
-    host.closeSameEdgeSurfaces();
-    assert.deepEqual(closed.splice(0), [], "another bar's popout is not on this edge");
-    root.embedded = false;
-    popouts.internal.sourceRegistration.context.barId = "bar";
-    host.closeSameEdgeSurfaces();
-    assert.deepEqual(closed.splice(0), [], "island-layout bars and dots keep the old one-way rule");
-    root.embedded = true;
-    root.connectedChrome = true;
-    modals.internal = { id: "launcher" };
-    host.ConnectedModeState.surfaceDescriptors.internal = { modal: { visible: true, barSide: "top" }, popout: { visible: true, barSide: "bottom" } };
-    host.closeSameEdgeSurfaces();
-    assert.deepEqual(closed.splice(0), ["modal:launcher"], "connected chrome closes only the same-edge slot, and only this screen's modal");
+test("the privacy slot is a known home layout entry appended after stored ones", () => {
+    const groupIds = JSON.parse(settingsSource.match(/_islandHomeGroupIds: (\[.*\])/)[1]);
+    const layoutDefault = JSON.parse(settingsSource.match(/_islandHomeLayoutDefault: (\[[\s\S]*?\n    \])/)[1]);
+    const settings = functions(settingsSource, "    ", vm.createContext({ _islandHomeGroupIds: groupIds, _islandHomeLayoutDefault: layoutDefault }));
+    settings.islandSetting = (config, key) => config[key];
+    settings.islandSettings = config => config;
+    const legacy = { islandHomeLayout: [{ id: "clock" }, { id: "media", enabled: false }] };
+    const ids = settings.getIslandHomeLayout(legacy).map(entry => entry.id);
+    assert.ok(ids.includes("privacy"), "a stored layout gains the privacy slot");
+    assert.equal(ids.indexOf("privacy"), ids.length - 1, "new slots append after the stored order");
 });

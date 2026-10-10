@@ -397,7 +397,7 @@ Item {
         }
     }
 
-    DankTooltip {
+    DTooltip {
         id: tooltip
         screen: root.dockScreen
     }

@@ -5,29 +5,33 @@ import Quickshell
 import QtQuick
 import qs.Common
 import qs.Services
-import "../DankCommon/Common/Contrast.js" as Contrast
-import "../DankCommon/Common/Hct.js" as Hct
+import "../DCommon/Common/Contrast.js" as Contrast
+import "../DCommon/Common/Hct.js" as Hct
 
 Singleton {
     id: root
 
     readonly property bool hasAccent: MediaOptions.albumArtAccent ? _accent !== null : true
     readonly property color accent: MediaOptions.albumArtAccent && _accent !== null ? _accent : Theme.primary
-    readonly property var lyricsHues: _lyricsHues()
-    readonly property var lyricsAccents: lyricsHues.map(color => _readableLyricColor(color))
-    readonly property color lyricsGroupAccent: _readableLyricColor(_mixHues(lyricsHues[0], lyricsHues[1], lyricsHues[2]))
+    property int lyricsConsumers: 0
+    readonly property bool lyricsLive: lyricsConsumers > 0
+    readonly property var lyricsHues: lyricsLive ? _lyricsHues() : [Theme.primary, Theme.tertiary, Theme.secondary]
+    readonly property var lyricsAccents: lyricsLive ? lyricsHues.map(color => _readableLyricColor(color)) : lyricsHues
+    readonly property color lyricsGroupAccent: lyricsLive ? _readableLyricColor(_mixHues(lyricsHues[0], lyricsHues[1], lyricsHues[2])) : Theme.primary
     readonly property real lyricsChromaMin: 36
     readonly property real lyricsContrast: 4.5
     readonly property real lyricsTintMax: 0.8
     readonly property color lyricsTint: Theme.withAlpha(Theme.cardSurface, Math.min(Theme.cardSurface.a * Theme.foregroundAlpha, lyricsTintMax))
     readonly property var lyricsBackgrounds: {
+        if (!lyricsLive)
+            return [];
         const surface = Theme.withAlpha(Theme.cardSurface, 1);
         return [surface].concat(TrackArtService.artwork.colors.map(art => Theme.blend(Theme.withAlpha(art, 1), surface, lyricsTint.a)));
     }
 
     readonly property color accentContainer: _container(Theme.primaryContainer, Theme.isLightMode ? 0.3 : 0.55, Theme.isLightMode ? 0.9 : 0.42, 1.25)
     readonly property color accentSecondaryContainer: _container(Theme.secondaryContainer, Theme.isLightMode ? 0.12 : 0.22, Theme.isLightMode ? 0.94 : 0.3, 1.08)
-    readonly property color readableAccent: contrastTo(accent, Theme.onSurface, Theme.chipSurface, 4.5)
+    readonly property color readableAccent: lyricsLive ? contrastTo(accent, Theme.onSurface, Theme.chipSurface, 4.5) : accent
 
     property color onAccent
     property color onAccentContainer

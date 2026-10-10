@@ -82,6 +82,7 @@ func (o *OpenSUSEDistribution) DetectDependenciesWithTerminal(ctx context.Contex
 	// Hyprland-specific tools
 	if wm == deps.WindowManagerHyprland {
 		dependencies = append(dependencies, o.detectHyprlandTools()...)
+		dependencies = append(dependencies, o.detectHyprlandGuiutils())
 	}
 
 	// Niri-specific tools
@@ -138,6 +139,7 @@ func (o *OpenSUSEDistribution) GetPackageMappingWithVariants(wm deps.WindowManag
 		packages["hyprland"] = PackageMapping{Name: "hyprland", Repository: RepoTypeSystem}
 		packages["hyprctl"] = PackageMapping{Name: "hyprland", Repository: RepoTypeSystem}
 		packages["jq"] = PackageMapping{Name: "jq", Repository: RepoTypeSystem}
+		packages["hyprland-guiutils"] = PackageMapping{Name: "hyprland-guiutils", Repository: RepoTypeSystem}
 	case deps.WindowManagerNiri:
 		// Niri stable has native package support on openSUSE
 		niriVariant := variants["niri"]

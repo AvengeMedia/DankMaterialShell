@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter
+import qs.DCommon.Widgets
 import qs.Widgets
 
 Rectangle {
@@ -62,7 +63,7 @@ Rectangle {
         anchors.centerIn: parent
         spacing: Theme.spacingS
 
-        DankIcon {
+        DIcon {
             name: "push_pin"
             size: Theme.chipIconSize
             color: root.contentColor

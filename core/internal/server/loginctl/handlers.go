@@ -33,99 +33,99 @@ func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	case "loginctl.subscribe":
 		handleSubscribe(conn, req, manager)
 	default:
-		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
+		conn.RespondError(req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
 }
 
 func handleGetState(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
-	models.Respond(conn, req.ID, manager.GetState())
+	conn.Respond(req.ID, manager.GetState())
 }
 
 func handleLock(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	if err := manager.Lock(); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "locked"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "locked"})
 }
 
 func handleUnlock(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	if err := manager.Unlock(); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "unlocked"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "unlocked"})
 }
 
 func handleActivate(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	if err := manager.Activate(); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "activated"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "activated"})
 }
 
 func handleSetIdleHint(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	idle, err := params.Bool(req.Params, "idle")
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
 	if err := manager.SetIdleHint(idle); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "idle hint set"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "idle hint set"})
 }
 
 func handleSetLockedHint(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	locked, err := params.Bool(req.Params, "locked")
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
 	if err := manager.SetLockedHint(locked); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "locked hint set"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "locked hint set"})
 }
 
 func handleSetLockBeforeSuspend(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	enabled, err := params.Bool(req.Params, "enabled")
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
 	manager.SetLockBeforeSuspend(enabled)
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "lock before suspend set"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "lock before suspend set"})
 }
 
 func handleSetSleepInhibitorEnabled(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	enabled, err := params.Bool(req.Params, "enabled")
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
 	manager.SetSleepInhibitorEnabled(enabled)
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "sleep inhibitor setting updated"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "sleep inhibitor setting updated"})
 }
 
 func handleLockerReady(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	manager.markLockerReady()
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "ok"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "ok"})
 }
 
 func handleTerminate(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	if err := manager.Terminate(); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "terminated"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "terminated"})
 }
 
 func handleSubscribe(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {

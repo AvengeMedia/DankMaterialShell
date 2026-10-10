@@ -6,7 +6,7 @@ import qs.Modals.Common
 import qs.Modules.Notifications.Center
 import qs.Services
 
-DankModal {
+DModal {
     id: notificationModal
 
     layerNamespace: "dms:notification-center-modal"
@@ -106,7 +106,7 @@ DankModal {
     }
 
     IpcHandler {
-        // DankIsland owns this trigger whenever it is the sole bar for the screen.
+        // DIsland owns this trigger whenever it is the sole bar for the screen.
         function open(): string {
             if (PopoutService.routeToIsland("notificationcenter", null, false))
                 return "NOTIFICATION_ISLAND_OPEN_SUCCESS";
@@ -190,6 +190,12 @@ DankModal {
             return "NOTIFICATION_DISMISS_SUCCESS";
         }
 
+        function invokeLast(): string {
+            if (!NotificationService.invokeLastNotification())
+                return "NOTIFICATION_INVOKE_NO_ACTION";
+            return "NOTIFICATION_INVOKE_SUCCESS";
+        }
+
         target: "notifications"
     }
 
@@ -210,8 +216,6 @@ DankModal {
                 NotificationHeader {
                     id: notificationHeader
                     modal: true
-                    keyboardController: modalKeyboardController
-                    historyView: historyList
                     transientSurfaceTracker: notificationModal.transientSurfaceTracker
                     onCloseRequested: notificationModal.hide()
                     onCurrentTabChanged: notificationModal.currentTab = currentTab

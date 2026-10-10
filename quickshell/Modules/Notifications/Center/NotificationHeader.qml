@@ -1,18 +1,16 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Notifications
 
 Item {
     id: root
 
-    property var keyboardController: null
-    property var historyView: null
     property int currentTab: 0
     property var transientSurfaceTracker: null
     property bool modal: false
-    readonly property var hintsOwner: currentTab === 1 && historyView ? historyView : keyboardController
     readonly property string currentLabel: {
         const count = NotificationService.notifications.length;
         if (count === 0)
@@ -63,7 +61,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.spacingXS
 
-        DankActionButton {
+        DActionButton {
             id: dndButton
             iconName: SessionData.doNotDisturb ? "notifications_off" : "notifications"
             buttonSize: Theme.buttonHeightXS
@@ -75,21 +73,9 @@ Item {
                 durationMenu.openDropdownMenu();
             }
         }
-
-        DankActionButton {
-            readonly property bool hintsShown: root.hintsOwner?.showKeyboardHints ?? false
-
-            visible: root.hintsOwner !== null
-            iconName: "info"
-            buttonSize: Theme.buttonHeightXS
-            backgroundColor: hintsShown ? Theme.secondaryContainer : "transparent"
-            iconColor: hintsShown ? Theme.onSecondaryContainer : Theme.onSurfaceVariant
-            tooltipText: I18n.tr("Keyboard shortcuts")
-            onClicked: root.hintsOwner.showKeyboardHints = !hintsShown
-        }
     }
 
-    DankButtonGroup {
+    DButtonGroup {
         id: tabs
         anchors.left: leadingActions.right
         anchors.right: actions.left
@@ -124,19 +110,17 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.spacingXS
 
-        DankActionButton {
+        DActionButton {
             iconName: "settings"
             buttonSize: Theme.buttonHeightXS
             tooltipText: I18n.tr("Settings")
             onClicked: root.settingsRequested()
         }
-        DankActionButton {
+        DActionButton {
             iconName: "delete_sweep"
             buttonSize: Theme.buttonHeightXS
             tooltipText: I18n.tr("Clear All")
             enabled: root.currentTab === 0 ? NotificationService.notifications.length > 0 : NotificationService.historyList.length > 0
-            backgroundColor: Theme.secondaryContainer
-            iconColor: Theme.onSecondaryContainer
             onClicked: {
                 if (root.currentTab === 0) {
                     NotificationService.clearAllNotifications();
@@ -145,7 +129,7 @@ Item {
                 NotificationService.clearHistory();
             }
         }
-        DankActionButton {
+        DActionButton {
             visible: root.modal
             iconName: "close"
             buttonSize: Theme.buttonHeightXS
@@ -154,7 +138,7 @@ Item {
         }
     }
 
-    DankDropdown {
+    DDropdown {
         id: durationMenu
         showTrigger: false
         popupAnchorItem: dndButton

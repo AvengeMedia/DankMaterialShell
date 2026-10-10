@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Common
 import qs.Services
-import qs.Widgets
 import "../../Common/Format.js" as Format
 
 Item {

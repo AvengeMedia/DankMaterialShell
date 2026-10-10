@@ -3,11 +3,13 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Window
 import Quickshell
+import Quickshell.Wayland
 import qs.Common
 import qs.Modals.Common
 import qs.Modules.Settings.Widgets
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
+import "../../Common/KeyUtils.js" as KeyUtils
 
 Item {
     id: keybindsTab
@@ -19,6 +21,7 @@ Item {
     property string selectedCategory: ""
     property string searchQuery: ""
     property string requestedSearchQuery: ""
+    property bool searchFocused: false
 
     property int _lastDataVersion: -1
     property var _cachedCategories: []
@@ -52,6 +55,22 @@ Item {
             focusTrapTimer.restart();
     }
 
+    Keys.onPressed: event => {
+        if (!searchFocused)
+            return;
+        const chord = KeyUtils.shortcutFromSearchKey(event, KeybindsService.modKey, KeybindsService.modSymbol);
+        if (!chord)
+            return;
+        event.accepted = true;
+        flickable.headerItem.searchField.text = chord;
+    }
+
+    ShortcutInhibitor {
+        id: searchInhibitor
+        window: keybindsTab.QsWindow.window
+        enabled: keybindsTab.searchFocused
+    }
+
     readonly property var categoryChips: [
         {
             "label": I18n.tr("All"),
@@ -68,7 +87,7 @@ Item {
             return I18n.tr("Hyprland conf mode is read-only in Settings");
         if (KeybindsService.requiresBindReview)
             return "";
-        return I18n.tr("Changes save to %1", "keybind editor dialog hint, %1 is the binds file path").arg(bindsFileLabel());
+        return I18n.tr("Changes save to %1", "hint under the keybind and window rule editors, %1 is the config file the changes are written to").arg(bindsFileLabel());
     }
 
     function bindsFileLabel() {
@@ -95,6 +114,7 @@ Item {
     Component.onDestruction: {
         _editAlive = false;
         _editRequest++;
+        KeybindsService.removeRef();
     }
 
     function beginEdit(binding, key) {
@@ -396,7 +416,8 @@ Item {
     function _matchesSearch(group, query) {
         if (!query)
             return true;
-        if (group.keys.some(entry => entry.key.toLowerCase().includes(query)))
+        const combo = KeyUtils.normalizeKeyCombo(query, KeybindsService.modKey, KeybindsService.modSymbol);
+        if (group.keys.some(entry => KeyUtils.normalizeKeyCombo(entry.key, KeybindsService.modKey, KeybindsService.modSymbol).includes(combo)))
             return true;
         return group.desc.toLowerCase().includes(query) || group.action.toLowerCase().includes(query);
     }
@@ -431,7 +452,7 @@ Item {
         const index = _filteredBinds.findIndex(bind => bind.action === action);
         if (!action || index < 0)
             return;
-        flickable.positionViewAtIndex(index, ListView.Contain);
+        flickable.revealIndex(index);
     }
 
     function _ensureCurrentProvider() {
@@ -470,6 +491,7 @@ Item {
     }
 
     Component.onCompleted: {
+        KeybindsService.addRef();
         _ensureCurrentProvider();
         Qt.callLater(_applyRequestedSearch);
     }
@@ -512,7 +534,7 @@ Item {
                 spacing: Theme.spacingS
                 layoutDirection: Qt.RightToLeft
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Accept reviewed changes", "Aqueous keyboard shortcut editor, retaining an unsaved edit while reviewing current bindings")
                     iconName: "check"
                     visible: reviewPanel.host.reviewingEdit && !!reviewPanel.host.reviewSnapshot
@@ -520,7 +542,7 @@ Item {
                     onClicked: reviewPanel.host.acceptReview()
                 }
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Remove", "verb, button that removes an item from a list")
                     iconName: "delete"
                     visible: reviewPanel.host.hasEditDraft && reviewPanel.host.editDraft.operation !== "set"
@@ -528,7 +550,7 @@ Item {
                     onClicked: reviewPanel.host.confirmEditRemoval()
                 }
 
-                DankButton {
+                DButton {
                     text: I18n.tr("Discard")
                     backgroundColor: "transparent"
                     textColor: Theme.surfaceText
@@ -536,7 +558,7 @@ Item {
                     onClicked: reviewPanel.host.discardEdit()
                 }
 
-                DankActionButton {
+                DActionButton {
                     iconName: "refresh"
                     iconColor: Theme.surfaceVariantText
                     Accessible.name: I18n.tr("Refresh")
@@ -585,9 +607,11 @@ Item {
         }
     }
 
-    DankListView {
+    DListView {
         id: flickable
         keyNavigationEnabled: false
+        // ListView hands focus to every new current row; cleared, filtering can't steal it from the header search
+        currentIndex: -1
 
         readonly property real columnWidth: Math.min(SettingsMetrics.contentMaxWidth, width - Theme.spacingL * 2)
         property Item fabBar: null
@@ -640,17 +664,19 @@ Item {
                 topPadding: Theme.spacingXS
                 spacing: Theme.spacingL
 
-                DankSearchField {
+                DSearchField {
                     id: searchInput
                     width: parent.width
-                    placeholderText: I18n.tr("Search shortcuts...")
+                    placeholderText: searchInhibitor.active ? I18n.tr("Search or press a shortcut...") : I18n.tr("Search shortcuts...")
+                    keyForwardTargets: [keybindsTab]
+                    onFocusStateChanged: hasFocus => keybindsTab.searchFocused = hasFocus
                     onTextChanged: {
                         keybindsTab.searchQuery = text;
                         searchDebounce.restart();
                     }
                 }
 
-                DankFilterChips {
+                DFilterChips {
                     id: categoryFilter
                     width: parent.width
                     showCounts: false
@@ -683,7 +709,7 @@ Item {
                         anchors.margins: Theme.spacingL
                         spacing: Theme.spacingM
 
-                        DankIcon {
+                        DIcon {
                             name: warningBox.showWarning ? "info" : "warning"
                             size: Theme.iconSize
                             color: Theme.primary
@@ -732,7 +758,7 @@ Item {
                             }
                         }
 
-                        DankButton {
+                        DButton {
                             id: fixButton
                             visible: warningBox.showSetup
                             text: KeybindsService.fixing ? I18n.tr("Setting up...") : I18n.tr("Setup", "verb, button that creates the dms include config file")
@@ -769,7 +795,7 @@ Item {
 
                             leading: Loader {
                                 active: keybindsTab.initialLoading
-                                sourceComponent: DankSpinner {
+                                sourceComponent: DSpinner {
                                     size: Theme.iconSize
                                 }
                             }
@@ -783,11 +809,20 @@ Item {
                 }
 
                 SettingsFabBar {
-                    shown: !KeybindsService.readOnly
+                    shown: !KeybindsService.readOnly || KeybindsService.cheatsheetAvailable
 
-                    DankFab {
-                        text: I18n.tr("Add shortcut")
+                    DFab {
+                        text: I18n.tr("Cheatsheet", "button opening the keybinds cheatsheet overlay")
+                        iconName: "keyboard"
+                        colorRole: "secondaryContainer"
+                        visible: KeybindsService.cheatsheetAvailable
+                        onClicked: PopoutService.showKeybindsModal()
+                    }
+
+                    DFab {
+                        text: I18n.tr("Add shortcut", "keybind editor dialog title and button")
                         iconName: "add"
+                        visible: !KeybindsService.readOnly
                         onClicked: keybindsTab.openNewEditor()
                     }
                 }

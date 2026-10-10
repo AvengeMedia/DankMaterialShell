@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -15,6 +15,8 @@ Item {
     readonly property string defaultLauncherKeybindSearch: "spotlight toggle"
     readonly property string spotlightBarKeybindSearch: "spotlight-bar"
     readonly property bool spotlightIgnoresRows: SettingsData.launcherStyle === "spotlight" && !SettingsData.connectedFrameModeActive
+    // The niri overview launcher still uses size and footer when it is set to the full style.
+    readonly property bool spotlightIgnoresSize: spotlightIgnoresRows && !(CompositorService.isNiri && SettingsData.niriOverviewOverlayEnabled && SettingsData.niriOverviewLauncherStyle !== "spotlight")
     readonly property var builtInPluginIds: ["dms_settings", "dms_notepad", "dms_sysmon", "dms_colorpicker", "dms_settings_search", "dms_clipboard_search", "dms_power", "dms_vpn", "dms_qr_generator"]
 
     function openKeybindsSearch(query) {
@@ -57,9 +59,12 @@ Item {
     }
 
     Component.onCompleted: {
+        KeybindsService.addRef();
         if (KeybindsService.available)
             KeybindsService.loadBinds(false);
     }
+
+    Component.onDestruction: KeybindsService.removeRef()
 
     SettingsPage {
         id: mainColumn
@@ -70,24 +75,16 @@ Item {
             title: I18n.tr("Default action")
             settingKey: "launcherStyle"
 
-            SettingsControlledBy {
-                visible: SettingsData.connectedFrameModeActive
-                parentModal: root.parentModal
-                section: "frameConnectedOptions"
-                settingLabel: I18n.tr("Default action")
-                reason: I18n.tr("Connected Frame Mode uses the connected launcher for default launcher shortcuts.")
-            }
-
             SettingsButtonGroupRow {
                 readonly property bool islandOffered: SettingsData.dankIslandEnabled || SettingsData.launcherStyle === "island"
+                readonly property bool spotlightOffered: !SettingsData.connectedFrameModeActive
 
-                visible: !SettingsData.connectedFrameModeActive
                 settingKey: "launcherStyleSelector"
                 tags: ["launcher", "style", "default", "spotlight", "full", "minimal", "island", "dankisland"]
                 resetKeys: ["launcherStyle"]
                 text: I18n.tr("Opens", "verb, row label, which launcher style the shortcut opens")
-                model: [I18n.tr("Full", "adjective, full size launcher style option"), I18n.tr("Spotlight", "launcher style option, small centered search bar")].concat(islandOffered ? [I18n.tr("Island")] : [])
-                values: ["full", "spotlight"].concat(islandOffered ? ["island"] : [])
+                model: [I18n.tr("Full", "adjective, full size launcher style option")].concat(spotlightOffered ? [I18n.tr("Spotlight", "launcher style option, small centered search bar")] : []).concat(islandOffered ? [I18n.tr("Island")] : [])
+                values: ["full"].concat(spotlightOffered ? ["spotlight"] : []).concat(islandOffered ? ["island"] : [])
                 value: SettingsData.launcherStyle
                 fallbackValue: "full"
                 onValueSelected: value => SettingsData.set("launcherStyle", value)
@@ -147,7 +144,7 @@ Item {
             SettingsButtonGroupRow {
                 readonly property var sizes: ["micro", "compact", "medium", "large"]
 
-                enabled: !root.spotlightIgnoresRows
+                enabled: !root.spotlightIgnoresSize
                 settingKey: "dankLauncherV2Size"
                 tags: ["launcher", "size", "micro", "compact", "medium", "large"]
                 text: I18n.tr("Size")
@@ -179,7 +176,7 @@ Item {
                 tags: ["launcher", "footer", "hints", "shortcuts", "modes", "filters"]
                 text: I18n.tr("Show footer")
                 checked: SettingsData.dankLauncherV2ShowFooter
-                enabled: SettingsData.dankLauncherV2Size !== "micro" && !root.spotlightIgnoresRows
+                enabled: SettingsData.dankLauncherV2Size !== "micro" && !root.spotlightIgnoresSize
                 onToggled: checked => SettingsData.set("dankLauncherV2ShowFooter", checked)
             }
 
@@ -279,6 +276,15 @@ Item {
             }
 
             SettingsToggleRow {
+                settingKey: "launcherHistoryEnabled"
+                tags: ["launcher", "history", "privacy", "usage", "recent", "persist", "save"]
+                text: I18n.tr("History")
+                description: I18n.tr("Record app usage and past queries. Turning this off clears what is stored.", "launcher history toggle description")
+                checked: SettingsData.launcherHistoryEnabled
+                onToggled: checked => SettingsData.set("launcherHistoryEnabled", checked)
+            }
+
+            SettingsToggleRow {
                 settingKey: "rememberLastQuery"
                 tags: ["launcher", "remember", "last", "search", "query"]
                 text: I18n.tr("Remember last query")
@@ -371,7 +377,7 @@ Item {
                         fallbackText: (hiddenAppRow.modelData.name || "?").charAt(0).toUpperCase()
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         iconName: "visibility"
                         Accessible.name: I18n.tr("Show")
                         iconColor: Theme.primary
@@ -445,7 +451,7 @@ Item {
                         fallbackText: (overrideRow.modelData.name || "?").charAt(0).toUpperCase()
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         iconName: "delete"
                         tooltipText: I18n.tr("Reset to default")
                         iconColor: Theme.error
@@ -579,7 +585,7 @@ Item {
                     iconName: modelData.iconType !== "unicode" ? modelData.icon : ""
                     textIcon: modelData.iconType === "unicode" ? modelData.icon : ""
 
-                    DankBadge {
+                    DBadge {
                         anchors.verticalCenter: parent.verticalCenter
                         visible: pluginRow.modelData.isBuiltIn
                         text: I18n.tr("Built-in", "badge on launcher plugins that ship with DMS")
@@ -587,7 +593,7 @@ Item {
                         textColor: Theme.primary
                     }
 
-                    DankToggle {
+                    DToggle {
                         anchors.verticalCenter: parent.verticalCenter
                         hideText: true
                         checked: {
@@ -647,7 +653,7 @@ Item {
                     iconName: plugin?.cornerIcon ?? "extension"
                     title: plugin?.name ?? modelData
 
-                    DankTextField {
+                    DTextField {
                         outlined: true
                         leftIconName: "keyboard"
                         labelText: I18n.tr("Trigger", "noun, launcher plugin trigger prefix text field label")
@@ -657,7 +663,7 @@ Item {
                         Component.onCompleted: text = SettingsData.getBuiltInPluginSetting(builtInRow.modelData, "trigger", builtInRow.plugin?.defaultTrigger ?? "")
                     }
 
-                    DankToggle {
+                    DToggle {
                         hideText: true
                         anchors.verticalCenter: parent.verticalCenter
                         checked: SettingsData.getBuiltInPluginSetting(builtInRow.modelData, "enabled", true)
@@ -721,6 +727,7 @@ Item {
             iconName: "history"
             title: I18n.tr("Recently used apps")
             settingKey: "recentApps"
+            visible: SettingsData.launcherHistoryEnabled
             collapsible: true
             expanded: false
 
@@ -763,17 +770,14 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         id: clearAllButton
                         iconName: "delete_sweep"
                         tooltipText: I18n.tr("Clear All")
                         iconSize: Theme.iconSizeMedium
                         iconColor: Theme.error
                         anchors.verticalCenter: parent.verticalCenter
-                        onClicked: {
-                            AppUsageHistoryData.appUsageRanking = {};
-                            AppUsageHistoryData.saveSettings();
-                        }
+                        onClicked: AppUsageHistoryData.clear()
                     }
                 }
             }
@@ -808,7 +812,7 @@ Item {
                         }
                     ]
 
-                    DankActionButton {
+                    DActionButton {
                         iconName: "close"
                         Accessible.name: I18n.tr("Remove")
                         iconColor: Theme.error

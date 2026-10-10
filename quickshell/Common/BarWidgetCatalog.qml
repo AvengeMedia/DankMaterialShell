@@ -74,16 +74,9 @@ Singleton {
             "section": "center"
         },
         {
-            "id": "mediaActivity",
-            "text": I18n.tr("Media activity"),
-            "description": I18n.tr("Show the current media activity"),
-            "icon": "music_note",
-            "section": "center"
-        },
-        {
             "id": "music",
-            "text": I18n.tr("Media controls"),
-            "description": I18n.tr("Control currently playing media"),
+            "text": I18n.tr("Media"),
+            "description": I18n.tr("Now playing and media controls"),
             "icon": "music_note",
             "section": "center"
         },
@@ -261,6 +254,7 @@ Singleton {
             "memUsage": "SystemMonitorOptions.qml",
             "gpuTemp": "SystemMonitorOptions.qml",
             "diskUsage": "SystemMonitorOptions.qml",
+            "network_speed_monitor": "NetworkMonitorOptions.qml",
             "systemUpdate": "SystemUpdateOptions.qml",
             "island": "IslandOptions.qml"
         })

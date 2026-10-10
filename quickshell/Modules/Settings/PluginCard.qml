@@ -3,9 +3,9 @@ import Quickshell.Widgets
 import qs.Common
 import qs.Modules.Settings.Widgets
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
-DankCard {
+DCard {
     id: root
 
     property var plugin: ({})
@@ -13,7 +13,8 @@ DankCard {
     property bool installed: false
     property bool selected: false
     property string fallbackIcon: "extension"
-    property string previewSource: PluginService.previewUrl(plugin)
+    property string previewSource: PluginService.thumbUrl(plugin)
+    property string previewFallback: PluginService.previewUrl(plugin)
     property var badges: PluginService.badgeModel(plugin)
     property bool allowUninstall: false
     property var palette: null
@@ -27,7 +28,7 @@ DankCard {
 
     implicitHeight: previewHeight + infoHeight + Theme.spacingS * 2 + Theme.spacingM
     radius: Theme.cornerRadiusM
-    color: Theme.floatingWindowNestedSurface
+    color: SettingsMetrics.rowColor
     border.color: focusRingShown ? Theme.focusRingColor : Theme.outlineMedium
     border.width: focusRingShown ? Theme.focusRingWidth : Theme.layerOutlineWidth
     pad: 0
@@ -46,19 +47,27 @@ DankCard {
         ClippingRectangle {
             anchors.fill: parent
             radius: Theme.cornerRadiusS
-            color: Theme.chipSurface
+            color: SettingsMetrics.controlColor
 
             CachingImage {
                 id: cardPreview
+
+                property bool useFallback: false
+
                 anchors.fill: parent
-                imagePath: root.previewSource
+                imagePath: useFallback ? root.previewFallback : root.previewSource
                 maxCacheSize: 640
                 fillMode: Image.PreserveAspectCrop
                 animate: false
                 visible: status === Image.Ready
+                onStatusChanged: {
+                    if (status !== Image.Error || useFallback || !root.previewFallback || root.previewFallback === root.previewSource)
+                        return;
+                    useFallback = true;
+                }
             }
 
-            DankIcon {
+            DIcon {
                 anchors.centerIn: parent
                 name: root.plugin.icon || root.fallbackIcon
                 size: Theme.avatarSize
@@ -66,14 +75,14 @@ DankCard {
                 visible: cardPreview.status !== Image.Ready
             }
 
-            DankSpinner {
+            DSpinner {
                 anchors.centerIn: parent
                 running: cardPreview.status === Image.Loading
                 visible: running
             }
         }
 
-        DankPaletteSwatch {
+        DPaletteSwatch {
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.margins: Theme.spacingXS
@@ -128,7 +137,7 @@ DankCard {
             width: parent.width
             spacing: Theme.spacingS
 
-            DankIcon {
+            DIcon {
                 id: cardIcon
                 name: root.plugin.icon || root.fallbackIcon
                 size: Theme.iconSizeMedium
@@ -147,7 +156,7 @@ DankCard {
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            DankActionButton {
+            DActionButton {
                 id: installAction
                 anchors.verticalCenter: parent.verticalCenter
                 enabled: !root.busy && (root.installed ? root.allowUninstall : root.compatible)

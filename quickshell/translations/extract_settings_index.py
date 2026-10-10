@@ -99,8 +99,8 @@ TAB_INDEX_MAP = {
     "TimeWeatherTab.qml": 1,
     "WeatherSettingsTab.qml": 56,
     "KeybindsTab.qml": 2,
-    "DankBarTab.qml": 3,
-    "DankDashTab.qml": 43,
+    "DBarTab.qml": 3,
+    "DDashTab.qml": 43,
     "DigitalWellbeingTab.qml": 67,
     "CompositorLayoutTab.qml": 37,
     "WindowRulesTab.qml": 38,
@@ -108,8 +108,8 @@ TAB_INDEX_MAP = {
     "DockWidgetsTab.qml": 57,
     "DockAppearanceTab.qml": 58,
     "DockAdvancedTab.qml": 59,
-    "DankBarAppearanceTab.qml": 6,
-    "DankDotTab.qml": 65,
+    "DBarAppearanceTab.qml": 6,
+    "DDotTab.qml": 65,
     "NetworkStatusTab.qml": 7,
     "NetworkEthernetTab.qml": 39,
     "NetworkWifiTab.qml": 40,
@@ -165,7 +165,7 @@ SIDEBAR_GATE_CONDITIONS = [
     ("dmsOnly", "networkAvailable"),
     ("hyprlandNiriOnly", "isHyprlandOrNiri"),
     ("clipboardOnly", "dmsConnected"),
-    ("niriOnly", "isNiri"),
+    ("inputCapable", "inputCapable"),
     ("pointerCapable", "pointerCapable"),
     ("windowRulesCapable", "windowRulesCapable"),
     ("layoutCapable", "layoutCapable"),
@@ -186,7 +186,7 @@ FILE_PAGE_MAP = {
 TAB_META_DEFAULT = ("Settings", None, None)
 
 # Frame and island rows live on the bar pages; ungated ones still need their feature on.
-BAR_TAB_FILES = {"DankBarTab.qml", "DankBarAppearanceTab.qml"}
+BAR_TAB_FILES = {"DBarTab.qml", "DBarAppearanceTab.qml"}
 
 SEARCHABLE_COMPONENTS = [
     "SettingsCard",
@@ -195,6 +195,7 @@ SEARCHABLE_COMPONENTS = [
     "SettingsButtonGroupRow",
     "SettingsSliderRow",
     "SettingsToggleCard",
+    "SettingsToggleSliderRow",
     "SettingsSplitRow",
     "SettingsNavRow",
     "SettingsRow",
@@ -369,12 +370,12 @@ SHARED_CARD_ROW_PATTERN = re.compile(r"\b(?:Settings\w*Row|Loader)\s*\{")
 
 
 def strip_hidden_rows(card_content, hosted, docked, dot):
-    """Drop rows the instance hides for good: `visible: !root.hosted` on a hosted page, `visible: root.docked` on an undocked one, `visible: !root.dot` on the dot."""
+    """Drop rows the instance hides for good: `visible: !root.hosted` on a hosted page, `visible: root.docked` on an undocked one, `visible: !root.isDot` on the dot."""
     result = card_content
     for match in reversed(list(SHARED_CARD_ROW_PATTERN.finditer(card_content))):
         block = parse_component_block(card_content, match.start(), "")
         visible = extract_property(block, "visible") or ""
-        if (hosted and "!root.hosted" in visible) or (not docked and "root.docked" in visible) or (dot and "!root.dot" in visible):
+        if (hosted and "!root.hosted" in visible) or (not docked and "root.docked" in visible) or (dot and "!root.isDot" in visible):
             result = result[: match.start()] + result[match.start() + len(block):]
     return result
 
@@ -391,7 +392,7 @@ def inline_shared_cards(root_dir, content):
         prefix = prefix_match.group(1) if prefix_match else "island"
         hosted = "hosted: true" in instance
         docked = "docked: false" not in instance
-        dot = "dot: true" in instance
+        dot = "isDot: true" in instance
         card = strip_hidden_rows(card_file.read_text(encoding="utf-8"), hosted, docked, dot)
         content += "\n" + card.replace('settingKey: root.keyPrefix + "', f'settingKey: "{prefix}')
     return content
@@ -405,6 +406,8 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
     if file_tab_index == -1 and not file_page:
         return results
 
+    card_conditions = []
+
     for component in SEARCHABLE_COMPONENTS + sorted(wrappers):
         defaults = wrappers.get(component, {})
         pattern = rf"\b{component}\s*\{{"
@@ -412,6 +415,7 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
             block = parse_component_block(content, match.start(), component)
             if not block:
                 continue
+            block_end = content.index(block, match.start()) + len(block)
 
             setting_key = extract_property(block, "settingKey") or defaults.get("settingKey")
             if setting_key:
@@ -454,7 +458,7 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
             if desc_raw:
                 description = extract_i18n_string(desc_raw)
 
-            visible_raw = extract_property(block, "visible")
+            visible_raw = extract_property(own_scope(block), "visible")
             page_meta = hub_meta.get(file_page) if file_page else None
             condition_key = page_meta[2] if page_meta else tab_meta.get(tab_index, TAB_META_DEFAULT)[2]
             if visible_raw:
@@ -473,7 +477,7 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
                 elif "CompositorService.supportsPointerConfig" in visible_raw:
                     condition_key = "pointerCapable"
                 elif "CompositorService.supportsInputConfig" in visible_raw:
-                    condition_key = "isNiri"
+                    condition_key = "inputCapable"
                 elif "CompositorService.isAqueous" in visible_raw:
                     if "CompositorService.isHyprland" in visible_raw:
                         condition_key = "smartDockCapable"
@@ -483,6 +487,10 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
                         condition_key = "isAqueous"
                 elif all(c in visible_raw for c in ("CompositorService.isNiri", "CompositorService.isHyprland", "CompositorService.isMango")):
                     condition_key = "windowRulesCapable"
+                elif all(c in visible_raw for c in ("CompositorService.isNiri", "CompositorService.isHyprland")):
+                    condition_key = "isHyprlandOrNiri"
+                elif all(c in visible_raw for c in ("CompositorService.isNiri", "CompositorService.isMango")):
+                    condition_key = "isNiriOrMango"
                 elif "CompositorService.isNiri" in visible_raw:
                     condition_key = "isNiri"
                 elif "CompositorService.isHyprland" in visible_raw:
@@ -501,13 +509,23 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
                     condition_key = "dmsConnected"
                 elif "Theme.matugenAvailable" in visible_raw:
                     condition_key = "matugenAvailable"
+                elif "dock.config.enabled" in visible_raw:
+                    condition_key = "dockEnabled"
+                elif "selectedIslandDocked" in visible_raw or "!root.selectedIslandFree" in visible_raw:
+                    condition_key = "islandDocked"
+                elif "selectedIslandFree" in visible_raw and "!dankBarTab.selectedIslandFree" not in visible_raw:
+                    condition_key = "islandFree"
             if filename in BAR_TAB_FILES and not condition_key:
                 if setting_key.startswith("frame"):
                     condition_key = "frameEnabled"
                 elif setting_key.startswith("island"):
                     condition_key = "islandEnabled"
-            if filename == "DankDotTab.qml" and not condition_key and setting_key != "dotEnabled":
+            if filename == "DDotTab.qml" and not condition_key and setting_key != "dotEnabled":
                 condition_key = "dotEnabled"
+            if component == "SettingsCard":
+                card_conditions.append((match.start(), block_end, condition_key if extract_property(own, "visible") else None))
+            elif not condition_key:
+                condition_key = next((cond for start, end, cond in card_conditions if start < match.start() < end), None)
 
             category, parent_label, _ = page_meta if page_meta else tab_meta.get(tab_index, TAB_META_DEFAULT)
             enriched_keywords = enrich_keywords(label, description, category, tags, parent_label)

@@ -14,8 +14,6 @@ Column {
         settingKey: "barWidgetClock"
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["clockCompactMode"]
             text: I18n.tr("Compact mode")
             checked: root.page.value("clockCompactMode")
             onToggled: checked => root.page.set("clockCompactMode", checked)
@@ -36,8 +34,6 @@ Column {
         }
 
         SettingsToggleRow {
-            resetStore: root.page
-            resetKeys: ["clockNotificationBadge"]
             text: I18n.tr("Notification badge", "clock widget option: unread notification count next to the time")
             checked: root.page.value("clockNotificationBadge")
             onToggled: checked => root.page.set("clockNotificationBadge", checked)

@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Modules.DankDash
+import qs.Modules.DDash
 
 QtObject {
     id: root
@@ -24,6 +24,7 @@ QtObject {
     readonly property string trackKey: track ? JSON.stringify([track.key, track.title, track.artist, track.album, fileUrl, MediaOptions.enabledLyricsProviders]) : ""
     readonly property int duration: Math.round(track?.length ?? 0)
     readonly property real position: player?.position ?? 0
+    readonly property string busName: player?.dbusName ?? ""
 
     property var lines: []
     property var plainLines: []
@@ -54,6 +55,7 @@ QtObject {
     property bool anchorPlaying: false
     property real anchorRate: 1
     property real positionWall: 0
+    property var probe: null
     property var memo: null
 
     onTrackKeyChanged: {
@@ -89,7 +91,10 @@ QtObject {
     }
     onPositionChanged: scheduleAnchor()
     onRateChanged: updatePlaybackClock()
-    onPlayingChanged: updatePlaybackClock()
+    onPlayingChanged: {
+        probe = null;
+        updatePlaybackClock();
+    }
     Component.onDestruction: {
         cancel();
         stopClock();
@@ -175,6 +180,7 @@ QtObject {
         wordEnd = -1;
         cueTimes = [];
         focusedGroups = [];
+        probe = null;
         wordRevision++;
         shownSong = "";
         shownResult = "";
@@ -383,6 +389,40 @@ QtObject {
         resync();
     }
 
+    // Quickshell fetches Position only on track, state and seek events and extrapolates from there,
+    // so a player whose Position lagged at that moment stays off until the next seek (#3650).
+    function probePosition() {
+        const token = serial;
+        const name = busName;
+        DMSService.dbusGetProperty("session", name, "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player", "Position", response => root.receivePosition(token, name, response));
+    }
+
+    function receivePosition(token, name, response) {
+        if (token !== serial || name !== busName || !playing || response.error)
+            return;
+        const observed = Number(response.result?.value) / 1e6;
+        if (!Number.isFinite(observed) || observed < 0)
+            return;
+        const wall = Date.now();
+        const previous = probe;
+        probe = {
+            position: observed,
+            wall
+        };
+        if (!previous)
+            return;
+        const advanced = previous.position + (wall - previous.wall) * rate / 1000;
+        if (Math.abs(observed - advanced) > DashMetrics.mediaLyricsPositionProbeDrift)
+            return;
+        if (Math.abs(observed - currentTime()) < DashMetrics.mediaLyricsPositionProbeThreshold)
+            return;
+        anchorPosition = observed;
+        anchorWall = wall;
+        anchorPlaying = playing;
+        anchorRate = rate;
+        resync();
+    }
+
     function scheduleAnchor() {
         positionWall = Date.now();
         if (enabled && synced && !stopped && !anchorUpdate.running)
@@ -472,6 +512,14 @@ QtObject {
     property Timer anchorUpdate: Timer {
         interval: 0
         onTriggered: root.reanchor(false)
+    }
+
+    property Timer positionProbe: Timer {
+        interval: DashMetrics.mediaLyricsPositionProbeInterval
+        repeat: true
+        triggeredOnStart: true
+        running: root.enabled && root.synced && root.playing && !root.stopped && root.busName !== "" && DMSService.isConnected
+        onTriggered: root.probePosition()
     }
 
     property Timer requestDelay: Timer {

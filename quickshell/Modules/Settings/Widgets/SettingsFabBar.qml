@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -38,7 +38,7 @@ Item {
         damping: root.scaleSpring.damping
     }
 
-    DankLayer {
+    DLayer {
         id: surface
 
         width: row.implicitWidth + root.shadowPadding * 2

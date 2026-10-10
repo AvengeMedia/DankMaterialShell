@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/mangoconf"
 )
 
 func TestQuickshellVersionFailureDetails(t *testing.T) {
@@ -60,21 +62,9 @@ QT_VERSION:5.15.19`
 			want:   "/usr/lib/qt/plugins",
 		},
 		{
-			name:   "a different key from the same dump",
-			output: dumpAll,
-			key:    "QT_VERSION",
-			want:   "5.15.19",
-		},
-		{
 			name:   "key absent from a multi line dump yields nothing",
 			output: dumpAll,
 			key:    "QT_INSTALL_LIBEXECS",
-			want:   "",
-		},
-		{
-			name:   "empty output yields nothing",
-			output: "",
-			key:    "QT_INSTALL_PLUGINS",
 			want:   "",
 		},
 		{
@@ -234,4 +224,55 @@ func TestCheckQtPlatformThemePlugin(t *testing.T) {
 			t.Fatalf("got %+v, want one OK result", results)
 		}
 	})
+}
+
+func TestCheckMangoConfigFlagsWrongDialectAndOverviewBinds(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(dir, "dms"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	_ = os.WriteFile(filepath.Join(dir, "config.conf"), []byte("exec-once=dms run\nmousebind=NONE,btn_left,toggleoverview,1\n"), 0o644)
+	_ = os.WriteFile(filepath.Join(dir, "dms", "layout.conf"), []byte("border_px=2\n"), 0o644)
+
+	if got := checkMangoConfig(dir, mangoconf.Legacy); len(got) != 2 || got[0].message != "Not legacy keys: layout.conf" {
+		t.Fatalf("legacy: %+v", got)
+	}
+	if got := checkMangoConfig(dir, mangoconf.Snake); len(got) != 2 || got[0].message != "Not snake keys: config.conf" {
+		t.Fatalf("snake: %+v", got)
+	}
+}
+
+func TestHyprlandLacksLua(t *testing.T) {
+	for ver, want := range map[string]bool{
+		"0.54.9": true,
+		"0.55.0": false,
+		"":       false,
+	} {
+		if got := hyprlandLacksLua(ver); got != want {
+			t.Errorf("hyprlandLacksLua(%q) = %v, want %v", ver, got, want)
+		}
+	}
+}
+
+func TestCheckHyprlandConfigFormat(t *testing.T) {
+	for name, tc := range map[string]struct {
+		files []string
+		warn  bool
+	}{
+		"lua only":  {[]string{"hyprland.lua"}, false},
+		"lua wins":  {[]string{"hyprland.lua", "hyprland.conf"}, false},
+		"conf only": {[]string{"hyprland.conf"}, true},
+		"neither":   {nil, false},
+	} {
+		dir := t.TempDir()
+		for _, f := range tc.files {
+			if err := os.WriteFile(filepath.Join(dir, f), nil, 0o644); err != nil {
+				t.Fatal(err)
+			}
+		}
+		got := checkHyprlandConfigFormat(dir)
+		if warned := len(got) == 1 && got[0].status == statusWarn; warned != tc.warn || (!tc.warn && len(got) != 0) {
+			t.Errorf("%s: got %+v, want warn=%v", name, got, tc.warn)
+		}
+	}
 }

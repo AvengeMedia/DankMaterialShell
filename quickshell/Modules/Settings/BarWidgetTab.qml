@@ -3,10 +3,10 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import "../../Common/settings/DockConfig.js" as DockConfig
-import "../DankBar/OverflowLayout.js" as OverflowLayout
+import "../DBar/OverflowLayout.js" as OverflowLayout
 
 Item {
     id: root
@@ -33,6 +33,8 @@ Item {
     }
     readonly property string widgetType: entry?.widgetId ?? entry?.id ?? ""
     readonly property bool sectionAutoOverflow: SettingsData.getBarConfig(barId)?.[section + "OverflowMode"] !== "bar"
+    readonly property bool hasPill: !dockHosted && !["spacer", "separator", "island"].includes(widgetType)
+    readonly property bool barBackground: !(SettingsData.barConfigs.find(config => config.id === barId)?.noBackground ?? false)
     readonly property var store: ({
             "get": key => root.value(key),
             "set": (key, value) => root.set(key, value),
@@ -154,17 +156,27 @@ Item {
             }
 
             SettingsDropdownRow {
-                readonly property var placementValues: ["section", "bar", "auto", "always"]
-                readonly property var placementLabels: [I18n.tr("Section default (%1)").arg(root.sectionAutoOverflow ? I18n.tr("Overflow when needed") : I18n.tr("Keep in Bar")), I18n.tr("Keep in Bar"), I18n.tr("Overflow when needed"), I18n.tr("Always in overflow")]
+                readonly property string sectionMode: root.sectionAutoOverflow ? "auto" : "bar"
+                readonly property var placementValues: ["section"].concat(["auto", "bar", "always"].filter(mode => mode !== sectionMode))
+                readonly property var placementLabels: [sectionMode].concat(placementValues.slice(1)).map(mode => mode === "auto" ? I18n.tr("Auto") : mode === "bar" ? I18n.tr("Keep in Bar") : I18n.tr("Always in overflow", "bar widget placement option, the widget always lives in the overflow menu"))
+                readonly property string placementValue: root.value("overflowMode") === sectionMode ? "section" : root.value("overflowMode")
 
                 visible: !root.dockHosted && !OverflowLayout.pinned(root.widgetType)
                 resetStore: root.store
                 resetKeys: ["overflowMode"]
                 text: I18n.tr("Placement")
-                description: I18n.tr("Move this widget into overflow when the bar runs out of space")
+                description: I18n.tr("Auto moves this widget into overflow when the bar runs out of space", "bar widget placement dropdown description")
                 options: placementLabels
-                currentValue: placementLabels[Math.max(0, placementValues.indexOf(root.value("overflowMode")))]
+                currentValue: placementLabels[Math.max(0, placementValues.indexOf(placementValue))]
                 onValueChanged: value => root.set("overflowMode", placementValues[placementLabels.indexOf(value)])
+            }
+
+            SettingsToggleRow {
+                visible: root.hasPill
+                tags: ["widget", "background", "pill", "transparent"]
+                text: I18n.tr("Background")
+                checked: root.entry?.background ?? root.barBackground
+                onToggled: checked => root.set("background", checked === root.barBackground ? undefined : checked)
             }
         }
 
@@ -189,7 +201,7 @@ Item {
             height: optionsLoader.status === Loader.Loading ? Theme.iconButtonSize * 2 : 0
             visible: optionsLoader.status === Loader.Loading
 
-            DankSpinner {
+            DSpinner {
                 anchors.centerIn: parent
             }
         }

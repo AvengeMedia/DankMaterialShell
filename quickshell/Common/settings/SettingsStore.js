@@ -1,7 +1,7 @@
 .pragma library
 .import "./SettingsSpec.js" as SpecModule
-.import "../../DankCommon/Common/settings/SpecUtil.js" as Util
-.import "../../DankCommon/Common/Shape.js" as Shape
+.import "../../DCommon/Common/settings/SpecUtil.js" as Util
+.import "../../DCommon/Common/Shape.js" as Shape
 .import "./BarWidgetDefaults.js" as WidgetDefaults
 .import "./DockConfig.js" as DockConfig
 
@@ -51,7 +51,6 @@ var ISLAND_KEY_MOVES = {
     dankIslandSatelliteBackground: "islandSatelliteBackground",
     dankIslandSatelliteGothCorners: "islandSatelliteGothCorners",
     dankIslandSatelliteTransparency: "islandSatelliteTransparency",
-    dankIslandSatelliteSwoopRadius: "islandSatelliteSwoopRadius",
     dankIslandReducedMotion: "islandReducedMotion",
     dankIslandSpringStiffness: "islandSpringStiffness",
     dankIslandSpringDamping: "islandSpringDamping",
@@ -194,7 +193,7 @@ function parse(root, jsonObj) {
     }
 }
 
-function toJson(root) {
+function toJson(root, setKeys) {
     var SPEC = SpecModule.SPEC;
     var out = {};
     for (var k in SPEC) {
@@ -207,7 +206,7 @@ function toJson(root) {
             value = withoutInstancePositions(value);
         if (k === "builtInPluginSettings")
             value = withoutSessionBackedPluginState(value);
-        if (Util.isDefault(value, SPEC[k].def))
+        if (!setKeys.has(k) && Util.isDefault(value, SPEC[k].def))
             continue;
         out[k] = value;
     }
@@ -518,6 +517,7 @@ function migrateToVersion(obj, targetVersion) {
         for (var dropKey in ISLAND_KEY_MOVES)
             delete settings[dropKey];
         delete settings.dankIslandBarId;
+        delete settings.dankIslandSatelliteSwoopRadius;
 
         settings.configVersion = 18;
     }
@@ -707,7 +707,94 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 35;
     }
 
+    if (currentVersion < 37 && targetVersion >= 37) {
+        if (Array.isArray(settings.controlCenterWidgets) && !settings.controlCenterWidgets.some(widget => widget?.id === "edit"))
+            settings.controlCenterWidgets = settings.controlCenterWidgets.concat([Object.assign({}, SpecModule.SPEC.controlCenterWidgets.def.find(widget => widget.id === "edit"))]);
+        settings.configVersion = 37;
+    }
+
+    if (currentVersion < 38 && targetVersion >= 38) {
+        migrateLockScreenWidgets(settings);
+        settings.configVersion = 38;
+    }
+
+    if (currentVersion < 39 && targetVersion >= 39) {
+        migrateIslandReducedMotion(settings);
+        settings.configVersion = 39;
+    }
+
+    if (currentVersion < 40 && targetVersion >= 40) {
+        migrateScrollColumnBehavior(settings);
+        settings.configVersion = 40;
+    }
+
     return settings;
+}
+
+// v40: the niri-only "column" scroll behavior became the compositor-neutral "focusWindow"
+function migrateScrollColumnBehavior(settings) {
+    for (const bar of Array.isArray(settings.barConfigs) ? settings.barConfigs : []) {
+        if (!bar || typeof bar !== "object")
+            continue;
+        for (const key of ["scrollXBehavior", "scrollYBehavior"]) {
+            if (bar[key] === "column")
+                bar[key] = "focusWindow";
+        }
+    }
+}
+
+// v39: the per-island toggle folded into the global reduceMotion; any bar that had it on turns the global one on
+function migrateIslandReducedMotion(settings) {
+    for (const bar of Array.isArray(settings.barConfigs) ? settings.barConfigs : []) {
+        if (!bar || typeof bar !== "object")
+            continue;
+        const holders = [bar];
+        for (const sectionId of ["leftWidgets", "centerWidgets", "rightWidgets"])
+            holders.push(...(Array.isArray(bar[sectionId]) ? bar[sectionId] : []).filter(entry => entry && typeof entry === "object" && entry.id === "island"));
+        for (const holder of holders) {
+            if (holder.islandReducedMotion === true)
+                settings.reduceMotion = true;
+            delete holder.islandReducedMotion;
+        }
+    }
+}
+
+var LOCK_WIDGET_MOVED_KEYS = ["lockScreenShowSystemIcons", "lockScreenShowTime", "lockScreenClockStyle", "lockScreenShowDate", "lockScreenShowPasswordField", "lockScreenShowMediaPlayer", "lockScreenNotificationMode"];
+var LOCK_WIDGET_GREETER_KEYS = ["lockScreenShowPowerActions", "lockScreenShowProfileImage", "lockScreenShowWeather"];
+
+function migrateLockScreenWidgets(settings) {
+    if (Array.isArray(settings.lockScreenWidgetInstances))
+        return;
+    const present = key => key in settings;
+    if (!LOCK_WIDGET_MOVED_KEYS.concat(LOCK_WIDGET_GREETER_KEYS).some(present))
+        return;
+    const instances = SpecModule.lockWidgetDefaults();
+    const byId = id => instances.find(inst => inst.id === id);
+    if (present("lockScreenShowTime"))
+        byId("lock_clock").enabled = !!settings.lockScreenShowTime;
+    if (present("lockScreenClockStyle"))
+        byId("lock_clock").config.style = settings.lockScreenClockStyle === "vertical" ? "overlap" : "digital";
+    if (present("lockScreenShowDate"))
+        byId("lock_date").enabled = !!settings.lockScreenShowDate;
+    byId("lock_auth").config.profileVisibility = settings.lockScreenShowProfileImage === false ? "never" : "always";
+    byId("lock_auth").config.passwordVisibility = settings.lockScreenShowPasswordField === false ? "typing" : "always";
+    if (present("lockScreenNotificationMode")) {
+        const mode = Number(settings.lockScreenNotificationMode) || 0;
+        byId("lock_notifications").enabled = mode > 0;
+        if (mode > 0)
+            byId("lock_notifications").config.mode = mode;
+    }
+    if (present("lockScreenShowSystemIcons"))
+        byId("lock_status").enabled = !!settings.lockScreenShowSystemIcons;
+    if (present("lockScreenShowMediaPlayer"))
+        byId("lock_status").config.showMediaPlayer = !!settings.lockScreenShowMediaPlayer;
+    if (present("lockScreenShowWeather"))
+        byId("lock_status").config.showWeather = !!settings.lockScreenShowWeather;
+    if (present("lockScreenShowPowerActions"))
+        byId("lock_power").enabled = !!settings.lockScreenShowPowerActions;
+    settings.lockScreenWidgetInstances = instances;
+    for (const key of LOCK_WIDGET_MOVED_KEYS)
+        delete settings[key];
 }
 
 function migrateControlCenterHeader(widgets, fixedHeader, columns) {

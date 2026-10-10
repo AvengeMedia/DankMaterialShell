@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Plugins
 
 PluginSettings {
@@ -64,7 +64,7 @@ PluginSettings {
                         color: Theme.surfaceVariantText
                     }
 
-                    DankTextField {
+                    DTextField {
                         id: nameField
                         width: parent.width
                         placeholderText: "Variant Name"
@@ -81,7 +81,7 @@ PluginSettings {
                         color: Theme.surfaceVariantText
                     }
 
-                    DankTextField {
+                    DTextField {
                         id: iconField
                         width: parent.width
                         placeholderText: "star"
@@ -98,7 +98,7 @@ PluginSettings {
                         color: Theme.surfaceVariantText
                     }
 
-                    DankTextField {
+                    DTextField {
                         id: textField
                         width: parent.width
                         placeholderText: "Display Text"
@@ -106,7 +106,7 @@ PluginSettings {
                 }
             }
 
-            DankButton {
+            DButton {
                 text: "Create Variant"
                 iconName: "add"
                 onClicked: {
@@ -178,7 +178,7 @@ PluginSettings {
                             height: Theme.iconSize
                             anchors.verticalCenter: parent.verticalCenter
 
-                            DankIcon {
+                            DIcon {
                                 anchors.centerIn: parent
                                 name: model.icon || "widgets"
                                 size: Theme.iconSize
@@ -212,16 +212,16 @@ PluginSettings {
                         }
 
                         Rectangle {
+                            id: deleteButton
                             Accessible.role: Accessible.Button
                             Accessible.name: I18n.tr("Delete")
-                            id: deleteButton
                             width: 32
                             height: 32
                             radius: 16
                             color: deleteArea.containsMouse ? Theme.error : Theme.withAlpha(Theme.error, 0)
                             anchors.verticalCenter: parent.verticalCenter
 
-                            DankIcon {
+                            DIcon {
                                 anchors.centerIn: parent
                                 name: "delete"
                                 size: 16
@@ -275,7 +275,7 @@ PluginSettings {
             Row {
                 spacing: Theme.spacingM
 
-                DankIcon {
+                DIcon {
                     name: "info"
                     size: Theme.iconSize
                     color: Theme.primary

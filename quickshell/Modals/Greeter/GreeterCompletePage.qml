@@ -2,7 +2,7 @@ import QtQuick
 import qs.Common
 import qs.Modules.Settings.Widgets
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -65,7 +65,7 @@ Item {
 
     readonly property bool hasKeybinds: dmsKeybinds.length > 0
 
-    DankFlickable {
+    DFlickable {
         anchors.fill: parent
         clip: true
         contentHeight: mainColumn.height + Theme.spacingL * 2
@@ -89,7 +89,7 @@ Item {
                     color: Theme.withAlpha(Theme.success, 0.15)
                     anchors.verticalCenter: parent.verticalCenter
 
-                    DankIcon {
+                    DIcon {
                         anchors.centerIn: parent
                         name: "check_circle"
                         size: Theme.iconSize + 4
@@ -113,7 +113,7 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingS
 
-                    DankIcon {
+                    DIcon {
                         name: "toolbar"
                         size: root.sectionIconSize
                         color: Theme.primary
@@ -150,7 +150,7 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingS
 
-                    DankIcon {
+                    DIcon {
                         name: "keyboard"
                         size: root.sectionIconSize
                         color: Theme.primary
@@ -227,7 +227,7 @@ Item {
                                         Repeater {
                                             model: (modelData.key || "").split("+")
 
-                                            DankKeycap {
+                                            DKeycap {
                                                 text: modelData
                                             }
                                         }
@@ -268,7 +268,7 @@ Item {
                     Row {
                         spacing: Theme.spacingS
 
-                        DankIcon {
+                        DIcon {
                             name: "keyboard"
                             size: root.sectionIconSize
                             color: Theme.surfaceVariantText
@@ -300,7 +300,7 @@ Item {
                             anchors.centerIn: parent
                             spacing: Theme.spacingS
 
-                            DankIcon {
+                            DIcon {
                                 name: "menu_book"
                                 size: root.sectionIconSize
                                 color: Theme.primary
@@ -315,7 +315,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            DankIcon {
+                            DIcon {
                                 name: "open_in_new"
                                 size: Theme.iconSizeSmall - 2
                                 color: Theme.surfaceVariantText
@@ -359,7 +359,7 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingS
 
-                    DankIcon {
+                    DIcon {
                         name: "settings"
                         size: root.sectionIconSize
                         color: Theme.primary
@@ -456,7 +456,7 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingS
 
-                    DankIcon {
+                    DIcon {
                         name: "explore"
                         size: root.sectionIconSize
                         color: Theme.primary

@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Row {
     id: root
@@ -9,7 +9,7 @@ Row {
 
     spacing: Theme.spacingS
 
-    DankIcon {
+    DIcon {
         name: "arrow_right"
         size: Theme.iconSizeSmall - 2
         color: Theme.surfaceVariantText

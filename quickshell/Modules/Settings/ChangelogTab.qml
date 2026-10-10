@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
@@ -27,25 +28,25 @@ Item {
             SettingsRow {
                 visible: root.feedMissing
                 iconName: "cloud_off"
-                title: I18n.tr("Release notes are unavailable")
-                subtitle: I18n.tr("They load with the next update check. Release notes are also published on GitHub.")
+                title: I18n.tr("Release notes are unavailable", "empty state title when no release notes are loaded")
+                subtitle: I18n.tr("They load with the next update check. Release notes are also published on GitHub.", "release notes empty state description")
 
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
                     text: I18n.tr("Retry")
                     iconName: "refresh"
                     busy: SystemUpdateService.isChecking
                     enabled: !SystemUpdateService.isChecking
-                    backgroundColor: Theme.chipSurface
+                    backgroundColor: SettingsMetrics.controlSurface
                     textColor: Theme.surfaceText
                     onClicked: SystemUpdateService.loadReleases(true)
                 }
 
-                DankButton {
+                DButton {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: I18n.tr("View on GitHub")
+                    text: I18n.tr("View on GitHub", "link to the release on GitHub")
                     iconName: "open_in_new"
-                    backgroundColor: Theme.chipSurface
+                    backgroundColor: SettingsMetrics.controlSurface
                     textColor: Theme.surfaceText
                     onClicked: Qt.openUrlExternally("https://github.com/AvengeMedia/DankMaterialShell/releases")
                 }
@@ -53,7 +54,7 @@ Item {
 
             SettingsRow {
                 visible: !root.feedMissing
-                body: DankFilterChips {
+                body: DFilterChips {
                     width: parent.width
                     model: root.releases.map(r => "v" + r.version)
                     currentIndex: root.selectedIndex

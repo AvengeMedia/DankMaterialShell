@@ -3,10 +3,12 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 WidgetPickerWindow {
     id: root
+
+    property string listKey: "desktopWidgetInstances"
 
     signal widgetAdded(string widgetType)
 
@@ -14,14 +16,14 @@ WidgetPickerWindow {
         const widgetType = widget.id;
         const defaultConfig = DesktopWidgetRegistry.getDefaultConfig(widgetType);
         const name = widget.name || widgetType;
-        SettingsData.createDesktopWidgetInstance(widgetType, name, defaultConfig);
+        SettingsData.createDesktopWidgetInstance(widgetType, name, defaultConfig, listKey);
         root.widgetAdded(widgetType);
         root.hide();
     }
 
     objectName: "desktopWidgetBrowser"
     title: I18n.tr("Add Desktop Widget")
-    widgets: DesktopWidgetRegistry.registeredWidgetsList || []
+    widgets: DesktopWidgetRegistry.getListWidgets(listKey).filter(widget => listKey === "desktopWidgetInstances" ? true : (widget.id !== "lockAuth" && widget.id !== "greeterSession"))
     featuredFirst: true
     showEmptyState: true
     widgetDelegate: tileDelegate
@@ -31,7 +33,7 @@ WidgetPickerWindow {
     Component {
         id: tileDelegate
 
-        DankListItem {
+        DListItem {
             id: delegateRoot
 
             required property var modelData
@@ -55,7 +57,7 @@ WidgetPickerWindow {
                     color: Theme.withAlpha(Theme.primary, Theme.tonalTintAlpha)
                     anchors.verticalCenter: parent.verticalCenter
 
-                    DankIcon {
+                    DIcon {
                         anchors.centerIn: parent
                         name: delegateRoot.modelData.icon || "widgets"
                         size: Theme.iconSize
@@ -106,7 +108,7 @@ WidgetPickerWindow {
                     }
                 }
 
-                DankIcon {
+                DIcon {
                     name: "add"
                     size: Theme.iconSizeMedium
                     color: Theme.primary

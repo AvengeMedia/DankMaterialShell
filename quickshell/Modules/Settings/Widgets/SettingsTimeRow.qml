@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Window
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -71,7 +71,7 @@ Item {
                 enabled: root.enabled
                 onClicked: root.edit(isStart)
 
-                DankIcon {
+                DIcon {
                     name: "schedule"
                     size: Theme.iconSize
                     color: Theme.surfaceVariantText
@@ -85,7 +85,7 @@ Item {
         id: pickerLoader
         active: false
 
-        sourceComponent: DankTimePicker {
+        sourceComponent: DTimePicker {
             parent: root.Window.contentItem
             is24Hour: root.is24Hour
             onAccepted: (hour, minute) => {

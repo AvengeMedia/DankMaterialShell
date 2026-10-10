@@ -11,36 +11,36 @@ import (
 func HandleRequest(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	switch req.Method {
 	case "sysupdate.getState":
-		models.Respond(conn, req.ID, m.GetState())
+		conn.Respond(req.ID, m.GetState())
 	case "sysupdate.refresh":
 		force := params.BoolOpt(req.Params, "force", false)
 		background := params.BoolOpt(req.Params, "background", false)
 		m.Refresh(RefreshOptions{Force: force, Background: background})
-		models.Respond(conn, req.ID, m.GetState())
+		conn.Respond(req.ID, m.GetState())
 	case "sysupdate.upgrade":
 		handleUpgrade(conn, req, m)
 	case "sysupdate.cancel":
 		m.Cancel()
-		models.Respond(conn, req.ID, m.GetState())
+		conn.Respond(req.ID, m.GetState())
 	case "sysupdate.acquire":
 		m.Acquire(ctx, conn)
-		models.Respond(conn, req.ID, models.SuccessResult{Success: true})
+		conn.Respond(req.ID, models.SuccessResult{Success: true})
 	case "sysupdate.release":
 		m.Release(conn)
-		models.Respond(conn, req.ID, models.SuccessResult{Success: true})
+		conn.Respond(req.ID, models.SuccessResult{Success: true})
 	case "sysupdate.releases":
 		force := params.BoolOpt(req.Params, "force", false)
-		models.Respond(conn, req.ID, m.Releases(force))
+		conn.Respond(req.ID, m.Releases(force))
 	case "sysupdate.setInterval":
 		seconds, err := params.Int(req.Params, "seconds")
 		if err != nil {
-			models.RespondError(conn, req.ID, err.Error())
+			conn.RespondError(req.ID, err.Error())
 			return
 		}
 		m.SetInterval(seconds)
-		models.Respond(conn, req.ID, m.GetState())
+		conn.Respond(req.ID, m.GetState())
 	default:
-		models.RespondError(conn, req.ID, "unknown method: "+req.Method)
+		conn.RespondError(req.ID, "unknown method: "+req.Method)
 	}
 }
 
@@ -56,10 +56,10 @@ func handleUpgrade(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 		Ignored:        stringSliceOpt(req.Params, "ignored"),
 	}
 	if err := m.Upgrade(opts); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, m.GetState())
+	conn.Respond(req.ID, m.GetState())
 }
 
 func stringSliceOpt(p map[string]any, key string) []string {

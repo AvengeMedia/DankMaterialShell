@@ -90,6 +90,7 @@ func (f *FedoraDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 	// Hyprland-specific tools
 	if wm == deps.WindowManagerHyprland {
 		dependencies = append(dependencies, f.detectHyprlandTools()...)
+		dependencies = append(dependencies, f.detectHyprlandGuiutils())
 	}
 
 	// Niri-specific tools
@@ -147,6 +148,7 @@ func (f *FedoraDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 		packages["hyprland"] = f.getHyprlandMapping(variants["hyprland"])
 		packages["hyprctl"] = f.getHyprlandMapping(variants["hyprland"])
 		packages["jq"] = PackageMapping{Name: "jq", Repository: RepoTypeSystem}
+		packages["hyprland-guiutils"] = PackageMapping{Name: "hyprland-guiutils", Repository: RepoTypeCOPR, RepoURL: "lionheartp/Hyprland"}
 	case deps.WindowManagerNiri:
 		packages["niri"] = f.getNiriMapping(variants["niri"])
 		packages["xwayland-satellite"] = PackageMapping{Name: "xwayland-satellite", Repository: RepoTypeSystem}

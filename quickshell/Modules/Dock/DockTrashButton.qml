@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell.Widgets
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 
 Item {
     id: root
@@ -86,7 +86,7 @@ Item {
                 visible: status === Image.Ready
             }
 
-            DankIcon {
+            DIcon {
                 anchors.centerIn: parent
                 visible: parent.iconPath === "" || trashIcon.status !== Image.Ready
                 name: "delete"

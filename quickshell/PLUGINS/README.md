@@ -31,7 +31,7 @@ Plugins are discovered from `~/.config/DankMaterialShell/plugins/` and managed b
    - Merges plugin components with built-in widgets
    - Supports every bar and dock edge
 
-5. **Dash integration** (`Modules/DankDash/DashRegistry.qml`)
+5. **Dash integration** (`Modules/DDash/DashRegistry.qml`)
    - Lists built-in and plugin tabs and overview cards
    - Hosts plugin tabs in `DashTabHost.qml` and cards in `Overview/DashCardSlot.qml`
 
@@ -1945,7 +1945,7 @@ Optional on the tab:
 - `signal tabRequested(string id)`: switch the dash to another tab (`"overview"`, `"media"`, `"wallpaper"`, `"weather"`, `"notifications"` or a `plugin_<id>`); a tab hidden from the bar opens as a detail page
 - `signal navFocusRequested`: return focus to the dash navigation
 
-Use `Card` from `qs.Modules.DankDash.Overview` for tiles inside a tab so they pick up the same surface colors, radius and tones as the overview.
+Use `Card` from `qs.Modules.DDash.Overview` for tiles inside a tab so they pick up the same surface colors, radius and tones as the overview.
 
 ### Widgets inside a tab
 
@@ -1976,7 +1976,7 @@ DashTabComponent {
 }
 ```
 
-Import `qs.Modules.DankDash` for the grid. Each definition has a stable `id`, a translated `text`, an `icon`, a QML `component`, default `w`/`h` and optional `minW`/`minH`/`maxW`/`maxH`. The grid is 4 columns wide (2 when narrower than `Theme.smallBreakpoint`), independent of the overview column count. Set `enabled: false` to leave a widget in the Add menu initially.
+Import `qs.Modules.DDash` for the grid. Each definition has a stable `id`, a translated `text`, an `icon`, a QML `component`, default `w`/`h` and optional `minW`/`minH`/`maxW`/`maxH`. The grid is 4 columns wide (2 when narrower than `Theme.smallBreakpoint`), independent of the overview column count. Set `enabled: false` to leave a widget in the Add menu initially.
 
 A definition can carry `options`, a list of option specs in the same shape as `dash.options` (`toggle`, `choice`, `number`). Build them with `DashRegistry.toggle(key, text, def)`, `DashRegistry.choice(key, text, def, choices)`, `DashRegistry.number(key, text, def, min, max, step, unit)` or `DashRegistry.toneOption(def)` for the shared Tone choice. In edit mode a widget with options shows an options button that opens them in a sheet. Each widget instance stores its own values, and the widget reads them from `widgetOptions` by key. `id`, `w`, `h`, `col` and `row` are reserved keys.
 
@@ -2147,8 +2147,8 @@ plugin.
 - **PluginService**: `Services/PluginService.qml`
 - **Settings UI**: `Modules/Settings/PluginSettingsPage.qml`
 - **Bar and Dock Integration**: `Modules/SurfaceWidgets/SurfaceWidgetHost.qml`
-- **Dash Integration**: `Modules/DankDash/DashRegistry.qml`
-- **Launcher Integration**: `Modals/DankLauncherV2/Controller.qml`
+- **Dash Integration**: `Modules/DDash/DashRegistry.qml`
+- **Launcher Integration**: `Modals/DLauncherV2/Controller.qml`
 - **Desktop Widget Integration**: `Modules/DesktopWidgetLayer.qml`
 - **Theme Reference**: `Common/Theme.qml`
 - **Widget Library**: `Widgets/`

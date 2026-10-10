@@ -5,7 +5,7 @@ import qs.Common
 import qs.Modules.ControlCenter
 import qs.Widgets
 
-DankOSD {
+DOSD {
     id: root
 
     property string iconName: ""
@@ -78,7 +78,7 @@ DankOSD {
     Loader {
         id: endIconTooltip
         active: false
-        sourceComponent: DankTooltip {}
+        sourceComponent: DTooltip {}
     }
 
     content: OsdLevelRow {

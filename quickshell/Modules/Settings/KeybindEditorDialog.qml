@@ -4,12 +4,13 @@ import QtQuick
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 import "../../Common/KeyUtils.js" as KeyUtils
 import "../../Common/KeybindActions.js" as Actions
 
-DankDialog {
+DDialog {
     id: root
 
     readonly property var log: Log.scoped("KeybindEditorDialog")
@@ -85,7 +86,7 @@ DankDialog {
     opened: false
     maximumWidth: SettingsMetrics.formDialogWidth
     surfaceColor: Theme.hostSurface
-    title: isNew ? I18n.tr("Add shortcut") : I18n.tr("Edit shortcut", "keybind editor dialog title")
+    title: isNew ? I18n.tr("Add shortcut", "keybind editor dialog title and button") : I18n.tr("Edit shortcut", "keybind editor dialog title")
     closeEnabled: !busy
     acceptEnabled: canSubmit
     onAccepted: save()
@@ -291,29 +292,20 @@ DankDialog {
             return;
         }
 
-        let mods = KeyUtils.modsFromEvent(event.modifiers);
-        let qtKey = event.key;
+        const mods = KeyUtils.modsFromEvent(event.modifiers);
 
         if (_altShiftGhost && (event.modifiers & Qt.AltModifier) && !mods.includes("Shift"))
             mods.push("Shift");
         _altShiftGhost = false;
 
-        if (qtKey === Qt.Key_Backtab) {
-            qtKey = Qt.Key_Tab;
-            if (!mods.includes("Shift"))
-                mods.push("Shift");
-        }
-        const hasShift = mods.includes("Shift");
-        mods = KeyUtils.withSymbolicMod(mods, KeybindsService.modKey, KeybindsService.modSymbol);
-
-        const key = KeyUtils.xkbKeyFromQtKey(qtKey, !!(event.modifiers & Qt.KeypadModifier), hasShift, event.nativeScanCode);
-        if (!key) {
+        const token = KeyUtils.chordToken(event.key, event.modifiers, mods, event.nativeScanCode, KeybindsService.modKey, KeybindsService.modSymbol);
+        if (!token) {
             log.warn("Unknown key:", event.key, "mods:", event.modifiers);
             return;
         }
 
         updateEdit({
-            "key": KeyUtils.formatToken(mods, key)
+            "key": token
         });
         stopRecording();
     }
@@ -597,6 +589,56 @@ DankDialog {
                     "label": I18n.tr("Long press"),
                     "value": "o",
                     "tooltip": I18n.tr("Triggers after holding the key", "keybind option tooltip, hyprland long press flag")
+                },
+                {
+                    "label": I18n.tr("Non-consuming", "adjective, hyprland bind flag toggle, key is not swallowed"),
+                    "value": "n",
+                    "tooltip": I18n.tr("The key also reaches the focused window", "keybind option tooltip, hyprland non-consuming flag")
+                },
+                {
+                    "label": I18n.tr("Mouse", "hyprland bind flag toggle, bind for a mouse button"),
+                    "value": "m",
+                    "tooltip": I18n.tr("Binds a mouse button, such as mouse:272", "keybind option tooltip, hyprland mouse flag")
+                },
+                {
+                    "label": I18n.tr("Transparent", "adjective, hyprland bind flag toggle"),
+                    "value": "t",
+                    "tooltip": I18n.tr("Other binds cannot shadow it", "keybind option tooltip, hyprland transparent flag")
+                },
+                {
+                    "label": I18n.tr("Ignore mods", "hyprland bind flag toggle, ignore modifier keys"),
+                    "value": "i",
+                    "tooltip": I18n.tr("Fires with any modifiers held", "keybind option tooltip, hyprland ignore mods flag")
+                },
+                {
+                    "label": I18n.tr("All submaps", "hyprland bind flag toggle, submap universal"),
+                    "value": "u",
+                    "tooltip": I18n.tr("Works in every submap", "keybind option tooltip, hyprland submap universal flag")
+                },
+                {
+                    "label": I18n.tr("Auto-consuming", "adjective, hyprland bind flag toggle"),
+                    "value": "a",
+                    "tooltip": I18n.tr("Consumes the key only when a dispatcher runs", "keybind option tooltip, hyprland auto-consuming flag")
+                },
+                {
+                    "label": I18n.tr("Input capture", "hyprland bind flag toggle, allow input capture"),
+                    "value": "x",
+                    "tooltip": I18n.tr("Fires even while an input capture session is active", "keybind option tooltip, hyprland allow input capture flag")
+                },
+                {
+                    "label": I18n.tr("Not inhibitable", "adjective, hyprland bind flag toggle, dont_inhibit"),
+                    "value": "p",
+                    "tooltip": I18n.tr("Fires even when an app inhibits shortcuts", "keybind option tooltip, hyprland dont inhibit flag")
+                },
+                {
+                    "label": I18n.tr("Click", "hyprland bind flag toggle, mouse click bind"),
+                    "value": "c",
+                    "tooltip": I18n.tr("Triggers on release if the pointer stayed put", "keybind option tooltip, hyprland click flag")
+                },
+                {
+                    "label": I18n.tr("Drag", "hyprland bind flag toggle, mouse drag bind"),
+                    "value": "g",
+                    "tooltip": I18n.tr("Triggers on release after the pointer moved", "keybind option tooltip, hyprland drag flag")
                 }
             ];
         }
@@ -678,7 +720,7 @@ DankDialog {
     }
 
     actions: [
-        DankButton {
+        DButton {
             text: I18n.tr("Reset to default")
             visible: root.canReset
             enabled: !root.busy && !root.locked
@@ -686,14 +728,14 @@ DankDialog {
             textColor: Theme.primary
             onClicked: root.resetRequested(root.originalKey)
         },
-        DankButton {
+        DButton {
             text: I18n.tr("Cancel")
             enabled: root.closeEnabled
             backgroundColor: "transparent"
             textColor: Theme.primary
             onClicked: root.rejected()
         },
-        DankButton {
+        DButton {
             text: root.isNew ? I18n.tr("Add") : I18n.tr("Save")
             visible: !root.readOnly
             enabled: root.canSubmit
@@ -721,7 +763,7 @@ DankDialog {
     SettingsCard {
         title: I18n.tr("Key", "noun, keybind editor row label for the key combination")
         enabled: root.formEnabled
-        headerActions: DankButton {
+        headerActions: DButton {
             visible: !root.isNew && !root.readOnly && !root.addingNewKey
             text: I18n.tr("New key")
             iconName: "add"
@@ -734,7 +776,7 @@ DankDialog {
         SettingsRow {
             visible: !root.isNew && (root.keys.length > 1 || root.addingNewKey)
 
-            body: DankFilterChips {
+            body: DFilterChips {
                 id: keyChips
                 width: parent.width
                 showCounts: false
@@ -812,14 +854,14 @@ DankDialog {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingM
 
-                        DankIcon {
+                        DIcon {
                             name: "keyboard"
                             size: Theme.iconSize
                             color: Theme.surfaceVariantText
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
-                        DankKeycap {
+                        DKeycap {
                             text: root.editKey
                             visible: root.editKey !== "" && !root.recording
                             anchors.verticalCenter: parent.verticalCenter
@@ -835,7 +877,7 @@ DankDialog {
                         }
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         id: recordButton
                         anchors.right: parent.right
                         anchors.rightMargin: Theme.spacingXS
@@ -853,7 +895,7 @@ DankDialog {
                     spacing: Theme.spacingS
                     visible: root.conflicts.length > 0
 
-                    DankIcon {
+                    DIcon {
                         id: conflictIcon
                         name: "warning"
                         size: Theme.iconSizeSmall
@@ -875,7 +917,7 @@ DankDialog {
                     spacing: Theme.spacingS
                     visible: root.keysymUnreachable
 
-                    DankIcon {
+                    DIcon {
                         id: unreachableIcon
                         name: "warning"
                         size: Theme.iconSizeSmall
@@ -900,7 +942,7 @@ DankDialog {
         enabled: root.formEnabled
 
         SettingsRow {
-            body: DankButtonGroup {
+            body: DButtonGroup {
                 arrowKeysSelect: false
                 width: parent.width
                 fillWidth: true
@@ -924,7 +966,7 @@ DankDialog {
         SettingsRow {
             visible: root.actionType === "dms"
 
-            body: DankDropdown {
+            body: DDropdown {
                 id: dmsActionDropdown
                 width: parent.width
                 compactMode: true
@@ -949,7 +991,7 @@ DankDialog {
                 width: parent.width
                 spacing: Theme.spacingS
 
-                DankDropdown {
+                DDropdown {
                     id: compositorCategoryDropdown
                     width: Math.round((parent.width - parent.spacing) / 3)
                     compactMode: true
@@ -957,7 +999,7 @@ DankDialog {
                     onValueChanged: value => root.selectCompositorCategory(value)
                 }
 
-                DankDropdown {
+                DDropdown {
                     id: compositorActionDropdown
                     visible: !root.useCustomCompositor
                     width: parent.width - compositorCategoryDropdown.width - parent.spacing
@@ -975,7 +1017,7 @@ DankDialog {
                     }
                 }
 
-                DankTextField {
+                DTextField {
                     visible: root.useCustomCompositor
                     width: parent.width - compositorCategoryDropdown.width - parent.spacing
                     outlined: true
@@ -995,7 +1037,7 @@ DankDialog {
         SettingsRow {
             visible: root.actionType === "spawn"
 
-            body: DankTextField {
+            body: DTextField {
                 readonly property var parsedCommand: root.actionType === "spawn" ? Actions.parseSpawnCommand(root.editAction) : null
 
                 width: parent.width
@@ -1018,7 +1060,7 @@ DankDialog {
         SettingsRow {
             visible: root.actionType === "shell"
 
-            body: DankTextField {
+            body: DTextField {
                 width: parent.width
                 outlined: true
                 leftIconName: "terminal"
@@ -1038,7 +1080,7 @@ DankDialog {
         SettingsRow {
             visible: root.showDmsArgs && root.dmsArgDefs.some(arg => arg.name === "amount")
 
-            body: DankTextField {
+            body: DTextField {
                 id: amountField
 
                 readonly property string amount: root.dmsParsedArgs?.args?.amount || ""
@@ -1067,7 +1109,7 @@ DankDialog {
         SettingsRow {
             visible: root.showDmsArgs && root.dmsArgDefs.some(arg => arg.name === "device")
 
-            body: DankTextField {
+            body: DTextField {
                 readonly property string device: root.dmsParsedArgs?.args?.device || ""
 
                 width: parent.width
@@ -1090,7 +1132,7 @@ DankDialog {
             visible: root.showDmsArgs && root.dmsArgDefs.some(arg => arg.name === "tab")
             title: I18n.tr("Tab", "noun, keybind argument label for a dashboard tab")
 
-            DankDropdown {
+            DDropdown {
                 id: dashTabDropdown
                 compactMode: true
                 options: [I18n.tr("Overview"), I18n.tr("Media"), I18n.tr("Wallpaper"), I18n.tr("Weather")]
@@ -1103,7 +1145,7 @@ DankDialog {
         SettingsRow {
             visible: root.showDmsArgs && root.dmsFlagArgs.length > 0
 
-            body: DankFilterChips {
+            body: DFilterChips {
                 width: parent.width
                 multiSelect: true
                 showCounts: false
@@ -1128,7 +1170,7 @@ DankDialog {
 
                 visible: root.showArgEditor(index, argDef)
 
-                body: DankTextField {
+                body: DTextField {
                     id: argField
 
                     property bool syncing: false
@@ -1160,7 +1202,7 @@ DankDialog {
         SettingsRow {
             visible: root.showCompositorPicker && root.compositorFlags.length > 0
 
-            body: DankFilterChips {
+            body: DFilterChips {
                 width: parent.width
                 multiSelect: true
                 showCounts: false
@@ -1173,7 +1215,7 @@ DankDialog {
         SettingsRow {
             visible: KeybindsService.currentProvider !== "aqueous"
 
-            body: DankTextField {
+            body: DTextField {
                 width: parent.width
                 outlined: true
                 leftIconName: "title"
@@ -1193,7 +1235,7 @@ DankDialog {
         visible: KeybindsService.currentProvider === "niri" || KeybindsService.currentProvider === "hyprland"
 
         SettingsRow {
-            body: DankFilterChips {
+            body: DFilterChips {
                 width: parent.width
                 multiSelect: true
                 showCounts: false
@@ -1206,7 +1248,7 @@ DankDialog {
         SettingsRow {
             visible: KeybindsService.currentProvider === "niri"
 
-            body: DankTextField {
+            body: DTextField {
                 id: cooldownField
 
                 readonly property int cooldownMs: root.editCooldownMs
@@ -1241,7 +1283,7 @@ DankDialog {
     }
 
     component FieldUnit: StyledText {
-        required property DankTextField field
+        required property DTextField field
 
         anchors.right: parent.right
         anchors.rightMargin: field.contentPadding

@@ -7,9 +7,10 @@ import Quickshell
 import qs.Common
 import qs.Modals.Common
 import qs.Services
+import qs.DCommon.Widgets
 import qs.Widgets
 
-DankModal {
+DModal {
     id: muxModal
 
     layerNamespace: "dms:mux"
@@ -130,8 +131,6 @@ DankModal {
     modalWidth: 600
     modalHeight: 600
     backgroundColor: Theme.floatingWindowSurface
-    borderColor: Theme.outlineMedium
-    borderWidth: 1
     enableShadow: true
     keepContentLoaded: true
 
@@ -305,7 +304,7 @@ DankModal {
             }
 
             // Search field
-            DankSearchField {
+            DSearchField {
                 id: searchField
 
                 width: parent.width
@@ -341,7 +340,7 @@ DankModal {
                         radius: Theme.fullRadius(width, height)
                         color: Theme.primaryContainer
 
-                        DankIcon {
+                        DIcon {
                             anchors.centerIn: parent
                             name: "add"
                             size: Theme.iconSize
@@ -384,7 +383,7 @@ DankModal {
                 radius: Theme.cornerRadius
                 color: "transparent"
 
-                DankFlickable {
+                DFlickable {
                     anchors.fill: parent
                     clip: true
                     contentHeight: sessionsColumn.height
@@ -476,7 +475,7 @@ DankModal {
                                         visible: MuxService.supportsRename
                                         color: renameMouse.containsMouse ? Theme.chipSurface : Theme.withAlpha(Theme.chipSurface, 0)
 
-                                        DankIcon {
+                                        DIcon {
                                             anchors.centerIn: parent
                                             name: "edit"
                                             size: Theme.iconSizeSmall
@@ -501,7 +500,7 @@ DankModal {
                                         radius: Theme.fullRadius(width, height)
                                         color: deleteMouse.containsMouse ? Theme.errorContainer : Theme.withAlpha(Theme.errorContainer, 0)
 
-                                        DankIcon {
+                                        DIcon {
                                             anchors.centerIn: parent
                                             name: "delete"
                                             size: Theme.iconSizeSmall
@@ -532,7 +531,7 @@ DankModal {
                                 anchors.centerIn: parent
                                 spacing: Theme.spacingM
 
-                                DankIcon {
+                                DIcon {
                                     name: muxModal.searchText.length > 0 ? "search_off" : "terminal"
                                     size: 48
                                     color: Theme.surfaceVariantText
@@ -558,7 +557,7 @@ DankModal {
                 }
             }
 
-            DankKeyHints {
+            DKeyHints {
                 id: shortcutsBar
 
                 width: parent.width

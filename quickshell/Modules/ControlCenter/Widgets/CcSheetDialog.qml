@@ -1,8 +1,9 @@
 import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter
+import qs.DCommon.Widgets
 import qs.Widgets
-import "../../../DankCommon/Common/FocusNavigation.js" as FocusNavigation
+import "../../../DCommon/Common/FocusNavigation.js" as FocusNavigation
 
 Item {
     id: root
@@ -147,7 +148,7 @@ Item {
                 width: parent.width
                 spacing: Theme.spacingM
 
-                DankIcon {
+                DIcon {
                     name: root.iconName
                     size: Theme.iconSizeLarge
                     color: Theme.primary
@@ -190,7 +191,7 @@ Item {
                 visible: text !== ""
             }
 
-            DankFlickable {
+            DFlickable {
                 id: contentFlickable
                 width: parent.width
                 height: Math.min(contentHeight, Math.max(0, root.height - Theme.spacingL * 4 - header.height - column.spacing - (status.visible ? status.height + column.spacing : 0)))
@@ -203,8 +204,7 @@ Item {
                     if (!root.shown || !item || !FocusNavigation.containsFocus(contentSlot))
                         return;
                     const top = item.mapToItem(contentSlot, 0, 0).y;
-                    const y = Math.min(top, Math.max(contentFlickable.contentY, top + item.height - contentFlickable.height));
-                    contentFlickable.contentY = Math.max(0, Math.min(contentFlickable.contentHeight - contentFlickable.height, y));
+                    contentFlickable.revealRange(top, top + item.height);
                 }
 
                 Column {

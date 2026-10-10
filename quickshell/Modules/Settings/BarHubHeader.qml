@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
 Column {
@@ -65,10 +65,6 @@ Column {
         bar.select("default");
     }
 
-    function canToggleBar(config) {
-        return config.id !== "default" || SettingsData.isIslandBarConfig(config);
-    }
-
     function setBarEnabled(barId, enabled) {
         SettingsData.updateBarConfig(barId, {
             enabled
@@ -99,7 +95,7 @@ Column {
         title: I18n.tr("Bars", "plural noun, the shell bars or panels, settings title")
         settingKey: "barConfigurations"
         tags: ["bar", "configuration", "add", "remove", "enable", "multiple", "name"]
-        headerActions: DankButton {
+        headerActions: DButton {
             text: I18n.tr("Add")
             iconName: "add"
             buttonHeight: Theme.buttonHeightXS
@@ -117,7 +113,6 @@ Column {
                 summary: root.barSummary(modelData)
                 selected: bar.selectedBarId === modelData.id
                 checked: modelData.enabled ?? false
-                toggleVisible: root.canToggleBar(modelData)
                 deletable: root.canDeleteBar(modelData)
                 onClicked: bar.select(modelData.id)
                 onToggled: checked => {
@@ -126,6 +121,14 @@ Column {
                 }
                 onDeleteRequested: root.deleteBar(modelData.id)
             }
+        }
+
+        SettingsNavRow {
+            iconName: "keyboard_command_key"
+            title: I18n.tr("Keyboard shortcuts")
+            hint: I18n.tr("With no bar, Dot or dock launcher on, shortcuts are the only way back to settings", "bars card hint shown when every bar, the Dot and every dock launcher button are off")
+            visible: !root.dotEnabled && !SettingsData.barConfigs.some(config => config.enabled && !SettingsData.isDotBarConfig(config)) && !SettingsData.dockConfigs.some(dock => dock.enabled && dock.launcherEnabled)
+            onClicked: keyboard => root.parentModal?.navigateTo("keybinds", keyboard)
         }
     }
 
@@ -140,7 +143,7 @@ Column {
             title: I18n.tr("Name")
             subtitle: root.editingBarId ? "" : bar.selectedBarName
 
-            DankActionButton {
+            DActionButton {
                 iconName: root.editingBarId ? "check" : "edit"
                 Accessible.name: root.editingBarId ? I18n.tr("Save") : I18n.tr("Rename")
                 onClicked: {
@@ -152,7 +155,7 @@ Column {
                     root.editingBarId = bar.selectedBarId;
                 }
             }
-            DankActionButton {
+            DActionButton {
                 visible: root.editingBarId !== ""
                 iconName: "close"
                 Accessible.name: I18n.tr("Cancel")
@@ -163,7 +166,7 @@ Column {
                 width: parent.width
                 active: root.editingBarId !== ""
                 visible: active
-                sourceComponent: DankTextField {
+                sourceComponent: DTextField {
                     id: renameField
                     width: parent.width
                     outlined: true

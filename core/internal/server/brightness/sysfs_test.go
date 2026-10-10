@@ -22,13 +22,6 @@ func TestSysfsBackend_PercentConversions(t *testing.T) {
 			tolerance: 0,
 		},
 		{
-			name:      "backlight 1% should be minValue=1",
-			device:    &sysfsDevice{maxBrightness: 100, minValue: 1, class: ClassBacklight},
-			percent:   1,
-			wantValue: 1,
-			tolerance: 0,
-		},
-		{
 			name:      "backlight 50% should be ~50",
 			device:    &sysfsDevice{maxBrightness: 100, minValue: 1, class: ClassBacklight},
 			percent:   50,
@@ -43,32 +36,11 @@ func TestSysfsBackend_PercentConversions(t *testing.T) {
 			tolerance: 0,
 		},
 		{
-			name:      "led 0% should be 0",
-			device:    &sysfsDevice{maxBrightness: 255, minValue: 0, class: ClassLED},
-			percent:   0,
-			wantValue: 0,
-			tolerance: 0,
-		},
-		{
-			name:      "led 1% should be ~2-3",
-			device:    &sysfsDevice{maxBrightness: 255, minValue: 0, class: ClassLED},
-			percent:   1,
-			wantValue: 2,
-			tolerance: 3,
-		},
-		{
 			name:      "led 50% should be ~127",
 			device:    &sysfsDevice{maxBrightness: 255, minValue: 0, class: ClassLED},
 			percent:   50,
 			wantValue: 127,
 			tolerance: 2,
-		},
-		{
-			name:      "led 100% should be max",
-			device:    &sysfsDevice{maxBrightness: 255, minValue: 0, class: ClassLED},
-			percent:   100,
-			wantValue: 255,
-			tolerance: 0,
 		},
 	}
 

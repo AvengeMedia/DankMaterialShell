@@ -7,8 +7,13 @@ import qs.Widgets
 CcTile {
     id: root
 
+    property bool live: Window.window?.visible ?? false
+    property bool batteryRefHeld: false
     readonly property bool available: BatteryService.batteryAvailable
     readonly property bool profileMode: !available && PowerProfileWatcher.available
+    readonly property string meterStyle: widgetData?.batteryStyle ?? "icon"
+    readonly property bool showsMeter: available && meterStyle !== "icon" && (small || compact) && !docked
+    property real meterWidth: 0
 
     iconName: profileMode ? Theme.getPowerProfileIcon(PowerProfileWatcher.currentProfile) : BatteryService.getBatteryIcon()
     title: {
@@ -28,9 +33,50 @@ CcTile {
         return `${BatteryService.batteryLevel}%`;
     }
     dockedText: available || profileMode ? subtitle : title
-    active: available && (BatteryService.isCharging || BatteryService.isPluggedIn)
+
+    function syncBatteryRef(wanted) {
+        if (wanted === batteryRefHeld)
+            return;
+        batteryRefHeld = wanted;
+        if (wanted) {
+            BatteryService.addRef();
+            return;
+        }
+        BatteryService.removeRef();
+    }
+
+    onLiveChanged: syncBatteryRef(live)
+    Component.onCompleted: syncBatteryRef(live)
+    Component.onDestruction: syncBatteryRef(false)
+    // The meter carries its own charging bolt and would vanish into an active body.
+    active: available && (BatteryService.isCharging || BatteryService.isPluggedIn) && !showsMeter
+    bodyContent: showsMeter ? meterPill : null
+    quickContentWidth: showsMeter ? meterWidth : 0
     opensPage: !profileMode
     showExpand: profileMode
+
+    Component {
+        id: meterPill
+
+        Item {
+            BatteryMeter {
+                id: meter
+
+                anchors.centerIn: parent
+                meterStyle: root.meterStyle
+                levelColors: true
+                thickness: CcMetrics.pillMeterThickness
+                scale: Math.min(1, (parent.width - Theme.spacingXS * 2) / Math.max(1, implicitWidth))
+            }
+
+            Binding {
+                target: root
+                property: "meterWidth"
+                value: meter.implicitWidth
+            }
+        }
+    }
+
     tallContent: Component {
         Item {
             BatteryMeter {

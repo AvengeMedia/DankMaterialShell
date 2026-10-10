@@ -1,10 +1,11 @@
 import QtQuick
 import qs.Common
 import qs.Modals.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
-DankFloatingWindow {
+DFloatingWindow {
     id: root
 
     property var parentModal: null
@@ -159,7 +160,7 @@ DankFloatingWindow {
             }
         }
 
-        DankWindowHeader {
+        DWindowHeader {
             id: headerArea
             anchors.left: parent.left
             anchors.right: parent.right
@@ -168,7 +169,7 @@ DankFloatingWindow {
             title: root.headerTitle
             onCloseRequested: root.hide()
 
-            DankRefreshButton {
+            DRefreshButton {
                 buttonSize: Theme.buttonHeightXXS
                 iconSize: Theme.iconSizeSmall
                 iconColor: Theme.surfaceText
@@ -185,10 +186,9 @@ DankFloatingWindow {
             anchors.right: parent.right
             anchors.top: headerArea.bottom
             anchors.bottom: parent.bottom
-            anchors.leftMargin: Theme.spacingL
-            anchors.rightMargin: Theme.spacingL
-            anchors.topMargin: Theme.spacingM
-            anchors.bottomMargin: Theme.spacingL
+            anchors.leftMargin: Theme.windowInset
+            anchors.rightMargin: Theme.windowInset
+            anchors.bottomMargin: Theme.windowInset
 
             Item {
                 id: browserBody
@@ -204,7 +204,7 @@ DankFloatingWindow {
                     spacing: Theme.spacingS
                 }
 
-                DankSearchField {
+                DSearchField {
                     id: browserSearchField
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -245,7 +245,7 @@ DankFloatingWindow {
                         anchors.fill: parent
                         visible: root.isLoading
 
-                        DankSpinner {
+                        DSpinner {
                             anchors.centerIn: parent
                             running: root.isLoading
                         }

@@ -13,8 +13,6 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 )
 
-// isIgnorableI2CBus checks if an I2C bus should be skipped during DDC probing.
-// Based on ddcutil's sysfs_is_ignorable_i2c_device() (src/sysfs/sysfs_simple.c)
 func isIgnorableI2CBus(busno int) bool {
 	name := getI2CDeviceSysfsName(busno)
 	if name == "DPMST" {
@@ -42,7 +40,6 @@ func isIgnorableI2CBus(busno int) bool {
 	return ignorable
 }
 
-// Based on ddcutil's ignorable_i2c_device_sysfs_name() (src/sysfs/sysfs_simple.c)
 func isIgnorableI2CDeviceName(name, driver string) bool {
 	ignorablePrefixes := []string{
 		"SMBus",
@@ -69,7 +66,6 @@ func isIgnorableI2CDeviceName(name, driver string) bool {
 	return false
 }
 
-// Based on ddcutil's get_i2c_device_sysfs_name() (sysfs_base.c:1175)
 func getI2CDeviceSysfsName(busno int) string {
 	path := fmt.Sprintf("/sys/bus/i2c/devices/i2c-%d/name", busno)
 	data, err := os.ReadFile(path)
@@ -79,7 +75,6 @@ func getI2CDeviceSysfsName(busno int) string {
 	return strings.TrimSpace(string(data))
 }
 
-// Based on ddcutil's get_i2c_device_sysfs_class() (src/sysfs/sysfs_simple.c)
 func getI2CDeviceSysfsClass(busno int) uint32 {
 	paths := []string{
 		fmt.Sprintf("/sys/bus/i2c/devices/i2c-%d", busno),
@@ -103,7 +98,6 @@ func getI2CDeviceSysfsClass(busno int) uint32 {
 	return 0
 }
 
-// Based on ddcutil's get_driver_for_busno() (src/sysfs/sysfs_simple.c)
 func getI2CSysfsDriver(busno int) string {
 	adapter := findI2CAdapter(fmt.Sprintf("/sys/bus/i2c/devices/i2c-%d", busno))
 	if adapter == "" {
@@ -116,8 +110,7 @@ func getI2CSysfsDriver(busno int) string {
 	return filepath.Base(module)
 }
 
-// Based on ddcutil's sysfs_find_adapter() (src/sysfs/sysfs_simple.c): the nearest
-// ancestor under /sys/devices carrying a class attribute.
+// The nearest ancestor under /sys/devices carrying a class attribute.
 func findI2CAdapter(path string) string {
 	resolved, err := filepath.EvalSymlinks(path)
 	if err != nil {
@@ -132,8 +125,7 @@ func findI2CAdapter(path string) string {
 	return ""
 }
 
-// ddcutil's known_reliable_drivers (src/sysfs/sysfs_base.c): drivers that keep the DRM connector
-// edid, status and dpms attributes current.
+// Drivers that keep the DRM connector edid, status and dpms attributes current; nvidia does not.
 var sysfsReliableDrivers = []string{"i915", "xe", "amdgpu", "radeon", "nouveau"}
 
 var (
@@ -149,7 +141,6 @@ const (
 	ddcBusNeedsEDIDRead
 )
 
-// Based on ddcutil's i2c_edid_exists() and its laptop panel exclusion (src/i2c/i2c_bus_core.c).
 func ddcBusVerdictFor(busno int, connectors map[int]string) ddcBusVerdict {
 	name := getI2CDeviceSysfsName(busno)
 	displayLink := name == "DisplayLink I2C Adapter"
@@ -177,7 +168,6 @@ func ddcBusVerdictFor(busno int, connectors map[int]string) ddcBusVerdict {
 	return ddcBusNeedsEDIDRead
 }
 
-// Based on ddcutil's dpms_check_drm_asleep_by_businfo() (src/sysfs/sysfs_dpms.c).
 func ddcDisplayAsleep(busno int, connectors map[int]string) bool {
 	connector, mapped := connectors[busno]
 	if !mapped || !slices.Contains(sysfsReliableDrivers, getI2CSysfsDriver(busno)) {
@@ -186,11 +176,13 @@ func ddcDisplayAsleep(busno int, connectors map[int]string) bool {
 	return strings.TrimSpace(drmConnectorAttr(connector, "dpms")) != "On"
 }
 
-// Based on ddcutil's get_connector_bus_numbers() (src/sysfs/sysfs_simple.c): a DP connector's own
-// i2c-N directory, any other connector's ddc/i2c-dev/i2c-N.
 func drmConnectorsByBus() map[int]string {
+	return drmConnectorsByBusIn("/sys/class/drm")
+}
+
+func drmConnectorsByBusIn(root string) map[int]string {
 	connectors := map[int]string{}
-	entries, err := os.ReadDir("/sys/class/drm")
+	entries, err := os.ReadDir(root)
 	if err != nil {
 		return connectors
 	}
@@ -199,15 +191,27 @@ func drmConnectorsByBus() map[int]string {
 		if !drmConnectorPattern.MatchString(name) {
 			continue
 		}
-		dir := filepath.Join("/sys/class/drm", name)
-		if !strings.Contains(name, "-DP-") {
-			dir = filepath.Join(dir, "ddc", "i2c-dev")
-		}
-		if busno, ok := i2cSubdirBus(dir); ok {
+		for _, busno := range drmConnectorBuses(name, filepath.Join(root, name)) {
 			connectors[busno] = name
 		}
 	}
 	return connectors
+}
+
+// amdgpu gives a DP connector two buses, the aux channel under i2c-N and the hardware i2c bus
+// behind ddc, and a DP++ to HDMI adapter answers only on the ddc one (#3724).
+func drmConnectorBuses(name, dir string) []int {
+	buses := []int{}
+	if busno, ok := i2cSubdirBus(filepath.Join(dir, "ddc", "i2c-dev")); ok {
+		buses = append(buses, busno)
+	}
+	if !strings.Contains(name, "-DP-") {
+		return buses
+	}
+	if busno, ok := i2cSubdirBus(dir); ok {
+		buses = append(buses, busno)
+	}
+	return buses
 }
 
 func i2cSubdirBus(dir string) (int, bool) {
@@ -237,7 +241,6 @@ func drmConnectorAttr(connector, attr string) string {
 
 var edidHeader = []byte{0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00}
 
-// Based on ddcutil's is_valid_raw_edid() (src/util/edid.c).
 func isValidEDID(edid []byte) bool {
 	if len(edid) < 128 || !bytes.Equal(edid[:8], edidHeader) {
 		return false
@@ -249,12 +252,11 @@ func isValidEDID(edid []byte) bool {
 	return sum == 0
 }
 
-// Based on ddcutil's is_laptop_parsed_edid() (src/util/edid.c).
+// A panel with neither a monitor name nor a serial descriptor is a laptop panel.
 func isLaptopEDID(edid []byte) bool {
 	return edidDescriptorText(edid, 0xfc) == "" && edidDescriptorText(edid, 0xff) == ""
 }
 
-// Based on ddcutil's get_edid_descriptor_strings() (src/util/edid.c).
 func edidDescriptorText(edid []byte, tag byte) string {
 	text := ""
 	for i := range 4 {

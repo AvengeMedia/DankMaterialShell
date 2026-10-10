@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 
 SettingsRow {
@@ -10,6 +11,7 @@ SettingsRow {
     property string currentValue: ""
     property alias options: dropdown.options
     property alias optionIcons: dropdown.optionIcons
+    property alias optionImages: dropdown.optionImages
     property alias optionIconMap: dropdown.optionIconMap
     property alias optionColorMap: dropdown.optionColorMap
     property alias enableFuzzySearch: dropdown.enableFuzzySearch
@@ -39,9 +41,10 @@ SettingsRow {
     subtitle: description
     onCurrentValueChanged: dropdown.currentValue = currentValue
 
-    DankDropdown {
+    DDropdown {
         id: dropdown
         downKeyOpens: false
+        backgroundColor: SettingsMetrics.controlSurface
         enabled: root.enabled
         Accessible.name: root.text
         Accessible.description: root.description + (root.description ? " · " : "") + currentValue

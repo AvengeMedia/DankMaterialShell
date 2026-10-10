@@ -80,3 +80,38 @@ test("panel step follows the pointer and holds on a pinned edge", () => {
     assert.equal(grid.nearestStep(rightEdge, 8, 6, 30, rightEdge(8) + 50), 9);
     assert.equal(grid.nearestStep(rightEdge, 20, 6, 30, 1400), 20);
 });
+
+const dropped = (cells, index, target, columns = 2, step = 1) => {
+    const items = cells.map((cell, i) => ({ id: String(i), w: cell.cols, h: cell.rows, col: cell.col, row: cell.row }));
+    const moved = items.map((item, i) => i === index ? Object.assign({}, item, target) : item);
+    const order = [index].concat(items.map((item, i) => i).filter(i => i !== index));
+    const pack = trial => grid.packCells(trial, order, columns, null, step, true).cells;
+    return plain(pack(grid.dropInto(moved, cells, index, target, pack, step)).map(cell => [cell.col, cell.row]));
+};
+
+test("a tile dragged down its own stack lands where dropped instead of back above the tile it covers", () => {
+    const cells = [{ col: 0, row: 0, cols: 1, rows: 1 }, { col: 0, row: 1, cols: 1, rows: 1 }, { col: 0, row: 2, cols: 1, rows: 2 }];
+    assert.deepEqual(dropped(cells, 0, { col: 0, row: 1 }), [[0, 1], [0, 0], [0, 2]]);
+    assert.deepEqual(dropped(cells, 0, { col: 0, row: 2 }), [[0, 3], [0, 0], [0, 1]]);
+    assert.deepEqual(dropped(cells, 2, { col: 0, row: 0 }), [[0, 2], [0, 3], [0, 0]]);
+    assert.deepEqual(dropped(cells, 1, { col: 0, row: 2 }), [[0, 0], [0, 3], [0, 1]]);
+});
+
+test("a half-width tile dragged down beside a blocked stack moves one step per half row", () => {
+    const cells = [{ col: 0, row: 0, cols: 1, rows: 1 }, { col: 1, row: 0, cols: 0.5, rows: 1 }, { col: 1.5, row: 0, cols: 0.5, rows: 1 }, { col: 0, row: 1, cols: 2, rows: 1 }, { col: 0, row: 2, cols: 2, rows: 1 }];
+    const rowOf = target => dropped(cells, 1, { col: 1, row: target }, 2, 0.5)[1][1];
+    assert.deepEqual([1, 1.5, 2, 2.5, 3].map(rowOf), [2, 2, 2, 3, 3]);
+});
+
+test("a tile dragged down from another column lands where dropped unless gravity would lift it back", () => {
+    const cells = [{ col: 0, row: 0, cols: 1, rows: 1 }, { col: 0, row: 1, cols: 1, rows: 1 }, { col: 0, row: 2, cols: 1, rows: 1 }, { col: 1, row: 0, cols: 1, rows: 1 }];
+    const items = cells.map((cell, i) => ({ id: "abcd"[i], col: cell.col, row: cell.row }));
+    const drop = (index, target) => {
+        const moved = items.map((item, i) => i === index ? Object.assign({}, item, target) : item);
+        const order = [index].concat(items.map((item, i) => i).filter(i => i !== index));
+        const pack = trial => grid.packCells(trial, order, 2, null, 1, true).cells;
+        return plain(grid.packCells(grid.dropInto(moved, cells, index, target, pack), order, 2, null, 1, true).cells.map(cell => [cell.col, cell.row]));
+    };
+    assert.deepEqual(drop(3, { col: 0, row: 1 }), [[0, 0], [0, 2], [0, 3], [0, 1]]);
+    assert.deepEqual(drop(0, { col: 0, row: 1 }), [[0, 1], [0, 0], [0, 2], [1, 0]]);
+});

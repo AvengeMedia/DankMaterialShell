@@ -10,17 +10,7 @@ SettingsCard {
     iconName: "animation"
     title: I18n.tr("Motion", "island settings: spring motion card title")
     settingKey: root.keyPrefix + "Motion"
-    tags: ["island", "motion", "spring", "animation", "reduce"]
-
-    SettingsToggleRow {
-        settingKey: root.keyPrefix + "ReducedMotion"
-        tags: ["island", "motion", "animation", "reduce", "accessibility", "spring"]
-        resetStore: root.store
-        resetKeys: ["islandReducedMotion"]
-        text: I18n.tr("Reduce motion")
-        checked: root.store.setting("islandReducedMotion")
-        onToggled: checked => root.store.apply("islandReducedMotion", checked)
-    }
+    tags: ["island", "motion", "spring", "animation"]
 
     SettingsSliderRow {
         settingKey: root.keyPrefix + "SpringStiffness"
@@ -33,7 +23,7 @@ SettingsCard {
         maximum: 1200
         step: 10
         value: Math.round(root.store.setting("islandSpringStiffness"))
-        enabled: !root.store.setting("islandReducedMotion")
+        enabled: !SettingsData.reduceMotion
         onSliderValueChanged: value => root.store.apply("islandSpringStiffness", value)
     }
 
@@ -48,7 +38,7 @@ SettingsCard {
         maximum: 100
         step: 1
         value: Math.round(root.store.setting("islandSpringDamping"))
-        enabled: !root.store.setting("islandReducedMotion")
+        enabled: !SettingsData.reduceMotion
         onSliderValueChanged: value => root.store.apply("islandSpringDamping", value)
     }
 
@@ -64,7 +54,7 @@ SettingsCard {
         unit: ""
         decimals: 2
         value: Math.round(root.store.setting("islandSpringMass") * 100)
-        enabled: !root.store.setting("islandReducedMotion")
+        enabled: !SettingsData.reduceMotion
         onSliderValueChanged: value => root.store.apply("islandSpringMass", value / 100)
     }
 }
