@@ -309,6 +309,23 @@ func TestIWDBackend_PendingPSK(t *testing.T) {
 	assert.False(t, ok, "expired pending PSK should not be returned")
 }
 
+func TestIWDBackend_StorePendingPSK_ConsumedByAgent(t *testing.T) {
+	backend, _ := NewIWDBackend()
+
+	backend.storePendingPSK("CafeWiFi", "secretpass")
+
+	agent := &IWDAgent{
+		takePendingSecret: backend.takePendingPSK,
+	}
+
+	psk, ok := agent.takePendingSecret("CafeWiFi")
+	assert.True(t, ok)
+	assert.Equal(t, "secretpass", psk)
+
+	_, ok = agent.takePendingSecret("CafeWiFi")
+	assert.False(t, ok, "pending PSK should only be consumed once")
+}
+
 type fakePromptBroker struct {
 	asked    chan PromptRequest
 	reply    PromptReply
