@@ -118,7 +118,27 @@ Singleton {
             return;
         }
         _candidateArt = candidate;
+        _quantize(url);
+    }
+
+    property bool _quantizing: false
+    property string _queuedArtUrl: ""
+
+    // Replacing a live source makes ColorQuantizer wait for the whole global thread pool on the gui thread.
+    function _quantize(url) {
+        if (_quantizing) {
+            _queuedArtUrl = url;
+            return;
+        }
+        _queuedArtUrl = "";
+        const previous = quantizer.source.toString();
         quantizer.source = url;
+        _quantizing = quantizer.source.toString() !== previous;
+    }
+
+    function _startQueued() {
+        if (_queuedArtUrl !== "" && !_quantizing)
+            _quantize(_queuedArtUrl);
     }
 
     ColorQuantizer {
@@ -126,14 +146,17 @@ Singleton {
         depth: 4
         rescaleSize: 64
         onColorsChanged: {
+            root._quantizing = false;
             root._quantizedArt = {
                 url: source.toString(),
                 colors: Array.from(colors)
             };
             const candidate = root._candidateArt;
-            if (!candidate || candidate.serial !== root._requestSerial || candidate.url !== source.toString())
-                return;
-            root._publish(candidate, root._quantizedArt.colors);
+            if (candidate && candidate.serial === root._requestSerial && candidate.url === source.toString())
+                root._publish(candidate, root._quantizedArt.colors);
+            // colorsChanged fires twice per run; start the queued source after both have seen this one.
+            if (root._queuedArtUrl !== "")
+                Qt.callLater(root._startQueued);
         }
     }
 
