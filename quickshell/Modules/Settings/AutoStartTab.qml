@@ -20,6 +20,7 @@ Item {
     property string newEntryExec: ""
     property string newEntryDesktopId: ""
     property string newEntryCommandWrapper: "%command%"
+    readonly property bool autostartTargetInactive: DesktopService.isSystemd && DesktopService.systemdAutostartTargetChecked && !DesktopService.systemdAutostartTargetActive
 
     readonly property string autostartDir: {
         const configHome = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
@@ -377,8 +378,17 @@ Item {
             SettingsNoteRow {
                 width: parent.width
                 paintBackground: false
-                visible: DesktopService.isSystemd && DesktopService.systemdAutostartTargetChecked && !DesktopService.systemdAutostartTargetActive
-                text: I18n.tr("%1 is not active, so autostart entries will not run at login. Start your session through a session manager such as uwsm.", "autostart settings warning, keep unit %1 and option names verbatim").arg("xdg-desktop-autostart.target")
+                visible: root.autostartTargetInactive
+                text: I18n.tr("Autostart entries will not run at login because %1 is not active.", "autostart settings warning, %1 is a systemd target").arg("xdg-desktop-autostart.target")
+            }
+
+            SettingsLinkRow {
+                width: parent.width
+                visible: root.autostartTargetInactive
+                iconName: "menu_book"
+                title: I18n.tr("Docs")
+                subtitle: Site.domain
+                url: Site.docs + "/dankmaterialshell/autostart#target-not-active"
             }
 
             SettingsCard {
