@@ -373,12 +373,19 @@ Item {
             width: Math.min(SettingsMetrics.contentMaxWidth, parent.width - Theme.spacingL * 2)
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
-            visible: DesktopService.autostartAvailable
+
+            SettingsNoteRow {
+                width: parent.width
+                paintBackground: false
+                visible: DesktopService.isSystemd && DesktopService.systemdAutostartTargetChecked && !DesktopService.systemdAutostartTargetActive
+                text: I18n.tr("%1 is not active, so autostart entries will not run at login. Start your session through a session manager such as uwsm.", "autostart settings warning, keep unit %1 and option names verbatim").arg("xdg-desktop-autostart.target")
+            }
 
             SettingsCard {
                 settingKey: "autostartAddEntry"
                 tags: ["autostart", "add", "entry", "command", "startup"]
                 width: parent.width
+                visible: DesktopService.autostartAvailable
                 iconName: "add_circle"
                 title: I18n.tr("Add entry")
 
@@ -484,6 +491,7 @@ Item {
                 iconName: "line_start"
                 title: I18n.tr("Entries", "card title listing autostart entries")
                 settingKey: "autostartEntries"
+                visible: DesktopService.autostartAvailable
                 collapsible: true
                 expanded: true
 
@@ -565,7 +573,7 @@ Item {
                 width: parent.width
                 iconName: "handyman"
                 title: I18n.tr("Tray icon fix")
-                visible: DesktopService.isSystemd
+                visible: DesktopService.isSystemd && DesktopService.autostartAvailable
 
                 SettingsRow {
                     body: Column {
