@@ -109,26 +109,6 @@ func writePlugin(t *testing.T, pluginsDir, file string) {
 	}
 }
 
-// qtenginePluginFile("", major) is a path with a directory component, and
-// qtPluginPath joins platformthemes/ again — a regression here silently warns
-// at every correctly installed system, so pin the full path down.
-func TestQtenginePluginPath(t *testing.T) {
-	root := t.TempDir()
-	if got := qtenginePluginPath([]string{root}, "6"); got != "" {
-		t.Fatalf("missing plugin should yield an empty path, got %q", got)
-	}
-	want := filepath.Join(root, "platformthemes", "libqt6engine-plugin.so")
-	if err := os.MkdirAll(filepath.Join(root, "platformthemes"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(want, nil, 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if got := qtenginePluginPath([]string{root}, "6"); got != want {
-		t.Fatalf("qtenginePluginPath = %q, want %q", got, want)
-	}
-}
-
 func TestCheckQtPlatformThemePlugin(t *testing.T) {
 	t.Run("qt6ct-kde is flagged as a package name, not a theme", func(t *testing.T) {
 		t.Setenv("QT_QPA_PLATFORMTHEME", "qt6ct-kde")
@@ -182,15 +162,55 @@ func TestCheckQtPlatformThemePlugin(t *testing.T) {
 		}
 	})
 
-	t.Run("unset and qtengine are left to their own checks", func(t *testing.T) {
+	t.Run("unset is left to checkEnvVar", func(t *testing.T) {
 		t.Setenv("PATH", t.TempDir())
 		t.Setenv("QT_QPA_PLATFORMTHEME", "")
 		if results := checkQtPlatformThemePlugin("QT_QPA_PLATFORMTHEME"); results != nil {
 			t.Fatalf("unset should yield no results, got %+v", results)
 		}
+	})
+
+	t.Run("qtengine checks the Qt5 and Qt6 plugins", func(t *testing.T) {
 		t.Setenv("QT_QPA_PLATFORMTHEME", "qtengine")
-		if results := checkQtPlatformThemePlugin("QT_QPA_PLATFORMTHEME"); results != nil {
-			t.Fatalf("qtengine should yield no results, got %+v", results)
+		qt5, qt6 := t.TempDir(), t.TempDir()
+		writePlugin(t, qt6, "libqt6engine-plugin.so")
+		dir5 := stubQtQueryTool(t, "qmake-qt5", "5.15.19", qt5)
+		dir6 := stubQtQueryTool(t, "qmake6", "6.11.2", qt6)
+		t.Setenv("PATH", dir6+string(os.PathListSeparator)+dir5)
+		results := checkQtPlatformThemePlugin("QT_QPA_PLATFORMTHEME")
+		if len(results) != 2 {
+			t.Fatalf("got %d results, want 2: %+v", len(results), results)
+		}
+		if results[0].name != "qtengine plugin (Qt5)" || results[0].status != statusWarn {
+			t.Fatalf("Qt5 result = %+v, want a warning for the missing plugin", results[0])
+		}
+		if !strings.Contains(results[0].details, filepath.Join(qt5, "platformthemes", "libqt5engine-plugin.so")) {
+			t.Fatalf("Qt5 details should contain the expected path, got %q", results[0].details)
+		}
+		if results[1].name != "qtengine plugin (Qt6)" || results[1].status != statusOK {
+			t.Fatalf("Qt6 result = %+v, want OK", results[1])
+		}
+	})
+
+	t.Run("qtengine in the qt6 variable skips Qt5", func(t *testing.T) {
+		t.Setenv("QT_QPA_PLATFORMTHEME_QT6", "qtengine")
+		qt5, qt6 := t.TempDir(), t.TempDir()
+		writePlugin(t, qt6, "libqt6engine-plugin.so")
+		dir5 := stubQtQueryTool(t, "qmake-qt5", "5.15.19", qt5)
+		dir6 := stubQtQueryTool(t, "qmake6", "6.11.2", qt6)
+		t.Setenv("PATH", dir6+string(os.PathListSeparator)+dir5)
+		results := checkQtPlatformThemePlugin("QT_QPA_PLATFORMTHEME_QT6")
+		if len(results) != 1 || results[0].name != "qtengine plugin (Qt6)" || results[0].status != statusOK {
+			t.Fatalf("got %+v, want one OK Qt6 result", results)
+		}
+	})
+
+	t.Run("qtengine without Qt tools degrades to one info", func(t *testing.T) {
+		t.Setenv("QT_QPA_PLATFORMTHEME", "qtengine")
+		t.Setenv("PATH", t.TempDir())
+		results := checkQtPlatformThemePlugin("QT_QPA_PLATFORMTHEME")
+		if len(results) != 1 || results[0].status != statusInfo || results[0].name != "qtengine plugin (Qt6)" {
+			t.Fatalf("got %+v, want one Qt6 info result", results)
 		}
 	})
 
@@ -224,6 +244,75 @@ func TestCheckQtPlatformThemePlugin(t *testing.T) {
 			t.Fatalf("got %+v, want one OK result", results)
 		}
 	})
+}
+
+func TestCheckQtengineConfig(t *testing.T) {
+	configHome, dataHome := t.TempDir(), t.TempDir()
+	t.Setenv("XDG_CONFIG_HOME", configHome)
+	t.Setenv("XDG_DATA_HOME", dataHome)
+	path := filepath.Join(configHome, "qtengine", "config.json")
+	scheme := filepath.Join(dataHome, "color-schemes", "DankMatugen.colors")
+
+	write := func(t *testing.T, content string) {
+		t.Helper()
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	tests := []struct {
+		name    string
+		content string // "" leaves the file absent
+		status  status
+		message string
+	}{
+		{"missing", "", statusInfo, "Not found"},
+		{"empty", "\n", statusInfo, "Not found"},
+		{"unparseable", "{", statusWarn, "Unreadable"},
+		{"theme is not an object", `{"theme": 1}`, statusWarn, "Unreadable"},
+		{"dms scheme", `{"theme": {"colorScheme": "` + scheme + `"}}`, statusOK, "Uses DMS colors"},
+		{"other scheme", `{"theme": {"colorScheme": "/usr/share/color-schemes/BreezeDark.colors"}}`, statusInfo, "Not using DMS colors"},
+		{"no scheme", `{"theme": {}}`, statusInfo, "Not using DMS colors"},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			os.Remove(path)
+			if tc.content != "" {
+				write(t, tc.content)
+			}
+			results := checkQtengineConfig()
+			if len(results) != 1 || results[0].status != tc.status || results[0].message != tc.message {
+				t.Fatalf("got %+v, want %s %q", results, tc.status, tc.message)
+			}
+		})
+	}
+}
+
+func TestCheckXDGMenuFile(t *testing.T) {
+	configHome, systemDir := t.TempDir(), t.TempDir()
+	t.Setenv("XDG_CONFIG_HOME", configHome)
+	t.Setenv("XDG_CONFIG_DIRS", systemDir)
+
+	if checkXDGMenuFile("hyprland-") {
+		t.Fatal("no menu file anywhere should not be found")
+	}
+	for _, dir := range []string{configHome, systemDir} {
+		menus := filepath.Join(dir, "menus")
+		if err := os.MkdirAll(menus, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		file := filepath.Join(menus, "hyprland-applications.menu")
+		if err := os.WriteFile(file, nil, 0o644); err != nil {
+			t.Fatal(err)
+		}
+		if !checkXDGMenuFile("hyprland-") {
+			t.Fatalf("menu file in %s should be found", menus)
+		}
+		os.Remove(file)
+	}
 }
 
 func TestCheckMangoConfigFlagsWrongDialectAndOverviewBinds(t *testing.T) {

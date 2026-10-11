@@ -1,10 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"maps"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -329,15 +329,24 @@ func checkEnvironmentVars() []checkResult {
 	var results []checkResult
 	results = append(results, checkEnvVar("QT_QPA_PLATFORMTHEME")...)
 	results = append(results, checkQtPlatformThemePlugin("QT_QPA_PLATFORMTHEME")...)
-	results = append(results, checkEnvVar("QT_QPA_PLATFORMTHEME_QT6")...)
-	if os.Getenv("QT_QPA_PLATFORMTHEME_QT6") != os.Getenv("QT_QPA_PLATFORMTHEME") {
-		results = append(results, checkQtPlatformThemePlugin("QT_QPA_PLATFORMTHEME_QT6")...)
+	switch {
+	case os.Getenv("QT_QPA_PLATFORMTHEME_QT6") != "":
+		results = append(results, checkEnvVar("QT_QPA_PLATFORMTHEME_QT6")...)
+		if os.Getenv("QT_QPA_PLATFORMTHEME_QT6") != os.Getenv("QT_QPA_PLATFORMTHEME") {
+			results = append(results, checkQtPlatformThemePlugin("QT_QPA_PLATFORMTHEME_QT6")...)
+		}
+	case os.Getenv("QT_QPA_PLATFORMTHEME") != "":
+		if doctorVerbose {
+			results = append(results, checkResult{catEnvironment, "QT_QPA_PLATFORMTHEME_QT6", statusInfo, "Not set, Qt6 uses QT_QPA_PLATFORMTHEME", "", doctorDocsURL + "#environment-variables"})
+		}
+	default:
+		results = append(results, checkEnvVar("QT_QPA_PLATFORMTHEME_QT6")...)
+	}
+	if matugen.QtengineActive() {
+		results = append(results, checkQtengineConfig()...)
 	}
 	results = append(results, checkEnvVar("QS_ICON_THEME")...)
 	results = append(results, checkXDGMenuPrefix()...)
-	if matugen.QtengineActive() {
-		results = append(results, checkQtenginePlugin()...)
-	}
 	return results
 }
 
@@ -358,7 +367,7 @@ func checkXDGMenuPrefix() []checkResult {
 		if checkXDGMenuFile(menuPrefix) {
 			return []checkResult{{catEnvironment, "XDG_MENU_PREFIX", statusInfo, menuPrefix, "", doctorDocsURL + "#xdg-menu-prefix"}}
 		}
-		return []checkResult{{catEnvironment, "XDG_MENU_PREFIX", statusWarn, fmt.Sprintf("%s (menu file not found)", menuPrefix), fmt.Sprintf("Dolphin 'Open with…' dialog may be empty. Ensure /etc/xdg/menus/%sapplications.menu exists.", menuPrefix), doctorDocsURL + "#xdg-menu-prefix"}}
+		return []checkResult{{catEnvironment, "XDG_MENU_PREFIX", statusWarn, fmt.Sprintf("%s (menu file not found)", menuPrefix), fmt.Sprintf("Dolphin 'Open with…' dialog may be empty. Ensure %sapplications.menu exists in ~/.config/menus or /etc/xdg/menus.", menuPrefix), doctorDocsURL + "#xdg-menu-prefix"}}
 	}
 	if _, err := exec.LookPath("keditfiletype"); err == nil {
 		return []checkResult{{catEnvironment, "XDG_MENU_PREFIX", statusWarn, "Not set", "Dolphin file associations and 'Open with…' dialog may be empty. Set XDG_MENU_PREFIX=plasma- in your compositor's environment block.", doctorDocsURL + "#xdg-menu-prefix"}}
@@ -384,55 +393,41 @@ var qtQueryBinaries = []struct{ bin, flag string }{
 	{"qtpaths", "--query"},
 }
 
-// checkQtenginePlugin verifies the qtengine platform theme plugin is installed
-// where Qt actually searches, for every Qt major that can be interrogated.
-//
-// Qt is asked where it looks rather than the filesystem searched, because a
-// package can install the Qt5 plugin under a prefix Qt5 does not search, after
-// which Qt5 apps silently fall back while Qt6 apps look correct. A search would
-// find the plugin and report OK on exactly that bug.
-func checkQtenginePlugin() []checkResult {
+// checkQtengineConfig reports whether qtengine's config points Qt apps at the
+// DMS color scheme, which DMS writes there when it generates a theme.
+func checkQtengineConfig() []checkResult {
 	url := doctorDocsURL + "#environment-variables"
+	path := matugen.QtengineConfigPath()
 
-	pluginRoots := qtPluginRoots()
-
-	// qmake/qtpaths ship in dev packages most users lack — never warn on a Qt
-	// that could not be interrogated, and never claim it is fine either.
-	if len(pluginRoots) == 0 {
-		return []checkResult{{
-			catEnvironment, "qtengine plugin", statusInfo, "Cannot verify (no qmake/qtpaths)",
-			"Install a Qt development package to let dms doctor check the plugin against the path Qt actually searches.",
-			url,
-		}}
+	data, err := os.ReadFile(path)
+	if os.IsNotExist(err) || (err == nil && len(bytes.TrimSpace(data)) == 0) {
+		return []checkResult{{catEnvironment, "qtengine config", statusInfo, "Not found", "Qt apps use qtengine's default palette until DMS generates a theme.", url}}
+	}
+	var cfg struct {
+		Theme struct {
+			ColorScheme string `json:"colorScheme"`
+		} `json:"theme"`
+	}
+	if err == nil {
+		err = json.Unmarshal(data, &cfg)
+	}
+	if err != nil {
+		return []checkResult{{catEnvironment, "qtengine config", statusWarn, "Unreadable", fmt.Sprintf("DMS won't overwrite %s while it can't parse it, so Qt apps stop following DMS colors. Fix or remove the file.", path), url}}
 	}
 
-	// Qt also searches QT_PLUGIN_PATH, so a plugin found there is loadable.
-	envRoots := filepath.SplitList(os.Getenv("QT_PLUGIN_PATH"))
-
-	var results []checkResult
-	for _, major := range slices.Sorted(maps.Keys(pluginRoots)) {
-		// qtengine only ships Qt5 and Qt6 plugins.
-		if major != "5" && major != "6" {
-			continue
-		}
-
-		root := pluginRoots[major]
-		name := fmt.Sprintf("qtengine plugin (Qt%s)", major)
-
-		plugin := qtenginePluginPath(append([]string{root}, envRoots...), major)
-		if plugin == "" {
-			expected := qtenginePluginFile(root, major)
-			results = append(results, checkResult{
-				catEnvironment, name, statusWarn, fmt.Sprintf("Not found in Qt%s plugin path", major),
-				fmt.Sprintf("Expected %s — Qt%s apps will silently fall back to an unthemed palette. The plugin is likely installed under a prefix Qt%s does not search.", expected, major, major),
-				url,
-			})
-			continue
-		}
-		results = append(results, checkResult{catEnvironment, name, statusOK, "Installed", plugin, url})
+	scheme := matugen.QtengineColorSchemePath()
+	if cfg.Theme.ColorScheme == scheme {
+		return []checkResult{{catEnvironment, "qtengine config", statusOK, "Uses DMS colors", path, url}}
 	}
-
-	return results
+	current := "No color scheme is set"
+	if cfg.Theme.ColorScheme != "" {
+		current = "The color scheme is " + cfg.Theme.ColorScheme
+	}
+	return []checkResult{{
+		catEnvironment, "qtengine config", statusInfo, "Not using DMS colors",
+		fmt.Sprintf("%s. DMS sets %s when it generates a theme with the qtengine and KColorScheme templates enabled.", current, scheme),
+		url,
+	}}
 }
 
 // checkQtPlatformThemePlugin validates one of the QT_QPA_PLATFORMTHEME
@@ -442,8 +437,8 @@ func checkQtenginePlugin() []checkResult {
 // Quickshell tray menus draw a placeholder for every icon an app publishes.
 func checkQtPlatformThemePlugin(varName string) []checkResult {
 	value := os.Getenv(varName)
-	// Unset is reported by checkEnvVar; qtengine has its own plugin check.
-	if value == "" || value == "qtengine" {
+	// Unset is reported by checkEnvVar.
+	if value == "" {
 		return nil
 	}
 
@@ -459,23 +454,41 @@ func checkQtPlatformThemePlugin(varName string) []checkResult {
 		}}
 	}
 
-	// DMS themes Qt6 through these variables; qt5ct is the Qt5 counterpart.
-	major := "6"
-	if value == "qt5ct" {
-		major = "5"
+	roots := qtPluginRoots()
+	var results []checkResult
+	for _, major := range qtPlatformThemeMajors(varName, value, roots) {
+		results = append(results, checkQtPlatformThemePluginFor(varName, value, major, roots[major]))
 	}
-	files := qtPlatformThemePluginFiles(value)
+	return results
+}
+
+// qtPlatformThemeMajors lists the Qt majors whose plugin a variable's value
+// must provide. DMS themes Qt6 through these variables and qt5ct is the Qt5
+// counterpart. qtengine ships both, and Qt5 reads only QT_QPA_PLATFORMTHEME, so
+// its Qt5 plugin is checked there when a Qt5 build tool can be asked.
+func qtPlatformThemeMajors(varName, value string, roots map[string]string) []string {
+	switch {
+	case value == "qt5ct":
+		return []string{"5"}
+	case value == "qtengine" && varName == "QT_QPA_PLATFORMTHEME" && roots["5"] != "":
+		return []string{"5", "6"}
+	}
+	return []string{"6"}
+}
+
+func checkQtPlatformThemePluginFor(varName, value, major, root string) checkResult {
+	url := doctorDocsURL + "#environment-variables"
+	files := qtPlatformThemePluginFiles(value, major)
 	name := fmt.Sprintf("%s plugin (Qt%s)", value, major)
 
-	root := qtPluginRoots()[major]
 	// qmake/qtpaths ship in dev packages most users lack — never warn on a Qt
 	// that could not be interrogated, and never claim it is fine either.
 	if root == "" {
-		return []checkResult{{
+		return checkResult{
 			catEnvironment, name, statusInfo, "Cannot verify (no qmake/qtpaths)",
 			"Install a Qt development package to let dms doctor check the plugin against the path Qt actually searches.",
 			url,
-		}}
+		}
 	}
 
 	// Qt also searches QT_PLUGIN_PATH, so a plugin found there is loadable.
@@ -485,20 +498,20 @@ func checkQtPlatformThemePlugin(varName string) []checkResult {
 		// changed across versions; a miss says nothing reliable about the
 		// install, so degrade to info instead of warning at a working setup.
 		if value == "kde" {
-			return []checkResult{{
+			return checkResult{
 				catEnvironment, name, statusInfo, "Cannot verify (plasma-integration)",
 				"The kde theme comes from plasma-integration, whose plugin file name varies across versions. Verify visually that Qt apps follow your theme.",
 				url,
-			}}
+			}
 		}
 		expected := filepath.Join(root, "platformthemes", files[0])
-		return []checkResult{{
+		return checkResult{
 			catEnvironment, name, statusWarn, fmt.Sprintf("Not found in Qt%s plugin path", major),
 			fmt.Sprintf("Expected %s — Qt apps silently fall back to a built-in theme, breaking icon lookups and palettes. Install the package providing it, or correct %s.", expected, varName),
 			url,
-		}}
+		}
 	}
-	return []checkResult{{catEnvironment, name, statusOK, "Installed", plugin, url}}
+	return checkResult{catEnvironment, name, statusOK, "Installed", plugin, url}
 }
 
 // qtPlatformThemePluginFiles lists the plugin file names that can provide a
@@ -506,7 +519,10 @@ func checkQtPlatformThemePlugin(varName string) []checkResult {
 // through plugin metadata keys rather than file names, so these are the names
 // each integration is known to ship; unmapped values fall back to Qt's
 // libq<value> naming convention.
-func qtPlatformThemePluginFiles(value string) []string {
+func qtPlatformThemePluginFiles(value, major string) []string {
+	if value == "qtengine" {
+		return []string{fmt.Sprintf("libqt%sengine-plugin.so", major)}
+	}
 	if files, ok := map[string][]string{
 		"qt6ct": {"libqt6ct.so"},
 		"qt5ct": {"libqt5ct.so"},
@@ -556,16 +572,6 @@ func qtPluginPath(roots []string, files ...string) string {
 	return ""
 }
 
-// qtenginePluginPath returns the first of roots that holds the qtengine platform
-// theme plugin for the given Qt major, or "" if none does.
-func qtenginePluginPath(roots []string, major string) string {
-	return qtPluginPath(roots, fmt.Sprintf("libqt%sengine-plugin.so", major))
-}
-
-func qtenginePluginFile(root, major string) string {
-	return filepath.Join(root, "platformthemes", fmt.Sprintf("libqt%sengine-plugin.so", major))
-}
-
 // qtQuery asks a Qt build tool for a single QLibraryInfo property.
 func qtQuery(bin, flag, key string) string {
 	output, err := exec.Command(bin, flag, key).Output()
@@ -591,10 +597,23 @@ func qtQueryValue(output, key string) string {
 	return ""
 }
 
+// checkXDGMenuFile looks for the menu file where the XDG menu spec does: the
+// user's config dir first, then each system config dir.
 func checkXDGMenuFile(prefix string) bool {
-	menuPath := fmt.Sprintf("/etc/xdg/menus/%sapplications.menu", prefix)
-	_, err := os.Stat(menuPath)
-	return err == nil
+	configDirs := os.Getenv("XDG_CONFIG_DIRS")
+	if configDirs == "" {
+		configDirs = "/etc/xdg"
+	}
+	dirs := append([]string{utils.XDGConfigHome()}, filepath.SplitList(configDirs)...)
+	for _, dir := range dirs {
+		if dir == "" {
+			continue
+		}
+		if _, err := os.Stat(filepath.Join(dir, "menus", prefix+"applications.menu")); err == nil {
+			return true
+		}
+	}
+	return false
 }
 
 func readOSRelease() map[string]string {
