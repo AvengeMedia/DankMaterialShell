@@ -48,6 +48,8 @@ Item {
     required property Component notificationCenterExpandedComponent
     required property Component clipboardCompactComponent
     required property Component clipboardExpandedComponent
+    required property Component powerMenuCompactComponent
+    required property Component powerMenuExpandedComponent
 
     readonly property real compactFade: root.fadeCompact(root.morphProgress)
     readonly property real expandedFade: root.fadeExpanded(root.morphProgress)
@@ -104,6 +106,7 @@ Item {
             "weather": weatherExpandedLoader,
             "notificationcenter": notificationCenterExpandedLoader,
             "clipboard": clipboardExpandedLoader,
+            "powermenu": powerMenuExpandedLoader,
             "controlcenter": controlCenterExpandedLoader
         })
 
@@ -344,6 +347,23 @@ Item {
         asynchronous: true
         sourceComponent: root.clipboardExpandedComponent
         opacity: root.expandedOpacity("clipboard")
+    }
+
+    CompactFace {
+        active: root.surfaceActive("powermenu")
+        activity: "powermenu"
+        face: root.powerMenuCompactComponent
+        opacity: root.compactOpacity("powermenu")
+    }
+
+    ExpandedFace {
+        id: powerMenuExpandedLoader
+
+        activity: "powermenu"
+        active: root.controller.visualsRequested("powermenu")
+        asynchronous: true
+        sourceComponent: root.powerMenuExpandedComponent
+        opacity: root.expandedOpacity("powermenu")
     }
 
     CompactFace {

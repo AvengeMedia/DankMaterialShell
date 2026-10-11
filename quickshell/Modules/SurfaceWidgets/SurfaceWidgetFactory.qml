@@ -241,6 +241,7 @@ Item {
                     widgetItem: powerMenuWidget,
                     section: root.getWidgetSection(parent) || "right",
                     triggerSource: "powerMenu",
+                    islandActivity: "powermenu",
                     mode: "click"
                 });
             }

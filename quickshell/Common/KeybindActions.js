@@ -49,6 +49,10 @@ const DMS_ACTIONS = [
         label: "DankIsland: Open Media"
     },
     {
+        id: "spawn dms ipc call island toggle media",
+        label: "DankIsland: Toggle Media"
+    },
+    {
         id: "spawn dms ipc call island open launcher",
         label: "DankIsland: Open Launcher"
     },

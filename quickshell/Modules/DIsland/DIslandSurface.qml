@@ -444,6 +444,8 @@ Item {
             notificationCenterExpandedComponent: expandedNotificationCenterComponent
             clipboardCompactComponent: compactClipboardComponent
             clipboardExpandedComponent: expandedClipboardComponent
+            powerMenuCompactComponent: compactPowerMenuComponent
+            powerMenuExpandedComponent: expandedPowerMenuComponent
         }
 
         HoverHandler {
@@ -800,6 +802,25 @@ Item {
             effectiveScreen: root.effectiveScreen
             alignedX: root.targetScreenX
             alignedY: root.targetScreenY
+        }
+    }
+
+    Component {
+        id: compactPowerMenuComponent
+
+        DestinationCompact {
+            controller: root.controller
+            activityId: "powermenu"
+            iconName: "power_settings_new"
+            label: I18n.tr("Power menu", "island compact face: power menu label")
+        }
+    }
+
+    Component {
+        id: expandedPowerMenuComponent
+
+        PowerMenuExpanded {
+            controller: root.controller
         }
     }
 

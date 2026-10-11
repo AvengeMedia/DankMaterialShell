@@ -3997,6 +3997,7 @@
       "notification center",
       "open",
       "panel",
+      "power menu",
       "routing",
       "shortcuts",
       "statusbar",
@@ -4100,6 +4101,34 @@
     ],
     "parentLabel": "Bar",
     "icon": "vertical_align_center"
+  },
+  {
+    "section": "islandRoutePowerMenu",
+    "label": "Power menu",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "general",
+      "hibernate",
+      "ipc",
+      "island",
+      "menu",
+      "panel",
+      "power",
+      "reboot",
+      "restart",
+      "routing",
+      "shortcuts",
+      "shutdown",
+      "sleep",
+      "statusbar",
+      "suspend",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "islandEnabled"
   },
   {
     "section": "islandReserveThickness",
@@ -4392,6 +4421,29 @@
     ],
     "parentLabel": "Bar",
     "conditionKey": "frameEnabled"
+  },
+  {
+    "section": "islandMediaAutoSwitch",
+    "label": "Switch to media when playback starts",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "auto",
+      "bar",
+      "compact",
+      "general",
+      "island",
+      "media",
+      "panel",
+      "playback",
+      "starts",
+      "statusbar",
+      "switch",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "islandEnabled"
   },
   {
     "section": "barUseOverlayLayer",
@@ -9836,7 +9888,7 @@
     "optionFile": "PrivacyOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:25",
+    "section": "barWidgetOption:IslandOptions.qml:27",
     "label": "Charging",
     "tabIndex": 22,
     "keywords": [],
@@ -9844,7 +9896,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:27",
+    "section": "barWidgetOption:IslandOptions.qml:29",
     "label": "Clear badge on open",
     "tabIndex": 22,
     "keywords": [],
@@ -10028,7 +10080,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:13",
+    "section": "barWidgetOption:IslandOptions.qml:14",
     "label": "Dashboard",
     "tabIndex": 22,
     "keywords": [],
@@ -10060,7 +10112,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:26",
+    "section": "barWidgetOption:IslandOptions.qml:28",
     "label": "Expand by default",
     "tabIndex": 22,
     "keywords": [],
@@ -10068,7 +10120,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:17",
+    "section": "barWidgetOption:IslandOptions.qml:18",
     "label": "Expansion mode",
     "tabIndex": 22,
     "keywords": [],
@@ -10140,7 +10192,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:20",
+    "section": "barWidgetOption:IslandOptions.qml:21",
     "label": "Hide delay",
     "tabIndex": 22,
     "keywords": [],
@@ -10180,7 +10232,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:18",
+    "section": "barWidgetOption:IslandOptions.qml:19",
     "label": "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open",
     "tabIndex": 22,
     "keywords": [],
@@ -10260,7 +10312,7 @@
     "optionFile": "ControlCenterOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:21",
+    "section": "barWidgetOption:IslandOptions.qml:22",
     "label": "Keep clock with media",
     "tabIndex": 22,
     "keywords": [],
@@ -10332,7 +10384,7 @@
     "optionFile": "SystemTrayOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:14",
+    "section": "barWidgetOption:IslandOptions.qml:15",
     "label": "Media",
     "tabIndex": 22,
     "keywords": [],
@@ -10364,7 +10416,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:28",
+    "section": "barWidgetOption:IslandOptions.qml:30",
     "label": "Motion",
     "tabIndex": 22,
     "keywords": [],
@@ -10412,7 +10464,7 @@
     "optionFile": "ClockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:22",
+    "section": "barWidgetOption:IslandOptions.qml:24",
     "label": "Notifications",
     "tabIndex": 22,
     "keywords": [],
@@ -10428,7 +10480,7 @@
     "optionFile": "BatteryOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:19",
+    "section": "barWidgetOption:IslandOptions.qml:20",
     "label": "Open delay",
     "tabIndex": 22,
     "keywords": [],
@@ -10466,6 +10518,14 @@
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "WorkspaceSwitcherOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:IslandOptions.qml:13",
+    "label": "Power menu",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
   },
   {
     "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:18",
@@ -10684,7 +10744,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:30",
+    "section": "barWidgetOption:IslandOptions.qml:32",
     "label": "Spring damping",
     "tabIndex": 22,
     "keywords": [],
@@ -10692,7 +10752,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:31",
+    "section": "barWidgetOption:IslandOptions.qml:33",
     "label": "Spring mass",
     "tabIndex": 22,
     "keywords": [],
@@ -10700,7 +10760,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:29",
+    "section": "barWidgetOption:IslandOptions.qml:31",
     "label": "Spring stiffness",
     "tabIndex": 22,
     "keywords": [],
@@ -10730,6 +10790,14 @@
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "WorkspaceSwitcherOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:IslandOptions.qml:23",
+    "label": "Switch to media when playback starts",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
   },
   {
     "section": "barWidgetOption:ClockOptions.qml:4",
@@ -10780,7 +10848,7 @@
     "optionFile": "SystemTrayOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:24",
+    "section": "barWidgetOption:IslandOptions.qml:26",
     "label": "Use standard OSDs",
     "tabIndex": 22,
     "keywords": [],
@@ -10788,7 +10856,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:23",
+    "section": "barWidgetOption:IslandOptions.qml:25",
     "label": "Use standard popups",
     "tabIndex": 22,
     "keywords": [],
@@ -10812,7 +10880,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:16",
+    "section": "barWidgetOption:IslandOptions.qml:17",
     "label": "Wallpapers",
     "tabIndex": 22,
     "keywords": [],
@@ -10820,7 +10888,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:15",
+    "section": "barWidgetOption:IslandOptions.qml:16",
     "label": "Weather",
     "tabIndex": 22,
     "keywords": [],
@@ -17943,6 +18011,7 @@
       "notification center",
       "open",
       "panel",
+      "power menu",
       "routing",
       "shortcuts",
       "statusbar",
@@ -17968,6 +18037,34 @@
       "panel",
       "statusbar",
       "surface",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "dotEnabled"
+  },
+  {
+    "section": "dotRoutePowerMenu",
+    "label": "Power menu",
+    "tabIndex": 65,
+    "category": "Dot",
+    "keywords": [
+      "bar",
+      "dot",
+      "hibernate",
+      "ipc",
+      "island",
+      "menu",
+      "panel",
+      "power",
+      "reboot",
+      "restart",
+      "routing",
+      "shortcuts",
+      "shutdown",
+      "sleep",
+      "statusbar",
+      "suspend",
       "taskbar",
       "topbar"
     ],

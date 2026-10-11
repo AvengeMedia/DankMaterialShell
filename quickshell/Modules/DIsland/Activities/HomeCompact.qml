@@ -95,7 +95,7 @@ Item {
         switch (groupId) {
         case "media":
             if (root.controller.mediaAvailable) {
-                root.controller.requestActivity("media", false, false);
+                root.controller.requestActivity("media", true, true);
                 return;
             }
             root.controller.requestLauncher("", "", false);

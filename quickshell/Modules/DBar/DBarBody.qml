@@ -332,15 +332,23 @@ Item {
     Component {
         id: blurIslandRegionComp
 
+        // Region geometry is int; keep it a pixel inside the fill so its antialiased edge never shows raw blur.
         Region {
-            x: topBarMouseArea.x + islandLoader.x + topBarSlide.x + (barWindow.islandHost?.currentVisualX ?? 0)
-            y: topBarMouseArea.y + islandLoader.y + topBarSlide.y + (barWindow.islandHost?.currentVisualY ?? 0)
-            width: barWindow.islandHost?.currentVisualWidth ?? 0
-            height: barWindow.islandHost?.currentVisualHeight ?? 0
-            topLeftRadius: barWindow.islandHost?.surface.surfaceMotion.currentTopLeftRadius ?? 0
-            topRightRadius: barWindow.islandHost?.surface.surfaceMotion.currentTopRightRadius ?? 0
-            bottomLeftRadius: barWindow.islandHost?.surface.surfaceMotion.currentBottomLeftRadius ?? 0
-            bottomRightRadius: barWindow.islandHost?.surface.surfaceMotion.currentBottomRightRadius ?? 0
+            readonly property real left: topBarMouseArea.x + islandLoader.x + topBarSlide.x + (barWindow.islandHost?.currentVisualX ?? 0)
+            readonly property real top: topBarMouseArea.y + islandLoader.y + topBarSlide.y + (barWindow.islandHost?.currentVisualY ?? 0)
+
+            function inset(r) {
+                return r > 0 ? Math.ceil(r) + 1 : 0;
+            }
+
+            x: Math.ceil(left) + 1
+            y: Math.ceil(top) + 1
+            width: Math.max(0, Math.floor(left + (barWindow.islandHost?.currentVisualWidth ?? 0)) - 1 - x)
+            height: Math.max(0, Math.floor(top + (barWindow.islandHost?.currentVisualHeight ?? 0)) - 1 - y)
+            topLeftRadius: inset(barWindow.islandHost?.surface.surfaceMotion.currentTopLeftRadius ?? 0)
+            topRightRadius: inset(barWindow.islandHost?.surface.surfaceMotion.currentTopRightRadius ?? 0)
+            bottomLeftRadius: inset(barWindow.islandHost?.surface.surfaceMotion.currentBottomLeftRadius ?? 0)
+            bottomRightRadius: inset(barWindow.islandHost?.surface.surfaceMotion.currentBottomRightRadius ?? 0)
         }
     }
 

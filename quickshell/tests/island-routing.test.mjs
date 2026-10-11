@@ -519,3 +519,46 @@ test("the privacy slot is a known home layout entry appended after stored ones",
     assert.ok(ids.includes("privacy"), "a stored layout gains the privacy slot");
     assert.equal(ids.indexOf("privacy"), ids.length - 1, "new slots append after the stored order");
 });
+
+test("power menu shortcuts open in the island before the modal", () => {
+    const popoutSource = readFileSync(new URL("../Services/PopoutService.qml", import.meta.url), "utf8");
+    const ipcSource = readFileSync(new URL("../DMSShellIPC.qml", import.meta.url), "utf8");
+    const block = ipcSource.split('target: "powermenu"')[0].split("IpcHandler {").pop();
+    const calls = [];
+    const state = { routed: false };
+    const modal = { shouldBeVisible: false, openCentered: () => { modal.shouldBeVisible = true; calls.push("modal:open"); }, close: () => { modal.shouldBeVisible = false; calls.push("modal:close"); } };
+    const loader = { active: false, item: null };
+    Object.defineProperty(loader, "active", { get: () => loader.item !== null, set: on => { if (on) loader.item = modal; } });
+    const context = vm.createContext({
+        powerMenuModalLoader: loader,
+        powerMenuModal: null,
+        dankIslandRouter: {
+            closeActivity: id => { calls.push("island:close:" + id); return true; }
+        }
+    });
+    const service = functions(popoutSource, "    ", context);
+    service.routeToIsland = (id, screen, toggle) => {
+        if (!state.routed)
+            return false;
+        calls.push(`island:${toggle ? "toggle" : "open"}:${id}`);
+        return true;
+    };
+    const handler = functions(block, "        ", vm.createContext({ root: {}, PopoutService: service }));
+
+    state.routed = true;
+    assert.equal(handler.toggle(), "POWERMENU_TOGGLE_SUCCESS");
+    assert.equal(handler.open(), "POWERMENU_OPEN_SUCCESS");
+    assert.deepEqual(calls.splice(0), ["island:toggle:powermenu", "island:open:powermenu"], "routed shortcuts leave the modal alone");
+    assert.equal(loader.item, null, "the modal loader stays inactive");
+
+    state.routed = false;
+    assert.equal(handler.toggle(), "POWERMENU_TOGGLE_SUCCESS");
+    assert.deepEqual(calls.splice(0), ["modal:open"], "no island means the centered modal");
+    handler.toggle();
+    assert.deepEqual(calls.splice(0), ["modal:close"], "a visible modal closes without asking the router");
+    assert.equal(handler.open(), "POWERMENU_OPEN_SUCCESS");
+    assert.deepEqual(calls.splice(0), ["modal:open"]);
+
+    assert.equal(handler.close(), "POWERMENU_CLOSE_SUCCESS");
+    assert.deepEqual(calls.splice(0), ["island:close:powermenu", "modal:close"], "close takes down both surfaces");
+});

@@ -1152,11 +1152,7 @@ Item {
     }
 
     function _switchUserFromPowerMenu() {
-        switchUserModalLoader.active = true;
-        Qt.callLater(() => {
-            if (switchUserModalLoader.loadedModal)
-                switchUserModalLoader.loadedModal.showFromPowerMenu();
-        });
+        PopoutService.openSwitchUser();
     }
 
     LazyLoader {
@@ -1207,6 +1203,8 @@ Item {
         active: false
         readonly property SwitchUserModal loadedModal: item as SwitchUserModal
 
+        Component.onCompleted: PopoutService.switchUserModalLoader = switchUserModalLoader
+
         SwitchUserModal {
             id: switchUserModal
         }
@@ -1245,7 +1243,6 @@ Item {
     }
 
     DMSShellIPC {
-        powerMenuModalLoaderRef: powerMenuModalLoader
         processListModalLoaderRef: processListModalLoader
         controlCenterLoaderRef: controlCenterLoader
         dankDashPopoutLoaderRef: dankDashPopoutLoader

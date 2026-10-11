@@ -22,6 +22,7 @@ QtObject {
     property string activeActivity: "home"
     property bool mediaAvailable: false
     property bool mediaPreferred: false
+    property bool mediaAutoSwitch: false
     property bool launcherCycleEnabled: false
     property bool launcherSessionActive: false
     property bool launcherInputFocused: false
@@ -164,8 +165,17 @@ QtObject {
         mediaContentLength = next;
     }
 
-    readonly property var destinations: ["launcher", "controlcenter", "wallpaper", "weather", "notificationcenter", "clipboard"]
-    readonly property var blankClickOwners: ["launcher", "controlcenter", "wallpaper", "notificationcenter", "clipboard"]
+    property real powerMenuContentWidth: 0
+
+    function setPowerMenuContentWidth(width) {
+        const next = Math.ceil(width);
+        if (!isFinite(next) || next <= 0 || Math.abs(next - powerMenuContentWidth) < 2)
+            return;
+        powerMenuContentWidth = next;
+    }
+
+    readonly property var destinations: ["launcher", "controlcenter", "wallpaper", "weather", "notificationcenter", "clipboard", "powermenu"]
+    readonly property var blankClickOwners: ["launcher", "controlcenter", "wallpaper", "notificationcenter", "clipboard", "powermenu"]
     readonly property var destinationDefaults: ({
             "launcher": {
                 "contentLength": 160,
@@ -188,6 +198,10 @@ QtObject {
                 "contentHeight": 320
             },
             "clipboard": {
+                "contentLength": 150,
+                "contentHeight": 0
+            },
+            "powermenu": {
                 "contentLength": 150,
                 "contentHeight": 0
             }
@@ -464,6 +478,7 @@ QtObject {
     readonly property var notificationExpandedTarget: sheetTarget(520, 220)
     readonly property var notificationCenterExpandedTarget: dashboardTargetFor("notificationcenter")
     readonly property var clipboardExpandedTarget: sheetTarget(Math.min(dashboardAvailableWidth, ClipboardConstants.sizeWidth(SettingsData.clipboardSize)), Math.min(dashboardAvailableHeight, ClipboardConstants.sizeHeight(SettingsData.clipboardSize)))
+    readonly property var powerMenuExpandedTarget: sheetTarget(Math.max(1, Math.min(dashboardAvailableWidth, powerMenuContentWidth)), Math.max(1, Math.min(dashboardAvailableHeight, destinationContentHeight("powermenu"))))
 
     readonly property bool systemActivityActive: isSystemActivity(activeActivity)
     readonly property bool notificationActive: activeActivity === "notification"
@@ -505,6 +520,8 @@ QtObject {
             return notificationCenterExpandedTarget;
         case "clipboard":
             return clipboardExpandedTarget;
+        case "powermenu":
+            return powerMenuExpandedTarget;
         case "media":
             return mediaExpandedTarget;
         }
@@ -536,15 +553,35 @@ QtObject {
 
     function updateMediaAvailability(available) {
         if (available) {
+            // A return inside the delay is a blip (track change, player switch), not a new start.
+            const blip = !mediaAvailable && mediaReturnTimer.running;
+            const started = !mediaAvailable && !blip;
             mediaReturnTimer.stop();
             mediaAvailable = true;
+            if (started && mediaAutoSwitch)
+                autoSwitchToMedia();
+            else if (blip && mediaPreferred && !expanded && activeActivity === "home")
+                activeActivity = "media";
             return;
         }
 
+        if (!mediaAvailable)
+            return;
         mediaAvailable = false;
-        mediaPreferred = false;
-        if (activeActivity === "media")
-            mediaReturnTimer.restart();
+        mediaReturnTimer.restart();
+    }
+
+    // Set directly: requestActivity would drop a destination open still waiting for its visuals.
+    function autoSwitchToMedia() {
+        if (activeActivity === "home" && !expanded && !(pointerInside && hoverExpandEnabled))
+            activeActivity = "media";
+        else if (systemActivityActive && transientReturnActivity === "home")
+            transientReturnActivity = "media";
+        else if ((notificationActive || notificationHeldForSystem) && suspendedActivity === "home" && !suspendedExpanded)
+            suspendedActivity = "media";
+        else
+            return;
+        mediaPreferred = true;
     }
 
     onInputSuspendedChanged: {
@@ -558,12 +595,17 @@ QtObject {
         keyboardYielded = false;
         launcherSessionActive = false;
         clearPendingRequests("");
-        if (isDestination(activeActivity))
-            activeActivity = mediaAvailable && mediaPreferred ? "media" : "home";
+        if (!transientActive)
+            activeActivity = idleActivity();
+    }
+
+    // The face a closed sheet lands on: media only when the user picked the media face.
+    function idleActivity() {
+        return mediaAvailable && mediaPreferred ? "media" : "home";
     }
 
     function requestHoverExpand() {
-        if (inputSuspended || !hoverExpandEnabled)
+        if (inputSuspended || !hoverExpandEnabled || activeActivity === "powermenu")
             return false;
         if (notificationActive) {
             hoverExpanded = true;
@@ -631,8 +673,7 @@ QtObject {
             finishTransient();
             return true;
         }
-        if (isDestination(activeActivity))
-            activeActivity = mediaAvailable && mediaPreferred ? "media" : "home";
+        activeActivity = idleActivity();
         return true;
     }
 
@@ -646,7 +687,7 @@ QtObject {
         }
         if (isDestination(activityId))
             return activityId;
-        return mediaAvailable && mediaPreferred ? "media" : "home";
+        return idleActivity();
     }
 
     function requestActivity(activityId, shouldExpand, requestKeyboardFocus) {
@@ -691,7 +732,7 @@ QtObject {
         keyboardDismissRequested = shouldExpand === true && requestKeyboardFocus === true;
         expanded = shouldExpand === true;
         activeActivity = activityId;
-        if (activityId === "media" || activityId === "home")
+        if ((activityId === "media" || activityId === "home") && shouldExpand !== true)
             mediaPreferred = activityId === "media";
         launcherSessionActive = activityId === "launcher" && expanded;
         if (destination && expanded)
@@ -739,6 +780,12 @@ QtObject {
         return requestActivity("clipboard", true, true);
     }
 
+    function requestPowerMenu(shouldToggle) {
+        if (shouldToggle === true && activeActivity === "powermenu" && expanded)
+            return requestCollapse();
+        return requestActivity("powermenu", true, true);
+    }
+
     function cycleActivity(direction, shouldExpand) {
         const activities = ["home"];
         if (mediaAvailable)
@@ -753,7 +800,12 @@ QtObject {
         const currentIndex = Math.max(0, activities.indexOf(activeActivity));
         const step = direction < 0 ? -1 : 1;
         const nextIndex = (currentIndex + step + activities.length) % activities.length;
-        return requestActivity(activities[nextIndex], shouldExpand, shouldExpand);
+        const next = activities[nextIndex];
+        if (!requestActivity(next, shouldExpand, shouldExpand))
+            return false;
+        if (next === "home" || next === "media")
+            mediaPreferred = next === "media";
+        return true;
     }
 
     function finishTransient() {
@@ -858,8 +910,9 @@ QtObject {
             return;
 
         notificationTimer.stop();
-        const nextActivity = suspendedActivity === "media" && !mediaAvailable ? "home" : suspendedActivity || (mediaAvailable && mediaPreferred ? "media" : "home");
         const nextExpanded = restoreExpanded === true && suspendedExpanded;
+        const suspendedFace = suspendedActivity === "home" || suspendedActivity === "media";
+        const nextActivity = !suspendedActivity || (suspendedFace && !nextExpanded) ? idleActivity() : suspendedActivity === "media" && !mediaAvailable ? "home" : suspendedActivity;
         const nextKeyboardDismissRequested = nextExpanded && suspendedKeyboardDismissRequested;
         suspendedActivity = "";
         suspendedExpanded = false;
@@ -944,7 +997,10 @@ QtObject {
     property Timer mediaReturnTimer: Timer {
         interval: root.mediaReturnDelay
         onTriggered: {
-            if (root.mediaAvailable || root.activeActivity !== "media")
+            if (root.mediaAvailable)
+                return;
+            root.mediaPreferred = false;
+            if (root.activeActivity !== "media")
                 return;
             root.keyboardDismissRequested = false;
             root.expanded = false;

@@ -12,7 +12,6 @@ Item {
     id: root
     readonly property var log: Log.scoped("DMSShellIPC")
 
-    required property var powerMenuModalLoaderRef
     required property var processListModalLoaderRef
     required property var controlCenterLoaderRef
     required property var dankDashPopoutLoaderRef
@@ -167,30 +166,17 @@ Item {
 
     IpcHandler {
         function open() {
-            root.powerMenuModalLoaderRef.active = true;
-            if (root.powerMenuModalLoaderRef.item)
-                root.powerMenuModalLoaderRef.item.openCentered();
-
+            PopoutService.openPowerMenu();
             return "POWERMENU_OPEN_SUCCESS";
         }
 
         function close() {
-            if (root.powerMenuModalLoaderRef.item)
-                root.powerMenuModalLoaderRef.item.close();
-
+            PopoutService.closePowerMenu();
             return "POWERMENU_CLOSE_SUCCESS";
         }
 
         function toggle() {
-            root.powerMenuModalLoaderRef.active = true;
-            if (root.powerMenuModalLoaderRef.item) {
-                if (root.powerMenuModalLoaderRef.item.shouldBeVisible) {
-                    root.powerMenuModalLoaderRef.item.close();
-                } else {
-                    root.powerMenuModalLoaderRef.item.openCentered();
-                }
-            }
-
+            PopoutService.togglePowerMenu();
             return "POWERMENU_TOGGLE_SUCCESS";
         }
 
