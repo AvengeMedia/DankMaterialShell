@@ -21,11 +21,17 @@ Item {
     property string layerNamespace: "dms:context-menu"
     property real menuMargin: Theme.spacingS
     property real minMenuWidth: Theme.fieldDefaultWidth
+    property real itemHeight: Theme.menuItemHeight
+    property real itemRadius: Theme.cornerRadiusS
+    property real itemFontSize: Theme.fontSizeSmall
+    property real containerRadius: Theme.windowRadius
     property bool keyboardNavigable: false
     property var transientSurfaceTracker: null
     property var targetScreen: null
     property real anchorX: 0
     property real anchorY: 0
+    property real originX: 0
+    property real originY: 0
     property bool openState: false
     property bool renderActive: false
     property int selectedMenuIndex: -1
@@ -44,12 +50,13 @@ Item {
         }
         return longest;
     }
-    readonly property real naturalMenuWidth: customContent ? Math.max(minMenuWidth, customContentWidth) : Math.max(minMenuWidth, menuTextMetrics.width + Theme.iconSize + Theme.spacingS * 5)
+    readonly property bool hasTrailingIcons: menuItems.some(menuItem => !!menuItem.trailingIcon)
+    readonly property real naturalMenuWidth: customContent ? Math.max(minMenuWidth, customContentWidth) : Math.max(minMenuWidth, menuTextMetrics.width + Theme.iconSize + Theme.spacingS * 5 + (hasTrailingIcons ? Theme.iconSizeMedium + Theme.spacingS : 0))
     readonly property real effectiveMenuWidth: Math.max(0, Math.min(maxMenuWidth, naturalMenuWidth))
     readonly property real naturalMenuHeight: (customContent ? customContentLoader.implicitHeight : menuItemsHeight()) + Theme.spacingS * 2
     readonly property real effectiveMenuHeight: Math.min(maxMenuHeight, naturalMenuHeight)
     readonly property bool menuScrolls: naturalMenuHeight > effectiveMenuHeight + 0.5
-    readonly property int visibleItemCount: menuItems.filter(menuItem => menuItem.type === "item").length
+    readonly property int visibleItemCount: menuItems.filter(menuItem => isSelectable(menuItem)).length
 
     signal backdropRightClicked(real x, real y)
 
@@ -68,22 +75,42 @@ Item {
     StyledTextMetrics {
         id: menuTextMetrics
         text: root.longestMenuText
-        font.pixelSize: Theme.fontSizeSmall
+        font.pixelSize: root.itemFontSize
     }
 
     function menuItemsHeight() {
+        const shown = menuItems.filter(menuItem => !menuItem.hidden);
         let h = 0;
-        for (const menuItem of menuItems)
-            h += menuItem.type === "separator" ? Theme.spacingXS + Theme.dividerWidth : Theme.menuItemHeight;
-        if (menuItems.length > 1)
-            h += (menuItems.length - 1) * Theme.groupedListGap;
+        for (const menuItem of shown)
+            h += itemHeightFor(menuItem);
+        if (shown.length > 1)
+            h += (shown.length - 1) * Theme.groupedListGap;
         return h;
+    }
+
+    function isSelectable(menuItem) {
+        return menuItem.type === "item" && !menuItem.hidden;
+    }
+
+    function itemHeightFor(menuItem) {
+        if (menuItem.hidden)
+            return 0;
+        switch (menuItem.type) {
+        case "separator":
+            return Theme.spacingXS + Theme.dividerWidth;
+        case "component":
+            return menuItem.height ?? 0;
+        default:
+            return itemHeight;
+        }
     }
 
     function open(screen, x, y, fromKeyboard) {
         targetScreen = screen;
         anchorX = x;
         anchorY = y;
+        originX = x;
+        originY = y;
         selectedMenuIndex = fromKeyboard ? 0 : -1;
         keyboardNavigation = !!fromKeyboard;
         renderActive = true;
@@ -107,12 +134,17 @@ Item {
             y = anchor.y - effectiveMenuHeight / 2;
         }
         open(anchor.screen, x, y, false);
+        originX = anchor.x;
+        originY = anchor.y;
     }
 
     function hide() {
         if (!renderActive)
             return;
         openState = false;
+        // The fullscreen window grabs input until renderActive drops; never leave that to an animation that may not run.
+        if (!closeFade.running)
+            renderActive = false;
     }
 
     function activate(menuItem) {
@@ -120,7 +152,8 @@ Item {
             return;
         if (typeof menuItem?.action === "function")
             menuItem.action();
-        hide();
+        if (!menuItem.keepOpen)
+            hide();
     }
 
     function selectNext() {
@@ -150,7 +183,7 @@ Item {
     function selectedDelegateIndex() {
         let itemIndex = 0;
         for (let i = 0; i < menuItems.length; i++) {
-            if (menuItems[i].type !== "item")
+            if (!isSelectable(menuItems[i]))
                 continue;
             if (itemIndex === selectedMenuIndex)
                 return i;
@@ -212,11 +245,11 @@ Item {
         WindowBlur {
             targetWindow: menuWindow
             surfaceColor: menuContainer.color
-            blurX: root.blurActive ? menuContainer.x : 0
-            blurY: root.blurActive ? menuContainer.y : 0
-            blurWidth: root.blurActive ? menuContainer.width : 0
-            blurHeight: root.blurActive ? menuContainer.height : 0
-            blurRadius: Theme.windowRadius
+            blurX: root.blurActive ? menuContainer.x + openScaleTransform.origin.x * (1 - menuContainer.openScale) : 0
+            blurY: root.blurActive ? menuContainer.y + openScaleTransform.origin.y * (1 - menuContainer.openScale) : 0
+            blurWidth: root.blurActive ? menuContainer.width * menuContainer.openScale : 0
+            blurHeight: root.blurActive ? menuContainer.height * menuContainer.openScale : 0
+            blurRadius: root.containerRadius * menuContainer.openScale
         }
 
         MouseArea {
@@ -268,13 +301,42 @@ Item {
                 width: root.effectiveMenuWidth
                 height: root.effectiveMenuHeight
                 color: Theme.readableSurface
-                radius: Theme.windowRadius
+                radius: root.containerRadius
                 border.color: BlurService.borderColor
                 border.width: BlurService.borderWidth
                 opacity: root.openState ? 1 : 0
+                transform: Scale {
+                    id: openScaleTransform
+                    origin.x: root.originX - menuContainer.x
+                    origin.y: root.originY - menuContainer.y
+                    xScale: menuContainer.openScale
+                    yScale: menuContainer.openScale
+                }
 
-                Behavior on opacity {
+                property real openScale: root.openState ? 1 : Theme.effectScaleCollapsed
+
+                Behavior on openScale {
                     NumberAnimation {
+                        duration: SettingsData.reduceMotion ? 0 : Theme.expressiveDurations.expressiveFastSpatial
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                    }
+                }
+
+                Behavior on height {
+                    enabled: root.openState
+                    NumberAnimation {
+                        duration: SettingsData.reduceMotion ? 0 : Theme.expressiveDurations.expressiveFastSpatial
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: Theme.expressiveCurves.emphasizedDecel
+                    }
+                }
+
+                // Fade out only; a fade-in shows the blur through an empty card.
+                Behavior on opacity {
+                    enabled: menuContainer.opacity > 0
+                    NumberAnimation {
+                        id: closeFade
                         duration: SettingsData.reduceMotion ? 0 : Theme.shortDuration
                         easing.type: Theme.emphasizedEasing
                         onRunningChanged: {
@@ -326,10 +388,18 @@ Item {
                                 required property int index
 
                                 readonly property bool isSeparator: modelData.type === "separator"
-                                readonly property int itemIndex: root.menuItems.slice(0, index).filter(menuItem => menuItem.type === "item").length
+                                readonly property bool isComponent: modelData.type === "component"
+                                readonly property int itemIndex: root.menuItems.slice(0, index).filter(menuItem => root.isSelectable(menuItem)).length
 
                                 width: menuColumn.width
-                                height: isSeparator ? Theme.spacingXS + Theme.dividerWidth : Theme.menuItemHeight
+                                height: root.itemHeightFor(modelData)
+                                visible: !modelData.hidden
+
+                                Loader {
+                                    anchors.fill: parent
+                                    active: menuItemDelegate.isComponent && root.renderActive
+                                    sourceComponent: menuItemDelegate.modelData.component ?? null
+                                }
 
                                 Rectangle {
                                     visible: menuItemDelegate.isSeparator
@@ -351,9 +421,9 @@ Item {
                                             return Theme.error;
                                         return selected ? Theme.onSelectedContainer : Theme.onSurface;
                                     }
-                                    visible: !menuItemDelegate.isSeparator
+                                    visible: !menuItemDelegate.isSeparator && !menuItemDelegate.isComponent
                                     anchors.fill: parent
-                                    radius: Theme.cornerRadiusS
+                                    radius: root.itemRadius
                                     color: {
                                         if (!itemEnabled)
                                             return "transparent";
@@ -379,19 +449,30 @@ Item {
 
                                         StyledText {
                                             text: menuItemDelegate.modelData.text || ""
-                                            font.pixelSize: Theme.fontSizeSmall
+                                            font.pixelSize: root.itemFontSize
                                             color: menuRow.contentColor
                                             font.weight: Theme.fontWeight
                                             anchors.verticalCenter: parent.verticalCenter
                                             elide: Text.ElideRight
-                                            width: parent.width - Theme.iconSizeMedium - Theme.spacingS
+                                            width: parent.width - (Theme.iconSizeMedium + Theme.spacingS) * (trailingIcon.visible ? 2 : 1)
                                         }
+                                    }
+
+                                    DIcon {
+                                        id: trailingIcon
+                                        visible: name !== ""
+                                        name: menuItemDelegate.modelData?.trailingIcon ?? ""
+                                        size: Theme.iconSizeMedium
+                                        color: menuRow.contentColor
+                                        anchors.right: parent.right
+                                        anchors.rightMargin: Theme.spacingS
+                                        anchors.verticalCenter: parent.verticalCenter
                                     }
 
                                     DRipple {
                                         id: menuItemRipple
                                         rippleColor: menuRow.contentColor
-                                        cornerRadius: Theme.cornerRadiusM
+                                        cornerRadius: Math.min(root.itemRadius, menuRow.height / 2)
                                     }
 
                                     MouseArea {
