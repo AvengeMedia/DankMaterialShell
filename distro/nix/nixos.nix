@@ -43,6 +43,9 @@ in
       restartIfChanged = cfg.systemd.restartIfChanged;
 
       serviceConfig = {
+        Type = "notify";
+        NotifyAccess = "main";
+        Environment = [ "QS_DISABLE_CRASH_HANDLER=1" ];
         ExecStart = lib.getExe cfg.package + " run --session";
         Restart = "on-failure";
         RestartForceExitStatus = "TEMPFAIL";

@@ -8,6 +8,7 @@
 
 import QtQuick
 import Quickshell
+import Quickshell.Services.SystemTray
 import qs.Common
 import qs.DCommon.Common as DC
 import qs.Modules
@@ -19,6 +20,13 @@ ShellRoot {
 
     readonly property bool runGreeter: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
     readonly property bool disableHotReload: Quickshell.env("DMS_DISABLE_HOT_RELOAD") === "1" || Quickshell.env("DMS_DISABLE_HOT_RELOAD") === "true"
+
+    readonly property bool shellReady: !!Quickshell.env("NOTIFY_SOCKET") && !runGreeter && dmsShellLoader.status === Loader.Ready && DMSService.isConnected && DMSService.apiVersion >= 38
+
+    onShellReadyChanged: {
+        if (shellReady)
+            DMSService.sendRequest("shell.ready", {"pid": Quickshell.processId});
+    }
 
     Binding {
         target: Quickshell
@@ -40,6 +48,8 @@ ShellRoot {
         void IconThemeService.ready;
         if (entrypoint.runGreeter)
             return;
+        // Start SNI registration even when no tray widget is visible.
+        void SystemTray.items;
         // Build the polkit agent here, outside incubation: first-touching it from a Connections target during DMSShell's async load crashed QQmlConnections::connectSignalsToMethods.
         void PolkitService.agent;
     }

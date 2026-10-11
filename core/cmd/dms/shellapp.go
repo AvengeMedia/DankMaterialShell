@@ -38,13 +38,17 @@ func (embeddedShell) Extract(baseDir string) (string, error) { return shellembed
 func (embeddedShell) Prune(baseDir, keep string) { shellembed.Prune(baseDir, keep) }
 
 type dmsBackend struct {
-	srv  *server.Server
-	done chan error
+	srv    *server.Server
+	done   chan error
+	cancel context.CancelFunc
 }
 
 func (b *dmsBackend) SocketPath() string { return b.srv.SocketPath() }
 
-func (b *dmsBackend) Close() { b.srv.Close() }
+func (b *dmsBackend) Close() {
+	b.cancel()
+	b.srv.Close()
+}
 
 func (b *dmsBackend) Done() <-chan error { return b.done }
 
@@ -57,8 +61,11 @@ func bootBackend(ctx context.Context) (shellapp.Backend, error) {
 		return nil, err
 	}
 
-	backend := &dmsBackend{srv: srv, done: make(chan error, 1)}
+	ctx, cancel := context.WithCancel(ctx)
+	backend := &dmsBackend{srv: srv, done: make(chan error, 1), cancel: cancel}
+	go srv.WaitReady(ctx)
 	go func() {
+		defer cancel()
 		defer func() {
 			if r := recover(); r != nil {
 				backend.done <- fmt.Errorf("server panic: %v", r)
