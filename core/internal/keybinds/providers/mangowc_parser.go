@@ -146,6 +146,14 @@ func mangowcAutogenerateComment(command, params string) string {
 			return "Swap window " + dir
 		}
 		return "Swap window " + params
+	case "move_client":
+		return "Move window " + params
+	case "scroller_stack":
+		return "Stack window " + params
+	case "togglejump":
+		return "Jump to window"
+	case "dwindle_toggle_split_direction":
+		return "Toggle split direction"
 	case "togglefloating":
 		return "Float/unfloat window"
 	case "togglefullscreen":

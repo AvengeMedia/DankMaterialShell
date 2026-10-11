@@ -184,7 +184,7 @@ var (
 	detected   Dialect
 )
 
-// Detect reads the mango binary because master and the last release both report 0.17.5.
+// Detect reads the mango binary: snake_case shipped on master builds still reporting 0.17.5, before the 0.18.0 release.
 func Detect() Dialect {
 	detectOnce.Do(func() {
 		path, err := exec.LookPath("mango")

@@ -16,9 +16,9 @@ import (
 const hyprlandBackupDirName = ".dms-backups"
 
 type ConfigDeployer struct {
-	logChan           chan<- string
-	replaceMangoBinds bool
-	hyprlandVersion   string
+	logChan         chan<- string
+	replaceBinds    bool
+	hyprlandVersion string
 }
 
 type DeploymentResult struct {
@@ -115,6 +115,9 @@ func (cd *ConfigDeployer) deployConfigurationsInternal(_ context.Context, wm dep
 	}
 
 	terminalCommand := terminal.Command()
+	if replaceConfigs != nil {
+		cd.replaceBinds = replaceConfigs[BindsConfigType]
+	}
 	switch wm {
 	case deps.WindowManagerNiri:
 		if shouldReplaceConfig("Niri") {
@@ -122,6 +125,22 @@ func (cd *ConfigDeployer) deployConfigurationsInternal(_ context.Context, wm dep
 			results = append(results, result)
 			if err != nil {
 				return results, fmt.Errorf("failed to deploy Niri config: %w", err)
+			}
+		} else if cd.replaceBinds {
+			bindsPath := filepath.Join(os.Getenv("HOME"), ".config", "niri", "dms", "binds.kdl")
+			if err := os.MkdirAll(filepath.Dir(bindsPath), 0o755); err != nil {
+				return results, fmt.Errorf("failed to create niri binds directory: %w", err)
+			}
+			stockBinds := strings.ReplaceAll(NiriBindsConfig, "{{TERMINAL_COMMAND}}", terminalCommand)
+			err := cd.deployBindsFile(bindsPath, stockBinds)
+			results = append(results, DeploymentResult{
+				ConfigType: BindsConfigType,
+				Path:       bindsPath,
+				Deployed:   err == nil,
+				Error:      err,
+			})
+			if err != nil {
+				return results, fmt.Errorf("failed to deploy Niri keybinds: %w", err)
 			}
 		}
 	case deps.WindowManagerHyprland:
@@ -138,7 +157,6 @@ func (cd *ConfigDeployer) deployConfigurationsInternal(_ context.Context, wm dep
 			}
 		}
 	case deps.WindowManagerMango:
-		cd.replaceMangoBinds = replaceConfigs[MangoBindsConfigType]
 		if shouldReplaceConfig("Mango") {
 			result, err := cd.deployMangoConfig(terminalCommand, useSystemd)
 			results = append(results, result)
@@ -273,7 +291,42 @@ func (cd *ConfigDeployer) deployNiriConfig(terminalCommand string, useSystemd bo
 	return result, nil
 }
 
+// deployBindsFile writes stock binds when the file is missing or empty. An
+// existing file is always backed up, then kept unless replaceBinds is set.
+func (cd *ConfigDeployer) deployBindsFile(path, stock string) error {
+	name := filepath.Base(path)
+	data, err := os.ReadFile(path)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("failed to read %s: %w", name, err)
+	}
+	if err != nil || len(data) == 0 {
+		if err := os.WriteFile(path, []byte(stock), 0o644); err != nil {
+			return fmt.Errorf("failed to write %s: %w", name, err)
+		}
+		cd.log("Deployed " + name)
+		return nil
+	}
+	backup := path + ".backup." + time.Now().Format("2006-01-02_15-04-05")
+	if err := os.WriteFile(backup, data, 0o644); err != nil {
+		return fmt.Errorf("failed to back up %s: %w", name, err)
+	}
+	cd.log(fmt.Sprintf("Backed up existing binds to %s", backup))
+	if !cd.replaceBinds {
+		cd.log("Keeping existing " + name)
+		return nil
+	}
+	if err := os.WriteFile(path, []byte(stock), 0o644); err != nil {
+		return fmt.Errorf("failed to write %s: %w", name, err)
+	}
+	cd.log("Deployed DMS stock " + name)
+	return nil
+}
+
 func (cd *ConfigDeployer) deployNiriDmsConfigs(dmsDir, terminalCommand string) error {
+	stockBinds := strings.ReplaceAll(NiriBindsConfig, "{{TERMINAL_COMMAND}}", terminalCommand)
+	if err := cd.deployBindsFile(filepath.Join(dmsDir, "binds.kdl"), stockBinds); err != nil {
+		return err
+	}
 	configs := []struct {
 		name    string
 		content string
@@ -281,7 +334,6 @@ func (cd *ConfigDeployer) deployNiriDmsConfigs(dmsDir, terminalCommand string) e
 		{"colors.kdl", NiriColorsConfig},
 		{"layout.kdl", NiriLayoutConfig},
 		{"alttab.kdl", NiriAlttabConfig},
-		{"binds.kdl", strings.ReplaceAll(NiriBindsConfig, "{{TERMINAL_COMMAND}}", terminalCommand)},
 		{"input.kdl", NiriInputConfig},
 		{"outputs.kdl", ""},
 		{"cursor.kdl", ""},

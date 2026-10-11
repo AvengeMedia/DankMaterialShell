@@ -925,6 +925,22 @@ const MANGOWC_ACTIONS = {
             label: "Swap Down"
         },
         {
+            id: "move_client left",
+            label: "Move Left"
+        },
+        {
+            id: "move_client right",
+            label: "Move Right"
+        },
+        {
+            id: "move_client up",
+            label: "Move Up"
+        },
+        {
+            id: "move_client down",
+            label: "Move Down"
+        },
+        {
             id: "exchange_stack_client next",
             label: "Swap Next in Stack"
         },

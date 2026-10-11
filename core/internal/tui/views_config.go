@@ -180,7 +180,7 @@ func (m Model) configReplacementNote() string {
 			return "Replacing Mango writes the DMS Mango template and starts the user systemd dms service with mango-session.target. Existing binds, monitor and window rules move into the dms/ files."
 		}
 		return "Replacing Mango writes the DMS Mango template and starts DMS from Mango with " + mangoconf.Detect().Key("exec_once") + "=dms run. Existing binds, monitor and window rules move into the dms/ files."
-	case config.MangoBindsConfigType:
+	case config.BindsConfigType:
 		return "Keep uses your binds as they are; replace starts from the DMS stock binds. A timestamped backup is kept either way."
 	case "Ghostty":
 		return "Replacing Ghostty writes the DMS terminal defaults and theme include."
@@ -232,7 +232,7 @@ func (m Model) applyConfigCheck(result configCheckResult) (tea.Model, tea.Cmd) {
 			continue
 		}
 		// Binds are the user's work; replacing them is opt-in.
-		m.replaceConfigs[cfg.ConfigType] = cfg.ConfigType != config.MangoBindsConfigType
+		m.replaceConfigs[cfg.ConfigType] = cfg.ConfigType != config.BindsConfigType
 		if !hasExisting {
 			m.selectedConfig = i
 		}
@@ -295,9 +295,8 @@ func (m Model) terminalConfigInfo() ExistingConfigInfo {
 func (m Model) checkExistingConfigurations() tea.Cmd {
 	return func() tea.Msg {
 		configs := []ExistingConfigInfo{m.wmConfigInfo()}
-		if m.chosenWindowManager() == deps.WindowManagerMango {
-			path, ok := config.MangoExistingBinds()
-			configs = append(configs, ExistingConfigInfo{ConfigType: config.MangoBindsConfigType, Path: path, Exists: ok})
+		if path, ok := config.ExistingBinds(m.chosenWindowManager()); ok {
+			configs = append(configs, ExistingConfigInfo{ConfigType: config.BindsConfigType, Path: path, Exists: true})
 		}
 		return configCheckResult{configs: append(configs, m.terminalConfigInfo())}
 	}

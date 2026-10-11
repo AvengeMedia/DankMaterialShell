@@ -9,15 +9,36 @@ import (
 	"strings"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/mangoconf"
 )
 
-// MangoBindsConfigType is the replaceConfigs key choosing stock DMS binds over the user's.
-const MangoBindsConfigType = "Mango binds"
+// BindsConfigType is the replaceConfigs key choosing stock DMS binds over the user's.
+const BindsConfigType = "Keybinds"
 
-// SetReplaceMangoBinds picks the DMS stock binds over existing ones; existing binds are kept by default.
-func (cd *ConfigDeployer) SetReplaceMangoBinds(replace bool) {
-	cd.replaceMangoBinds = replace
+// SetReplaceBinds picks the DMS stock binds over existing ones; existing binds are kept by default.
+func (cd *ConfigDeployer) SetReplaceBinds(replace bool) {
+	cd.replaceBinds = replace
+}
+
+// ExistingBinds returns where the user's keybinds for wm live, if any. Hyprland
+// is absent on purpose: its binds.lua is DMS-owned and user binds sit in binds-user.lua.
+func ExistingBinds(wm deps.WindowManager) (string, bool) {
+	switch wm {
+	case deps.WindowManagerNiri:
+		return nonEmptyFile(filepath.Join(os.Getenv("HOME"), ".config", "niri", "dms", "binds.kdl"))
+	case deps.WindowManagerMango:
+		return MangoExistingBinds()
+	}
+	return "", false
+}
+
+func nonEmptyFile(path string) (string, bool) {
+	info, err := os.Stat(path)
+	if err != nil || info.Size() == 0 {
+		return "", false
+	}
+	return path, true
 }
 
 var (
@@ -142,7 +163,7 @@ func (cd *ConfigDeployer) deployMangoDmsConfigs(dmsDir, terminalCommand string, 
 			return fmt.Errorf("failed to back up binds.conf: %w", err)
 		}
 		cd.log(fmt.Sprintf("Backed up existing binds to %s", backup))
-		if cd.replaceMangoBinds {
+		if cd.replaceBinds {
 			if err := os.WriteFile(bindsPath, []byte(dialect.Translate(stockBinds)), 0o644); err != nil {
 				return fmt.Errorf("failed to write binds.conf: %w", err)
 			}
@@ -157,7 +178,7 @@ func (cd *ConfigDeployer) deployMangoDmsConfigs(dmsDir, terminalCommand string, 
 		}
 	} else {
 		binds := stockBinds
-		if old := extractMangoLines(oldMain, mangoBindLine); old != "" && !cd.replaceMangoBinds {
+		if old := extractMangoLines(oldMain, mangoBindLine); old != "" && !cd.replaceBinds {
 			binds = mangoconf.BindsMovedHeader + "\n" + old
 			cd.log("Moved existing binds from config.conf to binds.conf")
 		}

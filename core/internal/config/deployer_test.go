@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
@@ -812,5 +813,100 @@ func TestHyprlandLuaUnsupported(t *testing.T) {
 	} {
 		err := hyprlandLuaUnsupported(ver)
 		assert.Equal(t, refuse, err != nil, ver)
+	}
+}
+
+func TestNiriDeployBindsChoiceAlwaysBacksUp(t *testing.T) {
+	for _, replace := range []bool{false, true} {
+		home := t.TempDir()
+		t.Setenv("HOME", home)
+		dms := filepath.Join(home, ".config", "niri", "dms")
+		require.NoError(t, os.MkdirAll(dms, 0o755))
+		user := "binds {\n    Mod+X { close-window; }\n}\n"
+		require.NoError(t, os.WriteFile(filepath.Join(dms, "binds.kdl"), []byte(user), 0o644))
+
+		cd := NewConfigDeployer(nil)
+		cd.SetReplaceBinds(replace)
+		_, err := cd.DeployCompositor(deps.WindowManagerNiri, "kitty", false)
+		require.NoError(t, err)
+
+		backups, _ := filepath.Glob(filepath.Join(dms, "binds.kdl.backup.*"))
+		assert.Len(t, backups, 1, "replace=%v", replace)
+		got, err := os.ReadFile(filepath.Join(dms, "binds.kdl"))
+		require.NoError(t, err)
+		assert.Equal(t, !replace, string(got) == user, "replace=%v", replace)
+		if replace {
+			assert.Contains(t, string(got), "spawn \"kitty\"")
+		}
+	}
+}
+
+func TestNiriReplaceBindsKeepsMainConfig(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	dmsDir := filepath.Join(home, ".config", "niri", "dms")
+	require.NoError(t, os.MkdirAll(dmsDir, 0o755))
+	mainPath := filepath.Join(filepath.Dir(dmsDir), "config.kdl")
+	main := "// user config\ninclude \"dms/binds.kdl\"\n"
+	require.NoError(t, os.WriteFile(mainPath, []byte(main), 0o644))
+	bindsPath := filepath.Join(dmsDir, "binds.kdl")
+	userBinds := "binds { Mod+X { close-window; } }\n"
+	require.NoError(t, os.WriteFile(bindsPath, []byte(userBinds), 0o644))
+	colorsPath := filepath.Join(dmsDir, "colors.kdl")
+	colors := "// user colors\n"
+	require.NoError(t, os.WriteFile(colorsPath, []byte(colors), 0o644))
+	kittyPath := filepath.Join(home, ".config", "kitty", "kitty.conf")
+	require.NoError(t, os.MkdirAll(filepath.Dir(kittyPath), 0o755))
+	require.NoError(t, os.WriteFile(kittyPath, []byte("# user terminal\n"), 0o644))
+
+	cd := NewConfigDeployer(nil)
+	results, err := cd.DeployConfigurationsSelectiveWithReinstallsAndSystemd(
+		context.Background(), deps.WindowManagerNiri, deps.TerminalKitty, nil,
+		map[string]bool{"Niri": false, "Kitty": false, BindsConfigType: true}, nil, false,
+	)
+	require.NoError(t, err)
+	got, err := os.ReadFile(bindsPath)
+	require.NoError(t, err)
+	assert.Equal(t, strings.ReplaceAll(NiriBindsConfig, "{{TERMINAL_COMMAND}}", "kitty"), string(got))
+	backups, err := filepath.Glob(bindsPath + ".backup.*")
+	require.NoError(t, err)
+	require.Len(t, backups, 1)
+	backup, err := os.ReadFile(backups[0])
+	require.NoError(t, err)
+	assert.Equal(t, userBinds, string(backup))
+	for path, want := range map[string]string{mainPath: main, colorsPath: colors} {
+		got, err := os.ReadFile(path)
+		require.NoError(t, err)
+		assert.Equal(t, want, string(got), path)
+	}
+	mainBackups, err := filepath.Glob(mainPath + ".backup.*")
+	require.NoError(t, err)
+	assert.Empty(t, mainBackups)
+	require.Len(t, results, 1)
+	assert.Equal(t, BindsConfigType, results[0].ConfigType)
+	assert.True(t, results[0].Deployed)
+}
+
+func TestDeployBindsFileReadErrorPreservesExistingFile(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("root can read files without read permission")
+	}
+	for _, replace := range []bool{false, true} {
+		path := filepath.Join(t.TempDir(), "binds.kdl")
+		user := "binds { Mod+X { close-window; } }\n"
+		require.NoError(t, os.WriteFile(path, []byte(user), 0o200))
+		_, err := os.ReadFile(path)
+		require.ErrorIs(t, err, os.ErrPermission)
+
+		cd := NewConfigDeployer(nil)
+		cd.SetReplaceBinds(replace)
+		assert.ErrorIs(t, cd.deployBindsFile(path, "stock binds\n"), os.ErrPermission, "replace=%v", replace)
+		require.NoError(t, os.Chmod(path, 0o600))
+		got, err := os.ReadFile(path)
+		require.NoError(t, err)
+		assert.Equal(t, user, string(got), "replace=%v", replace)
+		backups, err := filepath.Glob(path + ".backup.*")
+		require.NoError(t, err)
+		assert.Empty(t, backups)
 	}
 }

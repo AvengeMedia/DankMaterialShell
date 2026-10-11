@@ -71,7 +71,7 @@ func TestMangoDeployBindsChoiceAlwaysBacksUp(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(dms, "windowrules.conf"), []byte("windowrule=appid:keep,isglobal:1\n"), 0o644))
 
 		cd := NewConfigDeployer(nil)
-		cd.SetReplaceMangoBinds(replace)
+		cd.SetReplaceBinds(replace)
 		_, err := cd.DeployCompositor(deps.WindowManagerMango, "kitty", false)
 		require.NoError(t, err)
 

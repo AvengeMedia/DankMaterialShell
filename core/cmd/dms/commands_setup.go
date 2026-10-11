@@ -363,10 +363,10 @@ func runSetup() error {
 		return nil
 	}
 
-	replaceMangoBinds := false
-	if wmSelected && wm == deps.WindowManagerMango {
-		if path, ok := config.MangoExistingBinds(); ok {
-			replaceMangoBinds = promptMangoBinds(path)
+	replaceBinds := false
+	if wmSelected {
+		if path, ok := config.ExistingBinds(wm); ok {
+			replaceBinds = promptBinds(path)
 		}
 	}
 
@@ -390,7 +390,7 @@ func runSetup() error {
 	fmt.Println("\nDeploying configurations...")
 	logChan := make(chan string, 100)
 	deployer := config.NewConfigDeployer(logChan)
-	deployer.SetReplaceMangoBinds(replaceMangoBinds)
+	deployer.SetReplaceBinds(replaceBinds)
 
 	go func() {
 		for msg := range logChan {
@@ -526,8 +526,8 @@ func promptTerminal() (deps.Terminal, bool) {
 	}
 }
 
-func promptMangoBinds(path string) bool {
-	fmt.Printf("\nFound your Mango keybinds in %s.\n", path)
+func promptBinds(path string) bool {
+	fmt.Printf("\nFound your keybinds in %s.\n", path)
 	fmt.Println("  1) Keep my binds as they are")
 	fmt.Println("  2) Start from the DMS stock binds")
 	fmt.Println("Either way a timestamped backup is kept.")
