@@ -42,6 +42,7 @@ Singleton {
     property bool hyprOptionsLoading: false
     property bool inputGenerationPending: false
     property bool inputGenerationRunning: false
+    property int followMouseMode: -1
     // Hyprland only has per-device touchpad speed; probed once per compositor, a hotplugged touchpad waits for the next shell start
     property var hyprTouchpadNames: []
     property bool hyprDevicesReady: false
@@ -106,6 +107,7 @@ Singleton {
 
     Component.onCompleted: {
         if (CompositorService.isHyprland) {
+            refreshFollowMouse();
             refreshWorkspaceRules();
             refreshLuaConfigStatus();
             if (luaConfigActive)
@@ -144,12 +146,14 @@ Singleton {
         target: CompositorService
         function onIsHyprlandChanged() {
             if (CompositorService.isHyprland) {
+                refreshFollowMouse();
                 refreshLuaConfigStatus();
                 if (luaConfigActive)
                     ensureDmsLuaConfigs();
                 generateLayoutConfig();
                 return;
             }
+            followMouseMode = -1;
             luaConfigDetected = false;
             luaConfigStatusReady = false;
             luaConfigStatusLoading = false;
@@ -217,6 +221,30 @@ Singleton {
 
     function hyprSupports(name) {
         return hyprOptionNames[name] === true;
+    }
+
+    function refreshFollowMouse() {
+        if (!CompositorService.isHyprland)
+            return;
+        Proc.runCommand("hypr-follow-mouse", ["hyprctl", "-j", "getoption", "input:follow_mouse"], (output, exitCode) => {
+            if (exitCode !== 0 || !CompositorService.isHyprland)
+                return;
+            try {
+                const mode = JSON.parse(output).int;
+                if (Number.isInteger(mode) && mode >= 0 && mode <= 3)
+                    followMouseMode = mode;
+            } catch (error) {
+                log.warn("hyprctl follow_mouse parse failed:", error);
+            }
+        });
+    }
+
+    Connections {
+        target: CompositorService.isHyprland ? Hyprland : null
+        function onRawEvent(event) {
+            if (event.name === "configreloaded")
+                root.refreshFollowMouse();
+        }
     }
 
     function loadHyprOptionNames() {
@@ -819,6 +847,9 @@ hl.layer_rule({
             if (hyprSupports(option))
                 lines.push(line);
         };
+        // -1 leaves existing follow_mouse modes untouched until the user operates the toggle.
+        if (s.hyprlandFollowMouse === 0 || s.hyprlandFollowMouse === 1)
+            add("input:follow_mouse", `follow_mouse = ${s.hyprlandFollowMouse},`);
         if (s.mouseAccelSpeed !== 0)
             add("input:sensitivity", `sensitivity = ${s.mouseAccelSpeed.toFixed(2)},`);
         if (s.mouseAccelProfile !== "default")

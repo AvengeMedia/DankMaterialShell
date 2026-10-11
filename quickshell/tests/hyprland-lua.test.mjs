@@ -24,7 +24,7 @@ const scope = vm.createContext({
     liveMonitor: name => live[name] ?? null,
     hyprOptionNames: new Proxy({}, { get: (names, key) => key in names ? names[key] : true })
 });
-for (const fn of ["getOutputIdentifier", "luaQuoted", "forceFlagValue", "buildOutputsLua", "luaString", "luaTable", "hyprSupports", "blurLines", "decorationLines", "groupbarLines", "hyprScrollMethod", "touchpadNames", "inputLines", "touchpadDeviceLines"])
+for (const fn of ["getOutputIdentifier", "luaQuoted", "forceFlagValue", "buildOutputsLua", "luaString", "luaTable", "hyprSupports", "blurLines", "decorationLines", "groupbarLines", "hyprScrollMethod", "touchpadNames", "inputLines", "touchpadDeviceLines", "refreshFollowMouse"])
     vm.runInContext(extract(fn), scope);
 const withOptions = (names, run) => {
     const previous = scope.hyprOptionNames;
@@ -142,6 +142,36 @@ test("layout: effects the running Hyprland does not know are not written even wh
 
 test("input: turning natural scroll off is written so the template's true cannot shadow it", () => {
     assert.ok(table(inputLines(input({ touchpadNaturalScroll: false })), "touchpad").includes("natural_scroll = false,"));
+});
+
+test("input: focus follows mouse writes both on and off, leaves unmanaged modes alone, and skips unsupported options", () => {
+    const modeLine = mode => inputLines(input({ hyprlandFollowMouse: mode })).filter(line => line.startsWith("follow_mouse ="));
+    assert.deepEqual(modeLine(1), ["follow_mouse = 1,"]);
+    assert.deepEqual(modeLine(0), ["follow_mouse = 0,"]);
+    assert.deepEqual(modeLine(-1), []);
+    withOptions({}, () => {
+        assert.deepEqual(modeLine(1), []);
+    });
+});
+
+test("input: the live focus mode accepts all Hyprland modes and keeps the last value on failed reads", () => {
+    scope.CompositorService = { isHyprland: true };
+    scope.log = { warn() {} };
+    let callback;
+    scope.Proc = { runCommand(id, args, cb) { callback = cb; } };
+    for (const mode of [0, 1, 2, 3]) {
+        scope.refreshFollowMouse();
+        callback(JSON.stringify({ int: mode }), 0);
+        assert.equal(scope.followMouseMode, mode);
+    }
+    for (const [output, status] of [["", 1], ["invalid", 0], ['{"int":4}', 0], ['{"int":"1"}', 0]]) {
+        scope.refreshFollowMouse();
+        callback(output, status);
+        assert.equal(scope.followMouseMode, 3);
+    }
+    scope.CompositorService.isHyprland = false;
+    callback('{"int":1}', 0);
+    assert.equal(scope.followMouseMode, 3);
 });
 
 test("input: keyboard keys stay out until one is configured, then numlock is explicit and kb_file replaces the xkb names", () => {

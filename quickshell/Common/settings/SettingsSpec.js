@@ -315,6 +315,10 @@ var LOCAL_SPEC = {
         def: -1,
         onChange: "updateCompositorLayout"
     },
+    hyprlandFollowMouse: {
+        def: -1,
+        onChange: "updateCompositorInput"
+    },
     mouseAccelProfile: {
         def: "default",
         onChange: "updateCompositorInput"

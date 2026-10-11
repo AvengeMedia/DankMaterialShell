@@ -14376,6 +14376,29 @@
     "conditionKey": "pointerCapable"
   },
   {
+    "section": "hyprlandFollowMouse",
+    "label": "Focus follows mouse",
+    "tabIndex": 44,
+    "category": "Mouse & touchpad",
+    "keywords": [
+      "focus",
+      "follow",
+      "follows",
+      "hyprland",
+      "input",
+      "mouse",
+      "moves",
+      "over",
+      "pointer",
+      "touchpad",
+      "window",
+      "windows"
+    ],
+    "parentLabel": "Input",
+    "description": "Focus windows when the pointer moves over them.",
+    "conditionKey": "isHyprland"
+  },
+  {
     "section": "mouseLeftHanded",
     "label": "Left-handed",
     "tabIndex": 44,
@@ -14431,14 +14454,19 @@
     "category": "Mouse & touchpad",
     "keywords": [
       "acceleration",
+      "focus",
       "input",
       "mouse",
+      "moves",
+      "over",
       "pointer",
       "sensitivity",
-      "touchpad"
+      "touchpad",
+      "windows"
     ],
     "parentLabel": "Input",
     "icon": "mouse",
+    "description": "Focus windows when the pointer moves over them.",
     "conditionKey": "inputCapable"
   },
   {

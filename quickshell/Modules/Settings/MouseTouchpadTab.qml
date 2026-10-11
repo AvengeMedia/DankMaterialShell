@@ -32,6 +32,18 @@ Item {
             settingKey: "mouseSettings"
             iconName: "mouse"
 
+            SettingsToggleRow {
+                visible: CompositorService.isHyprland && HyprlandService.hyprSupports("input:follow_mouse")
+                enabled: inputInclude.included && !inputInclude.readOnly && HyprlandService.luaConfigActive && HyprlandService.followMouseMode >= 0
+                tags: ["mouse", "focus", "follow", "pointer", "window", "hyprland"]
+                settingKey: "hyprlandFollowMouse"
+                resetKeys: ["hyprlandFollowMouse"]
+                text: I18n.tr("Focus follows mouse", "Hyprland toggle that focuses a window when the pointer moves over it")
+                description: I18n.tr("Focus windows when the pointer moves over them.", "Description of the Hyprland focus follows mouse toggle")
+                checked: (SettingsData.hyprlandFollowMouse < 0 ? HyprlandService.followMouseMode : SettingsData.hyprlandFollowMouse) === 1
+                onToggled: checked => SettingsData.set("hyprlandFollowMouse", checked ? 1 : 0)
+            }
+
             SettingsSliderRow {
                 tags: ["mouse", "sensitivity", "speed", "accel"]
                 settingKey: "mouseAccelSpeed"
