@@ -85,11 +85,8 @@ SettingsCard {
         body: DTextField {
             width: parent.width
             outlined: true
-            controlHeight: Theme.fieldHeightLarge
             leftIconName: "lock"
-            font.pixelSize: Theme.fontSizeMedium
-            textColor: Theme.surfaceText
-            placeholderText: I18n.tr("Password")
+            labelText: I18n.tr("Password")
             echoMode: TextInput.Password
             showPasswordToggle: true
             enabled: root.passwordSaved

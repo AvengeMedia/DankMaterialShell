@@ -421,6 +421,7 @@ DModal {
             id: hiddenSecurityDropdown
             visible: isHiddenNetwork
             width: parent.width
+            addHorizontalPadding: true
             text: I18n.tr("Security", "noun, settings page name and wifi security type label")
             options: hiddenSecurityChoices.map(c => c[0])
             // DDropdown assigns currentValue on pick, which drops a plain binding; this re-applies it on reset.

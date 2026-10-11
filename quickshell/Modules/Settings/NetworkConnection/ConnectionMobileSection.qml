@@ -79,10 +79,7 @@ SettingsCard {
             id: field
             width: parent.width
             outlined: true
-            controlHeight: Theme.fieldHeightLarge
             leftIconName: "lock"
-            font.pixelSize: Theme.fontSizeMedium
-            textColor: Theme.surfaceText
             echoMode: TextInput.Password
             showPasswordToggle: true
             onTextEdited: {

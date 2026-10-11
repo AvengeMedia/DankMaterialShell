@@ -131,10 +131,7 @@ SettingsCard {
             id: pskField
             width: parent.width
             outlined: true
-            controlHeight: Theme.fieldHeightLarge
             leftIconName: "lock"
-            font.pixelSize: Theme.fontSizeMedium
-            textColor: Theme.surfaceText
             labelText: I18n.tr("Password")
             echoMode: TextInput.Password
             showPasswordToggle: true

@@ -282,6 +282,8 @@ Item {
                     visible: TailscaleService.backendState !== "NeedsLogin"
                     text: I18n.tr("Log out")
                     iconName: "logout"
+                    backgroundColor: Theme.secondaryContainer
+                    textColor: Theme.onSecondaryContainer
                     enabled: networkTailscaleTab.writable
                     onClicked: TailscaleService.logout(() => networkTailscaleTab.loadProfiles())
                 }

@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import qs.Common
-import qs.DCommon.Common as DCommon
 import qs.DCommon.Widgets
 import "../../Common/ConnectionEditor.js" as CE
 
@@ -141,26 +140,48 @@ Column {
         property string opensslCiphers
     }
 
+    component FormField: DTextField {
+        width: parent.width
+        expressive: root.expressive
+        outlined: !root.expressive
+    }
+
+    // DDropdown assigns currentValue on pick, which drops a plain binding; the Binding re-applies it on reset.
+    component ChoiceDropdown: DDropdown {
+        id: choiceDropdown
+
+        property var choices: []
+        property var selected
+
+        signal picked(var value)
+
+        width: parent.width
+        addHorizontalPadding: true
+        options: choices.map(c => c.label)
+        Binding {
+            target: choiceDropdown
+            property: "currentValue"
+            value: choiceDropdown.choices.some(c => c.value === choiceDropdown.selected) ? CE.choiceLabel(choiceDropdown.choices, choiceDropdown.selected) : ""
+        }
+        onValueChanged: value => choiceDropdown.picked(CE.choiceValue(choiceDropdown.choices, value))
+    }
+
     component PathField: Row {
         id: pathField
 
         property alias text: pathInput.text
         property alias labelText: pathInput.labelText
+        property alias leftIconName: pathInput.leftIconName
         property string target
 
         width: parent.width
         spacing: Theme.spacingS
 
-        DTextField {
+        FormField {
             id: pathInput
             width: parent.width - browseButton.width - parent.spacing
             anchors.verticalCenter: parent.verticalCenter
-            expressive: root.expressive
-            outlined: !root.expressive
             readOnly: true
-            controlHeight: root.expressive ? DCommon.Style.buttonHeightM : Theme.fieldHeightLarge
-            font.pixelSize: Theme.fontSizeMedium
-            textColor: Theme.surfaceText
         }
 
         DActionButton {
@@ -173,79 +194,29 @@ Column {
         }
     }
 
-    Row {
-        width: parent.width
-        spacing: Theme.spacingM
-
-        Column {
-            width: root.usesInner ? (parent.width - Theme.spacingM) / 2 : parent.width
-            spacing: Theme.spacingXS
-
-            StyledText {
-                text: I18n.tr("Authentication")
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceVariantText
-            }
-
-            DDropdown {
-                id: methodDropdown
-                width: parent.width
-                dropdownWidth: parent.width
-                compactMode: true
-                options: root.methodChoices.map(m => m.label)
-                // DDropdown assigns currentValue on pick, which drops a plain binding; this re-applies it on reset.
-                Binding {
-                    target: methodDropdown
-                    property: "currentValue"
-                    value: CE.choiceLabel(root.methodChoices, draft.eap)
-                }
-                onValueChanged: value => {
-                    const eap = CE.choiceValue(root.methodChoices, value);
-                    if (eap === draft.eap)
-                        return;
-                    draft.eap = eap;
-                    draft.phase2 = root.defaultInner(eap);
-                }
-            }
-        }
-
-        Column {
-            visible: root.usesInner
-            width: (parent.width - Theme.spacingM) / 2
-            spacing: Theme.spacingXS
-
-            StyledText {
-                text: I18n.tr("Inner authentication", "802.1X phase 2 authentication method")
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceVariantText
-            }
-
-            DDropdown {
-                id: innerDropdown
-                readonly property var choices: root.innerChoices[draft.eap] || []
-                width: parent.width
-                dropdownWidth: parent.width
-                compactMode: true
-                options: choices.map(i => i.label)
-                Binding {
-                    target: innerDropdown
-                    property: "currentValue"
-                    value: innerDropdown.choices.some(c => c.value === draft.phase2) ? CE.choiceLabel(innerDropdown.choices, draft.phase2) : ""
-                }
-                onValueChanged: value => draft.phase2 = CE.choiceValue(choices, value)
-            }
+    ChoiceDropdown {
+        text: I18n.tr("Authentication")
+        choices: root.methodChoices
+        selected: draft.eap
+        onPicked: eap => {
+            if (eap === draft.eap)
+                return;
+            draft.eap = eap;
+            draft.phase2 = root.defaultInner(eap);
         }
     }
 
-    DTextField {
+    ChoiceDropdown {
+        visible: root.usesInner
+        text: I18n.tr("Inner authentication", "802.1X phase 2 authentication method")
+        choices: root.innerChoices[draft.eap] || []
+        selected: draft.phase2
+        onPicked: value => draft.phase2 = value
+    }
+
+    FormField {
         id: identityField
-        width: parent.width
-        expressive: root.expressive
-        outlined: !root.expressive
-        controlHeight: root.expressive ? DCommon.Style.buttonHeightM : Theme.fieldHeightLarge
         leftIconName: "person"
-        font.pixelSize: Theme.fontSizeMedium
-        textColor: Theme.surfaceText
         labelText: I18n.tr("Username", "text field label for network, vpn and account forms")
         supportingText: root.usernameSuffix ? "@" + root.usernameSuffix : ""
         isError: root.usernameSuffixRequired && !CE.identityMatchesSuffix(text.trim(), root.usernameSuffix)
@@ -254,16 +225,10 @@ Column {
         onAccepted: passwordField.visible ? passwordField.forceActiveFocus() : root.submitRequested()
     }
 
-    DTextField {
+    FormField {
         id: passwordField
         visible: draft.savePassword
-        width: parent.width
-        expressive: root.expressive
-        outlined: !root.expressive
-        controlHeight: root.expressive ? DCommon.Style.buttonHeightM : Theme.fieldHeightLarge
         leftIconName: "lock"
-        font.pixelSize: Theme.fontSizeMedium
-        textColor: Theme.surfaceText
         showPasswordToggle: true
         morph: root.expressive
         echoMode: passwordVisible ? TextInput.Normal : TextInput.Password
@@ -285,39 +250,28 @@ Column {
         onToggled: checked => draft.savePassword = checked
     }
 
-    DTextField {
+    FormField {
         id: anonField
         visible: root.usesInner
-        width: parent.width
-        expressive: root.expressive
-        outlined: !root.expressive
-        controlHeight: root.expressive ? DCommon.Style.buttonHeightM : Theme.fieldHeightLarge
         leftIconName: "person_off"
-        font.pixelSize: Theme.fontSizeMedium
-        textColor: Theme.surfaceText
         labelText: I18n.tr("Anonymous Identity (optional)")
         text: draft.anonymousIdentity
         onTextEdited: draft.anonymousIdentity = text
         onAccepted: root.submitRequested()
     }
 
-    DDropdown {
-        id: caDropdown
+    ChoiceDropdown {
         visible: root.usesCa
-        width: parent.width
         text: I18n.tr("CA certificate", "network authentication certificate file field")
-        options: root.caChoices.map(a => a.label)
-        Binding {
-            target: caDropdown
-            property: "currentValue"
-            value: CE.choiceLabel(root.caChoices, draft.ca)
-        }
-        onValueChanged: value => draft.ca = CE.choiceValue(root.caChoices, value)
+        choices: root.caChoices
+        selected: draft.ca
+        onPicked: value => draft.ca = value
     }
 
     PathField {
         visible: root.usesCa && draft.ca === "file"
         target: "ca"
+        leftIconName: "verified_user"
         labelText: I18n.tr("File")
         text: draft.caCertPem ? root.caDisplayName : root.storedLabel("ca", draft.caCertPath)
     }
@@ -325,51 +279,35 @@ Column {
     StyledText {
         visible: root.usesCa && draft.ca === "none"
         width: parent.width
+        leftPadding: Theme.spacingM
+        rightPadding: Theme.spacingM
         text: I18n.tr("Without a CA certificate the server is not verified, and a fake network can capture the password.", "802.1X warning when no CA certificate is set")
         font.pixelSize: Theme.fontSizeSmall
         color: Theme.error
         wrapMode: Text.WordWrap
     }
 
-    Row {
+    FormField {
         visible: root.usesCa
-        width: parent.width
-        spacing: Theme.spacingS
+        leftIconName: "domain"
+        labelText: I18n.tr("Server")
+        isError: draft.ca === "system" && !text.trim()
+        text: draft.serverDomain
+        onTextEdited: draft.serverDomain = text
+    }
 
-        DTextField {
-            width: parent.width - matchDropdown.width - parent.spacing
-            anchors.verticalCenter: parent.verticalCenter
-            expressive: root.expressive
-            outlined: !root.expressive
-            controlHeight: root.expressive ? DCommon.Style.buttonHeightM : Theme.fieldHeightLarge
-            leftIconName: "domain"
-            font.pixelSize: Theme.fontSizeMedium
-            textColor: Theme.surfaceText
-            labelText: I18n.tr("Server")
-            isError: draft.ca === "system" && !text.trim()
-            text: draft.serverDomain
-            onTextEdited: draft.serverDomain = text
-        }
-
-        DDropdown {
-            id: matchDropdown
-            width: Math.round(parent.width / 3)
-            dropdownWidth: width
-            anchors.verticalCenter: parent.verticalCenter
-            compactMode: true
-            options: root.matchChoices.map(m => m.label)
-            Binding {
-                target: matchDropdown
-                property: "currentValue"
-                value: CE.choiceLabel(root.matchChoices, draft.serverDomainSuffix)
-            }
-            onValueChanged: value => draft.serverDomainSuffix = CE.choiceValue(root.matchChoices, value)
-        }
+    ChoiceDropdown {
+        visible: root.usesCa
+        text: I18n.tr("Match type", "802.1X server name match, exact or suffix")
+        choices: root.matchChoices
+        selected: draft.serverDomainSuffix
+        onPicked: value => draft.serverDomainSuffix = value
     }
 
     PathField {
         visible: root.isTls
         target: "clientCert"
+        leftIconName: "badge"
         labelText: I18n.tr("Client certificate", "network authentication certificate file field")
         text: root.storedLabel("clientCert", draft.clientCertPath)
     }
@@ -377,6 +315,7 @@ Column {
     PathField {
         visible: root.isTls
         target: "privateKey"
+        leftIconName: "key"
         labelText: I18n.tr("Private key", "network authentication key file field")
         text: root.storedLabel("privateKey", draft.privateKeyPath)
     }
@@ -384,23 +323,18 @@ Column {
     DCollapsibleSection {
         width: parent.width
         title: I18n.tr("Advanced")
+        showBackground: true
 
         Column {
             Layout.fillWidth: true
-            spacing: Theme.spacingS
+            spacing: root.spacing
 
-            DDropdown {
-                id: peapVersionDropdown
+            ChoiceDropdown {
                 visible: draft.eap === "peap"
-                width: parent.width
                 text: I18n.tr("PEAP version", "802.1X advanced option")
-                options: root.peapVersionChoices.map(v => v.label)
-                Binding {
-                    target: peapVersionDropdown
-                    property: "currentValue"
-                    value: CE.choiceLabel(root.peapVersionChoices, draft.peapVersion)
-                }
-                onValueChanged: value => draft.peapVersion = CE.choiceValue(root.peapVersionChoices, value)
+                choices: root.peapVersionChoices
+                selected: draft.peapVersion
+                onPicked: value => draft.peapVersion = value
             }
 
             // phase1-auth-flags: tls-1-0-enable 0x20, tls-1-1-enable 0x40, tls-1-3-disable 0x10
@@ -418,13 +352,8 @@ Column {
                 onToggled: checked => draft.authFlags = CE.withFlags(draft.authFlags, 0x10, checked)
             }
 
-            DTextField {
-                width: parent.width
-                expressive: root.expressive
-                outlined: !root.expressive
-                controlHeight: root.expressive ? DCommon.Style.buttonHeightM : Theme.fieldHeightLarge
-                font.pixelSize: Theme.fontSizeMedium
-                textColor: Theme.surfaceText
+            FormField {
+                leftIconName: "tune"
                 labelText: I18n.tr("OpenSSL ciphers", "802.1X advanced option")
                 text: draft.opensslCiphers
                 onTextEdited: draft.opensslCiphers = text
