@@ -20,6 +20,7 @@ Item {
     readonly property string clickThroughHint: I18n.tr("Disabled by Click through", "bar hover popouts card, Click through is the Advanced toggle name")
     readonly property bool selectedIslandFree: bar.selectedBarIsIsland && SettingsData.islandFreePlacement(bar.selectedBarConfig)
     readonly property bool selectedIslandDocked: bar.selectedBarIsIsland && !selectedIslandFree
+    readonly property bool popupGapsZeroed: SettingsData.barUsesConnectedFrameStyle(bar.selectedBarConfig) && !(bar.selectedBarConfig?.useOverlayLayer ?? false)
     readonly property int placementIndex: !bar.islandSetting("islandFloating") ? 0 : (bar.islandSetting("islandPlacement") === "free" ? 2 : 1)
 
     function setBarScreenPreferences(barId, prefs) {
@@ -221,7 +222,7 @@ Item {
                 allowEmpty: true
                 showLastDisplay: true
                 showOnLastDisplay: bar.selectedBarConfig?.showOnLastDisplay ?? true
-                onPreferencesChanged: prefs => dankBarTab.setBarScreenPreferences(bar.selectedBarId, prefs)
+                preferencesHandler: prefs => dankBarTab.setBarScreenPreferences(bar.selectedBarId, prefs)
                 onLastDisplayToggled: checked => dankBarTab.setBarShowOnLastDisplay(bar.selectedBarId, checked)
             }
         }
@@ -243,12 +244,11 @@ Item {
             }
 
             SettingsToggleSliderRow {
+                resetStore: bar
                 settingKey: "barAutoHide"
                 tags: ["autohide", "auto-hide", "reveal", "intellihide", "delay", "hide"]
                 visible: !bar.islandOwnsSelectedBarTop
                 text: I18n.tr("Auto-hide", "toggle to automatically hide the bar or dock")
-                resetStore: bar
-                resetKeys: ["autoHide"]
                 valueKeys: ["autoHideDelay"]
                 checked: bar.selectedBarConfig?.autoHide ?? false
                 value: bar.selectedBarConfig?.autoHideDelay ?? 250
@@ -272,8 +272,6 @@ Item {
                 tags: ["autohide", "strict", "popout"]
                 text: I18n.tr("Strict auto-hide", "Dank bar setting: hide the bar when the pointer leaves even if a menu or bar popover is still open")
                 description: I18n.tr("Hides even while a bar popout or menu is open", "bar strict auto-hide toggle description")
-                resetStore: bar
-                resetKeys: ["autoHideStrict"]
                 checked: bar.selectedBarConfig?.autoHideStrict ?? false
                 onToggled: toggled => {
                     SettingsData.updateBarConfig(bar.selectedBarId, {
@@ -289,8 +287,6 @@ Item {
                 visible: (bar.selectedBarConfig?.autoHide ?? false) && !bar.islandOwnsSelectedBarTop && CompositorService.supportsBarAutoHideReveal
                 text: I18n.tr("Hide when windows open")
                 description: I18n.tr("Stays visible while the workspace has no windows", "bar hide when windows open toggle description")
-                resetStore: bar
-                resetKeys: ["showOnWindowsOpen"]
                 checked: bar.selectedBarConfig?.showOnWindowsOpen ?? false
                 onToggled: toggled => SettingsData.updateBarConfig(bar.selectedBarId, {
                         showOnWindowsOpen: toggled
@@ -302,8 +298,6 @@ Item {
                 tags: ["bar", "overview", "niri", "show"]
                 visible: CompositorService.supportsNativeOverview && !bar.islandOwnsSelectedBarTop && !bar.selectedBarFrameStyled
                 text: I18n.tr("Show on overview")
-                resetStore: bar
-                resetKeys: ["openOnOverview"]
                 checked: bar.selectedBarConfig?.openOnOverview ?? false
                 onToggled: toggled => SettingsData.updateBarConfig(bar.selectedBarId, {
                         openOnOverview: toggled
@@ -316,8 +310,6 @@ Item {
                 visible: !bar.islandOwnsSelectedBarTop
                 text: I18n.tr("Manual show/hide")
                 description: I18n.tr("Off keeps the bar hidden until turned back on or shown over IPC", "bar manual visibility toggle description")
-                resetStore: bar
-                resetKeys: ["visible"]
                 checked: bar.selectedBarConfig?.visible ?? true
                 onToggled: toggled => {
                     SettingsData.updateBarConfig(bar.selectedBarId, {
@@ -420,14 +412,12 @@ Item {
 
             SettingsDisplayPicker {
                 displayPreferences: SettingsData.frameScreenPreferences
-                onPreferencesChanged: prefs => SettingsData.set("frameScreenPreferences", prefs)
+                preferencesHandler: prefs => SettingsData.set("frameScreenPreferences", prefs)
             }
         }
 
         SettingsToggleCard {
             settingKey: "hoverPopouts"
-            resetStore: bar
-            resetKeys: ["hoverPopouts"]
             tags: ["bar", "hover", "popout", "reveal", "widget", "delay"]
             iconName: "touch_app"
             title: I18n.tr("Hover popouts")
@@ -458,11 +448,10 @@ Item {
         }
 
         SettingsToggleCard {
+            id: scrollCard
             iconName: "mouse"
             settingKey: "barScrollWheel"
-            resetStore: bar
-            resetKeys: ["scrollEnabled"]
-            tags: ["scroll", "wheel", "workspace", "column", "axis"]
+            tags: ["scroll", "wheel", "workspace", "focus", "window", "axis"]
             title: I18n.tr("Scroll wheel")
             visible: (bar.selectedBarConfig?.enabled ?? false) && !bar.selectedBarIsIsland
             checked: bar.selectedBarConfig?.scrollEnabled ?? true
@@ -470,43 +459,23 @@ Item {
                     scrollEnabled: checked
                 })
 
+            readonly property var behaviors: CompositorService.canStepWindowFocus ? ["none", "workspace", "focusWindow"] : ["none", "workspace"]
+            readonly property var behaviorLabels: CompositorService.canStepWindowFocus ? [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Focus window")] : [I18n.tr("None"), I18n.tr("Workspace")]
+
             SettingsButtonGroupRow {
                 text: I18n.tr("Y axis")
                 resetStore: bar
                 resetKeys: ["scrollYBehavior"]
-                model: CompositorService.isNiri ? [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column", "noun, bar scroll behavior option, niri window column")] : [I18n.tr("None"), I18n.tr("Workspace")]
+                model: scrollCard.behaviorLabels
                 buttonPadding: Theme.spacingS
                 minButtonWidth: 44
                 textSize: Theme.fontSizeSmall
-                currentIndex: {
-                    switch (bar.selectedBarConfig?.scrollYBehavior || "workspace") {
-                    case "none":
-                        return 0;
-                    case "workspace":
-                        return 1;
-                    case "column":
-                        return 2;
-                    default:
-                        return 1;
-                    }
-                }
+                currentIndex: Math.max(0, scrollCard.behaviors.indexOf(bar.selectedBarConfig?.scrollYBehavior || "workspace"))
                 onSelectionChanged: (index, selected) => {
                     if (!selected)
                         return;
-                    let behavior = "workspace";
-                    switch (index) {
-                    case 0:
-                        behavior = "none";
-                        break;
-                    case 1:
-                        behavior = "workspace";
-                        break;
-                    case 2:
-                        behavior = "column";
-                        break;
-                    }
                     SettingsData.updateBarConfig(bar.selectedBarId, {
-                        scrollYBehavior: behavior
+                        scrollYBehavior: scrollCard.behaviors[index]
                     });
                 }
             }
@@ -515,40 +484,16 @@ Item {
                 text: I18n.tr("X axis")
                 resetStore: bar
                 resetKeys: ["scrollXBehavior"]
-                visible: CompositorService.isNiri
-                model: [I18n.tr("None"), I18n.tr("Workspace"), I18n.tr("Column")]
+                model: scrollCard.behaviorLabels
                 buttonPadding: Theme.spacingS
                 minButtonWidth: 44
                 textSize: Theme.fontSizeSmall
-                currentIndex: {
-                    switch (bar.selectedBarConfig?.scrollXBehavior || "column") {
-                    case "none":
-                        return 0;
-                    case "workspace":
-                        return 1;
-                    case "column":
-                        return 2;
-                    default:
-                        return 2;
-                    }
-                }
+                currentIndex: Math.max(0, scrollCard.behaviors.indexOf(bar.selectedBarConfig?.scrollXBehavior || "focusWindow"))
                 onSelectionChanged: (index, selected) => {
                     if (!selected)
                         return;
-                    let behavior = "column";
-                    switch (index) {
-                    case 0:
-                        behavior = "none";
-                        break;
-                    case 1:
-                        behavior = "workspace";
-                        break;
-                    case 2:
-                        behavior = "column";
-                        break;
-                    }
                     SettingsData.updateBarConfig(bar.selectedBarId, {
-                        scrollXBehavior: behavior
+                        scrollXBehavior: scrollCard.behaviors[index]
                     });
                 }
             }
@@ -566,8 +511,6 @@ Item {
                 description: I18n.tr("Anchored popouts open at the cursor instead of their widget")
                 settingKey: "barClickActionFollowMouse"
                 tags: ["bar", "click", "mouse", "cursor", "position", "anchor", "popout"]
-                resetStore: bar
-                resetKeys: ["clickActionFollowMouse"]
                 checked: bar.selectedBarConfig?.clickActionFollowMouse ?? false
                 onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
                         clickActionFollowMouse: checked
@@ -648,8 +591,6 @@ Item {
 
             SettingsToggleRow {
                 settingKey: "barClickThrough"
-                resetStore: bar
-                resetKeys: ["clickThrough"]
                 tags: ["clickthrough", "click", "through", "mouse", "input", "mask", "passthrough"]
                 visible: !bar.islandOwnsSelectedBarTop
                 text: I18n.tr("Click through")
@@ -662,10 +603,8 @@ Item {
 
             SettingsToggleRow {
                 settingKey: "barUseOverlayLayer"
-                resetStore: bar
-                resetKeys: ["useOverlayLayer"]
                 tags: ["bar", "fullscreen", "overlay", "layer"]
-                visible: !bar.islandOwnsSelectedBarTop
+                visible: !bar.islandOwnsSelectedBarTop && !(bar.selectedBarFrameStyled && !SettingsData.connectedFrameModeActive)
                 text: I18n.tr("Use overlay layer")
                 checked: bar.selectedBarConfig?.useOverlayLayer ?? false
                 onToggled: toggled => {
@@ -679,26 +618,38 @@ Item {
             SettingsToggleRow {
                 settingKey: "islandUseOverlayLayer"
                 tags: ["island", "fullscreen", "overlay", "layer"]
-                visible: bar.selectedBarIsIsland
-                resetStore: bar
-                resetKeys: ["islandUseOverlayLayer"]
+                visible: bar.selectedBarIsIsland && !bar.selectedBarFrameStyled
                 text: I18n.tr("Use overlay layer")
                 checked: bar.islandSetting("islandUseOverlayLayer")
                 onToggled: checked => bar.apply("islandUseOverlayLayer", checked)
             }
 
+            SettingsControlledBy {
+                visible: bar.selectedBarFrameStyled && (bar.selectedBarIsIsland || (!bar.islandOwnsSelectedBarTop && !SettingsData.connectedFrameModeActive))
+                parentModal: dankBarTab.parentModal
+                section: "frameBorder"
+                settingLabel: I18n.tr("Use overlay layer")
+                reason: I18n.tr("Disabled by Frame Mode")
+            }
+
             SettingsToggleRow {
                 settingKey: "barMaximizeDetection"
-                resetStore: bar
-                resetKeys: ["maximizeDetection"]
                 tags: ["maximize", "gaps", "border", "fullscreen"]
-                visible: CompositorService.supportsBarAutoHideReveal
+                visible: CompositorService.supportsBarAutoHideReveal && !bar.selectedBarFrameStyled
                 text: I18n.tr("Maximize detection")
                 description: I18n.tr("Drops bar gaps and rounding while a window is maximized", "bar maximize detection toggle description")
                 checked: bar.selectedBarConfig?.maximizeDetection ?? true
                 onToggled: toggled => SettingsData.updateBarConfig(bar.selectedBarId, {
                         maximizeDetection: toggled
                     })
+            }
+
+            SettingsControlledBy {
+                visible: CompositorService.supportsBarAutoHideReveal && bar.selectedBarFrameStyled
+                parentModal: dankBarTab.parentModal
+                section: "frameBorder"
+                settingLabel: I18n.tr("Maximize detection")
+                reason: I18n.tr("Disabled by Frame Mode")
             }
 
             SettingsSliderRow {
@@ -722,9 +673,7 @@ Item {
                 text: I18n.tr("Auto popup gaps")
                 description: I18n.tr("Gap between the bar and its popouts follows edge spacing", "bar auto popup gaps toggle description")
                 tags: ["popup", "gaps", "auto"]
-                visible: !bar.selectedBarFrameStyled
-                resetStore: bar
-                resetKeys: ["popupGapsAuto"]
+                visible: !dankBarTab.popupGapsZeroed
                 checked: bar.selectedBarConfig?.popupGapsAuto ?? true
                 onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
                         popupGapsAuto: checked
@@ -732,7 +681,7 @@ Item {
             }
 
             SettingsSliderRow {
-                visible: !bar.selectedBarFrameStyled && !(bar.selectedBarConfig?.popupGapsAuto ?? true)
+                visible: !dankBarTab.popupGapsZeroed && !(bar.selectedBarConfig?.popupGapsAuto ?? true)
                 text: I18n.tr("Gap size")
                 tags: ["popup", "gaps", "size"]
                 resetStore: bar

@@ -24,8 +24,6 @@ Item {
     property bool userToggled: false
 
     property alias resetStore: header.resetStore
-    property alias resetKeys: header.resetKeys
-    property alias resetByKeys: header.resetByKeys
     property var accessoryKeys: []
     property var valueKeys: []
     property alias modified: header.modified
@@ -66,7 +64,7 @@ Item {
             tab: root.tab
             tags: root.tags
             settingKey: root.settingKey
-            modified: (root.resetKeys.length > 0 && !resetStore.isDefault(root.resetKeys)) || (root.checked && root.accessoryKeys.length > 0 && !resetStore.isDefault(root.accessoryKeys))
+            modified: root.checked && root.accessoryKeys.length > 0 && !resetStore.isDefault(root.accessoryKeys)
             onResetRequested: {
                 resetStore.resetToDefault(root.accessoryKeys);
                 root.resetRequested();

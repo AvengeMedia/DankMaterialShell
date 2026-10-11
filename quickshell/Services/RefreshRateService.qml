@@ -417,9 +417,9 @@ Singleton {
                     }));
             const currentMode = target ? normalizedModes.findIndex(mode => OutputModel.modeWidth(mode) === OutputModel.modeWidth(target) && OutputModel.modeHeight(mode) === OutputModel.modeHeight(target) && Math.abs(OutputModel.modeRefresh(mode) - OutputModel.modeRefresh(target)) <= batteryRefreshRateTolerance) : -1;
 
+            // No enabled flag: a head asleep via sleep_monitor reports enabled=false, and Mango would persist that as disable:1.
             data[output.name] = {
                 "name": output.name,
-                "enabled": output.enabled !== false,
                 "make": output.make || "",
                 "model": output.model || "",
                 "serial": output.serial || output.serialNumber || "",

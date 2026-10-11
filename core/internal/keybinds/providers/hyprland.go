@@ -17,6 +17,8 @@ type HyprlandProvider struct {
 	configPath       string
 	dmsBindsIncluded bool
 	parsed           bool
+	// hyprlang configs (0.55/0.56) reject hl.dsp text, so binds carry no LuaAction there
+	luaConfig bool
 }
 
 func NewHyprlandProvider(configPath string) *HyprlandProvider {
@@ -48,6 +50,7 @@ func (h *HyprlandProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
 
 	h.dmsBindsIncluded = result.DMSBindsIncluded
 	h.parsed = true
+	h.luaConfig = result.ConfigFormat == "lua"
 
 	categorizedBinds := make(map[string][]keybinds.Keybind)
 	h.convertSection(result.Section, "", categorizedBinds, result.ConflictingConfigs, result.DefaultDMSKeys)
@@ -101,6 +104,8 @@ func (h *HyprlandProvider) convertSection(section *HyprlandSection, subcategory 
 
 func (h *HyprlandProvider) categorizeByDispatcher(dispatcher string) string {
 	switch {
+	case dispatcher == "exec" || strings.HasPrefix(dispatcher, "hl.dsp.exec_cmd("):
+		return "Execute"
 	case strings.Contains(dispatcher, "workspace"):
 		return "Workspace"
 	case strings.Contains(dispatcher, "monitor"):
@@ -114,12 +119,9 @@ func (h *HyprlandProvider) categorizeByDispatcher(dispatcher string) string {
 		dispatcher == "fullscreen" ||
 		dispatcher == "togglefloating" ||
 		dispatcher == "pin" ||
-		dispatcher == "fakefullscreen" ||
 		dispatcher == "splitratio" ||
 		dispatcher == "resizeactive":
 		return "Window"
-	case dispatcher == "exec":
-		return "Execute"
 	case dispatcher == "exit" || strings.Contains(dispatcher, "dpms"):
 		return "System"
 	default:
@@ -156,6 +158,11 @@ func (h *HyprlandProvider) convertKeybind(kb *HyprlandKeyBinding, subcategory st
 		Source:      source,
 		Flags:       kb.Flags,
 		HasDefault:  hasDefault,
+	}
+	if h.luaConfig {
+		if expr, ok := luaActionStringFromHyprlangAction(rawAction); ok {
+			bind.LuaAction = expr
+		}
 	}
 
 	if (source == "dms" || source == "dms-default") && conflicts != nil {
@@ -220,14 +227,18 @@ func (h *HyprlandProvider) validateAction(action string) error {
 			return fmt.Errorf("exec dispatcher requires arguments")
 		}
 	}
+	if isRawLuaActionText(action) {
+		return nil
+	}
+	if _, ok := luaActionStringFromHyprlangAction(action); !ok {
+		return fmt.Errorf("hyprland has no Lua dispatcher for %q", action)
+	}
 	return nil
 }
 
 var luaExprActionPattern = regexp.MustCompile(`^(function\s*\(|hl\.)`)
 
-// isRawLuaActionText reports that action is a Lua expression to re-emit
-// verbatim rather than freeform dispatcher text to wrap for hyprctl. The
-// balance check keeps malformed input from corrupting the generated file.
+// The balance check keeps malformed input from corrupting the generated file.
 func isRawLuaActionText(action string) bool {
 	if !luaExprActionPattern.MatchString(action) {
 		return false
@@ -280,7 +291,6 @@ func (h *HyprlandProvider) SetBind(key, action, description string, options map[
 		existingBinds = make(map[string]*hyprlandOverrideBind)
 	}
 
-	// Extract flags from options
 	var flags string
 	if options != nil {
 		if f, ok := options["flags"].(string); ok {
@@ -290,16 +300,37 @@ func (h *HyprlandProvider) SetBind(key, action, description string, options map[
 
 	canonicalKey := canonicalHyprlandOverrideKey(key)
 	normalizedKey := hyprlandOverrideMapKey(canonicalKey)
+	var device string
+	if prev := existingBinds[normalizedKey]; prev != nil {
+		device = prev.Device
+	} else {
+		device = h.mainConfigBindDevice(normalizedKey)
+	}
 	existingBinds[normalizedKey] = &hyprlandOverrideBind{
 		Key:          canonicalKey,
 		Action:       action,
 		Description:  description,
 		Flags:        flags,
+		Device:       device,
 		Options:      options,
 		RawLuaAction: isRawLuaActionText(action),
 	}
 
 	return h.writeOverrideBinds(existingBinds)
+}
+
+func (h *HyprlandProvider) mainConfigBindDevice(normalizedKey string) string {
+	parser := NewHyprlandParser(h.configPath)
+	if _, err := parser.ParseWithDMS(); err != nil {
+		return ""
+	}
+	if kb := parser.bindMap[normalizedKey]; kb != nil && kb.Device != "" {
+		return kb.Device
+	}
+	if kb := parser.conflictingConfigs[normalizedKey]; kb != nil {
+		return kb.Device
+	}
+	return ""
 }
 
 func (h *HyprlandProvider) RemoveBind(key string) error {
@@ -333,7 +364,8 @@ type hyprlandOverrideBind struct {
 	Key         string
 	Action      string
 	Description string
-	Flags       string // Bind flags: l=locked, r=release, e=repeat, n=non-consuming, m=mouse, t=transparent, i=ignore-mods, s=separate, d=description, o=long-press
+	Flags       string // see hyprlandBindFlagOptions
+	Device      string // raw hl.bind device table, written when Flags has k
 	Options     map[string]any
 	// Unbind: negative override (hl.unbind only, no rebind).
 	Unbind bool
@@ -541,31 +573,6 @@ func splitHyprlandAction(action string) (dispatcher, params string) {
 	return strings.ToLower(strings.TrimSpace(action[:idx])), strings.TrimSpace(action[idx+1:])
 }
 
-func isKnownHyprlandDispatcher(dispatcher string) bool {
-	switch dispatcher {
-	case "exec", "execr", "spawn",
-		"killactive", "forcekillactive", "closewindow", "killwindow",
-		"signal", "signalwindow", "togglefloating", "setfloating", "settiled",
-		"workspace", "renameworkspace", "fullscreen", "fullscreenstate", "fakefullscreen",
-		"movetoworkspace", "movetoworkspacesilent", "pseudo", "movefocus",
-		"movewindow", "swapwindow", "centerwindow", "togglegroup", "changegroupactive",
-		"movegroupwindow", "focusmonitor", "movecursortocorner", "movecursor",
-		"workspaceopt", "exit", "movecurrentworkspacetomonitor", "focusworkspaceoncurrentmonitor",
-		"moveworkspacetomonitor", "togglespecialworkspace", "forcerendererreload",
-		"resizeactive", "moveactive", "cyclenext", "focuswindowbyclass", "focuswindow",
-		"tagwindow", "toggleswallow", "submap", "pass", "sendshortcut", "sendkeystate",
-		"layoutmsg", "splitratio", "dpms", "movewindowpixel", "resizewindowpixel",
-		"swapnext", "swapactiveworkspaces", "pin", "mouse", "bringactivetotop",
-		"alterzorder", "focusurgentorlast", "focuscurrentorlast", "lockgroups",
-		"lockactivegroup", "moveintogroup", "moveoutofgroup", "movewindoworgroup",
-		"moveintoorcreategroup", "setignoregrouplock", "denywindowfromgroup", "event",
-		"global", "setprop", "forceidle":
-		return true
-	default:
-		return false
-	}
-}
-
 func firstParam(params string) (head, rest string) {
 	params = strings.TrimSpace(params)
 	if params == "" {
@@ -653,8 +660,46 @@ func splitCommaParams(params string) (left, right string) {
 	return left, right
 }
 
-func luaHyprctlDispatchFunction(action string) string {
-	return fmt.Sprintf(`function() hl.exec_cmd(%s) end`, strconv.Quote("hyprctl dispatch "+strings.TrimSpace(action)))
+func dispatcherFullscreen(params string) string {
+	mode, rest := firstParam(params)
+	action, _ := firstParam(rest)
+	// the editor drops an empty mode, leaving "fullscreen set"
+	if action == "" && (mode == "toggle" || mode == "set" || mode == "unset") {
+		mode, action = "", mode
+	}
+	switch mode {
+	case "", "0":
+		mode = "fullscreen"
+	case "1":
+		mode = "maximized"
+	default:
+		return ""
+	}
+	switch action {
+	case "":
+		action = "toggle"
+	case "toggle", "set", "unset":
+	default:
+		return ""
+	}
+	return luaDispatcherTableCall("hl.dsp.window.fullscreen", luaStringField("mode", mode), luaStringField("action", action))
+}
+
+// The dwindle layoutmsg wants `exact` last, unlike legacy `splitratio exact 0.5`.
+func dispatcherSplitRatio(params string) string {
+	fields := strings.Fields(params)
+	exact := len(fields) > 0 && strings.EqualFold(fields[0], "exact")
+	if exact {
+		fields = fields[1:]
+	}
+	if len(fields) != 1 {
+		return ""
+	}
+	msg := "splitratio " + fields[0]
+	if exact {
+		msg += " exact"
+	}
+	return fmt.Sprintf(`hl.dsp.layout(%s)`, strconv.Quote(msg))
 }
 
 func luaToggleActionValue(params string) string {
@@ -772,10 +817,14 @@ func dispatcherTagWindow(params string) string {
 	return luaDispatcherTableCall("hl.dsp.window.tag", fields...)
 }
 
-func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
+// ok is false when no hl.dsp equivalent exists: legacy text is a Lua error at press time.
+func luaActionStringFromHyprlangAction(action string) (string, bool) {
 	dispatcher, params := splitHyprlandAction(action)
 	switch dispatcher {
 	case "spawn", "exec":
+		if params == "" {
+			return "", false
+		}
 		return fmt.Sprintf(`hl.dsp.exec_cmd(%s)`, strconv.Quote(params)), true
 	case "execr":
 		return fmt.Sprintf(`hl.dsp.exec_raw(%s)`, strconv.Quote(params)), true
@@ -800,14 +849,9 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 	case "settiled":
 		return dispatcherToggleTableCall("hl.dsp.window.float", "off"), true
 	case "fullscreen":
-		mode := strings.TrimSpace(params)
-		switch mode {
-		case "", "0":
-			return `hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" })`, true
-		case "1":
-			return `hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })`, true
+		if expr := dispatcherFullscreen(params); expr != "" {
+			return expr, true
 		}
-		return luaHyprctlDispatchFunction(action), true
 	case "fullscreenstate":
 		internal, rest := firstParam(params)
 		client, _ := firstParam(rest)
@@ -817,8 +861,6 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 				luaNumberOrStringField("client", client),
 			), true
 		}
-	case "fakefullscreen":
-		return luaHyprctlDispatchFunction(action), true
 	case "pin":
 		if params == "" {
 			return `hl.dsp.window.pin()`, true
@@ -849,22 +891,18 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 		if expr := dispatcherActiveMoveResize("hl.dsp.window.resize", params); expr != "" {
 			return expr, true
 		}
-		return luaHyprctlDispatchFunction(action), true
 	case "moveactive":
 		if expr := dispatcherActiveMoveResize("hl.dsp.window.move", params); expr != "" {
 			return expr, true
 		}
-		return luaHyprctlDispatchFunction(action), true
 	case "resizewindowpixel":
 		if expr := dispatcherWindowMoveResize("hl.dsp.window.resize", params); expr != "" {
 			return expr, true
 		}
-		return luaHyprctlDispatchFunction(action), true
 	case "movewindowpixel":
 		if expr := dispatcherWindowMoveResize("hl.dsp.window.move", params); expr != "" {
 			return expr, true
 		}
-		return luaHyprctlDispatchFunction(action), true
 	case "workspace":
 		if params == "" {
 			return "", false
@@ -907,8 +945,6 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 		if workspace != "" && monitor != "" {
 			return luaDispatcherTableCall("hl.dsp.workspace.move", luaStringField("workspace", workspace), luaStringField("monitor", monitor)), true
 		}
-	case "workspaceopt":
-		return luaHyprctlDispatchFunction(action), true
 	case "swapactiveworkspaces":
 		monitor1, rest := firstParam(params)
 		monitor2, _ := firstParam(rest)
@@ -927,10 +963,6 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 		if params != "" {
 			return luaDispatcherTableCall("hl.dsp.focus", luaStringField("window", params)), true
 		}
-	case "focuswindowbyclass":
-		if params != "" {
-			return luaDispatcherTableCall("hl.dsp.focus", luaStringField("window", "class:"+params)), true
-		}
 	case "focuscurrentorlast":
 		return `hl.dsp.focus({ last = true })`, true
 	case "focusurgentorlast":
@@ -939,13 +971,14 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 		if expr := dispatcherCycleNext(params); expr != "" {
 			return expr, true
 		}
-		return luaHyprctlDispatchFunction(action), true
 	case "layoutmsg":
 		if params != "" {
 			return fmt.Sprintf(`hl.dsp.layout(%s)`, strconv.Quote(params)), true
 		}
 	case "splitratio":
-		return luaHyprctlDispatchFunction(action), true
+		if expr := dispatcherSplitRatio(params); expr != "" {
+			return expr, true
+		}
 	case "alterzorder":
 		mode, window := firstParam(params)
 		if mode != "" {
@@ -982,17 +1015,20 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 			return expr, true
 		}
 	case "dpms":
-		dpmsAction := strings.TrimSpace(params)
+		dpmsAction, monitor := firstParam(params)
 		switch dpmsAction {
+		case "":
+			return `hl.dsp.dpms({})`, true
 		case "on":
 			dpmsAction = "enable"
 		case "off":
 			dpmsAction = "disable"
 		}
-		if dpmsAction == "" {
-			return `hl.dsp.dpms({})`, true
+		fields := []luaField{luaStringField("action", dpmsAction)}
+		if monitor != "" {
+			fields = append(fields, luaStringField("monitor", monitor))
 		}
-		return luaDispatcherTableCall("hl.dsp.dpms", luaStringField("action", dpmsAction)), true
+		return luaDispatcherTableCall("hl.dsp.dpms", fields...), true
 	case "exit":
 		return `hl.dsp.exit()`, true
 	case "submap":
@@ -1002,8 +1038,9 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 	case "event":
 		return fmt.Sprintf(`hl.dsp.event(%s)`, strconv.Quote(params)), true
 	case "pass":
+		// hl.dsp.pass requires a window selector.
 		if params == "" {
-			return `hl.dsp.pass({})`, true
+			return "", false
 		}
 		return luaDispatcherTableCall("hl.dsp.pass", luaStringField("window", params)), true
 	case "sendshortcut":
@@ -1041,7 +1078,6 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 		if expr := dispatcherGroupActive(params); expr != "" {
 			return expr, true
 		}
-		return luaHyprctlDispatchFunction(action), true
 	case "movegroupwindow":
 		return dispatcherMoveGroupWindow(params), true
 	case "moveintogroup":
@@ -1067,29 +1103,16 @@ func luaActionStringFromKnownHyprlandAction(action string) (string, bool) {
 		return dispatcherToggleTableCall("hl.dsp.group.lock_active", params), true
 	case "denywindowfromgroup":
 		return dispatcherToggleTableCall("hl.dsp.window.deny_from_group", params), true
-	case "setignoregrouplock":
-		return luaHyprctlDispatchFunction(action), true
 	case "forcerendererreload":
 		return `hl.dsp.force_renderer_reload()`, true
 	case "forceidle":
 		if params != "" && isBareLuaNumber(params) {
 			return fmt.Sprintf(`hl.dsp.force_idle(%s)`, params), true
 		}
-	}
-	if isKnownHyprlandDispatcher(dispatcher) {
-		return luaHyprctlDispatchFunction(action), true
+	case "releaseinputcapture":
+		return `hl.dsp.release_input_capture()`, true
 	}
 	return "", false
-}
-
-func luaActionStringFromHyprlangAction(action string) string {
-	action = strings.TrimSpace(action)
-	if expr, ok := luaActionStringFromKnownHyprlandAction(action); ok {
-		return expr
-	}
-	// Unrecognized dispatchers are freeform text, not Lua; forward them to
-	// hyprctl quoted so a stray `"` can't produce broken Lua output.
-	return luaHyprctlDispatchFunction(action)
 }
 
 // luaExprToInternalAction converts a parsed Lua bind expression back into
@@ -1100,22 +1123,26 @@ func luaExprToInternalAction(expr string) (action string, isRawLua bool) {
 	if d == expr && p == "" {
 		return expr, true
 	}
-	if d == "exec" && p != "" && !strings.HasPrefix(p, "hyprctl dispatch lua:") {
-		return "exec " + p, false
-	}
+	action = d
 	if p != "" {
-		return d + " " + p, false
+		action = d + " " + p
 	}
-	return d, false
+	// An unmappable legacy hyprctl wrapper stays verbatim so a rewrite never drops the bind.
+	if _, ok := luaActionStringFromHyprlangAction(action); !ok {
+		return expr, true
+	}
+	return action, false
 }
 
 func luaBindOptions(bind *hyprlandOverrideBind) []string {
 	var opts []string
-	if strings.Contains(bind.Flags, "l") {
-		opts = append(opts, "locked = true")
+	for _, fo := range hyprlandBindFlagOptions {
+		if strings.IndexByte(bind.Flags, fo.flag) >= 0 {
+			opts = append(opts, fo.option+" = true")
+		}
 	}
-	if strings.Contains(bind.Flags, "e") {
-		opts = append(opts, "repeating = true")
+	if bind.Device != "" && strings.Contains(bind.Flags, "k") {
+		opts = append(opts, "device = "+bind.Device)
 	}
 	if bind.Description != "" {
 		opts = append(opts, fmt.Sprintf("description = %s", strconv.Quote(bind.Description)))
@@ -1130,11 +1157,15 @@ func writeLuaBindLine(sb *strings.Builder, bind *hyprlandOverrideBind) {
 		sb.WriteByte('\n')
 		return
 	}
-	var expr string
-	if bind.RawLuaAction {
-		expr = bind.Action
-	} else {
-		expr = luaActionStringFromHyprlangAction(bind.Action)
+	expr := bind.Action
+	if !bind.RawLuaAction {
+		mapped, ok := luaActionStringFromHyprlangAction(bind.Action)
+		if !ok {
+			// Commented out: the bind would error at press time, but the user's action survives.
+			fmt.Fprintf(sb, "-- unsupported action for %s: %s\n", key, strings.NewReplacer("\r", " ", "\n", " ").Replace(bind.Action))
+			return
+		}
+		expr = mapped
 	}
 	opts := luaBindOptions(bind)
 	fmt.Fprintf(sb, `hl.unbind(%s)`, key)
@@ -1159,7 +1190,6 @@ func parseLuaBindOverrideLine(line string) (*hyprlandOverrideBind, bool) {
 	internalKey := luaKeyComboToInternalKey(kbc)
 
 	action, isRawLua := luaExprToInternalAction(actionExpr)
-	flags := luaBindOptFlags(optSuffix)
 	description := luaBindOptDescription(optSuffix)
 	if description == "" {
 		description = luaLineTrailingComment(line)
@@ -1168,7 +1198,8 @@ func parseLuaBindOverrideLine(line string) (*hyprlandOverrideBind, bool) {
 		Key:          internalKey,
 		Action:       action,
 		Description:  description,
-		Flags:        flags,
+		Flags:        luaBindOptFlags(optSuffix),
+		Device:       luaBindOptDevice(optSuffix),
 		RawLuaAction: isRawLua,
 	}, true
 }
@@ -1235,19 +1266,17 @@ func readLuaOrHyprlangOverride(path string) (map[string]*hyprlandOverrideBind, e
 		if kb == nil {
 			continue
 		}
-		keyStr := parser.formatBindKey(kb)
 		action := kb.Dispatcher
 		if kb.Params != "" {
 			action = kb.Dispatcher + " " + kb.Params
 		}
-		flags := kb.Flags
-		keyStr = canonicalHyprlandOverrideKey(keyStr)
+		keyStr := canonicalHyprlandOverrideKey(parser.formatBindKey(kb))
 		normalizedKey := hyprlandOverrideMapKey(keyStr)
 		binds[normalizedKey] = &hyprlandOverrideBind{
 			Key:         keyStr,
 			Action:      action,
 			Description: kb.Comment,
-			Flags:       flags,
+			Flags:       kb.Flags,
 		}
 		delete(pendingUnbinds, normalizedKey)
 	}

@@ -3,27 +3,45 @@ package providers
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/mangoconf"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/windowrules"
 )
 
-func TestParseMangoWindowRuleLine(t *testing.T) {
-	fields := parseMangoWindowRuleLine("appid:firefox,title:Gmail,isfloating:1,tags:2,monitor:HDMI-A-1")
-	if fields["appid"] != "firefox" {
-		t.Errorf("appid = %q, want firefox", fields["appid"])
+func TestParseMangoWindowRuleLineReadsBothDialects(t *testing.T) {
+	for _, line := range []string{
+		"appid:firefox,title:Gmail,isfloating:1,tags:2,monitor:HDMI-A-1",
+		"app_id:firefox,title:Gmail,is_floating:1,tags:2,monitor:HDMI-A-1",
+	} {
+		fields := parseMangoWindowRuleLine(line)
+		want := map[string]string{"app_id": "firefox", "title": "Gmail", "is_floating": "1", "tags": "2", "monitor": "HDMI-A-1"}
+		for k, v := range want {
+			if fields[k] != v {
+				t.Errorf("%s: %s = %q, want %q", line, k, fields[k], v)
+			}
+		}
 	}
-	if fields["title"] != "Gmail" {
-		t.Errorf("title = %q, want Gmail", fields["title"])
+}
+
+func TestMangoRulesWrittenInInstalledDialect(t *testing.T) {
+	floating := true
+	rule := windowrules.WindowRule{MatchCriteria: windowrules.MatchCriteria{AppID: "discord"}, Actions: windowrules.Actions{OpenFloating: &floating, NoAnim: &floating}}
+	if got, want := formatMangoRule(rule, mangoconf.Legacy), "windowrule=appid:discord,isfloating:1,isnoanimation:1"; got != want {
+		t.Errorf("legacy = %q, want %q", got, want)
 	}
-	if fields["isfloating"] != "1" {
-		t.Errorf("isfloating = %q, want 1", fields["isfloating"])
+	if got, want := formatMangoRule(rule, mangoconf.Snake), "window_rule=app_id:discord,is_floating:1,no_animation:1"; got != want {
+		t.Errorf("snake = %q, want %q", got, want)
 	}
-	if fields["tags"] != "2" {
-		t.Errorf("tags = %q, want 2", fields["tags"])
-	}
-	if fields["monitor"] != "HDMI-A-1" {
-		t.Errorf("monitor = %q, want HDMI-A-1", fields["monitor"])
+
+	dir := t.TempDir()
+	rulesPath := filepath.Join(dir, "dms", "windowrules.conf")
+	_ = os.MkdirAll(filepath.Dir(rulesPath), 0o755)
+	_ = os.WriteFile(rulesPath, []byte("# @id=a @name=A\nwindow_rule=app_id:discord,is_floating:1\n"), 0o644)
+	loaded, err := (&MangoWritableProvider{configDir: dir, dialect: mangoconf.Snake}).LoadDMSRules()
+	if err != nil || len(loaded) != 1 || loaded[0].MatchCriteria.AppID != "discord" || loaded[0].Actions.OpenFloating == nil {
+		t.Fatalf("snake rule not loaded: %+v, %v", loaded, err)
 	}
 }
 
@@ -116,5 +134,34 @@ func TestMangoSetAndLoadRoundTrip(t *testing.T) {
 	loaded, _ = provider.LoadDMSRules()
 	if len(loaded) != 0 {
 		t.Errorf("after remove got %d rules, want 0", len(loaded))
+	}
+}
+
+func TestMangoRuleSaveKeepsUnmodeledFieldsAndOnceRules(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "dms", "windowrules.conf")
+	_ = os.MkdirAll(filepath.Dir(path), 0o755)
+	_ = os.WriteFile(path, []byte("# @id=a @name=A\nwindowrule=appid:mpv,isglobal:1,offsetx:20,width:0.5\nwindowrule-once=appid:firefox,tags:2\n"), 0o644)
+
+	p := &MangoWritableProvider{configDir: dir, dialect: mangoconf.Legacy}
+	floating := true
+	if err := p.SetRule(windowrules.WindowRule{ID: "b", Name: "B", MatchCriteria: windowrules.MatchCriteria{AppID: "foot"}, Actions: windowrules.Actions{OpenFloating: &floating}}); err != nil {
+		t.Fatal(err)
+	}
+	data, _ := os.ReadFile(path)
+	got := string(data)
+	for _, want := range []string{
+		"windowrule=appid:mpv,isglobal:1,offsetx:20,width:0.5\n",
+		"windowrule=appid:foot,isfloating:1\n",
+		"windowrule-once=appid:firefox,tags:2\n",
+	} {
+		if !strings.Contains(got, want) {
+			t.Errorf("missing %q in:\n%s", want, got)
+		}
+	}
+
+	long := windowrules.WindowRule{ID: "c", MatchCriteria: windowrules.MatchCriteria{Title: strings.Repeat("x", 300)}}
+	if err := p.SetRule(long); err == nil {
+		t.Error("a rule Mango would truncate must be rejected")
 	}
 }

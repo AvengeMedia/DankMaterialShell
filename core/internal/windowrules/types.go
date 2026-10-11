@@ -16,6 +16,17 @@ type MatchCriteria struct {
 	Fullscreen         *bool  `json:"fullscreen,omitempty"`
 	Pinned             *bool  `json:"pinned,omitempty"`
 	Initialised        *bool  `json:"initialised,omitempty"`
+
+	InitialClass            string `json:"initialClass,omitempty"`
+	InitialTitle            string `json:"initialTitle,omitempty"`
+	Tag                     string `json:"tag,omitempty"`
+	Workspace               string `json:"workspace,omitempty"`
+	Content                 string `json:"content,omitempty"`
+	XdgTag                  string `json:"xdgTag,omitempty"`
+	Grouped                 *bool  `json:"group,omitempty"`
+	Modal                   *bool  `json:"modal,omitempty"`
+	FullscreenStateInternal *int   `json:"fullscreenStateInternal,omitempty"`
+	FullscreenStateClient   *int   `json:"fullscreenStateClient,omitempty"`
 }
 
 type Actions struct {
@@ -71,6 +82,18 @@ type Actions struct {
 	Opaque                    *bool  `json:"opaque,omitempty"`
 	ForcergbX                 *bool  `json:"forcergbx,omitempty"`
 	Idleinhibit               string `json:"idleinhibit,omitempty"`
+
+	NoInitialFocus  *bool    `json:"noInitialFocus,omitempty"`
+	FocusOnActivate *bool    `json:"focusOnActivate,omitempty"`
+	StayFocused     *bool    `json:"stayFocused,omitempty"`
+	ConfinePointer  *bool    `json:"confinePointer,omitempty"`
+	NoXdgDrags      *bool    `json:"noXdgDrags,omitempty"`
+	NoAutoHDR       *bool    `json:"noAutoHdr,omitempty"`
+	NoGlow          *bool    `json:"noGlow,omitempty"`
+	NoWobble        *bool    `json:"noWobble,omitempty"`
+	ScrollingWidth  *float64 `json:"scrollingWidth,omitempty"`
+	Tonemap         string   `json:"tonemap,omitempty"`
+	SuppressEvent   string   `json:"suppressEvent,omitempty"`
 }
 
 type WindowRule struct {

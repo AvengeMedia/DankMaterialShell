@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
@@ -94,43 +95,6 @@ layout {
 			wantContains: []string{"gaps 5"}, // Should keep new config
 		},
 		{
-			name: "merge single output",
-			newConfig: `input {
-    keyboard {
-        xkb {
-        }
-    }
-}
-/-output "eDP-2" {
-    mode "2560x1600@239.998993"
-    position x=2560 y=0
-}
-layout {
-    gaps 5
-}`,
-			existingConfig: `input {
-    keyboard {
-        xkb {
-        }
-    }
-}
-output "eDP-1" {
-    mode "1920x1080@60.000000"
-    position x=0 y=0
-    scale 1.0
-}
-layout {
-    gaps 10
-}`,
-			wantError: false,
-			wantContains: []string{
-				"gaps 5",                              // New config preserved
-				`output "eDP-1"`,                      // Existing output merged
-				"1920x1080@60.000000",                 // Existing output details
-				"Outputs from existing configuration", // Comment added
-			},
-		},
-		{
 			name: "merge multiple outputs",
 			newConfig: `input {
     keyboard {
@@ -165,46 +129,11 @@ layout {
 }`,
 			wantError: false,
 			wantContains: []string{
-				"gaps 5",              // New config preserved
-				`output "eDP-1"`,      // First existing output
-				`/-output "HDMI-1"`,   // Second existing output (commented)
-				"1920x1080@60.000000", // Output details
-			},
-		},
-		{
-			name: "merge commented outputs",
-			newConfig: `input {
-    keyboard {
-        xkb {
-        }
-    }
-}
-/-output "eDP-2" {
-    mode "2560x1600@239.998993"
-    position x=2560 y=0
-}
-layout {
-    gaps 5
-}`,
-			existingConfig: `input {
-    keyboard {
-        xkb {
-        }
-    }
-}
-/-output "eDP-1" {
-    mode "1920x1080@60.000000"
-    position x=0 y=0
-    scale 1.0
-}
-layout {
-    gaps 10
-}`,
-			wantError: false,
-			wantContains: []string{
-				"gaps 5",              // New config preserved
-				`/-output "eDP-1"`,    // Commented output preserved
-				"1920x1080@60.000000", // Output details
+				"gaps 5",                              // New config preserved
+				`output "eDP-1"`,                      // First existing output
+				`/-output "HDMI-1"`,                   // Second existing output (commented)
+				"1920x1080@60.000000",                 // Output details
+				"Outputs from existing configuration", // Comment added
 			},
 		},
 	}
@@ -377,7 +306,7 @@ func TestHyprlandConfigDeployment(t *testing.T) {
 		require.NoError(t, err)
 		defer os.RemoveAll(td)
 		os.Setenv("HOME", td)
-		result, err := cd.deployHyprlandConfig(deps.TerminalGhostty, true)
+		result, err := cd.deployHyprlandConfig("ghostty", true)
 		require.NoError(t, err)
 
 		assert.Equal(t, "Hyprland", result.ConfigType)
@@ -418,7 +347,7 @@ general {
 		require.NoError(t, os.WriteFile(filepath.Join(filepath.Dir(hyprPath), "hyprland.conf.backup.old"), []byte("old backup\n"), 0o644))
 		require.NoError(t, os.WriteFile(filepath.Join(dmsDir, "binds.conf.backup.old"), []byte("old dms backup\n"), 0o644))
 
-		result, err := cd.deployHyprlandConfig(deps.TerminalKitty, true)
+		result, err := cd.deployHyprlandConfig("kitty", true)
 		require.NoError(t, err)
 
 		assert.Equal(t, "Hyprland", result.ConfigType)
@@ -469,7 +398,7 @@ general {
 		require.NoError(t, os.WriteFile(luaPath, []byte(`require("dms.binds")`+"\n"), 0o644))
 		require.NoError(t, os.Symlink(filepath.Join(configDir, "missing-legacy.conf"), confPath))
 
-		result, err := cd.deployHyprlandConfig(deps.TerminalKitty, true)
+		result, err := cd.deployHyprlandConfig("kitty", true)
 		require.NoError(t, err)
 
 		assert.Equal(t, luaPath, result.Path)
@@ -491,7 +420,7 @@ general {
 		userBinds := "-- custom user binds\n"
 		require.NoError(t, os.WriteFile(filepath.Join(dmsDir, "binds-user.lua"), []byte(userBinds), 0o644))
 
-		_, err = cd.deployHyprlandConfig(deps.TerminalKitty, true)
+		_, err = cd.deployHyprlandConfig("kitty", true)
 		require.NoError(t, err)
 
 		managed, err := os.ReadFile(filepath.Join(dmsDir, "binds.lua"))
@@ -866,7 +795,7 @@ func TestDeployHyprlandConfigWritesLuaBeforeRemovingLegacyConf(t *testing.T) {
 	}()
 	defer close(logChan)
 
-	result, err := cd.deployHyprlandConfig(deps.TerminalGhostty, true)
+	result, err := cd.deployHyprlandConfig("ghostty", true)
 	require.NoError(t, err)
 
 	assert.NoFileExists(t, confPath)
@@ -874,4 +803,110 @@ func TestDeployHyprlandConfigWritesLuaBeforeRemovingLegacyConf(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, userConfig, string(backup))
 	assert.Equal(t, filepath.Join(filepath.Dir(result.BackupPath), "hyprland.conf"), result.BackupPath)
+}
+
+func TestHyprlandLuaUnsupported(t *testing.T) {
+	for ver, refuse := range map[string]bool{
+		"0.54.2": true,
+		"0.55.0": false,
+		"":       false,
+	} {
+		err := hyprlandLuaUnsupported(ver)
+		assert.Equal(t, refuse, err != nil, ver)
+	}
+}
+
+func TestNiriDeployBindsChoiceAlwaysBacksUp(t *testing.T) {
+	for _, replace := range []bool{false, true} {
+		home := t.TempDir()
+		t.Setenv("HOME", home)
+		dms := filepath.Join(home, ".config", "niri", "dms")
+		require.NoError(t, os.MkdirAll(dms, 0o755))
+		user := "binds {\n    Mod+X { close-window; }\n}\n"
+		require.NoError(t, os.WriteFile(filepath.Join(dms, "binds.kdl"), []byte(user), 0o644))
+
+		cd := NewConfigDeployer(nil)
+		cd.SetReplaceBinds(replace)
+		_, err := cd.DeployCompositor(deps.WindowManagerNiri, "kitty", false)
+		require.NoError(t, err)
+
+		backups, _ := filepath.Glob(filepath.Join(dms, "binds.kdl.backup.*"))
+		assert.Len(t, backups, 1, "replace=%v", replace)
+		got, err := os.ReadFile(filepath.Join(dms, "binds.kdl"))
+		require.NoError(t, err)
+		assert.Equal(t, !replace, string(got) == user, "replace=%v", replace)
+		if replace {
+			assert.Contains(t, string(got), "spawn \"kitty\"")
+		}
+	}
+}
+
+func TestNiriReplaceBindsKeepsMainConfig(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	dmsDir := filepath.Join(home, ".config", "niri", "dms")
+	require.NoError(t, os.MkdirAll(dmsDir, 0o755))
+	mainPath := filepath.Join(filepath.Dir(dmsDir), "config.kdl")
+	main := "// user config\ninclude \"dms/binds.kdl\"\n"
+	require.NoError(t, os.WriteFile(mainPath, []byte(main), 0o644))
+	bindsPath := filepath.Join(dmsDir, "binds.kdl")
+	userBinds := "binds { Mod+X { close-window; } }\n"
+	require.NoError(t, os.WriteFile(bindsPath, []byte(userBinds), 0o644))
+	colorsPath := filepath.Join(dmsDir, "colors.kdl")
+	colors := "// user colors\n"
+	require.NoError(t, os.WriteFile(colorsPath, []byte(colors), 0o644))
+	kittyPath := filepath.Join(home, ".config", "kitty", "kitty.conf")
+	require.NoError(t, os.MkdirAll(filepath.Dir(kittyPath), 0o755))
+	require.NoError(t, os.WriteFile(kittyPath, []byte("# user terminal\n"), 0o644))
+
+	cd := NewConfigDeployer(nil)
+	results, err := cd.DeployConfigurationsSelectiveWithReinstallsAndSystemd(
+		context.Background(), deps.WindowManagerNiri, deps.TerminalKitty, nil,
+		map[string]bool{"Niri": false, "Kitty": false, BindsConfigType: true}, nil, false,
+	)
+	require.NoError(t, err)
+	got, err := os.ReadFile(bindsPath)
+	require.NoError(t, err)
+	assert.Equal(t, strings.ReplaceAll(NiriBindsConfig, "{{TERMINAL_COMMAND}}", "kitty"), string(got))
+	backups, err := filepath.Glob(bindsPath + ".backup.*")
+	require.NoError(t, err)
+	require.Len(t, backups, 1)
+	backup, err := os.ReadFile(backups[0])
+	require.NoError(t, err)
+	assert.Equal(t, userBinds, string(backup))
+	for path, want := range map[string]string{mainPath: main, colorsPath: colors} {
+		got, err := os.ReadFile(path)
+		require.NoError(t, err)
+		assert.Equal(t, want, string(got), path)
+	}
+	mainBackups, err := filepath.Glob(mainPath + ".backup.*")
+	require.NoError(t, err)
+	assert.Empty(t, mainBackups)
+	require.Len(t, results, 1)
+	assert.Equal(t, BindsConfigType, results[0].ConfigType)
+	assert.True(t, results[0].Deployed)
+}
+
+func TestDeployBindsFileReadErrorPreservesExistingFile(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("root can read files without read permission")
+	}
+	for _, replace := range []bool{false, true} {
+		path := filepath.Join(t.TempDir(), "binds.kdl")
+		user := "binds { Mod+X { close-window; } }\n"
+		require.NoError(t, os.WriteFile(path, []byte(user), 0o200))
+		_, err := os.ReadFile(path)
+		require.ErrorIs(t, err, os.ErrPermission)
+
+		cd := NewConfigDeployer(nil)
+		cd.SetReplaceBinds(replace)
+		assert.ErrorIs(t, cd.deployBindsFile(path, "stock binds\n"), os.ErrPermission, "replace=%v", replace)
+		require.NoError(t, os.Chmod(path, 0o600))
+		got, err := os.ReadFile(path)
+		require.NoError(t, err)
+		assert.Equal(t, user, string(got), "replace=%v", replace)
+		backups, err := filepath.Glob(path + ".backup.*")
+		require.NoError(t, err)
+		assert.Empty(t, backups)
+	}
 }

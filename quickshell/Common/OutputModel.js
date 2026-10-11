@@ -165,6 +165,7 @@ function parseNiriOutputs(content) {
 
 function hyprLuaSettings(line, disabled, vrrMode) {
     return {
+        "vrr": vrrMode,
         "disabled": disabled || undefined,
         "bitdepth": hyprLuaField(line, "bitdepth"),
         "colorManagement": hyprLuaField(line, "cm"),
@@ -178,8 +179,7 @@ function hyprLuaSettings(line, disabled, vrrMode) {
         "sdrMaxLuminance": hyprLuaField(line, "sdr_max_luminance"),
         "minLuminance": hyprLuaField(line, "min_luminance"),
         "maxLuminance": hyprLuaField(line, "max_luminance"),
-        "maxAvgLuminance": hyprLuaField(line, "max_avg_luminance"),
-        "vrrFullscreenOnly": vrrMode === 2 ? true : undefined
+        "maxAvgLuminance": hyprLuaField(line, "max_avg_luminance")
     };
 }
 
@@ -187,14 +187,16 @@ function parseHyprlandLuaMonitorLine(line) {
     if (!line.match(/^\s*hl\.monitor\s*\(/))
         return null;
     const name = hyprLuaField(line, "output");
-    if (name === undefined)
+    // output = "" is the catch-all fallback, not a monitor; the writer re-emits it verbatim.
+    if (name === undefined || String(name).trim() === "")
         return null;
     const disabled = hyprLuaField(line, "disabled") === true;
     const mode = hyprLuaField(line, "mode") || "preferred";
     const position = hyprLuaField(line, "position") || "0x0";
     const scaleValue = hyprLuaField(line, "scale");
     const transform = Number(hyprLuaField(line, "transform") ?? 0);
-    const vrrMode = Number(hyprLuaField(line, "vrr") ?? 0);
+    const vrrField = hyprLuaField(line, "vrr");
+    const vrrMode = vrrField === undefined || isNaN(Number(vrrField)) ? undefined : Number(vrrField);
     const posMatch = String(position).match(/^(-?\d+)x(-?\d+)$/);
     const modeMatch = String(mode).match(/^(\d+)x(\d+)@([\d.]+)/);
     return {
@@ -210,8 +212,98 @@ function parseHyprlandLuaMonitorLine(line) {
         "vrr_enabled": vrrMode >= 1,
         "vrr_supported": vrrMode > 0,
         "hyprlandSettings": hyprLuaSettings(line, disabled, vrrMode),
-        "mirror": hyprLuaField(line, "mirror") || ""
+        "mirror": hyprLuaField(line, "mirror") || "",
+        "autoPosition": posMatch ? undefined : String(position),
+        "autoScale": scaleValue === "auto" ? true : undefined
     };
+}
+
+// Keeps Hyprland's "auto" words while the written value still equals what Hyprland resolved them to.
+function hyprlandLuaGeometry(output, saved, live) {
+    const x = output?.logical?.x ?? 0;
+    const y = output?.logical?.y ?? 0;
+    const scale = Number(output?.logical?.scale ?? 1.0);
+    const resolved = live || saved?.logical || {};
+    const keepPosition = !!saved?.autoPosition && x === resolved.x && y === resolved.y;
+    const keepScale = saved?.autoScale === true && Math.abs(scale - Number(resolved.scale)) <= WLR_SCALE_STEP;
+    return {
+        "position": keepPosition ? saved.autoPosition : x + "x" + y,
+        "scale": keepScale ? "auto" : hyprlandScaleValue(scale)
+    };
+}
+
+// Hyprland snaps to the nearest n/120 itself; writing that keeps a live float32 scale and the UI preset byte-identical.
+function hyprlandScaleValue(scale) {
+    const value = Number(scale);
+    if (!isFinite(value) || value <= 0)
+        return 1;
+    const numerator = Math.round(value * SCALE_DENOMINATOR);
+    if (Math.abs(numerator / SCALE_DENOMINATOR - value) <= WLR_SCALE_STEP)
+        return scaleFromNumerator(numerator);
+    return parseFloat(value.toFixed(6));
+}
+
+// Unset per-monitor vrr inherits misc:vrr (Hyprland 0.56); -1 is the explicit "inherit" choice.
+// A bare vrr = 0 in the file is what DMS used to write for every untouched monitor, so it is not a choice.
+function hyprlandVrrMode(settings, saved) {
+    const chosen = settings?.vrr;
+    if (Number.isInteger(chosen))
+        return chosen < 0 ? undefined : chosen;
+    if (settings?.vrrFullscreenOnly)
+        return 2;
+    const fromFile = saved?.hyprlandSettings?.vrr;
+    return Number.isInteger(fromFile) && fromFile > 0 ? fromFile : undefined;
+}
+
+// hardwareDetails exists from Hyprland 0.56; null means unknown and gates nothing.
+function hyprlandHardware(ipcObject) {
+    const details = ipcObject?.hardwareDetails;
+    if (!details || typeof details !== "object")
+        return null;
+    return {
+        "hdr": details.hdr === true,
+        "chroma": details.chroma === true,
+        "bt2020": details.bt2020 === true,
+        "vrrCapable": details.vrrCapable === true
+    };
+}
+
+function forcedFlag(value, fallback) {
+    if (value === true || value === 1)
+        return true;
+    if (value === false || value === -1)
+        return false;
+    return fallback;
+}
+
+// Mirrors CMonitor::supportsWideColor/supportsHDR: a forced supports_* flag beats the EDID.
+function hyprlandCaps(hardware, settings) {
+    if (!hardware)
+        return null;
+    const wideColor = forcedFlag(settings?.supportsWideColor, hardware.bt2020);
+    return {
+        "vrr": hardware.vrrCapable,
+        "wideColor": wideColor,
+        "hdr": wideColor && forcedFlag(settings?.supportsHdr, hardware.hdr),
+        "edidColor": hardware.chroma
+    };
+}
+
+// Hyprland falls back to sRGB for edid without EDID primaries and for hdr/hdredid without HDR support.
+function hyprlandCmAllowed(cm, caps) {
+    if (!caps)
+        return true;
+    switch (cm) {
+    case "wide":
+        return caps.wideColor;
+    case "edid":
+        return caps.edidColor;
+    case "hdr":
+    case "hdredid":
+        return caps.hdr;
+    default:
+        return true;
+    }
 }
 
 function parseHyprlandDisableLine(line) {
@@ -244,17 +336,17 @@ function hyprlandConfExtras(rest) {
     const sdrBrightnessMatch = rest.match(/,\s*sdrbrightness,\s*([\d.]+)/);
     const sdrSaturationMatch = rest.match(/,\s*sdrsaturation,\s*([\d.]+)/);
     const mirrorMatch = rest.match(/,\s*mirror,\s*([^,\s]+)/);
-    const vrrMode = vrrMatch ? parseInt(vrrMatch[1]) : 0;
+    const vrrMode = vrrMatch ? parseInt(vrrMatch[1]) : undefined;
     return {
         "transform": transformMatch ? parseInt(transformMatch[1]) : 0,
-        "vrrMode": vrrMode,
+        "vrrMode": vrrMode ?? 0,
         "mirror": mirrorMatch ? mirrorMatch[1] : "",
         "settings": {
+            "vrr": vrrMode,
             "bitdepth": bitdepthMatch ? parseInt(bitdepthMatch[1]) : undefined,
             "colorManagement": cmMatch ? cmMatch[1] : undefined,
             "sdrBrightness": sdrBrightnessMatch ? parseFloat(sdrBrightnessMatch[1]) : undefined,
-            "sdrSaturation": sdrSaturationMatch ? parseFloat(sdrSaturationMatch[1]) : undefined,
-            "vrrFullscreenOnly": vrrMode === 2 ? true : undefined
+            "sdrSaturation": sdrSaturationMatch ? parseFloat(sdrSaturationMatch[1]) : undefined
         }
     };
 }
@@ -328,14 +420,85 @@ function parseMangoOutputs(content) {
     const result = {};
     for (const line of content.split("\n")) {
         const trimmed = line.trim();
-        if (!trimmed.startsWith("monitorrule="))
+        const match = trimmed.match(/^(?:monitorrule|monitor_rule)\s*=\s*(.*)$/);
+        if (!match)
             continue;
-        const entry = parseMangoRule(trimmed.substring("monitorrule=".length));
+        const entry = parseMangoRule(match[1]);
         if (!entry)
             continue;
         result[entry.name] = entry;
     }
     return result;
+}
+
+const mangoModeledRuleKeys = ["name", "width", "height", "refresh", "x", "y", "scale", "rr", "vrr"];
+
+function mangoRuleFields(rule) {
+    const fields = [];
+    for (const pair of rule.split(",")) {
+        const colonIdx = pair.indexOf(":");
+        if (colonIdx > 0)
+            fields.push([pair.substring(0, colonIdx).trim(), pair.substring(colonIdx + 1).trim()]);
+    }
+    return fields;
+}
+
+// Mango applies only the first matching monitor rule and resets hdr/icc/disable a rule omits,
+// so unmodeled fields of every existing rule for an output are carried into DMS's rule, first one winning.
+function mangoMonitorRuleLines(outputsData, existingText, snakeKeys) {
+    const carried = {};
+    for (const line of (existingText || "").split("\n")) {
+        const match = line.trim().match(/^(?:monitorrule|monitor_rule)\s*=\s*(.*)$/);
+        if (!match)
+            continue;
+        const fields = mangoRuleFields(match[1]);
+        const name = (fields.find(f => f[0] === "name")?.[1] || "").replace(/^\^/, "").replace(/\$$/, "");
+        if (!name)
+            continue;
+        if (!carried[name])
+            carried[name] = [];
+        const kept = carried[name];
+        for (const field of fields) {
+            if (!mangoModeledRuleKeys.includes(field[0]) && !kept.some(k => k[0] === field[0]))
+                kept.push(field);
+        }
+    }
+
+    const lines = [];
+    for (const outputName in outputsData) {
+        const output = outputsData[outputName];
+        if (!output)
+            continue;
+        let width = 1920;
+        let height = 1080;
+        let refreshRate = 60;
+        const configured = (output.configured_mode || "").match(/^(\d+)x(\d+)@([\d.]+)$/);
+        if (configured) {
+            width = parseInt(configured[1], 10);
+            height = parseInt(configured[2], 10);
+            refreshRate = parseFloat(configured[3]);
+        } else if (output.modes && output.current_mode !== undefined) {
+            const mode = output.modes[output.current_mode];
+            if (mode) {
+                width = mode.width || 1920;
+                height = mode.height || 1080;
+                refreshRate = (mode.refresh_rate || 60000) / 1000;
+            }
+        }
+
+        // Anchored: mango matches `name:` unanchored, so "DP-1" would also match "eDP-1".
+        // Mango picks the nearest mode, so the refresh keeps its fraction.
+        const fields = ["name:^" + outputName + "$", "width:" + width, "height:" + height, "refresh:" + Number(refreshRate.toFixed(3)), "x:" + (output.logical?.x ?? 0), "y:" + (output.logical?.y ?? 0), "scale:" + (output.logical?.scale ?? 1.0), "rr:" + transformIndex(output.logical?.transform ?? "Normal"), "vrr:" + (output.vrr_enabled ? 1 : 0)];
+        for (const [key, value] of carried[outputName] || []) {
+            if (key === "disable" && output.enabled !== undefined)
+                continue;
+            fields.push(key + ":" + value);
+        }
+        if (output.enabled === false)
+            fields.push("disable:1");
+        lines.push((snakeKeys ? "monitor_rule=" : "monitorrule=") + fields.join(","));
+    }
+    return lines;
 }
 
 function outputsFromWlr(wlrOutputs, liveMonitors) {
@@ -370,6 +533,8 @@ function outputsFromWlr(wlrOutputs, liveMonitors) {
         const live = liveMonitors[output.name];
         if (!live)
             continue;
+        if (live.hardware)
+            map[output.name].hardware = live.hardware;
         map[output.name].logical.x = live.x;
         map[output.name].logical.y = live.y;
         map[output.name].logical.scale = live.scale || 1.0;
@@ -464,6 +629,8 @@ function outputsDataFromConfigEntry(configEntry, outputs, displayNameMode, compo
         };
         if (cfg.hyprland?.mirror)
             entry.mirror = cfg.hyprland.mirror;
+        if (liveOutput?.hardware)
+            entry.hardware = liveOutput.hardware;
         result[outputId] = entry;
     }
     return result;

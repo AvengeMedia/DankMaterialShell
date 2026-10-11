@@ -299,6 +299,38 @@ function withSymbolicMod(mods, modKey, modSymbol) {
     });
 }
 
+const QT_KEY_TAB = 16777217;
+const QT_KEY_BACKTAB = 16777218;
+const QT_KEYPAD_MODIFIER = 0x20000000;
+const QT_SHORTCUT_MODIFIERS = 0x10000000 | 0x08000000;
+const QT_CONTROL_MODIFIER = 0x04000000;
+// keys a text field owns: escape, tab, backtab, backspace, return, enter, insert, delete, home, end, arrows, page up/down
+const TEXT_EDIT_KEYS = [16777216, 16777217, 16777218, 16777219, 16777220, 16777221, 16777222, 16777223, 16777232, 16777233, 16777234, 16777235, 16777236, 16777237, 16777238, 16777239];
+const QT_MODIFIER_KEYS = [16777248, 16777249, 16777250, 16777251, 16777252, 16777253, 16777254];
+
+function chordToken(qtKey, modifiers, mods, scanCode, modKey, modSymbol) {
+    if (qtKey === QT_KEY_BACKTAB) {
+        qtKey = QT_KEY_TAB;
+        if (!mods.includes("Shift"))
+            mods = mods.concat("Shift");
+    }
+    const key = xkbKeyFromQtKey(qtKey, !!(modifiers & QT_KEYPAD_MODIFIER), mods.includes("Shift"), scanCode);
+    if (!key)
+        return "";
+    return formatToken(withSymbolicMod(mods, modKey, modSymbol), key);
+}
+
+// A focused search field keeps typing and editing keys. Super or Alt chords and
+// keys that never produce text (function, media, Print) read as a shortcut.
+function shortcutFromSearchKey(event, modKey, modSymbol) {
+    if (QT_MODIFIER_KEYS.includes(event.key))
+        return "";
+    const chord = !!(event.modifiers & QT_SHORTCUT_MODIFIERS);
+    if (!chord && (event.text !== "" || (event.modifiers & QT_CONTROL_MODIFIER) || TEXT_EDIT_KEYS.includes(event.key)))
+        return "";
+    return chordToken(event.key, event.modifiers, modsFromEvent(event.modifiers), event.nativeScanCode, modKey, modSymbol);
+}
+
 function normalizeKeyCombo(keyCombo, modKey, modSymbol) {
     if (!keyCombo)
         return "";

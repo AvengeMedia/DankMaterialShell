@@ -8,12 +8,9 @@ import qs.Modules.Notifications
 Item {
     id: root
 
-    property var keyboardController: null
-    property var historyView: null
     property int currentTab: 0
     property var transientSurfaceTracker: null
     property bool modal: false
-    readonly property var hintsOwner: currentTab === 1 && historyView ? historyView : keyboardController
     readonly property string currentLabel: {
         const count = NotificationService.notifications.length;
         if (count === 0)
@@ -76,18 +73,6 @@ Item {
                 durationMenu.openDropdownMenu();
             }
         }
-
-        DActionButton {
-            readonly property bool hintsShown: root.hintsOwner?.showKeyboardHints ?? false
-
-            visible: root.hintsOwner !== null
-            iconName: "info"
-            buttonSize: Theme.buttonHeightXS
-            backgroundColor: hintsShown ? Theme.secondaryContainer : "transparent"
-            iconColor: hintsShown ? Theme.onSecondaryContainer : Theme.onSurfaceVariant
-            tooltipText: I18n.tr("Keyboard shortcuts")
-            onClicked: root.hintsOwner.showKeyboardHints = !hintsShown
-        }
     }
 
     DButtonGroup {
@@ -136,8 +121,6 @@ Item {
             buttonSize: Theme.buttonHeightXS
             tooltipText: I18n.tr("Clear All")
             enabled: root.currentTab === 0 ? NotificationService.notifications.length > 0 : NotificationService.historyList.length > 0
-            backgroundColor: Theme.secondaryContainer
-            iconColor: Theme.onSecondaryContainer
             onClicked: {
                 if (root.currentTab === 0) {
                     NotificationService.clearAllNotifications();

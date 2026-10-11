@@ -150,8 +150,8 @@ Singleton {
     readonly property bool reservesDesktopInput: isLabwc || isSway || isScroll || isKwin
     readonly property bool supportsSmartDock: isNiri || isHyprland || isMango || isAqueous
     readonly property bool supportsNativeOverview: isNiri || isAqueous
-    readonly property bool supportsPointerConfig: isNiri || isMango
-    readonly property bool supportsInputConfig: isNiri
+    readonly property bool supportsPointerConfig: isNiri || isHyprland || isMango
+    readonly property bool supportsInputConfig: isNiri || isHyprland || isMango
 
     readonly property string displayName: {
         switch (compositor) {
@@ -973,8 +973,8 @@ Singleton {
         const t = _hyprlandToplevelFor(window);
         if (!t?.address)
             return;
-        const target = t.monitor?.activeWorkspace?.id;
-        HyprlandService.moveToWorkspace(target > 0 ? target : "+0", t.address, true);
+        const target = t.monitor?.activeWorkspace;
+        HyprlandService.moveToWorkspace(target?.name ? WorkspaceModel.hyprlandSelector(target) : "+0", t.address, true);
     }
 
     function moveWindowToSpecial(window, name) {
@@ -1307,6 +1307,10 @@ Singleton {
         return toplevels.filter(w => monitorWindows.has(w));
     }
 
+    function _workspaceKeyOf(ws) {
+        return ws ? (WorkspaceModel.hyprlandKey(ws) || null) : null;
+    }
+
     function filterHyprlandCurrentWorkspaceSafe(toplevels, screenName) {
         if (!toplevels || toplevels.length === 0 || !Hyprland.toplevels)
             return toplevels;
@@ -1316,14 +1320,14 @@ Singleton {
             if (Hyprland.monitors) {
                 const monitor = Hyprland.monitors.values.find(m => m.name === screenName);
                 if (monitor)
-                    currentWorkspaceId = _get(monitor, ["activeWorkspace", "id"], null);
+                    currentWorkspaceId = _workspaceKeyOf(_get(monitor, ["activeWorkspace"], null));
             }
 
             if (currentWorkspaceId === null) {
                 const hy = Array.from(Hyprland.toplevels.values);
                 for (const t of hy) {
                     const mon = _get(t, ["monitor", "name"], "");
-                    const wsId = _get(t, ["workspace", "id"], null);
+                    const wsId = _workspaceKeyOf(_get(t, ["workspace"], null));
                     const active = !!_get(t, ["activated"], false);
                     if (mon === screenName && wsId !== null) {
                         if (active) {
@@ -1338,10 +1342,10 @@ Singleton {
 
             if (currentWorkspaceId === null && Hyprland.workspaces) {
                 const wss = Array.from(Hyprland.workspaces.values);
-                const focusedId = _get(Hyprland, ["focusedWorkspace", "id"], null);
+                const focusedId = _workspaceKeyOf(Hyprland.focusedWorkspace);
                 for (const ws of wss) {
                     const monName = _get(ws, ["monitor", "name"], "");
-                    const wsId = _get(ws, ["id"], null);
+                    const wsId = _workspaceKeyOf(ws);
                     if (monName === screenName && wsId !== null) {
                         if (focusedId !== null && wsId === focusedId) {
                             currentWorkspaceId = wsId;
@@ -1363,7 +1367,7 @@ Singleton {
         try {
             const hy = Array.from(Hyprland.toplevels.values);
             for (const t of hy) {
-                const wsId = _get(t, ["workspace", "id"], null);
+                const wsId = _workspaceKeyOf(_get(t, ["workspace"], null));
                 if (t && t.wayland && wsId !== null)
                     map.set(t.wayland, wsId);
             }
@@ -1796,6 +1800,8 @@ Singleton {
         switch (compositor) {
         case "niri":
             return record.idx;
+        case "hyprland":
+            return WorkspaceModel.hyprlandKey(record);
         default:
             return record.id;
         }
@@ -1857,7 +1863,7 @@ Singleton {
         case "aqueous":
             return record.active === true;
         case "hyprland":
-            return record.special === true ? record.active === true : record.id === currentKey;
+            return record.special === true ? record.active === true : WorkspaceModel.hyprlandKey(record) === currentKey;
         default:
             return _workspaceKey(record) === currentKey;
         }
@@ -1981,7 +1987,7 @@ Singleton {
                 HyprlandService.toggleSpecial(record.name === "special" ? "" : record.name);
                 return;
             }
-            HyprlandService.focusWorkspace(record.id > 0 ? record.id : "name:" + (record.name ?? ""));
+            HyprlandService.focusWorkspace(WorkspaceModel.hyprlandSelector(record));
             return;
         case "mango":
             MangoService.switchToTag(record.output, record.id);
@@ -2099,7 +2105,10 @@ Singleton {
             NiriService.toggleOverview();
             return;
         case "mango":
-            MangoService.dispatch("toggleoverview");
+            if (MangoService.getOutputState(screenName))
+                MangoService.dispatchOnOutput(screenName, "toggleoverview");
+            else
+                MangoService.dispatch("toggleoverview");
             return;
         }
     }
@@ -2114,6 +2123,35 @@ Singleton {
             if (record)
                 MangoService.toggleTag(screenName, record.id);
             return;
+        }
+    }
+
+    readonly property bool canStepWindowFocus: compositor === "niri" || compositor === "hyprland" || compositor === "mango"
+
+    function stepWindowFocus(screenName, direction) {
+        switch (compositor) {
+        case "niri":
+            if (direction > 0)
+                NiriService.focusColumnRight(screenName);
+            else
+                NiriService.focusColumnLeft(screenName);
+            return true;
+        case "hyprland":
+            if (screenName && screenName !== Hyprland.focusedMonitor?.name)
+                HyprlandService.focusMonitor(screenName);
+            HyprlandService.cycleWindow(direction > 0);
+            return true;
+        case "mango":
+            {
+                const command = direction > 0 ? "focusstack,next" : "focusstack,prev";
+                if (screenName)
+                    MangoService.dispatchOnOutput(screenName, command);
+                else
+                    MangoService.dispatch(command);
+                return true;
+            }
+        default:
+            return false;
         }
     }
 
@@ -2162,9 +2200,21 @@ Singleton {
                 MangoService.generateLayoutConfig();
         }
 
+        function onBlurStrengthRefreshNeeded() {
+            if (root.isAqueous && typeof AqueousConfigService !== "undefined") {
+                AqueousConfigService.applyBlurStrength();
+                return;
+            }
+            onCompositorLayoutRefreshNeeded(false);
+        }
+
         function onCompositorInputRefreshNeeded() {
             if (root.isNiri && typeof NiriService !== "undefined")
                 NiriService.generateNiriInputConfig();
+            if (root.isHyprland && typeof HyprlandService !== "undefined")
+                HyprlandService.generateInputConfig();
+            if (root.isMango && typeof MangoService !== "undefined")
+                MangoService.generateInputConfig();
         }
 
         function onCompositorCursorRefreshNeeded() {

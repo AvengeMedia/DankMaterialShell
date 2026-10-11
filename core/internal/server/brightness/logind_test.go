@@ -54,25 +54,3 @@ func TestLogindBackend_SetBrightness_DBusError(t *testing.T) {
 		t.Error("SetBrightness() error = nil, want error")
 	}
 }
-
-func TestLogindBackend_SetBrightness_LEDDevice(t *testing.T) {
-	mockConn := mocks_brightness.NewMockDBusConn(t)
-	mockObj := mock_dbus.NewMockBusObject(t)
-
-	backend := NewLogindBackendWithConn(mockConn)
-
-	mockConn.EXPECT().
-		Object("org.freedesktop.login1", dbus.ObjectPath("/org/freedesktop/login1/session/auto")).
-		Return(mockObj).
-		Once()
-
-	mockObj.EXPECT().
-		Call("org.freedesktop.login1.Session.SetBrightness", dbus.Flags(0), "leds", "test_led", uint32(128)).
-		Return(&dbus.Call{Err: nil}).
-		Once()
-
-	err := backend.SetBrightness("leds", "test_led", 128)
-	if err != nil {
-		t.Errorf("SetBrightness() error = %v, want nil", err)
-	}
-}

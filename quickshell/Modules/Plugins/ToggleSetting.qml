@@ -49,6 +49,7 @@ Row {
             font.pixelSize: Theme.fontSizeLarge
             font.weight: Theme.fontWeightMedium
             color: Theme.surfaceText
+            width: parent.width
         }
 
         StyledText {

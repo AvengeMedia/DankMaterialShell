@@ -292,29 +292,20 @@ DDialog {
             return;
         }
 
-        let mods = KeyUtils.modsFromEvent(event.modifiers);
-        let qtKey = event.key;
+        const mods = KeyUtils.modsFromEvent(event.modifiers);
 
         if (_altShiftGhost && (event.modifiers & Qt.AltModifier) && !mods.includes("Shift"))
             mods.push("Shift");
         _altShiftGhost = false;
 
-        if (qtKey === Qt.Key_Backtab) {
-            qtKey = Qt.Key_Tab;
-            if (!mods.includes("Shift"))
-                mods.push("Shift");
-        }
-        const hasShift = mods.includes("Shift");
-        mods = KeyUtils.withSymbolicMod(mods, KeybindsService.modKey, KeybindsService.modSymbol);
-
-        const key = KeyUtils.xkbKeyFromQtKey(qtKey, !!(event.modifiers & Qt.KeypadModifier), hasShift, event.nativeScanCode);
-        if (!key) {
+        const token = KeyUtils.chordToken(event.key, event.modifiers, mods, event.nativeScanCode, KeybindsService.modKey, KeybindsService.modSymbol);
+        if (!token) {
             log.warn("Unknown key:", event.key, "mods:", event.modifiers);
             return;
         }
 
         updateEdit({
-            "key": KeyUtils.formatToken(mods, key)
+            "key": token
         });
         stopRecording();
     }
@@ -598,6 +589,56 @@ DDialog {
                     "label": I18n.tr("Long press"),
                     "value": "o",
                     "tooltip": I18n.tr("Triggers after holding the key", "keybind option tooltip, hyprland long press flag")
+                },
+                {
+                    "label": I18n.tr("Non-consuming", "adjective, hyprland bind flag toggle, key is not swallowed"),
+                    "value": "n",
+                    "tooltip": I18n.tr("The key also reaches the focused window", "keybind option tooltip, hyprland non-consuming flag")
+                },
+                {
+                    "label": I18n.tr("Mouse", "hyprland bind flag toggle, bind for a mouse button"),
+                    "value": "m",
+                    "tooltip": I18n.tr("Binds a mouse button, such as mouse:272", "keybind option tooltip, hyprland mouse flag")
+                },
+                {
+                    "label": I18n.tr("Transparent", "adjective, hyprland bind flag toggle"),
+                    "value": "t",
+                    "tooltip": I18n.tr("Other binds cannot shadow it", "keybind option tooltip, hyprland transparent flag")
+                },
+                {
+                    "label": I18n.tr("Ignore mods", "hyprland bind flag toggle, ignore modifier keys"),
+                    "value": "i",
+                    "tooltip": I18n.tr("Fires with any modifiers held", "keybind option tooltip, hyprland ignore mods flag")
+                },
+                {
+                    "label": I18n.tr("All submaps", "hyprland bind flag toggle, submap universal"),
+                    "value": "u",
+                    "tooltip": I18n.tr("Works in every submap", "keybind option tooltip, hyprland submap universal flag")
+                },
+                {
+                    "label": I18n.tr("Auto-consuming", "adjective, hyprland bind flag toggle"),
+                    "value": "a",
+                    "tooltip": I18n.tr("Consumes the key only when a dispatcher runs", "keybind option tooltip, hyprland auto-consuming flag")
+                },
+                {
+                    "label": I18n.tr("Input capture", "hyprland bind flag toggle, allow input capture"),
+                    "value": "x",
+                    "tooltip": I18n.tr("Fires even while an input capture session is active", "keybind option tooltip, hyprland allow input capture flag")
+                },
+                {
+                    "label": I18n.tr("Not inhibitable", "adjective, hyprland bind flag toggle, dont_inhibit"),
+                    "value": "p",
+                    "tooltip": I18n.tr("Fires even when an app inhibits shortcuts", "keybind option tooltip, hyprland dont inhibit flag")
+                },
+                {
+                    "label": I18n.tr("Click", "hyprland bind flag toggle, mouse click bind"),
+                    "value": "c",
+                    "tooltip": I18n.tr("Triggers on release if the pointer stayed put", "keybind option tooltip, hyprland click flag")
+                },
+                {
+                    "label": I18n.tr("Drag", "hyprland bind flag toggle, mouse drag bind"),
+                    "value": "g",
+                    "tooltip": I18n.tr("Triggers on release after the pointer moved", "keybind option tooltip, hyprland drag flag")
                 }
             ];
         }

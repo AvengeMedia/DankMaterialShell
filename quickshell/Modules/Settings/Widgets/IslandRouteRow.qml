@@ -11,9 +11,6 @@ SettingsToggleRow {
 
     tags: ["island", "routing", "shortcuts", "ipc"]
     visible: root.hosted || SettingsData.islandSharedRoutingMode(root.store.config) !== "always"
-    resetStore: root.store
-    resetKeys: [root.routeKey]
-    resetByKeys: true
     checked: root.hosted ? SettingsData.islandActivityRoutingMode(root.store.config, root.activity) === "always" : root.store.setting(root.routeKey) === "island"
     onToggled: checked => root.store.apply(root.routeKey, checked ? "island" : (root.hosted ? "bar" : "follow"))
 }

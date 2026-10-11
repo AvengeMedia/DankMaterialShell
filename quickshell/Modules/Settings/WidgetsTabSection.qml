@@ -103,8 +103,6 @@ Column {
         SettingsToggleRow {
             text: I18n.tr("Auto overflow")
             description: I18n.tr("Widgets in this section move into overflow when space runs out", "bar section overflow description")
-            resetStore: root.overflowStore
-            resetKeys: [root.sectionId + "OverflowMode"]
             checked: root.autoOverflow
             onToggled: checked => root.setOverflowOption("Mode", checked ? "auto" : "bar")
         }

@@ -143,6 +143,7 @@ Singleton {
     }
 
     property var materialWallpapers: ({})
+    property var materialWallpaperProfiles: ({})
     property int wallpaperRevision: 0
     property int wallpaperScopeRevision: 0
     property var monitorWallpaperRevisions: ({})
@@ -217,6 +218,7 @@ Singleton {
 
     property bool wallpaperCyclingEnabled: false
     property bool wallpaperCyclingRandom: false
+    property bool wallpaperCyclingRecursive: false
     property string wallpaperCyclingMode: "interval"
     property int wallpaperCyclingInterval: 300
     property string wallpaperCyclingTime: "06:00"
@@ -1020,7 +1022,7 @@ Singleton {
     }
 
     function getMonitorMaterialWallpaper(screenName) {
-        return MaterialWallpaper.composition(materialWallpaperEntry(materialWallpaperTarget(screenName)));
+        return MaterialWallpaper.composition(materialWallpaperEntry(materialWallpaperTarget(screenName)), materialWallpaperProfiles);
     }
 
     function writeMonitorWallpaper(map, screenName, path, inherit = false) {
@@ -1094,6 +1096,44 @@ Singleton {
         if ((!target.separate || target.light === isLightMode) && (!target.perMonitor || target.screen === Theme.wallpaperSourceScreen))
             Theme.generateSystemThemesFromCurrentTheme();
         return true;
+    }
+
+    function materialWallpaperProfileList() {
+        return MaterialWallpaper.profiles(materialWallpaperProfiles);
+    }
+
+    function addMaterialWallpaperProfile(layout, fallbackName = "") {
+        const normalized = MaterialWallpaper.normalizeLayout(layout);
+        if (!normalized)
+            return "";
+        const id = MaterialWallpaper.profileId(normalized.name || fallbackName, materialWallpaperProfiles);
+        if (!normalized.name)
+            normalized.name = fallbackName || id;
+        materialWallpaperProfiles = Object.assign({}, materialWallpaperProfiles, {
+            [id]: normalized
+        });
+        saveSettings();
+        return id;
+    }
+
+    function removeMaterialWallpaperProfile(id) {
+        const store = Object.assign({}, materialWallpaperProfiles);
+        if (MaterialWallpaper.builtinIds.includes(id))
+            store[id] = null;
+        else
+            delete store[id];
+        materialWallpaperProfiles = store;
+        saveSettings();
+    }
+
+    function restoreMaterialWallpaperProfiles() {
+        const store = {};
+        for (const id of Object.keys(materialWallpaperProfiles)) {
+            if (materialWallpaperProfiles[id])
+                store[id] = materialWallpaperProfiles[id];
+        }
+        materialWallpaperProfiles = store;
+        saveSettings();
     }
 
     function setPerMonitorWallpaper(enabled) {
@@ -1204,6 +1244,11 @@ Singleton {
         saveSettings();
     }
 
+    function setWallpaperCyclingRecursive(recursive) {
+        wallpaperCyclingRecursive = recursive;
+        saveSettings();
+    }
+
     function setWallpaperCyclingMode(mode) {
         wallpaperCyclingMode = mode;
         saveSettings();
@@ -1246,6 +1291,10 @@ Singleton {
 
     function setMonitorCyclingRandom(screenName, random) {
         updateMonitorCyclingSetting(screenName, "random", random);
+    }
+
+    function setMonitorCyclingRecursive(screenName, recursive) {
+        updateMonitorCyclingSetting(screenName, "recursive", recursive);
     }
 
     function setMonitorCyclingMode(screenName, mode) {
@@ -1813,6 +1862,7 @@ Singleton {
         var defaults = {
             "enabled": false,
             "random": false,
+            "recursive": false,
             "mode": "interval",
             "interval": 300,
             "time": "06:00",

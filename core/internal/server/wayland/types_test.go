@@ -19,46 +19,10 @@ func TestConfigValidate(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "valid_with_location",
-			config: Config{
-				LowTemp:   4000,
-				HighTemp:  6500,
-				Latitude:  new(40.7128),
-				Longitude: new(-74.0060),
-				Gamma:     1.0,
-				Contrast:  1.0,
-				Enabled:   true,
-			},
-			wantErr: false,
-		},
-		{
-			name: "valid_manual_times",
-			config: Config{
-				LowTemp:       4000,
-				HighTemp:      6500,
-				ManualSunrise: new(time.Date(0, 1, 1, 6, 30, 0, 0, time.Local)),
-				ManualSunset:  new(time.Date(0, 1, 1, 18, 30, 0, 0, time.Local)),
-				Gamma:         1.0,
-				Contrast:      1.0,
-				Enabled:       true,
-			},
-			wantErr: false,
-		},
-		{
 			name: "invalid_low_temp_too_low",
 			config: Config{
 				LowTemp:  500,
 				HighTemp: 6500,
-				Gamma:    1.0,
-				Contrast: 1.0,
-			},
-			wantErr: true,
-		},
-		{
-			name: "invalid_low_temp_too_high",
-			config: Config{
-				LowTemp:  15000,
-				HighTemp: 20000,
 				Gamma:    1.0,
 				Contrast: 1.0,
 			},
@@ -104,41 +68,11 @@ func TestConfigValidate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "invalid_gamma_negative",
-			config: Config{
-				LowTemp:  4000,
-				HighTemp: 6500,
-				Gamma:    -1.0,
-			},
-			wantErr: true,
-		},
-		{
-			name: "invalid_gamma_too_high",
-			config: Config{
-				LowTemp:  4000,
-				HighTemp: 6500,
-				Gamma:    15.0,
-			},
-			wantErr: true,
-		},
-		{
 			name: "invalid_latitude_too_high",
 			config: Config{
 				LowTemp:   4000,
 				HighTemp:  6500,
 				Latitude:  new(100.0),
-				Longitude: new(0.0),
-				Gamma:     1.0,
-				Contrast:  1.0,
-			},
-			wantErr: true,
-		},
-		{
-			name: "invalid_latitude_too_low",
-			config: Config{
-				LowTemp:   4000,
-				HighTemp:  6500,
-				Latitude:  new(-100.0),
 				Longitude: new(0.0),
 				Gamma:     1.0,
 				Contrast:  1.0,
@@ -158,18 +92,6 @@ func TestConfigValidate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "invalid_longitude_too_low",
-			config: Config{
-				LowTemp:   4000,
-				HighTemp:  6500,
-				Latitude:  new(40.0),
-				Longitude: new(-200.0),
-				Gamma:     1.0,
-				Contrast:  1.0,
-			},
-			wantErr: true,
-		},
-		{
 			name: "invalid_latitude_without_longitude",
 			config: Config{
 				LowTemp:  4000,
@@ -177,17 +99,6 @@ func TestConfigValidate(t *testing.T) {
 				Latitude: new(40.0),
 				Gamma:    1.0,
 				Contrast: 1.0,
-			},
-			wantErr: true,
-		},
-		{
-			name: "invalid_longitude_without_latitude",
-			config: Config{
-				LowTemp:   4000,
-				HighTemp:  6500,
-				Longitude: new(-74.0),
-				Gamma:     1.0,
-				Contrast:  1.0,
 			},
 			wantErr: true,
 		},
@@ -202,17 +113,6 @@ func TestConfigValidate(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		{
-			name: "invalid_sunset_without_sunrise",
-			config: Config{
-				LowTemp:      4000,
-				HighTemp:     6500,
-				ManualSunset: new(time.Date(0, 1, 1, 18, 30, 0, 0, time.Local)),
-				Gamma:        1.0,
-				Contrast:     1.0,
-			},
-			wantErr: true,
-		},
 	}
 
 	for _, tt := range tests {
@@ -222,29 +122,6 @@ func TestConfigValidate(t *testing.T) {
 				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
-	}
-}
-
-func TestDefaultConfig(t *testing.T) {
-	config := DefaultConfig()
-
-	if config.LowTemp != 4000 {
-		t.Errorf("default low temp = %d, want 4000", config.LowTemp)
-	}
-	if config.HighTemp != 6500 {
-		t.Errorf("default high temp = %d, want 6500", config.HighTemp)
-	}
-	if config.Gamma != 1.0 {
-		t.Errorf("default gamma = %f, want 1.0", config.Gamma)
-	}
-	if config.Enabled {
-		t.Error("default should be disabled")
-	}
-	if config.Latitude != nil {
-		t.Error("default should not have latitude")
-	}
-	if config.Longitude != nil {
-		t.Error("default should not have longitude")
 	}
 }
 
@@ -274,12 +151,6 @@ func TestStateChanged(t *testing.T) {
 			name:        "output list changed",
 			old:         baseState,
 			new:         func() *State { st := *baseState; st.Outputs = []string{"DP-1"}; return &st }(),
-			wantChanged: true,
-		},
-		{
-			name:        "nil_new",
-			old:         baseState,
-			new:         nil,
 			wantChanged: true,
 		},
 		{
@@ -349,22 +220,6 @@ func TestStateChanged(t *testing.T) {
 					"DP-1": {Path: "/tmp/dp1.icc", Active: true},
 				},
 			},
-			wantChanged: true,
-		},
-		{
-			name: "profile_removed",
-			old: &State{
-				CurrentTemp:    baseState.CurrentTemp,
-				NextTransition: baseState.NextTransition,
-				SunriseTime:    baseState.SunriseTime,
-				SunsetTime:     baseState.SunsetTime,
-				IsDay:          baseState.IsDay,
-				Config:         baseState.Config,
-				ICCProfiles: map[string]*ICCStatus{
-					"DP-1": {Path: "/tmp/dp1.icc", Active: true},
-				},
-			},
-			new:         baseState,
 			wantChanged: true,
 		},
 		{

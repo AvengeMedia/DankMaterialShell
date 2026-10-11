@@ -121,7 +121,7 @@ test("always-here is exclusive among islands and dots sharing a screen", () => {
         barConfigs: [{ id: "dot", dot: true, islandSharedRouting: "always" }, { id: "island", island: true }, { id: "remote", island: true, islandSharedRouting: "always" }]
     }));
     settings.updateBarConfigs = () => {};
-    settings._sanitizeBarConfigsForConnectedFrame = configs => ({ configs });
+    settings._applyConnectedFrameBarStyles = configs => ({ configs });
     settings.barConfigCoversScreen = (cfg, screen) => covers[cfg.id].includes(screen.name);
     settings.setIslandSharedRouting("island", "always");
     assert.deepEqual([...settings.barConfigs].map(cfg => cfg.islandSharedRouting), [undefined, "always", "always"], "same-screen always is reset, other-screen always is kept");
@@ -148,7 +148,7 @@ function hostedSettings(barConfigs, extra = {}) {
     settings.updateBarConfigs = () => {};
     settings.barConfigCoversScreen = () => true;
     settings.getBarConfig = id => settings.barConfigs.find(cfg => cfg.id === id);
-    settings._sanitizeBarConfigsForConnectedFrame = configs => ({ configs });
+    settings._applyConnectedFrameBarStyles = configs => ({ configs });
     return settings;
 }
 
@@ -472,7 +472,7 @@ test("control-center IPC hide and status agree on both surfaces", () => {
     const state = { islandOpen: false, routed: false };
     const bar = { triggerControlCenter: () => calls.push("bar:trigger") };
     const handler = functions(block, "        ", vm.createContext({
-        root: { controlCenterLoader: { item: popout }, getPreferredBar: () => bar },
+        root: { controlCenterLoaderRef: { item: popout }, getPreferredBar: () => bar },
         PopoutService: {
             get islandControlCenterOpen() {
                 return state.islandOpen;

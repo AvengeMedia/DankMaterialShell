@@ -107,7 +107,7 @@ Singleton {
                 valid = typeof value === "number" && Number.isFinite(value);
                 break;
             case "a":
-                valid = Array.isArray(value) && value.every(v => typeof v === "string");
+                valid = value instanceof Array && value.every(v => typeof v === "string");
                 break;
             case "r":
                 valid = value && ["x", "y", "width", "height"].every(k => Number.isSafeInteger(value[k]));

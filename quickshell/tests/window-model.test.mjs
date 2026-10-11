@@ -174,6 +174,14 @@ test("hyprland: workspace membership against the focused workspace, pid from the
     assert.equal(specialWorkspaceName(hypr, null), "");
 });
 
+test("hyprland main: named workspaces all report id -1, so active-workspace membership compares addresses", () => {
+    const music = { id: -1, address: "music", name: "music" };
+    const chat = { id: -1, address: "chat", name: "chat" };
+    const win = { id: "w", appId: "w", title: "w" };
+    const state = { toplevels: [{ wayland: win, workspace: music, lastIpcObject: { pid: 7 } }] };
+    assert.deepEqual([chat, music].map(focused => focusedAppHyprland(state, win, focused).onActiveWorkspace), [false, true]);
+});
+
 test("mango: compositor visibility covers global windows and overview without counting hidden clients", () => {
     const windows = [
         { id: 1, monitor: "DP-1", tags: [2], is_visible: true },

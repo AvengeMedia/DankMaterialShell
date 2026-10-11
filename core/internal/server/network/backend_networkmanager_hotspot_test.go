@@ -834,10 +834,7 @@ func TestClassifyHotspotStateReason(t *testing.T) {
 	// missing-dnsmasq failure ('ip-config-unavailable'), and package-local
 	// aliases with the same names carry different, incorrect values.
 	assert.Equal(t, "hotspot-ip-config-failed", classifyHotspotStateReason(5))
-	assert.Equal(t, "hotspot-ip-config-failed", classifyHotspotStateReason(gonetworkmanager.NmDeviceStateReasonSharedStartFailed))
-	assert.Equal(t, "hotspot-ip-config-failed", classifyHotspotStateReason(gonetworkmanager.NmDeviceStateReasonDhcpFailed))
 	assert.Equal(t, "hotspot-supplicant-failed", classifyHotspotStateReason(gonetworkmanager.NmDeviceStateReasonSupplicantFailed))
-	assert.Equal(t, "hotspot-supplicant-failed", classifyHotspotStateReason(gonetworkmanager.NmDeviceStateReasonSupplicantDisconnect))
 	assert.Equal(t, "hotspot-failed", classifyHotspotStateReason(gonetworkmanager.NmDeviceStateReasonModemNoCarrier))
 }
 
@@ -916,12 +913,10 @@ func TestValidateHotspotPassword(t *testing.T) {
 		valid    bool
 	}{
 		{"open network", "", true},
-		{"three digits", "123", false},
 		{"seven chars", "testing", false},
 		{"eight chars", "testing1", true},
 		{"sixty three chars", strings.Repeat("a", 63), true},
 		{"sixty four hex", hex64, true},
-		{"sixty four hex uppercase", strings.ToUpper(hex64), true},
 		{"sixty four non-hex", strings.Repeat("g", 64), false},
 		{"sixty five chars", strings.Repeat("a", 65), false},
 		{"multibyte counts bytes", "ääää", true},

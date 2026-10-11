@@ -116,7 +116,7 @@ function classifyAppSource(app) {
     if (cmd0 === "flatpak" || exec.indexOf("flatpak run ") !== -1)
         return "flatpak";
 
-    if (cmd0 === "snap" || exec.indexOf("bamf_desktop_file_hint=") !== -1 || exec.indexOf("/snap/bin/") !== -1 || exec.indexOf("/snap/core") !== -1 || exec.indexOf("snap run ") === 0)
+    if (cmd0 === "snap" || exec.indexOf("/snap/bin/") !== -1 || exec.indexOf("/snap/core") !== -1 || exec.indexOf("snap run ") === 0)
         return "snap";
 
     if (/\.appimage(\s|$|")/i.test(execRaw) || id.indexOf("appimagekit_") === 0)

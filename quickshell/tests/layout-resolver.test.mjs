@@ -55,30 +55,27 @@ test("model assignments follow screen position and preserve connector matching",
     assert.equal(resolver.screenModelIndex(moved[1], moved), 0);
 });
 
-test("one to four mixed configs coexist in config order on every edge and frame mode", () => {
-    for (const screen of screens)
-        for (let count = 1; count <= 4; count++)
-            for (let position = 0; position < 4; position++)
-                for (const effectiveFrameEnabled of [false, true])
-                    for (const effectiveConnected of [false, true]) {
-                        const configs = ["z", "a", "m", "b"].slice(0, count).map((id, index) => bar(id, position, { island: index % 2 === 1, innerPadding: index * 2 }));
-                        const layout = resolve(configs, { effectiveFrameEnabled, effectiveConnected }, screen);
-                        assert.deepEqual(plain(layout.instances.map(instance => instance.barId)), configs.map(config => config.id));
-                        let offset = 0;
-                        for (const instance of layout.instances) {
-                            assert.equal(instance.rowOffset, offset);
-                            offset += instance.rowThickness;
-                            assert.equal(instance.kind, configs[instance.configOrder].island ? "island" : effectiveFrameEnabled && effectiveConnected ? "frame" : "bar");
-                        }
-                        const band = layout.edges[["top", "bottom", "left", "right"][position]];
-                        assert.equal(band.occupancy, offset);
-                        assert.equal(band.reservation, offset);
-                        if (layout.manualPlacement) {
-                            const owned = layout.instances.reduce((sum, instance) => sum + instance.exclusionSize, 0);
-                            assert.equal(owned + (effectiveFrameEnabled ? band.reservation : 0), offset);
-                            assert.equal(layout.instances.every(instance => instance.exclusiveZone === -1), true);
-                        }
-                    }
+test("mixed configs coexist in config order on a horizontal and a vertical edge in every frame mode", () => {
+    for (const position of [0, 2])
+        for (const [effectiveFrameEnabled, effectiveConnected] of [[false, false], [true, false], [true, true]]) {
+            const configs = ["z", "a", "m", "b"].map((id, index) => bar(id, position, { island: index % 2 === 1, innerPadding: index * 2 }));
+            const layout = resolve(configs, { effectiveFrameEnabled, effectiveConnected });
+            assert.deepEqual(plain(layout.instances.map(instance => instance.barId)), configs.map(config => config.id));
+            let offset = 0;
+            for (const instance of layout.instances) {
+                assert.equal(instance.rowOffset, offset);
+                offset += instance.rowThickness;
+                assert.equal(instance.kind, configs[instance.configOrder].island ? "island" : effectiveFrameEnabled && effectiveConnected ? "frame" : "bar");
+            }
+            const band = layout.edges[["top", "bottom", "left", "right"][position]];
+            assert.equal(band.occupancy, offset);
+            assert.equal(band.reservation, offset);
+            if (layout.manualPlacement) {
+                const owned = layout.instances.reduce((sum, instance) => sum + instance.exclusionSize, 0);
+                assert.equal(owned + (effectiveFrameEnabled ? band.reservation : 0), offset);
+                assert.equal(layout.instances.every(instance => instance.exclusiveZone === -1), true);
+            }
+        }
 });
 
 test("row identity and occupancy stay fixed through reveal, floating and expansion", () => {

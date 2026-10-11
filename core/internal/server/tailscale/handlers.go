@@ -38,59 +38,59 @@ func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	case "tailscale.profiles":
 		handleProfiles(conn, req, manager)
 	case "tailscale.switchProfile":
-		id := models.GetOr(req, "id", "")
+		id := req.GetOr("id", "")
 		handleSimple(conn, req, func() error { return manager.SwitchProfile(id) })
 	case "tailscale.suggestExitNode":
 		handleSuggestExitNode(conn, req, manager)
 	case "tailscale.grantOperator":
 		handleGrantOperator(conn, req, manager)
 	default:
-		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
+		conn.RespondError(req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
 }
 
 func handleGetStatus(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	state := manager.GetState()
-	models.Respond(conn, req.ID, state)
+	conn.Respond(req.ID, state)
 }
 
 func handleRefresh(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	manager.RefreshState()
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "refreshed"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "refreshed"})
 }
 
 func handleConnect(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	if err := manager.Connect(); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "connected"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "connected"})
 }
 
 func handleDisconnect(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	if err := manager.Disconnect(); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "disconnected"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "disconnected"})
 }
 
 func handleSetExitNode(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
-	id := models.GetOr(req, "id", "")
+	id := req.GetOr("id", "")
 	if err := manager.SetExitNode(id); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "exit node updated"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "exit node updated"})
 }
 
 func handleSetAllowLanAccess(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
-	enabled := models.GetOr(req, "enabled", false)
+	enabled := req.GetOr("enabled", false)
 	if err := manager.SetAllowLANAccess(enabled); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "lan access updated"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "lan access updated"})
 }
 
 // Swappable for tests only; production values are fixed.
@@ -105,10 +105,10 @@ var operatorGrantMu sync.Mutex
 
 func handleSimple(conn *ipc.ConnWriter, req ipc.Request, fn func() error) {
 	if err := fn(); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true})
+	conn.Respond(req.ID, models.SuccessResult{Success: true})
 }
 
 type setPrefsResult struct {
@@ -125,7 +125,7 @@ func handleSetPrefs(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 		}
 	}
 	setBool := func(key string, dst **bool) {
-		if v, ok := models.Get[bool](req, key); ok {
+		if v, ok := req.Get[bool](key); ok {
 			*dst = &v
 		} else {
 			reject(key)
@@ -136,17 +136,17 @@ func handleSetPrefs(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	setBool("shieldsUp", &p.ShieldsUp)
 	setBool("runSsh", &p.RunSSH)
 	setBool("advertiseExitNode", &p.AdvertiseExitNode)
-	if v, ok := models.Get[string](req, "hostname"); ok {
+	if v, ok := req.Get[string]("hostname"); ok {
 		p.Hostname = &v
 	} else {
 		reject("hostname")
 	}
-	v, routesOK := models.Get[[]any](req, "advertiseRoutes")
+	v, routesOK := req.Get[[]any]("advertiseRoutes")
 	if !routesOK {
 		reject("advertiseRoutes")
 	}
 	if invalid != "" {
-		models.RespondError(conn, req.ID, fmt.Sprintf("invalid '%s' parameter", invalid))
+		conn.RespondError(req.ID, fmt.Sprintf("invalid '%s' parameter", invalid))
 		return
 	}
 	if routesOK {
@@ -154,7 +154,7 @@ func handleSetPrefs(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 		for _, e := range v {
 			s, isStr := e.(string)
 			if !isStr {
-				models.RespondError(conn, req.ID, "advertiseRoutes must be a list of strings")
+				conn.RespondError(req.ID, "advertiseRoutes must be a list of strings")
 				return
 			}
 			routes = append(routes, s)
@@ -164,10 +164,10 @@ func handleSetPrefs(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 
 	warning, err := manager.SetPrefs(p)
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, setPrefsResult{Success: true, Warning: warning})
+	conn.Respond(req.ID, setPrefsResult{Success: true, Warning: warning})
 }
 
 // profilesWithGrant returns Profiles with GrantAvailable filled in.
@@ -186,37 +186,37 @@ func profilesWithGrant(manager *Manager) (ProfilesResult, error) {
 func handleProfiles(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	res, err := profilesWithGrant(manager)
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, res)
+	conn.Respond(req.ID, res)
 }
 
 func handleSuggestExitNode(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	sug, err := manager.SuggestExitNode()
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
-	models.Respond(conn, req.ID, sug)
+	conn.Respond(req.ID, sug)
 }
 
 // handleGrantOperator takes no request params: the elevated argv is built
 // from fixed values only.
 func handleGrantOperator(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	if !operatorGrantMu.TryLock() {
-		models.RespondError(conn, req.ID, "a permission request is already open")
+		conn.RespondError(req.ID, "a permission request is already open")
 		return
 	}
 	defer operatorGrantMu.Unlock()
 
 	argv, err := operatorGrantArgv(operatorStat, operatorLookPath, operatorCurrentUser)
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 	if err := grantOperator(manager.ctx, argv, operatorRunner); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 	manager.RefreshState()

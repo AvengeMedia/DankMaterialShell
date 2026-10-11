@@ -49,6 +49,8 @@ Singleton {
     property var durationPopoutLoader: null
     property var processListModal: null
     property var processListModalLoader: null
+    property var keybindsModal: null
+    property var keybindsModalLoader: null
     property var systemUpdateModal: null
     property var systemUpdateModalLoader: null
     property var colorPickerModal: null
@@ -72,6 +74,7 @@ Singleton {
 
     property string pendingThemeInstall: ""
     property string pendingPluginInstall: ""
+    property string pendingWallpaperInstall: ""
 
     // Deferred unload: keep popouts warm while the session is active and reclaim them on lock/monitors-off.
     property var _pendingUnloads: ({})
@@ -1071,6 +1074,17 @@ Singleton {
 
     function hideProcessListModal() {
         processListModal?.hide();
+    }
+
+    function showKeybindsModal() {
+        if (keybindsModal) {
+            keybindsModal.open();
+            return;
+        }
+        if (!keybindsModalLoader)
+            return;
+        keybindsModalLoader.active = true;
+        Qt.callLater(() => keybindsModal?.open());
     }
 
     function unloadProcessListModal() {

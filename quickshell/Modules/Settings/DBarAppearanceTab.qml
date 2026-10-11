@@ -22,6 +22,14 @@ Item {
     readonly property bool selectedIslandFree: bar.selectedBarIsIsland && SettingsData.islandFreePlacement(bar.selectedBarConfig)
     readonly property bool selectedIslandNotch: bar.selectedBarIsIsland && !root.selectedIslandFree && bar.islandSetting("islandNotch")
     readonly property int frameInsetPaddingDisplay: Math.round(SettingsData.frameBarContentGap)
+    readonly property var frameBar: SettingsData.frameBarConfig
+    readonly property bool frameBarOverridden: frameBar?.followInterfaceStyle === false
+
+    function updateFrameBar(updates) {
+        if (!frameBar)
+            return;
+        SettingsData.updateBarConfig(frameBar.id, updates);
+    }
 
     BarSelectionState {
         id: bar
@@ -52,7 +60,7 @@ Item {
             SettingsSliderRow {
                 settingKey: "frameThickness"
                 tags: ["frame", "border", "thickness", "size", "width"]
-                text: I18n.tr("Width")
+                text: I18n.tr("Thickness")
                 unit: "px"
                 minimum: 2
                 maximum: 100
@@ -77,10 +85,11 @@ Item {
                 settingKey: "frameBarInsetPadding"
                 tags: ["frame", "bar", "edge", "inset", "padding", "corner", "end"]
                 text: I18n.tr("Bar inset padding")
+                description: I18n.tr("Gap between the bar ends and the outermost widgets", "bar inset padding slider description")
                 minimumLabel: I18n.tr("Edge to edge", "slider minimum label, bar touches the screen edges")
                 unit: "px"
                 minimum: 0
-                maximum: 48
+                maximum: 100
                 step: 1
                 value: root.frameInsetPaddingDisplay
                 onSliderDragFinished: v => SettingsData.set("frameBarInsetPadding", v)
@@ -97,35 +106,62 @@ Item {
                 visible: BlurService.available
             }
 
-            SettingsRow {
+            SettingsControlledBy {
                 visible: BlurService.available && !SettingsData.blurEnabled
-                body: Item {
-                    width: parent.width
-                    height: blurToggleNote.height + Theme.spacingM * 2
+                target: "surfaces"
+                parentModal: root.parentModal
+                section: "blurEnabled"
+                settingLabel: I18n.tr("Background blur")
+            }
 
-                    Row {
-                        id: blurToggleNote
-                        x: Theme.spacingM
-                        width: parent.width - Theme.spacingM * 2
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingS
+            SurfaceColorRow {
+                settingKey: "frameSurfaceColor"
+                tags: ["frame", "background", "color", "surface"]
+                visible: !!root.frameBar
+                text: I18n.tr("Background")
+                defaultColor: Theme.hostSurface
+                currentMode: root.frameBar?.surfaceColor ?? "default"
+                customColor: root.frameBar?.surfaceCustomColor ?? SettingsData.barConfigDefault("surfaceCustomColor")
+                pickerTitle: I18n.tr("Background")
+                modified: (root.frameBar?.surfaceColor ?? "default") !== "default"
+                resetByKeys: false
+                onResetRequested: root.updateFrameBar({
+                    surfaceColor: "default",
+                    surfaceCustomColor: SettingsData.barConfigDefault("surfaceCustomColor")
+                })
+                onModeSelected: mode => root.updateFrameBar({
+                        surfaceColor: mode
+                    })
+                onCustomColorSelected: selectedColor => root.updateFrameBar({
+                        surfaceCustomColor: selectedColor.toString()
+                    })
+            }
 
-                        DIcon {
-                            name: "blur_on"
-                            size: Theme.fontSizeMedium
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Frame Blur follows Background Blur in Theme & Colors")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            wrapMode: Text.WordWrap
-                            width: parent.width - Theme.fontSizeMedium - Theme.spacingS
-                        }
-                    }
-                }
+            SettingsToggleSliderRow {
+                settingKey: "frameSurfaceOpacity"
+                tags: ["frame", "opacity", "transparency", "override", "interface", "style"]
+                visible: !!root.frameBar
+                text: I18n.tr("Opacity")
+                description: I18n.tr("Override")
+                checked: root.frameBarOverridden
+                value: Math.round((root.frameBar?.transparency ?? 1) * 100)
+                minimum: 0
+                maximum: 100
+                modified: root.frameBarOverridden
+                valueModified: (root.frameBar?.transparency ?? 1) !== 1
+                onResetRequested: root.updateFrameBar({
+                    followInterfaceStyle: true,
+                    transparency: 1
+                })
+                onValueResetRequested: root.updateFrameBar({
+                    transparency: 1
+                })
+                onToggled: checked => root.updateFrameBar({
+                        followInterfaceStyle: !checked
+                    })
+                onSliderDragFinished: finalValue => root.updateFrameBar({
+                        transparency: finalValue / 100
+                    })
             }
         }
 
@@ -154,8 +190,6 @@ Item {
                 settingKey: "islandHighContrast"
                 tags: ["island", "appearance", "contrast", "accessibility", "outline"]
                 visible: bar.selectedBarIsIsland
-                resetStore: bar
-                resetKeys: ["islandHighContrast"]
                 text: I18n.tr("High contrast", "island settings: high contrast toggle")
                 checked: bar.islandSetting("islandHighContrast")
                 onToggled: checked => bar.apply("islandHighContrast", checked)
@@ -214,8 +248,6 @@ Item {
                 text: I18n.tr("Goth corners")
                 description: I18n.tr("Adds concave curves where the bar meets the screen edge", "bar goth corners toggle description")
                 visible: !bar.selectedBarFrameSanitized && !bar.islandOwnsSelectedBarTop
-                resetStore: bar
-                resetKeys: ["gothCornersEnabled"]
                 checked: bar.selectedBarConfig?.gothCornersEnabled ?? false
                 onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
                         gothCornersEnabled: checked
@@ -223,11 +255,10 @@ Item {
             }
 
             SettingsToggleSliderRow {
+                resetStore: bar
                 text: I18n.tr("Custom radius")
                 tags: ["goth", "corners", "radius"]
                 visible: (bar.selectedBarConfig?.gothCornersEnabled ?? false) && !bar.selectedBarFrameSanitized && !bar.islandOwnsSelectedBarTop
-                resetStore: bar
-                resetKeys: ["gothCornerRadiusOverride"]
                 valueKeys: ["gothCornerRadiusValue"]
                 checked: bar.selectedBarConfig?.gothCornerRadiusOverride ?? false
                 unit: "px"
@@ -249,6 +280,14 @@ Item {
                 section: "barShadow"
                 settingLabel: I18n.tr("Shadow", "bar shadow settings card")
             }
+
+            SettingsControlledBy {
+                visible: bar.selectedBarFrameSanitized && !bar.selectedBarFrameStyled && !bar.islandOwnsSelectedBarTop
+                parentModal: root.parentModal
+                section: "frameBorder"
+                settingLabel: [I18n.tr("Corner style"), I18n.tr("Border", "noun, settings toggle card title for an outline around a surface"), I18n.tr("Shadow", "bar shadow settings card")].join(" · ")
+                reason: I18n.tr("Disabled by Frame Mode")
+            }
         }
 
         SettingsToggleCard {
@@ -256,8 +295,6 @@ Item {
             iconName: "border_style"
             title: I18n.tr("Border", "noun, settings toggle card title for an outline around a surface")
             visible: (bar.selectedBarConfig?.enabled ?? false) && !bar.selectedBarFrameSanitized && !bar.islandOwnsSelectedBarTop
-            resetStore: bar
-            resetKeys: ["borderEnabled"]
             checked: bar.selectedBarConfig?.borderEnabled ?? false
             onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
                     borderEnabled: checked
@@ -329,7 +366,6 @@ Item {
             SettingsSliderRow {
                 settingKey: "barSize"
                 tags: ["size", "thickness", "height", "inner"]
-                visible: !bar.selectedBarFrameStyled
                 text: I18n.tr("Size")
                 resetStore: bar
                 resetKeys: ["innerPadding"]
@@ -477,7 +513,6 @@ Item {
                 visible: !bar.selectedBarFrameStyled && SettingsData.barConfigs.length > 1
                 text: I18n.tr("Sync inset padding")
                 tags: ["bar", "padding", "inset", "edge", "sync", "all", "global"]
-                resetKeys: ["barInsetPaddingSyncAll"]
                 checked: SettingsData.barInsetPaddingSyncAll
                 onToggled: checked => SettingsData.set("barInsetPaddingSyncAll", checked)
             }
@@ -500,8 +535,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "islandSatellitesEnabled"
                 tags: ["island", "satellite", "widgets", "left", "right"]
-                resetStore: bar
-                resetKeys: ["islandSatellitesEnabled"]
                 text: I18n.tr("Show", "island settings: satellite widgets toggle")
                 checked: bar.islandSetting("islandSatellitesEnabled")
                 onToggled: checked => bar.apply("islandSatellitesEnabled", checked)
@@ -524,8 +557,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "islandSatelliteBackground"
                 tags: ["island", "satellite", "widgets", "background", "chrome"]
-                resetStore: bar
-                resetKeys: ["islandSatelliteBackground"]
                 text: I18n.tr("Background", "island settings: satellite background toggle")
                 checked: bar.islandSetting("islandSatelliteBackground")
                 visible: bar.islandSetting("islandSatellitesEnabled")
@@ -535,8 +566,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "islandSatelliteGothCorners"
                 tags: ["island", "satellite", "goth", "corners", "wing", "sweep"]
-                resetStore: bar
-                resetKeys: ["islandSatelliteGothCorners"]
                 text: I18n.tr("Goth corners", "island settings: satellite goth corners toggle")
                 checked: bar.islandSetting("islandSatelliteGothCorners")
                 visible: bar.islandSetting("islandSatellitesEnabled")
@@ -545,10 +574,9 @@ Item {
             }
 
             SettingsToggleSliderRow {
+                resetStore: bar
                 settingKey: "islandGothCornerRadius"
                 tags: ["island", "satellite", "notch", "goth", "corners", "radius", "sweep", "size"]
-                resetStore: bar
-                resetKeys: ["gothCornerRadiusOverride"]
                 valueKeys: ["gothCornerRadiusValue"]
                 text: I18n.tr("Custom radius")
                 checked: bar.selectedBarConfig?.gothCornerRadiusOverride ?? false
@@ -564,10 +592,9 @@ Item {
             }
 
             SettingsToggleSliderRow {
+                resetStore: bar
                 settingKey: "islandSatelliteTransparency"
                 tags: ["island", "satellite", "background", "opacity", "transparency", "blur", "override", "interface", "style"]
-                resetStore: bar
-                resetKeys: ["islandSatelliteFollowInterfaceStyle"]
                 valueKeys: ["islandSatelliteTransparency"]
                 text: I18n.tr("Override", "verb, toggle to override the global setting for this item")
                 description: I18n.tr("Opacity", "island settings: satellite background opacity slider")
@@ -610,8 +637,6 @@ Item {
                 settingKey: "barNoBackground"
                 tags: ["transparent", "background", "invisible"]
                 text: I18n.tr("Background")
-                resetStore: bar
-                resetKeys: ["noBackground"]
                 checked: !(bar.selectedBarConfig?.noBackground ?? false)
                 onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
                         noBackground: !checked
@@ -650,12 +675,11 @@ Item {
             }
 
             SettingsToggleSliderRow {
+                resetStore: bar
                 text: I18n.tr("Override", "verb, toggle to override the global setting for this item")
                 description: I18n.tr("Opacity")
                 tags: ["widget", "opacity", "transparency", "override", "foreground", "interface", "style"]
                 enabled: root.widgetBackgroundEnabled
-                resetStore: bar
-                resetKeys: ["widgetFollowInterfaceStyle"]
                 valueKeys: ["widgetTransparency"]
                 checked: bar.selectedBarConfig?.widgetFollowInterfaceStyle === false
                 value: Math.round(SettingsData.barWidgetTransparency(bar.selectedBarConfig) * 100)
@@ -687,8 +711,6 @@ Item {
                 settingKey: "barMaximizeWidgetIcons"
                 tags: ["maximize", "icons", "stretch"]
                 text: I18n.tr("Maximize widget icons")
-                resetStore: bar
-                resetKeys: ["maximizeWidgetIcons"]
                 checked: bar.selectedBarConfig?.maximizeWidgetIcons ?? false
                 onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
                         maximizeWidgetIcons: checked
@@ -699,8 +721,6 @@ Item {
                 settingKey: "barMaximizeWidgetText"
                 tags: ["maximize", "text", "stretch"]
                 text: I18n.tr("Maximize widget text")
-                resetStore: bar
-                resetKeys: ["maximizeWidgetText"]
                 checked: bar.selectedBarConfig?.maximizeWidgetText ?? false
                 onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
                         maximizeWidgetText: checked
@@ -714,8 +734,6 @@ Item {
             title: I18n.tr("Widget outline")
             visible: bar.selectedBarConfig?.enabled ?? false
             enabled: root.widgetBackgroundEnabled
-            resetStore: bar
-            resetKeys: ["widgetOutlineEnabled"]
             checked: bar.selectedBarConfig?.widgetOutlineEnabled ?? false
             onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
                     widgetOutlineEnabled: checked

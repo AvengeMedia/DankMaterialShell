@@ -53,9 +53,14 @@ Singleton {
     readonly property real iconBoxActiveRadius: Theme.cornerRadiusL
     readonly property real iconBoxIconSize: Theme.iconSize * iconScale
     readonly property real tallMeterThickness: 28
+    readonly property real pillMeterThickness: Math.round(18 * iconScale)
     readonly property real tileTextGap: Theme.spacingM
     readonly property real footerHeight: iconBoxSize
     readonly property real footerGap: Theme.spacingS
+    // Half the gap, so the grid and row rings meet on one line instead of drawing two.
+    readonly property real dropZoneInset: gridGap / 2
+    readonly property real dropZoneOuterInset: Theme.spacingS
+    readonly property real dropZoneRadius: Theme.cornerRadiusL
     readonly property real runningAppsIconSize: Theme.iconSize * iconScale
     // The resize corner counts a small tile as this many rows and snaps to the nearer of this and a full row.
     readonly property real smallRowFraction: 0.5
@@ -120,6 +125,10 @@ Singleton {
     readonly property color tileInactiveContent: Theme.surfaceText
     readonly property color tileInactiveSubtitle: Theme.surfaceVariantText
     readonly property color tileInactiveIcon: Theme.primary
+    readonly property color bareActiveIcon: Theme.primary
+    readonly property real quickBarePadding: Theme.spacingL
+    readonly property real quickBareWidth: iconBoxIconSize + quickBarePadding
+    readonly property real quickTileGap: Theme.spacingXS
 
     readonly property bool animationsEnabled: !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
 

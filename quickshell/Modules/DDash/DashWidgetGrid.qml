@@ -130,7 +130,7 @@ Item {
         editMode: root.editMode
         sourceItems: root.widgets
         slotLayout: GridUtils.packCards(layoutItems, placementOrder, root.columns, width, DashMetrics.gridGap, DashMetrics.gridRowUnit, I18n.isRtl, id => root.specFor(id) !== null)
-        onLayoutCommitted: items => root.save(WidgetUtils.resolve(root.definitions, items))
+        commitHandler: items => root.save(WidgetUtils.resolve(root.definitions, items))
 
         function requestFocus(backwards) {
             const targets = root.focusTargets();

@@ -10,11 +10,12 @@ type Keybind struct {
 	Key             string   `json:"key"`
 	Description     string   `json:"desc"`
 	Action          string   `json:"action,omitempty"`
+	LuaAction       string   `json:"luaAction,omitempty"` // Hyprland: hl.dsp expression for `hyprctl dispatch`
 	Subcategory     string   `json:"subcat,omitempty"`
 	Source          string   `json:"source,omitempty"`
 	HideOnOverlay   bool     `json:"hideOnOverlay,omitempty"`
 	CooldownMs      int      `json:"cooldownMs,omitempty"`
-	Flags           string   `json:"flags,omitempty"` // Hyprland bind flags: e=repeat, l=locked, r=release, o=long-press
+	Flags           string   `json:"flags,omitempty"` // Hyprland hl.bind options as letters (e=repeating, l=locked, r=release, o=long_press, ...)
 	AllowWhenLocked bool     `json:"allowWhenLocked,omitempty"`
 	AllowInhibiting *bool    `json:"allowInhibiting,omitempty"` // nil=default(true), false=explicitly disabled
 	Repeat          *bool    `json:"repeat,omitempty"`          // nil=default(true), false=explicitly disabled

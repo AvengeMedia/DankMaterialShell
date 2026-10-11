@@ -56,31 +56,17 @@ Singleton {
 
     Connections {
         target: DMSService
-        enabled: root.refCount > 0
         function onIsConnectedChanged() {
             root.refreshPasteSupport();
         }
     }
 
-    onRefCountChanged: {
-        if (refCount > 0) {
-            ensureSubscription();
-        } else if (refCount === 0 && DMSService.activeSubscriptions.includes("clipboard")) {
-            DMSService.removeSubscription("clipboard");
-        }
-    }
+    // subscribed for the shell's lifetime; resubscribing replays every service's snapshot
+    Component.onCompleted: DMSService.addSubscription("clipboard")
 
-    function ensureSubscription() {
-        if (refCount <= 0)
-            return;
-        if (!_pasteSupportChecked)
+    onRefCountChanged: {
+        if (refCount > 0 && !_pasteSupportChecked)
             refreshPasteSupport();
-        if (DMSService.activeSubscriptions.includes("clipboard"))
-            return;
-        if (DMSService.activeSubscriptions.includes("all"))
-            return;
-        DMSService.addSubscription("clipboard");
-        refresh();
     }
 
     function refreshPasteSupport() {
@@ -163,11 +149,14 @@ Singleton {
                 log.warn("Failed to get history:", response.error);
                 return;
             }
-            internalEntries = response.result || [];
-            pinnedEntries = internalEntries.filter(e => e.pinned);
-            pinnedCount = pinnedEntries.length;
-            updateFilteredModel();
+            applyHistory(response.result || []);
         });
+    }
+
+    function applyHistory(history) {
+        internalEntries = history;
+        pinnedCount = history.filter(e => e.pinned).length;
+        updateFilteredModel();
     }
 
     function requestLauncherSearch(query, limit) {
@@ -333,28 +322,16 @@ Singleton {
     }
 
     function pinEntry(entry) {
-        DMSService.sendRequest("clipboard.getPinnedCount", null, function (countResponse) {
-            if (countResponse.error) {
-                ToastService.showError(I18n.tr("Failed to check pin limit"));
+        DMSService.sendRequest("clipboard.pinEntry", {
+            "id": entry.id
+        }, function (response) {
+            if (response.error) {
+                // error text from core/internal/server/clipboard
+                const limit = /^maximum pinned entries reached \((\d+)\)/.exec(response.error);
+                ToastService.showError(limit ? I18n.tr("Maximum pinned entries reached") + " (" + limit[1] + ")" : I18n.tr("Failed to pin entry"));
                 return;
             }
-
-            const maxPinned = 25;
-            if (countResponse.result.count >= maxPinned) {
-                ToastService.showError(I18n.tr("Maximum pinned entries reached") + " (" + maxPinned + ")");
-                return;
-            }
-
-            DMSService.sendRequest("clipboard.pinEntry", {
-                "id": entry.id
-            }, function (response) {
-                if (response.error) {
-                    ToastService.showError(I18n.tr("Failed to pin entry"));
-                    return;
-                }
-                ToastService.showInfo(I18n.tr("Entry pinned"));
-                refresh();
-            });
+            ToastService.showInfo(I18n.tr("Entry pinned"));
         });
     }
 
@@ -367,7 +344,6 @@ Singleton {
                 return;
             }
             ToastService.showInfo(I18n.tr("Entry unpinned"));
-            refresh();
         });
     }
 
@@ -492,15 +468,16 @@ Singleton {
         refresh();
     }
 
+    // only pinnedCount is tracked while no surface is open; the bar menu reads it, surfaces refresh on open
     Connections {
         target: DMSService
-        enabled: root.refCount > 0
         function onClipboardStateUpdate(data) {
-            const newHistory = data.history || [];
-            internalEntries = newHistory;
-            pinnedEntries = newHistory.filter(e => e.pinned);
-            pinnedCount = pinnedEntries.length;
-            updateFilteredModel();
+            const history = data.history || [];
+            if (root.refCount > 0) {
+                root.applyHistory(history);
+                return;
+            }
+            root.pinnedCount = history.filter(e => e.pinned).length;
         }
     }
 }

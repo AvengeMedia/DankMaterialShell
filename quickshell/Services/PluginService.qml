@@ -1108,16 +1108,11 @@ Singleton {
         }
         const path = getPluginStatePath(pluginId);
         try {
-            const fv = stateSaveFvComp.createObject(root, {
+            const fv = stateLoadFvComp.createObject(root, {
                 path: path
             });
             _stateWriters[pluginId] = fv;
-            fv.loaded.connect(function () {
-                fv.setText(content);
-            });
-            fv.loadFailed.connect(function () {
-                fv.setText(content);
-            });
+            fv.setText(content);
         } catch (e) {
             log.warn("Failed to write state for", pluginId, e.message);
         }
@@ -1127,14 +1122,6 @@ Singleton {
         id: stateLoadFvComp
         FileView {
             blockLoading: true
-            blockWrites: true
-            atomicWrites: true
-        }
-    }
-
-    Component {
-        id: stateSaveFvComp
-        FileView {
             blockWrites: true
             atomicWrites: true
         }

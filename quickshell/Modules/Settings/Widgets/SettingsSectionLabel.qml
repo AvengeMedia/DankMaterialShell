@@ -36,7 +36,8 @@ Item {
 
     FocusRing {
         id: labelRing
-        radius: Theme.cornerRadiusS + Theme.focusRingOffset
+        anchors.fill: headerHit
+        radius: headerHit.radius + Theme.focusRingOffset
         visible: parentFocused && !pointerFocused && root.collapsible
     }
 
@@ -48,6 +49,7 @@ Item {
     StyledText {
         id: label
         anchors.left: parent.left
+        anchors.leftMargin: Theme.spacingS
         anchors.right: actionsRow.left
         anchors.rightMargin: Theme.spacingS
         anchors.verticalCenter: parent.verticalCenter
@@ -63,7 +65,7 @@ Item {
     Row {
         id: actionsRow
         anchors.right: root.collapsible ? caret.left : parent.right
-        anchors.rightMargin: root.collapsible ? Theme.spacingS : 0
+        anchors.rightMargin: Theme.spacingS
         anchors.verticalCenter: label.verticalCenter
         spacing: Theme.spacingXS
     }
@@ -71,6 +73,7 @@ Item {
     DIcon {
         id: caret
         anchors.right: parent.right
+        anchors.rightMargin: Theme.spacingS
         anchors.verticalCenter: label.verticalCenter
         name: "expand_more"
         size: Theme.iconSize
@@ -96,8 +99,6 @@ Item {
         anchors.bottom: parent.bottom
         anchors.topMargin: root.topGap - Theme.spacingXS
         anchors.bottomMargin: root.bottomGap - Theme.spacingXS
-        anchors.leftMargin: -Theme.spacingS
-        anchors.rightMargin: -Theme.spacingS
         radius: Theme.cornerRadiusS
         color: "transparent"
         visible: root.collapsible

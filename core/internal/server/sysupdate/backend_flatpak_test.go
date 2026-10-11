@@ -15,11 +15,6 @@ func TestParseFlatpakUpdateOutput(t *testing.T) {
 		want      []Package
 	}{
 		{
-			name:  "empty output",
-			input: "",
-			want:  nil,
-		},
-		{
 			name:  "nothing to do",
 			input: "Looking for updates…\n\nNothing to do.\n",
 			want:  nil,

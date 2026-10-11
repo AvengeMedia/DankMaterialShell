@@ -1162,7 +1162,7 @@ Item {
                         propagateComposedEvents: true
                         z: -1
                         scrollEnabled: barWindow.barConfig?.scrollEnabled ?? true
-                        xBehavior: barWindow.barConfig?.scrollXBehavior ?? "column"
+                        xBehavior: barWindow.barConfig?.scrollXBehavior ?? "focusWindow"
                         yBehavior: barWindow.barConfig?.scrollYBehavior ?? "workspace"
                         screenName: barWindow.screenName
                         barConfig: barWindow.barConfig

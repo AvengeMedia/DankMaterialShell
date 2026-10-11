@@ -29,13 +29,17 @@ DEditableGrid {
     signal closeRequested
     property bool tapToClose: false
     property var runningToplevels: []
+    // A member drag inside a quick-tiles group never reaches the grid's own interaction state.
+    property bool memberDragging: false
 
     readonly property real gridHeight: layoutHeight
     readonly property real cellWidth: (width + CcMetrics.gridGap) / columns
     readonly property CcTileSlot draggingSlot: tileRepeater.itemAt(draggingSourceIndex) as CcTileSlot
+    readonly property string hoverGroup: heldOutside && draggingSourceIndex >= 0 ? (groupAt(dragScenePoint, draggingSourceIndex)?.groupId ?? "") : ""
 
     readonly property var savedWidgets: SettingsData.controlCenterWidgets || []
-    readonly property var shownIndices: savedWidgets.reduce((indices, widget, i) => !WidgetUtils.inFooter(widget) && WidgetUtils.isShown(widget) && model?.componentForWidget(widget) ? indices.concat([i]) : indices, [])
+    readonly property var groupIds: WidgetUtils.groupIds(savedWidgets)
+    readonly property var shownIndices: savedWidgets.reduce((indices, widget, i) => !WidgetUtils.inFooter(widget) && !WidgetUtils.inGroup(widget, groupIds) && WidgetUtils.isShown(widget) && model?.componentForWidget(widget) ? indices.concat([i]) : indices, [])
 
     sourceItems: shownIndices.map(i => Object.assign({}, savedWidgets[i], sizeWithHiddenTwin(i)))
     slotLayout: GridUtils.packCards(clamped(layoutItems), placementOrder, columns, width, CcMetrics.gridGap, cellWidth - CcMetrics.gridGap, I18n.isRtl, null, CcMetrics.gridStep, true)
@@ -44,7 +48,11 @@ DEditableGrid {
     packer: items => GridUtils.packCells(clamped(items), placementOrder, columns, null, CcMetrics.gridStep, true).cells
     placeholderRadius: draggingSlot?.small ? Theme.fullRadius(draggingSlot.width, draggingSlot.height) : (draggingSlot?.tileItem?.bodyRadius ?? Theme.fullRadius(width, CcMetrics.tileHeight))
 
-    onLayoutCommitted: items => model.setLayout(withHidden(items))
+    commitHandler: items => model.setLayout(withHidden(items))
+    onEditModeChanged: {
+        if (!editMode)
+            memberDragging = false;
+    }
 
     function clamped(items) {
         return items.map(widget => Object.assign({}, widget, WidgetUtils.clampSize(widget, columns, maximumRows)));
@@ -66,6 +74,17 @@ DEditableGrid {
             return size;
         }
         return size;
+    }
+
+    function groupAt(scenePoint, excludeIndex) {
+        for (let i = 0; i < tileRepeater.count; i++) {
+            const slot = tileRepeater.itemAt(i) as CcTileSlot;
+            if (i === excludeIndex || slot?.widgetData.id !== WidgetUtils.GROUP_ID)
+                continue;
+            if (slot.contains(slot.mapFromItem(null, scenePoint.x, scenePoint.y)))
+                return slot.tileItem;
+        }
+        return null;
     }
 
     function savedIndex(index) {

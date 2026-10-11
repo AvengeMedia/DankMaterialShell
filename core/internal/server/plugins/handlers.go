@@ -3,7 +3,6 @@ package plugins
 import (
 	"fmt"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/dankgo/ipc"
 )
 
@@ -22,6 +21,6 @@ func HandleRequest(conn *ipc.ConnWriter, req ipc.Request) {
 	case "plugins.search":
 		HandleSearch(conn, req)
 	default:
-		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
+		conn.RespondError(req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
 }

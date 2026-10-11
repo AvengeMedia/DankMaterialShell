@@ -58,7 +58,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "mediaScrollTitle"
                 tags: ["scroll", "title", "marquee"]
-                resetKeys: ["scrollTitleEnabled"]
                 text: I18n.tr("Scroll song title")
                 checked: SettingsData.scrollTitleEnabled
                 onToggled: checked => SettingsData.set("scrollTitleEnabled", checked)
@@ -67,7 +66,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "mediaVisualizer"
                 tags: ["visualizer", "cava", "spectrum"]
-                resetKeys: ["audioVisualizerEnabled"]
                 text: I18n.tr("Audio visualizer")
                 checked: SettingsData.audioVisualizerEnabled
                 onToggled: checked => SettingsData.set("audioVisualizerEnabled", checked)
@@ -76,7 +74,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "bluetoothMpris"
                 tags: ["bluetooth", "headphones", "media", "mpris", "avrcp"]
-                resetKeys: ["bluetoothMprisEnabled"]
                 text: I18n.tr("Bluetooth media controls", "Title for the setting that routes Bluetooth headset media buttons through DMS")
                 description: root.mprisProxyRunning ? I18n.tr("mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service", "Warning shown when the legacy BlueZ MPRIS proxy conflicts with DMS Bluetooth media controls") : I18n.tr("Route Bluetooth headset controls to the active DMS media player", "Description of how Bluetooth headset media buttons select a player")
                 descriptionColor: root.mprisProxyRunning ? Theme.error : Theme.surfaceVariantText

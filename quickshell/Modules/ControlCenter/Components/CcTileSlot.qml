@@ -20,6 +20,8 @@ DEditableGridSlot {
     readonly property real smallSpanLimit: (1 + CcMetrics.smallRowFraction) / 2
 
     passthrough: tileItem?.passthrough ?? null
+    restCursor: widgetData.id === WidgetUtils.EDIT_ID ? Qt.PointingHandCursor : Qt.OpenHandCursor
+    raised: dragging || resizing || (tileItem?.memberDragging ?? false)
 
     function reanchor(small) {
         const shift = ((small ? CcMetrics.smallRowFraction : 1) - smallSpanLimit) * grid.cellWidth;
@@ -28,6 +30,11 @@ DEditableGridSlot {
 
     function spanOf(requested, bias = 0) {
         return (requested + bias + CcMetrics.gridGap) / grid.cellWidth;
+    }
+
+    onClicked: {
+        if (widgetData.id === WidgetUtils.EDIT_ID)
+            root.grid.editRequested();
     }
 
     onPressAndHold: {

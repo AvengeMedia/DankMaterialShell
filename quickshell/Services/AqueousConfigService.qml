@@ -3,6 +3,8 @@ pragma ComponentBehavior: Bound
 
 import Quickshell
 import qs.Services
+import qs.Common
+import "../Common/BlurStrength.js" as BlurStrength
 
 Singleton {
     id: root
@@ -145,5 +147,25 @@ Singleton {
 
     function apply(draft, callback) {
         request("apply", draft, callback);
+    }
+
+    // 0 restores the schema default so a reset does not pin the last slider value in the user override
+    function applyBlurStrength() {
+        load((snapshot, error) => {
+            if (!snapshot)
+                return;
+            const field = snapshot.fields?.find(f => f.id === "blur.radius");
+            if (!field)
+                return;
+            const strength = SettingsData.blurStrength;
+            const radius = strength > 0 ? BlurStrength.aqueousRadius(strength) : field.default;
+            if (!Number.isFinite(radius) || radius === field.value)
+                return;
+            apply({
+                expected_generation: snapshot.generation,
+                create_user_override: true,
+                changes: [{ id: "blur.radius", value: radius }]
+            }, () => {});
+        });
     }
 }

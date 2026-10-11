@@ -14,10 +14,13 @@ Item {
     property var resizeOrigin: null
     property var dragOrigin: null
     property Item passthrough: null
+    property int restCursor: Qt.OpenHandCursor
+    property bool raised: dragging || resizing
     readonly property bool interactionEnabled: resizeOrigin !== null || dragOrigin !== null || !grid.interacting
 
     signal resizeRequested(real requestedWidth, real requestedHeight)
     signal pressAndHold
+    signal clicked
 
     function moveDrag(scenePosition) {
         if (!dragOrigin || !dragging)
@@ -77,7 +80,7 @@ Item {
     visible: slot !== null
     width: slot ? slot.w : 0
     height: slot ? slot.h : 0
-    z: dragging || resizing ? 1 : 0
+    z: raised ? 2 : hoverTracker.hovered ? 1 : 0
 
     QtObject {
         id: passthroughMask
@@ -144,6 +147,12 @@ Item {
         }
     }
 
+    // Edit chrome overhangs the gap; the hovered slot paints over its neighbours so its badges stay whole.
+    HoverHandler {
+        id: hoverTracker
+        enabled: root.grid.editMode
+    }
+
     MouseArea {
         id: dragArea
 
@@ -153,9 +162,10 @@ Item {
         enabled: visible && (root.dragOrigin !== null || !root.grid.interacting)
         hoverEnabled: enabled
         acceptedButtons: Qt.LeftButton
-        cursorShape: root.dragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+        cursorShape: root.dragging ? Qt.ClosedHandCursor : root.restCursor
         containmentMask: root.passthrough ? passthroughMask : null
         onPressAndHold: root.pressAndHold()
+        onClicked: root.clicked()
         onWheel: wheel => wheel.accepted = true
     }
 

@@ -12,6 +12,7 @@ Item {
     property var cachedMonoFamilies: []
     property bool fontsEnumerated: false
     property bool shortcutsExpanded: false
+    property bool frameManagesGap: false
 
     signal settingsRequested
     signal findRequested
@@ -449,7 +450,8 @@ Item {
                             anchors.leftMargin: -Theme.spacingM
                             width: parent.width + Theme.spacingM
                             text: I18n.tr("Auto Compositor Gaps")
-                            description: I18n.tr("Inset the Notepad from screen edges using the compositor's configured gaps")
+                            description: root.frameManagesGap ? I18n.tr("Managed by Frame in Connected Mode") : I18n.tr("Inset the Notepad from screen edges using the compositor's configured gaps")
+                            enabled: !root.frameManagesGap
                             checked: SettingsData.notepadUseCompositorGap
                             onToggled: checked => {
                                 SettingsData.notepadUseCompositorGap = checked;
@@ -469,6 +471,7 @@ Item {
                             anchors.leftMargin: Theme.spacingXS
                             width: parent.width - Theme.spacingXS * 2
                             visible: !SettingsData.notepadUseCompositorGap
+                            enabled: !root.frameManagesGap
                             value: SettingsData.notepadEdgeGap
                             minimum: 0
                             maximum: 64

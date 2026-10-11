@@ -236,6 +236,7 @@ FocusScope {
 
         DListView {
             id: transcript
+            fadeEdges: false
             showScrollBar: false
             anchors.left: parent.left
             anchors.right: parent.right

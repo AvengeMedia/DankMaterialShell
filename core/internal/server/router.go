@@ -48,10 +48,10 @@ func requestHandler(handle func(*ipc.ConnWriter, ipc.Request)) ipc.Handler {
 func newRequestMux() *ipc.Mux {
 	mux := ipc.NewMux()
 	mux.Handle("ping", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
-		models.Respond(conn, req.ID, "pong")
+		conn.Respond(req.ID, "pong")
 	}))
 	mux.Handle("getServerInfo", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
-		models.Respond(conn, req.ID, getServerInfo())
+		conn.Respond(req.ID, getServerInfo())
 	}))
 	mux.Handle("subscribe", func(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request, _ *ipc.Subscriber) {
 		handleSubscribe(ctx, conn, req)
@@ -59,13 +59,13 @@ func newRequestMux() *ipc.Mux {
 	mux.Handle("matugen.queue", requestHandler(handleMatugenQueue))
 	mux.Handle("matugen.status", requestHandler(handleMatugenStatus))
 	mux.Handle("clipboard.getConfig", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
-		models.Respond(conn, req.ID, clipboard.LoadConfig())
+		conn.Respond(req.ID, clipboard.LoadConfig())
 	}))
 	mux.Handle("clipboard.setConfig", requestHandler(handleClipboardSetConfig))
 
 	mux.HandlePrefix("network.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if networkManager == nil {
-			models.RespondError(conn, req.ID, "network manager not initialized")
+			conn.RespondError(req.ID, "network manager not initialized")
 			return
 		}
 		network.HandleRequest(conn, req, networkManager)
@@ -79,7 +79,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("theme.auto.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if themeModeManager == nil {
-			models.RespondError(conn, req.ID, "theme mode manager not initialized")
+			conn.RespondError(req.ID, "theme mode manager not initialized")
 			return
 		}
 		thememode.HandleRequest(conn, req, themeModeManager)
@@ -87,7 +87,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("wallpaper.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if wallpaperManager == nil {
-			models.RespondError(conn, req.ID, "wallpaper manager not initialized")
+			conn.RespondError(req.ID, "wallpaper manager not initialized")
 			return
 		}
 		wallpaper.HandleRequest(conn, req, wallpaperManager)
@@ -95,7 +95,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("loginctl.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if loginctlManager == nil {
-			models.RespondError(conn, req.ID, "loginctl manager not initialized")
+			conn.RespondError(req.ID, "loginctl manager not initialized")
 			return
 		}
 		loginctl.HandleRequest(conn, req, loginctlManager)
@@ -103,7 +103,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("freedesktop.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if freedesktopManager == nil {
-			models.RespondError(conn, req.ID, "freedesktop manager not initialized")
+			conn.RespondError(req.ID, "freedesktop manager not initialized")
 			return
 		}
 		freedesktop.HandleRequest(conn, req, freedesktopManager)
@@ -111,7 +111,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("wayland.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if waylandManager == nil {
-			models.RespondError(conn, req.ID, "wayland manager not initialized")
+			conn.RespondError(req.ID, "wayland manager not initialized")
 			return
 		}
 		wayland.HandleRequest(conn, req, waylandManager)
@@ -119,7 +119,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("bluetooth.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if bluezManager == nil {
-			models.RespondError(conn, req.ID, "bluetooth manager not initialized")
+			conn.RespondError(req.ID, "bluetooth manager not initialized")
 			return
 		}
 		bluez.HandleRequest(conn, req, bluezManager)
@@ -129,7 +129,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("files.", func(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request, _ *ipc.Subscriber) {
 		if filesService == nil {
-			models.RespondError(conn, req.ID, "files service not initialized")
+			conn.RespondError(req.ID, "files service not initialized")
 			return
 		}
 		filesService.Handle(ctx, conn, req)
@@ -141,7 +141,7 @@ func newRequestMux() *ipc.Mux {
 
 	appPickerHandler := requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if appPickerManager == nil {
-			models.RespondError(conn, req.ID, "apppicker manager not initialized")
+			conn.RespondError(req.ID, "apppicker manager not initialized")
 			return
 		}
 		apppicker.HandleRequest(conn, req, appPickerManager)
@@ -152,7 +152,7 @@ func newRequestMux() *ipc.Mux {
 	mux.HandlePrefix("cups.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		mgr, err := ensureCupsManager()
 		if err != nil {
-			models.RespondError(conn, req.ID, "CUPS manager not initialized")
+			conn.RespondError(req.ID, "CUPS manager not initialized")
 			return
 		}
 		cups.HandleRequest(conn, req, mgr)
@@ -160,7 +160,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("tailscale.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if tailscaleManager == nil {
-			models.RespondError(conn, req.ID, "Tailscale not available")
+			conn.RespondError(req.ID, "Tailscale not available")
 			return
 		}
 		tailscale.HandleRequest(conn, req, tailscaleManager)
@@ -168,7 +168,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("brightness.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if brightnessManager == nil {
-			models.RespondError(conn, req.ID, "brightness manager not initialized")
+			conn.RespondError(req.ID, "brightness manager not initialized")
 			return
 		}
 		brightness.HandleRequest(conn, req, brightnessManager)
@@ -176,7 +176,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("wlroutput.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if wlrOutputManager == nil {
-			models.RespondError(conn, req.ID, "wlroutput manager not initialized")
+			conn.RespondError(req.ID, "wlroutput manager not initialized")
 			return
 		}
 		wlroutput.HandleRequest(conn, req, wlrOutputManager)
@@ -184,7 +184,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("evdev.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if evdevManager == nil {
-			models.RespondError(conn, req.ID, "evdev manager not initialized")
+			conn.RespondError(req.ID, "evdev manager not initialized")
 			return
 		}
 		evdev.HandleRequest(conn, req, evdevManager)
@@ -192,7 +192,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("dbus.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if dbusManager == nil {
-			models.RespondError(conn, req.ID, "dbus manager not initialized")
+			conn.RespondError(req.ID, "dbus manager not initialized")
 			return
 		}
 		serverDbus.HandleRequest(conn, req, dbusManager, dbusClientID)
@@ -200,7 +200,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("clipboard.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if clipboardManager == nil {
-			models.RespondError(conn, req.ID, "clipboard manager not initialized")
+			conn.RespondError(req.ID, "clipboard manager not initialized")
 			return
 		}
 		clipboard.HandleRequest(conn, req, clipboardManager)
@@ -208,7 +208,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("location.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if locationManager == nil {
-			models.RespondError(conn, req.ID, "location manager not initialized")
+			conn.RespondError(req.ID, "location manager not initialized")
 			return
 		}
 		location.HandleRequest(conn, req, locationManager)
@@ -216,7 +216,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("wellbeing.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if wellbeingManager == nil {
-			models.RespondError(conn, req.ID, "wellbeing manager not initialized")
+			conn.RespondError(req.ID, "wellbeing manager not initialized")
 			return
 		}
 		wellbeing.HandleRequest(conn, req, wellbeingManager)
@@ -224,7 +224,7 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("notify.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if notifyActionsManager == nil {
-			models.RespondError(conn, req.ID, "notification action manager not initialized")
+			conn.RespondError(req.ID, "notification action manager not initialized")
 			return
 		}
 		notifyactions.HandleRequest(conn, req, notifyActionsManager)
@@ -232,14 +232,14 @@ func newRequestMux() *ipc.Mux {
 
 	mux.HandlePrefix("sysupdate.", func(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request, _ *ipc.Subscriber) {
 		if sysUpdateManager == nil {
-			models.RespondError(conn, req.ID, "sysupdate manager not initialized")
+			conn.RespondError(req.ID, "sysupdate manager not initialized")
 			return
 		}
 		sysupdate.HandleRequest(ctx, conn, req, sysUpdateManager)
 	})
 
 	mux.HandlePrefix("", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
-		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
+		conn.RespondError(req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}))
 	return mux
 }
@@ -247,29 +247,29 @@ func newRequestMux() *ipc.Mux {
 func handleClipboardSetConfig(conn *ipc.ConnWriter, req ipc.Request) {
 	cfg := clipboard.LoadConfig()
 
-	if v, ok := models.Get[float64](req, "maxHistory"); ok {
+	if v, ok := req.Get[float64]("maxHistory"); ok {
 		cfg.MaxHistory = int(v)
 	}
-	if v, ok := models.Get[float64](req, "maxEntrySize"); ok {
+	if v, ok := req.Get[float64]("maxEntrySize"); ok {
 		cfg.MaxEntrySize = int64(v)
 	}
-	if v, ok := models.Get[float64](req, "autoClearDays"); ok {
+	if v, ok := req.Get[float64]("autoClearDays"); ok {
 		cfg.AutoClearDays = int(v)
 	}
-	if v, ok := models.Get[bool](req, "clearAtStartup"); ok {
+	if v, ok := req.Get[bool]("clearAtStartup"); ok {
 		cfg.ClearAtStartup = v
 	}
-	if v, ok := models.Get[bool](req, "disabled"); ok {
+	if v, ok := req.Get[bool]("disabled"); ok {
 		cfg.Disabled = v
 	}
-	if v, ok := models.Get[float64](req, "maxPinned"); ok {
+	if v, ok := req.Get[float64]("maxPinned"); ok {
 		cfg.MaxPinned = int(v)
 	}
 
 	if err := clipboard.SaveConfig(cfg); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "config updated"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "config updated"})
 }

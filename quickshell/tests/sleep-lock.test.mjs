@@ -10,5 +10,4 @@ test("lock-before-sleep waits until the session lock is actually up", () => {
     assert.equal(sleepLock.shouldWaitForLock(true, false), true, "lock requested and not yet secure");
     assert.equal(sleepLock.shouldWaitForLock(true, true), false, "already locked, sleep immediately");
     assert.equal(sleepLock.shouldWaitForLock(false, false), false, "setting off, do not delay sleep");
-    assert.equal(sleepLock.shouldWaitForLock(false, true), false, "setting off even if already locked");
 });

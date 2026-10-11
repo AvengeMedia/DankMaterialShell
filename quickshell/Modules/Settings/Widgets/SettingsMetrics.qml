@@ -19,6 +19,8 @@ Singleton {
     readonly property real pagePaddingV: 32
     readonly property real paneMargin: Theme.windowInset
     readonly property real panePadding: Theme.spacingXL
+    // Scroll containers clip at their bounds, so pages grow by this and inset their content to let focus rings bleed
+    readonly property real focusGutter: Theme.focusRingOffset + Theme.focusRingWidth
     readonly property real paneRadius: Theme.cornerRadiusL
     readonly property real pageHeaderHeight: Theme.fontSizeXXLarge + Theme.spacingXL + Theme.spacingM
     readonly property real rowPaddingH: 20

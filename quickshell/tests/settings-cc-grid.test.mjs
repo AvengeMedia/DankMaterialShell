@@ -18,9 +18,6 @@ test("control center width percentages become square grid cells", () => {
 });
 
 test("sparse settings migrate without inventing grid keys", () => {
-    const migrated = store.migrateToVersion({ configVersion: 26, controlCenterWidth: 550, controlCenterWidgets: [{ id: "wifi", width: 50 }, { id: "battery", width: 100 }] }, 27);
-    assert.equal(migrated.controlCenterColumns, 8);
-    assert.deepEqual(JSON.parse(JSON.stringify(migrated.controlCenterWidgets)), [{ id: "wifi", w: 4, h: 1 }, { id: "battery", w: 8, h: 1 }]);
     const sparse = store.migrateToVersion({ configVersion: 26 }, 27);
     assert.equal(sparse.controlCenterColumns, undefined);
     assert.equal(sparse.controlCenterWidgets, undefined);

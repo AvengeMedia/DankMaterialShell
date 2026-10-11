@@ -71,6 +71,7 @@ func (u *UbuntuDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 	// Hyprland-specific tools
 	if wm == deps.WindowManagerHyprland {
 		dependencies = append(dependencies, u.detectHyprlandTools()...)
+		dependencies = append(dependencies, u.detectHyprlandGuiutils())
 	}
 
 	// Niri-specific tools
@@ -134,6 +135,7 @@ func (u *UbuntuDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 		packages["hyprland"] = PackageMapping{Name: "hyprland", Repository: RepoTypePPA, RepoURL: "ppa:cppiber/hyprland"}
 		packages["hyprctl"] = PackageMapping{Name: "hyprland", Repository: RepoTypePPA, RepoURL: "ppa:cppiber/hyprland"}
 		packages["jq"] = PackageMapping{Name: "jq", Repository: RepoTypeSystem}
+		packages["hyprland-guiutils"] = PackageMapping{Name: "hyprland-guiutils", Repository: RepoTypePPA, RepoURL: "ppa:cppiber/hyprland"}
 	case deps.WindowManagerNiri:
 		niriVariant := variants["niri"]
 		packages["niri"] = u.getNiriMapping(niriVariant)

@@ -37,6 +37,8 @@ BasePill {
     onRightClicked: {
         if (CompositorService.isNiri) {
             NiriService.toggleOverview();
+        } else if (CompositorService.isMango) {
+            CompositorService.toggleOverview(root.parentScreen?.name);
         } else if (root.hyprlandOverviewLoader?.item) {
             root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen;
         }

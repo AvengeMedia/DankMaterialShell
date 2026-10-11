@@ -35,6 +35,7 @@ Column {
     readonly property var opacityTargets: {
         SettingsData.barConfigs;
         SettingsData.dockConfigs;
+        const frameBarId = SettingsData.frameEnabled ? SettingsData.frameBarConfig?.id : undefined;
         const bars = SettingsData.barConfigs.filter(config => !SettingsData.isDotBarConfig(config)).map(config => ({
                     key: "bar:" + config.id,
                     kind: "bar",
@@ -42,7 +43,8 @@ Column {
                     name: config.name || config.id,
                     enabled: config.enabled !== false,
                     override: config.followInterfaceStyle === false,
-                    transparency: config.transparency ?? 1
+                    transparency: config.transparency ?? 1,
+                    frame: config.id === frameBarId
                 }));
         const docks = SettingsData.dockConfigs.map(config => ({
                     key: "dock:" + config.id,
@@ -51,7 +53,8 @@ Column {
                     name: config.name,
                     enabled: config.enabled !== false,
                     override: config.followInterfaceStyle === false,
-                    transparency: config.transparency ?? 1
+                    transparency: config.transparency ?? 1,
+                    overlay: config.useOverlayLayer ?? false
                 }));
         return bars.concat(docks);
     }
@@ -108,7 +111,6 @@ Column {
             tab: "theme"
             tags: ["foreground", "layers", "outline", "border", "opacity", "cards", "pills", "widgets", "notifications", "control center"]
             settingKey: "blurLayerOutline"
-            resetKeys: ["blurLayerOutlineOpacity"]
             text: I18n.tr("Layer outline")
             description: I18n.tr("Faint edge on cards, pills and widgets", "surface layer outline toggle description")
             checked: root.layerOutlineEnabled
@@ -186,14 +188,26 @@ Column {
             }
         }
 
-        SettingsToggleRow {
+        SettingsControlledBy {
+            visible: SettingsData.connectedFrameModeActive && root.borderEnabled
+            parentModal: root.parentModal
+            section: "frameBorder"
+            settingLabel: I18n.tr("Border")
+            reason: I18n.tr("Managed by Frame in Connected Mode")
+        }
+
+        SettingsToggleSliderRow {
             tab: "theme"
-            tags: ["blur", "background", "transparency", "glass", "frosted"]
+            tags: ["blur", "background", "transparency", "glass", "frosted", "strength", "radius", "size", "passes", "reach"]
             settingKey: "blurEnabled"
+            valueKeys: ["blurStrength"]
             text: I18n.tr("Background blur")
-            description: BlurService.available ? "" : I18n.tr("Your compositor does not support background blur (ext-background-effect-v1)")
+            visible: BlurService.available
             checked: SettingsData.blurEnabled ?? false
-            enabled: BlurService.available
+            value: BlurService.strength
+            minimum: 16
+            maximum: 160
+            unit: "px"
             onToggled: checked => {
                 SettingsData.set("blurEnabled", checked);
                 if (!checked || SettingsData.blurBorderSeeded)
@@ -202,13 +216,22 @@ Column {
                 SettingsData.set("blurBorderEnabled", true);
                 SettingsSearchService.navigateToSection("blurBorderEnabled");
             }
+            onSliderValueChanged: newValue => SettingsData.set("blurStrength", newValue)
+        }
+
+        SettingsNoteRow {
+            visible: BlurService.probed && !BlurService.available
+            noteIconName: "info"
+            tint: Theme.surfaceVariantText
+            tintBackground: Theme.surfaceVariantAlpha
+            text: I18n.tr("Your compositor does not support ext-background blur")
         }
 
         SettingsNavRow {
             tab: "theme"
             tags: ["blur", "xray", "compositor", "layout"]
             settingKey: "blurXrayLink"
-            visible: CompositorService.isNiri || CompositorService.isHyprland
+            visible: BlurService.available && (CompositorService.isNiri || CompositorService.isHyprland)
             title: I18n.tr("Xray options are in Compositor → Layout")
             onClicked: keyboard => root.parentModal?.navigateTo("compositor_layout", keyboard)
         }
@@ -280,7 +303,6 @@ Column {
             settingKey: "windowRadius"
             text: I18n.tr("Override window radius", "toggle: stop the window radius following the corner style setting")
             visible: root.windowRadiusKey !== ""
-            resetKeys: root.windowRadiusKey !== "" ? [root.windowRadiusKey] : []
             checked: Theme.compositorRadiusOverride >= 0
             value: Theme.windowRadius
             minimum: 0
@@ -322,6 +344,14 @@ Column {
             title: modelData.title
             settingKey: modelData.settingKey
             visible: targets.length > 0
+
+            SettingsControlledBy {
+                visible: targetCard.modelData.kind === "dock" && SettingsData.connectedFrameModeActive && targetCard.activeTargets.some(target => !target.overlay)
+                parentModal: root.parentModal
+                section: "frameSurfaceOpacity"
+                settingLabel: I18n.tr("Opacity")
+                reason: I18n.tr("Managed by Frame in Connected Mode")
+            }
 
             Repeater {
                 model: targetCard.activeKeys ? targetCard.activeKeys.split("\n") : []
@@ -437,14 +467,13 @@ Column {
             tags: ["surface", "opacity", "transparency", "bar", "dock", "override"]
             settingKey: "surfaceOpacity_" + modelData.replace(":", "_")
             text: target?.name ?? ""
-            description: I18n.tr("Override")
+            description: target?.frame ? I18n.tr("Frame") + " · " + I18n.tr("Override") : I18n.tr("Override")
             checked: target?.override ?? false
             value: Math.round((target?.transparency ?? 1) * 100)
             minimum: 0
             maximum: 100
             modified: target?.override ?? false
             valueModified: (target?.transparency ?? 1) !== 1
-            resetByKeys: true
             onResetRequested: root.setOpacityOverride(target, {
                 followInterfaceStyle: true,
                 transparency: 1

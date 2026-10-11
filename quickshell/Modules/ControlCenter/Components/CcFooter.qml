@@ -39,7 +39,10 @@ Item {
     readonly property bool dragRemovable: liftedIndex >= 0 ? WidgetUtils.isRemovable(items.find(item => item.index === liftedIndex)?.widget) : incomingRemovable
     readonly property bool overTrash: trashContains(liftedIndex >= 0 ? liftedPoint : gridDragPoint)
 
+    property bool canUndo: false
+
     signal addWidgetRequested
+    signal undoRequested
     signal resetRequested
     signal clearRequested
     signal moveRequested
@@ -53,7 +56,9 @@ Item {
     // Grid columns, so footer widths line up with the tiles above.
     readonly property real spacing: CcMetrics.gridGap
     readonly property real pitch: grid.cellWidth
-    readonly property real editActionsWidth: Theme.iconButtonSize * 3 + spacing * 2
+    readonly property real editActionsWidth: Theme.iconButtonSize * 2 + spacing
+    // The pencil turns into the check, so the row shrinks away from it and the same spot leaves edit mode.
+    readonly property bool editAtEnd: items.some(item => item.widget.id === WidgetUtils.EDIT_ID && WidgetUtils.footerEnds(item.widget))
     // The row owns its full width in both modes, so capacity never changes under the user's feet; edit mode
     // shows the whole row scaled into the room beside the edit buttons, so every width stays reachable.
     readonly property real trackWidth: width
@@ -215,6 +220,29 @@ Item {
         };
     }
 
+    Rectangle {
+        readonly property real inset: CcMetrics.dropZoneInset
+        readonly property bool receiving: root.incoming !== null || (root.liftedIndex >= 0 && root.liftedSlot !== null)
+
+        x: (I18n.isRtl !== root.editAtEnd ? root.trackWidth * (1 - trackScale.xScale) : 0) - inset
+        y: -inset
+        width: root.trackWidth * trackScale.xScale + inset * 2
+        height: CcMetrics.footerHeight + inset * 2
+        radius: CcMetrics.dropZoneRadius
+        color: "transparent"
+        border.width: Theme.outlineWidth
+        border.color: receiving ? Theme.primary : Theme.outlineVariant
+        visible: root.editMode
+
+        Behavior on border.color {
+            enabled: CcMetrics.animationsEnabled
+            ColorAnimation {
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+    }
+
     Item {
         id: track
 
@@ -233,7 +261,7 @@ Item {
         transform: Scale {
             id: trackScale
 
-            origin.x: I18n.isRtl ? track.width - track.overhang : track.overhang
+            origin.x: I18n.isRtl !== root.editAtEnd ? track.width - track.overhang : track.overhang
             origin.y: track.height / 2
             xScale: root.trackScale
             yScale: root.trackScale
@@ -391,6 +419,11 @@ Item {
                     onConfigRequested: anchor => root.configRequested(footerItem.entry.index, footerItem.entry.widget, anchor)
                 }
 
+                HoverHandler {
+                    enabled: root.editMode && root.resizePreview === null
+                    cursorShape: footerItem.lifted ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+                }
+
                 DragHandler {
                     id: dragHandler
 
@@ -428,7 +461,8 @@ Item {
     Item {
         id: editActions
 
-        anchors.right: parent.right
+        // A side anchor set to undefined is never released, so flipping sides stretched the block across the row.
+        x: root.editAtEnd !== I18n.isRtl ? 0 : root.width - width
         anchors.verticalCenter: parent.verticalCenter
         width: root.editActionsWidth
         height: CcMetrics.footerHeight
@@ -456,10 +490,8 @@ Item {
                 buttonSize: Theme.iconButtonSize
                 iconName: "more_horiz"
                 iconSize: CcMetrics.iconBoxIconSize
-                iconColor: CcMetrics.tileInactiveContent
-                backgroundColor: CcMetrics.tileInactiveColor
-                border.width: Theme.layerOutlineWidth
-                border.color: Theme.outlineMedium
+                iconColor: Theme.onSecondaryContainer
+                backgroundColor: Theme.secondaryContainer
                 tooltipText: I18n.tr("More")
                 onClicked: editMenu.openAt(moreButton)
             }
@@ -468,12 +500,11 @@ Item {
         StyledRect {
             id: trash
 
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            width: root.editActionsWidth - Theme.iconButtonSize - root.spacing
-            height: CcMetrics.footerHeight
+            anchors.fill: parent
             radius: Theme.fullRadius(width, height)
             color: root.overTrash ? Theme.errorContainer : CcMetrics.tileInactiveColor
+            border.width: Theme.outlineWidth
+            border.color: root.overTrash ? Theme.error : Theme.outlineVariant
             visible: root.dragging && root.dragRemovable
             Accessible.role: Accessible.Graphic
             Accessible.name: I18n.tr("Remove")
@@ -493,18 +524,6 @@ Item {
                 color: root.overTrash ? Theme.onErrorContainer : CcMetrics.tileInactiveContent
             }
         }
-
-        DActionButton {
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            buttonSize: Theme.iconButtonSize
-            iconName: "check"
-            iconSize: CcMetrics.iconBoxIconSize
-            iconColor: Theme.onPrimary
-            backgroundColor: Theme.primary
-            tooltipText: I18n.tr("Save")
-            onClicked: root.finishRequested()
-        }
     }
 
     CcMenu {
@@ -512,6 +531,12 @@ Item {
 
         transientSurfaceTracker: root.transientSurfaceTracker
         items: [
+            {
+                "iconName": "undo",
+                "label": I18n.tr("Undo"),
+                "enabled": root.canUndo,
+                "action": () => root.undoRequested()
+            },
             {
                 "iconName": root.onTop ? "vertical_align_bottom" : "vertical_align_top",
                 "label": root.onTop ? I18n.tr("Move row to footer", "control center edit menu, moves the row from the header to the footer") : I18n.tr("Move row to header", "control center edit menu, moves the row from the footer to the header"),

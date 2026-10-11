@@ -6,6 +6,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/mangoconf"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -196,13 +197,16 @@ func (m Model) troubleshootingHints() (autostart, logs string) {
 		case deps.WindowManagerHyprland:
 			autostart = `remove hl.exec_cmd("dms run") from ~/.config/hypr/hyprland.lua`
 		default:
-			autostart = "remove 'exec-once=dms run' from ~/.config/mango/config.conf"
+			autostart = "remove '" + mangoconf.Detect().Key("exec_once") + "=dms run' from ~/.config/mango/config.conf"
 		}
 		return autostart, logs
 	}
 
 	if wm == deps.WindowManagerMango {
-		return "remove 'exec-once=dms run' from ~/.config/mango/config.conf", "qs -p ~/.config/quickshell/dms log"
+		if mangoconf.SessionTargetInstalled() {
+			return "rm ~/.config/systemd/user/mango-session.target.wants/dms.service", "journalctl --user -u dms"
+		}
+		return "remove '" + mangoconf.Detect().Key("exec_once") + "=dms run' from ~/.config/mango/config.conf", "qs -p ~/.config/quickshell/dms log"
 	}
 	return "systemctl --user disable dms", "journalctl --user -u dms"
 }

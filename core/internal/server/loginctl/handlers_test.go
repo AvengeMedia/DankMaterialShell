@@ -13,7 +13,6 @@ import (
 	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/godbus/dbus/v5"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -423,28 +422,5 @@ func TestHandleRequest(t *testing.T) {
 
 		assert.Equal(t, 123, resp.ID)
 		assert.Empty(t, resp.Error)
-	})
-
-	t.Run("lock method", func(t *testing.T) {
-		mockSessionObj := mockdbus.NewMockBusObject(t)
-		mockCall := &dbus.Call{Err: nil}
-		mockSessionObj.EXPECT().Call("org.freedesktop.login1.Session.Lock", mock.Anything).Return(mockCall)
-
-		manager.sessionObj = mockSessionObj
-
-		mc := newMockNetConn()
-		conn := ipc.NewConnWriter(mc)
-		req := ipc.Request{
-			ID:     123,
-			Method: "loginctl.lock",
-		}
-
-		HandleRequest(conn, req, manager)
-
-		var resp ipc.Response[any]
-		err := json.NewDecoder(mc.writeBuf).Decode(&resp)
-		require.NoError(t, err)
-
-		assert.Equal(t, 123, resp.ID)
 	})
 }

@@ -164,6 +164,10 @@ func TestSelectedLogicalGeometryPreSelection(t *testing.T) {
 }
 
 func TestWaylandOutputBoundsScaled(t *testing.T) {
+	// DetectCompositor caches its result, so inside a live Hyprland session the test would exec hyprctl
+	prev := detectedCompositor
+	detectedCompositor = CompositorUnknown
+	t.Cleanup(func() { detectedCompositor = prev })
 	out := &WaylandOutput{
 		name:            "DP-2",
 		x:               1920,

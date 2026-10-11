@@ -62,20 +62,20 @@ func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, m *Manager, clientID s
 	case "dbus.unsubscribe":
 		handleUnsubscribe(conn, req, m)
 	default:
-		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
+		conn.RespondError(req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
 }
 
 func handleCall(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	op, err := extractObjectParams(req.Params, true)
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
 	method, err := params.String(req.Params, "method")
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
@@ -88,88 +88,88 @@ func handleCall(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 
 	result, err := m.Call(op.bus, op.dest, op.path, op.iface, method, args)
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, result)
+	conn.Respond(req.ID, result)
 }
 
 func handleGetProperty(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	op, err := extractObjectParams(req.Params, true)
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
 	property, err := params.String(req.Params, "property")
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
 	result, err := m.GetProperty(op.bus, op.dest, op.path, op.iface, property)
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, result)
+	conn.Respond(req.ID, result)
 }
 
 func handleSetProperty(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	op, err := extractObjectParams(req.Params, true)
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
 	property, err := params.String(req.Params, "property")
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
 	value, ok := params.Any(req.Params, "value")
 	if !ok {
-		models.RespondError(conn, req.ID, "missing 'value' parameter")
+		conn.RespondError(req.ID, "missing 'value' parameter")
 		return
 	}
 
 	if err := m.SetProperty(op.bus, op.dest, op.path, op.iface, property, value); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true})
+	conn.Respond(req.ID, models.SuccessResult{Success: true})
 }
 
 func handleGetAllProperties(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	op, err := extractObjectParams(req.Params, true)
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
 	result, err := m.GetAllProperties(op.bus, op.dest, op.path, op.iface)
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, result)
+	conn.Respond(req.ID, result)
 }
 
 func handleIntrospect(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	bus, err := params.String(req.Params, "bus")
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
 	dest, err := params.String(req.Params, "dest")
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
@@ -177,27 +177,27 @@ func handleIntrospect(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 
 	result, err := m.Introspect(bus, dest, path)
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, result)
+	conn.Respond(req.ID, result)
 }
 
 func handleListNames(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	bus, err := params.String(req.Params, "bus")
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
 	result, err := m.ListNames(bus)
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, result)
+	conn.Respond(req.ID, result)
 }
 
 func handleSubscribe(conn *ipc.ConnWriter, req ipc.Request, m *Manager, clientID string) {
@@ -207,7 +207,7 @@ func handleSubscribe(conn *ipc.ConnWriter, req ipc.Request, m *Manager, clientID
 
 	bus, err := params.String(req.Params, "bus")
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
@@ -218,24 +218,24 @@ func handleSubscribe(conn *ipc.ConnWriter, req ipc.Request, m *Manager, clientID
 
 	result, err := m.Subscribe(clientID, bus, sender, path, iface, member)
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, result)
+	conn.Respond(req.ID, result)
 }
 
 func handleUnsubscribe(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	subID, err := params.String(req.Params, "subscriptionId")
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
 	if err := m.Unsubscribe(subID); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true})
+	conn.Respond(req.ID, models.SuccessResult{Success: true})
 }

@@ -118,14 +118,9 @@ DPopout {
         contentLoader.item.externalKeyboardController = keyboardController;
 
         const notificationList = findChild(contentLoader.item, "notificationList");
-        const notificationHeader = findChild(contentLoader.item, "notificationHeader");
-
         if (notificationList) {
             keyboardController.listView = notificationList;
             notificationList.keyboardController = keyboardController;
-        }
-        if (notificationHeader) {
-            notificationHeader.keyboardController = keyboardController;
         }
 
         keyboardController.reset();

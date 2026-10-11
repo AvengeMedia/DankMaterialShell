@@ -3,6 +3,7 @@ package providers
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -16,46 +17,28 @@ func TestParseWindowRuleV1(t *testing.T) {
 		name      string
 		line      string
 		wantClass string
-		wantRule  string
-		wantNil   bool
+		wantFloat bool
+		wantTile  bool
 	}{
-		{
-			name:      "basic float rule",
-			line:      "windowrule = float, ^(firefox)$",
-			wantClass: "^(firefox)$",
-			wantRule:  "float",
-		},
-		{
-			name:      "tile rule",
-			line:      "windowrule = tile, steam",
-			wantClass: "steam",
-			wantRule:  "tile",
-		},
-		{
-			name:      "no match returns empty class",
-			line:      "windowrule = float",
-			wantClass: "",
-			wantRule:  "",
-		},
+		{name: "basic float rule", line: "windowrule = float, ^(firefox)$", wantClass: "^(firefox)$", wantFloat: true},
+		{name: "tile rule", line: "windowrule = tile, steam", wantClass: "steam", wantTile: true},
+		{name: "no match returns empty class", line: "windowrule = float"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := parser.parseWindowRuleLine(tt.line)
-			if tt.wantNil {
-				if result != nil {
-					t.Errorf("expected nil, got %+v", result)
-				}
-				return
-			}
 			if result == nil {
 				t.Fatal("expected non-nil result")
 			}
-			if result.MatchClass != tt.wantClass {
-				t.Errorf("MatchClass = %q, want %q", result.MatchClass, tt.wantClass)
+			if result.Match.AppID != tt.wantClass {
+				t.Errorf("AppID = %q, want %q", result.Match.AppID, tt.wantClass)
 			}
-			if result.Rule != tt.wantRule {
-				t.Errorf("Rule = %q, want %q", result.Rule, tt.wantRule)
+			if (result.Actions.OpenFloating != nil) != tt.wantFloat {
+				t.Errorf("OpenFloating = %v, want %v", result.Actions.OpenFloating, tt.wantFloat)
+			}
+			if (result.Actions.Tile != nil) != tt.wantTile {
+				t.Errorf("Tile = %v, want %v", result.Actions.Tile, tt.wantTile)
 			}
 		})
 	}
@@ -65,34 +48,17 @@ func TestParseWindowRuleV2(t *testing.T) {
 	parser := NewHyprlandRulesParser("")
 
 	tests := []struct {
-		name      string
-		line      string
-		wantClass string
-		wantTitle string
-		wantRule  string
-		wantValue string
+		name        string
+		line        string
+		wantClass   string
+		wantTitle   string
+		wantOpacity float64
+		wantMax     bool
 	}{
-		{
-			name:      "float with class",
-			line:      "windowrulev2 = float, class:^(firefox)$",
-			wantClass: "^(firefox)$",
-			wantRule:  "float",
-		},
-		{
-			name:      "opacity with value",
-			line:      "windowrulev2 = opacity 0.8, class:^(code)$",
-			wantClass: "^(code)$",
-			wantRule:  "opacity",
-			wantValue: "0.8",
-		},
-		{
-			name:      "size with value and title",
-			line:      "windowrulev2 = size 800 600, class:^(steam)$, title:Settings",
-			wantClass: "^(steam)$",
-			wantTitle: "Settings",
-			wantRule:  "size",
-			wantValue: "800 600",
-		},
+		{name: "float with class", line: "windowrulev2 = float, class:^(firefox)$", wantClass: "^(firefox)$"},
+		{name: "opacity with value", line: "windowrulev2 = opacity 0.8, class:^(code)$", wantClass: "^(code)$", wantOpacity: 0.8},
+		{name: "maximize", line: "windowrulev2 = maximize, class:^(steam)$", wantClass: "^(steam)$", wantMax: true},
+		{name: "size with value and title", line: "windowrulev2 = size 800 600, class:^(steam)$, title:Settings", wantClass: "^(steam)$", wantTitle: "Settings"},
 	}
 
 	for _, tt := range tests {
@@ -101,76 +67,128 @@ func TestParseWindowRuleV2(t *testing.T) {
 			if result == nil {
 				t.Fatal("expected non-nil result")
 			}
-			if result.MatchClass != tt.wantClass {
-				t.Errorf("MatchClass = %q, want %q", result.MatchClass, tt.wantClass)
+			if result.Match.AppID != tt.wantClass {
+				t.Errorf("AppID = %q, want %q", result.Match.AppID, tt.wantClass)
 			}
-			if result.MatchTitle != tt.wantTitle {
-				t.Errorf("MatchTitle = %q, want %q", result.MatchTitle, tt.wantTitle)
+			if result.Match.Title != tt.wantTitle {
+				t.Errorf("Title = %q, want %q", result.Match.Title, tt.wantTitle)
 			}
-			if result.Rule != tt.wantRule {
-				t.Errorf("Rule = %q, want %q", result.Rule, tt.wantRule)
+			if tt.wantOpacity != 0 && (result.Actions.Opacity == nil || *result.Actions.Opacity != tt.wantOpacity) {
+				t.Errorf("Opacity = %v, want %v", result.Actions.Opacity, tt.wantOpacity)
 			}
-			if result.Value != tt.wantValue {
-				t.Errorf("Value = %q, want %q", result.Value, tt.wantValue)
+			if (result.Actions.OpenMaximized != nil) != tt.wantMax {
+				t.Errorf("OpenMaximized = %v, want %v", result.Actions.OpenMaximized, tt.wantMax)
 			}
 		})
 	}
 }
 
-func TestConvertHyprlandRulesToWindowRules(t *testing.T) {
-	hyprRules := []HyprlandWindowRule{
-		{MatchClass: "^(firefox)$", Rule: "float"},
-		{MatchClass: "^(code)$", Rule: "opacity", Value: "0.9"},
-		{MatchClass: "^(steam)$", Rule: "maximize"},
+func TestParseHyprlangMatchSyntax(t *testing.T) {
+	tmpDir := t.TempDir()
+	conf := `
+windowrule = match:class ^(kitty)$, match:initial_title ^Login$, match:focus 1, float on, rounding 12
+windowrule = no_initial_focus on, match:fullscreen_state_client 2, match:xdg_tag ^portal$, size 800 600
+windowrule {
+    name = steam-popups
+    match:class = ^steam$
+    match:modal = true
+    match:title = ^a##b$ # trailing
+    border_color = rgb(ff0000)
+    move = 10 20
+    float = on # x
+}
+windowrule = match:class ^(mpv)$, opacity 0.8 0.9 # x
+`
+	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.conf"), []byte(conf), 0644); err != nil {
+		t.Fatal(err)
 	}
 
-	result := ConvertHyprlandRulesToWindowRules(hyprRules)
-
-	if len(result) != 3 {
-		t.Errorf("expected 3 rules, got %d", len(result))
+	res, err := ParseHyprlandWindowRules(tmpDir)
+	if err != nil {
+		t.Fatalf("ParseHyprlandWindowRules: %v", err)
+	}
+	got := ConvertHyprlandRulesToWindowRules(res.Rules)
+	if len(got) != 4 {
+		t.Fatalf("expected 4 rules, got %d", len(got))
 	}
 
-	if result[0].MatchCriteria.AppID != "^(firefox)$" {
-		t.Errorf("rule 0 AppID = %q, want ^(firefox)$", result[0].MatchCriteria.AppID)
+	want := []struct {
+		match windowrules.MatchCriteria
+		act   windowrules.Actions
+	}{
+		{
+			windowrules.MatchCriteria{AppID: "^(kitty)$", InitialTitle: "^Login$", IsFocused: new(true)},
+			windowrules.Actions{OpenFloating: new(true), CornerRadius: new(12)},
+		},
+		{
+			windowrules.MatchCriteria{FullscreenStateClient: new(2), XdgTag: "^portal$"},
+			windowrules.Actions{NoInitialFocus: new(true), SizeWidth: "800", SizeHeight: "600"},
+		},
+		{
+			windowrules.MatchCriteria{AppID: "^steam$", Title: "^a#b$", Modal: new(true)},
+			windowrules.Actions{BorderColor: "rgb(ff0000)", MoveX: "10", MoveY: "20", OpenFloating: new(true)},
+		},
+		{
+			windowrules.MatchCriteria{AppID: "^(mpv)$"},
+			windowrules.Actions{Opacity: new(0.8)},
+		},
 	}
-	if result[0].Actions.OpenFloating == nil || !*result[0].Actions.OpenFloating {
-		t.Error("rule 0 should have OpenFloating = true")
+	for i, w := range want {
+		if !reflect.DeepEqual(got[i].MatchCriteria, w.match) {
+			t.Errorf("rule %d match = %+v, want %+v", i, got[i].MatchCriteria, w.match)
+		}
+		if !reflect.DeepEqual(got[i].Actions, w.act) {
+			t.Errorf("rule %d actions = %+v, want %+v", i, got[i].Actions, w.act)
+		}
 	}
-
-	if result[1].Actions.Opacity == nil || *result[1].Actions.Opacity != 0.9 {
-		t.Errorf("rule 1 Opacity = %v, want 0.9", result[1].Actions.Opacity)
-	}
-
-	if result[2].Actions.OpenMaximized == nil || !*result[2].Actions.OpenMaximized {
-		t.Error("rule 2 should have OpenMaximized = true")
+	if res.DMSStatus.ConfigFormat != "hyprlang" || !res.DMSStatus.ReadOnly {
+		t.Errorf("status format=%q readOnly=%v, want hyprlang/true", res.DMSStatus.ConfigFormat, res.DMSStatus.ReadOnly)
 	}
 }
 
-func TestHyprlandSetAndLoadDMSRules(t *testing.T) {
+func TestHyprlandLuaPreferredOverConf(t *testing.T) {
 	tmpDir := t.TempDir()
-	provider := NewHyprlandWritableProvider(tmpDir)
-
-	rule := newTestWindowRule("test_id", "Test Rule", "^(firefox)$")
-	rule.Actions.OpenFloating = new(true)
-
-	if err := provider.SetRule(rule); err != nil {
-		t.Fatalf("SetRule failed: %v", err)
+	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.conf"), []byte("windowrule = match:class ^conf$, float on\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.lua"), []byte(`hl.window_rule({ match = { class = "^lua$" }, float = true })`+"\n"), 0644); err != nil {
+		t.Fatal(err)
 	}
 
-	rules, err := provider.LoadDMSRules()
+	res, err := ParseHyprlandWindowRules(tmpDir)
 	if err != nil {
-		t.Fatalf("LoadDMSRules failed: %v", err)
+		t.Fatalf("ParseHyprlandWindowRules: %v", err)
+	}
+	if len(res.Rules) != 1 || res.Rules[0].Match.AppID != "^lua$" {
+		t.Fatalf("expected only the Lua rule, got %+v", res.Rules)
+	}
+	if res.DMSStatus.ConfigFormat != "lua" || res.DMSStatus.ReadOnly {
+		t.Errorf("status format=%q readOnly=%v, want lua/false", res.DMSStatus.ConfigFormat, res.DMSStatus.ReadOnly)
+	}
+	if err := NewHyprlandWritableProvider(tmpDir).EnsureWritable(); err != nil {
+		t.Errorf("EnsureWritable with hyprland.lua present: %v", err)
+	}
+}
+
+func TestHyprlandLoadDMSRulesFromConfFragment(t *testing.T) {
+	tmpDir := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(tmpDir, "dms"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	frag := "# DMS-RULE: id=ff, name=Firefox\nwindowrulev2 = float, class:^(firefox)$\n"
+	if err := os.WriteFile(filepath.Join(tmpDir, "dms", "windowrules.conf"), []byte(frag), 0644); err != nil {
+		t.Fatal(err)
 	}
 
-	if len(rules) != 1 {
-		t.Fatalf("expected 1 rule, got %d", len(rules))
+	rules, err := NewHyprlandWritableProvider(tmpDir).LoadDMSRules()
+	if err != nil {
+		t.Fatalf("LoadDMSRules: %v", err)
 	}
-
-	if rules[0].ID != "test_id" {
-		t.Errorf("ID = %q, want test_id", rules[0].ID)
+	if len(rules) != 1 || rules[0].ID != "ff" || rules[0].Name != "Firefox" || rules[0].MatchCriteria.AppID != "^(firefox)$" {
+		t.Fatalf("unexpected rules: %+v", rules)
 	}
-	if rules[0].MatchCriteria.AppID != "^(firefox)$" {
-		t.Errorf("AppID = %q, want ^(firefox)$", rules[0].MatchCriteria.AppID)
+	if rules[0].Actions.OpenFloating == nil || !*rules[0].Actions.OpenFloating {
+		t.Errorf("expected OpenFloating, got %+v", rules[0].Actions)
 	}
 }
 
@@ -318,30 +336,6 @@ require("dms.windowrules")
 	}
 }
 
-func TestParseHyprlandLuaNoInitialFocusAlias(t *testing.T) {
-	tmpDir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.lua"), []byte(`
-hl.window_rule({
-	match = { class = "^steam$" },
-	no_initial_focus = true,
-})
-`), 0644); err != nil {
-		t.Fatal(err)
-	}
-
-	res, err := ParseHyprlandWindowRules(tmpDir)
-	if err != nil {
-		t.Fatalf("ParseHyprlandWindowRules: %v", err)
-	}
-	if len(res.Rules) != 1 {
-		t.Fatalf("expected 1 rule, got %d", len(res.Rules))
-	}
-	wr := ConvertHyprlandRulesToWindowRules(res.Rules)[0]
-	if wr.Actions.NoFocus == nil || !*wr.Actions.NoFocus {
-		t.Fatalf("expected no_initial_focus to populate NoFocus action: %#v", wr.Actions)
-	}
-}
-
 func TestFormatLuaManagedHyprRuleUsesLuaFieldNames(t *testing.T) {
 	enabled := true
 	rule := windowrules.WindowRule{
@@ -450,11 +444,6 @@ func TestApplyLuaActionKeyTableSyntax(t *testing.T) {
 			raw:  `"800x600"`,
 		},
 		{
-			name: "move string syntax returns false",
-			key:  "move",
-			raw:  `"100 200"`,
-		},
-		{
 			name:      "size expressions",
 			key:       "size",
 			raw:       `{ "window_w * 0.5", "window_h - 50" }`,
@@ -496,78 +485,6 @@ func TestApplyLuaActionKeyTableSyntax(t *testing.T) {
 				t.Errorf("MoveY = %q, want %q", a.MoveY, tt.wantMoveY)
 			}
 		})
-	}
-}
-
-func TestLuaRoundTripTableSyntax(t *testing.T) {
-	original := windowrules.Actions{
-		SizeWidth:  "800",
-		SizeHeight: "600",
-		MoveX:      "100",
-		MoveY:      "200",
-	}
-
-	var out []string
-	luaAppendActions(original, &out)
-
-	var parsed windowrules.Actions
-	for _, line := range out {
-		parts := strings.SplitN(line, "=", 2)
-		if len(parts) != 2 {
-			continue
-		}
-		key := strings.TrimSpace(parts[0])
-		val := strings.TrimSpace(parts[1])
-		applyLuaActionKey(&parsed, key, val)
-	}
-
-	if parsed.SizeWidth != original.SizeWidth {
-		t.Errorf("SizeWidth = %q, want %q", parsed.SizeWidth, original.SizeWidth)
-	}
-	if parsed.SizeHeight != original.SizeHeight {
-		t.Errorf("SizeHeight = %q, want %q", parsed.SizeHeight, original.SizeHeight)
-	}
-	if parsed.MoveX != original.MoveX {
-		t.Errorf("MoveX = %q, want %q", parsed.MoveX, original.MoveX)
-	}
-	if parsed.MoveY != original.MoveY {
-		t.Errorf("MoveY = %q, want %q", parsed.MoveY, original.MoveY)
-	}
-}
-
-func TestLuaRoundTripTableSyntaxExpressions(t *testing.T) {
-	original := windowrules.Actions{
-		SizeWidth:  "window_w * 0.5",
-		SizeHeight: "window_h - 50",
-		MoveX:      "100",
-		MoveY:      "(monitor_h / 2) + 17",
-	}
-
-	var out []string
-	luaAppendActions(original, &out)
-
-	var parsed windowrules.Actions
-	for _, line := range out {
-		parts := strings.SplitN(line, "=", 2)
-		if len(parts) != 2 {
-			continue
-		}
-		key := strings.TrimSpace(parts[0])
-		val := strings.TrimSpace(parts[1])
-		applyLuaActionKey(&parsed, key, val)
-	}
-
-	if parsed.SizeWidth != original.SizeWidth {
-		t.Errorf("SizeWidth = %q, want %q", parsed.SizeWidth, original.SizeWidth)
-	}
-	if parsed.SizeHeight != original.SizeHeight {
-		t.Errorf("SizeHeight = %q, want %q", parsed.SizeHeight, original.SizeHeight)
-	}
-	if parsed.MoveX != original.MoveX {
-		t.Errorf("MoveX = %q, want %q", parsed.MoveX, original.MoveX)
-	}
-	if parsed.MoveY != original.MoveY {
-		t.Errorf("MoveY = %q, want %q", parsed.MoveY, original.MoveY)
 	}
 }
 
@@ -646,23 +563,23 @@ func TestParseMatchLuaSpellings(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var m luaMatchFields
+			var m windowrules.MatchCriteria
 			parseMatchLua(tt.in, &m)
-			if (m.floating == nil) != (tt.wantFloating == nil) || (m.floating != nil && *m.floating != *tt.wantFloating) {
-				t.Errorf("floating = %v, want %v", m.floating, tt.wantFloating)
+			if (m.IsFloating == nil) != (tt.wantFloating == nil) || (m.IsFloating != nil && *m.IsFloating != *tt.wantFloating) {
+				t.Errorf("floating = %v, want %v", m.IsFloating, tt.wantFloating)
 			}
-			if (m.pinned == nil) != (tt.wantPinned == nil) || (m.pinned != nil && *m.pinned != *tt.wantPinned) {
-				t.Errorf("pinned = %v, want %v", m.pinned, tt.wantPinned)
+			if (m.Pinned == nil) != (tt.wantPinned == nil) || (m.Pinned != nil && *m.Pinned != *tt.wantPinned) {
+				t.Errorf("pinned = %v, want %v", m.Pinned, tt.wantPinned)
 			}
 		})
 	}
 }
 
 func TestParseMatchLuaStillReadsInitialised(t *testing.T) {
-	var m luaMatchFields
+	var m windowrules.MatchCriteria
 	parseMatchLua(`{ initialised = true }`, &m)
-	if m.initialised == nil || !*m.initialised {
-		t.Fatalf("initialised not parsed: %v", m.initialised)
+	if m.Initialised == nil || !*m.Initialised {
+		t.Fatalf("initialised not parsed: %v", m.Initialised)
 	}
 }
 
@@ -841,5 +758,96 @@ func TestNiriEndToEndOpaqueLast(t *testing.T) {
 	}
 	if strings.Index(content, "^a$") > strings.Index(content, "opacity 1.00") {
 		t.Errorf("opaque rule not last in:\n%s", content)
+	}
+}
+
+func TestHyprlandLuaRoundTripCatalogKeys(t *testing.T) {
+	tests := []struct {
+		name  string
+		lua   string
+		match windowrules.MatchCriteria
+		act   windowrules.Actions
+	}{
+		{"initial_class", `initial_class = "^steam$"`, windowrules.MatchCriteria{InitialClass: "^steam$"}, windowrules.Actions{}},
+		{"initial_title", `initial_title = "^Login$"`, windowrules.MatchCriteria{InitialTitle: "^Login$"}, windowrules.Actions{}},
+		{"tag", `tag = "negative:games"`, windowrules.MatchCriteria{Tag: "negative:games"}, windowrules.Actions{}},
+		{"workspace", `workspace = "w[tv1]"`, windowrules.MatchCriteria{Workspace: "w[tv1]"}, windowrules.Actions{}},
+		{"content", `content = "video"`, windowrules.MatchCriteria{Content: "video"}, windowrules.Actions{}},
+		{"xdg_tag", `xdg_tag = "^portal$"`, windowrules.MatchCriteria{XdgTag: "^portal$"}, windowrules.Actions{}},
+		{"focus", `focus = false`, windowrules.MatchCriteria{IsFocused: new(false)}, windowrules.Actions{}},
+		{"group", `group = true`, windowrules.MatchCriteria{Grouped: new(true)}, windowrules.Actions{}},
+		{"modal", `modal = true`, windowrules.MatchCriteria{Modal: new(true)}, windowrules.Actions{}},
+		{"fullscreen_state_internal", `fullscreen_state_internal = 2`, windowrules.MatchCriteria{FullscreenStateInternal: new(2)}, windowrules.Actions{}},
+		{"fullscreen_state_client", `fullscreen_state_client = 0`, windowrules.MatchCriteria{FullscreenStateClient: new(0)}, windowrules.Actions{}},
+		{"no_initial_focus", `no_initial_focus = true`, windowrules.MatchCriteria{}, windowrules.Actions{NoInitialFocus: new(true)}},
+		{"focus_on_activate", `focus_on_activate = false`, windowrules.MatchCriteria{}, windowrules.Actions{FocusOnActivate: new(false)}},
+		{"stay_focused", `stay_focused = true`, windowrules.MatchCriteria{}, windowrules.Actions{StayFocused: new(true)}},
+		{"confine_pointer", `confine_pointer = true`, windowrules.MatchCriteria{}, windowrules.Actions{ConfinePointer: new(true)}},
+		{"no_xdg_drags", `no_xdg_drags = true`, windowrules.MatchCriteria{}, windowrules.Actions{NoXdgDrags: new(true)}},
+		{"no_auto_hdr", `no_auto_hdr = true`, windowrules.MatchCriteria{}, windowrules.Actions{NoAutoHDR: new(true)}},
+		{"no_glow", `no_glow = true`, windowrules.MatchCriteria{}, windowrules.Actions{NoGlow: new(true)}},
+		{"no_wobble", `no_wobble = true`, windowrules.MatchCriteria{}, windowrules.Actions{NoWobble: new(true)}},
+		{"scrolling_width", `scrolling_width = 0.5`, windowrules.MatchCriteria{}, windowrules.Actions{ScrollingWidth: new(0.5)}},
+		{"tonemap", `tonemap = "clamp"`, windowrules.MatchCriteria{}, windowrules.Actions{Tonemap: "clamp"}},
+		{"suppress_event", `suppress_event = "maximize fullscreen"`, windowrules.MatchCriteria{}, windowrules.Actions{SuppressEvent: "maximize fullscreen"}},
+		{"monitor silent", `monitor = "DP-1 silent"`, windowrules.MatchCriteria{}, windowrules.Actions{Monitor: "DP-1 silent"}},
+		{"border_color per focus", `border_color = "rgb(ff0000)"`, windowrules.MatchCriteria{IsFocused: new(true)}, windowrules.Actions{BorderColor: "rgb(ff0000)"}},
+		{"rounding at cap", `rounding = 20`, windowrules.MatchCriteria{}, windowrules.Actions{CornerRadius: new(20)}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			provider := NewHyprlandWritableProvider(t.TempDir())
+			rule := newTestWindowRule("rt", "Round Trip", "^app$")
+			tt.match.AppID = "^app$"
+			rule.MatchCriteria = tt.match
+			rule.Actions = tt.act
+			if tt.act == (windowrules.Actions{}) {
+				rule.Actions.OpenFloating = new(true)
+			}
+			if err := provider.SetRule(rule); err != nil {
+				t.Fatalf("SetRule: %v", err)
+			}
+			written, err := os.ReadFile(provider.GetOverridePath())
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !strings.Contains(string(written), tt.lua) {
+				t.Fatalf("missing %q in:\n%s", tt.lua, written)
+			}
+			rules, err := provider.LoadDMSRules()
+			if err != nil || len(rules) != 1 {
+				t.Fatalf("LoadDMSRules: %v, %d rules", err, len(rules))
+			}
+			if !reflect.DeepEqual(rules[0].MatchCriteria, rule.MatchCriteria) {
+				t.Errorf("match = %+v, want %+v", rules[0].MatchCriteria, rule.MatchCriteria)
+			}
+			if !reflect.DeepEqual(rules[0].Actions, rule.Actions) {
+				t.Errorf("actions = %+v, want %+v", rules[0].Actions, rule.Actions)
+			}
+		})
+	}
+}
+
+func TestHyprlandNoInitialFocusStaysDistinct(t *testing.T) {
+	tmpDir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.lua"), []byte(`
+hl.window_rule({
+	match = { class = "^steam$" },
+	no_initial_focus = true,
+})
+`), 0644); err != nil {
+		t.Fatal(err)
+	}
+	res, err := ParseHyprlandWindowRules(tmpDir)
+	if err != nil || len(res.Rules) != 1 {
+		t.Fatalf("ParseHyprlandWindowRules: %v, %d rules", err, len(res.Rules))
+	}
+	wr := ConvertHyprlandRulesToWindowRules(res.Rules)[0]
+	if wr.Actions.NoFocus != nil {
+		t.Errorf("no_initial_focus leaked into NoFocus")
+	}
+	joined := strings.Join(formatLuaManagedHyprRule(wr), "\n")
+	if !strings.Contains(joined, "no_initial_focus = true") || strings.Contains(joined, "no_focus") {
+		t.Errorf("no_initial_focus not re-emitted unchanged:\n%s", joined)
 	}
 }

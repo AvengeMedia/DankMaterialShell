@@ -33,6 +33,8 @@ Item {
     }
     readonly property string widgetType: entry?.widgetId ?? entry?.id ?? ""
     readonly property bool sectionAutoOverflow: SettingsData.getBarConfig(barId)?.[section + "OverflowMode"] !== "bar"
+    readonly property bool hasPill: !dockHosted && !["spacer", "separator", "island"].includes(widgetType)
+    readonly property bool barBackground: !(SettingsData.barConfigs.find(config => config.id === barId)?.noBackground ?? false)
     readonly property var store: ({
             "get": key => root.value(key),
             "set": (key, value) => root.set(key, value),
@@ -167,6 +169,14 @@ Item {
                 options: placementLabels
                 currentValue: placementLabels[Math.max(0, placementValues.indexOf(placementValue))]
                 onValueChanged: value => root.set("overflowMode", placementValues[placementLabels.indexOf(value)])
+            }
+
+            SettingsToggleRow {
+                visible: root.hasPill
+                tags: ["widget", "background", "pill", "transparent"]
+                text: I18n.tr("Background")
+                checked: root.entry?.background ?? root.barBackground
+                onToggled: checked => root.set("background", checked === root.barBackground ? undefined : checked)
             }
         }
 

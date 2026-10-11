@@ -77,6 +77,7 @@ func (v *VoidDistribution) DetectDependenciesWithTerminal(ctx context.Context, w
 
 	if wm == deps.WindowManagerHyprland {
 		dependencies = append(dependencies, v.detectHyprlandTools()...)
+		dependencies = append(dependencies, v.detectHyprlandGuiutils())
 	}
 
 	if wm == deps.WindowManagerNiri || wm == deps.WindowManagerMango {
@@ -192,6 +193,7 @@ func (v *VoidDistribution) GetPackageMappingWithVariants(wm deps.WindowManager, 
 		packages["hyprland"] = PackageMapping{Name: "hyprland", Repository: RepoTypeXBPS, RepoURL: VoidHyprlandRepo}
 		packages["hyprctl"] = PackageMapping{Name: "hyprland", Repository: RepoTypeXBPS, RepoURL: VoidHyprlandRepo}
 		packages["jq"] = PackageMapping{Name: "jq", Repository: RepoTypeSystem}
+		packages["hyprland-guiutils"] = PackageMapping{Name: "hyprland-guiutils", Repository: RepoTypeXBPS, RepoURL: VoidHyprlandRepo}
 	case deps.WindowManagerNiri:
 		packages["niri"] = PackageMapping{Name: "niri", Repository: RepoTypeSystem}
 		packages["xwayland-satellite"] = PackageMapping{Name: "xwayland-satellite", Repository: RepoTypeSystem}

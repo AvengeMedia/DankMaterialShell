@@ -17,7 +17,8 @@ Item {
     property real barThickness: 48
     property real barSpacing: 4
     property var barConfig: null
-    property bool noBackground: barConfig?.noBackground ?? false
+    property bool widgetBackground: !(barConfig?.noBackground ?? false)
+    property bool noBackground: !widgetBackground
     property var blurBarWindow: null
     property alias content: contentLoader.sourceComponent
     property bool isVerticalOrientation: axis?.isVertical ?? false

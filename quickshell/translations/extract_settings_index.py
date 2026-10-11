@@ -168,7 +168,7 @@ SIDEBAR_GATE_CONDITIONS = [
     ("dmsOnly", "networkAvailable"),
     ("hyprlandNiriOnly", "isHyprlandOrNiri"),
     ("clipboardOnly", "dmsConnected"),
-    ("niriOnly", "isNiri"),
+    ("inputCapable", "inputCapable"),
     ("pointerCapable", "pointerCapable"),
     ("windowRulesCapable", "windowRulesCapable"),
     ("layoutCapable", "layoutCapable"),
@@ -463,7 +463,7 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
             if desc_raw:
                 description = extract_i18n_string(desc_raw)
 
-            visible_raw = extract_property(block, "visible")
+            visible_raw = extract_property(own_scope(block), "visible")
             page_meta = hub_meta.get(file_page) if file_page else None
             condition_key = page_meta[2] if page_meta else tab_meta.get(tab_index, TAB_META_DEFAULT)[2]
             if visible_raw:
@@ -482,7 +482,7 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
                 elif "CompositorService.supportsPointerConfig" in visible_raw:
                     condition_key = "pointerCapable"
                 elif "CompositorService.supportsInputConfig" in visible_raw:
-                    condition_key = "isNiri"
+                    condition_key = "inputCapable"
                 elif "CompositorService.isAqueous" in visible_raw:
                     if "CompositorService.isHyprland" in visible_raw:
                         condition_key = "smartDockCapable"
@@ -492,6 +492,10 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
                         condition_key = "isAqueous"
                 elif all(c in visible_raw for c in ("CompositorService.isNiri", "CompositorService.isHyprland", "CompositorService.isMango")):
                     condition_key = "windowRulesCapable"
+                elif all(c in visible_raw for c in ("CompositorService.isNiri", "CompositorService.isHyprland")):
+                    condition_key = "isHyprlandOrNiri"
+                elif all(c in visible_raw for c in ("CompositorService.isNiri", "CompositorService.isMango")):
+                    condition_key = "isNiriOrMango"
                 elif "CompositorService.isNiri" in visible_raw:
                     condition_key = "isNiri"
                 elif "CompositorService.isHyprland" in visible_raw:

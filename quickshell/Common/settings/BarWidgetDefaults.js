@@ -127,6 +127,7 @@ var DEFAULTS = {
         clockNotificationBadge: false
     },
     music: {
+        mediaStyle: "controls",
         mediaSize: 1,
         mediaAdaptiveWidthEnabled: true,
         mediaShowLyrics: true,

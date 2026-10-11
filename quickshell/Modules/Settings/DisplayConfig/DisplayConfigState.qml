@@ -988,7 +988,6 @@ Singleton {
 
             if (CompositorService.isHyprland) {
                 initHyprlandSettingsFromConfig(parsed);
-                syncHyprlandVrrFromConfig(parsed);
                 syncHyprlandDisabledFromConfig(parsed);
             }
             if (CompositorService.isNiri) {
@@ -1023,29 +1022,6 @@ Singleton {
             changed = true;
         }
 
-        if (changed) {
-            SessionData.hyprlandOutputSettings = current;
-            SessionData.saveSettings();
-        }
-    }
-
-    function syncHyprlandVrrFromConfig(parsedOutputs) {
-        const current = JSON.parse(JSON.stringify(SessionData.hyprlandOutputSettings));
-        let changed = false;
-        for (const outputName in parsedOutputs) {
-            const settings = parsedOutputs[outputName]?.hyprlandSettings;
-            const fromConfig = settings?.vrrFullscreenOnly ?? false;
-            const stored = current[outputName]?.vrrFullscreenOnly ?? false;
-            if (fromConfig === stored)
-                continue;
-            if (!current[outputName])
-                current[outputName] = {};
-            if (fromConfig)
-                current[outputName].vrrFullscreenOnly = true;
-            else
-                delete current[outputName].vrrFullscreenOnly;
-            changed = true;
-        }
         if (changed) {
             SessionData.hyprlandOutputSettings = current;
             SessionData.saveSettings();
@@ -1156,7 +1132,8 @@ Singleton {
                 "x": live.x,
                 "y": live.y,
                 "scale": live.scale,
-                "transformIndex": live.lastIpcObject?.transform ?? 0
+                "transformIndex": live.lastIpcObject?.transform ?? 0,
+                "hardware": OutputModel.hyprlandHardware(live.lastIpcObject)
             };
         }
         return OutputModel.outputsFromWlr(wlrOutputs, liveMonitors);
@@ -1481,6 +1458,30 @@ Singleton {
         pendingHyprlandChanges = newPending;
     }
 
+    function getHyprlandCaps(output, outputName) {
+        return OutputModel.hyprlandCaps(outputs[outputName]?.hardware ?? null, {
+            "supportsWideColor": getHyprlandSetting(output, outputName, "supportsWideColor", undefined),
+            "supportsHdr": getHyprlandSetting(output, outputName, "supportsHdr", undefined)
+        });
+    }
+
+    function hyprlandCmAllowed(cm, caps) {
+        return OutputModel.hyprlandCmAllowed(cm, caps);
+    }
+
+    function getHyprlandVrrMode(output, outputName) {
+        const settings = {
+            "vrr": getHyprlandSetting(output, outputName, "vrr", undefined),
+            "vrrFullscreenOnly": getHyprlandSetting(output, outputName, "vrrFullscreenOnly", false)
+        };
+        return OutputModel.hyprlandVrrMode(settings, savedParsedOutputs[getHyprlandOutputIdentifier(output, outputName)]);
+    }
+
+    function setHyprlandVrrMode(output, outputName, mode) {
+        setHyprlandSetting(output, outputName, "vrr", mode);
+        setHyprlandSetting(output, outputName, "vrrFullscreenOnly", null);
+    }
+
     function initOriginalHyprlandSettings() {
         if (originalHyprlandSettings)
             return;
@@ -1634,8 +1635,10 @@ Singleton {
                 changeDescriptions.push(outputId + ": " + I18n.tr("Force HDR") + " → " + (changes.supportsHdr ? I18n.tr("Yes") : I18n.tr("No")));
             if (changes.supportsWideColor !== undefined)
                 changeDescriptions.push(outputId + ": " + I18n.tr("Force Wide Color") + " → " + (changes.supportsWideColor ? I18n.tr("Yes") : I18n.tr("No")));
-            if (changes.vrrFullscreenOnly !== undefined)
-                changeDescriptions.push(outputId + ": " + I18n.tr("VRR Fullscreen Only") + " → " + (changes.vrrFullscreenOnly ? I18n.tr("Enabled") : I18n.tr("Disabled")));
+            if (changes.vrr !== undefined)
+                changeDescriptions.push(outputId + ": " + "VRR" + " → " + hyprlandVrrLabel(changes.vrr));
+            if (changes.sdrEotf !== undefined)
+                changeDescriptions.push(outputId + ": " + I18n.tr("SDR transfer function") + " → " + (changes.sdrEotf || I18n.tr("Default")));
         }
 
         if (CompositorService.isNiri) {
@@ -1735,6 +1738,20 @@ Singleton {
                 if (SessionData.niriOutputSettings[id]?.disabled)
                     SessionData.setNiriOutputSetting(id, "disabled", null);
             }
+        }
+    }
+
+    function hyprlandVrrLabel(mode) {
+        switch (mode) {
+        case 0:
+            return I18n.tr("Off");
+        case 1:
+            return I18n.tr("On", "adjective, enabled state");
+        case 2:
+        case 3:
+            return I18n.tr("Fullscreen only");
+        default:
+            return I18n.tr("Default (Global)");
         }
     }
 

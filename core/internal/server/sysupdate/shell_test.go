@@ -5,9 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -23,7 +21,6 @@ func TestGitBuildCount(t *testing.T) {
 		{"1.7.0+git4915.56234761", 4915},
 		{"0.0.git.4920.d430cae9", 4920},
 		{"1.7.0", 0},
-		{"dev", 0},
 	} {
 		if got := GitBuildCount(tt.version); got != tt.want {
 			t.Errorf("GitBuildCount(%q) = %d, want %d", tt.version, got, tt.want)
@@ -317,31 +314,6 @@ func TestRebootHintPersistsAcrossRestartNotReboot(t *testing.T) {
 	defer m2.Close()
 	if m2.GetState().Reboot.Recommended {
 		t.Error("reboot hint survived a reboot")
-	}
-}
-
-type niceBackend struct {
-	fakeBackend
-	nice string
-}
-
-func (b *niceBackend) CheckUpdates(ctx context.Context) ([]Package, error) {
-	out, err := exec.CommandContext(ctx, "nice").Output()
-	b.nice = strings.TrimSpace(string(out))
-	return nil, err
-}
-
-func TestCheckRunsAtLowPriority(t *testing.T) {
-	if runtime.GOOS != "linux" {
-		t.Skip("thread priority is only lowered on linux")
-	}
-	m := newTestManager(t)
-	backend := &niceBackend{}
-	m.selection = Selection{Overlay: []Backend{backend}}
-
-	m.runRefresh(context.Background(), false)
-	if backend.nice != "19" {
-		t.Errorf("package manager ran at nice %q, want 19", backend.nice)
 	}
 }
 

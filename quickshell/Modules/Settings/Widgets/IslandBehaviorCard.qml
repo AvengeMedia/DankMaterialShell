@@ -170,8 +170,6 @@ SettingsCard {
         settingKey: root.keyPrefix + "MediaClockVisible"
         tags: ["island", "media", "clock", "compact", "time"]
         visible: !root.isDot
-        resetStore: root.store
-        resetKeys: ["islandMediaClockVisible"]
         text: I18n.tr("Keep clock with media", "island settings: clock in media face toggle")
         checked: root.store.setting("islandMediaClockVisible")
         onToggled: checked => root.store.apply("islandMediaClockVisible", checked)
