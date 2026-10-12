@@ -164,7 +164,7 @@ DankDialog {
                     width: parent.width
                     spacing: Theme.spacingS
 
-                    DankDropdown {
+                    DDropdown {
                         id: conditionFieldDropdown
                         width: Math.round(parent.width / 3)
                         anchors.verticalCenter: parent.verticalCenter
@@ -175,7 +175,7 @@ DankDialog {
                         onValueChanged: value => root.ruleConditions[conditionRow.index].field = root.valueOf(root.fieldOptions, value)
                     }
 
-                    DankDropdown {
+                    DDropdown {
                         id: conditionMatchTypeDropdown
                         width: Math.round(parent.width / 4)
                         anchors.verticalCenter: parent.verticalCenter
@@ -186,7 +186,7 @@ DankDialog {
                         onValueChanged: value => root.ruleConditions[conditionRow.index].matchType = root.valueOf(root.matchTypeOptions, value)
                     }
 
-                    DankTextField {
+                    DTextField {
                         id: conditionPatternInput
                         width: parent.width - conditionFieldDropdown.width - conditionMatchTypeDropdown.width - removeConditionButton.width - parent.spacing * 3
                         anchors.verticalCenter: parent.verticalCenter
@@ -197,7 +197,7 @@ DankDialog {
                         onAccepted: root.submit()
                     }
 
-                    DankActionButton {
+                    DActionButton {
                         id: removeConditionButton
                         anchors.verticalCenter: parent.verticalCenter
                         iconName: "delete"
@@ -212,7 +212,7 @@ DankDialog {
         SettingsRow {
             subtitle: root.ruleConditions.length > 0 ? I18n.tr("A notification must match every condition", "hint in the notification rule editor, all match conditions must apply") : ""
 
-            DankButton {
+            DButton {
                 text: I18n.tr("Add condition", "button in the notification rule editor, adds another match condition")
                 iconName: "add"
                 backgroundColor: "transparent"
