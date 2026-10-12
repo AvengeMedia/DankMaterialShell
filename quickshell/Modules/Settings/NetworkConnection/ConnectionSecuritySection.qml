@@ -157,19 +157,15 @@ SettingsCard {
         onToggled: checked => root.setWiredEnterprise(checked)
     }
 
-    SettingsRow {
-        id: enterpriseRow
+    EnterpriseAuthForm {
+        id: form
         visible: root.enterpriseActive
         enabled: !root.locked
-        body: EnterpriseAuthForm {
-            id: form
-            width: enterpriseRow.width - enterpriseRow.paddingH * 2
-            onBrowseRequested: target => {
-                root.browseTarget = target;
-                root.certBrowserLoader.active = true;
-                if (root.certBrowserLoader.item)
-                    root.certBrowserLoader.item.open();
-            }
+        onBrowseRequested: target => {
+            root.browseTarget = target;
+            root.certBrowserLoader.active = true;
+            if (root.certBrowserLoader.item)
+                root.certBrowserLoader.item.open();
         }
     }
 }

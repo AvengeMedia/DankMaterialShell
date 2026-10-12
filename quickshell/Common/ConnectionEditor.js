@@ -657,10 +657,12 @@ function enterpriseConfig(s) {
     }
     if (s.eap === "peap" && s.peapVersion)
         cfg.peapVersion = s.peapVersion;
-    if (s.authFlags)
-        cfg.authFlags = s.authFlags;
-    if (s.opensslCiphers.trim())
-        cfg.opensslCiphers = s.opensslCiphers.trim();
+    if (s.eap !== "pwd") {
+        if (s.authFlags)
+            cfg.authFlags = s.authFlags;
+        if (s.opensslCiphers.trim())
+            cfg.opensslCiphers = s.opensslCiphers.trim();
+    }
     return cfg;
 }
 
@@ -732,14 +734,14 @@ var CONNECTION_TYPES = [
         "group": "ethernet",
         "icon": "lan",
         "addable": true,
-        "sections": ["general", "ipv4", "ipv6", "ethernet", "security"]
+        "sections": ["general", "ethernet", "security", "ipv4", "ipv6"]
     },
     {
         "type": "802-11-wireless",
         "group": "wifi",
         "icon": "wifi",
         "addable": true,
-        "sections": ["general", "ipv4", "ipv6", "wifi", "security"]
+        "sections": ["general", "wifi", "security", "ipv4", "ipv6"]
     },
     {
         "type": "wireguard",

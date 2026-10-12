@@ -236,18 +236,6 @@ Item {
                 }
             }
 
-            SettingsRow {
-                visible: TailscaleService.available && TailscaleService.backendState === "NeedsLogin"
-                enabled: networkTailscaleTab.writable
-
-                DButton {
-                    text: I18n.tr("Login")
-                    iconName: "login"
-                    enabled: networkTailscaleTab.writable
-                    onClicked: TailscaleService.login()
-                }
-            }
-
             SettingsDropdownRow {
                 id: accountRow
                 visible: TailscaleService.available && networkTailscaleTab.profiles.length > 0
@@ -264,28 +252,6 @@ Item {
                             accountRow.resync();
                         networkTailscaleTab.loadProfiles();
                     });
-                }
-            }
-
-            SettingsRow {
-                visible: TailscaleService.available && networkTailscaleTab.queryable && networkTailscaleTab.profilesLoaded
-                enabled: networkTailscaleTab.writable
-
-                DButton {
-                    text: I18n.tr("Add account", "Tailscale: add another account")
-                    iconName: "person_add"
-                    enabled: networkTailscaleTab.writable
-                    onClicked: TailscaleService.addProfile()
-                }
-
-                DButton {
-                    visible: TailscaleService.backendState !== "NeedsLogin"
-                    text: I18n.tr("Log out")
-                    iconName: "logout"
-                    backgroundColor: Theme.secondaryContainer
-                    textColor: Theme.onSecondaryContainer
-                    enabled: networkTailscaleTab.writable
-                    onClicked: TailscaleService.logout(() => networkTailscaleTab.loadProfiles())
                 }
             }
 
@@ -433,6 +399,35 @@ Item {
                     peer: modelData
                     onCopyRequested: text => networkTailscaleTab.copyText(text)
                 }
+            }
+        }
+
+        SettingsFabBar {
+            shown: TailscaleService.available && networkTailscaleTab.queryable && networkTailscaleTab.profilesLoaded
+
+            DFab {
+                visible: networkTailscaleTab.backendState !== "NeedsLogin"
+                text: I18n.tr("Log out")
+                iconName: "logout"
+                colorRole: "secondaryContainer"
+                enabled: networkTailscaleTab.writable
+                onClicked: TailscaleService.logout(() => networkTailscaleTab.loadProfiles())
+            }
+
+            DFab {
+                visible: networkTailscaleTab.backendState === "NeedsLogin"
+                text: I18n.tr("Login")
+                iconName: "login"
+                enabled: networkTailscaleTab.writable
+                onClicked: TailscaleService.login()
+            }
+
+            DFab {
+                visible: networkTailscaleTab.backendState !== "NeedsLogin"
+                text: I18n.tr("Add account", "Tailscale: add another account")
+                iconName: "person_add"
+                enabled: networkTailscaleTab.writable
+                onClicked: TailscaleService.addProfile()
             }
         }
     }

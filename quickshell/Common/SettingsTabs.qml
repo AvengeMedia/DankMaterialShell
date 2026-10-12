@@ -392,6 +392,15 @@ Singleton {
                     "hint": I18n.tr("Networks, saved networks, hotspot")
                 },
                 {
+                    "id": "network_wifi_connect",
+                    "hidden": true,
+                    "searchable": false,
+                    "titleFrom": "wifiConnectTitle",
+                    "text": I18n.tr("Connect to Wi-Fi"),
+                    "icon": "wifi",
+                    "tabIndex": 71
+                },
+                {
                     "id": "network_ethernet",
                     "text": I18n.tr("Ethernet"),
                     "icon": "settings_ethernet",

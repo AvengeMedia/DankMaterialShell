@@ -31,6 +31,26 @@ Singleton {
         newConnectionType = newType ?? "";
     }
 
+    // mode: "password", "hidden" or "import"; empty means no pending connect.
+    property string wifiConnectMode: ""
+    property string wifiConnectSsid: ""
+    property var wifiConnectProfile: null
+    property string wifiConnectFileName: ""
+    property string wifiConnectTitle: ""
+
+    function selectWifiConnect(mode, ssid, profile, fileName) {
+        wifiConnectMode = mode ?? "";
+        wifiConnectSsid = ssid ?? "";
+        wifiConnectProfile = profile ?? null;
+        wifiConnectFileName = fileName ?? "";
+        if (mode === "hidden")
+            wifiConnectTitle = I18n.tr("Connect to Hidden Network");
+        else if (mode === "import")
+            wifiConnectTitle = profile?.providerName || I18n.tr("Connect to Wi-Fi");
+        else
+            wifiConnectTitle = I18n.tr("Connect to Wi-Fi");
+    }
+
     // The dot has its own page, so bar selection never lands on it.
     function normalizeSelectedBar() {
         const config = SettingsData.getBarConfig(selectedBarId);

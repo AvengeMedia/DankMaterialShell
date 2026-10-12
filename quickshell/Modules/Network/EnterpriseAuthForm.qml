@@ -1,9 +1,9 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Layouts
 import qs.Common
 import qs.DCommon.Widgets
+import qs.Modules.Settings.Widgets
 import "../../Common/ConnectionEditor.js" as CE
 
 Column {
@@ -14,6 +14,7 @@ Column {
     property bool usernameSuffixRequired: false
     property string caDisplayName: ""
     property string defaultCa: "system"
+    property bool advancedOpen: false
     // Files NM already holds as blobs (keys ca, clientCert, privateKey): they count as present while their path is empty.
     property var storedFiles: ({})
     readonly property bool valid: CE.enterpriseConfigValid(toConfig(), {
@@ -37,6 +38,7 @@ Column {
     readonly property bool usesInner: draft.eap === "peap" || draft.eap === "ttls"
     readonly property bool usesCa: draft.eap !== "pwd"
     readonly property bool isTls: draft.eap === "tls"
+    readonly property bool usesTlsOptions: draft.eap !== "pwd"
 
     function defaultInner(eap) {
         return eap === "ttls" ? "pap" : "mschapv2";
@@ -44,6 +46,7 @@ Column {
 
     function reset(cfg) {
         const c = cfg || {};
+        advancedOpen = false;
         const eap = methodChoices.some(m => m.value === c.eap) ? c.eap : "peap";
         const inner = innerChoices[eap] || [];
         draft.eap = eap;
@@ -67,6 +70,10 @@ Column {
 
     function focusIdentity() {
         identityField.forceActiveFocus();
+    }
+
+    function choiceLabel(choices, selected) {
+        return choices.some(c => c.value === selected) ? CE.choiceLabel(choices, selected) : "";
     }
 
     function storedLabel(target, path) {
@@ -115,8 +122,10 @@ Column {
         });
     }
 
-    spacing: Theme.spacingM
-    Component.onCompleted: reset()
+    width: parent?.width ?? 0
+    spacing: Theme.groupedListGap
+    // Don't overwrite a reset the host already made while being created.
+    Component.onCompleted: if (draft.eap === "") reset()
 
     QtObject {
         id: draft
@@ -146,55 +155,51 @@ Column {
         outlined: !root.expressive
     }
 
-    // DDropdown assigns currentValue on pick, which drops a plain binding; the Binding re-applies it on reset.
-    component ChoiceDropdown: DDropdown {
-        id: choiceDropdown
-
+    component ChoiceRow: SettingsDropdownRow {
         property var choices: []
         property var selected
 
         signal picked(var value)
 
-        width: parent.width
-        addHorizontalPadding: true
         options: choices.map(c => c.label)
-        Binding {
-            target: choiceDropdown
-            property: "currentValue"
-            value: choiceDropdown.choices.some(c => c.value === choiceDropdown.selected) ? CE.choiceLabel(choiceDropdown.choices, choiceDropdown.selected) : ""
+        currentValue: root.choiceLabel(choices, selected)
+        onValueChanged: value => {
+            picked(CE.choiceValue(choices, value));
+            resync();
         }
-        onValueChanged: value => choiceDropdown.picked(CE.choiceValue(choiceDropdown.choices, value))
     }
 
-    component PathField: Row {
-        id: pathField
+    component PathRow: SettingsRow {
+        id: pathRow
 
         property alias text: pathInput.text
         property alias labelText: pathInput.labelText
         property alias leftIconName: pathInput.leftIconName
         property string target
 
-        width: parent.width
-        spacing: Theme.spacingS
+        body: Row {
+            width: parent.width
+            spacing: Theme.spacingS
 
-        FormField {
-            id: pathInput
-            width: parent.width - browseButton.width - parent.spacing
-            anchors.verticalCenter: parent.verticalCenter
-            readOnly: true
-        }
+            FormField {
+                id: pathInput
+                width: parent.width - browseButton.width - parent.spacing
+                anchors.verticalCenter: parent.verticalCenter
+                readOnly: true
+            }
 
-        DActionButton {
-            id: browseButton
-            anchors.verticalCenter: parent.verticalCenter
-            iconName: "folder_open"
-            tooltipText: I18n.tr("Select File")
-            Accessible.name: pathInput.labelText + ": " + tooltipText
-            onClicked: root.browseRequested(pathField.target)
+            DActionButton {
+                id: browseButton
+                anchors.verticalCenter: parent.verticalCenter
+                iconName: "folder_open"
+                tooltipText: I18n.tr("Select File")
+                Accessible.name: pathInput.labelText + ": " + tooltipText
+                onClicked: root.browseRequested(pathRow.target)
+            }
         }
     }
 
-    ChoiceDropdown {
+    ChoiceRow {
         text: I18n.tr("Authentication")
         choices: root.methodChoices
         selected: draft.eap
@@ -206,7 +211,7 @@ Column {
         }
     }
 
-    ChoiceDropdown {
+    ChoiceRow {
         visible: root.usesInner
         text: I18n.tr("Inner authentication", "802.1X phase 2 authentication method")
         choices: root.innerChoices[draft.eap] || []
@@ -214,53 +219,58 @@ Column {
         onPicked: value => draft.phase2 = value
     }
 
-    FormField {
-        id: identityField
-        leftIconName: "person"
-        labelText: I18n.tr("Username", "text field label for network, vpn and account forms")
-        supportingText: root.usernameSuffix ? "@" + root.usernameSuffix : ""
-        isError: root.usernameSuffixRequired && !CE.identityMatchesSuffix(text.trim(), root.usernameSuffix)
-        text: draft.identity
-        onTextEdited: draft.identity = text
-        onAccepted: passwordField.visible ? passwordField.forceActiveFocus() : root.submitRequested()
-    }
-
-    FormField {
-        id: passwordField
-        visible: draft.savePassword
-        leftIconName: "lock"
-        showPasswordToggle: true
-        morph: root.expressive
-        echoMode: passwordVisible ? TextInput.Normal : TextInput.Password
-        labelText: root.isTls ? I18n.tr("Private Key Password") : I18n.tr("Password")
-        text: root.isTls ? draft.privateKeyPassword : draft.password
-        onTextEdited: {
-            if (root.isTls)
-                draft.privateKeyPassword = text;
-            else
-                draft.password = text;
+    SettingsRow {
+        body: FormField {
+            id: identityField
+            leftIconName: "person"
+            labelText: I18n.tr("Username", "text field label for network, vpn and account forms")
+            supportingText: root.usernameSuffix ? "@" + root.usernameSuffix : ""
+            isError: root.usernameSuffixRequired && !CE.identityMatchesSuffix(text.trim(), root.usernameSuffix)
+            text: draft.identity
+            onTextEdited: draft.identity = text
+            onAccepted: passwordField.visible ? passwordField.forceActiveFocus() : root.submitRequested()
         }
-        onAccepted: anonField.visible ? anonField.forceActiveFocus() : root.submitRequested()
     }
 
-    DToggle {
-        width: parent.width
+    SettingsRow {
+        visible: draft.savePassword
+        body: FormField {
+            id: passwordField
+            leftIconName: "lock"
+            showPasswordToggle: true
+            morph: root.expressive
+            echoMode: passwordVisible ? TextInput.Normal : TextInput.Password
+            labelText: root.isTls ? I18n.tr("Private Key Password") : I18n.tr("Password")
+            text: root.isTls ? draft.privateKeyPassword : draft.password
+            onTextEdited: {
+                if (root.isTls)
+                    draft.privateKeyPassword = text;
+                else
+                    draft.password = text;
+            }
+            onAccepted: anonField.visible ? anonField.forceActiveFocus() : root.submitRequested()
+        }
+    }
+
+    SettingsToggleRow {
         text: I18n.tr("Save password")
         checked: draft.savePassword
         onToggled: checked => draft.savePassword = checked
     }
 
-    FormField {
-        id: anonField
+    SettingsRow {
         visible: root.usesInner
-        leftIconName: "person_off"
-        labelText: I18n.tr("Anonymous Identity (optional)")
-        text: draft.anonymousIdentity
-        onTextEdited: draft.anonymousIdentity = text
-        onAccepted: root.submitRequested()
+        body: FormField {
+            id: anonField
+            leftIconName: "person_off"
+            labelText: I18n.tr("Anonymous Identity (optional)")
+            text: draft.anonymousIdentity
+            onTextEdited: draft.anonymousIdentity = text
+            onAccepted: root.submitRequested()
+        }
     }
 
-    ChoiceDropdown {
+    ChoiceRow {
         visible: root.usesCa
         text: I18n.tr("CA certificate", "network authentication certificate file field")
         choices: root.caChoices
@@ -268,7 +278,7 @@ Column {
         onPicked: value => draft.ca = value
     }
 
-    PathField {
+    PathRow {
         visible: root.usesCa && draft.ca === "file"
         target: "ca"
         leftIconName: "verified_user"
@@ -276,27 +286,25 @@ Column {
         text: draft.caCertPem ? root.caDisplayName : root.storedLabel("ca", draft.caCertPath)
     }
 
-    StyledText {
+    SettingsNoteRow {
         visible: root.usesCa && draft.ca === "none"
-        width: parent.width
-        leftPadding: Theme.spacingM
-        rightPadding: Theme.spacingM
         text: I18n.tr("Without a CA certificate the server is not verified, and a fake network can capture the password.", "802.1X warning when no CA certificate is set")
-        font.pixelSize: Theme.fontSizeSmall
-        color: Theme.error
-        wrapMode: Text.WordWrap
+        tint: Theme.error
+        tintBackground: Theme.errorHover
     }
 
-    FormField {
+    SettingsRow {
         visible: root.usesCa
-        leftIconName: "domain"
-        labelText: I18n.tr("Server")
-        isError: draft.ca === "system" && !text.trim()
-        text: draft.serverDomain
-        onTextEdited: draft.serverDomain = text
+        body: FormField {
+            leftIconName: "domain"
+            labelText: I18n.tr("Server")
+            isError: draft.ca === "system" && !text.trim()
+            text: draft.serverDomain
+            onTextEdited: draft.serverDomain = text
+        }
     }
 
-    ChoiceDropdown {
+    ChoiceRow {
         visible: root.usesCa
         text: I18n.tr("Match type", "802.1X server name match, exact or suffix")
         choices: root.matchChoices
@@ -304,7 +312,7 @@ Column {
         onPicked: value => draft.serverDomainSuffix = value
     }
 
-    PathField {
+    PathRow {
         visible: root.isTls
         target: "clientCert"
         leftIconName: "badge"
@@ -312,7 +320,7 @@ Column {
         text: root.storedLabel("clientCert", draft.clientCertPath)
     }
 
-    PathField {
+    PathRow {
         visible: root.isTls
         target: "privateKey"
         leftIconName: "key"
@@ -320,44 +328,51 @@ Column {
         text: root.storedLabel("privateKey", draft.privateKeyPath)
     }
 
-    DCollapsibleSection {
-        width: parent.width
+    SettingsRow {
+        visible: root.usesTlsOptions
         title: I18n.tr("Advanced")
-        showBackground: true
+        clickable: true
+        Accessible.name: title + ": " + (root.advancedOpen ? I18n.tr("Collapse") : I18n.tr("Expand"))
+        onClicked: root.advancedOpen = !root.advancedOpen
 
-        Column {
-            Layout.fillWidth: true
-            spacing: root.spacing
+        DIcon {
+            name: root.advancedOpen ? "expand_less" : "expand_more"
+            size: Theme.iconSize
+            color: Theme.surfaceVariantText
+            anchors.verticalCenter: parent.verticalCenter
+        }
+    }
 
-            ChoiceDropdown {
-                visible: draft.eap === "peap"
-                text: I18n.tr("PEAP version", "802.1X advanced option")
-                choices: root.peapVersionChoices
-                selected: draft.peapVersion
-                onPicked: value => draft.peapVersion = value
-            }
+    ChoiceRow {
+        visible: root.advancedOpen && draft.eap === "peap"
+        text: I18n.tr("PEAP version", "802.1X advanced option")
+        choices: root.peapVersionChoices
+        selected: draft.peapVersion
+        onPicked: value => draft.peapVersion = value
+    }
 
-            // phase1-auth-flags: tls-1-0-enable 0x20, tls-1-1-enable 0x40, tls-1-3-disable 0x10
-            DToggle {
-                width: parent.width
-                text: I18n.tr("Allow TLS 1.0 and 1.1", "802.1X advanced option")
-                checked: (draft.authFlags & 0x60) === 0x60
-                onToggled: checked => draft.authFlags = CE.withFlags(draft.authFlags, 0x60, checked)
-            }
+    // phase1-auth-flags: tls-1-0-enable 0x20, tls-1-1-enable 0x40, tls-1-3-disable 0x10
+    SettingsToggleRow {
+        visible: root.advancedOpen && root.usesTlsOptions
+        text: I18n.tr("Allow TLS 1.0 and 1.1", "802.1X advanced option")
+        checked: (draft.authFlags & 0x60) === 0x60
+        onToggled: checked => draft.authFlags = CE.withFlags(draft.authFlags, 0x60, checked)
+    }
 
-            DToggle {
-                width: parent.width
-                text: I18n.tr("Disable TLS 1.3", "802.1X advanced option")
-                checked: (draft.authFlags & 0x10) !== 0
-                onToggled: checked => draft.authFlags = CE.withFlags(draft.authFlags, 0x10, checked)
-            }
+    SettingsToggleRow {
+        visible: root.advancedOpen && root.usesTlsOptions
+        text: I18n.tr("Disable TLS 1.3", "802.1X advanced option")
+        checked: (draft.authFlags & 0x10) !== 0
+        onToggled: checked => draft.authFlags = CE.withFlags(draft.authFlags, 0x10, checked)
+    }
 
-            FormField {
-                leftIconName: "tune"
-                labelText: I18n.tr("OpenSSL ciphers", "802.1X advanced option")
-                text: draft.opensslCiphers
-                onTextEdited: draft.opensslCiphers = text
-            }
+    SettingsRow {
+        visible: root.advancedOpen && root.usesTlsOptions
+        body: FormField {
+            leftIconName: "tune"
+            labelText: I18n.tr("OpenSSL ciphers", "802.1X advanced option")
+            text: draft.opensslCiphers
+            onTextEdited: draft.opensslCiphers = text
         }
     }
 }

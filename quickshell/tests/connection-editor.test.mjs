@@ -257,8 +257,8 @@ test("leaving WEP drops the WEP keys and auth-alg", () => {
 });
 
 test("registry: sections, groups and new-profile defaults", () => {
-    assert.deepEqual(ce.sectionsFor("802-3-ethernet", {}), ["general", "ipv4", "ipv6", "ethernet", "security"]);
-    assert.deepEqual(ce.sectionsFor("802-11-wireless", {}), ["general", "ipv4", "ipv6", "wifi", "security"]);
+    assert.deepEqual(ce.sectionsFor("802-3-ethernet", {}), ["general", "ethernet", "security", "ipv4", "ipv6"]);
+    assert.deepEqual(ce.sectionsFor("802-11-wireless", {}), ["general", "wifi", "security", "ipv4", "ipv6"]);
     assert.deepEqual(ce.sectionsFor("vpn", { connection: {}, ipv4: { method: "auto" } }), ["general", "vpnData", "ipv4"]);
     assert.deepEqual(ce.sectionsFor("tun", {}), ["general"]);
     assert.deepEqual(["802-3-ethernet", "802-11-wireless", "vpn", "wireguard", "gsm", "cdma", "bond"].map(t => ce.groupOf(t)),
@@ -635,6 +635,10 @@ test("enterpriseConfig maps form state to EnterpriseConfig", () => {
     assert.equal(pwd.ca, "none");
     assert.equal("phase2" in pwd, false);
     assert.equal("serverDomain" in pwd, false);
+
+    const pwdHidden = ce.enterpriseConfig(enterpriseState({ eap: "pwd", authFlags: 0x8, opensslCiphers: "DEFAULT@SECLEVEL=0" }));
+    assert.equal("authFlags" in pwdHidden, false);
+    assert.equal("opensslCiphers" in pwdHidden, false);
 });
 
 test("enterpriseConfigValid matrix", () => {

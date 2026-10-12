@@ -137,6 +137,7 @@ TAB_INDEX_MAP = {
     "ChangelogTab.qml": 66,
     "NetworkConnectionsTab.qml": 68,
     "NetworkConnectionTab.qml": 69,
+    "NetworkWifiConnectTab.qml": 71,
     "PowerSleepTab.qml": 21,
     "ClipboardTab.qml": 23,
     "DisplayConfigTab.qml": 24,
@@ -678,7 +679,7 @@ def generate_hub_entries(hubs):
         child_labels = [
             child["label"]
             for child in hub["children"]
-            if child["label"] and child["conditionKey"] != "connectionEditorAvailable"
+            if child["label"] and child["conditionKey"] != "connectionEditorAvailable" and '"searchable": false' not in child["own"]
         ]
         keywords = set(enrich_keywords(hub["label"], " ".join(child_labels + [hub["hint"] or ""]), hub["label"], []))
         for child_label in child_labels:

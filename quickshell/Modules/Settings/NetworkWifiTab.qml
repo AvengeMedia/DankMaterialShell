@@ -29,6 +29,16 @@ Item {
         NetworkService.removeRef();
     }
 
+    NetworkWifiDialogs {
+        id: wifiDialogs
+        parentModal: networkWifiTab.parentModal
+    }
+
+    function openConnectPage(mode, ssid, profile, fileName) {
+        SettingsUiState.selectWifiConnect(mode, ssid, profile, fileName);
+        parentModal?.navigateTo("network_wifi_connect");
+    }
+
     function configureWifiProfile(ssid) {
         NetworkService.listConnections(response => {
             const matches = (response.result || []).filter(p => p.ssid === ssid);
@@ -321,7 +331,7 @@ Item {
                         ToastService.showError(I18n.tr("Failed to import profile", "toast title when importing a WiFi profile file fails"), r.error || "");
                         return;
                     }
-                    PopoutService.showWifiEnterpriseImport(r.result, path.split("/").pop());
+                    networkWifiTab.openConnectPage("import", "", r.result, path.split("/").pop());
                 });
             }
 
@@ -348,7 +358,7 @@ Item {
                     tooltipText: I18n.tr("Connect to Hidden Network")
                     buttonSize: Theme.buttonHeightXS
                     visible: NetworkService.backend === "networkmanager"
-                    onClicked: PopoutService.showHiddenNetworkModal()
+                    onClicked: networkWifiTab.openConnectPage("hidden", "", null, "")
                 },
                 DActionButton {
                     iconName: "upload_file"
@@ -417,7 +427,8 @@ Item {
                         onClicked: {
                             WifiConnectionActions.connectToNetwork(wifiNetworkDelegate.modelData, {
                                 connected: wifiNetworkDelegate.isConnected,
-                                disconnectWhenConnected: true
+                                disconnectWhenConnected: true,
+                                promptCredentials: ssid => networkWifiTab.openConnectPage("password", ssid, null, "")
                             });
                         }
 
@@ -473,7 +484,7 @@ Item {
                             tooltipText: I18n.tr("Show QR Code")
                             visible: wifiNetworkDelegate.modelData.secured && wifiNetworkDelegate.modelData.saved && !(wifiNetworkDelegate.modelData.enterprise || false)
                             onClicked: {
-                                PopoutService.showWifiQRCodeModal(wifiNetworkDelegate.modelData.ssid);
+                                wifiDialogs.openQRCode(wifiNetworkDelegate.modelData.ssid);
                             }
                         }
 
@@ -604,7 +615,8 @@ Item {
                         onClicked: {
                             WifiConnectionActions.connectToNetwork(savedWifiDelegate.modelData, {
                                 connected: savedWifiDelegate.isConnected,
-                                disconnectWhenConnected: true
+                                disconnectWhenConnected: true,
+                                promptCredentials: ssid => networkWifiTab.openConnectPage("password", ssid, null, "")
                             });
                         }
 
@@ -660,7 +672,7 @@ Item {
                             tooltipText: I18n.tr("Show QR Code")
                             visible: savedWifiDelegate.modelData.secured && !(savedWifiDelegate.modelData.enterprise || false)
                             onClicked: {
-                                PopoutService.showWifiQRCodeModal(savedWifiDelegate.modelData.ssid);
+                                wifiDialogs.openQRCode(savedWifiDelegate.modelData.ssid);
                             }
                         }
 
@@ -1070,7 +1082,7 @@ Item {
                     buttonHeight: 36
                     backgroundColor: SettingsMetrics.controlSurface
                     textColor: Theme.surfaceText
-                    onClicked: PopoutService.showWifiQRCodeModal(NetworkService.hotspotSSID)
+                    onClicked: wifiDialogs.openQRCode(NetworkService.hotspotSSID)
                 }
 
                 DButton {
