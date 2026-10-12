@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"debug/elf"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -466,24 +467,24 @@ func checkQtPlatformThemePlugin(varName string) []checkResult {
 // must provide. DMS themes Qt6 through these variables and qt5ct is the Qt5
 // counterpart. qtengine ships both, and Qt5 reads only QT_QPA_PLATFORMTHEME, so
 // its Qt5 plugin is checked there when a Qt5 build tool can be asked.
-func qtPlatformThemeMajors(varName, value string, roots map[string]string) []string {
+func qtPlatformThemeMajors(varName, value string, roots map[string]qtInstall) []string {
 	switch {
 	case value == "qt5ct":
 		return []string{"5"}
-	case value == "qtengine" && varName == "QT_QPA_PLATFORMTHEME" && roots["5"] != "":
+	case value == "qtengine" && varName == "QT_QPA_PLATFORMTHEME" && roots["5"].plugins != "":
 		return []string{"5", "6"}
 	}
 	return []string{"6"}
 }
 
-func checkQtPlatformThemePluginFor(varName, value, major, root string) checkResult {
+func checkQtPlatformThemePluginFor(varName, value, major string, qt qtInstall) checkResult {
 	url := doctorDocsURL + "#environment-variables"
 	files := qtPlatformThemePluginFiles(value, major)
 	name := fmt.Sprintf("%s plugin (Qt%s)", value, major)
 
 	// qmake/qtpaths ship in dev packages most users lack — never warn on a Qt
 	// that could not be interrogated, and never claim it is fine either.
-	if root == "" {
+	if qt.plugins == "" {
 		return checkResult{
 			catEnvironment, name, statusInfo, "Cannot verify (no qmake/qtpaths)",
 			"Install a Qt development package to let dms doctor check the plugin against the path Qt actually searches.",
@@ -492,7 +493,7 @@ func checkQtPlatformThemePluginFor(varName, value, major, root string) checkResu
 	}
 
 	// Qt also searches QT_PLUGIN_PATH, so a plugin found there is loadable.
-	plugin := qtPluginPath(append([]string{root}, filepath.SplitList(os.Getenv("QT_PLUGIN_PATH"))...), files...)
+	plugin := qtPluginPath(append([]string{qt.plugins}, filepath.SplitList(os.Getenv("QT_PLUGIN_PATH"))...), files...)
 	if plugin == "" {
 		// plasma-integration ships the kde theme under a file name that has
 		// changed across versions; a miss says nothing reliable about the
@@ -504,14 +505,61 @@ func checkQtPlatformThemePluginFor(varName, value, major, root string) checkResu
 				url,
 			}
 		}
-		expected := filepath.Join(root, "platformthemes", files[0])
+		expected := filepath.Join(qt.plugins, "platformthemes", files[0])
 		return checkResult{
 			catEnvironment, name, statusWarn, fmt.Sprintf("Not found in Qt%s plugin path", major),
 			fmt.Sprintf("Expected %s — Qt apps silently fall back to a built-in theme, breaking icon lookups and palettes. Install the package providing it, or correct %s.", expected, varName),
 			url,
 		}
 	}
+	// Qt skips QPA plugins built against another Qt major.minor without a
+	// warning, so an out-of-tree plugin silently stops loading after a Qt update.
+	if built, ok := qtPluginBuildVersion(plugin); ok && built != qtMinorVersion(qt.version) {
+		return checkResult{
+			catEnvironment, name, statusWarn, fmt.Sprintf("Built for Qt %s, Qt is %s", built, qt.version),
+			fmt.Sprintf("Qt ignores platform theme plugins built for another Qt minor version, so Qt apps silently fall back to a built-in theme, breaking icon lookups and palettes. Rebuild or reinstall the package providing %s against the installed Qt, then restart the shell.", plugin),
+			url,
+		}
+	}
 	return checkResult{catEnvironment, name, statusOK, "Installed", plugin, url}
+}
+
+// qtPluginBuildVersion reads the Qt major.minor a plugin was built against
+// from the ELF note Qt 6 embeds in every plugin. Qt 5 plugins carry no such
+// note and report false.
+func qtPluginBuildVersion(path string) (string, bool) {
+	f, err := elf.Open(path)
+	if err != nil {
+		return "", false
+	}
+	defer f.Close()
+	section := f.Section(".note.qt.metadata")
+	if section == nil {
+		return "", false
+	}
+	data, err := section.Data()
+	if err != nil || len(data) < 12 {
+		return "", false
+	}
+	nameSize := f.ByteOrder.Uint32(data[0:4])
+	descSize := f.ByteOrder.Uint32(data[4:8])
+	if f.ByteOrder.Uint32(data[8:12]) != 0x74510001 || descSize < 3 {
+		return "", false
+	}
+	// The descriptor starts with the metadata format version, then Qt's major and minor.
+	desc := 12 + (uint64(nameSize)+3)&^3
+	if uint64(len(data)) < desc+uint64(descSize) {
+		return "", false
+	}
+	return fmt.Sprintf("%d.%d", data[desc+1], data[desc+2]), true
+}
+
+func qtMinorVersion(version string) string {
+	parts := strings.SplitN(version, ".", 3)
+	if len(parts) < 2 {
+		return version
+	}
+	return parts[0] + "." + parts[1]
 }
 
 // qtPlatformThemePluginFiles lists the plugin file names that can provide a
@@ -534,22 +582,28 @@ func qtPlatformThemePluginFiles(value, major string) []string {
 	return []string{"libq" + value + ".so", "lib" + value + ".so"}
 }
 
+type qtInstall struct {
+	plugins string
+	version string
+}
+
 // qtPluginRoots asks every available Qt build tool where its Qt looks for
 // plugins, keyed by Qt major. A binary's name does not reliably say which Qt
 // it belongs to — plain "qmake" is Qt5 on Arch and Qt6 elsewhere — so each one
 // is asked for QT_VERSION and the major is taken from the answer.
-func qtPluginRoots() map[string]string {
-	pluginRoots := make(map[string]string)
+func qtPluginRoots() map[string]qtInstall {
+	pluginRoots := make(map[string]qtInstall)
 	for _, q := range qtQueryBinaries {
 		if _, err := exec.LookPath(q.bin); err != nil {
 			continue
 		}
-		major, _, _ := strings.Cut(qtQuery(q.bin, q.flag, "QT_VERSION"), ".")
-		if major == "" || pluginRoots[major] != "" {
+		version := qtQuery(q.bin, q.flag, "QT_VERSION")
+		major, _, _ := strings.Cut(version, ".")
+		if major == "" || pluginRoots[major].plugins != "" {
 			continue
 		}
 		if root := qtQuery(q.bin, q.flag, "QT_INSTALL_PLUGINS"); root != "" {
-			pluginRoots[major] = root
+			pluginRoots[major] = qtInstall{plugins: root, version: version}
 		}
 	}
 	return pluginRoots
