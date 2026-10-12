@@ -30,6 +30,18 @@ func isReadOnlyCommand(args []string) bool {
 	return false
 }
 
+// isRootHelper reports whether args run the system monitor's sysmon-helper,
+// which is meant to run as root (it is started through pkexec).
+func isRootHelper(args []string) bool {
+	for _, arg := range args[1:] {
+		if strings.HasPrefix(arg, "-") {
+			continue
+		}
+		return arg == "sysmon-helper"
+	}
+	return false
+}
+
 func isArchPackageInstalled(packageName string) bool {
 	cmd := exec.Command("pacman", "-Q", packageName)
 	err := cmd.Run()

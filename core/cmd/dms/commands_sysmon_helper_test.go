@@ -53,3 +53,10 @@ func TestServeSysmonHelperAnswersEachLine(t *testing.T) {
 	assert.Equal(t, float64(7), got[1]["result"])
 	assert.Equal(t, "nope", got[2]["error"])
 }
+
+func TestIsRootHelper(t *testing.T) {
+	assert.True(t, isRootHelper([]string{"dms", "sysmon-helper"}))
+	assert.False(t, isRootHelper([]string{"dms", "run"}))
+	assert.False(t, isRootHelper([]string{"dms", "ipc", "sysmon-helper"}))
+	assert.False(t, isRootHelper([]string{"dms"}))
+}

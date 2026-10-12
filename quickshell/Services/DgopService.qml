@@ -495,14 +495,25 @@ Singleton {
                 "method": "dgop.modules"
             }) + "\n");
         }
+        property string lastError: ""
+
         onExited: (code, status) => {
+            // pkexec exits 126 when the password prompt is dismissed; anything else before ready is a real failure.
+            if (!ready && code !== 0 && code !== 126) {
+                root.log.warn("sysmon helper failed:", code, lastError);
+                ToastService.showError(I18n.tr("Failed to unlock", "toast title when the system monitor could not get root access"), lastError);
+            }
             ready = false;
+            lastError = "";
             const pending = root._helperCallbacks;
             root._helperCallbacks = {};
             for (const id in pending)
                 pending[id]({
                     "error": "locked"
                 });
+        }
+        stderr: SplitParser {
+            onRead: line => helper.lastError = line
         }
         stdout: SplitParser {
             onRead: line => {
