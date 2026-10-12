@@ -1,0 +1,169 @@
+pragma ComponentBehavior: Bound
+
+import QtQuick
+import qs.Common
+import qs.Services
+import qs.Widgets
+import qs.DCommon.Widgets
+import "../../Services/SysmonDevices.js" as Devices
+
+DevicePane {
+    id: root
+
+    readonly property var info: DgopService.cpuInfo
+    readonly property var cache: info?.cache ?? null
+    readonly property var freqs: info?.coreFrequencies ?? []
+    // MHz; offline CPUs report 0
+    readonly property real meanMHz: {
+        const online = freqs.filter(f => f > 0);
+        return online.length > 0 ? online.reduce((a, b) => a + b, 0) / online.length : 0;
+    }
+    readonly property real clockMHz: meanMHz > 0 ? meanMHz : DgopService.cpuFrequency
+    readonly property int threads: info?.count ?? 0
+
+    function ghz(mhz) {
+        return mhz > 0 ? (mhz / 1000).toFixed(2) + " GHz" : null;
+    }
+
+    function size(bytes) {
+        return bytes > 0 ? Devices.formatBytes(bytes) : null;
+    }
+
+    function count(n) {
+        return n > 0 ? n.toLocaleString(Qt.locale(), "f", 0) : null;
+    }
+
+    title: I18n.tr("CPU", "processor label in system monitor")
+    subtitle: DgopService.cpuModel
+    subtitle2: info?.physicalCores > 0 && threads > 0 ? I18n.tr("%1 cores, %2 threads", "CPU core and thread count").arg(info.physicalCores).arg(threads) : ""
+    chartLabel: I18n.tr("Usage", "chart legend: CPU or GPU utilization")
+    chartValue: DgopService.cpuSampleCount === 0 ? "—" : DgopService.cpuUsage.toFixed(0) + "%"
+    maximum: 100
+    maximumText: "100%"
+
+    leftStats: [
+        {
+            label: I18n.tr("Clock"),
+            value: root.ghz(root.clockMHz),
+            tooltip: info?.governor ? I18n.tr("Governor") + ": " + info.governor : ""
+        },
+        {
+            label: I18n.tr("Temperature"),
+            value: DgopService.cpuTemperature > 0 ? Devices.formatTemp(DgopService.cpuTemperature, SettingsData.useFahrenheit) : null
+        },
+        {
+            label: I18n.tr("Load Average", "system info label"),
+            value: DgopService.loadAverage || null
+        },
+        {
+            label: I18n.tr("Processes"),
+            value: root.count(DgopService.processCount)
+        },
+        {
+            label: I18n.tr("Threads"),
+            value: root.count(DgopService.threadCount)
+        },
+        {
+            label: I18n.tr("Open files", "system-wide open file handles"),
+            value: root.count(DgopService.openFileCount ?? 0)
+        }
+    ]
+
+    rightStats: [
+        {
+            label: I18n.tr("Base clock", "CPU nominal frequency"),
+            value: root.ghz(info?.baseFrequency ?? 0)
+        },
+        {
+            label: I18n.tr("Max clock"),
+            value: root.ghz(info?.maxFrequency ?? 0)
+        },
+        {
+            label: I18n.tr("Sockets", "CPU sockets on the motherboard"),
+            value: root.count(info?.sockets ?? 0)
+        },
+        {
+            label: I18n.tr("Virtualization", "CPU hardware virtualization, e.g. AMD-V"),
+            value: info?.virtualization || null
+        },
+        {
+            label: I18n.tr("L3 cache"),
+            value: root.size(cache?.l3 ?? 0),
+            tooltip: [[I18n.tr("L1 cache", "CPU cache level"), root.size((cache?.l1d ?? 0) + (cache?.l1i ?? 0))], [I18n.tr("L2 cache", "CPU cache level"), root.size(cache?.l2 ?? 0)]].filter(p => p[1] !== null).map(p => p[0] + ": " + p[1]).join("\n")
+        },
+        {
+            label: I18n.tr("Uptime"),
+            value: DgopService.uptime ? DgopService.uptime.slice(3) : null
+        }
+    ]
+
+    Rectangle {
+        visible: DgopService.perCoreCpuUsage.length > 0
+        width: parent.width
+        height: threadColumn.implicitHeight + Theme.spacingL * 2
+        radius: Theme.cornerRadiusL
+        color: Theme.surfaceContainerLow
+
+        Column {
+            id: threadColumn
+            x: Theme.spacingL
+            y: Theme.spacingL
+            width: parent.width - Theme.spacingL * 2
+            spacing: Theme.spacingS
+
+            StyledText {
+                text: I18n.tr("Per thread")
+                font.pixelSize: Theme.fontSizeMedium
+                color: Theme.surfaceText
+            }
+
+            Grid {
+                id: threadGrid
+
+                readonly property real cellWidth: (width - spacing * (columns - 1)) / columns
+
+                width: parent.width
+                columns: Math.max(1, Math.min(16, DgopService.perCoreCpuUsage.length))
+                spacing: Theme.spacingXS
+
+                Repeater {
+                    model: DgopService.perCoreCpuUsage.length
+
+                    Rectangle {
+                        id: thread
+
+                        required property int index
+                        readonly property real usage: DgopService.perCoreCpuUsage[index] ?? 0
+                        readonly property real mhz: root.freqs[index] ?? 0
+
+                        width: threadGrid.cellWidth
+                        height: Theme.iconButtonSize * 0.7
+                        radius: Theme.cornerRadiusXS
+                        color: Theme.surfaceContainerHighest
+                        clip: true
+
+                        Rectangle {
+                            anchors.bottom: parent.bottom
+                            width: parent.width
+                            height: parent.height * Math.min(100, Math.max(0, thread.usage)) / 100
+                            color: Theme.withAlpha(Theme.primary, 0.7)
+                        }
+
+                        MouseArea {
+                            id: threadHover
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            acceptedButtons: Qt.NoButton
+                        }
+
+                        DTooltipHost {
+                            text: Math.round(thread.usage) + "%" + (thread.mhz > 0 ? ", " + root.ghz(thread.mhz) : "")
+                            target: thread
+                            hoverArea: threadHover
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

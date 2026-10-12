@@ -4,7 +4,8 @@ import Quickshell
 import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
-import "../../Common/Format.js" as Format
+import Quickshell.Widgets
+import "ProcessColumns.js" as ProcessColumns
 
 DListItem {
     id: root
@@ -12,33 +13,46 @@ DListItem {
     required property var process
     property real rowHeight: ProcessListMetrics.rowHeight
     property bool isExpanded: false
+    property var meterMaxes: ({})
     readonly property string command: process?.command ?? ""
     readonly property string fullCommand: process?.fullCommand ?? command
 
-    signal killRequested
+    property var columns: ProcessColumns.DEFAULT_COLUMNS
+    readonly property int childCount: process?.childCount ?? 0
 
-    surfaceColor: Theme.foregroundColor(Theme.chipSurface, Theme.isFloatingWindow(root))
+    signal actionRequested(string action)
 
-    height: root.rowHeight + (isExpanded ? details.implicitHeight + Theme.spacingM * 2 : 0)
+    listView: null
+    surfaceColor: "transparent"
+    color: "transparent"
+    border.width: 0
+    radius: Theme.cornerRadiusS
+    topLeftRadius: radius
+    topRightRadius: radius
+    bottomLeftRadius: radius
+    bottomRightRadius: radius
+
+    height: root.rowHeight + (isExpanded && details.item ? details.item.implicitHeight + Theme.spacingXS + Theme.spacingS : 0)
     clip: true
+
+    // Opening one strip closes another; animating both shows where the selection went.
+    Behavior on height {
+        enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+        NumberAnimation {
+            duration: Theme.expressiveDurations.expressiveDefaultSpatial
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+        }
+    }
     Accessible.name: command
     Accessible.description: fullCommand
 
-    function processIcon(command) {
-        const cmd = command.toLowerCase();
-        if (cmd.includes("firefox") || cmd.includes("chrome") || cmd.includes("browser") || cmd.includes("chromium"))
-            return "web";
-        if (cmd.includes("code") || cmd.includes("editor") || cmd.includes("vim"))
-            return "code";
-        if (cmd.includes("terminal") || cmd.includes("bash") || cmd.includes("zsh"))
-            return "terminal";
-        if (cmd.includes("music") || cmd.includes("audio") || cmd.includes("spotify"))
-            return "music_note";
-        if (cmd.includes("video") || cmd.includes("vlc") || cmd.includes("mpv"))
-            return "play_circle";
-        if (cmd.includes("systemd") || cmd.includes("elogind") || cmd.includes("kernel") || cmd.includes("kthread") || cmd.includes("kworker"))
-            return "settings";
-        return "memory";
+    Rectangle {
+        width: parent.width
+        height: root.rowHeight
+        radius: Theme.cornerRadiusS
+        color: Theme.selectedContainer
+        visible: root.isSelected || root.visualFocus
     }
 
     RowLayout {
@@ -48,140 +62,128 @@ DListItem {
         anchors.leftMargin: Theme.spacingL
         anchors.rightMargin: Theme.spacingL
         height: root.rowHeight
-        spacing: Theme.spacingS
-
-        DIcon {
-            name: root.processIcon(root.command)
-            size: Theme.iconSize
-            color: root.contentColor
-        }
-
-        Column {
-            Layout.fillWidth: true
-            Layout.minimumWidth: 0
-            Layout.preferredWidth: 0
-            spacing: 0
-
-            StyledText {
-                id: nameText
-                width: parent.width
-                maximumLineCount: 1
-                text: root.command
-                font.pixelSize: Theme.fontSizeMedium
-                font.weight: Theme.fontWeightMedium
-                color: root.contentColor
-                textFormat: Text.PlainText
-                elide: Text.ElideRight
-            }
-
-            StyledText {
-                width: parent.width
-                height: Math.min(implicitHeight, Math.max(0, root.rowHeight - nameText.implicitHeight - Theme.spacingXS * 2))
-                maximumLineCount: 2
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                text: root.fullCommand
-                font.pixelSize: Theme.fontSizeSmall
-                color: root.supportingContentColor
-                textFormat: Text.PlainText
-                elide: Text.ElideRight
-            }
-        }
-
-        NumericText {
-            Layout.minimumWidth: ProcessListMetrics.cpuColumnWidth
-            Layout.maximumWidth: ProcessListMetrics.cpuColumnWidth
-            elide: Text.ElideRight
-            maximumLineCount: 1
-            reserveText: "9999.9%"
-            text: (root.process?.cpu ?? 0).toFixed(1) + "%"
-            isMonospace: false
-            horizontalAlignment: Text.AlignRight
-            font.pixelSize: Theme.fontSizeSmall
-            color: root.contentColor
-        }
-
-        NumericText {
-            Layout.minimumWidth: ProcessListMetrics.memoryColumnWidth
-            Layout.maximumWidth: ProcessListMetrics.memoryColumnWidth
-            elide: Text.ElideRight
-            maximumLineCount: 1
-            reserveText: "999.9 GB"
-            text: Format.formatBytes((root.process?.memoryKB ?? 0) * 1024)
-            isMonospace: false
-            horizontalAlignment: Text.AlignRight
-            font.pixelSize: Theme.fontSizeSmall
-            color: root.contentColor
-        }
-
-        NumericText {
-            Layout.minimumWidth: ProcessListMetrics.pidColumnWidth
-            Layout.maximumWidth: ProcessListMetrics.pidColumnWidth
-            elide: Text.ElideRight
-            maximumLineCount: 1
-            reserveText: "9999999"
-            text: (root.process?.pid ?? 0).toString()
-            isMonospace: false
-            horizontalAlignment: Text.AlignRight
-            font.pixelSize: Theme.fontSizeSmall
-            color: root.supportingContentColor
-        }
+        spacing: Theme.spacingXS
 
         Item {
-            Layout.minimumWidth: ProcessListMetrics.actionColumnWidth
-            Layout.maximumWidth: ProcessListMetrics.actionColumnWidth
-            Layout.preferredHeight: Theme.iconButtonSize
+            Layout.rightMargin: Theme.spacingS
+            Layout.preferredWidth: ProcessListMetrics.appIconSize
+            Layout.preferredHeight: ProcessListMetrics.appIconSize
 
-            DActionButton {
-                anchors.centerIn: parent
-                iconName: "close"
-                iconColor: root.contentColor
-                tooltipText: I18n.tr("Kill Process")
-                focusPolicy: activeFocus || root.isSelected ? Qt.StrongFocus : Qt.ClickFocus
-                visible: root.hovered || root.isSelected || activeFocus
-                enabled: (root.process?.pid ?? 0) > 0
-                onClicked: root.killRequested()
-            }
-        }
-    }
-
-    ColumnLayout {
-        id: details
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.topMargin: root.rowHeight
-        anchors.leftMargin: Theme.spacingL
-        anchors.rightMargin: Theme.spacingL
-        spacing: Theme.spacingXS
-        visible: root.isExpanded
-
-        RowLayout {
-            Layout.fillWidth: true
-
-            StyledText {
-                Layout.fillWidth: true
-                text: root.fullCommand
-                font.pixelSize: Theme.fontSizeSmall
-                color: root.contentColor
-                textFormat: Text.PlainText
-                wrapMode: Text.WrapAnywhere
+            IconImage {
+                id: appIcon
+                anchors.fill: parent
+                source: root.command ? Paths.getAppIcon(root.command, DesktopEntries.heuristicLookup(root.command)) : ""
+                smooth: true
+                mipmap: true
+                asynchronous: true
+                visible: status === Image.Ready
             }
 
-            DActionButton {
-                iconName: "content_copy"
-                iconColor: root.contentColor
-                tooltipText: I18n.tr("Copy Full Command")
-                onClicked: Quickshell.execDetached(["dms", "cl", "copy", root.fullCommand])
+            Rectangle {
+                anchors.fill: parent
+                visible: !appIcon.visible
+                radius: Theme.cornerRadiusXS
+                color: Theme.surfaceContainerHighest
+
+                StyledText {
+                    anchors.centerIn: parent
+                    text: root.command.charAt(0).toUpperCase()
+                    font.pixelSize: Theme.fontSizeSmall
+                    font.weight: Theme.fontWeightMedium
+                    color: Theme.surfaceVariantText
+                }
             }
         }
 
         StyledText {
             Layout.fillWidth: true
-            elide: Text.ElideRight
-            maximumLineCount: 1
-            text: "PPID" + ": " + (root.process?.ppid ?? 0) + " · " + I18n.tr("Memory") + ": " + (root.process?.memoryPercent ?? 0).toFixed(1) + "%"
-            font.pixelSize: Theme.fontSizeSmall
+            Layout.preferredWidth: 0
+            text: root.childCount > 0 ? root.command + " (" + root.childCount + ")" : root.command
+            font.pixelSize: Theme.fontSizeMedium
             color: root.contentColor
+            textFormat: Text.PlainText
+            maximumLineCount: 1
+            elide: Text.ElideRight
+        }
+
+        Repeater {
+            model: root.columns
+
+            Item {
+                id: cell
+
+                required property string modelData
+                readonly property var col: ProcessColumns.COLUMNS.find(c => c.id === modelData) ?? ({})
+                readonly property var raw: ProcessColumns.formatCell(modelData, root.process ?? ({}), false)
+                readonly property bool absent: raw === null
+                readonly property real fill: ProcessColumns.meterRatio(modelData, root.process ?? ({}), root.meterMaxes)
+                readonly property bool zero: !cell.absent && ProcessColumns.rawValue(cell.modelData, root.process ?? ({})) === 0
+
+                Layout.minimumWidth: Theme.fontSizeSmall * (col.width ?? 6)
+                Layout.maximumWidth: Layout.minimumWidth
+                Layout.fillHeight: true
+
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width * cell.fill
+                    height: parent.height - Theme.spacingXS * 2
+                    radius: Theme.cornerRadiusXS
+                    color: Theme.withAlpha(Theme.primary, 0.2)
+                    visible: cell.fill >= 0.01
+                }
+
+                NumericText {
+                    anchors.fill: parent
+                    anchors.rightMargin: Theme.spacingS
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignRight
+                    elide: Text.ElideRight
+                    maximumLineCount: 1
+                    isMonospace: false
+                    text: cell.absent ? "—" : cell.modelData === "status" ? ProcessListMetrics.statusLabel(cell.raw) : cell.raw
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: cell.absent || cell.zero ? Theme.surfaceVariantText : cell.col.meter ? root.contentColor : root.supportingContentColor
+                }
+
+                MouseArea {
+                    id: absentArea
+                    anchors.fill: parent
+                    enabled: cell.absent
+                    hoverEnabled: true
+                    acceptedButtons: Qt.NoButton
+                    onContainsMouseChanged: {
+                        if (containsMouse) {
+                            absentTip.text = ProcessColumns.absentReason(cell.modelData, root.process) === "unmonitored" ? I18n.tr("Monitoring off") : I18n.tr("Not readable without privileges");
+                            absentTip.target = cell;
+                            absentTip.hoverArea = absentArea;
+                        } else if (absentTip.hoverArea === absentArea) {
+                            absentTip.hoverArea = null;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    DTooltipHost {
+        id: absentTip
+        text: I18n.tr("Not readable without privileges")
+    }
+
+    Loader {
+        id: details
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.topMargin: root.rowHeight + Theme.spacingXS
+        anchors.leftMargin: Theme.spacingL
+        anchors.rightMargin: Theme.spacingL
+        active: root.isExpanded || root.height > root.rowHeight
+
+        sourceComponent: ProcessDetailStrip {
+            process: root.process
+            onActionRequested: action => root.actionRequested(action)
         }
     }
 }

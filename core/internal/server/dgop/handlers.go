@@ -28,6 +28,8 @@ func dispatch(conn *ipc.ConnWriter, req ipc.Request) {
 		handleHardware(conn, req)
 	case "dgop.modules":
 		handleModules(conn, req)
+	case "dgop.process":
+		handleProcess(conn, req)
 	default:
 		conn.RespondError(req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
@@ -40,17 +42,7 @@ func handleMeta(conn *ipc.ConnWriter, req ipc.Request) {
 		return
 	}
 
-	metaParams := gops.MetaParams{
-		SortBy:         gops.ProcSortBy(params.StringOpt(req.Params, "sort", string(gops.SortByCPU))),
-		ProcLimit:      params.IntOpt(req.Params, "limit", 20),
-		EnableCPU:      !params.BoolLoose(req.Params, "noCpu"),
-		MergeChildren:  params.BoolOpt(req.Params, "mergeChildren", true),
-		GPUPciIds:      params.StringSlice(req.Params, "gpuPciIds"),
-		CPUCursor:      params.StringOpt(req.Params, "cpuCursor", ""),
-		ProcCursor:     params.StringOpt(req.Params, "procCursor", ""),
-		NetRateCursor:  params.StringOpt(req.Params, "netRateCursor", ""),
-		DiskRateCursor: params.StringOpt(req.Params, "diskRateCursor", ""),
-	}
+	metaParams := metaParamsFrom(req.Params)
 
 	ctx, cancel := context.WithTimeout(context.Background(), metaTimeout)
 	defer cancel()
@@ -62,6 +54,22 @@ func handleMeta(conn *ipc.ConnWriter, req ipc.Request) {
 	}
 
 	conn.Respond(req.ID, meta)
+}
+
+func metaParamsFrom(p map[string]any) gops.MetaParams {
+	return gops.MetaParams{
+		SortBy:               gops.ProcSortBy(params.StringOpt(p, "sort", string(gops.SortByCPU))),
+		ProcLimit:            params.IntOpt(p, "limit", 20),
+		EnableCPU:            !params.BoolLoose(p, "noCpu"),
+		MergeChildren:        params.BoolOpt(p, "mergeChildren", true),
+		GPUPciIds:            params.StringSlice(p, "gpuPciIds"),
+		CPUCursor:            params.StringOpt(p, "cpuCursor", ""),
+		ProcCursor:           params.StringOpt(p, "procCursor", ""),
+		NetRateCursor:        params.StringOpt(p, "netRateCursor", ""),
+		DiskRateCursor:       params.StringOpt(p, "diskRateCursor", ""),
+		GPUStatsCursor:       params.StringOpt(p, "gpuStatsCursor", ""),
+		NetRateAllInterfaces: params.BoolLoose(p, "netRateAllInterfaces"),
+	}
 }
 
 func handleGPU(conn *ipc.ConnWriter, req ipc.Request) {
@@ -92,4 +100,18 @@ func handleModules(conn *ipc.ConnWriter, req ipc.Request) {
 	}
 
 	conn.Respond(req.ID, modules)
+}
+
+func handleProcess(conn *ipc.ConnWriter, req ipc.Request) {
+	pid, err := params.Int(req.Params, "pid")
+	if err != nil || pid <= 0 {
+		conn.RespondError(req.ID, "pid is required")
+		return
+	}
+	detail, err := util.GetProcessDetail(int32(pid))
+	if err != nil {
+		conn.RespondError(req.ID, err.Error())
+		return
+	}
+	conn.Respond(req.ID, detail)
 }

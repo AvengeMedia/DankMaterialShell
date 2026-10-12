@@ -1,388 +1,330 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
+import qs.Modules.Settings.Widgets
+import "SystemInfo.js" as SystemInfo
+import "../../Services/SysmonDevices.js" as Devices
 
 Item {
     id: root
 
+    // The page's one action sits in a FAB, like Settings pages; SettingsFabBar finds this property.
+    property var fabBar: null
+
     Ref {
         service: DgopService
-        modules: ["system", "cpu"]
+        modules: ["system", "cpu", "memory-modules", "sensors"]
         active: root.visible
     }
 
-    ColumnLayout {
+    Ref {
+        service: DriveService
+        active: root.visible
+    }
+
+    readonly property var displayRows: {
+        const outputs = (WlrOutputService.outputs ?? []).filter(o => o.enabled && o.currentMode);
+        if (outputs.length > 0)
+            return outputs.map(o => SystemInfo.modeText(o.currentMode));
+        return Quickshell.screens.map(s => SystemInfo.modeText({
+                "width": Math.round(s.width * s.devicePixelRatio),
+                "height": Math.round(s.height * s.devicePixelRatio)
+            }));
+    }
+
+    readonly property string networkText: {
+        if (NetworkService.ethernetConnected) {
+            const dev = (NetworkService.ethernetDevices ?? []).find(d => d.name === NetworkService.ethernetInterface);
+            const speed = dev?.speed > 0 ? (dev.speed >= 1000 ? dev.speed / 1000 + " Gbit/s" : dev.speed + " Mbit/s") : "";
+            return [I18n.tr("Ethernet"), speed].filter(s => s).join(", ");
+        }
+        if (NetworkService.wifiConnected)
+            return I18n.tr("Wi-Fi");
+        return NetworkService.networkAvailable ? I18n.tr("Disconnected") : "";
+    }
+
+    readonly property var softwareRows: [
+        {
+            "label": I18n.tr("Distribution", "system info label"),
+            "value": DgopService.distribution
+        },
+        {
+            "label": I18n.tr("Kernel", "system info label"),
+            "value": DgopService.kernelVersion,
+            "tooltip": DgopService.architecture
+        },
+        {
+            "label": I18n.tr("Compositor"),
+            "value": CompositorService.displayName
+        },
+        {
+            "label": "DMS",
+            "value": ShellVersionService.shellVersion
+        },
+        {
+            "label": I18n.tr("Init", "init system, e.g. systemd"),
+            "value": DgopService.initSystem ?? ""
+        },
+        {
+            "label": I18n.tr("Uptime"),
+            "value": DgopService.uptime ? DgopService.uptime.slice(3) : ""
+        },
+        {
+            "label": I18n.tr("Processes"),
+            "value": DgopService.processCount > 0 ? DgopService.processCount.toString() : ""
+        }
+    ]
+
+    readonly property var hardwareRows: {
+        const rows = [
+            {
+                "label": I18n.tr("Board"),
+                "value": DgopService.bios?.motherboard ?? ""
+            },
+            {
+                "label": I18n.tr("BIOS"),
+                "value": DgopService.bios?.version ?? "",
+                "tooltip": DgopService.bios?.date ?? ""
+            },
+            {
+                "label": I18n.tr("CPU"),
+                "value": DgopService.cpuModel
+            },
+            {
+                "label": I18n.tr("Memory"),
+                "value": Devices.memoryModulesSummary(DgopService.memoryModules?.modules) || (DgopService.totalMemoryKB > 0 ? DgopService.formatSystemMemory(DgopService.totalMemoryKB) : "")
+            }
+        ];
+        for (const gpu of DgopService.availableGpus ?? [])
+            rows.push({
+                "label": I18n.tr("GPU"),
+                "value": gpu.displayName,
+                "tooltip": gpu.fullName !== gpu.displayName ? gpu.fullName : ""
+            });
+        rows.push({
+            "label": I18n.tr("Storage", "total drive capacity, e.g. 2 TB + 4 TB NVMe"),
+            "value": SystemInfo.storageSummary(DriveService.drives),
+            "tooltip": (DriveService.drives ?? []).map(d => d.model || d.name).join("\n")
+        });
+        for (const mode of root.displayRows)
+            rows.push({
+                "label": I18n.tr("Display"),
+                "value": mode
+            });
+        rows.push({
+            "label": I18n.tr("Network"),
+            "value": root.networkText
+        });
+        return rows;
+    }
+
+    readonly property var sensorNames: ({
+            "cpu": I18n.tr("CPU"),
+            "gpu": I18n.tr("GPU"),
+            "memory": I18n.tr("Memory")
+        })
+    readonly property var gpuNames: (DgopService.gpuStats ?? []).map(g => ({
+                "pciSlot": g.pciSlot,
+                "name": g.name
+            }))
+    readonly property var sensorRows: SystemInfo.sensorRows(DgopService.sensors, DriveService.drives, gpuNames, sensorNames, SettingsData.useFahrenheit)
+    readonly property int sensorSplit: Math.ceil(sensorRows.length / 2)
+
+    function copySystemInfo() {
+        const text = SystemInfo.plainText(DgopService.hostname, [
+            {
+                "title": I18n.tr("Software", "system info section"),
+                "rows": softwareRows
+            },
+            {
+                "title": I18n.tr("Hardware", "system info section"),
+                "rows": hardwareRows
+            }
+        ]);
+        Quickshell.execDetached([Proc.dmsBin, "cl", "copy", text]);
+        ToastService.showInfo(I18n.tr("Copied to clipboard"));
+    }
+
+    DFlickable {
+        id: scroll
         anchors.fill: parent
-        spacing: Theme.spacingM
+        contentWidth: width
+        contentHeight: column.implicitHeight + (root.fabBar?.reservedHeight ?? 0)
 
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: systemInfoColumn.implicitHeight + Theme.spacingM * 2
-            radius: Theme.cornerRadius
-            color: Theme.nestedSurface
-            border.width: Theme.layerOutlineWidth
-            border.color: Theme.outlineMedium
+        ColumnLayout {
+            id: column
+            width: scroll.width
+            spacing: Theme.spacingL
 
-            ColumnLayout {
-                id: systemInfoColumn
-                anchors.fill: parent
-                anchors.margins: Theme.spacingM
-                spacing: Theme.spacingM
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: Theme.spacingL
 
-                Row {
-                    spacing: Theme.spacingS
-
-                    DIcon {
-                        name: "computer"
-                        size: Theme.iconSize
-                        color: Theme.primary
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    StyledText {
-                        text: I18n.tr("System Information", "system info header in system monitor")
-                        font.pixelSize: Theme.fontSizeLarge
-                        font.weight: Theme.fontWeightMedium
-                        color: Theme.surfaceText
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
+                StyledText {
+                    Layout.fillWidth: true
+                    text: DgopService.hostname
+                    font.pixelSize: Theme.fontSizeXXLarge
+                    color: Theme.surfaceText
+                    wrapMode: Text.NoWrap
+                    elide: Text.ElideRight
                 }
 
-                GridLayout {
-                    Layout.fillWidth: true
-                    columns: 2
-                    rowSpacing: Theme.spacingS
-                    columnSpacing: Theme.spacingXL
+            }
 
-                    InfoRow {
-                        label: I18n.tr("Hostname", "system info label")
-                        value: DgopService.hostname || "--"
-                    }
-                    InfoRow {
-                        label: I18n.tr("Distribution", "system info label")
-                        value: DgopService.distribution || "--"
-                    }
-                    InfoRow {
-                        label: I18n.tr("Kernel", "system info label")
-                        value: DgopService.kernelVersion || "--"
-                    }
-                    InfoRow {
-                        label: I18n.tr("Architecture", "system info label")
-                        value: DgopService.architecture || "--"
-                    }
-                    InfoRow {
-                        label: I18n.tr("CPU")
-                        value: DgopService.cpuModel || ("" + DgopService.cpuCores + " cores")
-                    }
-                    InfoRow {
-                        label: I18n.tr("Uptime")
-                        value: DgopService.uptime ? DgopService.uptime.slice(3) : "--"
-                    }
-                    InfoRow {
-                        label: I18n.tr("Load Average", "system info label")
-                        value: DgopService.loadAverage || "--"
-                    }
-                    InfoRow {
-                        label: I18n.tr("Processes")
-                        value: DgopService.processCount > 0 ? DgopService.processCount.toString() : "--"
-                    }
+            GridLayout {
+                Layout.fillWidth: true
+                columns: width >= 640 ? 2 : 1
+                columnSpacing: Theme.spacingXL
+                rowSpacing: Theme.spacingL
+
+                InfoColumn {
+                    title: I18n.tr("Software", "system info section")
+                    rows: root.softwareRows
+                }
+
+                InfoColumn {
+                    title: I18n.tr("Hardware", "system info section")
+                    rows: root.hardwareRows
                 }
             }
-        }
-
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            radius: Theme.cornerRadius
-            color: Theme.nestedSurface
-            border.width: Theme.layerOutlineWidth
-            border.color: Theme.outlineMedium
 
             ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: Theme.spacingM
-                spacing: Theme.spacingM
+                visible: root.sensorRows.length > 0
+                Layout.fillWidth: true
+                spacing: 0
 
-                Row {
-                    spacing: Theme.spacingS
-
-                    DIcon {
-                        name: "developer_board"
-                        size: Theme.iconSize
-                        color: Theme.secondary
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    StyledText {
-                        text: I18n.tr("GPU Monitoring", "gpu section header in system monitor")
-                        font.pixelSize: Theme.fontSizeLarge
-                        font.weight: Theme.fontWeightMedium
-                        color: Theme.surfaceText
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
+                SettingsSectionLabel {
+                    Layout.fillWidth: true
+                    text: I18n.tr("Sensors", "hardware sensors section")
                 }
 
-                Rectangle {
+                RowLayout {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 1
-                    color: Theme.outlineLight
-                }
+                    spacing: Theme.groupedListGap
 
-                DListView {
-                    id: gpuListView
-
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    clip: true
-                    spacing: Theme.spacingS
-
-                    model: DgopService.availableGpus
-
-                    delegate: Rectangle {
-                        required property var modelData
-                        required property int index
-
-                        width: gpuListView.width
-                        height: 80
-                        radius: Theme.cornerRadius
-                        color: {
-                            const vendor = (modelData?.vendor ?? "").toLowerCase();
-                            if (vendor.includes("nvidia"))
-                                return Theme.withAlpha(Theme.success, 0.08);
-                            if (vendor.includes("amd"))
-                                return Theme.errorHover;
-                            if (vendor.includes("intel"))
-                                return Theme.withAlpha(Theme.info, 0.08);
-                            return Theme.cardSurface;
-                        }
-                        border.color: {
-                            const vendor = (modelData?.vendor ?? "").toLowerCase();
-                            if (vendor.includes("nvidia"))
-                                return Theme.withAlpha(Theme.success, 0.2);
-                            if (vendor.includes("amd"))
-                                return Theme.errorPressed;
-                            if (vendor.includes("intel"))
-                                return Theme.withAlpha(Theme.info, 0.2);
-                            return Theme.surfaceVariantAlpha;
-                        }
-                        border.width: 1
-
-                        readonly property bool tempEnabled: {
-                            const pciId = modelData?.pciId ?? "";
-                            if (!pciId)
-                                return false;
-                            return SessionData.enabledGpuPciIds ? SessionData.enabledGpuPciIds.indexOf(pciId) !== -1 : false;
-                        }
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.margins: Theme.spacingM
-                            spacing: Theme.spacingM
-
-                            DIcon {
-                                name: "developer_board"
-                                size: Theme.iconSize + 4
-                                color: {
-                                    const vendor = (modelData?.vendor ?? "").toLowerCase();
-                                    if (vendor.includes("nvidia"))
-                                        return Theme.success;
-                                    if (vendor.includes("amd"))
-                                        return Theme.error;
-                                    if (vendor.includes("intel"))
-                                        return Theme.info;
-                                    return Theme.surfaceVariantText;
-                                }
-                            }
-
-                            Column {
-                                Layout.fillWidth: true
-                                spacing: Theme.spacingXS
-
-                                StyledText {
-                                    text: modelData?.displayName ?? I18n.tr("Unknown GPU", "fallback gpu name")
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Theme.fontWeightMedium
-                                    color: Theme.surfaceText
-                                }
-
-                                Row {
-                                    spacing: Theme.spacingS
-
-                                    StyledText {
-                                        text: modelData?.vendor ?? ""
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
-                                    }
-
-                                    StyledText {
-                                        text: "•"
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
-                                        visible: (modelData?.driver ?? "").length > 0
-                                    }
-
-                                    StyledText {
-                                        text: modelData?.driver ?? ""
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
-                                        visible: (modelData?.driver ?? "").length > 0
-                                    }
-                                }
-
-                                StyledText {
-                                    text: modelData?.pciId ?? ""
-                                    font.pixelSize: Theme.fontSizeSmall - 2
-                                    font.family: SettingsData.monoFontFamily
-                                    color: Theme.surfaceVariantText
-                                    opacity: 0.7
-                                }
-                            }
-
-                            Rectangle {
-                                width: 70
-                                height: 32
-                                radius: Theme.cornerRadius
-                                color: parent.parent.tempEnabled ? Theme.withAlpha(Theme.surfaceVariant, 0.3) : Theme.surfaceSelected
-                                border.color: tempMouseArea.containsMouse ? Theme.outline : Theme.withAlpha(Theme.outline, 0)
-                                border.width: 1
-
-                                Row {
-                                    id: tempRow
-                                    anchors.centerIn: parent
-                                    spacing: Theme.spacingXS
-
-                                    DIcon {
-                                        name: "thermostat"
-                                        size: 16
-                                        color: {
-                                            if (!parent.parent.parent.parent.tempEnabled)
-                                                return Theme.surfaceVariantText;
-                                            const temp = modelData?.temperature ?? 0;
-                                            if (temp > 85)
-                                                return Theme.error;
-                                            if (temp > 70)
-                                                return Theme.warning;
-                                            return Theme.surfaceText;
-                                        }
-                                        opacity: parent.parent.parent.parent.tempEnabled ? 1 : 0.5
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    StyledText {
-                                        text: {
-                                            if (!parent.parent.parent.parent.tempEnabled)
-                                                return I18n.tr("Off");
-                                            const temp = modelData?.temperature ?? 0;
-                                            return temp > 0 ? (temp.toFixed(0) + "°C") : "--";
-                                        }
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        font.family: parent.parent.parent.parent.tempEnabled ? SettingsData.monoFontFamily : ""
-                                        font.weight: parent.parent.parent.parent.tempEnabled ? Theme.fontWeightMedium : Theme.fontWeight
-                                        color: {
-                                            if (!parent.parent.parent.parent.tempEnabled)
-                                                return Theme.surfaceVariantText;
-                                            const temp = modelData?.temperature ?? 0;
-                                            if (temp > 85)
-                                                return Theme.error;
-                                            if (temp > 70)
-                                                return Theme.warning;
-                                            return Theme.surfaceText;
-                                        }
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-                                }
-
-                                MouseArea {
-                                    id: tempMouseArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        const pciId = modelData?.pciId;
-                                        if (!pciId)
-                                            return;
-
-                                        const enabledIds = SessionData.enabledGpuPciIds ? SessionData.enabledGpuPciIds.slice() : [];
-                                        const idx = enabledIds.indexOf(pciId);
-                                        const wasEnabled = idx !== -1;
-
-                                        if (!wasEnabled) {
-                                            enabledIds.push(pciId);
-                                            DgopService.addGpuPciId(pciId);
-                                        } else {
-                                            enabledIds.splice(idx, 1);
-                                            DgopService.removeGpuPciId(pciId);
-                                        }
-
-                                        SessionData.setEnabledGpuPciIds(enabledIds);
-                                    }
-                                }
-
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Theme.shortDuration
-                                    }
-                                }
-                            }
-                        }
+                    SensorGroup {
+                        rows: root.sensorRows.slice(0, root.sensorSplit)
                     }
 
-                    Rectangle {
-                        anchors.centerIn: parent
-                        width: 300
-                        height: 100
-                        radius: Theme.cornerRadius
-                        color: "transparent"
-                        visible: DgopService.availableGpus.length === 0
-
-                        Column {
-                            anchors.centerIn: parent
-                            spacing: Theme.spacingM
-
-                            DIcon {
-                                name: "developer_board_off"
-                                size: 32
-                                color: Theme.surfaceVariantText
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-
-                            StyledText {
-                                text: I18n.tr("No GPU detected", "empty state in gpu list")
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceVariantText
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                        }
+                    SensorGroup {
+                        rows: root.sensorRows.slice(root.sensorSplit)
                     }
                 }
             }
         }
     }
 
-    component InfoRow: RowLayout {
-        property string label: ""
-        property string value: ""
+    component InfoColumn: ColumnLayout {
+        id: info
+
+        property string title: ""
+        property var rows: []
 
         Layout.fillWidth: true
-        spacing: Theme.spacingS
+        Layout.preferredWidth: 1
+        Layout.alignment: Qt.AlignTop
+        spacing: 0
 
-        StyledText {
-            text: label + ":"
-            font.pixelSize: Theme.fontSizeSmall
-            font.weight: Theme.fontWeightMedium
-            color: Theme.surfaceVariantText
-            Layout.preferredWidth: 100
+        SettingsSectionLabel {
+            Layout.fillWidth: true
+            text: info.title
         }
 
-        StyledText {
-            text: value
-            font.pixelSize: Theme.fontSizeSmall
-            font.family: SettingsData.monoFontFamily
-            color: Theme.surfaceText
+        SettingsGroup {
             Layout.fillWidth: true
-            elide: Text.ElideRight
+            customPaddingV: 0
+            customPaddingH: Theme.spacingL
+
+            Repeater {
+                model: info.rows
+
+                StatRow {
+                    required property var modelData
+                    visible: !!modelData.value
+                    label: modelData.label
+                    value: modelData.value
+                    tooltip: modelData.tooltip ?? ""
+                }
+            }
+        }
+    }
+
+    component SensorGroup: SettingsGroup {
+        id: group
+
+        property var rows: []
+
+        Layout.fillWidth: true
+        Layout.alignment: Qt.AlignTop
+        customPaddingV: 0
+        customPaddingH: Theme.spacingL
+
+        Repeater {
+            model: group.rows
+
+            Item {
+                id: sensor
+
+                required property var modelData
+
+                height: Theme.iconButtonSize
+
+                StyledText {
+                    anchors.left: parent.left
+                    anchors.right: bar.left
+                    anchors.rightMargin: Theme.spacingM
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: sensor.modelData.name
+                    font.pixelSize: Theme.fontSizeMedium
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.NoWrap
+                    elide: Text.ElideRight
+                }
+
+                Rectangle {
+                    id: bar
+                    anchors.right: valueText.left
+                    anchors.rightMargin: Theme.spacingM
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: Math.min(120, sensor.width / 4)
+                    height: Theme.spacingS
+                    radius: height / 2
+                    color: Theme.surfaceContainerHighest
+                    opacity: sensor.modelData.ratio === null ? 0 : 1
+
+                    Rectangle {
+                        width: parent.width * (sensor.modelData.ratio ?? 0)
+                        height: parent.height
+                        radius: height / 2
+                        color: (sensor.modelData.ratio ?? 0) >= 0.9 ? Theme.error : Theme.primary
+                    }
+                }
+
+                NumericText {
+                    id: valueText
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: Theme.iconButtonSize * 2
+                    isMonospace: false
+                    text: sensor.modelData.value
+                    font.pixelSize: Theme.fontSizeMedium
+                    color: Theme.surfaceText
+                    horizontalAlignment: Text.AlignRight
+                }
+            }
+        }
+    }
+
+    SettingsFabBar {
+        DFab {
+            text: I18n.tr("Copy system info", "button, copies a plain-text summary of software and hardware")
+            iconName: "content_copy"
+            onClicked: root.copySystemInfo()
         }
     }
 }

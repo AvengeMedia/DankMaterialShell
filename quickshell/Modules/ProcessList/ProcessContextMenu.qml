@@ -15,7 +15,7 @@ Popup {
     property var parentFocusItem: null
     property var transientSurfaceTracker: null
 
-    readonly property alias confirmationOpen: confirmation.visible
+    readonly property bool confirmationOpen: confirmation.opened
 
     signal menuClosed
     signal processKilled
@@ -56,18 +56,31 @@ Popup {
             type: "separator"
         },
         {
-            text: I18n.tr("Kill Process"),
+            text: I18n.tr("Quit", "process action: ask the process to exit (SIGTERM)"),
             icon: "close",
-            action: killProcess,
-            enabled: true,
+            action: () => requestAction("quit"),
+            enabled: ProcessActions.canEnd(processData),
             dangerous: true
         },
         {
-            text: I18n.tr("Force Kill (SIGKILL)"),
+            text: I18n.tr("Force quit", "process action: kill the process immediately (SIGKILL)"),
             icon: "dangerous",
-            action: forceKillProcess,
-            enabled: processData && processData.pid > 1000,
+            action: () => requestAction("force"),
+            enabled: ProcessActions.canEnd(processData),
             dangerous: true
+        },
+        {
+            text: I18n.tr("End process tree", "process action: quit the process and every process it started"),
+            icon: "account_tree",
+            action: () => requestAction("tree"),
+            enabled: ProcessActions.canEnd(processData),
+            dangerous: true
+        },
+        {
+            text: actionTitle("restart", processData),
+            icon: "restart_alt",
+            action: () => requestAction("restart"),
+            enabled: ProcessActions.canRestart(processData)
         }
     ]
 
@@ -157,20 +170,20 @@ Popup {
     }
 
     function killProcess() {
-        requestKill(false);
+        requestAction("quit");
     }
 
-    function forceKillProcess() {
-        requestKill(true);
+    function actionTitle(action, process) {
+        return ProcessActions.title(action, process);
     }
 
-    function requestKill(force) {
-        if (!processData || processData.pid <= 0 || (force && processData.pid <= 1000))
+    // Ending a critical process warns and offers a restart instead; everything else gets a plain confirmation.
+    function requestAction(action) {
+        if (!processData || !(action === "restart" ? ProcessActions.canRestart(processData) : ProcessActions.canEnd(processData)))
             return;
-        confirmation.process = Object.assign({}, processData);
-        confirmation.forceKill = force;
+        const process = Object.assign({}, processData);
         close();
-        confirmation.open();
+        confirmation.open(process, action, action !== "restart" && ProcessActions.isCritical(process));
     }
 
     function dismiss() {
@@ -178,60 +191,18 @@ Popup {
         confirmation.close();
     }
 
-    Popup {
+    ProcessActionDialog {
         id: confirmation
-        property var process: null
-        property bool forceKill: false
         parent: processContextMenu.parent
-        width: Math.min(ProcessListMetrics.dialogWidth, parent.width - Theme.spacingL * 2)
-        height: confirmationContent.implicitHeight + Theme.spacingL * 2
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        padding: Theme.spacingL
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        onOpened: {
-            confirmationContent.reset();
-            confirmationContent.selectedButton = 0;
-            confirmationContent.keyboardNavigation = true;
-            confirmationContent.forceActiveFocus();
+        onChosen: (action, process) => {
+            if ((process?.pid ?? 0) <= 0)
+                return;
+            ProcessActions.run(action, process);
+            processContextMenu.processKilled();
         }
-        onClosed: focusRestore.restart()
-
-        background: Rectangle {
-            color: Theme.isFloatingWindow(processContextMenu) ? Theme.floatingWindowSurface : Theme.readableSurface
-            border.width: Theme.layerOutlineWidth
-            border.color: Theme.outlineMedium
-            radius: Theme.windowRadius
-        }
-
-        contentItem: ConfirmDialogContent {
-            id: confirmationContent
-            confirmTitle: confirmation.forceKill ? I18n.tr("Force Kill (SIGKILL)") : I18n.tr("Kill Process")
-            confirmMessage: (confirmation.process?.command ?? "") + " (" + I18n.tr("PID") + " " + (confirmation.process?.pid ?? 0) + ")"
-            confirmButtonText: I18n.tr("Kill Process")
-            confirmButtonColor: Theme.error
-            Keys.onPressed: event => {
-                if (event.key === Qt.Key_Backtab) {
-                    keyboardNavigation = true;
-                    selectedButton = selectedButton === 0 ? 1 : 0;
-                    event.accepted = true;
-                    return;
-                }
-                handleKey(event);
-            }
-            onCancelled: confirmation.close()
-            onButtonActivated: button => {
-                const pid = confirmation.process?.pid ?? 0;
-                const force = confirmation.forceKill;
-                confirmation.close();
-                if (button !== 1 || pid <= 0)
-                    return;
-                const args = force ? ["kill", "-9", pid.toString()] : ["kill", pid.toString()];
-                Quickshell.execDetached(args);
-                processContextMenu.processKilled();
-            }
+        onOpenedChanged: {
+            if (!opened)
+                focusRestore.restart();
         }
     }
 
@@ -362,8 +333,8 @@ Popup {
                                 return menuItemArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0);
                             }
                             if (isSelected)
-                                return Theme.primaryPressed;
-                            return menuItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0);
+                                return Theme.selectedContainer;
+                            return menuItemArea.pressed ? Theme.withAlpha(Theme.onSurface, Theme.stateLayerPressed) : menuItemArea.containsMouse ? Theme.withAlpha(Theme.onSurface, Theme.stateLayerHover) : "transparent";
                         }
 
                         Row {

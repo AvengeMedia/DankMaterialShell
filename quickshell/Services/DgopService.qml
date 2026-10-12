@@ -6,6 +6,8 @@ import Quickshell
 import Quickshell.Services.UPower
 import qs.Common
 import qs.Services
+import "SysmonDevices.js" as SysmonDevices
+import "ProcessSort.js" as ProcessSort
 
 Singleton {
     id: root
@@ -38,6 +40,9 @@ Singleton {
     // Cursor data for accurate CPU calculations
     property string cpuCursor: ""
     property string procCursor: ""
+    property string diskRateCursor: ""
+    property string netRateCursor: ""
+    property string gpuStatsCursor: ""
     property int cpuSampleCount: 0
 
     property real cpuUsage: 0
@@ -68,6 +73,15 @@ Singleton {
     property var diskMounts: []
     property bool diskMountsRequested: false
     property var diskDevices: []
+    property var diskRates: []
+    property var netRates: []
+    property var memoryInfo: null
+    property var bios: null
+    property var cpuInfo: null
+    property var gpuStats: []
+    property var sensors: []
+    property var memoryModules: null
+    property var availableModules: []
 
     property var processes: []
     property var allProcesses: []
@@ -82,6 +96,8 @@ Singleton {
     property string loadAverage: ""
     property int processCount: 0
     property int threadCount: 0
+    property int openFileCount: 0
+    property string initSystem: ""
     property string bootTime: ""
     property string motherboard: ""
     property string biosVersion: ""
@@ -99,12 +115,15 @@ Singleton {
             "read": [],
             "write": []
         })
+    property int deviceHistorySize: 60
+    property var deviceHistory: ({})
 
     function ensureMeta() {
         _metaWanted = true;
         if (_metaLoaded || !dgopAvailable)
             return;
         _metaLoaded = true;
+        initializeModules();
         initializeSystemMetadata();
         initializeGpuMetadata();
     }
@@ -199,9 +218,33 @@ Singleton {
             cpuSampleCount = 0;
             cpuHistory = [];
             perCoreCpuUsage = [];
+            cpuInfo = null;
+            removeDeviceHistory("cpu");
         }
-        if (!hasModule("memory"))
+        if (!hasModule("memory")) {
             memoryHistory = [];
+            memoryInfo = null;
+            removeDeviceHistory("memory");
+        }
+        if (!hasModule("disk-rate")) {
+            diskRateCursor = "";
+            diskRates = [];
+            removeDeviceHistory("disk");
+        }
+        if (!hasModule("net-rate")) {
+            netRateCursor = "";
+            netRates = [];
+            removeDeviceHistory("net");
+        }
+        if (!hasModule("gpu-stats")) {
+            gpuStatsCursor = "";
+            gpuStats = [];
+            removeDeviceHistory("gpu");
+        }
+        if (!hasModule("sensors"))
+            sensors = [];
+        if (!hasModule("memory-modules"))
+            memoryModules = null;
         if (!hasModule("network")) {
             networkHistory = {
                 rx: [],
@@ -226,7 +269,85 @@ Singleton {
             procCursor = "";
             allProcesses = [];
             processes = [];
+        } else if (!hasModule("process-gpu") || !hasModule("process-io") || !hasModule("process-net")) {
+            const noGpu = !hasModule("process-gpu");
+            const noIo = !hasModule("process-io");
+            const noNet = !hasModule("process-net");
+            allProcesses = allProcesses.map(p => Object.assign({}, p, noGpu ? {
+                    "gpu": null,
+                    "gpuVideo": null,
+                    "vramKB": null,
+                    "gpuGtt": null,
+                    "gpuUnmonitored": true
+                } : {}, noIo ? {
+                    "diskRead": null,
+                    "diskWrite": null
+                } : {}, noNet ? {
+                    "connections": null,
+                    "remotes": [],
+                    "netRx": null,
+                    "netTx": null
+                } : {}));
+            applySorting();
         }
+    }
+
+    function removeDeviceHistory(prefix) {
+        const next = {};
+        let changed = false;
+        for (const key of Object.keys(deviceHistory)) {
+            if (key === prefix || key.startsWith(prefix + ":"))
+                changed = true;
+            else
+                next[key] = deviceHistory[key];
+        }
+        if (changed)
+            deviceHistory = next;
+    }
+
+    // Appends one sample per key to `history` in place and drops keys under `prefix` missing from `liveKeys` (null keeps all).
+    function pushDeviceHistory(history, prefix, samples, liveKeys) {
+        if (liveKeys) {
+            for (const key of Object.keys(history)) {
+                if (key.startsWith(prefix + ":") && !liveKeys.includes(key))
+                    delete history[key];
+            }
+        }
+        for (const sample of samples) {
+            const old = history[sample.key] || {
+                a: [],
+                b: []
+            };
+            history[sample.key] = {
+                a: SysmonDevices.appendHistory(old.a, sample.a, deviceHistorySize),
+                b: sample.b === undefined ? old.b : SysmonDevices.appendHistory(old.b, sample.b, deviceHistorySize)
+            };
+        }
+    }
+
+    function setGpuMonitoring(pciId, on) {
+        if (!pciId)
+            return;
+        const ids = SessionData.enabledGpuPciIds ? SessionData.enabledGpuPciIds.slice() : [];
+        const idx = ids.indexOf(pciId);
+        if (on && idx === -1) {
+            ids.push(pciId);
+            addGpuPciId(pciId);
+        } else if (!on && idx !== -1) {
+            ids.splice(idx, 1);
+            removeGpuPciId(pciId);
+        } else {
+            return;
+        }
+        SessionData.setEnabledGpuPciIds(ids);
+        if (refCount > 0)
+            updateAllStats();
+    }
+
+    function gpuHeldByWidget(pciId) {
+        const id = String(pciId).toLowerCase();
+        const held = Object.keys(gpuPciIdRefCounts).some(k => k.toLowerCase() === id && gpuPciIdRefCounts[k] > 0);
+        return held && !(SessionData.enabledGpuPciIds || []).some(e => String(e).toLowerCase() === id);
     }
 
     function addGpuPciId(pciId) {
@@ -318,6 +439,32 @@ Singleton {
         });
     }
 
+    // On-demand fields of one process (IO totals, swap, open files, systemd unit); callback gets null on failure.
+    function fetchProcessDetail(pid, callback) {
+        DMSService.sendRequest("dgop.process", {
+            "pid": pid
+        }, response => callback(response.result ?? null));
+    }
+
+    function initializeModules() {
+        DMSService.sendRequest("dgop.modules", null, response => {
+            if (!response.result) {
+                log.warn("dgop.modules failed:", response.error || "empty result");
+                return;
+            }
+            availableModules = response.result.available ?? [];
+            if (pollingActive)
+                updateAllStats();
+        });
+    }
+
+    // GetMeta fails the whole call on an unknown module, so never send one dgop didn't list.
+    function isModuleAvailable(module) {
+        if (availableModules.length > 0)
+            return availableModules.includes(module);
+        return !["gpu-stats", "sensors", "memory-modules", "process-gpu", "process-io", "process-net"].includes(module);
+    }
+
     function initializeSystemMetadata() {
         if (!dgopAvailable)
             return;
@@ -364,7 +511,7 @@ Singleton {
             return null;
 
         // Replace 'gpu' with 'gpu-temp' when we have PCI IDs to monitor
-        const finalModules = [];
+        let finalModules = [];
         for (const module of enabledModules) {
             if (module === "gpu" && gpuPciIds.length > 0) {
                 finalModules.push("gpu-temp");
@@ -376,6 +523,7 @@ Singleton {
         if (hasModule("gpu") && gpuPciIds.length > 0 && finalModules.indexOf("gpu-temp") === -1) {
             finalModules.push("gpu-temp");
         }
+        finalModules = finalModules.filter(module => module === "all" || isModuleAvailable(module));
 
         const params = {};
         if (enabledModules.indexOf("all") !== -1) {
@@ -393,15 +541,27 @@ Singleton {
         if ((enabledModules.includes("processes") || enabledModules.includes("all")) && procCursor) {
             params.procCursor = procCursor;
         }
-
-        if (gpuPciIds.length > 0) {
-            params.gpuPciIds = gpuPciIds;
+        if (enabledModules.includes("disk-rate") && diskRateCursor) {
+            params.diskRateCursor = diskRateCursor;
         }
+        if (enabledModules.includes("net-rate") && netRateCursor) {
+            params.netRateCursor = netRateCursor;
+        }
+        if (finalModules.includes("net-rate")) {
+            params.netRateAllInterfaces = true;
+        }
+        if (finalModules.includes("gpu-stats") && gpuStatsCursor) {
+            params.gpuStatsCursor = gpuStatsCursor;
+        }
+
+        // Always sent: a missing key means "all GPUs" to dgop, and [] means none.
+        params.gpuPciIds = gpuPciIds;
 
         if (enabledModules.indexOf("processes") !== -1 || enabledModules.indexOf("all") !== -1) {
             // 0 means no limit in dgop
             params.limit = fullProcessListRefs > 0 ? 0 : 100;
-            params.sort = "cpu";
+            const mod = currentSort === "gpu" || currentSort === "vram" ? "process-gpu" : currentSort.startsWith("disk") ? "process-io" : "";
+            params.sort = mod && enabledModules.includes(mod) && isModuleAvailable(mod) ? (mod === "process-io" ? "disk" : currentSort) : "cpu";
             if (noCpu) {
                 params.noCpu = true;
             }
@@ -412,6 +572,8 @@ Singleton {
 
     function parseData(data) {
         const sampleTime = Date.now();
+        const history = Object.assign({}, deviceHistory);
+        let historyChanged = false;
         if (hasModule("cpu") && data.cpu) {
             const cpu = data.cpu;
             cpuSampleCount++;
@@ -422,7 +584,15 @@ Singleton {
             cpuCores = cpu.count || 1;
             cpuModel = cpu.model || "";
             perCoreCpuUsage = cpu.coreUsage || [];
+            cpuInfo = cpu;
             cpuHistory = appendHistory(cpuHistory, cpuUsage);
+            historyChanged = true;
+            pushDeviceHistory(history, "cpu", [
+                {
+                    key: "cpu",
+                    a: cpuUsage
+                }
+            ], null);
 
             if (cpu.cursor) {
                 cpuCursor = cpu.cursor;
@@ -453,6 +623,14 @@ Singleton {
             usedSwapKB = (mem.swaptotal || 0) - (mem.swapfree || 0);
 
             memoryHistory = appendHistory(memoryHistory, memoryUsage);
+            memoryInfo = mem;
+            historyChanged = true;
+            pushDeviceHistory(history, "memory", [
+                {
+                    key: "memory",
+                    a: memoryUsage
+                }
+            ], null);
         }
 
         if (hasModule("network") && data.network && Array.isArray(data.network)) {
@@ -486,12 +664,9 @@ Singleton {
         if (hasModule("disk") && data.disk && Array.isArray(data.disk)) {
             diskDevices = data.disk;
 
-            let totalRead = 0;
-            let totalWrite = 0;
-            for (const disk of data.disk) {
-                totalRead += (disk.read || 0) * 512;
-                totalWrite += (disk.write || 0) * 512;
-            }
+            const wholeDisks = SysmonDevices.sumWholeDisks(data.disk, "read", "write");
+            const totalRead = wholeDisks.read * 512;
+            const totalWrite = wholeDisks.write * 512;
 
             if (lastDiskStats) {
                 const timeDiff = Math.max(1, sampleTime - lastDiskStats.time) / 1000;
@@ -510,6 +685,93 @@ Singleton {
                 "write": totalWrite
             };
         }
+
+        if (hasModule("disk-rate") && data.diskrate && Array.isArray(data.diskrate.disks)) {
+            const hadCursor = diskRateCursor !== "";
+            const rates = [];
+            for (const d of data.diskrate.disks) {
+                const entry = {
+                    device: d.device,
+                    readRate: d.readrate,
+                    writeRate: d.writerate,
+                    readTotal: d.readtotal,
+                    writeTotal: d.writetotal
+                };
+                if (d.busy !== undefined)
+                    entry.busy = d.busy;
+                if (d.responseTime !== undefined)
+                    entry.responseTime = d.responseTime;
+                rates.push(entry);
+            }
+            diskRates = rates;
+            if (data.diskrate.cursor)
+                diskRateCursor = data.diskrate.cursor;
+            const whole = rates.filter(r => SysmonDevices.isWholeDisk(r.device));
+            const samples = hadCursor ? whole.map(r => ({
+                        key: SysmonDevices.deviceKey("disk", r.device),
+                        a: r.readRate || 0,
+                        b: r.writeRate || 0
+                    })) : [];
+            historyChanged = true;
+            pushDeviceHistory(history, "disk", samples, whole.map(r => SysmonDevices.deviceKey("disk", r.device)));
+        }
+
+        if (hasModule("net-rate") && data.netrate && Array.isArray(data.netrate.interfaces)) {
+            const hadCursor = netRateCursor !== "";
+            const rates = data.netrate.interfaces.map(i => {
+                const entry = {
+                    iface: i.interface,
+                    rxRate: i.rxrate,
+                    txRate: i.txrate,
+                    rxTotal: i.rxtotal,
+                    txTotal: i.txtotal
+                };
+                for (const key of ["mtu", "speed", "duplex", "linkType", "driver", "ipv4", "ipv6"]) {
+                    if (i[key] !== undefined)
+                        entry[key] = i[key];
+                }
+                return entry;
+            });
+            netRates = rates;
+            if (data.netrate.cursor)
+                netRateCursor = data.netrate.cursor;
+            const samples = hadCursor ? rates.map(r => ({
+                        key: SysmonDevices.deviceKey("net", r.iface),
+                        a: r.rxRate || 0,
+                        b: r.txRate || 0
+                    })) : [];
+            historyChanged = true;
+            pushDeviceHistory(history, "net", samples, rates.map(r => SysmonDevices.deviceKey("net", r.iface)));
+        }
+
+        if (hasModule("gpu-stats") && data.gpustats && Array.isArray(data.gpustats.gpus)) {
+            const gpus = data.gpustats.gpus;
+            gpuStats = gpus;
+            if (data.gpustats.cursor)
+                gpuStatsCursor = data.gpustats.cursor;
+            const samples = [];
+            for (const g of gpus) {
+                if (g.usage === undefined)
+                    continue;
+                const vram = g.vramUsed !== undefined && g.vramTotal > 0 ? g.vramUsed / g.vramTotal * 100 : undefined;
+                samples.push({
+                    key: SysmonDevices.deviceKey("gpu", g.pciSlot),
+                    a: g.usage,
+                    b: vram
+                });
+            }
+            historyChanged = true;
+            pushDeviceHistory(history, "gpu", samples, gpus.map(g => SysmonDevices.deviceKey("gpu", g.pciSlot)));
+        }
+
+        if (hasModule("sensors") && data.sensors && Array.isArray(data.sensors.sensors))
+            sensors = data.sensors.sensors;
+
+        if (hasModule("memory-modules") && data.memorymodules)
+            memoryModules = data.memorymodules;
+
+        if (historyChanged)
+            deviceHistory = history;
 
         if (hasModule("diskmounts") && data.diskmounts) {
             diskMountsRequested = true;
@@ -532,6 +794,23 @@ Singleton {
                     "command": proc.command || "",
                     "fullCommand": proc.fullCommand || "",
                     "username": proc.username || "",
+                    "childCount": proc.childCount || 0,
+                    "pticks": proc.pticks || 0,
+                    "status": proc.status || "",
+                    "threads": proc.threads ?? null,
+                    "nice": proc.nice ?? null,
+                    "startTime": proc.startTime ?? null,
+                    "gpu": gpuPciIds.length > 0 ? (proc.gpu ?? null) : null,
+                    "gpuVideo": gpuPciIds.length > 0 ? (proc.gpuVideo ?? null) : null,
+                    "vramKB": gpuPciIds.length > 0 ? (proc.vramKB ?? null) : null,
+                    "gpuGtt": gpuPciIds.length > 0 ? (proc.gpuGtt ?? null) : null,
+                    "gpuUnmonitored": gpuPciIds.length > 0 ? (proc.gpuUnmonitored ?? false) : true,
+                    "diskRead": proc.diskRead ?? null,
+                    "diskWrite": proc.diskWrite ?? null,
+                    "connections": proc.connections ?? null,
+                    "remotes": proc.remotes ?? [],
+                    "netRx": proc.netRx ?? null,
+                    "netTx": proc.netTx ?? null,
                     "displayName": (proc.command && proc.command.length > 15) ? proc.command.substring(0, 15) + "..." : (proc.command || "")
                 });
             }
@@ -586,6 +865,7 @@ Singleton {
             loadAverage = sys.loadavg || "";
             processCount = sys.processes || 0;
             threadCount = sys.threads || 0;
+            openFileCount = sys.openFileCount || 0;
         }
 
         const hwData = data.hardware || ((data.hostname || data.kernel || data.distro || data.arch) ? data : null);
@@ -594,8 +874,10 @@ Singleton {
             kernelVersion = hwData.kernel || "";
             distribution = hwData.distro || "";
             architecture = hwData.arch || "";
+            initSystem = hwData.initSystem || "";
             motherboard = (hwData.bios && hwData.bios.motherboard) || "";
             biosVersion = (hwData.bios && hwData.bios.version) || "";
+            bios = hwData.bios ?? null;
         }
 
         statsUpdated();
@@ -676,34 +958,17 @@ Singleton {
         applySorting();
     }
 
-    function compareProcesses(a, b) {
-        let result;
-        switch (currentSort) {
-        case "cpu":
-            result = (b.cpu || 0) - (a.cpu || 0);
-            break;
-        case "memory":
-            result = (b.memoryKB || 0) - (a.memoryKB || 0);
-            break;
-        case "name":
-            result = (a.command || "").toLowerCase().localeCompare((b.command || "").toLowerCase());
-            break;
-        case "pid":
-            result = (a.pid || 0) - (b.pid || 0);
-            break;
-        default:
-            return 0;
-        }
-        if (result === 0)
-            return (a.pid || 0) - (b.pid || 0);
-        return sortAscending ? -result : result;
+    // Name and PID read ascending by default, so sortAscending inverts for them.
+    function processComparator() {
+        const naturallyAscending = currentSort === "name" || currentSort === "pid";
+        return ProcessSort.compare(currentSort, sortAscending !== naturallyAscending);
     }
 
     function applySorting() {
         if (!allProcesses || allProcesses.length === 0)
             return;
 
-        const sorted = allProcesses.slice().sort(compareProcesses);
+        const sorted = allProcesses.slice().sort(processComparator());
         processes = sorted.slice(0, processLimit);
     }
 
@@ -724,6 +989,7 @@ Singleton {
 
     onDgopAvailableChanged: {
         if (!dgopAvailable) {
+            availableModules = [];
             _metaLoaded = false;
             return;
         }
