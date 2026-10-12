@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.UPower
 import qs.Common
 import qs.Services
@@ -412,7 +413,7 @@ Singleton {
 
         isUpdating = true;
         const generation = subscriptionGeneration;
-        DMSService.sendRequest("dgop.meta", params, response => {
+        request("dgop.meta", params, response => {
             if (!response.result) {
                 log.warn("dgop.meta failed:", response.error || "empty result");
             } else if (pollingActive && generation === subscriptionGeneration) {
@@ -441,9 +442,86 @@ Singleton {
 
     // On-demand fields of one process (IO totals, swap, open files, systemd unit); callback gets null on failure.
     function fetchProcessDetail(pid, callback) {
-        DMSService.sendRequest("dgop.process", {
+        request("dgop.process", {
             "pid": pid
         }, response => callback(response.result ?? null));
+    }
+
+    // Unlock: after one polkit prompt a root `dms sysmon-helper` answers dgop requests, so other users' processes
+    // are readable, and runs process actions. It exits when lock() closes its stdin or the shell goes away.
+    readonly property bool unlocked: helper.running && helper.ready
+    readonly property bool unlocking: helper.running && !helper.ready
+    property var _helperCallbacks: ({})
+    property int _helperNextId: 1
+
+    function unlock() {
+        if (!helper.running)
+            helper.running = true;
+    }
+
+    function lock() {
+        if (helper.running)
+            helper.stdinEnabled = false;
+    }
+
+    // Through the unlocked helper while it runs, otherwise through the DMS background process.
+    function request(method, params, callback) {
+        if (!unlocked) {
+            DMSService.sendRequest(method, params, callback);
+            return;
+        }
+        const id = _helperNextId++;
+        if (callback)
+            _helperCallbacks[id] = callback;
+        helper.write(JSON.stringify({
+            "id": id,
+            "method": method,
+            "params": params ?? {}
+        }) + "\n");
+    }
+
+    Process {
+        id: helper
+
+        property bool ready: false
+
+        command: ["pkexec", Proc.dmsBin, "sysmon-helper"]
+        stdinEnabled: true
+        onStarted: {
+            ready = false;
+            stdinEnabled = true;
+            write(JSON.stringify({
+                "id": 0,
+                "method": "dgop.modules"
+            }) + "\n");
+        }
+        onExited: (code, status) => {
+            ready = false;
+            const pending = root._helperCallbacks;
+            root._helperCallbacks = {};
+            for (const id in pending)
+                pending[id]({
+                    "error": "locked"
+                });
+        }
+        stdout: SplitParser {
+            onRead: line => {
+                let response;
+                try {
+                    response = JSON.parse(line);
+                } catch (e) {
+                    return;
+                }
+                if (response.id === 0) {
+                    helper.ready = !response.error;
+                    return;
+                }
+                const callback = root._helperCallbacks[response.id];
+                delete root._helperCallbacks[response.id];
+                if (callback)
+                    callback(response);
+            }
+        }
     }
 
     function initializeModules() {

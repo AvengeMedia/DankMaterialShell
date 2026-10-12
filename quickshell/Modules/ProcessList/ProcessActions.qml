@@ -111,6 +111,18 @@ Singleton {
         const pid = String(process?.pid ?? 0);
         if (!canEnd(process))
             return;
+        // Unlocked, the root helper ends other users' processes without another password prompt.
+        if (!isOwn(process) && DgopService.unlocked && action !== "restart") {
+            const params = {
+                "pid": process.pid
+            };
+            if (action === "tree")
+                params.skip = treeSkipNames;
+            else if (action === "force")
+                params.signal = "KILL";
+            DgopService.request(action === "tree" ? "process.tree" : "process.signal", params, null);
+            return;
+        }
         const auth = isOwn(process) ? [] : ["pkexec"];
         switch (action) {
         case "quit":
@@ -155,6 +167,16 @@ Singleton {
             return;
         case "system":
             DgopService.fetchProcessDetail(process.pid, detail => {
+                if (DgopService.unlocked) {
+                    DgopService.request("process.restartService", {
+                        "pid": process.pid,
+                        "unit": detail?.unit ?? ""
+                    }, response => {
+                        if (response.error)
+                            failed(process, I18n.tr("Only the main process of a system service can be restarted.", "toast body when restarting another user's process"));
+                    });
+                    return;
+                }
                 Proc.runCommand("processRestart" + pid, ["pkexec", "sh", "-c", systemRestartScript, "sh", pid, detail?.unit ?? ""], (output, exitCode) => {
                     if (exitCode === 4)
                         failed(process, I18n.tr("Only the main process of a system service can be restarted.", "toast body when restarting another user's process"));

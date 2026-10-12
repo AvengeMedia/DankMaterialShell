@@ -98,6 +98,7 @@ DFloatingWindow {
 
     onVisibleChanged: {
         if (!visible) {
+            DgopService.lock();
             processContextMenu.dismiss();
             closingModal();
             searchText = "";
@@ -285,6 +286,14 @@ DFloatingWindow {
                             text: processesTabLoader.item?.processCountText ?? ""
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
+                        }
+
+                        DIconButton {
+                            iconName: DgopService.unlocked ? "lock_open" : "lock"
+                            variant: DgopService.unlocked ? "tonal" : "standard"
+                            enabled: !DgopService.unlocking
+                            tooltipText: DgopService.unlocked ? I18n.tr("Lock") : I18n.tr("Unlock")
+                            onClicked: DgopService.unlocked ? DgopService.lock() : DgopService.unlock()
                         }
 
                         DIconButton {
