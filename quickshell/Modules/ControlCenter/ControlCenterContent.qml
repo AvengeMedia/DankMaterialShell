@@ -350,29 +350,37 @@ FocusScope {
         widgetSheetLoader.item.opened = false;
     }
 
-    Keys.onEscapePressed: event => {
+    function handleEscape() {
         if (widgetSheetLoader.item?.opened) {
             closeWidgetSheet();
-            event.accepted = true;
-            return;
+            return true;
         }
         if (configOverlayLoader.item?.visible) {
             configOverlayLoader.item.close();
-            event.accepted = true;
-            return;
+            return true;
         }
         if (pageOpen) {
             goBack();
-            event.accepted = true;
-            return;
+            return true;
         }
         if (host.editMode) {
             host.editMode = false;
-            event.accepted = true;
-            return;
+            return true;
         }
         host.close();
-        event.accepted = true;
+        return true;
+    }
+
+    Keys.onEscapePressed: event => {
+        if (handleEscape())
+            event.accepted = true;
+    }
+
+    Shortcut {
+        sequence: "Escape"
+        enabled: root.host.shouldBeVisible
+        context: Qt.WindowShortcut
+        onActivated: root.handleEscape()
     }
 
     Shortcut {
