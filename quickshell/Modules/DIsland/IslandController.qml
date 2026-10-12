@@ -16,6 +16,8 @@ QtObject {
     property bool inputSuspended: false
     property bool expanded: false
     property bool pointerInside: false
+    // A right-click face swap resizes the island under the pointer; hover stays off until it leaves.
+    property bool hoverHeld: false
     property int slotHoverCount: 0
     readonly property bool slotHovered: slotHoverCount > 0
     property bool keyboardDismissRequested: false
@@ -604,8 +606,18 @@ QtObject {
         return mediaAvailable && mediaPreferred ? "media" : "home";
     }
 
+    readonly property bool mediaFaceToggleAvailable: !expanded && mediaAvailable && (activeActivity === "home" || activeActivity === "media")
+
+    function toggleMediaFace() {
+        if (!mediaFaceToggleAvailable)
+            return false;
+        hoverHeld = true;
+        hoverOpenTimer.stop();
+        return requestActivity(activeActivity === "media" ? "home" : "media", false, false);
+    }
+
     function requestHoverExpand() {
-        if (inputSuspended || !hoverExpandEnabled || activeActivity === "powermenu")
+        if (inputSuspended || hoverHeld || !hoverExpandEnabled || activeActivity === "powermenu")
             return false;
         if (notificationActive) {
             hoverExpanded = true;
@@ -966,6 +978,7 @@ QtObject {
         syncNotificationTimeout(!pointerInside);
         syncTransientTimeout(!pointerInside);
         if (!pointerInside) {
+            hoverHeld = false;
             slotHoverCount = 0;
             hoverOpenTimer.stop();
             if (hoverExpanded && expanded)

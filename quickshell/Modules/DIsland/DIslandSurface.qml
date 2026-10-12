@@ -274,6 +274,19 @@ Item {
         root.motionStartBounds = Qt.rect(left, top, right - left, bottom - top);
     }
 
+    // Without a face to swap to, a right-click falls through to the bar's own right-click action.
+    function acceptsClick(button) {
+        return button !== Qt.RightButton || root.controller.mediaFaceToggleAvailable;
+    }
+
+    function handleClick(button) {
+        SettingsData.recordBarInteraction(root.effectiveScreen, root.controller.barConfig?.id);
+        if (button === Qt.RightButton)
+            root.controller.toggleMediaFace();
+        else
+            root.controller.requestToggle(true);
+    }
+
     function requestActivityFocus() {
         return contentHost.requestActivityFocus();
     }
@@ -391,12 +404,10 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            acceptedButtons: Qt.LeftButton
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onPressed: mouse => mouse.accepted = root.acceptsClick(mouse.button)
             enabled: !root.controller.expanded || !root.controller.activityOwnsBlankClicks
-            onClicked: {
-                SettingsData.recordBarInteraction(root.effectiveScreen, root.controller.barConfig?.id);
-                root.controller.requestToggle(true);
-            }
+            onClicked: mouse => root.handleClick(mouse.button)
             onWheel: wheel => {
                 if (root.controller.expanded) {
                     wheel.accepted = false;
@@ -485,11 +496,9 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            acceptedButtons: Qt.LeftButton
-            onClicked: {
-                SettingsData.recordBarInteraction(root.effectiveScreen, root.controller.barConfig?.id);
-                root.controller.requestToggle(true);
-            }
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onPressed: mouse => mouse.accepted = root.acceptsClick(mouse.button)
+            onClicked: mouse => root.handleClick(mouse.button)
             onWheel: wheel => {
                 root.scrollWheel(wheel);
                 wheel.accepted = true;
