@@ -392,7 +392,14 @@ DDialog {
                     required property var modelData
                     swatchColor: modelData
                     selected: Qt.colorEqual(root.currentColor, swatchColor)
+                    tooltipText: I18n.tr("%1, right-click to remove", "tooltip on a recently picked color swatch, %1 is the color").arg(modelData)
                     onClicked: root.setColor(swatchColor)
+                    Keys.onDeletePressed: SessionData.removeRecentColor(modelData)
+
+                    TapHandler {
+                        acceptedButtons: Qt.RightButton
+                        onTapped: SessionData.removeRecentColor(parent.modelData)
+                    }
                 }
             }
         }
