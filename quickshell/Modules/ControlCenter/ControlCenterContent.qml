@@ -351,6 +351,14 @@ FocusScope {
     }
 
     function handleEscape() {
+        if (codecSelectorLoader.item?.shown) {
+            codecSelectorLoader.item.dismiss();
+            return true;
+        }
+        if (portSelectorLoader.item?.shown) {
+            portSelectorLoader.item.dismiss();
+            return true;
+        }
         if (widgetSheetLoader.item?.opened) {
             closeWidgetSheet();
             return true;
