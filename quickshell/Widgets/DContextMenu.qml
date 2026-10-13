@@ -30,11 +30,13 @@ Item {
     property real anchorY: 0
     property real originX: 0
     property real originY: 0
+    property string menuEdge: "top"
     property bool openState: false
     property bool renderActive: false
     property int selectedMenuIndex: -1
     property bool keyboardNavigation: false
     readonly property alias contextWindow: menuWindow
+    readonly property alias customContentItem: customContentLoader.item
     readonly property bool blurActive: renderActive && openState && BlurService.enabled
 
     readonly property real maxMenuWidth: Math.max(0, (targetScreen?.width ?? Theme.launcherWidthMicro) - menuMargin * 2)
@@ -294,8 +296,18 @@ Item {
 
             Rectangle {
                 id: menuContainer
-                x: Math.max(root.menuMargin, Math.min(menuWindow.width - width - root.menuMargin, root.anchorX))
-                y: Math.max(root.menuMargin, Math.min(menuWindow.height - height - root.menuMargin, root.anchorY))
+                x: {
+                    if (root.menuEdge === "right")
+                        return Math.max(root.menuMargin, Math.min(menuWindow.width - width - root.menuMargin, root.anchorX - width));
+                    return Math.max(root.menuMargin, Math.min(menuWindow.width - width - root.menuMargin, root.anchorX));
+                }
+                y: {
+                    if (root.menuEdge === "bottom")
+                        return Math.max(root.menuMargin, Math.min(menuWindow.height - height - root.menuMargin, root.anchorY - height));
+                    if (root.menuEdge === "left" || root.menuEdge === "right")
+                        return Math.max(root.menuMargin, Math.min(menuWindow.height - height - root.menuMargin, root.anchorY - height / 2));
+                    return Math.max(root.menuMargin, Math.min(menuWindow.height - height - root.menuMargin, root.anchorY));
+                }
                 width: root.effectiveMenuWidth
                 height: root.effectiveMenuHeight
                 color: Theme.readableSurface
@@ -315,6 +327,7 @@ Item {
 
                 Behavior on openScale {
                     NumberAnimation {
+                        id: openScaleAnim
                         duration: SettingsData.reduceMotion ? 0 : Theme.expressiveDurations.expressiveFastSpatial
                         easing.type: Easing.BezierSpline
                         easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
@@ -322,7 +335,7 @@ Item {
                 }
 
                 Behavior on height {
-                    enabled: root.openState
+                    enabled: root.openState && !openScaleAnim.running && menuContainer.openScale >= 1.0
                     NumberAnimation {
                         duration: SettingsData.reduceMotion ? 0 : Theme.expressiveDurations.expressiveFastSpatial
                         easing.type: Easing.BezierSpline

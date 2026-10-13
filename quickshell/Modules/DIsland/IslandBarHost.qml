@@ -409,6 +409,8 @@ Item {
         barConfig: root.barConfig
         screen: root.screen
         edge: root.edge
+        sectionOriginX: root.sectionOriginX
+        sectionOriginY: root.sectionOriginY
         transientSurfaces: islandTransientSurfaces
         freeMode: root.freeMode
         dotMode: root.dotMode

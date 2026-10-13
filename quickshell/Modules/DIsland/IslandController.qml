@@ -50,6 +50,9 @@ QtObject {
     property var barConfig: null
     property var screen: null
     property string edge: "top"
+    // Screen position of the host window origin; item coordinates inside the island are window-relative.
+    property real sectionOriginX: 0
+    property real sectionOriginY: 0
     readonly property bool isVertical: edge === "left" || edge === "right"
     readonly property bool farEdge: edge === "bottom" || edge === "right"
     property real cornerRadius: 34

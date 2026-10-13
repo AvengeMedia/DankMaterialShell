@@ -1,6 +1,9 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import Quickshell
+import Quickshell.Services.SystemTray
+import Quickshell.Widgets
 import qs.Common
 import qs.Modules.DBar.Widgets
 import qs.Services
@@ -56,6 +59,46 @@ Item {
         reverseScrolling: root.workspaceOption("reverseScrolling")
     }
 
+    readonly property var hiddenTrayIds: {
+        const envValue = Quickshell.env("DMS_HIDE_TRAYIDS") || "";
+        return envValue ? envValue.split(",").map(id => id.trim().toLowerCase()) : [];
+    }
+    readonly property var allTrayItems: {
+        if (!hiddenTrayIds.length)
+            return SystemTray.items.values;
+        return SystemTray.items.values.filter(item => {
+            const itemId = item?.id || "";
+            return !hiddenTrayIds.includes(itemId.toLowerCase());
+        });
+    }
+    readonly property var visibleTrayItems: allTrayItems.filter(item => !SessionData.isHiddenTrayId(item?.id || ""))
+    readonly property var hiddenTrayItems: allTrayItems.filter(item => SessionData.isHiddenTrayId(item?.id || ""))
+
+    // The island sits inside a host window, so mapToGlobal is window-relative, not screen space.
+    function screenPosAt(item, x, y) {
+        const p = item.mapToItem(null, x, y);
+        return Qt.point(p.x + root.controller.sectionOriginX, p.y + root.controller.sectionOriginY);
+    }
+
+    function islandEdgeCoord() {
+        const edge = root.controller.edge;
+        switch (edge) {
+        case "bottom":
+            return root.screenPosAt(root, 0, 0).y;
+        case "top":
+            return root.screenPosAt(root, 0, root.height).y;
+        case "left":
+            return root.screenPosAt(root, root.width, 0).x;
+        case "right":
+            return root.screenPosAt(root, 0, 0).x;
+        }
+        return 0;
+    }
+
+    function trayIconSourceFor(trayItem) {
+        return TrayMenuManager.iconSourceFor(trayItem);
+    }
+
     function groupsForSide(side) {
         const groups = side === "left" ? root.controller.homeLeftGroups : root.controller.homeRightGroups;
         return groups.filter(id => root.groupShown(id));
@@ -75,6 +118,8 @@ Item {
             return PrivacyService.anyPrivacyActive;
         case "workspaces":
             return workspaces.available;
+        case "tray":
+            return root.visibleTrayItems.length > 0 || root.hiddenTrayItems.length > 0;
         }
         return true;
     }
@@ -219,6 +264,7 @@ Item {
 
     onWeatherSlotEnabledChanged: root.syncWeatherRef(root.weatherSlotEnabled)
     onIsVerticalChanged: root.pushMeasuredLength()
+    onVisibleTrayItemsChanged: root.pushMeasuredLength()
     Component.onCompleted: {
         root.syncWeatherRef(root.weatherSlotEnabled);
         root.pushMeasuredLength();
@@ -274,7 +320,7 @@ Item {
 
         enabled: !group.isClock
         controller: root.controller
-        acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+        acceptedButtons: group.isTray ? Qt.NoButton : (Qt.LeftButton | Qt.MiddleButton)
 
         function connectivityTypeAt(event) {
             const clickPos = group.vertical ? event.y : event.x;
@@ -341,6 +387,7 @@ Item {
         readonly property bool isBrightness: group.groupId === "brightness"
         readonly property bool isPrivacy: group.groupId === "privacy"
         readonly property bool isWorkspaces: group.groupId === "workspaces"
+        readonly property bool isTray: group.groupId === "tray"
         readonly property bool isSystemLevel: group.isVolume || group.isBrightness
         readonly property var pager: pagerLoader.item
         readonly property bool usesConnectivity: group.isStatus && root.controller.homeStatusContent === "connectivity"
@@ -353,13 +400,25 @@ Item {
         width: group.vertical ? root.width : (group.iconOnly ? root.iconSize : content.implicitWidth)
         height: group.vertical ? content.implicitHeight : root.slotSize
 
+        GroupHoverArea {
+            id: groupArea
+
+            group: group
+            anchors.verticalCenter: group.vertical ? undefined : parent.verticalCenter
+            anchors.horizontalCenter: group.vertical ? parent.horizontalCenter : undefined
+            x: group.vertical ? 0 : -group.leadPad
+            y: group.vertical ? -group.leadPad : 0
+            width: group.vertical ? root.width : parent.width + group.leadPad + group.trailPad
+            height: group.vertical ? parent.height + group.leadPad + group.trailPad : root.height
+        }
+
         Rectangle {
             anchors.centerIn: parent
             width: group.vertical ? root.slotSize : parent.width + Theme.spacingS
             height: group.vertical ? parent.height + Theme.spacingXS : root.slotSize
             radius: group.vertical ? Theme.cornerRadius : Theme.fullRadius(width, height)
             color: groupArea.containsMouse ? Theme.surfaceTextHover : "transparent"
-            visible: !group.isClock && (group.vertical || !group.usesBattery)
+            visible: !group.isClock && !group.isTray && (group.vertical || !group.usesBattery)
         }
 
         Grid {
@@ -498,19 +557,201 @@ Item {
                 size: root.iconSize
                 color: Theme.surfaceText
             }
-        }
 
-        GroupHoverArea {
-            id: groupArea
+            Repeater {
+                model: group.isTray ? root.visibleTrayItems : []
 
-            group: group
-            anchors.verticalCenter: group.vertical ? undefined : parent.verticalCenter
-            anchors.horizontalCenter: group.vertical ? parent.horizontalCenter : undefined
-            x: group.vertical ? 0 : -group.leadPad
-            y: group.vertical ? -group.leadPad : 0
-            width: group.vertical ? root.width : parent.width + group.leadPad + group.trailPad
-            height: group.vertical ? parent.height + group.leadPad + group.trailPad : root.height
+                Item {
+                    id: trayItemRoot
+
+                    required property var modelData
+                    readonly property var trayItem: modelData
+                    property bool hovered: false
+
+                    width: root.iconSize + Theme.spacingXXS
+                    height: root.iconSize + Theme.spacingXXS
+
+                    Rectangle {
+                        id: trayHighlightBg
+                        anchors.fill: parent
+                        radius: Theme.fullRadius(width, height)
+                        color: trayMouseArea.pressed
+                            ? Theme.withAlpha(Theme.surfaceText, Theme.stateLayerPressed)
+                            : (trayItemRoot.hovered ? Theme.withAlpha(Theme.surfaceText, 0.15) : "transparent")
+                    }
+
+                    IconImage {
+                        id: trayIconImg
+                        anchors.centerIn: parent
+                        width: root.statusIconSize
+                        height: root.statusIconSize
+                        source: root.trayIconSourceFor(trayItemRoot.trayItem)
+                        asynchronous: true
+                        smooth: true
+                        mipmap: true
+                        visible: status === Image.Ready
+                    }
+
+                    StyledText {
+                        anchors.centerIn: parent
+                        visible: !trayIconImg.visible
+                        text: {
+                            const itemId = trayItemRoot.trayItem?.id || "";
+                            return itemId ? itemId.charAt(0).toUpperCase() : "?";
+                        }
+                        font.pixelSize: 10
+                        color: Theme.surfaceTextSecondary
+                    }
+
+                    MouseArea {
+                        id: trayMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton
+                        cursorShape: Qt.PointingHandCursor
+
+                        onContainsMouseChanged: {
+                            trayItemRoot.hovered = containsMouse;
+                            if (containsMouse) {
+                                root.controller.slotHoverEntered();
+                            } else {
+                                root.controller.slotHoverExited();
+                            }
+                        }
+
+                        Component.onDestruction: {
+                            if (trayItemRoot.hovered) {
+                                trayItemRoot.hovered = false;
+                                root.controller.slotHoverExited();
+                            }
+                        }
+
+                        onClicked: mouse => {
+                            if (!trayItemRoot.trayItem)
+                                return;
+                            const screen = root.controller.screen;
+                            const screenX = screen?.x || 0;
+                            const screenY = screen?.y || 0;
+                            const edge = root.controller.edge;
+                            let targetX = 0;
+                            let targetY = 0;
+                            if (edge === "bottom" || edge === "top") {
+                                targetX = root.screenPosAt(trayMouseArea, trayItemRoot.width / 2, 0).x;
+                                targetY = root.islandEdgeCoord();
+                            } else {
+                                targetX = root.islandEdgeCoord();
+                                targetY = root.screenPosAt(trayMouseArea, 0, trayItemRoot.height / 2).y;
+                            }
+                            if (mouse.button === Qt.RightButton) {
+                                if (trayItemRoot.trayItem.hasMenu) {
+                                    trayContextMenu.openFor(trayItemRoot.trayItem, targetX, targetY, screen, edge);
+                                    return;
+                                }
+                                const mousePt = root.screenPosAt(trayMouseArea, mouse.x, mouse.y);
+                                TrayMenuManager.callContextMenuFallback(trayItemRoot.trayItem.id, screenX + mousePt.x, screenY + mousePt.y);
+                                return;
+                            }
+                            if (!trayItemRoot.trayItem.onlyMenu) {
+                                trayItemRoot.trayItem.activate();
+                                return;
+                            }
+                            if (trayItemRoot.trayItem.hasMenu) {
+                                trayContextMenu.openFor(trayItemRoot.trayItem, targetX, targetY, screen, edge);
+                            }
+                        }
+                    }
+                }
+            }
+
+            Item {
+                id: caretRoot
+                visible: group.isTray && root.hiddenTrayItems.length > 0
+                width: root.iconSize + Theme.spacingXXS
+                height: root.iconSize + Theme.spacingXXS
+                property bool hovered: false
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: Theme.fullRadius(width, height)
+                    color: caretArea.pressed
+                        ? Theme.withAlpha(Theme.surfaceText, Theme.stateLayerPressed)
+                        : (caretRoot.hovered ? Theme.withAlpha(Theme.surfaceText, 0.15) : "transparent")
+                }
+
+                DIcon {
+                    anchors.centerIn: parent
+                    name: {
+                        const edge = root.controller.edge;
+                        const open = trayOverflowMenu.openState;
+                        switch (edge) {
+                        case "left":
+                            return open ? "keyboard_arrow_left" : "keyboard_arrow_right";
+                        case "right":
+                            return open ? "keyboard_arrow_right" : "keyboard_arrow_left";
+                        case "bottom":
+                            return open ? "keyboard_arrow_down" : "keyboard_arrow_up";
+                        case "top":
+                        default:
+                            return open ? "keyboard_arrow_up" : "keyboard_arrow_down";
+                        }
+                    }
+                    size: root.statusIconSize
+                    color: Theme.surfaceText
+                }
+
+                MouseArea {
+                    id: caretArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+
+                    onContainsMouseChanged: {
+                        caretRoot.hovered = containsMouse;
+                        if (containsMouse) {
+                            root.controller.slotHoverEntered();
+                        } else {
+                            root.controller.slotHoverExited();
+                        }
+                    }
+
+                    Component.onDestruction: {
+                        if (caretRoot.hovered) {
+                            caretRoot.hovered = false;
+                            root.controller.slotHoverExited();
+                        }
+                    }
+
+                    onClicked: {
+                        if (trayOverflowMenu.openState) {
+                            trayOverflowMenu.hide();
+                            return;
+                        }
+                        const screen = root.controller.screen;
+                        const edge = root.controller.edge;
+                        let triggerX = 0;
+                        let triggerY = 0;
+                        if (edge === "bottom" || edge === "top") {
+                            triggerX = root.screenPosAt(caretArea, caretRoot.width / 2, 0).x;
+                            triggerY = root.islandEdgeCoord();
+                        } else {
+                            triggerX = root.islandEdgeCoord();
+                            triggerY = root.screenPosAt(caretArea, 0, caretRoot.height / 2).y;
+                        }
+                        trayOverflowMenu.openAt(triggerX, triggerY, screen, edge);
+                    }
+                }
+            }
         }
+    }
+
+    TrayContextMenu {
+        id: trayContextMenu
+    }
+
+    TrayOverflowMenu {
+        id: trayOverflowMenu
+        hiddenItems: root.hiddenTrayItems
+        contextMenu: trayContextMenu
     }
 
     Row {
