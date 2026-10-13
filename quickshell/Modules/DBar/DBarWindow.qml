@@ -140,7 +140,7 @@ PanelWindow {
         }
 
         Region {
-            readonly property bool active: body.clickThroughEnabled && !body.inputMaskItem.showing
+            readonly property bool active: (body.clickThroughEnabled || isIsland) && !body.inputMaskItem.showing
             x: active ? body.inputMaskItem.x : 0
             y: active ? body.inputMaskItem.y : 0
             width: active ? body.inputMaskItem.width : 0
