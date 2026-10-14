@@ -1,16 +1,14 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell
-import Quickshell.Widgets
 import qs.Common
-import qs.DCommon.Widgets
 import qs.Widgets
 
 DContextMenu {
     id: root
 
     property var trayItem: null
+    property var bar: null
     readonly property var menuHandle: trayItem?.menu ?? null
 
     layerNamespace: "dms:tray-context-menu"
@@ -90,6 +88,7 @@ DContextMenu {
             width: root.customContentWidth
             trayItem: root.trayItem
             menuHandle: root.menuHandle
+            bar: root.bar
             onCloseRequested: root.hide()
             onActionTriggered: pendingActionCloseTimer.restart()
         }

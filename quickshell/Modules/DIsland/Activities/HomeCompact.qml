@@ -1,9 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell
 import Quickshell.Services.SystemTray
-import Quickshell.Widgets
 import qs.Common
 import qs.Modules.DBar.Widgets
 import qs.Services
@@ -62,8 +60,44 @@ Item {
     readonly property bool traySlotEnabled: (root.controller.homeLeftGroups.indexOf("tray") !== -1 || root.controller.homeRightGroups.indexOf("tray") !== -1)
     readonly property var allTrayItems: traySlotEnabled ? TrayMenuManager.filterEnvHidden(SystemTray.items.values) : []
     readonly property var allSortedTrayItems: TrayMenuManager.sortByPreferredOrder(allTrayItems, SessionData.trayItemOrder)
-    readonly property var visibleTrayItems: allSortedTrayItems.filter(item => !SessionData.isHiddenTrayId(TrayMenuManager.getTrayItemKey(item)))
-    readonly property var hiddenTrayItems: allSortedTrayItems.filter(item => SessionData.isHiddenTrayId(TrayMenuManager.getTrayItemKey(item)))
+    // Same options as the bar's tray widget (a satellite entry on island bars)
+    readonly property var trayWidgetData: SettingsData.barWidgetEntry(root.controller.barConfig, "systemTray")
+    readonly property var visibleSortedTrayItems: allSortedTrayItems.filter(item => !SessionData.isHiddenTrayId(TrayMenuManager.getTrayItemKey(item)))
+    readonly property int trayVisibleLimit: {
+        const shown = root.visibleSortedTrayItems.length;
+        if (!SettingsData.widgetOption("systemTray", root.trayWidgetData, "trayAutoOverflow"))
+            return shown;
+        const limit = Number(SettingsData.widgetOption("systemTray", root.trayWidgetData, "trayMaxVisibleItems") || 0);
+        return limit > 0 ? Math.max(1, Math.min(shown, limit)) : shown;
+    }
+    readonly property var visibleTrayItems: visibleSortedTrayItems.slice(0, trayVisibleLimit)
+    readonly property var autoOverflowTrayItems: visibleSortedTrayItems.slice(trayVisibleLimit)
+    readonly property var hiddenTrayItems: allSortedTrayItems.filter(item => !root.visibleTrayItems.includes(item))
+
+    function isManualHiddenTrayItem(item) {
+        return SessionData.isHiddenTrayId(TrayMenuManager.getTrayItemKey(item));
+    }
+
+    function isAutoOverflowTrayItem(item) {
+        return root.autoOverflowTrayItems.includes(item);
+    }
+
+    function promoteTrayItemToBar(item) {
+        const key = TrayMenuManager.getTrayItemKey(item);
+        if (!key)
+            return;
+        if (SessionData.isHiddenTrayId(key)) {
+            SessionData.showTrayId(key);
+            return;
+        }
+        const order = root.allSortedTrayItems.map(entry => TrayMenuManager.getTrayItemKey(entry));
+        const from = order.indexOf(key);
+        if (from < 0)
+            return;
+        order.splice(from, 1);
+        order.splice(Math.max(0, Math.min(root.trayVisibleLimit - 1, order.length)), 0, key);
+        SessionData.setTrayItemOrder(order);
+    }
 
     property int trayDraggedIndex: -1
     property int trayDropTargetIndex: -1
@@ -909,6 +943,7 @@ Item {
 
                 TrayContextMenu {
                     id: ctxMenu
+                    bar: root
                 }
 
                 TrayOverflowMenu {

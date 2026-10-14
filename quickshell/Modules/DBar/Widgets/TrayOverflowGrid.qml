@@ -1,12 +1,8 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell
-import Quickshell.Widgets
 import qs.Common
-import qs.DCommon.Widgets
 import qs.Modules.DBar
-import qs.Widgets
 
 Grid {
     id: root
@@ -71,9 +67,11 @@ Grid {
                 }
             }
 
-            Rectangle {
+            BarPillSurface {
                 anchors.fill: parent
-                radius: root.bar ? BarMetrics.buttonRadius(root.effectiveItemSize, root.bar.barConfig) : Theme.fullRadius(width, height)
+                style: root.bar ? BarMetrics.widgetStyle(root.bar.barConfig) : "pills"
+                pressed: itemArea.pressed
+                radiusOverride: root.bar ? -1 : Theme.fullRadius(width, height)
                 color: itemArea.pressed
                     ? Theme.withAlpha(root.bar ? Theme.onSurface : Theme.surfaceText, Theme.stateLayerPressed)
                     : (itemArea.containsMouse ? (root.bar ? Theme.withAlpha(Theme.onSurface, Theme.stateLayerHover) : Theme.surfaceTextHover) : "transparent")

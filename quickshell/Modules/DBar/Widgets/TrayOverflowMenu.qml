@@ -1,11 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell
-import Quickshell.Services.SystemTray
-import Quickshell.Widgets
 import qs.Common
-import qs.DCommon.Widgets
 import qs.Widgets
 
 DContextMenu {
@@ -24,12 +20,9 @@ DContextMenu {
     readonly property real itemSize: iconSize + Theme.spacingS
     readonly property real iconSpacing: Theme.spacingXXS
     readonly property int cols: Math.min(5, Math.max(1, hiddenItems.length))
-    readonly property int rows: Math.ceil(Math.max(1, hiddenItems.length) / cols)
-    readonly property real expectedHeight: rows * itemSize + (rows - 1) * iconSpacing + Theme.spacingS * 2
 
     // DContextMenu has flickable margins Theme.spacingS on both sides
     customContentWidth: cols * itemSize + (cols - 1) * iconSpacing + Theme.spacingS * 2
-    readonly property real naturalMenuHeight: expectedHeight
 
     function openAt(targetX, targetY, screen, edge) {
         root.menuEdge = edge || "top";
