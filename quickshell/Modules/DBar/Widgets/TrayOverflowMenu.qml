@@ -63,40 +63,99 @@ DContextMenu {
     }
 
     customContent: Component {
-        TrayOverflowGrid {
-            items: root.hiddenItems
-            customColumns: root.cols
-            customIconSize: root.iconSize
-            customItemSize: root.itemSize
-            customSpacing: root.iconSpacing
+        Item {
+            id: contentContainer
+            implicitWidth: overflowGrid.implicitWidth
+            implicitHeight: overflowGrid.implicitHeight
+            width: implicitWidth
+            height: implicitHeight
 
-            onItemClicked: (item, mouse, itemArea) => {
-                if (!item)
-                    return;
-                const screen = root.parentScreen;
+            Grid {
+                id: overflowGrid
+                anchors.centerIn: parent
+                columns: root.cols
+                spacing: root.iconSpacing
 
-                if (mouse.button === Qt.RightButton) {
-                    if (item.hasMenu && root.contextMenu) {
-                        root.itemActivated(item);
-                        root.hide();
-                        root.contextMenu.openFor(item, root.originX, root.originY, screen, root.menuEdge);
-                        return;
+                Repeater {
+                    model: root.hiddenItems
+
+                    Item {
+                        id: overflowItemRoot
+                        required property var modelData
+                        readonly property var trayItem: modelData
+
+                        width: root.itemSize
+                        height: root.itemSize
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: Theme.fullRadius(width, height)
+                            color: itemArea.pressed
+                                ? Theme.withAlpha(Theme.surfaceText, Theme.stateLayerPressed)
+                                : (itemArea.containsMouse ? Theme.withAlpha(Theme.surfaceText, Theme.stateLayerHover) : "transparent")
+                        }
+
+                        IconImage {
+                            id: itemIcon
+                            anchors.centerIn: parent
+                            width: root.iconSize
+                            height: root.iconSize
+                            source: TrayMenuManager.iconSourceFor(overflowItemRoot.trayItem)
+                            asynchronous: true
+                            smooth: true
+                            mipmap: true
+                            visible: status === Image.Ready
+                        }
+
+                        StyledText {
+                            anchors.centerIn: parent
+                            visible: !itemIcon.visible
+                            text: {
+                                const itemId = overflowItemRoot.trayItem?.id || "";
+                                return itemId ? itemId.charAt(0).toUpperCase() : "?";
+                            }
+                            font.pixelSize: 10
+                            color: Theme.surfaceTextSecondary
+                        }
+
+                        MouseArea {
+                            id: itemArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton
+                            cursorShape: Qt.PointingHandCursor
+
+                            onClicked: mouse => {
+                                if (!overflowItemRoot.trayItem)
+                                    return;
+                                const screen = root.parentScreen;
+
+                                if (mouse.button === Qt.RightButton) {
+                                    if (overflowItemRoot.trayItem.hasMenu && root.contextMenu) {
+                                        root.itemActivated(overflowItemRoot.trayItem);
+                                        root.hide();
+                                        root.contextMenu.openFor(overflowItemRoot.trayItem, root.originX, root.originY, screen, root.menuEdge);
+                                        return;
+                                    }
+                                    const gp = itemArea.mapToGlobal(mouse.x, mouse.y);
+                                    TrayMenuManager.callContextMenuFallback(overflowItemRoot.trayItem.id, gp.x, gp.y);
+                                    root.hide();
+                                    return;
+                                }
+
+                                if (!overflowItemRoot.trayItem.onlyMenu) {
+                                    overflowItemRoot.trayItem.activate();
+                                    root.hide();
+                                    return;
+                                }
+                                if (overflowItemRoot.trayItem.hasMenu && root.contextMenu) {
+                                    root.itemActivated(overflowItemRoot.trayItem);
+                                    root.hide();
+                                    root.contextMenu.openFor(overflowItemRoot.trayItem, root.originX, root.originY, screen, root.menuEdge);
+                                }
+                            }
+                        }
                     }
-                    const gp = itemArea.mapToGlobal(mouse.x, mouse.y);
-                    TrayMenuManager.callContextMenuFallback(item.id, gp.x, gp.y);
-                    root.hide();
-                    return;
-                }
-
-                if (!item.onlyMenu) {
-                    item.activate();
-                    root.hide();
-                    return;
-                }
-                if (item.hasMenu && root.contextMenu) {
-                    root.itemActivated(item);
-                    root.hide();
-                    root.contextMenu.openFor(item, root.originX, root.originY, screen, root.menuEdge);
                 }
             }
         }
