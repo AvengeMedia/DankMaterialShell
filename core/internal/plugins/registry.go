@@ -124,9 +124,6 @@ func (g *realGitClient) HasUpdates(path string) (bool, string, string, error) {
 		return false, localHash.String(), remoteHead, nil
 	}
 
-	// An update exists only when the remote head is not contained in the
-	// local history. Inequality alone misreports checkouts left ahead of
-	// upstream by a force-push rewind, and Pull cannot converge those.
 	remoteCommit, err := repo.CommitObject(plumbing.NewHash(remoteHead))
 	if errors.Is(err, plumbing.ErrObjectNotFound) {
 		return true, localHash.String(), remoteHead, nil

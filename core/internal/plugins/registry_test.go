@@ -677,8 +677,6 @@ func TestRealGitClientHasUpdatesIgnoresLocalAheadAfterRemoteRewind(t *testing.T)
 	_, err = git.PlainClone(localPath, &git.CloneOptions{URL: remotePath})
 	require.NoError(t, err)
 
-	// Upstream force-pushes the second commit away; the local checkout keeps
-	// it and is now strictly ahead of the remote.
 	require.NoError(t, remote.Storer.SetReference(plumbing.NewHashReference(plumbing.NewBranchReferenceName("master"), first)))
 
 	client := &realGitClient{}
