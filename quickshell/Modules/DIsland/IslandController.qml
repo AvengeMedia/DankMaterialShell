@@ -2,11 +2,13 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import qs.Services
 import qs.Modals.Clipboard
 import qs.Modals.DLauncherV2.Components
 import qs.Modules.ControlCenter
 import qs.Modules.DBar
 import qs.Modules.DDash
+import "../../Common/IslandActivities.js" as Activities
 
 QtObject {
     id: root
@@ -16,15 +18,110 @@ QtObject {
     property bool inputSuspended: false
     property bool expanded: false
     property bool pointerInside: false
-    // A right-click face swap resizes the island under the pointer; hover stays off until it leaves.
+    // Resizing beneath a stationary pointer must not re-arm hover after an explicit close.
     property bool hoverHeld: false
-    property int slotHoverCount: 0
-    readonly property bool slotHovered: slotHoverCount > 0
+    property bool geometryTransitionActive: false
+    onGeometryTransitionActiveChanged: {
+        if (!geometryTransitionActive && !pointerInside)
+            hoverHeld = false;
+    }
     property bool keyboardDismissRequested: false
     property string activeActivity: "home"
     property bool mediaAvailable: false
     property bool mediaPreferred: false
     property bool mediaAutoSwitch: false
+    property bool mediaAlwaysVisible: false
+    property bool mediaVisualizerIdle: false
+    property bool mediaTitleVisible: false
+    property bool mediaArtworkCircular: true
+    property string liveIconAnimationMode: "activity"
+    property int liveIconAnimationDuration: 650
+    property int liveIconAnimationIntensity: 65
+    property string mediaHoverActivity: "home"
+    property var liveCandidate: null
+    property var liveEntry: null
+    property var selectedLiveEntry: null
+    property var presentationSession: null
+    readonly property var stableActivities: dotMode ? [] : (presentationSession?.stableEntries ?? []).filter(entry => !liveActive || Activities.identity(entry) !== Activities.identity(liveEntry))
+    property var stableSlotLengths: ({left: 0, center: 0, right: 0})
+    readonly property real stableLeadingLength: stableSlotLengths.left + stableSlotLengths.center
+    readonly property real stableSlotsLength: stableLeadingLength + stableSlotLengths.right
+    readonly property string stableVersion: (presentationSession?.stableEntries ?? []).map(entry => liveVersion(entry)).join(";")
+    onStableVersionChanged: Qt.callLater(syncLiveActivity)
+    readonly property real stableSlotMaxLength: Math.min(mediaCompactMaxLength / 2, Math.max(compactFaceThickness, (isVertical ? dashboardAvailableHeight : dashboardAvailableWidth) * 0.45 / Math.max(1, stableActivities.length)))
+
+    function setStableSlotLength(position, length) {
+        if (stableSlotLengths[position] === length)
+            return;
+        stableSlotLengths = Object.assign({}, stableSlotLengths, {[position]: length});
+    }
+
+    function openStableEntry(entry) {
+        if (inputSuspended || !entry)
+            return false;
+        hoverOpenTimer.stop();
+        if (IslandActivityService.activate(entry))
+            return true;
+        if (entry.clickActivity !== "live")
+            return requestActivity(entry.clickActivity, true, false);
+        selectedLiveEntry = entry;
+        liveReturnActivity = idleActivity();
+        liveEntry = entry;
+        activeActivity = "live";
+        hoverExpanded = false;
+        keyboardDismissRequested = false;
+        expanded = true;
+        return true;
+    }
+    property real liveContentLength: mediaCompactMaxLength
+    property real liveExpandedWidth: mediaCompactMaxLength
+    property real liveExpandedHeight: compactFaceThickness + Theme.spacingL * 2
+    property string liveReturnActivity: "home"
+    property string dismissedLiveVersion: ""
+    readonly property bool liveActive: activeActivity === "live"
+
+    function liveVersion(entry) {
+        return entry ? JSON.stringify([entry.source, entry.id, entry.revision]) : "";
+    }
+
+    function idleActivity() {
+        return Activities.idleActivity(mediaAvailable, mediaAlwaysVisible);
+    }
+
+    onMediaAlwaysVisibleChanged: {
+        if (!expanded && (activeActivity === "home" || activeActivity === "media"))
+            activeActivity = idleActivity();
+    }
+
+    function syncLiveActivity() {
+        if (selectedLiveEntry && expanded && liveActive) {
+            const current = presentationSession?.stableEntries.find(entry => Activities.identity(entry) === Activities.identity(selectedLiveEntry));
+            if (current) {
+                liveEntry = current;
+                return;
+            }
+            selectedLiveEntry = null;
+        }
+        if (liveActive && !liveCandidate) {
+            expanded = false;
+            hoverExpanded = false;
+            keyboardDismissRequested = false;
+            activeActivity = resolvedReturnActivity(liveReturnActivity);
+            return;
+        }
+        if (!liveCandidate || inputSuspended || systemActivityActive || notificationActive || (expanded && !liveActive))
+            return;
+        if (liveVersion(liveCandidate) === dismissedLiveVersion)
+            return;
+        if (!liveActive)
+            liveReturnActivity = activeActivity;
+        liveEntry = liveCandidate;
+        activeActivity = "live";
+    }
+
+    onLiveCandidateChanged: syncLiveActivity()
+    onActiveActivityChanged: Qt.callLater(syncLiveActivity)
+    onExpandedChanged: Qt.callLater(syncLiveActivity)
     property bool launcherCycleEnabled: false
     property bool launcherSessionActive: false
     property bool launcherInputFocused: false
@@ -48,6 +145,8 @@ QtObject {
     property real alongOffset: 0
     property real outerGap: 8
     property var barConfig: null
+    property var widgetHost: null
+    readonly property bool usesBarWidgets: SettingsData.isIslandBarConfig(barConfig) && !SettingsData.isDotBarConfig(barConfig)
     property var screen: null
     property string edge: "top"
     readonly property bool isVertical: edge === "left" || edge === "right"
@@ -67,11 +166,12 @@ QtObject {
     property int transientTimeout: 2200
     property int notificationTimeout: 5000
     property string transientReturnActivity: ""
+    property string queuedSystemActivityId: ""
     property string suspendedActivity: ""
     property bool suspendedExpanded: false
     property bool suspendedKeyboardDismissRequested: false
-    property int hoverOpenDelay: 150
-    property int hoverCloseDelay: 150
+    property int hoverOpenDelay: 600
+    property int hoverCloseDelay: 280
     property int mediaReturnDelay: 1800
     property real controlCenterMaxHeight: 640
     property string editingActivity: ""
@@ -181,7 +281,7 @@ QtObject {
     }
 
     readonly property var destinations: ["launcher", "controlcenter", "wallpaper", "weather", "notificationcenter", "clipboard", "powermenu"]
-    readonly property var blankClickOwners: ["launcher", "controlcenter", "wallpaper", "notificationcenter", "clipboard", "powermenu"]
+    readonly property var blankClickOwners: ["live", "launcher", "controlcenter", "wallpaper", "notificationcenter", "clipboard", "powermenu"]
     readonly property var destinationDefaults: ({
             "launcher": {
                 "contentLength": 160,
@@ -467,7 +567,7 @@ QtObject {
     readonly property var systemLevelActivities: ["volume", "brightness", "mic"]
     readonly property var systemStateActivities: ["capslock", "powerprofile", "idleinhibitor", "charging"]
     readonly property var systemActivities: systemLevelActivities.concat(systemStateActivities)
-    readonly property var dotTransientActivities: ["notification"].concat(systemActivities)
+    readonly property var dotTransientActivities: ["notification", "live"].concat(systemActivities)
     function isSystemActivity(activityId) {
         return root.systemActivities.indexOf(activityId) !== -1;
     }
@@ -492,16 +592,26 @@ QtObject {
     readonly property var powerMenuExpandedTarget: sheetTarget(Math.max(1, Math.min(dashboardAvailableWidth, powerMenuContentWidth)), Math.max(1, Math.min(dashboardAvailableHeight, destinationContentHeight("powermenu"))))
 
     readonly property bool systemActivityActive: isSystemActivity(activeActivity)
+    readonly property bool queuedSystemActivityActive: queuedSystemActivityId.length > 0
     readonly property bool notificationActive: activeActivity === "notification"
     readonly property bool notificationHeldForSystem: root.systemActivityActive && root.transientReturnActivity === "notification"
-    readonly property bool transientActive: systemActivityActive || notificationActive
+    readonly property bool transientActive: systemActivityActive || notificationActive || liveActive
     readonly property bool timeoutSuspended: pointerInside || (expanded && !notificationActive)
     readonly property bool activityOwnsBlankClicks: blankClickOwners.indexOf(activeActivity) !== -1
-    readonly property bool hoverExpandEnabled: root.interactionMode === "hybrid" && !root.systemActivityActive
-    function compactTargetFor(activityId) {
+    readonly property bool timedLivePreview: liveActive && !selectedLiveEntry && presentationSession?.current?.kind === "activity"
+    readonly property string hoverDestination: Activities.hoverActivityFor(activeActivity, expanded, liveEntry, hoverHeld, geometryTransitionActive)
+    readonly property bool hoverExpandEnabled: interactionMode === "hybrid" && hoverDestination.length > 0
+    onHoverDestinationChanged: hoverOpenTimer.stop()
+    onHoverExpandEnabledChanged: {
+        if (!hoverExpandEnabled)
+            hoverOpenTimer.stop();
+    }
+    function compactBodyTargetFor(activityId) {
         if (root.usesDotFace(activityId))
             return dotCompactTarget;
         switch (activityId) {
+        case "live":
+            return pillTarget(isVertical ? compactFaceThickness : Math.min(dashboardAvailableWidth, mediaCompactMaxLength, Math.max(compactFaceThickness, liveContentLength)), compactFaceThickness);
         case "notification":
             return notificationCompactTarget;
         case "media":
@@ -516,11 +626,20 @@ QtObject {
         return isDestination(activityId) ? pillTarget(destinationCompactLength(activityId), compactFaceThickness) : homeCompactTarget;
     }
 
+    function compactTargetFor(activityId) {
+        const target = compactBodyTargetFor(activityId);
+        if (!stableSlotsLength || usesDotFace(activityId))
+            return target;
+        return Object.assign({}, target, isVertical ? {height: Math.min(dashboardAvailableHeight, target.height + stableSlotsLength)} : {width: Math.min(dashboardAvailableWidth, target.width + stableSlotsLength)});
+    }
+
     readonly property var compactTarget: compactTargetFor(activeActivity)
     function expandedTargetFor(activityId) {
         switch (activityId) {
         case "home":
             return homeExpandedTarget;
+        case "live":
+            return sheetTarget(Math.min(dashboardAvailableWidth, liveExpandedWidth), Math.min(dashboardAvailableHeight, liveExpandedHeight));
         case "notification":
             return notificationExpandedTarget;
         case "launcher":
@@ -543,6 +662,10 @@ QtObject {
     readonly property var targetDescriptor: expanded ? expandedTarget : compactTarget
 
     function syncNotificationTimeout(restart) {
+        if (presentationSession) {
+            notificationTimer.stop();
+            return;
+        }
         if (!notificationActive || timeoutSuspended || notificationTimeout <= 0) {
             notificationTimer.stop();
             return;
@@ -554,7 +677,7 @@ QtObject {
     onNotificationTimeoutChanged: syncNotificationTimeout(true)
 
     function syncTransientTimeout(restart) {
-        if (!systemActivityActive || timeoutSuspended) {
+        if (queuedSystemActivityActive || !systemActivityActive || timeoutSuspended) {
             transientTimer.stop();
             return;
         }
@@ -595,9 +718,18 @@ QtObject {
         mediaPreferred = true;
     }
 
-    onInputSuspendedChanged: {
-        if (!inputSuspended)
+    function flashMediaTitle() {
+        if (!mediaAvailable)
             return;
+        mediaTitleVisible = true;
+        mediaTitleTimer.restart();
+    }
+
+    onInputSuspendedChanged: {
+        if (!inputSuspended) {
+            syncLiveActivity();
+            return;
+        }
         hoverExpanded = false;
         hoverOpenTimer.stop();
         hoverCloseTimer.stop();
@@ -608,11 +740,6 @@ QtObject {
         clearPendingRequests("");
         if (!transientActive)
             activeActivity = idleActivity();
-    }
-
-    // The face a closed sheet lands on: media only when the user picked the media face.
-    function idleActivity() {
-        return mediaAvailable && mediaPreferred ? "media" : "home";
     }
 
     readonly property bool mediaFaceToggleAvailable: !expanded && mediaAvailable && (activeActivity === "home" || activeActivity === "media")
@@ -628,15 +755,7 @@ QtObject {
     function requestHoverExpand() {
         if (inputSuspended || hoverHeld || !hoverExpandEnabled || activeActivity === "powermenu")
             return false;
-        if (notificationActive) {
-            hoverExpanded = true;
-            keyboardDismissRequested = false;
-            expanded = true;
-            hoverCloseTimer.stop();
-            notificationTimer.stop();
-            return true;
-        }
-        if (!requestExpand(false))
+        if (!requestActivity(hoverDestination, true, false))
             return false;
         hoverExpanded = true;
         return true;
@@ -645,13 +764,6 @@ QtObject {
     function requestHoverCollapse() {
         if (!hoverExpanded)
             return false;
-        if (notificationActive) {
-            hoverExpanded = false;
-            expanded = false;
-            keyboardDismissRequested = false;
-            syncNotificationTimeout(true);
-            return true;
-        }
         return requestCollapse();
     }
 
@@ -677,6 +789,15 @@ QtObject {
     }
 
     function requestCollapse() {
+        if (expanded && pointerInside)
+            hoverHeld = true;
+        if (liveActive) {
+            if (!selectedLiveEntry)
+                presentationSession?.finishCurrent(liveEntry);
+            selectedLiveEntry = null;
+            dismissedLiveVersion = liveVersion(liveEntry);
+            activeActivity = resolvedReturnActivity(liveReturnActivity);
+        }
         hoverExpanded = false;
         hoverOpenTimer.stop();
         transientTimer.stop();
@@ -702,7 +823,9 @@ QtObject {
         switch (activityId) {
         case "notification":
         case "home":
-            return activityId;
+            return activityId === "home" && mediaAlwaysVisible ? idleActivity() : activityId;
+        case "live":
+            return liveCandidate ? "live" : idleActivity();
         case "media":
             return mediaAvailable ? "media" : "home";
         }
@@ -712,6 +835,15 @@ QtObject {
     }
 
     function requestActivity(activityId, shouldExpand, requestKeyboardFocus) {
+        if (activityId === "live") {
+            if (!liveCandidate && shouldExpand === true)
+                return openStableEntry(presentationSession?.stableEntries[0]);
+            if (!liveCandidate || inputSuspended || (transientActive && !liveActive))
+                return false;
+            dismissedLiveVersion = "";
+            syncLiveActivity();
+            return liveActive && (shouldExpand !== true || requestExpand(requestKeyboardFocus));
+        }
         const destination = isDestination(activityId);
         if (activityId !== "home" && activityId !== "media" && !destination)
             return false;
@@ -722,15 +854,16 @@ QtObject {
         if (activityId === "weather" && !SettingsData.weatherEnabled)
             return false;
 
+        selectedLiveEntry = null;
+
+        hoverExpanded = false;
         if (activityId !== "launcher")
             launcherSessionActive = false;
         clearPendingRequests(activityId);
 
         if (activeActivity === activityId && expanded && shouldExpand === true) {
-            if (requestKeyboardFocus === true) {
+            if (requestKeyboardFocus === true)
                 keyboardDismissRequested = true;
-                hoverExpanded = false;
-            }
             return true;
         }
 
@@ -744,8 +877,6 @@ QtObject {
             return true;
         }
 
-        if (requestKeyboardFocus === true)
-            hoverExpanded = false;
         hoverOpenTimer.stop();
         hoverCloseTimer.stop();
         transientTimer.stop();
@@ -842,6 +973,10 @@ QtObject {
     function finishTransient() {
         if (!systemActivityActive)
             return;
+        if (queuedSystemActivityActive && presentationSession?.current?.kind === "system") {
+            presentationSession.finishCurrent(presentationSession.current);
+            return;
+        }
 
         transientTimer.stop();
         const returnActivity = resolvedReturnActivity(transientReturnActivity);
@@ -891,6 +1026,35 @@ QtObject {
             transientReturnActivity = activeActivity;
         activeActivity = activityId;
         syncTransientTimeout(true);
+        return true;
+    }
+
+    function presentQueuedSystemActivity(activityId) {
+        if (!isSystemActivity(activityId) || (expanded && !notificationActive && !systemActivityActive))
+            return false;
+        launcherSessionActive = false;
+        clearPendingRequests("");
+        if (notificationActive) {
+            notificationTimer.stop();
+            hoverExpanded = false;
+            hoverOpenTimer.stop();
+            hoverCloseTimer.stop();
+            keyboardDismissRequested = false;
+            expanded = false;
+        }
+        if (!systemActivityActive)
+            transientReturnActivity = activeActivity;
+        queuedSystemActivityId = activityId;
+        activeActivity = activityId;
+        transientTimer.stop();
+        return true;
+    }
+
+    function finishQueuedSystemActivity() {
+        if (!queuedSystemActivityActive)
+            return false;
+        queuedSystemActivityId = "";
+        finishTransient();
         return true;
     }
 
@@ -975,44 +1139,30 @@ QtObject {
         return requestExpand(requestKeyboardFocus);
     }
 
-    function slotHoverEntered() {
-        slotHoverCount++;
-    }
-
-    function slotHoverExited() {
-        slotHoverCount = Math.max(0, slotHoverCount - 1);
-    }
-
-    onSlotHoveredChanged: {
-        if (slotHovered) {
-            hoverOpenTimer.stop();
-            return;
-        }
-        if (pointerInside && hoverExpandEnabled && !expanded)
-            hoverOpenTimer.restart();
-    }
-
     function updatePointerInside(inside) {
-        pointerInside = inside === true;
+        const next = inside === true;
+        if (pointerInside === next)
+            return;
+        pointerInside = next;
         syncNotificationTimeout(!pointerInside);
         syncTransientTimeout(!pointerInside);
         if (!pointerInside) {
-            hoverHeld = false;
-            slotHoverCount = 0;
+            if (!geometryTransitionActive)
+                hoverHeld = false;
             hoverOpenTimer.stop();
             if (hoverExpanded && expanded)
                 hoverCloseTimer.restart();
             return;
         }
         hoverCloseTimer.stop();
-        if (hoverExpandEnabled && !expanded && !slotHovered)
+        if (hoverExpandEnabled)
             hoverOpenTimer.restart();
     }
 
     property Timer hoverOpenTimer: Timer {
         interval: root.hoverOpenDelay
         onTriggered: {
-            if (!root.pointerInside || !root.hoverExpandEnabled || root.inputSuspended || root.slotHovered)
+            if (!root.pointerInside || !root.hoverExpandEnabled || root.inputSuspended)
                 return;
             root.requestHoverExpand();
         }
@@ -1038,6 +1188,12 @@ QtObject {
             root.expanded = false;
             root.activeActivity = "home";
         }
+    }
+
+    property Timer mediaTitleTimer: Timer {
+        interval: Math.max(500, Math.min(15000, SettingsData.barWidgetEntry(root.barConfig, "music")?.mediaTitleDuration ?? 2400))
+        running: root.mediaTitleVisible
+        onTriggered: root.mediaTitleVisible = false
     }
 
     property Timer transientTimer: Timer {
