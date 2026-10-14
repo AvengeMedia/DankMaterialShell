@@ -38,4 +38,3 @@ test("nonmatches and failing plugin callbacks do not block later interceptors", 
     assert.equal(interceptors.evaluate([broken, calendar], { desktopEntry: "dank-calendar", summary: "Event" }, entry => entry.priority, () => true).source, "calendar");
     assert.equal(interceptors.evaluate([calendar], { desktopEntry: "mail", summary: "Message" }, entry => entry.priority, () => true), null);
 });
-
