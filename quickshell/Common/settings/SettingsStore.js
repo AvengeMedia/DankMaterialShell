@@ -5,6 +5,7 @@
 .import "./BarWidgetDefaults.js" as WidgetDefaults
 .import "./DockConfig.js" as DockConfig
 .import "../GridLayout.js" as GridLayout
+.import "../IslandLayout.js" as IslandLayout
 
 var PIN_KEYS = ["brightnessDevicePins", "wifiNetworkPins", "bluetoothDevicePins", "audioInputDevicePins", "audioOutputDevicePins"];
 
@@ -750,6 +751,12 @@ function migrateToVersion(obj, targetVersion) {
     if (currentVersion < 42 && targetVersion >= 42) {
         migrateDockAppsSizing(settings);
         settings.configVersion = 42;
+    }
+
+    if (currentVersion < 43 && targetVersion >= 43) {
+        for (const config of settings.barConfigs || [])
+            IslandLayout.migrate(config);
+        settings.configVersion = 43;
     }
 
     return settings;

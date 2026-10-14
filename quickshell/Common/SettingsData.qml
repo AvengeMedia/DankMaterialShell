@@ -18,12 +18,13 @@ import "settings/SettingsStore.js" as Store
 import "../DCommon/Common/settings/SpecUtil.js" as SpecUtil
 import "settings/BarWidgetDefaults.js" as WidgetDefaults
 import "settings/DockConfig.js" as DockConfig
+import "IslandLayout.js" as IslandLayout
 
 Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 42
+    readonly property int settingsConfigVersion: 43
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -1067,6 +1068,10 @@ Singleton {
     function islandHomeGroupEnabled(bc, id) {
         const entry = getIslandHomeLayout(bc).find(g => g.id === id);
         return entry ? entry.enabled : false;
+    }
+
+    function islandCollapsedWidgets(bc) {
+        return IslandLayout.widgets(bc);
     }
 
     function setIslandHomeLayoutOrder(barId, ids) {
@@ -3646,6 +3651,18 @@ Singleton {
         updated[pluginId][key] = value;
         pluginSettings = updated;
         savePluginSettings();
+    }
+
+    function removePluginSetting(pluginId, key) {
+        if (!pluginSettings[pluginId] || !(key in pluginSettings[pluginId]))
+            return false;
+        const updated = JSON.parse(JSON.stringify(pluginSettings));
+        delete updated[pluginId][key];
+        if (Object.keys(updated[pluginId]).length === 0)
+            delete updated[pluginId];
+        pluginSettings = updated;
+        savePluginSettings();
+        return true;
     }
 
     function getPluginSettingsForPlugin(pluginId) {
