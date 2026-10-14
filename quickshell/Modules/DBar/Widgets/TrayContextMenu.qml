@@ -90,7 +90,6 @@ DContextMenu {
             width: root.customContentWidth
             trayItem: root.trayItem
             menuHandle: root.menuHandle
-            anchorWindow: root.contextWindow
             onCloseRequested: root.hide()
             onActionTriggered: pendingActionCloseTimer.restart()
         }

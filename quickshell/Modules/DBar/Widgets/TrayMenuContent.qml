@@ -48,15 +48,11 @@ Item {
         const h = entry.menu || entry;
         if (h && typeof h.updateLayout === "function")
             h.updateLayout();
-        submenuHydrator.menu = h;
-        try {
+        if (root.anchorWindow) {
+            submenuHydrator.menu = h;
             submenuHydrator.open();
-            Qt.callLater(() => {
-                try {
-                    submenuHydrator.close();
-                } catch (e) {}
-            });
-        } catch (e) {}
+            Qt.callLater(() => submenuHydrator.close());
+        }
     }
 
     function goBack() {
@@ -67,6 +63,7 @@ Item {
 
     QsMenuAnchor {
         id: submenuHydrator
+        anchor.window: root.anchorWindow
     }
 
     QsMenuOpener {
