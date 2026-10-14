@@ -60,22 +60,41 @@ Item {
     }
 
     readonly property bool traySlotEnabled: (root.controller.homeLeftGroups.indexOf("tray") !== -1 || root.controller.homeRightGroups.indexOf("tray") !== -1)
-    readonly property var hiddenTrayIds: {
-        const envValue = Quickshell.env("DMS_HIDE_TRAYIDS") || "";
-        return envValue ? envValue.split(",").map(id => id.trim().toLowerCase()) : [];
+    readonly property var allTrayItems: traySlotEnabled ? TrayMenuManager.filterEnvHidden(SystemTray.items.values) : []
+    readonly property var allSortedTrayItems: TrayMenuManager.sortByPreferredOrder(allTrayItems, SessionData.trayItemOrder)
+    readonly property var visibleTrayItems: allSortedTrayItems.filter(item => !SessionData.isHiddenTrayId(TrayMenuManager.getTrayItemKey(item)))
+    readonly property var hiddenTrayItems: allSortedTrayItems.filter(item => SessionData.isHiddenTrayId(TrayMenuManager.getTrayItemKey(item)))
+
+    Connections {
+        target: TrayMenuManager
+        enabled: root.traySlotEnabled
+
+        function onOpenTrayMenuRequested() {
+            Qt.callLater(() => {
+                const screen = root.controller.screen;
+                const request = TrayMenuManager.claimMenuRequest(screen?.name);
+                if (!request)
+                    return;
+
+                const item = TrayMenuManager.findTrayItem(request.itemId);
+                if (!item || !item.hasMenu || !root.trayContextMenu)
+                    return;
+
+                const edge = root.controller.edge;
+                let targetX = 0;
+                let targetY = 0;
+                if (edge === "bottom" || edge === "top") {
+                    targetX = root.screenPosAt(root, root.width / 2, 0).x;
+                    targetY = root.islandEdgeCoord();
+                } else {
+                    targetX = root.islandEdgeCoord();
+                    targetY = root.screenPosAt(root, 0, root.height / 2).y;
+                }
+
+                root.trayContextMenu.openFor(item, targetX, targetY, screen, edge);
+            });
+        }
     }
-    readonly property var allTrayItems: {
-        if (!traySlotEnabled)
-            return [];
-        if (!hiddenTrayIds.length)
-            return SystemTray.items.values;
-        return SystemTray.items.values.filter(item => {
-            const itemId = item?.id || "";
-            return !hiddenTrayIds.includes(itemId.toLowerCase());
-        });
-    }
-    readonly property var visibleTrayItems: allTrayItems.filter(item => !SessionData.isHiddenTrayId(item?.id || ""))
-    readonly property var hiddenTrayItems: allTrayItems.filter(item => SessionData.isHiddenTrayId(item?.id || ""))
 
     // The island sits inside a host window, so mapToGlobal is window-relative, not screen space.
     function screenPosAt(item, x, y) {
@@ -583,27 +602,12 @@ Item {
                             : (trayItemRoot.hovered ? Theme.surfaceTextHover : "transparent")
                     }
 
-                    IconImage {
-                        id: trayIconImg
+                    TrayItemIcon {
                         anchors.centerIn: parent
-                        width: root.statusIconSize
-                        height: root.statusIconSize
+                        trayItem: trayItemRoot.trayItem
                         source: root.trayIconSourceFor(trayItemRoot.trayItem)
-                        asynchronous: true
-                        smooth: true
-                        mipmap: true
-                        visible: status === Image.Ready
-                    }
-
-                    StyledText {
-                        anchors.centerIn: parent
-                        visible: !trayIconImg.visible
-                        text: {
-                            const itemId = trayItemRoot.trayItem?.id || "";
-                            return itemId ? itemId.charAt(0).toUpperCase() : "?";
-                        }
-                        font.pixelSize: 10
-                        color: Theme.surfaceTextSecondary
+                        iconSize: root.statusIconSize
+                        fallbackTextColor: Theme.surfaceTextSecondary
                     }
 
                     MouseArea {

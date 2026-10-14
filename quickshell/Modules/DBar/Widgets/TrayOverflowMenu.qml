@@ -92,30 +92,15 @@ DContextMenu {
                             radius: Theme.fullRadius(width, height)
                             color: itemArea.pressed
                                 ? Theme.withAlpha(Theme.surfaceText, Theme.stateLayerPressed)
-                                : (itemArea.containsMouse ? Theme.withAlpha(Theme.surfaceText, Theme.stateLayerHover) : "transparent")
+                                : (itemArea.containsMouse ? Theme.surfaceTextHover : "transparent")
                         }
 
-                        IconImage {
-                            id: itemIcon
+                        TrayItemIcon {
                             anchors.centerIn: parent
-                            width: root.iconSize
-                            height: root.iconSize
+                            trayItem: overflowItemRoot.trayItem
                             source: TrayMenuManager.iconSourceFor(overflowItemRoot.trayItem)
-                            asynchronous: true
-                            smooth: true
-                            mipmap: true
-                            visible: status === Image.Ready
-                        }
-
-                        StyledText {
-                            anchors.centerIn: parent
-                            visible: !itemIcon.visible
-                            text: {
-                                const itemId = overflowItemRoot.trayItem?.id || "";
-                                return itemId ? itemId.charAt(0).toUpperCase() : "?";
-                            }
-                            font.pixelSize: 10
-                            color: Theme.surfaceTextSecondary
+                            iconSize: root.iconSize
+                            fallbackTextColor: Theme.surfaceTextSecondary
                         }
 
                         MouseArea {

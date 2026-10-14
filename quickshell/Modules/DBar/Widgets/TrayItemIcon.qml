@@ -7,25 +7,32 @@ import qs.DCommon.Widgets
 Item {
     id: root
 
-    required property var tray
+    property var tray: null
     property var trayItem: null
     property string source: ""
+    property real iconSize: tray ? tray.trayIconSize : 16
+    property bool iconTintEnabled: tray ? tray.trayIconTintEnabled : false
+    property real iconSaturation: tray ? tray.trayIconSaturation : 0
+    property real iconColorization: tray ? tray.trayIconColorization : 0
+    property color iconTintColor: tray ? tray.trayIconTintColor : "transparent"
+    property color fallbackTextColor: tray ? (tray.trayTextColor ?? Theme.widgetTextColor) : Theme.widgetTextColor
+    property real fallbackTextSize: 10
 
     IconImage {
         id: iconImg
         anchors.centerIn: parent
-        width: root.tray.trayIconSize
-        height: root.tray.trayIconSize
+        width: root.iconSize
+        height: root.iconSize
         source: root.source
         asynchronous: true
         smooth: true
         mipmap: true
         visible: status === Image.Ready
-        layer.enabled: root.tray.trayIconTintEnabled
+        layer.enabled: root.iconTintEnabled
         layer.effect: MultiEffect {
-            saturation: root.tray.trayIconSaturation
-            colorization: root.tray.trayIconColorization
-            colorizationColor: root.tray.trayIconTintColor
+            saturation: root.iconSaturation
+            colorization: root.iconColorization
+            colorizationColor: root.iconTintColor
         }
     }
 
@@ -38,7 +45,7 @@ Item {
                 return "?";
             return itemId.charAt(0).toUpperCase();
         }
-        font.pixelSize: 10
-        color: Theme.widgetTextColor
+        font.pixelSize: root.fallbackTextSize
+        color: root.fallbackTextColor
     }
 }
