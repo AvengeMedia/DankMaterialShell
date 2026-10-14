@@ -59,11 +59,14 @@ Item {
         reverseScrolling: root.workspaceOption("reverseScrolling")
     }
 
+    readonly property bool traySlotEnabled: (root.controller.homeLeftGroups.indexOf("tray") !== -1 || root.controller.homeRightGroups.indexOf("tray") !== -1)
     readonly property var hiddenTrayIds: {
         const envValue = Quickshell.env("DMS_HIDE_TRAYIDS") || "";
         return envValue ? envValue.split(",").map(id => id.trim().toLowerCase()) : [];
     }
     readonly property var allTrayItems: {
+        if (!traySlotEnabled)
+            return [];
         if (!hiddenTrayIds.length)
             return SystemTray.items.values;
         return SystemTray.items.values.filter(item => {
@@ -643,8 +646,8 @@ Item {
                                 targetY = root.screenPosAt(trayMouseArea, 0, trayItemRoot.height / 2).y;
                             }
                             if (mouse.button === Qt.RightButton) {
-                                if (trayItemRoot.trayItem.hasMenu) {
-                                    trayContextMenu.openFor(trayItemRoot.trayItem, targetX, targetY, screen, edge);
+                                if (trayItemRoot.trayItem.hasMenu && root.trayContextMenu) {
+                                    root.trayContextMenu.openFor(trayItemRoot.trayItem, targetX, targetY, screen, edge);
                                     return;
                                 }
                                 const mousePt = root.screenPosAt(trayMouseArea, mouse.x, mouse.y);
@@ -655,8 +658,8 @@ Item {
                                 trayItemRoot.trayItem.activate();
                                 return;
                             }
-                            if (trayItemRoot.trayItem.hasMenu) {
-                                trayContextMenu.openFor(trayItemRoot.trayItem, targetX, targetY, screen, edge);
+                            if (trayItemRoot.trayItem.hasMenu && root.trayContextMenu) {
+                                root.trayContextMenu.openFor(trayItemRoot.trayItem, targetX, targetY, screen, edge);
                             }
                         }
                     }
@@ -682,7 +685,7 @@ Item {
                     anchors.centerIn: parent
                     name: {
                         const edge = root.controller.edge;
-                        const open = trayOverflowMenu.openState;
+                        const open = root.trayOverflowMenu ? root.trayOverflowMenu.openState : false;
                         switch (edge) {
                         case "left":
                             return open ? "keyboard_arrow_left" : "keyboard_arrow_right";
@@ -722,8 +725,10 @@ Item {
                     }
 
                     onClicked: {
-                        if (trayOverflowMenu.openState) {
-                            trayOverflowMenu.hide();
+                        if (!root.trayOverflowMenu)
+                            return;
+                        if (root.trayOverflowMenu.openState) {
+                            root.trayOverflowMenu.hide();
                             return;
                         }
                         const screen = root.controller.screen;
@@ -737,21 +742,36 @@ Item {
                             triggerX = root.islandEdgeCoord();
                             triggerY = root.screenPosAt(caretArea, 0, caretRoot.height / 2).y;
                         }
-                        trayOverflowMenu.openAt(triggerX, triggerY, screen, edge);
+                        root.trayOverflowMenu.openAt(triggerX, triggerY, screen, edge);
                     }
                 }
             }
         }
     }
 
-    TrayContextMenu {
-        id: trayContextMenu
-    }
+    readonly property var trayContextMenu: trayMenusLoader.item?.contextMenu ?? null
+    readonly property var trayOverflowMenu: trayMenusLoader.item?.overflowMenu ?? null
 
-    TrayOverflowMenu {
-        id: trayOverflowMenu
-        hiddenItems: root.hiddenTrayItems
-        contextMenu: trayContextMenu
+    Loader {
+        id: trayMenusLoader
+        active: root.traySlotEnabled
+        sourceComponent: Component {
+            Item {
+                id: trayMenusHost
+                readonly property alias contextMenu: ctxMenu
+                readonly property alias overflowMenu: ovMenu
+
+                TrayContextMenu {
+                    id: ctxMenu
+                }
+
+                TrayOverflowMenu {
+                    id: ovMenu
+                    hiddenItems: root.hiddenTrayItems
+                    contextMenu: ctxMenu
+                }
+            }
+        }
     }
 
     Row {
