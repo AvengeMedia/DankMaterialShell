@@ -1206,8 +1206,10 @@ EOFCONFIG
     }
 
     readonly property string sinkVolumeIconName: {
-        const bluetoothDevice = Bluetooth.deviceForNodeName(sink?.name);
-        if (bluetoothDevice?.connected && Bluetooth.getDeviceIcon(bluetoothDevice) === "headset")
+        if (isSilent(sink))
+            return volumeIconName(sink);
+        const bluetoothDevice = BluetoothService.deviceForNodeName(sink?.name);
+        if (bluetoothDevice?.connected && BluetoothService.getDeviceIcon(bluetoothDevice) === "headset")
             return "headphones";
         return volumeIconName(sink);
     }
