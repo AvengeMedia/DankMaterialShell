@@ -571,8 +571,8 @@ Item {
                     readonly property var trayItem: modelData
                     property bool hovered: false
 
-                    width: root.iconSize + Theme.spacingXXS
-                    height: root.iconSize + Theme.spacingXXS
+                    width: group.vertical ? root.slotSize : (root.iconSize + Theme.spacingXS)
+                    height: group.vertical ? (root.iconSize + Theme.spacingXS) : root.slotSize
 
                     Rectangle {
                         id: trayHighlightBg
@@ -669,8 +669,8 @@ Item {
             Item {
                 id: caretRoot
                 visible: group.isTray && root.hiddenTrayItems.length > 0
-                width: root.iconSize + Theme.spacingXXS
-                height: root.iconSize + Theme.spacingXXS
+                width: group.vertical ? root.slotSize : (root.iconSize + Theme.spacingXS)
+                height: group.vertical ? (root.iconSize + Theme.spacingXS) : root.slotSize
                 property bool hovered: false
 
                 Rectangle {
