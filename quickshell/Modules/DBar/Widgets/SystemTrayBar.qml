@@ -213,18 +213,9 @@ BasePill {
     }
 
     function moveTrayItemKeyInFullOrder(fromKey, toKey) {
-        if (!fromKey || !toKey)
-            return;
-
-        const fullOrder = [...allSortedTrayItemKeys];
-        const fullFromIndex = fullOrder.indexOf(fromKey);
-        const fullToIndex = fullOrder.indexOf(toKey);
-        if (fullFromIndex < 0 || fullToIndex < 0)
-            return;
-
-        const movedKey = fullOrder.splice(fullFromIndex, 1)[0];
-        fullOrder.splice(fullToIndex, 0, movedKey);
-        SessionData.setTrayItemOrder(fullOrder);
+        const nextOrder = TrayMenuManager.reorderItemKeys(allSortedTrayItemKeys, fromKey, toKey);
+        if (nextOrder)
+            SessionData.setTrayItemOrder(nextOrder);
     }
 
     function promoteTrayItemToBar(item) {
@@ -256,13 +247,7 @@ BasePill {
     }
 
     function dragShiftOffset(index, draggedIndex, dropTargetIndex, shiftAmount) {
-        if (draggedIndex < 0 || index === draggedIndex || dropTargetIndex < 0)
-            return 0;
-        if (draggedIndex < dropTargetIndex && index > draggedIndex && index <= dropTargetIndex)
-            return -shiftAmount;
-        if (draggedIndex > dropTargetIndex && index >= dropTargetIndex && index < draggedIndex)
-            return shiftAmount;
-        return 0;
+        return TrayMenuManager.dragShiftOffset(index, draggedIndex, dropTargetIndex, shiftAmount);
     }
 
     function beginMainDrag(visualIndex, reversed) {

@@ -80,6 +80,29 @@ Singleton {
         });
     }
 
+    function dragShiftOffset(index, draggedIndex, dropTargetIndex, shiftAmount) {
+        if (draggedIndex < 0 || index === draggedIndex || dropTargetIndex < 0)
+            return 0;
+        if (draggedIndex < dropTargetIndex && index > draggedIndex && index <= dropTargetIndex)
+            return -shiftAmount;
+        if (draggedIndex > dropTargetIndex && index >= dropTargetIndex && index < draggedIndex)
+            return shiftAmount;
+        return 0;
+    }
+
+    function reorderItemKeys(allKeys, fromKey, toKey) {
+        if (!allKeys || !fromKey || !toKey)
+            return null;
+        const fullOrder = [...allKeys];
+        const fromIdx = fullOrder.indexOf(fromKey);
+        const toIdx = fullOrder.indexOf(toKey);
+        if (fromIdx < 0 || toIdx < 0 || fromIdx === toIdx)
+            return null;
+        const moved = fullOrder.splice(fromIdx, 1)[0];
+        fullOrder.splice(toIdx, 0, moved);
+        return fullOrder;
+    }
+
     signal openTrayMenuRequested
 
     function requestOpenMenu(itemId, screenName) {

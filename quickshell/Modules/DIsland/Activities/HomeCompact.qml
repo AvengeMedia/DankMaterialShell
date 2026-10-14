@@ -65,6 +65,42 @@ Item {
     readonly property var visibleTrayItems: allSortedTrayItems.filter(item => !SessionData.isHiddenTrayId(TrayMenuManager.getTrayItemKey(item)))
     readonly property var hiddenTrayItems: allSortedTrayItems.filter(item => SessionData.isHiddenTrayId(TrayMenuManager.getTrayItemKey(item)))
 
+    property int trayDraggedIndex: -1
+    property int trayDropTargetIndex: -1
+    property bool suppressTrayShiftAnimation: false
+
+    function beginTrayDrag(visualIndex) {
+        root.trayDraggedIndex = visualIndex;
+        root.trayDropTargetIndex = visualIndex;
+    }
+
+    function updateTrayDrag(axisOffset, visualIndex, itemSize) {
+        const slotOffset = Math.round(axisOffset / itemSize);
+        const visualTargetIndex = Math.max(0, Math.min(root.visibleTrayItems.length - 1, visualIndex + slotOffset));
+        if (visualTargetIndex !== root.trayDropTargetIndex)
+            root.trayDropTargetIndex = visualTargetIndex;
+    }
+
+    function finishTrayDrag() {
+        const didReorder = root.trayDropTargetIndex >= 0 && root.trayDropTargetIndex !== root.trayDraggedIndex;
+        if (didReorder) {
+            const fromItem = root.visibleTrayItems[root.trayDraggedIndex];
+            const toItem = root.visibleTrayItems[root.trayDropTargetIndex];
+            const fromKey = TrayMenuManager.getTrayItemKey(fromItem);
+            const toKey = TrayMenuManager.getTrayItemKey(toItem);
+            const allKeys = root.allSortedTrayItems.map(item => TrayMenuManager.getTrayItemKey(item));
+            const nextOrder = TrayMenuManager.reorderItemKeys(allKeys, fromKey, toKey);
+            if (nextOrder) {
+                root.suppressTrayShiftAnimation = true;
+                SessionData.setTrayItemOrder(nextOrder);
+                Qt.callLater(() => root.suppressTrayShiftAnimation = false);
+            }
+        }
+        root.trayDraggedIndex = -1;
+        root.trayDropTargetIndex = -1;
+        return didReorder;
+    }
+
     Connections {
         target: TrayMenuManager
         enabled: root.traySlotEnabled
@@ -587,27 +623,74 @@ Item {
                     id: trayItemRoot
 
                     required property var modelData
+                    required property int index
                     readonly property var trayItem: modelData
                     property bool hovered: false
 
+                    readonly property real itemStep: (group.vertical ? height : width) + content.spacing
+                    property real shiftOffset: TrayMenuManager.dragShiftOffset(index, root.trayDraggedIndex, root.trayDropTargetIndex, itemStep)
+
                     width: group.vertical ? root.slotSize : (root.iconSize + Theme.spacingXS)
                     height: group.vertical ? (root.iconSize + Theme.spacingXS) : root.slotSize
+                    z: dragHandler.dragging ? 100 : 0
 
-                    Rectangle {
-                        id: trayHighlightBg
-                        anchors.fill: parent
-                        radius: Theme.fullRadius(width, height)
-                        color: trayMouseArea.pressed
-                            ? Theme.withAlpha(Theme.surfaceText, Theme.stateLayerPressed)
-                            : (trayItemRoot.hovered ? Theme.surfaceTextHover : "transparent")
+                    transform: Translate {
+                        x: !group.vertical ? trayItemRoot.shiftOffset : 0
+                        y: group.vertical ? trayItemRoot.shiftOffset : 0
+                        Behavior on x {
+                            enabled: !root.suppressTrayShiftAnimation && !group.vertical
+                            NumberAnimation {
+                                duration: Theme.shortDuration
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+                        Behavior on y {
+                            enabled: !root.suppressTrayShiftAnimation && group.vertical
+                            NumberAnimation {
+                                duration: Theme.shortDuration
+                                easing.type: Easing.OutCubic
+                            }
+                        }
                     }
 
-                    TrayItemIcon {
-                        anchors.centerIn: parent
-                        trayItem: trayItemRoot.trayItem
-                        source: root.trayIconSourceFor(trayItemRoot.trayItem)
-                        iconSize: root.statusIconSize
-                        fallbackTextColor: Theme.surfaceTextSecondary
+                    Item {
+                        id: visualContent
+                        anchors.fill: parent
+
+                        transform: Translate {
+                            x: dragHandler.dragging && !group.vertical ? dragHandler.dragAxisOffset : 0
+                            y: dragHandler.dragging && group.vertical ? dragHandler.dragAxisOffset : 0
+                        }
+
+                        Rectangle {
+                            id: trayHighlightBg
+                            anchors.fill: parent
+                            radius: Theme.fullRadius(width, height)
+                            color: trayMouseArea.pressed
+                                ? Theme.withAlpha(Theme.surfaceText, Theme.stateLayerPressed)
+                                : (trayItemRoot.hovered ? Theme.surfaceTextHover : "transparent")
+                            border.width: dragHandler.dragging ? Theme.outlineWidthFocused : 0
+                            border.color: Theme.primary
+                            opacity: dragHandler.dragging ? 0.8 : 1.0
+                        }
+
+                        TrayItemIcon {
+                            anchors.centerIn: parent
+                            trayItem: trayItemRoot.trayItem
+                            source: root.trayIconSourceFor(trayItemRoot.trayItem)
+                            iconSize: root.statusIconSize
+                            fallbackTextColor: Theme.surfaceTextSecondary
+                        }
+                    }
+
+                    Item {
+                        id: dragHandler
+                        anchors.fill: parent
+                        property bool dragInitiated: false
+                        property bool dragging: false
+                        property bool wasDragging: false
+                        property point dragStartPos: Qt.point(0, 0)
+                        property real dragAxisOffset: 0
                     }
 
                     MouseArea {
@@ -615,25 +698,83 @@ Item {
                         anchors.fill: parent
                         hoverEnabled: true
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
-                        cursorShape: Qt.PointingHandCursor
+                        cursorShape: dragHandler.dragging ? Qt.DragMoveCursor : Qt.PointingHandCursor
 
                         onContainsMouseChanged: {
                             trayItemRoot.hovered = containsMouse;
                             if (containsMouse) {
                                 root.controller.slotHoverEntered();
                             } else {
-                                root.controller.slotHoverExited();
+                                if (!dragHandler.dragging)
+                                    root.controller.slotHoverExited();
                             }
                         }
 
                         Component.onDestruction: {
+                            if (dragHandler.dragging) {
+                                dragHandler.dragging = false;
+                                root.finishTrayDrag();
+                            }
                             if (trayItemRoot.hovered) {
                                 trayItemRoot.hovered = false;
                                 root.controller.slotHoverExited();
                             }
                         }
 
+                        onPressed: mouse => {
+                            dragHandler.wasDragging = false;
+                            if (mouse.button === Qt.LeftButton) {
+                                dragHandler.dragInitiated = true;
+                                dragHandler.dragStartPos = Qt.point(mouse.x, mouse.y);
+                                root.controller.hoverOpenTimer.stop();
+                                root.controller.hoverHeld = true;
+                            }
+                        }
+
+                        onReleased: mouse => {
+                            dragHandler.dragInitiated = false;
+                            const wasDragging = dragHandler.dragging;
+                            if (wasDragging) {
+                                dragHandler.wasDragging = true;
+                                root.finishTrayDrag();
+                                if (!trayMouseArea.containsMouse)
+                                    root.controller.slotHoverExited();
+                            }
+                            dragHandler.dragging = false;
+                            dragHandler.dragAxisOffset = 0;
+                            root.controller.hoverOpenTimer.stop();
+                            Qt.callLater(() => {
+                                root.controller.hoverOpenTimer.stop();
+                                if (!trayMouseArea.containsMouse)
+                                    root.controller.hoverHeld = false;
+                            });
+                        }
+
+                        onPositionChanged: mouse => {
+                            if (!dragHandler.dragInitiated || (mouse.buttons & Qt.LeftButton) === 0)
+                                return;
+
+                            root.controller.hoverOpenTimer.stop();
+                            root.controller.hoverHeld = true;
+
+                            const dist = Math.hypot(mouse.x - dragHandler.dragStartPos.x, mouse.y - dragHandler.dragStartPos.y);
+                            if (!dragHandler.dragging && dist > 5) {
+                                dragHandler.dragging = true;
+                                root.beginTrayDrag(trayItemRoot.index);
+                            }
+                            if (!dragHandler.dragging)
+                                return;
+
+                            const axisDelta = group.vertical ? (mouse.y - dragHandler.dragStartPos.y) : (mouse.x - dragHandler.dragStartPos.x);
+                            dragHandler.dragAxisOffset = axisDelta;
+                            root.updateTrayDrag(axisDelta, trayItemRoot.index, trayItemRoot.itemStep);
+                        }
+
                         onClicked: mouse => {
+                            if (dragHandler.wasDragging) {
+                                dragHandler.wasDragging = false;
+                                return;
+                            }
                             if (!trayItemRoot.trayItem)
                                 return;
                             const screen = root.controller.screen;
