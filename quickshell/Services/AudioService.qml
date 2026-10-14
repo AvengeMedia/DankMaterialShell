@@ -1209,7 +1209,7 @@ EOFCONFIG
         if (isSilent(sink))
             return volumeIconName(sink);
         const bluetoothDevice = BluetoothService.deviceForNodeName(sink?.name);
-        if (bluetoothDevice?.connected && BluetoothService.getDeviceIcon(bluetoothDevice) === "headset")
+        if (bluetoothDevice?.connected && /headset|headphone/.test((bluetoothDevice.icon || "").toLowerCase()))
             return "headphones";
         return volumeIconName(sink);
     }
