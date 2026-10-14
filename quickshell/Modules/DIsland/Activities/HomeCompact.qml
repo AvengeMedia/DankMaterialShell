@@ -580,7 +580,7 @@ Item {
                         radius: Theme.fullRadius(width, height)
                         color: trayMouseArea.pressed
                             ? Theme.withAlpha(Theme.surfaceText, Theme.stateLayerPressed)
-                            : (trayItemRoot.hovered ? Theme.withAlpha(Theme.surfaceText, 0.15) : "transparent")
+                            : (trayItemRoot.hovered ? Theme.surfaceTextHover : "transparent")
                     }
 
                     IconImage {
@@ -678,7 +678,7 @@ Item {
                     radius: Theme.fullRadius(width, height)
                     color: caretArea.pressed
                         ? Theme.withAlpha(Theme.surfaceText, Theme.stateLayerPressed)
-                        : (caretRoot.hovered ? Theme.withAlpha(Theme.surfaceText, 0.15) : "transparent")
+                        : (caretRoot.hovered ? Theme.surfaceTextHover : "transparent")
                 }
 
                 DIcon {

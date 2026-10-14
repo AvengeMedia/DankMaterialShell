@@ -327,7 +327,6 @@ Item {
 
                 Behavior on openScale {
                     NumberAnimation {
-                        id: openScaleAnim
                         duration: SettingsData.reduceMotion ? 0 : Theme.expressiveDurations.expressiveFastSpatial
                         easing.type: Easing.BezierSpline
                         easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
@@ -335,7 +334,7 @@ Item {
                 }
 
                 Behavior on height {
-                    enabled: root.openState && !openScaleAnim.running && menuContainer.openScale >= 1.0
+                    enabled: root.openState
                     NumberAnimation {
                         duration: SettingsData.reduceMotion ? 0 : Theme.expressiveDurations.expressiveFastSpatial
                         easing.type: Easing.BezierSpline
