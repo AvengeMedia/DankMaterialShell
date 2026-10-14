@@ -82,10 +82,15 @@ Item {
     }
 
     function finishTrayDrag() {
-        const didReorder = root.trayDropTargetIndex >= 0 && root.trayDropTargetIndex !== root.trayDraggedIndex;
+        const fromIdx = root.trayDraggedIndex;
+        const toIdx = root.trayDropTargetIndex;
+        root.trayDraggedIndex = -1;
+        root.trayDropTargetIndex = -1;
+
+        const didReorder = toIdx >= 0 && fromIdx >= 0 && toIdx !== fromIdx;
         if (didReorder) {
-            const fromItem = root.visibleTrayItems[root.trayDraggedIndex];
-            const toItem = root.visibleTrayItems[root.trayDropTargetIndex];
+            const fromItem = root.visibleTrayItems[fromIdx];
+            const toItem = root.visibleTrayItems[toIdx];
             const fromKey = TrayMenuManager.getTrayItemKey(fromItem);
             const toKey = TrayMenuManager.getTrayItemKey(toItem);
             const allKeys = root.allSortedTrayItems.map(item => TrayMenuManager.getTrayItemKey(item));
@@ -96,8 +101,6 @@ Item {
                 Qt.callLater(() => root.suppressTrayShiftAnimation = false);
             }
         }
-        root.trayDraggedIndex = -1;
-        root.trayDropTargetIndex = -1;
         return didReorder;
     }
 
@@ -711,10 +714,8 @@ Item {
                         }
 
                         Component.onDestruction: {
-                            if (dragHandler.dragging) {
-                                dragHandler.dragging = false;
-                                root.finishTrayDrag();
-                            }
+                            dragHandler.dragging = false;
+                            dragHandler.dragInitiated = false;
                             if (trayItemRoot.hovered) {
                                 trayItemRoot.hovered = false;
                                 root.controller.slotHoverExited();
@@ -734,14 +735,14 @@ Item {
                         onReleased: mouse => {
                             dragHandler.dragInitiated = false;
                             const wasDragging = dragHandler.dragging;
+                            dragHandler.dragging = false;
+                            dragHandler.dragAxisOffset = 0;
                             if (wasDragging) {
                                 dragHandler.wasDragging = true;
                                 root.finishTrayDrag();
                                 if (!trayMouseArea.containsMouse)
                                     root.controller.slotHoverExited();
                             }
-                            dragHandler.dragging = false;
-                            dragHandler.dragAxisOffset = 0;
                             root.controller.hoverOpenTimer.stop();
                             Qt.callLater(() => {
                                 root.controller.hoverOpenTimer.stop();
