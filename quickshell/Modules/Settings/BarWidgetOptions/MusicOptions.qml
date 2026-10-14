@@ -10,7 +10,8 @@ Column {
     readonly property var scrollModes: ["volume", "song", "nothing"]
     readonly property var scrollLabels: [I18n.tr("Change Volume", "media scroll wheel option"), I18n.tr("Change Song", "media scroll wheel option"), I18n.tr("Nothing", "media scroll wheel option")]
     readonly property var styles: ["controls", "activity"]
-    readonly property bool controls: root.page.value("mediaStyle") !== "activity"
+    readonly property bool island: !root.page.dockHosted && root.page.section === "center" && SettingsData.isIslandBarConfig(SettingsData.getBarConfig(root.page.barId))
+    readonly property bool controls: !root.island && root.page.value("mediaStyle") !== "activity"
 
     width: parent?.width ?? 0
     spacing: Theme.spacingL
@@ -21,6 +22,7 @@ Column {
         SettingsButtonGroupRow {
             resetStore: root.page
             resetKeys: ["mediaStyle"]
+            visible: !root.island
             text: I18n.tr("Style")
             model: [I18n.tr("Controls", "media widget style with play, previous and next buttons"), I18n.tr("Now playing", "media widget style showing only the cover, visualizer and title")]
             currentIndex: Math.max(0, root.styles.indexOf(root.page.value("mediaStyle")))
@@ -60,10 +62,72 @@ Column {
         }
 
         SettingsToggleRow {
-            visible: root.controls
             text: I18n.tr("Cover art", "media widget option showing the album cover in the pill")
             checked: root.page.value("mediaShowCoverArt")
             onToggled: checked => root.page.set("mediaShowCoverArt", checked)
+        }
+
+        SettingsToggleRow {
+            visible: !root.controls
+            text: I18n.tr("Circular artwork")
+            checked: root.page.value("mediaArtworkCircular")
+            onToggled: checked => root.page.set("mediaArtworkCircular", checked)
+        }
+
+        SettingsToggleRow {
+            visible: !root.controls
+            text: I18n.tr("Visualizer")
+            checked: root.page.value("mediaVisualizerEnabled")
+            onToggled: checked => root.page.set("mediaVisualizerEnabled", checked)
+        }
+
+        SettingsToggleRow {
+            visible: !root.controls && root.page.value("mediaVisualizerEnabled")
+            text: I18n.tr("Show visualizer when paused")
+            checked: root.page.value("mediaVisualizerIdle")
+            onToggled: checked => root.page.set("mediaVisualizerIdle", checked)
+        }
+
+        SettingsToggleRow {
+            visible: !root.controls
+            text: I18n.tr("Keep widget visible")
+            description: I18n.tr("Keep a media shortcut when no player is available")
+            checked: root.page.value("mediaAlwaysVisible")
+            onToggled: checked => root.page.set("mediaAlwaysVisible", checked)
+        }
+
+        SettingsButtonGroupRow {
+            visible: !root.controls
+            text: I18n.tr("Song title")
+            readonly property var modes: ["changes", "always", "never"]
+            model: [I18n.tr("On change"), I18n.tr("Always"), I18n.tr("Never")]
+            currentIndex: Math.max(0, modes.indexOf(root.page.value("mediaTitleMode")))
+            onSelectionChanged: (index, selected) => {
+                if (selected)
+                    root.page.set("mediaTitleMode", modes[index]);
+            }
+        }
+
+        SettingsSliderRow {
+            visible: !root.controls
+            text: I18n.tr("Maximum title width")
+            minimum: 100
+            maximum: 400
+            step: 10
+            unit: "px"
+            value: root.page.value("mediaTitleMaxWidth")
+            onSliderValueChanged: value => root.page.set("mediaTitleMaxWidth", value)
+        }
+
+        SettingsSliderRow {
+            visible: !root.controls && root.page.value("mediaTitleMode") === "changes"
+            text: I18n.tr("Title duration")
+            minimum: 500
+            maximum: 15000
+            step: 100
+            unit: "ms"
+            value: root.page.value("mediaTitleDuration")
+            onSliderValueChanged: value => root.page.set("mediaTitleDuration", value)
         }
 
         SettingsDropdownRow {

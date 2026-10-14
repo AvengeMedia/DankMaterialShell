@@ -5,6 +5,7 @@ import Quickshell.Services.Notifications
 import qs.Common
 import qs.Services
 import "../../Common/htmlElide.js" as HtmlElide
+import "../../Common/IslandActivities.js" as Activities
 
 QtObject {
     id: root
@@ -12,6 +13,13 @@ QtObject {
     required property IslandController controller
     required property var targetScreen
     property bool enabled: true
+    property var activitySession: null
+    readonly property string visibleVersion: NotificationService.visibleNotifications.map(wrapper => wrapper.seq).join(",")
+    readonly property string presentationVersion: activitySession?.current?.kind === "notification" ? activitySession.current.id : ""
+    readonly property bool notificationPresented: controller.notificationActive
+    onVisibleVersionChanged: syncVisibleNotifications()
+    onPresentationVersionChanged: Qt.callLater(syncPresentation)
+    onNotificationPresentedChanged: Qt.callLater(completeHiddenNotification)
 
     property var currentWrapper: null
     property string appName: ""
@@ -22,6 +30,7 @@ QtObject {
     property string fallbackIcon: "material:notifications"
     property string fallbackText: ""
     property string actionLabel: ""
+    property bool summarized: false
     property bool critical: false
     property bool important: false
 
@@ -43,6 +52,7 @@ QtObject {
         fallbackIcon = "material:notifications";
         fallbackText = "";
         actionLabel = "";
+        summarized = false;
         critical = false;
         important = false;
     }
@@ -56,7 +66,7 @@ QtObject {
         const timer = currentWrapper?.timer;
         if (!timer)
             return;
-        if (wrapperTimeoutHeld) {
+        if (activitySession || wrapperTimeoutHeld) {
             timer.stop();
             return;
         }
@@ -65,6 +75,8 @@ QtObject {
     }
 
     function releaseWrapperTimeoutHold() {
+        if (activitySession)
+            return;
         const timer = currentWrapper?.timer;
         if (!timer || !currentWrapper.popup || timer.interval <= 0)
             return;
@@ -89,6 +101,12 @@ QtObject {
         imageSource = wrapper.displayImage;
         fallbackIcon = wrapper.fallbackIconName || "material:notifications";
         fallbackText = appName.charAt(0).toUpperCase();
+        summarized = !!wrapper.islandPresentation;
+        if (summarized) {
+            summary = Activities.notificationTitle(wrapper.islandPresentation.title || "{summary}", {summary: summary, body: body, appName: appName}) || summary;
+            fallbackIcon = "material:" + (wrapper.islandPresentation.icon || "event");
+            imageSource = "";
+        }
         critical = isCritical;
         important = !isCritical && wrapper.urgency === NotificationUrgency.Normal && fallbackIcon.startsWith("material:battery");
         const actions = wrapper.actions || [];
@@ -100,6 +118,12 @@ QtObject {
     }
 
     function refreshDeduplicated(wrapper) {
+        if (activitySession) {
+            activitySession.refreshNotification(wrapper);
+            if (wrapper === currentWrapper)
+                adopt(wrapper);
+            return;
+        }
         if (!wrapper || wrapper !== currentWrapper)
             return;
         controller.refreshNotification();
@@ -110,6 +134,14 @@ QtObject {
 
     function syncVisibleNotifications() {
         const visible = NotificationService.visibleNotifications || [];
+        if (activitySession) {
+            activitySession.cancelMissingNotifications(visible);
+            if (enabled && NotificationService.isFocusedScreen(root.targetScreen)) {
+                for (const wrapper of visible)
+                    activitySession.enqueueNotification(wrapper);
+            }
+            return;
+        }
         const latest = visible.length > 0 ? visible[visible.length - 1] : null;
         if (latest && (latest === currentWrapper || adopt(latest)))
             return;
@@ -118,6 +150,25 @@ QtObject {
         currentWrapper = null;
         controller.completeNotification();
         scheduleDisplayFieldClear();
+    }
+
+    function syncPresentation() {
+        const wrapper = activitySession?.current?.kind === "notification" ? activitySession.current.wrapper : null;
+        if (wrapper) {
+            if (wrapper !== currentWrapper)
+                adopt(wrapper);
+            return;
+        }
+        if (!currentWrapper)
+            return;
+        currentWrapper = null;
+        controller.completeNotification();
+        scheduleDisplayFieldClear();
+    }
+
+    function completeHiddenNotification() {
+        if (!controller.notificationActive && !controller.notificationHeldForSystem && activitySession?.current?.kind === "notification" && currentWrapper)
+            activitySession.finishCurrent(activitySession.current);
     }
 
     onEnabledChanged: {
@@ -142,6 +193,8 @@ QtObject {
     function dismiss() {
         const wrapper = currentWrapper;
         currentWrapper = null;
+        if (activitySession?.current?.kind === "notification")
+            activitySession.finishCurrent(activitySession.current);
         controller.completeNotification();
         scheduleDisplayFieldClear();
         if (wrapper)
@@ -151,10 +204,6 @@ QtObject {
     property Connections notificationConnections: Connections {
         target: NotificationService
         enabled: root.enabled
-
-        function onVisibleNotificationsChanged() {
-            root.syncVisibleNotifications();
-        }
 
         function onNotificationDeduplicated(wrapper) {
             root.refreshDeduplicated(wrapper);
