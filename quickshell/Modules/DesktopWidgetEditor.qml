@@ -27,19 +27,29 @@ Scope {
             WlrLayershell.namespace: "dms:desktop-widget-editor"
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.exclusiveZone: -1
-            WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+            WlrLayershell.keyboardFocus: PopoutManager.screenshotActive ? WlrKeyboardFocus.None : WlrKeyboardFocus.Exclusive
 
             color: "transparent"
 
             FocusScope {
                 anchors.fill: parent
-                focus: true
+                focus: !PopoutManager.screenshotActive
 
                 Keys.onPressed: event => {
+                    if (PopoutManager.screenshotActive) {
+                        event.accepted = false;
+                        return;
+                    }
                     if (widgetLayer.handleKey(event))
                         event.accepted = true;
                 }
-                Keys.onEscapePressed: overlay.dismiss()
+                Keys.onEscapePressed: event => {
+                    if (PopoutManager.screenshotActive) {
+                        event.accepted = false;
+                        return;
+                    }
+                    overlay.dismiss();
+                }
 
                 Rectangle {
                     anchors.fill: parent
