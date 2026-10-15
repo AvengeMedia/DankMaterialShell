@@ -105,6 +105,39 @@ Item {
         return SettingsData.dockAssignmentConflict(selectedDockId, screenPreferences, config.position);
     }
 
+    // The apps strip keeps its own options on its widget entry rather than on the dock.
+    readonly property var appsEntry: config?.widgets.find(item => item.widgetId === "appsDock") ?? null
+    readonly property var _appsDefaults: ({
+            "appsDockHideIndicators": false,
+            "runningAppsCurrentWorkspace": false
+        })
+    readonly property var apps: ({
+            "get": key => root.appsValue(key),
+            "set": (key, value) => root.setAppsOption(key, value),
+            "isDefault": keys => keys.every(key => root.appsDefault(key) === undefined || JSON.stringify(root.appsValue(key)) === JSON.stringify(root.appsDefault(key))),
+            "resetToDefault": keys => keys.filter(key => root.appsDefault(key) !== undefined).forEach(key => root.setAppsOption(key, root.appsDefault(key)))
+        })
+
+    function appsDefault(key) {
+        if (key in _appsDefaults)
+            return _appsDefaults[key];
+        return SettingsData.widgetDefaults("appsDock")[key];
+    }
+
+    function appsValue(key) {
+        if (key in _appsDefaults)
+            return appsEntry?.[key] ?? _appsDefaults[key];
+        return SettingsData.widgetOption("appsDock", appsEntry, key);
+    }
+
+    function setAppsOption(key, value) {
+        if (!appsEntry)
+            return;
+        SettingsData.updateDockWidget(selectedDockId, appsEntry.id, {
+            [key]: value
+        });
+    }
+
     function isDefault(keys) {
         if (!config)
             return true;

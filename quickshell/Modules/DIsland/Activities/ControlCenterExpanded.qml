@@ -54,7 +54,7 @@ FocusScope {
         property bool editMode: false
         property string expandedSection: ""
 
-        onEditModeChanged: root.controller.setEditing("controlcenter", editMode)
+        onEditModeChanged: root.controller.setEditing("controlcenter", editMode, CcMetrics.islandEditRoom)
 
         readonly property int gridColumnCap: root.controller.controlCenterColumnCap
         readonly property int gridColumns: root.controller.controlCenterColumns
@@ -65,6 +65,7 @@ FocusScope {
         readonly property bool shouldBeVisible: root.controller.activeActivity === "controlcenter" && root.controller.expanded
         readonly property bool headerTogglesClose: true
         readonly property real editRoom: CcMetrics.islandEditRoom
+        readonly property bool editRoomShown: root.controller.editRoomGranted && root.controller.editingActivity === "controlcenter"
         readonly property bool growsFromTop: root.controller.edge === "top"
         readonly property bool powerMenuOpen: PopoutService.powerMenuModalLoader?.item?.shouldBeVisible ?? false
         readonly property var screen: root.effectiveScreen

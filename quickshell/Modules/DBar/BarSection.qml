@@ -79,6 +79,20 @@ Item {
     property real overflowButtonPosition: 0
     property bool overflowWanted: false
     readonly property real overflowTriggerSize: widgetThickness
+    readonly property bool overflowBackground: {
+        root.entryRevision;
+        let barePills = 0;
+        for (let index = 0; index < (entryRepeater?.count ?? 0); index++) {
+            const wrapper = entryRepeater.itemAt(index);
+            const item = wrapper?.available ? wrapper.widgetItem : null;
+            if (!item || !("widgetBackground" in item))
+                continue;
+            if (item.widgetBackground)
+                return true;
+            barePills++;
+        }
+        return barePills === 0 && !noBackground;
+    }
     readonly property var inlineOrder: {
         const layout = inlineLayout();
         return layout.indices.filter((index, position) => layout.sizes[position] !== null);

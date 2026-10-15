@@ -148,6 +148,16 @@ Singleton {
     readonly property bool supportsWorkspaceFollowFocus: isKnownCompositor && !isLabwc
     // labwc root menu and desktop scroll, sway/scroll --whole-window binds, plasmashell desktop menu
     readonly property bool reservesDesktopInput: isLabwc || isSway || isScroll || isKwin
+    readonly property bool desktopContextMenuEnabled: {
+        switch (SettingsData.desktopContextMenu) {
+        case "on":
+            return true;
+        case "off":
+            return false;
+        default:
+            return !reservesDesktopInput;
+        }
+    }
     readonly property bool supportsSmartDock: isNiri || isHyprland || isMango || isAqueous
     readonly property bool supportsNativeOverview: isNiri || isAqueous
     readonly property bool supportsPointerConfig: isNiri || isHyprland || isMango

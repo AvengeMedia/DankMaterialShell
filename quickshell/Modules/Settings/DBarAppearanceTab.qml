@@ -354,7 +354,7 @@ Item {
                 visible: bar.selectedBarIsIsland && !root.selectedIslandFree
                 resetStore: bar
                 resetKeys: ["islandCompactThickness"]
-                text: bar.selectedBarIsVertical ? I18n.tr("Compact width", "island settings: compact pill width slider") : I18n.tr("Compact height", "island settings: compact pill height slider")
+                text: bar.selectedBarIsVertical ? I18n.tr("Width") : I18n.tr("Height")
                 unit: "px"
                 minimum: 24
                 maximum: 72
@@ -366,10 +366,11 @@ Item {
             SettingsSliderRow {
                 settingKey: "barSize"
                 tags: ["size", "thickness", "height", "inner"]
+                visible: !bar.selectedBarIsIsland || bar.islandSetting("islandSatellitesEnabled")
                 text: I18n.tr("Size")
                 resetStore: bar
                 resetKeys: ["innerPadding"]
-                value: bar.selectedBarConfig?.innerPadding ?? 4
+                value: bar.selectedBarConfig?.innerPadding ?? 2
                 minimum: -8
                 maximum: 24
                 unit: "px"
@@ -633,16 +634,6 @@ Item {
             tags: ["widget", "style", "pills", "segments", "opacity", "padding", "maximize"]
             visible: bar.selectedBarConfig?.enabled ?? false
 
-            SettingsToggleRow {
-                settingKey: "barNoBackground"
-                tags: ["transparent", "background", "invisible"]
-                text: I18n.tr("Background")
-                checked: !(bar.selectedBarConfig?.noBackground ?? false)
-                onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
-                        noBackground: !checked
-                    })
-            }
-
             SettingsRow {
                 settingKey: "barWidgetStyle"
                 tags: ["widget", "style", "segments", "pills", "flat", "connected", "group"]
@@ -672,6 +663,16 @@ Item {
                             widgetStyle: key
                         })
                 }
+            }
+
+            SettingsToggleRow {
+                settingKey: "barNoBackground"
+                tags: ["transparent", "background", "invisible"]
+                text: I18n.tr("Background")
+                checked: !(bar.selectedBarConfig?.noBackground ?? false)
+                onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
+                        noBackground: !checked
+                    })
             }
 
             SettingsToggleSliderRow {

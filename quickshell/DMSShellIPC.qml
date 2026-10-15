@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Services.SystemTray
@@ -12,7 +13,6 @@ Item {
     id: root
     readonly property var log: Log.scoped("DMSShellIPC")
 
-    required property var powerMenuModalLoaderRef
     required property var processListModalLoaderRef
     required property var controlCenterLoaderRef
     required property var dankDashPopoutLoaderRef
@@ -34,29 +34,38 @@ Item {
         for (const screenName in BarWidgetService.frameHostedBars)
             bars.push(...BarWidgetService.frameBarsForScreen(screenName));
 
-        let currentBar = null;
-        let islandBar = null;
-        for (const bar of bars) {
-            if (!bar)
-                continue;
-
-            const onFocusedScreen = focusedScreenName && bar.modelData?.name === focusedScreenName;
-            const hasRef = !refPropertyName || !!bar[refPropertyName];
-            if (!hasRef)
-                continue;
-
-            if (bar.isIsland) {
-                if (!islandBar || onFocusedScreen)
-                    islandBar = bar;
-                continue;
+        const configOrder = SettingsData.barConfigs.map(config => config.id);
+        const screenOrder = Quickshell.screens.map(screen => screen.name);
+        const lastBarId = focusedScreenName ? SettingsData.lastUsedBarByScreen[focusedScreenName] : "";
+        // Same order as BarWidgetService.resolveIpcWidget, so every IPC path picks the same bar.
+        const rank = bar => {
+            const screenName = bar.modelData?.name;
+            const onFocused = !!focusedScreenName && screenName === focusedScreenName;
+            const registration = refPropertyName ? BarWidgetService.registrationForItem(bar[refPropertyName]) : null;
+            const tier = !refPropertyName || BarWidgetService.registrationShown(registration) ? 0 : BarWidgetService.registrationLive(registration) ? 1 : 2;
+            const position = bar.barConfig?.position;
+            return [bar.isIsland ? 1 : 0, onFocused ? 0 : 1, tier, onFocused && bar.barConfig?.id === lastBarId ? 0 : 1, screenOrder.indexOf(screenName), position === SettingsData.Position.Left || position === SettingsData.Position.Right ? 1 : 0, configOrder.indexOf(bar.barConfig?.id)];
+        };
+        const compare = (a, b) => {
+            for (let i = 0; i < a.length; i++) {
+                if (a[i] !== b[i])
+                    return a[i] - b[i];
             }
+            return 0;
+        };
 
-            currentBar = bar;
-            if (onFocusedScreen)
-                break;
+        let best = null;
+        let bestRank = null;
+        for (const bar of bars) {
+            if (!bar || (refPropertyName && !bar[refPropertyName]))
+                continue;
+            const barRank = rank(bar);
+            if (!best || compare(barRank, bestRank) < 0) {
+                best = bar;
+                bestRank = barRank;
+            }
         }
-
-        return currentBar ?? islandBar;
+        return best;
     }
 
     readonly property var defaultAppMimeTypes: ({
@@ -167,30 +176,17 @@ Item {
 
     IpcHandler {
         function open() {
-            root.powerMenuModalLoaderRef.active = true;
-            if (root.powerMenuModalLoaderRef.item)
-                root.powerMenuModalLoaderRef.item.openCentered();
-
+            PopoutService.openPowerMenu();
             return "POWERMENU_OPEN_SUCCESS";
         }
 
         function close() {
-            if (root.powerMenuModalLoaderRef.item)
-                root.powerMenuModalLoaderRef.item.close();
-
+            PopoutService.closePowerMenu();
             return "POWERMENU_CLOSE_SUCCESS";
         }
 
         function toggle() {
-            root.powerMenuModalLoaderRef.active = true;
-            if (root.powerMenuModalLoaderRef.item) {
-                if (root.powerMenuModalLoaderRef.item.shouldBeVisible) {
-                    root.powerMenuModalLoaderRef.item.close();
-                } else {
-                    root.powerMenuModalLoaderRef.item.openCentered();
-                }
-            }
-
+            PopoutService.togglePowerMenu();
             return "POWERMENU_TOGGLE_SUCCESS";
         }
 
@@ -1888,8 +1884,7 @@ Item {
             if (root.workspaceRenameModalLoaderRef.item) {
                 if (CompositorService.isAqueous)
                     return root.workspaceRenameModalLoaderRef.item.show("") ? "WORKSPACE_RENAME_MODAL_OPENED" : "WORKSPACE_RENAME_UNAVAILABLE";
-                const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
-                root.workspaceRenameModalLoaderRef.item.show(ws?.name || "");
+                root.workspaceRenameModalLoaderRef.item.show(root.workspaceRenameModalLoaderRef.item.focusedWorkspaceName());
                 return "WORKSPACE_RENAME_MODAL_OPENED";
             }
             return "WORKSPACE_RENAME_MODAL_NOT_FOUND";
@@ -1912,8 +1907,7 @@ Item {
                 }
                 if (CompositorService.isAqueous)
                     return root.workspaceRenameModalLoaderRef.item.show("") ? "WORKSPACE_RENAME_MODAL_OPENED" : "WORKSPACE_RENAME_UNAVAILABLE";
-                const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
-                root.workspaceRenameModalLoaderRef.item.show(ws?.name || "");
+                root.workspaceRenameModalLoaderRef.item.show(root.workspaceRenameModalLoaderRef.item.focusedWorkspaceName());
                 return "WORKSPACE_RENAME_MODAL_OPENED";
             }
             return "WORKSPACE_RENAME_MODAL_NOT_FOUND";

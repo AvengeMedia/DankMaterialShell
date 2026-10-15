@@ -52,6 +52,12 @@ Item {
     implicitHeight: CcMetrics.editActionsHeight
     visible: editMode
 
+    function actionsY(rowHeight) {
+        if (!joined)
+            return (height - rowHeight) / 2;
+        return above ? height - rowHeight : 0;
+    }
+
     // No far or side edge, so a held tile stays held until it moves back into the panel.
     function trashContains(scenePosition) {
         if (!trashShown)
@@ -111,8 +117,8 @@ Item {
 
     Row {
         anchors.left: parent.left
-        anchors.leftMargin: CcMetrics.editActionsPadding
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.leftMargin: CcMetrics.sheetPadding
+        y: root.actionsY(height)
         spacing: Theme.spacingS
         visible: !root.trashShown
 
@@ -140,8 +146,8 @@ Item {
 
     Row {
         anchors.right: parent.right
-        anchors.rightMargin: CcMetrics.editActionsPadding
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: CcMetrics.sheetPadding
+        y: root.actionsY(height)
         spacing: Theme.spacingS
         visible: !root.trashShown
 

@@ -29,7 +29,7 @@ DPopout {
     readonly property int gridColumnCap: CcMetrics.columnCapFor(maxBodyWidth > 0 ? maxBodyWidth - PopoutMetrics.editOverflow * 2 : CcMetrics.sheetWidthDefault)
     readonly property int gridColumns: Math.min(CcMetrics.gridColumns, gridColumnCap)
     readonly property real sheetContentWidth: CcMetrics.sheetWidthFor(gridColumns)
-    readonly property real availableHeight: _maxPopupHeight()
+    readonly property real availableHeight: _maxPopupHeight(0)
     property bool powerMenuOpen: powerMenuModalLoader?.item?.shouldBeVisible ?? false
     property var colorPickerModal: null
     property var powerMenuModalLoader: null
@@ -94,10 +94,10 @@ DPopout {
 
     signal lockRequested
 
-    function _maxPopupHeight() {
+    function _maxPopupHeight(reserved) {
         if (maxBodyHeight <= 0)
             return CcMetrics.fallbackScreenHeight - CcMetrics.maxHeightInset;
-        return maxBodyHeight - CcMetrics.editOverflow;
+        return maxBodyHeight - reserved;
     }
 
     function collapseAll() {
@@ -105,7 +105,7 @@ DPopout {
     }
 
     popupWidth: sheetContentWidth
-    popupHeight: Math.min(_maxPopupHeight(), Math.max(CcMetrics.minHeight, contentLoader.item?.targetImplicitHeight ?? CcMetrics.minHeight))
+    popupHeight: Math.min(_maxPopupHeight(editMode ? CcMetrics.editOverflow : 0), Math.max(CcMetrics.minHeight, contentLoader.item?.targetImplicitHeight ?? CcMetrics.minHeight))
     triggerWidth: CcMetrics.triggerWidth
     positioning: ""
     screen: triggerScreen

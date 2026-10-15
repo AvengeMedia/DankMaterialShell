@@ -625,9 +625,9 @@ func TestManager_ConfigSnapshotConcurrentMarshal(t *testing.T) {
 }
 
 // On a default install (night light off, no profile) no gamma control exists,
-// so a per-output temperature used to be written to wayland.json without ever
-// being applied or reported: the settings slider snapped back to "Default" and
-// the value only took effect after a daemon restart.
+// so a per-output temperature used to be persisted without ever being applied
+// or reported: the settings slider snapped back to "Default" and the value only
+// took effect after a daemon restart.
 func TestManager_SetOutputTempWithoutControlsPublishesValue(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 
@@ -654,15 +654,12 @@ func TestManager_SetOutputTempWithoutControlsPublishesValue(t *testing.T) {
 
 	assert.Equal(t, 7000, m.GetOutputTemps()["DP-1"], "the value is reported even without gamma controls")
 
-	path, err := getConfigPath()
-	if err != nil {
-		t.Fatalf("config path: %v", err)
-	}
+	path := iccConfigPath()
 	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read %s: %v", path, err)
 	}
-	var saved Config
+	var saved iccConfig
 	if err := json.Unmarshal(data, &saved); err != nil {
 		t.Fatalf("unmarshal %s: %v", path, err)
 	}
@@ -670,9 +667,9 @@ func TestManager_SetOutputTempWithoutControlsPublishesValue(t *testing.T) {
 }
 
 // Arguments that no wl_output or file can satisfy are rejected before anything is
-// written: an empty name would persist an entry in wayland.json that nothing can
-// match, and a relative profile path cannot be resolved by the next start, when
-// the daemon no longer has the caller's working directory.
+// written: an empty name would persist an entry in icc.json that nothing can
+// match, and a relative profile path cannot be resolved by the daemon, which
+// does not have the caller's working directory.
 func TestManager_RejectsInvalidICCArguments(t *testing.T) {
 	m := &Manager{config: DefaultConfig()}
 

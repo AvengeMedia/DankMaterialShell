@@ -747,7 +747,34 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 41;
     }
 
+    if (currentVersion < 42 && targetVersion >= 42) {
+        migrateDockAppsSizing(settings);
+        settings.configVersion = 42;
+    }
+
     return settings;
+}
+
+// v42: dock apps follow the dock's icon size and magnification instead of their own copies
+function migrateDockAppsSizing(settings) {
+    if (!Array.isArray(settings.dockConfigs))
+        return;
+    for (const dock of settings.dockConfigs) {
+        for (const widget of Array.isArray(dock?.widgets) ? dock.widgets : []) {
+            if (!widget || typeof widget !== "object")
+                continue;
+            if (widget.appsDockEnlargeOnHover === true && dock.magnification !== true) {
+                dock.magnification = true;
+                dock.magnificationScale = Math.max(105, Math.min(160, Number(widget.appsDockEnlargePercentage) || 125));
+            }
+            const percentage = Number(widget.appsDockIconSizePercentage);
+            if (percentage > 0 && percentage !== 100)
+                dock.iconSize = Math.round((Number(dock.iconSize) || DockConfig.create("", "").iconSize) * percentage / 100);
+            delete widget.appsDockEnlargeOnHover;
+            delete widget.appsDockEnlargePercentage;
+            delete widget.appsDockIconSizePercentage;
+        }
+    }
 }
 
 // v41: footer entries became a grid row under the rest, keeping their order and widths

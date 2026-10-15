@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
+import qs.Modals.Common
 
 FocusScope {
     id: updaterPanel
@@ -20,6 +21,7 @@ FocusScope {
     readonly property bool upgradeRunsInTerminal: SystemUpdateService.useCustomCommand || (SystemUpdateService.backends || []).some(b => b.runsInTerminal === true)
     readonly property bool showPackages: !SystemUpdateService.isUpgrading && !SystemUpdateService.isChecking && !SystemUpdateService.hasError && SystemUpdateService.helperAvailable && SystemUpdateService.updateCount > 0
     readonly property var ignoredNames: SettingsData.updaterIgnoredPackages || []
+    readonly property bool offerReboot: SystemUpdateService.rebootRecommended && !SystemUpdateService.isUpgrading && !showPackages
     readonly property bool showIgnored: ignoredNames.length > 0 && !SystemUpdateService.isUpgrading && !SystemUpdateService.isChecking
     property bool ignoredExpanded: false
     property int nowUnix: Math.floor(Date.now() / 1000)
@@ -52,6 +54,15 @@ FocusScope {
     function updateAll() {
         if (SystemUpdateService.isUpgrading) {
             SystemUpdateService.cancelUpdates();
+            return;
+        }
+        if (offerReboot) {
+            rebootConfirm.showWithOptions({
+                title: I18n.tr("Reboot now?", "confirmation dialog title, reboot to finish a system update"),
+                message: I18n.tr("Save your work first. Open apps will close.", "reboot confirmation after a system update"),
+                confirmText: I18n.tr("Reboot", "verb, power menu action"),
+                onConfirm: () => SessionService.reboot()
+            });
             return;
         }
         const opts = {
@@ -291,6 +302,16 @@ FocusScope {
 
                     StyledText {
                         width: parent.width
+                        visible: updaterPanel.offerReboot && !SystemUpdateService.hasError
+                        text: I18n.tr("Reboot recommended", "chip shown after a kernel or systemd upgrade") + " · " + SystemUpdateService.rebootPackages.join(", ")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.warning
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    }
+
+                    StyledText {
+                        width: parent.width
                         visible: SystemUpdateService.isUpgrading
                         text: I18n.tr("AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.")
                         font.pixelSize: Theme.fontSizeSmall
@@ -310,16 +331,12 @@ FocusScope {
                 clip: true
                 onContentHeightChanged: contentY = Math.max(0, contentHeight - height)
 
-                StyledText {
+                UpgradeLogText {
                     id: logText
                     x: Theme.spacingL
                     y: Theme.spacingL
                     width: upgradeLog.width - Theme.spacingL * 2
-                    text: (SystemUpdateService.recentLog || []).join("\n")
-                    font.family: Theme.monoFontFamily
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.onSurface
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    lines: upgradeLog.visible ? SystemUpdateService.recentLog : []
                 }
             }
         }
@@ -394,13 +411,13 @@ FocusScope {
             spacing: Theme.spacingS
 
             DButton {
-                text: SystemUpdateService.isUpgrading ? I18n.tr("Cancel") : I18n.tr("Update All")
-                iconName: SystemUpdateService.isUpgrading ? "stop" : "system_update_alt"
+                text: SystemUpdateService.isUpgrading ? I18n.tr("Cancel") : updaterPanel.offerReboot ? I18n.tr("Reboot", "verb, power menu action") : I18n.tr("Update All")
+                iconName: SystemUpdateService.isUpgrading ? "stop" : updaterPanel.offerReboot ? "restart_alt" : "system_update_alt"
                 backgroundColor: Theme.primary
                 textColor: Theme.onPrimary
                 maximumWidth: parent.width
                 wrapText: true
-                enabled: SystemUpdateService.isUpgrading || updaterPanel.showPackages
+                enabled: SystemUpdateService.isUpgrading || updaterPanel.showPackages || updaterPanel.offerReboot
                 onClicked: updaterPanel.updateAll()
             }
 
@@ -415,5 +432,9 @@ FocusScope {
                 onClicked: updaterPanel.closeRequested()
             }
         }
+    }
+
+    ConfirmDialogOverlay {
+        id: rebootConfirm
     }
 }

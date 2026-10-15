@@ -45,7 +45,7 @@ func (b portageBackend) CheckUpdates(ctx context.Context) ([]Package, error) {
 
 func (b portageBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine func(string)) error {
 	err := b.upgrade(ctx, opts, onLine)
-	if err != nil && isPortageAuthCanceled(err) {
+	if err != nil && isAuthDismissed(err) {
 		return err
 	}
 	if err != nil && !opts.DryRun && ctx.Err() == nil {
@@ -64,14 +64,6 @@ func notifyPortageFailure() {
 	}); err != nil {
 		log.Warnf("[sysupdate] portage failure notification: %v", err)
 	}
-}
-
-func isPortageAuthCanceled(err error) bool {
-	if err == nil {
-		return false
-	}
-	msg := strings.ToLower(err.Error())
-	return strings.Contains(msg, "exit status 126")
 }
 
 func (b portageBackend) upgrade(ctx context.Context, opts UpgradeOptions, onLine func(string)) error {
@@ -173,7 +165,7 @@ func portageSync(ctx context.Context) (string, error) {
 	cmd.Stdout = &out
 	cmd.Stderr = &out
 	err := cmd.Run()
-	if err != nil && isPortageAuthCanceled(err) {
+	if err != nil && isAuthDismissed(err) {
 		return out.String(), errors.New("authentication request was dismissed or canceled")
 	}
 	if err != nil {

@@ -24,9 +24,9 @@ FocusScope {
 
     readonly property bool pageOpen: (host.expandedSection ?? "") !== ""
     readonly property real gridHeight: widgetGrid.gridHeight
-    // Held in both modes so entering edit mode never resizes the island or reflows tiles.
+    // Reserved from the grid in both modes so the island growing into edit mode never reflows tiles.
     readonly property real editRoom: host.editRoom ?? 0
-    readonly property real chromeHeight: editRoom
+    readonly property real chromeHeight: (host.editRoomShown ?? false) ? editRoom : 0
     readonly property bool stripAbove: host.stripAbove ?? false
     readonly property bool widgetSheetOpen: widgetSheetLoader.item?.active ?? false
     readonly property real coveredAmount: Math.max(detailPage.opacity, widgetSheetLoader.item?.progress ?? 0)
@@ -48,7 +48,7 @@ FocusScope {
     // Held during a drag so the trash never moves under the pointer.
     readonly property real heldGridHeight: widgetGrid.dragging ? widgetGrid.pinnedHeight + dragRoom : gridHeight
     readonly property real targetImplicitHeight: {
-        const total = CcMetrics.sheetPadding * 2 + heldGridHeight + chromeHeight;
+        const total = CcMetrics.sheetPadding * 2 + heldGridHeight;
         if (detailPage.shownSection === "")
             return total;
         return Math.max(total, detailPage.topInset + detailPage.minimumHeight + CcMetrics.detailDialogInset);
@@ -442,26 +442,6 @@ FocusScope {
                 height: Math.max(root.gridHeight, root.heldGridHeight)
                 opacity: CcMetrics.hideCoveredContent ? 1 - root.coveredAmount : 1
 
-                Rectangle {
-                    readonly property bool receiving: widgetGrid.externalItem !== null || (widgetGrid.draggingSourceIndex >= 0 && !widgetGrid.heldOutside)
-
-                    anchors.fill: parent
-                    anchors.margins: -CcMetrics.dropZoneOuterInset
-                    radius: CcMetrics.dropZoneRadius
-                    color: "transparent"
-                    border.width: Theme.outlineWidth
-                    border.color: receiving ? Theme.primary : Theme.outlineVariant
-                    visible: root.host.editMode
-
-                    Behavior on border.color {
-                        enabled: CcMetrics.animationsEnabled
-                        ColorAnimation {
-                            duration: Theme.shortDuration
-                            easing.type: Theme.standardEasing
-                        }
-                    }
-                }
-
                 CcTileGrid {
                     id: widgetGrid
                     columns: root.gridColumns
@@ -509,7 +489,7 @@ FocusScope {
         id: editActions
 
         x: 0
-        y: root.editRoom > 0 ? root.height - root.editRoom + (root.editRoom - height) / 2 : (root.stripAbove ? -height : root.height)
+        y: root.editRoom > 0 ? Math.max(root.height - root.editRoom, CcMetrics.sheetPadding * 2 + root.heldGridHeight) + (root.editRoom - height) / 2 : (root.stripAbove ? -height : root.height)
         width: root.sheetContentWidth
         height: implicitHeight
         // Below the edit rings so the shoulder fill never covers them.

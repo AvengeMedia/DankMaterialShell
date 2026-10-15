@@ -134,7 +134,7 @@ DEditableGridSlot {
         cornerRadius: root.small ? Theme.fullRadius(root.width, root.height - root.bodyInset * 2) : (root.tileItem?.bodyRadius ?? Theme.fullRadius(root.width, root.height))
         sizeText: root.cols + "×" + (root.small ? CcMetrics.smallRowFraction : root.rows)
         onResizeStarted: (px, py) => {
-            root.biasH = root.small ? (CcMetrics.smallRowFraction - 1) * root.grid.cellWidth : 0;
+            root.biasH = root.small ? CcMetrics.smallRowFraction * root.grid.cellWidth - CcMetrics.gridGap - root.height : 0;
             root.beginResize(px, py);
         }
         onResizeMoved: (px, py) => root.resizeTo(px, py)

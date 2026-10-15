@@ -135,12 +135,65 @@ Item {
             }
         }
 
-        SettingsControlledBy {
-            visible: dock.hasConfig && !dock.connectedFrameModeActive
-            target: "surfaces"
-            parentModal: root.parentModal
-            section: "surfaceOpacity_dock_" + dock.selectedDockId
-            settingLabel: I18n.tr("Opacity")
+        SettingsCard {
+            width: parent.width
+            visible: dock.appsEntry !== null
+            iconName: "auto_awesome"
+            title: I18n.tr("Visual effects")
+            settingKey: "dockVisualEffects"
+            tags: ["dock", "indicator", "running", "active", "colorize", "highlight"]
+
+            SettingsToggleRow {
+                text: I18n.tr("Indicators")
+                checked: !dock.appsValue("appsDockHideIndicators")
+                onToggled: checked => dock.setAppsOption("appsDockHideIndicators", !checked)
+            }
+
+            SettingsButtonGroupRow {
+                resetStore: dock
+                resetKeys: ["indicatorStyle"]
+                text: I18n.tr("Indicator style")
+                enabled: !dock.appsValue("appsDockHideIndicators")
+                model: [I18n.tr("Circle", "dock indicator style option"), I18n.tr("Line", "dock indicator style option")]
+                buttonPadding: Theme.spacingS
+                currentIndex: dock.config?.indicatorStyle === "circle" ? 0 : 1
+                onSelectionChanged: (index, selected) => {
+                    if (!selected)
+                        return;
+                    dock.setOption("indicatorStyle", index === 0 ? "circle" : "line");
+                }
+            }
+
+            SettingsToggleRow {
+                text: I18n.tr("Colorize active")
+                checked: dock.appsValue("appsDockColorizeActive")
+                onToggled: checked => dock.setAppsOption("appsDockColorizeActive", checked)
+            }
+
+            ColorDropdownRow {
+                resetStore: dock.apps
+                resetKeys: ["appsDockActiveColorMode"]
+                text: I18n.tr("Active color")
+                enabled: dock.appsValue("appsDockColorizeActive")
+                options: [({
+                            "value": "primary",
+                            "label": I18n.tr("Primary")
+                        }), ({
+                            "value": "secondary",
+                            "label": I18n.tr("Secondary")
+                        }), ({
+                            "value": "primaryContainer",
+                            "label": I18n.tr("Primary Container")
+                        }), ({
+                            "value": "error",
+                            "label": I18n.tr("Error")
+                        }), ({
+                            "value": "success",
+                            "label": I18n.tr("Success", "noun, theme color name in active color dropdown")
+                        })]
+                currentMode: dock.appsValue("appsDockActiveColorMode")
+                onModeSelected: mode => dock.setAppsOption("appsDockActiveColorMode", mode)
+            }
         }
 
         SettingsToggleCard {
@@ -191,6 +244,14 @@ Item {
                 unit: "px"
                 onSliderValueChanged: value => dock.setOption("borderThickness", value)
             }
+        }
+
+        SettingsControlledBy {
+            visible: dock.hasConfig && !dock.connectedFrameModeActive
+            target: "surfaces"
+            parentModal: root.parentModal
+            section: "surfaceOpacity_dock_" + dock.selectedDockId
+            settingLabel: I18n.tr("Opacity")
         }
 
         SettingsControlledBy {

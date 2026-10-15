@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"debug/elf"
+	"encoding/binary"
 	"os"
 	"path/filepath"
 	"strings"
@@ -109,6 +112,45 @@ func writePlugin(t *testing.T, pluginsDir, file string) {
 	}
 }
 
+// writeQtPluginELF writes a minimal ELF holding only the .note.qt.metadata
+// note Qt 6 embeds in plugins, recording the Qt version it was built against.
+func writeQtPluginELF(t *testing.T, pluginsDir, file string, major, minor byte) {
+	t.Helper()
+	var note bytes.Buffer
+	binary.Write(&note, binary.LittleEndian, []uint32{12, 4, 0x74510001})
+	note.WriteString("qt-project!\x00")
+	note.Write([]byte{1, major, minor, 1})
+	shstrtab := []byte("\x00.note.qt.metadata\x00.shstrtab\x00")
+
+	noteOff := uint64(64)
+	strOff := noteOff + uint64(note.Len())
+	shOff := strOff + uint64(len(shstrtab))
+	var out bytes.Buffer
+	header := elf.Header64{
+		Type: uint16(elf.ET_DYN), Machine: uint16(elf.EM_X86_64), Version: uint32(elf.EV_CURRENT),
+		Shoff: shOff, Ehsize: 64, Shentsize: 64, Shnum: 3, Shstrndx: 2,
+	}
+	copy(header.Ident[:], elf.ELFMAG)
+	header.Ident[elf.EI_CLASS] = byte(elf.ELFCLASS64)
+	header.Ident[elf.EI_DATA] = byte(elf.ELFDATA2LSB)
+	header.Ident[elf.EI_VERSION] = byte(elf.EV_CURRENT)
+	binary.Write(&out, binary.LittleEndian, header)
+	out.Write(note.Bytes())
+	out.Write(shstrtab)
+	binary.Write(&out, binary.LittleEndian, []elf.Section64{
+		{},
+		{Name: 1, Type: uint32(elf.SHT_NOTE), Off: noteOff, Size: uint64(note.Len()), Addralign: 4},
+		{Name: 20, Type: uint32(elf.SHT_STRTAB), Off: strOff, Size: uint64(len(shstrtab)), Addralign: 1},
+	})
+
+	if err := os.MkdirAll(filepath.Join(pluginsDir, "platformthemes"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(pluginsDir, "platformthemes", file), out.Bytes(), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestCheckQtPlatformThemePlugin(t *testing.T) {
 	t.Run("qt6ct-kde is flagged as a package name, not a theme", func(t *testing.T) {
 		t.Setenv("QT_QPA_PLATFORMTHEME", "qt6ct-kde")
@@ -136,6 +178,34 @@ func TestCheckQtPlatformThemePlugin(t *testing.T) {
 		}
 		if !strings.Contains(results[0].details, "libqt6ct.so") {
 			t.Fatalf("details should point at the plugin, got %q", results[0].details)
+		}
+	})
+
+	t.Run("plugin built for the installed Qt minor reports OK", func(t *testing.T) {
+		t.Setenv("QT_QPA_PLATFORMTHEME", "qt6ct")
+		plugins := t.TempDir()
+		writeQtPluginELF(t, plugins, "libqt6ct.so", 6, 12)
+		stubQtQueryTool(t, "qmake6", "6.12.3", plugins)
+		results := checkQtPlatformThemePlugin("QT_QPA_PLATFORMTHEME")
+		if len(results) != 1 || results[0].status != statusOK {
+			t.Fatalf("got %+v, want one OK result", results)
+		}
+	})
+
+	t.Run("plugin built for another Qt minor warns", func(t *testing.T) {
+		t.Setenv("QT_QPA_PLATFORMTHEME", "qt6ct")
+		plugins := t.TempDir()
+		writeQtPluginELF(t, plugins, "libqt6ct.so", 6, 11)
+		stubQtQueryTool(t, "qmake6", "6.12.0", plugins)
+		results := checkQtPlatformThemePlugin("QT_QPA_PLATFORMTHEME")
+		if len(results) != 1 || results[0].status != statusWarn {
+			t.Fatalf("got %+v, want one warn result", results)
+		}
+		if results[0].message != "Built for Qt 6.11, Qt is 6.12.0" {
+			t.Fatalf("message = %q, want both Qt versions", results[0].message)
+		}
+		if !strings.Contains(results[0].details, filepath.Join(plugins, "platformthemes", "libqt6ct.so")) {
+			t.Fatalf("details should name the stale plugin, got %q", results[0].details)
 		}
 	})
 

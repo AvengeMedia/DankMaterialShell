@@ -84,7 +84,7 @@ Item {
     }
 
     function _finishWidgetPopoutOpen(spec, popout) {
-        if (spec.registration && !BarWidgetService.registrationActive(spec.registration))
+        if (spec.registration && !BarWidgetService.registrationActive(spec.registration, true))
             return false;
         const effectiveBarConfig = barConfig;
         const barPosition = getBarPosition();
@@ -241,6 +241,7 @@ Item {
                     widgetItem: powerMenuWidget,
                     section: root.getWidgetSection(parent) || "right",
                     triggerSource: "powerMenu",
+                    islandActivity: "powermenu",
                     mode: "click"
                 });
             }

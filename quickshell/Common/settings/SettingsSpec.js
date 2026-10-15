@@ -1121,6 +1121,14 @@ var LOCAL_SPEC = {
         def: false,
         onChange: "regenSystemThemes"
     },
+    terminalOpacity: {
+        def: 100,
+        onChange: "regenSystemThemes"
+    },
+    terminalPalette: {
+        def: "default",
+        onChange: "regenSystemThemes"
+    },
     muxType: {
         def: "tmux"
     },
@@ -1398,6 +1406,9 @@ var LOCAL_SPEC = {
     osdCapsLockEnabled: {
         def: true
     },
+    osdTouchpadEnabled: {
+        def: true
+    },
     osdPowerProfileEnabled: {
         def: false
     },
@@ -1508,7 +1519,7 @@ var LOCAL_SPEC = {
                 centerWidgets: ["music", "clock", "weather"],
                 rightWidgets: ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"],
                 spacing: 4,
-                innerPadding: 4,
+                innerPadding: 2,
                 barInsetPadding: -1,
                 barLengthPadding: 0,
                 barLengthMode: "full",

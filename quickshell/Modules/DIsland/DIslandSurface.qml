@@ -274,6 +274,19 @@ Item {
         root.motionStartBounds = Qt.rect(left, top, right - left, bottom - top);
     }
 
+    // Without a face to swap to, a right-click falls through to the bar's own right-click action.
+    function acceptsClick(button) {
+        return button !== Qt.RightButton || root.controller.mediaFaceToggleAvailable;
+    }
+
+    function handleClick(button) {
+        SettingsData.recordBarInteraction(root.effectiveScreen, root.controller.barConfig?.id);
+        if (button === Qt.RightButton)
+            root.controller.toggleMediaFace();
+        else
+            root.controller.requestToggle(true);
+    }
+
     function requestActivityFocus() {
         return contentHost.requestActivityFocus();
     }
@@ -391,12 +404,10 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            acceptedButtons: Qt.LeftButton
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onPressed: mouse => mouse.accepted = root.acceptsClick(mouse.button)
             enabled: !root.controller.expanded || !root.controller.activityOwnsBlankClicks
-            onClicked: {
-                SettingsData.recordBarInteraction(root.effectiveScreen, root.controller.barConfig?.id);
-                root.controller.requestToggle(true);
-            }
+            onClicked: mouse => root.handleClick(mouse.button)
             onWheel: wheel => {
                 if (root.controller.expanded) {
                     wheel.accepted = false;
@@ -411,6 +422,7 @@ Item {
             id: contentHost
 
             controller: root.controller
+            surfaceColor: root.effectiveSurfaceColor
             freeMode: root.freeMode
             compactFaceOverride: root.compactFaceOverride
             resolveTarget: target => root.resolveTarget(target)
@@ -444,6 +456,8 @@ Item {
             notificationCenterExpandedComponent: expandedNotificationCenterComponent
             clipboardCompactComponent: compactClipboardComponent
             clipboardExpandedComponent: expandedClipboardComponent
+            powerMenuCompactComponent: compactPowerMenuComponent
+            powerMenuExpandedComponent: expandedPowerMenuComponent
         }
 
         HoverHandler {
@@ -483,11 +497,9 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            acceptedButtons: Qt.LeftButton
-            onClicked: {
-                SettingsData.recordBarInteraction(root.effectiveScreen, root.controller.barConfig?.id);
-                root.controller.requestToggle(true);
-            }
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onPressed: mouse => mouse.accepted = root.acceptsClick(mouse.button)
+            onClicked: mouse => root.handleClick(mouse.button)
             onWheel: wheel => {
                 root.scrollWheel(wheel);
                 wheel.accepted = true;
@@ -800,6 +812,25 @@ Item {
             effectiveScreen: root.effectiveScreen
             alignedX: root.targetScreenX
             alignedY: root.targetScreenY
+        }
+    }
+
+    Component {
+        id: compactPowerMenuComponent
+
+        DestinationCompact {
+            controller: root.controller
+            activityId: "powermenu"
+            iconName: "power_settings_new"
+            label: I18n.tr("Power menu", "island compact face: power menu label")
+        }
+    }
+
+    Component {
+        id: expandedPowerMenuComponent
+
+        PowerMenuExpanded {
+            controller: root.controller
         }
     }
 

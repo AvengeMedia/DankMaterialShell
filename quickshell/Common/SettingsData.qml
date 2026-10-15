@@ -23,7 +23,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 41
+    readonly property int settingsConfigVersion: 42
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -746,6 +746,8 @@ Singleton {
 
     property bool syncModeWithPortal: Spec.SPEC.syncModeWithPortal.def
     property bool terminalsAlwaysDark: Spec.SPEC.terminalsAlwaysDark.def
+    property int terminalOpacity: Spec.SPEC.terminalOpacity.def
+    property string terminalPalette: Spec.SPEC.terminalPalette.def
 
     property string muxType: Spec.SPEC.muxType.def
     property bool muxUseCustomCommand: Spec.SPEC.muxUseCustomCommand.def
@@ -996,7 +998,10 @@ Singleton {
     function islandStripThickness(bc) {
         return LayoutResolver.islandThickness(islandSettings(bc), islandDefaultsFor(bc));
     }
-    readonly property var _islandHomeGroupIds: ["workspaces", "media", "clock", "weather", "status", "volume", "brightness", "notifications", "privacy"]
+    function islandReserveThickness(bc) {
+        return LayoutResolver.islandReserve(islandSettings(bc), islandDefaultsFor(bc));
+    }
+    readonly property var _islandHomeGroupIds: ["workspaces", "media", "clock", "weather", "status", "volume", "brightness", "notifications", "privacy", "tray"]
     readonly property var _islandHomeLayoutDefault: [
         {
             "id": "workspaces",
@@ -1033,6 +1038,10 @@ Singleton {
         {
             "id": "privacy",
             "enabled": true
+        },
+        {
+            "id": "tray",
+            "enabled": false
         }
     ]
     function getIslandHomeLayout(bc) {
@@ -1099,6 +1108,7 @@ Singleton {
     property bool osdMicMuteEnabled: Spec.SPEC.osdMicMuteEnabled.def
     property bool osdMicVolumeEnabled: Spec.SPEC.osdMicVolumeEnabled.def
     property bool osdCapsLockEnabled: Spec.SPEC.osdCapsLockEnabled.def
+    property bool osdTouchpadEnabled: Spec.SPEC.osdTouchpadEnabled.def
     property bool osdPowerProfileEnabled: Spec.SPEC.osdPowerProfileEnabled.def
     property bool osdAudioOutputEnabled: Spec.SPEC.osdAudioOutputEnabled.def
     property bool osdWorkspaceEnabled: Spec.SPEC.osdWorkspaceEnabled.def
@@ -2889,6 +2899,8 @@ Singleton {
             return "islandRouteWallpaper";
         case "clipboard":
             return "islandRouteClipboard";
+        case "powermenu":
+            return "islandRoutePowerMenu";
         }
         return "";
     }
@@ -3028,9 +3040,6 @@ Singleton {
         if (matugenScheme === normalized)
             return;
         set("matugenScheme", normalized);
-        if (typeof Theme !== "undefined") {
-            Theme.generateSystemThemesFromCurrentTheme();
-        }
     }
 
     function setMatugenSmartMode(enabled) {
@@ -3043,10 +3052,6 @@ Singleton {
         var normalized = mode || "dominant";
         if (matugenSourceMode === normalized)
             return;
-        // Regeneration comes from the regenSystemThemes onChange hook in
-        // SettingsSpec.js, which set() dispatches. matugenScheme above also
-        // calls Theme.generateSystemThemesFromCurrentTheme() directly, which is
-        // redundant with its own hook.
         set("matugenSourceMode", normalized);
     }
 
@@ -3080,9 +3085,6 @@ Singleton {
         if (matugenTargetMonitor === monitorName)
             return;
         set("matugenTargetMonitor", monitorName);
-        if (typeof Theme !== "undefined") {
-            Theme.generateSystemThemesFromCurrentTheme();
-        }
     }
 
     function setCornerRadius(radius) {
@@ -3399,7 +3401,7 @@ Singleton {
         if (!app && !desktop)
             return -1;
         return rules.findIndex(rule => {
-            if (!predicate(rule) || (rule.matchType || "contains").toString().toLowerCase() !== "exact")
+            if (!predicate(rule) || (rule.matchType || "contains").toString().toLowerCase() !== "exact" || (rule.conditions || []).length > 0)
                 return false;
             const pattern = (rule.pattern || "").toString().toLowerCase();
             const value = !rule.field || rule.field === "appName" ? app : rule.field === "desktopEntry" ? desktop : "";

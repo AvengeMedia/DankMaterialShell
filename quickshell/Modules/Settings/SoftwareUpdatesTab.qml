@@ -6,6 +6,7 @@ import qs.Services
 import qs.DCommon.Widgets
 import qs.Modals.Common
 import qs.Modules.Settings.Widgets
+import qs.Modules.SystemUpdate
 import "../../Common/Format.js" as Format
 
 Item {
@@ -178,14 +179,16 @@ Item {
     }
 
     function statusSubtitle() {
-        if (SystemUpdateService.restartPending)
-            return I18n.tr("Requires restart");
         if (SystemUpdateService.rebootRecommended)
             return I18n.tr("Reboot recommended", "chip shown after a kernel or systemd upgrade") + " · " + SystemUpdateService.rebootPackages.join(", ");
+        if (SystemUpdateService.restartPending)
+            return I18n.tr("Requires restart");
         return root.lastCheckedText();
     }
 
-    readonly property bool primaryIsCheck: !SystemUpdateService.isUpgrading && !root.anythingToInstall && !SystemUpdateService.restartPending
+    readonly property bool offerReboot: SystemUpdateService.rebootRecommended && !SystemUpdateService.isUpgrading && !root.anythingToInstall
+    readonly property bool needsRestart: SystemUpdateService.restartPending || SystemUpdateService.rebootRecommended
+    readonly property bool primaryIsCheck: !SystemUpdateService.isUpgrading && !root.anythingToInstall && !root.needsRestart
 
     function primaryLabel() {
         switch (true) {
@@ -193,6 +196,8 @@ Item {
             return I18n.tr("Cancel");
         case root.anythingToInstall:
             return I18n.tr("Install", "install action button");
+        case root.offerReboot:
+            return I18n.tr("Reboot", "verb, power menu action");
         case SystemUpdateService.restartPending:
             return I18n.tr("Restart DMS");
         default:
@@ -206,6 +211,7 @@ Item {
             return "stop";
         case root.anythingToInstall:
             return "system_update_alt";
+        case root.offerReboot:
         case SystemUpdateService.restartPending:
             return "restart_alt";
         default:
@@ -224,6 +230,14 @@ Item {
                 message: root.installSummary(),
                 confirmText: I18n.tr("Install", "install action button"),
                 onConfirm: () => root.runUpdateAll()
+            });
+            return;
+        case root.offerReboot:
+            installConfirm.showWithOptions({
+                title: I18n.tr("Reboot now?", "confirmation dialog title, reboot to finish a system update"),
+                message: I18n.tr("Save your work first. Open apps will close.", "reboot confirmation after a system update"),
+                confirmText: I18n.tr("Reboot", "verb, power menu action"),
+                onConfirm: () => SessionService.reboot()
             });
             return;
         case SystemUpdateService.restartPending:
@@ -290,8 +304,8 @@ Item {
                 title: root.statusTitle()
                 titleColor: failed ? Theme.error : contentColor
                 subtitle: root.statusSubtitle()
-                iconName: failed ? "error_outline" : SystemUpdateService.restartPending ? "restart_alt" : "system_update_alt"
-                iconColor: failed ? Theme.error : SystemUpdateService.restartPending ? Theme.warning : Theme.primary
+                iconName: failed ? "error_outline" : root.needsRestart ? "restart_alt" : "system_update_alt"
+                iconColor: failed ? Theme.error : root.needsRestart ? Theme.warning : Theme.primary
 
                 DActionButton {
                     anchors.verticalCenter: parent.verticalCenter
@@ -494,15 +508,12 @@ Item {
                     height: Math.min(logText.implicitHeight, Math.floor(root.logViewHeight / lineHeight) * lineHeight)
                     clip: true
 
-                    StyledText {
+                    UpgradeLogText {
                         id: logText
                         anchors.bottom: parent.bottom
                         width: parent.width
-                        text: root.upgradeRunsInTerminal ? I18n.tr("Running in terminal") : (SystemUpdateService.recentLog || []).slice(-root.logTailLines).join("\n")
-                        font.family: Theme.monoFontFamily
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.onSurface
-                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        placeholder: root.upgradeRunsInTerminal ? I18n.tr("Running in terminal") : ""
+                        lines: (SystemUpdateService.recentLog || []).slice(-root.logTailLines)
                     }
                 }
             }

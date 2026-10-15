@@ -9,6 +9,99 @@ Singleton {
 
     property var activeTrayMenus: ({})
     property var _pendingMenuRequest: null
+    property var _trayKeyByItem: new Map()
+
+    readonly property var envHiddenTrayIds: {
+        const envValue = Quickshell.env("DMS_HIDE_TRAYIDS") || "";
+        return envValue ? envValue.split(",").map(id => id.trim().toLowerCase()) : [];
+    }
+
+    function isEnvHidden(itemId) {
+        if (!itemId || !envHiddenTrayIds.length)
+            return false;
+        return envHiddenTrayIds.includes(itemId.toLowerCase());
+    }
+
+    function filterEnvHidden(items) {
+        if (!items)
+            return [];
+        if (!envHiddenTrayIds.length)
+            return items;
+        return items.filter(item => !isEnvHidden(item?.id));
+    }
+
+    Connections {
+        target: SystemTray
+        function onItemUnregistered(item) {
+            root._trayKeyByItem.delete(item);
+        }
+    }
+
+    function getTrayItemKey(item, allItems) {
+        const id = item?.id || "";
+        if (!id)
+            return "";
+        if (_trayKeyByItem.has(item))
+            return _trayKeyByItem.get(item);
+        const pool = allItems || SystemTray.items.values;
+        const taken = new Set();
+        for (const live of pool) {
+            if (live !== item && (live?.id || "") === id && _trayKeyByItem.has(live))
+                taken.add(_trayKeyByItem.get(live));
+        }
+        let key = id;
+        for (let n = 1; taken.has(key); n++)
+            key = `${id}::${n}`;
+        _trayKeyByItem.set(item, key);
+        return key;
+    }
+
+    function resolveOrderIndex(key, orderMap) {
+        if (orderMap.has(key))
+            return orderMap.get(key);
+        return -1;
+    }
+
+    function sortByPreferredOrder(items, savedOrder) {
+        if (!items)
+            return [];
+        const order = savedOrder || [];
+        const orderMap = new Map();
+        order.forEach((key, idx) => orderMap.set(key, idx));
+
+        return [...items].sort((a, b) => {
+            const keyA = getTrayItemKey(a, items);
+            const keyB = getTrayItemKey(b, items);
+            const orderA = resolveOrderIndex(keyA, orderMap);
+            const orderB = resolveOrderIndex(keyB, orderMap);
+            const posA = orderA >= 0 ? orderA : 10000 + items.indexOf(a);
+            const posB = orderB >= 0 ? orderB : 10000 + items.indexOf(b);
+            return posA - posB;
+        });
+    }
+
+    function dragShiftOffset(index, draggedIndex, dropTargetIndex, shiftAmount) {
+        if (draggedIndex < 0 || index === draggedIndex || dropTargetIndex < 0)
+            return 0;
+        if (draggedIndex < dropTargetIndex && index > draggedIndex && index <= dropTargetIndex)
+            return -shiftAmount;
+        if (draggedIndex > dropTargetIndex && index >= dropTargetIndex && index < draggedIndex)
+            return shiftAmount;
+        return 0;
+    }
+
+    function reorderItemKeys(allKeys, fromKey, toKey) {
+        if (!allKeys || !fromKey || !toKey)
+            return null;
+        const fullOrder = [...allKeys];
+        const fromIdx = fullOrder.indexOf(fromKey);
+        const toIdx = fullOrder.indexOf(toKey);
+        if (fromIdx < 0 || toIdx < 0 || fromIdx === toIdx)
+            return null;
+        const moved = fullOrder.splice(fromIdx, 1)[0];
+        fullOrder.splice(toIdx, 0, moved);
+        return fullOrder;
+    }
 
     signal openTrayMenuRequested
 
@@ -83,5 +176,33 @@ Singleton {
                 menu.showMenu = false;
             }
         }
+    }
+
+    function iconSourceFor(trayItem) {
+        let icon = trayItem && trayItem.icon;
+        if (typeof icon === "string" || icon instanceof String) {
+            if (icon === "")
+                return "";
+            if (icon.includes("?path=")) {
+                const split = icon.split("?path=");
+                if (split.length !== 2)
+                    return icon;
+                const name = split[0];
+                const path = split[1];
+                let fileName = name.substring(name.lastIndexOf("/") + 1);
+                if (fileName.startsWith("dropboxstatus"))
+                    fileName = `hicolor/16x16/status/${fileName}`;
+                return `file://${path}/${fileName}`;
+            }
+            if (icon.startsWith("/") && !icon.startsWith("file://"))
+                return `file://${icon}`;
+            return icon;
+        }
+        return "";
+    }
+
+    function callContextMenuFallback(trayItemId, globalX, globalY) {
+        const script = ['ITEMS=$(dbus-send --session --print-reply --dest=org.kde.StatusNotifierWatcher /StatusNotifierWatcher org.freedesktop.DBus.Properties.Get string:org.kde.StatusNotifierWatcher string:RegisteredStatusNotifierItems 2>/dev/null)', 'while IFS= read -r line; do', '  line="${line#*\\\"}"', '  line="${line%\\\"*}"', '  [ -z "$line" ] && continue', '  BUS="${line%%/*}"', '  OBJ="/${line#*/}"', '  ID=$(dbus-send --session --print-reply --dest="$BUS" "$OBJ" org.freedesktop.DBus.Properties.Get string:org.kde.StatusNotifierItem string:Id 2>/dev/null | grep -oP "(?<=\\\")(.*?)(?=\\\")" | tail -1)', '  if [ "$ID" = "$1" ]; then', '    dbus-send --session --type=method_call --dest="$BUS" "$OBJ" org.kde.StatusNotifierItem.ContextMenu int32:"$2" int32:"$3"', '    exit 0', '  fi', 'done <<< "$ITEMS"',].join("\n");
+        Quickshell.execDetached(["bash", "-c", script, "_", trayItemId, String(Math.round(globalX)), String(Math.round(globalY))]);
     }
 }
