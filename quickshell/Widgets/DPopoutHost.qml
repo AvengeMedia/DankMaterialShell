@@ -31,6 +31,8 @@ Item {
     property int resizeDuration: popoutHandle.resizeDuration
     property bool resizeMotion: popoutHandle.resizeMotion
     property bool resizing: popoutHandle.resizing
+    property real bottomOverflow: popoutHandle.bottomOverflow
+    property real topOverflow: popoutHandle.topOverflow
     property real inputMargin: popoutHandle.inputMargin
     property real triggerX: popoutHandle.triggerX
     property real triggerY: popoutHandle.triggerY
@@ -98,7 +100,7 @@ Item {
     readonly property real effectiveBarThickness: {
         if (root.usesConnectedSurfaceChrome)
             return Math.max(0, storedBarThickness);
-        return Theme.barThickness(storedBarConfig?.innerPadding ?? 4, dpr) + storedBarSpacing;
+        return Theme.barThickness(storedBarConfig?.innerPadding ?? 2, dpr) + storedBarSpacing;
     }
 
     readonly property var barBounds: {
@@ -276,7 +278,9 @@ Item {
             "animY": animationOffset.y,
             "screen": root.screen ? root.screen.name : "",
             "omitStartConnector": root._closeGapOmitStartConnector(),
-            "omitEndConnector": root._closeGapOmitEndConnector()
+            "omitEndConnector": root._closeGapOmitEndConnector(),
+            "overflowTop": Theme.snap(root.topOverflow, root.dpr),
+            "overflowBottom": Theme.snap(root.bottomOverflow, root.dpr)
         };
     }
 
@@ -459,6 +463,16 @@ Item {
         }
     }
     onSettingsFrameCloseGapsChanged: {
+        if (!connected)
+            return;
+        _syncPopoutChromeState();
+    }
+    onTopOverflowChanged: {
+        if (!connected)
+            return;
+        _syncPopoutChromeState();
+    }
+    onBottomOverflowChanged: {
         if (!connected)
             return;
         _syncPopoutChromeState();
@@ -1191,7 +1205,7 @@ Item {
         }
     }
 
-    function _connectedAlignedY() {
+    function _connectedAlignedY(overTop, overBottom) {
         const popupGap = _popupGapValue();
         const edgeGapTop = _edgeGapFor("top", popupGap);
         const edgeGapBottom = _edgeGapFor("bottom", popupGap);
@@ -1199,15 +1213,15 @@ Item {
 
         switch (effectiveBarPosition) {
         case SettingsData.Position.Bottom:
-            return Math.max(edgeGapTop, Math.min(screenHeight - popupHeight - popupGap, anchorY - popupHeight));
+            return Math.max(edgeGapTop + overTop, Math.min(screenHeight - popupHeight - overBottom - popupGap, anchorY - popupHeight - overBottom));
         case SettingsData.Position.Top:
-            return Math.max(popupGap, Math.min(screenHeight - popupHeight - edgeGapBottom, anchorY));
+            return Math.max(popupGap + overTop, Math.min(screenHeight - popupHeight - overBottom - edgeGapBottom, anchorY + overTop));
         default:
             const rawY = triggerY - (popupHeight / 2);
             const clearTop = adjacentBarClearance(adjacentBarInfo.topBar);
             const clearBottom = adjacentBarClearance(adjacentBarInfo.bottomBar);
-            const minY = Math.max(edgeGapTop, clearTop);
-            const maxY = screenHeight - popupHeight - Math.max(edgeGapBottom, clearBottom);
+            const minY = Math.max(edgeGapTop, clearTop) + overTop;
+            const maxY = screenHeight - popupHeight - overBottom - Math.max(edgeGapBottom, clearBottom);
             return _snapNearFrameBound(Math.max(minY, Math.min(maxY, rawY)), minY, maxY, edgeGapTop >= clearTop, edgeGapBottom >= clearBottom);
         }
     }
@@ -1236,20 +1250,20 @@ Item {
         }
     }
 
-    function _standaloneAlignedY() {
+    function _standaloneAlignedY(overTop, overBottom) {
         const popupGap = _standalonePopupGap();
         const topGap = _edgeClearance("top", popupGap, adjacentBarInfo.topBar > 0 ? adjacentBarInfo.topBar : 0);
         const bottomGap = _edgeClearance("bottom", popupGap, adjacentBarInfo.bottomBar > 0 ? adjacentBarInfo.bottomBar : 0);
 
         switch (effectiveBarPosition) {
         case SettingsData.Position.Bottom:
-            return Math.max(topGap, Math.min(screenHeight - popupHeight - bottomGap, triggerY - popupHeight));
+            return Math.max(topGap + overTop, Math.min(screenHeight - popupHeight - overBottom - bottomGap, triggerY - popupHeight - overBottom));
         case SettingsData.Position.Top:
-            return Math.max(topGap, Math.min(screenHeight - popupHeight - bottomGap, triggerY));
+            return Math.max(topGap + overTop, Math.min(screenHeight - popupHeight - overBottom - bottomGap, triggerY + overTop));
         default:
             const rawY = triggerY - (popupHeight / 2);
-            const minY = topGap;
-            const maxY = screenHeight - popupHeight - bottomGap;
+            const minY = topGap + overTop;
+            const maxY = screenHeight - popupHeight - overBottom - bottomGap;
             return Math.max(minY, Math.min(maxY, rawY));
         }
     }
@@ -1259,7 +1273,12 @@ Item {
     }
 
     readonly property real alignedX: alignedXFor(popupWidth)
-    readonly property real alignedY: Theme.snap(connected ? _connectedAlignedY() : _standaloneAlignedY(), dpr)
+
+    function alignedYFor(overTop, overBottom) {
+        return Theme.snap(connected ? _connectedAlignedY(overTop, overBottom) : _standaloneAlignedY(overTop, overBottom), dpr);
+    }
+
+    readonly property real alignedY: alignedYFor(topOverflow, bottomOverflow)
 
     function _maxBodyWidthFor(startGap, endGap, anchorX) {
         switch (effectiveBarPosition) {
@@ -1603,34 +1622,34 @@ Item {
                     x: 0
                     y: 0
                     width: parent.width
-                    height: root.renderedAlignedY
+                    height: Math.max(0, root.renderedAlignedY - root.topOverflow)
                     enabled: parent.enabled
                     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                     onClicked: root.backgroundClicked()
                 }
                 MouseArea {
                     x: 0
-                    y: root.renderedAlignedY + root.renderedAlignedHeight
+                    y: root.renderedAlignedY + root.renderedAlignedHeight + root.bottomOverflow
                     width: parent.width
-                    height: Math.max(0, parent.height - root.renderedAlignedY - root.renderedAlignedHeight)
+                    height: Math.max(0, parent.height - y)
                     enabled: parent.enabled
                     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                     onClicked: root.backgroundClicked()
                 }
                 MouseArea {
                     x: 0
-                    y: root.renderedAlignedY
+                    y: root.renderedAlignedY - root.topOverflow
                     width: root.renderedAlignedX
-                    height: root.renderedAlignedHeight
+                    height: root.renderedAlignedHeight + root.topOverflow + root.bottomOverflow
                     enabled: parent.enabled
                     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                     onClicked: root.backgroundClicked()
                 }
                 MouseArea {
                     x: root.renderedAlignedX + root.renderedAlignedWidth
-                    y: root.renderedAlignedY
+                    y: root.renderedAlignedY - root.topOverflow
                     width: Math.max(0, parent.width - root.renderedAlignedX - root.renderedAlignedWidth)
-                    height: root.renderedAlignedHeight
+                    height: root.renderedAlignedHeight + root.topOverflow + root.bottomOverflow
                     enabled: parent.enabled
                     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                     onClicked: root.backgroundClicked()
@@ -1827,9 +1846,9 @@ Item {
                 readonly property real _dxClamp: (contentContainer.barLeft || contentContainer.barRight) ? Math.max(-contentContainer.width, Math.min(contentContainer.animX, contentContainer.width)) : 0
 
                 blurX: trackBlurFromBarEdge ? contentContainer.x + (contentContainer.barRight ? _dxClamp : 0) : contentContainer.x + contentContainer.width * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr) - contentContainer.horizontalConnectorExtent * s
-                blurY: trackBlurFromBarEdge ? contentContainer.y + (contentContainer.barBottom ? _dyClamp : 0) : contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr) - contentContainer.verticalConnectorExtent * s
+                blurY: (trackBlurFromBarEdge ? contentContainer.y + (contentContainer.barBottom ? _dyClamp : 0) : contentContainer.y + contentContainer.height * (1 - s) * 0.5 + Theme.snap(contentContainer.animY, root.dpr) - contentContainer.verticalConnectorExtent * s) - root.topOverflow
                 blurWidth: root.shouldBeVisible ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.width - Math.abs(_dxClamp)) : (contentContainer.width + contentContainer.horizontalConnectorExtent * 2) * s) : 0
-                blurHeight: root.shouldBeVisible ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.height - Math.abs(_dyClamp)) : (contentContainer.height + contentContainer.verticalConnectorExtent * 2) * s) : 0
+                blurHeight: root.shouldBeVisible ? (trackBlurFromBarEdge ? Math.max(0, contentContainer.height - Math.abs(_dyClamp)) : (contentContainer.height + contentContainer.verticalConnectorExtent * 2) * s) + root.topOverflow + root.bottomOverflow : 0
                 blurRadius: root.usesConnectedSurfaceChrome ? Theme.connectedCornerRadius : Theme.windowRadius
             }
 
@@ -2069,15 +2088,15 @@ Item {
                 readonly property bool revealClipActive: root.directionalRevealActive || root._fluidMotionActive
 
                 blurX: revealClipActive ? contentContainer.x : contentContainer.x + contentContainer.width * (1 - visibleScale) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
-                blurY: revealClipActive ? contentContainer.y : contentContainer.y + contentContainer.height * (1 - visibleScale) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)
+                blurY: (revealClipActive ? contentContainer.y : contentContainer.y + contentContainer.height * (1 - visibleScale) * 0.5 + Theme.snap(contentContainer.animY, root.dpr)) - root.topOverflow
                 blurWidth: root.shouldBeVisible ? (revealClipActive ? contentContainer.width : contentContainer.width * visibleScale) : 0
-                blurHeight: root.shouldBeVisible ? (revealClipActive ? contentContainer.height : contentContainer.height * visibleScale) : 0
+                blurHeight: root.shouldBeVisible ? (revealClipActive ? contentContainer.height : contentContainer.height * visibleScale) + root.topOverflow + root.bottomOverflow : 0
                 blurRadius: Theme.windowRadius
                 clipEnabled: revealClipActive
                 clipX: contentContainer.x + (root._fluidMotionActive ? chrome.fluidBody.x : chrome.revealX)
-                clipY: contentContainer.y + (root._fluidMotionActive ? chrome.fluidBody.y : chrome.revealY)
+                clipY: contentContainer.y + (root._fluidMotionActive ? chrome.fluidBody.y : chrome.revealY) - root.topOverflow
                 clipWidth: root.shouldBeVisible ? (root._fluidMotionActive ? chrome.fluidBody.width : chrome.revealWidth) : 0
-                clipHeight: root.shouldBeVisible ? (root._fluidMotionActive ? chrome.fluidBody.height : chrome.revealHeight) : 0
+                clipHeight: root.shouldBeVisible ? (root._fluidMotionActive ? chrome.fluidBody.height : chrome.revealHeight) + root.topOverflow + root.bottomOverflow : 0
             }
 
             SurfaceContentClip {
@@ -2091,16 +2110,19 @@ Item {
                 revealY: chrome.revealY
                 revealWidth: chrome.revealWidth
                 revealHeight: chrome.revealHeight
+                topOverflow: root.topOverflow
+                bottomOverflow: root.bottomOverflow
 
+                // Covers overflow chrome so the shadow and border don't cross the seam.
                 ElevationShadow {
                     parent: root._fluidMotionActive ? chrome : contentClip.contentItem
                     z: root._fluidMotionActive ? -1 : 0
                     width: root._fluidMotionActive ? chrome.fluidBody.width : chrome.width
-                    height: root._fluidMotionActive ? chrome.fluidBody.height : chrome.height
+                    height: root._fluidMotionActive ? chrome.fluidBody.height : chrome.height + root.topOverflow + root.bottomOverflow
                     opacity: root._fluidMotionActive ? FluidGeometry.chromeOpacity(morph.value) : contentWrapper.publishedOpacity
                     scale: root.directionalRevealActive ? 1 : contentWrapper.scale
                     x: root._fluidMotionActive ? chrome.fluidBody.x : (root.directionalRevealActive ? 0 : contentWrapper.x)
-                    y: root._fluidMotionActive ? chrome.fluidBody.y : (root.directionalRevealActive ? 0 : contentWrapper.y)
+                    y: root._fluidMotionActive ? chrome.fluidBody.y : (root.directionalRevealActive ? 0 : contentWrapper.y) - root.topOverflow
                     level: root.shadowLevel
                     direction: root.effectiveShadowDirection
                     fallbackOffset: root.shadowFallbackOffset
@@ -2152,9 +2174,9 @@ Item {
                 Rectangle {
                     parent: root._fluidMotionActive ? chrome : contentClip.contentItem
                     width: root._fluidMotionActive ? chrome.fluidBody.width : chrome.width
-                    height: root._fluidMotionActive ? chrome.fluidBody.height : chrome.height
+                    height: root._fluidMotionActive ? chrome.fluidBody.height : chrome.height + root.topOverflow + root.bottomOverflow
                     x: root._fluidMotionActive ? chrome.fluidBody.x : (root.directionalRevealActive ? 0 : contentWrapper.x)
-                    y: root._fluidMotionActive ? chrome.fluidBody.y : (root.directionalRevealActive ? 0 : contentWrapper.y)
+                    y: root._fluidMotionActive ? chrome.fluidBody.y : (root.directionalRevealActive ? 0 : contentWrapper.y) - root.topOverflow
                     opacity: root._fluidMotionActive ? FluidGeometry.chromeOpacity(morph.value) : contentWrapper.publishedOpacity
                     scale: root.directionalRevealActive ? 1 : contentWrapper.scale
                     visible: contentWrapper.visible

@@ -44,6 +44,15 @@ Item {
         return SettingsData.isIslandBarConfig(SettingsData.getBarConfig(selectedBarId));
     }
 
+    readonly property bool islandSatellitesHidden: {
+        SettingsData.barConfigs;
+        selectedBarId;
+        const bc = SettingsData.getBarConfig(selectedBarId);
+        if (!SettingsData.isIslandBarConfig(bc))
+            return false;
+        return SettingsData.isDotBarConfig(bc) || !SettingsData.islandSetting(bc, "islandSatellitesEnabled");
+    }
+
     property bool hasMultipleBars: SettingsData.barConfigs.length > 1
     property int pluginCatalogRevision: 0
 
@@ -629,6 +638,14 @@ Item {
                     wrapMode: Text.WordWrap
                 }
             }
+
+            SettingsRow {
+                iconName: "info"
+                iconColor: Theme.surfaceVariantText
+                visible: widgetsTab.islandSatellitesHidden
+                title: I18n.tr("Satellites", "island settings: satellite widgets card title")
+                subtitle: I18n.tr("Not shown on this bar, so its section widgets stay hidden", "widgets settings: island satellites are not rendered on this bar")
+            }
         }
 
         Column {
@@ -677,6 +694,13 @@ Item {
                 tags: ["island", "home", "compact", "layout", "groups", "order"]
                 visible: widgetsTab.dankIslandOwnsSelectedBarCenter
 
+                SettingsRow {
+                    iconName: "info"
+                    iconColor: Theme.surfaceVariantText
+                    title: selectedBarIsVertical ? I18n.tr("Middle section", "widgets settings: bar section replaced by the island") : I18n.tr("Center section", "widgets settings: bar section replaced by the island")
+                    subtitle: I18n.tr("The Island takes its place on this bar", "widgets settings: the island replaces the bar's center section")
+                }
+
                 Loader {
                     width: parent.width
                     readonly property bool isSettingsRow: true
@@ -722,6 +746,7 @@ Item {
             WidgetsTabSection {
                 id: centerSection
                 width: parent.width
+                visible: !widgetsTab.dankIslandOwnsSelectedBarCenter
                 title: selectedBarIsVertical ? I18n.tr("Middle section") : I18n.tr("Center section")
                 sectionId: "center"
                 barId: widgetsTab.selectedBarId

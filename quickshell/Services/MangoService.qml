@@ -780,6 +780,7 @@ cursor_size=${size}`;
         add("mouse_middle_button_emulation", flag(s.mouseMiddleEmulation));
         add("axis_scroll_factor", s.mouseScrollFactor.toFixed(2));
         add("mouse_scroll_method", scrollMethod(s.mouseScrollMethod));
+        add("sloppy_focus", s.focusFollowsMouse);
         add("tap_to_click", flag(s.touchpadTapToClick));
         add("tap_and_drag", flag(s.touchpadTapAndDrag));
         add("drag_lock", flag(s.touchpadDragLock));

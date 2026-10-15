@@ -483,6 +483,8 @@ Singleton {
 
         function onRawEvent(event) {
             if (event.name === "monitoraddedv2" || event.name === "monitorremoved" || event.name === "configreloaded") {
+                if (event.name === "configreloaded")
+                    HyprlandService.refreshFollowMouse();
                 root.refreshHyprlandMonitorLayout();
                 return;
             }

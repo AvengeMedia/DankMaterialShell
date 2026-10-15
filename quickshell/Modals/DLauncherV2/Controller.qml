@@ -27,6 +27,7 @@ Item {
     property var collapsedSections: ({})
     property bool keyboardNavigationActive: false
     property bool active: false
+    property bool retainResultsOnClose: false
     property var _modeSectionsCache: ({})
     property bool _queryDrivenSearch: false
     property bool _diskCacheConsumed: false
@@ -183,9 +184,14 @@ Item {
         } else {
             SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
         }
+        _cancelSearch();
+        selectedFlatIndex = -1;
+        selectedItem = null;
+        keyboardNavigationActive = false;
+        if (retainResultsOnClose && searchMode !== "dmenu")
+            return;
         sections = [];
         flatModel = [];
-        selectedItem = null;
         _clearModeCache();
     }
 
@@ -247,9 +253,9 @@ Item {
     readonly property int searchCacheVersion: AppSearchService.cacheVersion
 
     onSearchCacheVersionChanged: {
+        _clearModeCache();
         if (!active)
             return;
-        _clearModeCache();
         if (searchMode === "apps") {
             _loadAppCategories();
             performSearch();
@@ -542,6 +548,19 @@ Item {
 
     property bool _searchPending: false
 
+    function _cancelSearch() {
+        _searchVersion++;
+        searchDebounce.stop();
+        pluginPhaseTimer.stop();
+        fileSearchDebounce.stop();
+        _searchPending = false;
+        _pluginPhasePending = false;
+        _pluginPhaseForceFirst = false;
+        _phase1Items = [];
+        isSearching = false;
+        isFileSearching = false;
+    }
+
     // Leading-edge debounce: search immediately when idle, coalesce bursts
     function requestSearch() {
         if (searchDebounce.running) {
@@ -673,11 +692,11 @@ Item {
     }
 
     function reset() {
+        _cancelSearch();
         searchQuery = "";
         searchMode = "all";
         previousSearchMode = "all";
         autoSwitchedToFiles = false;
-        isFileSearching = false;
         fileSearchType = "all";
         fileSearchExt = "";
         fileSearchFolder = "";
@@ -686,7 +705,6 @@ Item {
         flatModel = [];
         selectedFlatIndex = 0;
         selectedItem = null;
-        isSearching = false;
         activePluginId = "";
         activePluginName = "";
         activePluginCategories = [];
@@ -697,12 +715,10 @@ Item {
         collapsedSections = {};
         _clearModeCache();
         _queryDrivenSearch = false;
-        _pluginPhasePending = false;
-        _pluginPhaseForceFirst = false;
-        _phase1Items = [];
     }
 
     function openSession(query, explicitQuery, mode, searchWhenEmpty) {
+        _cancelSearch();
         if (mode && mode.indexOf("dmenu:") === 0) {
             _startDmenuSession(mode.slice("dmenu:".length));
             return;
@@ -716,7 +732,6 @@ Item {
         historyIndex = -1;
         previousSearchMode = "all";
         autoSwitchedToFiles = false;
-        isFileSearching = false;
         fileSearchType = SessionData.launcherLastFileSearchType || "all";
         fileSearchExt = "";
         fileSearchFolder = "";
@@ -729,9 +744,6 @@ Item {
         selectedFlatIndex = 0;
         selectedItem = null;
         _queryDrivenSearch = false;
-        _pluginPhasePending = false;
-        _pluginPhaseForceFirst = false;
-        _phase1Items = [];
         searchMode = mode;
         if (query) {
             setSearchQuery(query);
@@ -1528,7 +1540,7 @@ Item {
 
     function _performPluginPhase() {
         _pluginPhasePending = false;
-        if (searchMode !== "all")
+        if (!active || searchMode !== "all")
             return;
         if (searchQuery && searchQuery.length < 2)
             return;
@@ -1671,7 +1683,7 @@ Item {
     }
 
     function performFileSearch() {
-        if (!DSearchService.dsearchAvailable)
+        if (!active || !DSearchService.dsearchAvailable)
             return;
         var fileQuery = "";
         var effectiveType = fileSearchType || "all";
@@ -1706,6 +1718,8 @@ Item {
         var queryTypes = splitBothTypes ? ["file", "dir"] : [effectiveType];
         var pending = queryTypes.length;
         var aggregatedItems = [];
+        const currentVersion = _searchVersion;
+        const currentMode = searchMode;
 
         for (var t = 0; t < queryTypes.length; t++) {
             var queryType = queryTypes[t];
@@ -1727,6 +1741,8 @@ Item {
             }
 
             DSearchService.search(fileQuery, params, function (response) {
+                if (!root.active || currentVersion !== root._searchVersion || currentMode !== root.searchMode)
+                    return;
                 pending--;
                 if (!response.error) {
                     var hits = response.result?.hits || [];

@@ -538,7 +538,6 @@ Singleton {
                     "text": I18n.tr("Autostart apps"),
                     "icon": "line_start",
                     "tabIndex": 36,
-                    "autostartOnly": true,
                     "hint": I18n.tr("Apps and commands started with the session")
                 },
                 {

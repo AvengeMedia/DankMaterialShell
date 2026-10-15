@@ -20,6 +20,7 @@ Item {
     property string newEntryExec: ""
     property string newEntryDesktopId: ""
     property string newEntryCommandWrapper: "%command%"
+    readonly property bool autostartTargetInactive: DesktopService.isSystemd && DesktopService.systemdAutostartTargetChecked && !DesktopService.systemdAutostartTargetActive
 
     readonly property string autostartDir: {
         const configHome = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
@@ -373,12 +374,28 @@ Item {
             width: Math.min(SettingsMetrics.contentMaxWidth, parent.width - Theme.spacingL * 2)
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
-            visible: DesktopService.autostartAvailable
+
+            SettingsNoteRow {
+                width: parent.width
+                paintBackground: false
+                visible: root.autostartTargetInactive
+                text: I18n.tr("Autostart entries will not run at login because %1 is not active.", "autostart settings warning, %1 is a systemd target").arg("xdg-desktop-autostart.target")
+            }
+
+            SettingsLinkRow {
+                width: parent.width
+                visible: root.autostartTargetInactive
+                iconName: "menu_book"
+                title: I18n.tr("Docs")
+                subtitle: Site.domain
+                url: Site.docs + "/dankmaterialshell/autostart#target-not-active"
+            }
 
             SettingsCard {
                 settingKey: "autostartAddEntry"
                 tags: ["autostart", "add", "entry", "command", "startup"]
                 width: parent.width
+                visible: DesktopService.autostartAvailable
                 iconName: "add_circle"
                 title: I18n.tr("Add entry")
 
@@ -484,6 +501,7 @@ Item {
                 iconName: "line_start"
                 title: I18n.tr("Entries", "card title listing autostart entries")
                 settingKey: "autostartEntries"
+                visible: DesktopService.autostartAvailable
                 collapsible: true
                 expanded: true
 
@@ -565,7 +583,7 @@ Item {
                 width: parent.width
                 iconName: "handyman"
                 title: I18n.tr("Tray icon fix")
-                visible: DesktopService.isSystemd
+                visible: DesktopService.isSystemd && DesktopService.autostartAvailable
 
                 SettingsRow {
                     body: Column {

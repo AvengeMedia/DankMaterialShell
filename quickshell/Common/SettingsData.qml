@@ -23,7 +23,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 40
+    readonly property int settingsConfigVersion: 42
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -245,6 +245,7 @@ Singleton {
     property int mangoLayoutGapsOutOverride: Spec.SPEC.mangoLayoutGapsOutOverride.def
     property int mangoLayoutRadiusOverride: Spec.SPEC.mangoLayoutRadiusOverride.def
     property int mangoLayoutBorderSize: Spec.SPEC.mangoLayoutBorderSize.def
+    property int focusFollowsMouse: Spec.SPEC.focusFollowsMouse.def
     property string mouseAccelProfile: Spec.SPEC.mouseAccelProfile.def
     property real mouseAccelSpeed: Spec.SPEC.mouseAccelSpeed.def
     property bool mouseLeftHanded: Spec.SPEC.mouseLeftHanded.def
@@ -433,7 +434,6 @@ Singleton {
 
     property int controlCenterColumns: Spec.SPEC.controlCenterColumns.def
     property real controlCenterIconScale: Spec.SPEC.controlCenterIconScale.def
-    property string controlCenterFooterPosition: Spec.SPEC.controlCenterFooterPosition.def
     property var controlCenterWidgets: Spec.SPEC.controlCenterWidgets.def
 
     property var workspaceNameIcons: Spec.SPEC.workspaceNameIcons.def
@@ -996,7 +996,10 @@ Singleton {
     function islandStripThickness(bc) {
         return LayoutResolver.islandThickness(islandSettings(bc), islandDefaultsFor(bc));
     }
-    readonly property var _islandHomeGroupIds: ["workspaces", "media", "clock", "weather", "status", "volume", "brightness", "notifications", "privacy"]
+    function islandReserveThickness(bc) {
+        return LayoutResolver.islandReserve(islandSettings(bc), islandDefaultsFor(bc));
+    }
+    readonly property var _islandHomeGroupIds: ["workspaces", "media", "clock", "weather", "status", "volume", "brightness", "notifications", "privacy", "tray"]
     readonly property var _islandHomeLayoutDefault: [
         {
             "id": "workspaces",
@@ -1033,6 +1036,10 @@ Singleton {
         {
             "id": "privacy",
             "enabled": true
+        },
+        {
+            "id": "tray",
+            "enabled": false
         }
     ]
     function getIslandHomeLayout(bc) {
@@ -1099,6 +1106,7 @@ Singleton {
     property bool osdMicMuteEnabled: Spec.SPEC.osdMicMuteEnabled.def
     property bool osdMicVolumeEnabled: Spec.SPEC.osdMicVolumeEnabled.def
     property bool osdCapsLockEnabled: Spec.SPEC.osdCapsLockEnabled.def
+    property bool osdTouchpadEnabled: Spec.SPEC.osdTouchpadEnabled.def
     property bool osdPowerProfileEnabled: Spec.SPEC.osdPowerProfileEnabled.def
     property bool osdAudioOutputEnabled: Spec.SPEC.osdAudioOutputEnabled.def
     property bool osdWorkspaceEnabled: Spec.SPEC.osdWorkspaceEnabled.def
@@ -2889,6 +2897,8 @@ Singleton {
             return "islandRouteWallpaper";
         case "clipboard":
             return "islandRouteClipboard";
+        case "powermenu":
+            return "islandRoutePowerMenu";
         }
         return "";
     }
@@ -3399,7 +3409,7 @@ Singleton {
         if (!app && !desktop)
             return -1;
         return rules.findIndex(rule => {
-            if (!predicate(rule) || (rule.matchType || "contains").toString().toLowerCase() !== "exact")
+            if (!predicate(rule) || (rule.matchType || "contains").toString().toLowerCase() !== "exact" || (rule.conditions || []).length > 0)
                 return false;
             const pattern = (rule.pattern || "").toString().toLowerCase();
             const value = !rule.field || rule.field === "appName" ? app : rule.field === "desktopEntry" ? desktop : "";

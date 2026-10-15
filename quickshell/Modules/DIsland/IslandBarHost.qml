@@ -139,7 +139,6 @@ Item {
     readonly property bool isVertical: !root.dotMode && SettingsData.islandVertical(root.barConfig)
     readonly property string edge: root.freeMode ? (root.isVertical ? "left" : "top") : SettingsData.islandEdge(root.barConfig)
     readonly property bool farEdge: root.edge === "bottom" || root.edge === "right"
-    readonly property int reservedStripThickness: root.islandMetrics.thickness
     readonly property real windowWidth: root.hostWindow?.width ?? 0
     readonly property real windowHeight: root.hostWindow?.height ?? 0
     readonly property real windowMarginLeft: root.hostWindow?.margins?.left ?? 0
@@ -169,8 +168,8 @@ Item {
     readonly property var springDampingRange: [10, 100]
     readonly property var springMassRange: [0.25, 3]
     readonly property int destinationMaxHeight: Math.max(destinationMinHeight, Math.min(destinationMaxHeightLimit, (root.screen?.height ?? referenceScreenHeight) - screenMargin))
-    readonly property int maxActivityHeight: Math.max(root.heldEditSurfaceHeight, controller.dashboardHeight, controller.controlCenterHeight, controller.launcherExpandedTarget.height, controller.clipboardExpandedTarget.height, destinationMaxHeight)
-    readonly property int maxActivityWidth: Math.max(controller.dashboardMaxWidth, controller.controlCenterMaxWidth, controller.launcherExpandedTarget.width, controller.clipboardExpandedTarget.width, Math.min(activityMaxWidth, Math.max(activityMinWidth, (root.screen?.width ?? referenceScreenWidth) - screenMargin)))
+    readonly property int maxActivityHeight: Math.max(root.heldEditSurfaceHeight, controller.dashboardHeight, controller.controlCenterHeight, controller.launcherExpandedTarget.height, controller.clipboardExpandedTarget.height, controller.powerMenuExpandedTarget.height, destinationMaxHeight)
+    readonly property int maxActivityWidth: Math.max(controller.dashboardMaxWidth, controller.controlCenterMaxWidth, controller.launcherExpandedTarget.width, controller.clipboardExpandedTarget.width, controller.powerMenuExpandedTarget.width, Math.min(activityMaxWidth, Math.max(activityMinWidth, (root.screen?.width ?? referenceScreenWidth) - screenMargin)))
     readonly property int hostThickness: outerGap + nearInset + (root.isVertical ? maxActivityWidth : maxActivityHeight) + Theme.spacingS
     readonly property real maximumAlongOffset: root.isVertical ? Math.max(0, (height - maxActivityHeight) / 2 - Theme.spacingS) : Math.max(0, (width - maxActivityWidth) / 2 - Theme.spacingS)
     readonly property bool scrollEnabled: root.barConfig?.scrollEnabled ?? true
@@ -188,6 +187,39 @@ Item {
         if (!screenName)
             return false;
         return !!PopoutManager.currentPopoutsByScreen[screenName] || !!ModalManager.currentModalsByScreen[screenName];
+    }
+
+    // A non-embedded island follows popout rules: whatever would close a bar popout on this screen collapses it.
+    readonly property QtObject screenPopout: {
+        root.popoutRevision;
+        return PopoutManager.currentPopoutsByScreen[root.screenName] ?? null;
+    }
+    readonly property QtObject screenModal: {
+        const modal = ModalManager.currentModalsByScreen[root.screenName] ?? null;
+        return modal?.keepPopoutsOpen ? null : modal;
+    }
+    onScreenPopoutChanged: root.collapseForSurface(root.screenPopout)
+    onScreenModalChanged: root.collapseForSurface(root.screenModal)
+
+    function collapseForSurface(surfaceObject) {
+        if (root.embedded || !surfaceObject)
+            return;
+        // Otherwise the notification would re-expand the sheet over the new surface when it ends.
+        if (controller.notificationActive) {
+            if (controller.suspendedExpanded) {
+                controller.suspendedActivity = "";
+                controller.suspendedExpanded = false;
+            }
+            return;
+        }
+        if (controller.expanded)
+            controller.requestCollapse();
+    }
+
+    // A reopened popout (new trigger, or mid close animation) keeps its identity, so screenPopout never changes.
+    function collapseForOpenedPopout() {
+        if (root.screenPopout?.shouldBeVisible)
+            root.collapseForSurface(root.screenPopout);
     }
 
     function requestKeyboardFocus() {
@@ -355,6 +387,10 @@ Item {
             root.popoutRevision++;
         }
 
+        function onPopoutOpening() {
+            Qt.callLater(root.collapseForOpenedPopout);
+        }
+
         function onScreenshotActiveChanged() {
             if (!PopoutManager.screenshotActive && controller.keyboardDismissRequested)
                 root.requestKeyboardFocus();
@@ -373,6 +409,8 @@ Item {
         barConfig: root.barConfig
         screen: root.screen
         edge: root.edge
+        sectionOriginX: root.sectionOriginX
+        sectionOriginY: root.sectionOriginY
         transientSurfaces: islandTransientSurfaces
         freeMode: root.freeMode
         dotMode: root.dotMode
@@ -393,6 +431,7 @@ Item {
         homeBrightnessDisplay: SettingsData.islandLevelDisplay(root.barConfig, "islandHomeBrightnessDisplay")
         batteryStyle: root.setting("islandBatteryStyle")
         mediaClockVisible: root.setting("islandMediaClockVisible")
+        mediaAutoSwitch: root.setting("islandMediaAutoSwitch")
         launcherCycleEnabled: SettingsData.launcherStyle === "island"
         dashboardAvailableWidth: Math.max(0, (root.screen?.width ?? root.referenceScreenWidth) - (root.isVertical ? root.crossInsetStart + root.crossInsetEnd + root.outerGap + root.nearInset : root.alongInset) - Theme.spacingL * 2)
         dashboardAvailableHeight: Math.max(0, (root.screen?.height ?? root.referenceScreenHeight) - (root.isVertical ? root.alongInset : root.crossInsetStart + root.crossInsetEnd + root.outerGap + root.nearInset) - Theme.spacingL * 2)
@@ -407,6 +446,7 @@ Item {
         id: launcherController
 
         active: controller.launcherSessionActive
+        retainResultsOnClose: !SettingsData.dankLauncherV2UnloadOnClose
         viewModeContext: "spotlight"
         forceLinearNavigation: true
     }

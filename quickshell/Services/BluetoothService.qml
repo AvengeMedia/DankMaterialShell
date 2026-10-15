@@ -339,6 +339,13 @@ Singleton {
         });
     }
 
+    function hasRealName(device) {
+        const name = device.name || device.deviceName || "";
+        if (!name)
+            return false;
+        return name !== (device.address || "").replace(/:/g, "-");
+    }
+
     function sortDevices(devices) {
         return devices.sort((a, b) => {
             const aName = a.name || a.deviceName || "";
@@ -346,8 +353,8 @@ Singleton {
             const aAddr = a.address || "";
             const bAddr = b.address || "";
 
-            const aHasRealName = aName.includes(" ") && aName.length > 3;
-            const bHasRealName = bName.includes(" ") && bName.length > 3;
+            const aHasRealName = hasRealName(a);
+            const bHasRealName = hasRealName(b);
 
             if (aHasRealName && !bHasRealName)
                 return -1;

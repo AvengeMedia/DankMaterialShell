@@ -220,7 +220,7 @@ PluginComponent {
 - `ccWidgetIsToggle`: Whether the icon toggles state; set false for action-only tiles
 - `ccExpandedContent`: Optional inline controls for larger tiles
 - `ccExpandedMinimumHeight`: Minimum height for inline controls, default `Theme.listItemHeight`
-- `ccFooterContent`: Optional content for the footer strip
+- `ccFooterContent`: Accepted but ignored; the footer strip is gone and users shrink tiles to half-height pills instead
 - `ccDetailContent`: Optional detail page
 
 **Signals:**
@@ -256,27 +256,6 @@ ccExpandedContent: Component {
 
 Existing plugins need no changes to use the standard responsive tile. Custom
 inline controls must fit their allocated space and gate ongoing work on `live`.
-
-**Footer strip:**
-
-Users can drag any tile into the footer strip. There tiles are one row of 48px
-cells: a single cell shows the icon, wider cells show the icon and
-`ccWidgetPrimaryText` on one line, and `ccWidgetSecondaryText` moves to the
-tooltip. Set `ccFooterContent` to draw the strip version yourself. It replaces
-the tile body, receives `tile` like inline content, and gets the tile's full
-width at 48px tall.
-
-```qml
-ccFooterContent: Component {
-    CcTileContent {
-        StyledText {
-            anchors.centerIn: parent
-            text: root.shortStatus
-            color: parent.contentColor
-        }
-    }
-}
-```
 
 **Custom Click Actions:**
 

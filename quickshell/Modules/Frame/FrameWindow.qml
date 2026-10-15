@@ -544,9 +544,10 @@ PanelWindow {
 
             radius: win._surfaceRadius
             x: _active ? Math.round(win._popoutBodyGeometry.x) : 0
-            y: _active ? Math.round(win._popoutBodyGeometry.y) : 0
+            // Covers chrome hung off the body; the cap and connectors stay on the body.
+            y: _active ? Math.round(win._popoutBodyGeometry.y - win._popoutDescriptor.overflowTop) : 0
             width: _active ? Math.round(win._popoutBodyGeometry.width) : 0
-            height: _active ? Math.round(win._popoutBodyGeometry.height) : 0
+            height: _active ? Math.round(win._popoutBodyGeometry.height + win._popoutDescriptor.overflowTop + win._popoutDescriptor.overflowBottom) : 0
         }
         Region {
             id: _popoutBodyBlurCap

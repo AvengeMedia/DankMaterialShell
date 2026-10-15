@@ -22,6 +22,8 @@ FocusScope {
     property bool showResultsWithoutQuery: false
     property bool suspendSearchUpdates: false
     property real maxResultsHeight: 0
+    // Off for fixed-height hosts, where the resize would only slide the bottom fade.
+    property bool resizeAnimated: true
     property real resultsInset: LauncherMetrics.spotlightInset
 
     property bool editMode: false
@@ -447,7 +449,7 @@ FocusScope {
         visible: !root.editMode
 
         Behavior on height {
-            enabled: root._animateResize
+            enabled: root.resizeAnimated && root._animateResize
             NumberAnimation {
                 duration: root._resizeDuration
                 easing.type: Easing.BezierSpline

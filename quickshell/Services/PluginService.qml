@@ -7,6 +7,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import "../Common/PluginRanking.js" as PluginRanking
 
 Singleton {
     id: root
@@ -1364,6 +1365,13 @@ Singleton {
                 label: I18n.tr("3rd party"),
                 icon: "",
                 tone: "warning"
+            });
+        var recency = PluginRanking.recency(plugin);
+        if (recency)
+            badges.push({
+                label: recency === "new" ? I18n.tr("new", "adjective, lowercase plugin badge, recently added") : I18n.tr("updated", "adjective, lowercase plugin badge, recently updated"),
+                icon: recency === "new" ? "fiber_new" : "update",
+                tone: "secondary"
             });
         var status = plugin.status || [];
         for (var i = 0; i < status.length; i++)

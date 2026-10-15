@@ -315,6 +315,10 @@ var LOCAL_SPEC = {
         def: -1,
         onChange: "updateCompositorLayout"
     },
+    focusFollowsMouse: {
+        def: -1,
+        onChange: "updateCompositorInput"
+    },
     mouseAccelProfile: {
         def: "default",
         onChange: "updateCompositorInput"
@@ -541,9 +545,6 @@ var LOCAL_SPEC = {
     controlCenterIconScale: {
         def: 1.0
     },
-    controlCenterFooterPosition: {
-        def: "bottom"
-    },
     controlCenterWidgets: {
         def: [
             {
@@ -648,18 +649,16 @@ var LOCAL_SPEC = {
             {
                 id: "runningApps",
                 enabled: true,
-                w: 4,
+                w: 7,
                 h: 1,
-                footer: true
+                small: true
             },
             {
                 id: "edit",
                 enabled: true,
                 w: 1,
                 h: 1,
-                small: true,
-                footer: true,
-                footerEnd: true
+                small: true
             }
         ]
     },
@@ -1399,6 +1398,9 @@ var LOCAL_SPEC = {
     osdCapsLockEnabled: {
         def: true
     },
+    osdTouchpadEnabled: {
+        def: true
+    },
     osdPowerProfileEnabled: {
         def: false
     },
@@ -1509,7 +1511,7 @@ var LOCAL_SPEC = {
                 centerWidgets: ["music", "clock", "weather"],
                 rightWidgets: ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"],
                 spacing: 4,
-                innerPadding: 4,
+                innerPadding: 2,
                 barInsetPadding: -1,
                 barLengthPadding: 0,
                 barLengthMode: "full",

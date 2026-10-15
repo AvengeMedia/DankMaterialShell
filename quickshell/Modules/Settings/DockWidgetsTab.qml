@@ -13,49 +13,28 @@ Item {
     property int catalogRevision: 0
 
     readonly property bool dockHosted: true
-    readonly property var appsEntry: dock.config?.widgets.find(item => item.widgetId === "appsDock") ?? null
+    readonly property var appsEntry: dock.appsEntry
     readonly property var appStore: ({
             "get": key => dock.config?.[key],
             "set": (key, value) => dock.setOption(key, value),
             "isDefault": keys => dock.isDefault(keys),
             "resetToDefault": keys => dock.resetToDefault(keys)
         })
-    readonly property var _dockAppsDefaults: ({
-            "appsDockHideIndicators": false,
-            "appsDockIconSizePercentage": 100,
-            "runningAppsCurrentWorkspace": false
-        })
-
-    function defaultOption(key) {
-        if (key in _dockAppsDefaults)
-            return _dockAppsDefaults[key];
-        return SettingsData.widgetDefaults("appsDock")[key];
-    }
 
     function value(key) {
-        if (key in _dockAppsDefaults)
-            return appsEntry?.[key] ?? _dockAppsDefaults[key];
-        return SettingsData.widgetOption("appsDock", appsEntry, key);
-    }
-
-    function isDefault(keys) {
-        return keys.every(key => defaultOption(key) === undefined || JSON.stringify(value(key)) === JSON.stringify(defaultOption(key)));
-    }
-
-    function resetToDefault(keys) {
-        for (const key of keys) {
-            const fallback = defaultOption(key);
-            if (fallback !== undefined)
-                set(key, fallback);
-        }
+        return dock.appsValue(key);
     }
 
     function set(key, value) {
-        if (!appsEntry)
-            return;
-        SettingsData.updateDockWidget(dock.selectedDockId, appsEntry.id, {
-            [key]: value
-        });
+        dock.setAppsOption(key, value);
+    }
+
+    function isDefault(keys) {
+        return dock.apps.isDefault(keys);
+    }
+
+    function resetToDefault(keys) {
+        dock.apps.resetToDefault(keys);
     }
 
     DockSelectionState {

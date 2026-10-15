@@ -1512,6 +1512,15 @@ Singleton {
         saveSettings();
     }
 
+    function removeRecentColor(color) {
+        const colorStr = color.toString();
+        const recent = recentColors.filter(c => c !== colorStr);
+        if (recent.length === recentColors.length)
+            return;
+        recentColors = recent;
+        saveSettings();
+    }
+
     function setShowThirdPartyPlugins(enabled) {
         showThirdPartyPlugins = enabled;
         saveSettings();

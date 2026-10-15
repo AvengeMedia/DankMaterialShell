@@ -133,6 +133,7 @@ func (n *NiriProvider) categorizeByAction(action string) string {
 		action == "suspend" ||
 		action == "do-screen-transition" ||
 		action == "toggle-keyboard-shortcuts-inhibit" ||
+		action == "toggle-touchpad" ||
 		strings.Contains(action, "dpms"):
 		return "System"
 	case action == "spawn":

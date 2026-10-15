@@ -138,7 +138,6 @@ Item {
         heldOutside = dragsOutside?.(draggingSourceIndex, dragScenePoint, Qt.rect(x - contentPadding, y - contentPadding, slot.w, slot.h)) ?? false;
         if (heldOutside) {
             dragCell = null;
-            heldHeight = pinnedHeight;
             return;
         }
         const cell = GridUtils.cellAt(slotLayout, x - contentPadding, y - contentPadding, slot.cols, slot.rows);

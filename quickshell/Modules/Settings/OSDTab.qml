@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Services
 import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 
@@ -47,6 +48,11 @@ Item {
             "value": "capsLock",
             "label": I18n.tr("Caps lock"),
             "shown": SettingsData.osdCapsLockEnabled
+        },
+        {
+            "value": "touchpad",
+            "label": I18n.tr("Touchpad"),
+            "shown": SettingsData.osdTouchpadEnabled && CompositorService.isNiri
         },
         {
             "value": "powerProfile",
@@ -182,6 +188,14 @@ Item {
                 text: I18n.tr("Caps lock")
                 checked: SettingsData.osdCapsLockEnabled
                 onToggled: checked => SettingsData.set("osdCapsLockEnabled", checked)
+            }
+
+            SettingsToggleRow {
+                settingKey: "osdTouchpadEnabled"
+                visible: CompositorService.isNiri
+                text: I18n.tr("Touchpad")
+                checked: SettingsData.osdTouchpadEnabled
+                onToggled: checked => SettingsData.set("osdTouchpadEnabled", checked)
             }
 
             SettingsToggleRow {

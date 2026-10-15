@@ -50,6 +50,7 @@ PanelWindow {
         return false;
     }
     readonly property real screenY: stackMotion.value
+    readonly property real stackTarget: stackMotion.target
     readonly property bool stackMoving: stackMotion.running
     property real presentationProgress: 0
     property real chromeRelease: 0
