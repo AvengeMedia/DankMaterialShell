@@ -9,6 +9,7 @@ Item {
     id: root
 
     property var facts: ({})
+    property bool loaded: false
     property var doctor: null
     readonly property bool doctorRunning: doctorProc.running
 
@@ -83,6 +84,7 @@ p qpa "\${QT_QPA_PLATFORMTHEME:-}"
                         map[line.slice(0, i)] = line.slice(i + 1).trim();
                 }
                 root.facts = map;
+                root.loaded = true;
             }
         }
     }

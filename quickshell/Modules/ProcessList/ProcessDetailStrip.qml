@@ -86,17 +86,6 @@ Rectangle {
         return ProcessColumns.formatCell(id, live ?? ({}), false) ?? "—";
     }
 
-    function statusIcon(letter) {
-        switch (letter) {
-        case "R": return "play_circle";
-        case "D": return "hourglass_top";
-        case "Z": return "cancel";
-        case "T":
-        case "t": return "stop_circle";
-        }
-        return "pause_circle";
-    }
-
     function bytes(v) {
         return v === null || v === undefined ? "" : Devices.formatBytes(v);
     }
@@ -266,15 +255,17 @@ Rectangle {
             customPaddingH: Theme.spacingM
             slotColor: Theme.surfaceContainerHighest
 
+            // By count, so a new sample rebinds the rows instead of rebuilding them; hidden tabs build none.
             Repeater {
-                model: section.shown
+                model: section.visible ? section.shown.length : 0
 
                 StatRow {
-                    required property var modelData
+                    required property int index
+                    readonly property var entry: section.shown[index] ?? ({})
                     height: Theme.buttonHeightXS
-                    label: modelData.label
-                    value: String(modelData.value)
-                    tooltip: modelData.tooltip ?? ""
+                    label: entry.label ?? ""
+                    value: String(entry.value ?? "")
+                    tooltip: entry.tooltip ?? ""
                 }
             }
         }
@@ -347,11 +338,14 @@ Rectangle {
                 StyledText {
                     id: commandLine
                     Layout.fillWidth: true
-                    text: root.fullCommand
+                    // Commands can hold whole scripts with line breaks; one line here, the full one is under Details.
+                    text: root.fullCommand.replace(/\s+/g, " ")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
+                    textFormat: Text.PlainText
                     wrapMode: Text.NoWrap
-                    elide: Text.ElideMiddle
+                    maximumLineCount: 1
+                    elide: Text.ElideRight
 
                     MouseArea {
                         id: commandHover
@@ -365,17 +359,11 @@ Rectangle {
                         target: commandLine
                         hoverArea: commandHover
                         multiline: true
-                        text: root.fullCommand
+                        text: root.fullCommand.length > 600 ? root.fullCommand.slice(0, 600) + "…" : root.fullCommand
                     }
                 }
             }
 
-            DActionButton {
-                iconName: "content_copy"
-                iconColor: Theme.surfaceText
-                tooltipText: I18n.tr("Copy Full Command")
-                onClicked: Quickshell.execDetached(["dms", "cl", "copy", root.fullCommand])
-            }
         }
 
         Flow {
@@ -386,12 +374,6 @@ Rectangle {
                 iconName: "person"
                 text: root.live?.username ?? ""
                 tip: I18n.tr("User")
-            }
-
-            InfoChip {
-                iconName: root.statusIcon(root.live?.status ?? "")
-                text: root.live?.status ? ProcessListMetrics.statusLabel(root.live.status) : ""
-                tip: I18n.tr("Status")
             }
 
             InfoChip {
@@ -572,7 +554,7 @@ Rectangle {
                 Layout.alignment: Qt.AlignTop
                 title: I18n.tr("Process")
                 iconName: "info"
-                rows: [root.row(I18n.tr("User"), root.live?.username), root.row("UID", root.detail?.uid), root.row(I18n.tr("Group"), root.detail?.group ? root.detail.group + " (" + root.detail.gid + ")" : root.detail?.gid), root.row(I18n.tr("Started"), root.started ? root.started.toLocaleString(Qt.locale(), Locale.ShortFormat) : null), root.row(I18n.tr("Parents", "chain of processes that started this one"), root.parentChain), root.row(I18n.tr("Terminal", "controlling terminal of a process"), root.detail?.tty), root.row(I18n.tr("Session", "login session id of a process"), root.detail?.session), root.row(I18n.tr("Setuid", "process runs with another user's rights"), root.privileges?.setuid ? I18n.tr("Yes") : null)]
+                rows: [root.row(I18n.tr("User"), root.live?.username), root.row(I18n.tr("Status"), root.live?.status ? ProcessListMetrics.statusLabel(root.live.status) : null), root.row("UID", root.detail?.uid), root.row(I18n.tr("Group"), root.detail?.group ? root.detail.group + " (" + root.detail.gid + ")" : root.detail?.gid), root.row(I18n.tr("Started"), root.started ? root.started.toLocaleString(Qt.locale(), Locale.ShortFormat) : null), root.row(I18n.tr("Parents", "chain of processes that started this one"), root.parentChain), root.row(I18n.tr("Terminal", "controlling terminal of a process"), root.detail?.tty), root.row(I18n.tr("Session", "login session id of a process"), root.detail?.session), root.row(I18n.tr("Setuid", "process runs with another user's rights"), root.privileges?.setuid ? I18n.tr("Yes") : null)]
             }
 
             Section {
@@ -617,19 +599,31 @@ Rectangle {
 
                 Rectangle {
                     width: parent.width
-                    height: commandFull.implicitHeight + Theme.spacingS * 2
+                    height: Math.max(commandFull.implicitHeight + Theme.spacingS * 2, commandCopy.height + Theme.spacingXS * 2)
                     radius: Theme.cornerRadiusL
                     color: Theme.surfaceContainerHighest
 
                     StyledText {
                         id: commandFull
                         x: Theme.spacingM
-                        y: Theme.spacingS
-                        width: parent.width - Theme.spacingM * 2
+                        y: Math.max(Theme.spacingS, (parent.height - implicitHeight) / 2)
+                        width: commandCopy.x - x - Theme.spacingS
                         text: root.fullCommand
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceText
+                        textFormat: Text.PlainText
                         wrapMode: Text.WrapAnywhere
+                    }
+
+                    DActionButton {
+                        id: commandCopy
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingXS
+                        y: Theme.spacingXS
+                        iconName: "content_copy"
+                        iconColor: Theme.surfaceText
+                        tooltipText: I18n.tr("Copy Full Command")
+                        onClicked: Quickshell.execDetached(["dms", "cl", "copy", root.fullCommand])
                     }
                 }
             }

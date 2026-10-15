@@ -36,6 +36,7 @@ DevicePane {
         return lines.join("\n");
     }
 
+    loaded: info !== null && (DgopService.memoryModules !== null || !DgopService.isModuleAvailable("memory-modules"))
     title: I18n.tr("Memory", "system RAM label in system monitor")
     subtitle: Devices.memoryModulesSummary(mods)
     subtitle2: moduleSummary

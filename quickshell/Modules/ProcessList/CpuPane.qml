@@ -35,6 +35,7 @@ DevicePane {
         return n > 0 ? n.toLocaleString(Qt.locale(), "f", 0) : null;
     }
 
+    loaded: info !== null
     title: I18n.tr("CPU", "processor label in system monitor")
     subtitle: DgopService.cpuModel
     subtitle2: info?.physicalCores > 0 && threads > 0 ? I18n.tr("%1 cores, %2 threads", "CPU core and thread count").arg(info.physicalCores).arg(threads) : ""

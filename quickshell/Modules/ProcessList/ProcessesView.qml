@@ -391,6 +391,18 @@ Rectangle {
 
     Component.onCompleted: updateProcesses()
 
+    // The first details panel compiles its type, which stalled the first expand; build one hidden in the background.
+    Loader {
+        property bool warmed: false
+        active: root.active && !warmed && DgopService.allProcesses.length > 0
+        asynchronous: true
+        visible: false
+        sourceComponent: ProcessDetailStrip {
+            process: null
+        }
+        onLoaded: warmed = true
+    }
+
     // Column and direction change together on a header click; one refresh covers both.
     readonly property string sortOrder: DgopService.currentSort + (DgopService.sortAscending ? "+" : "-")
 
@@ -564,9 +576,16 @@ Rectangle {
 
                 StyledText {
                     anchors.centerIn: parent
-                    text: root.searchText.length > 0 || root.processFilterTypes.length === 1 || root.onlineOnly || DgopService.allProcesses.length > 0 ? I18n.tr("No matching processes", "empty state in process list") : I18n.tr("Loading...")
+                    text: I18n.tr("No matching processes", "empty state in process list")
                     color: Theme.onSurfaceVariant
-                    visible: processListView.count === 0
+                    visible: processListView.count === 0 && !listSpinner.visible
+                }
+
+                DSpinner {
+                    id: listSpinner
+                    anchors.centerIn: parent
+                    size: Theme.iconSize
+                    visible: processListView.count === 0 && DgopService.allProcesses.length === 0
                 }
             }
         }

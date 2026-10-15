@@ -31,6 +31,7 @@ DevicePane {
         return v === null || v === undefined ? null : SysmonDevices.formatBytes(v);
     }
 
+    loaded: (history.a ?? []).length > 0
     title: deviceName
     subtitle: title !== deviceName ? deviceName : ""
     subtitle2: linkSpeed

@@ -30,9 +30,11 @@ DFlickable {
     property var rightStats: []
     default property alias content: slot.data
     property alias headerActions: headerActionsRow.data
+    property alias topContent: topSlot.data
 
-    // Labels that had a value on this device keep their row (showing "—") so samples without the value don't
-    // make the grid jump.
+    // Until the device's first samples arrive every row is shown with a spinner, so nothing pops in later. Labels that
+    // had a value on this device keep their row (showing "—") so samples without the value don't make the grid jump.
+    property bool loaded: true
     property var seenLabels: ({})
 
     function hasValue(s) {
@@ -40,8 +42,9 @@ DFlickable {
     }
 
     function present(list, advanced) {
-        return (list ?? []).filter(s => s && (s.advanced === true) === advanced && (hasValue(s) || seenLabels[s.label])).map(s => hasValue(s) ? s : Object.assign({}, s, {
-                    value: "—"
+        return (list ?? []).filter(s => s && (s.advanced === true) === advanced && (!loaded || hasValue(s) || seenLabels[s.label])).map(s => hasValue(s) ? s : Object.assign({}, s, {
+                    value: "—",
+                    loading: !loaded
                 }));
     }
 
@@ -131,6 +134,12 @@ DFlickable {
             }
         }
 
+        Column {
+            id: topSlot
+            width: parent.width
+            visible: children.length > 0
+        }
+
         ChartCard {
             visible: root.showChart
             width: parent.width
@@ -158,12 +167,11 @@ DFlickable {
             rightGroup: root.present(root.rightStats, false)
         }
 
-        DButton {
+        CollapsibleHeader {
             visible: advancedGrid.hasStats
-            text: ProcessListMetrics.showAdvanced ? I18n.tr("Hide advanced", "button: hide the less used details") : I18n.tr("Show advanced", "button: show the less used details")
-            backgroundColor: "transparent"
-            textColor: Theme.primary
-            onClicked: ProcessListMetrics.showAdvanced = !ProcessListMetrics.showAdvanced
+            text: I18n.tr("Advanced")
+            collapsed: !ProcessListMetrics.showAdvanced
+            onToggled: ProcessListMetrics.showAdvanced = !ProcessListMetrics.showAdvanced
         }
 
         StatGrid {
@@ -217,6 +225,7 @@ DFlickable {
                 label: stat.label ?? ""
                 value: String(stat.value ?? "")
                 tooltip: stat.tooltip ?? ""
+                loading: stat.loading ?? false
             }
         }
     }

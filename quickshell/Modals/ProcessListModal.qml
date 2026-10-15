@@ -293,11 +293,19 @@ DFloatingWindow {
                         }
 
                         DIconButton {
-                            iconName: DgopService.unlocked ? "lock_open" : "lock"
+                            id: lockButton
+                            readonly property bool busy: DgopService.unlocking || DgopService.unlockLoading
+                            iconName: busy ? "" : DgopService.unlocked ? "lock_open" : "lock"
                             variant: DgopService.unlocked ? "tonal" : "standard"
                             enabled: !DgopService.unlocking
                             tooltipText: DgopService.unlocked ? I18n.tr("Lock") : I18n.tr("Unlock")
                             onClicked: DgopService.unlocked ? DgopService.lock() : DgopService.unlock()
+
+                            DSpinner {
+                                anchors.centerIn: parent
+                                size: Theme.iconSizeSmall
+                                visible: lockButton.busy
+                            }
                         }
 
                         DIconButton {

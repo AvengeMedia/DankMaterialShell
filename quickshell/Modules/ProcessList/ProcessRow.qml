@@ -135,6 +135,7 @@ DListItem {
                 readonly property var col: ProcessColumns.COLUMNS.find(c => c.id === modelData) ?? ({})
                 readonly property var raw: ProcessColumns.formatCell(modelData, root.process ?? ({}), false)
                 readonly property bool absent: raw === null
+                readonly property bool waiting: absent && DgopService.unlockLoading
                 readonly property bool zero: !cell.absent && ProcessColumns.rawValue(cell.modelData, root.process ?? ({})) === 0
 
                 Layout.minimumWidth: Theme.fontSizeSmall * (col.width ?? 6) - Theme.spacingS
@@ -149,9 +150,18 @@ DListItem {
                 font.features: {
                     "tnum": 1
                 }
-                text: cell.absent ? "—" : cell.modelData === "status" ? ProcessListMetrics.statusLabel(cell.raw) : cell.raw
+                text: cell.waiting ? "" : cell.absent ? "—" : cell.modelData === "status" ? ProcessListMetrics.statusLabel(cell.raw) : cell.raw
                 font.pixelSize: Theme.fontSizeSmall
                 color: cell.absent || cell.zero ? Theme.surfaceVariantText : cell.col.meter ? root.contentColor : root.supportingContentColor
+
+                Loader {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    active: cell.waiting
+                    sourceComponent: DSpinner {
+                        size: Theme.fontSizeSmall
+                    }
+                }
 
                 MouseArea {
                     id: absentArea
@@ -186,7 +196,9 @@ DListItem {
         width: (root.detailWidth >= 0 ? root.detailWidth : root.width) - Theme.spacingL * 2
         anchors.top: parent.top
         anchors.topMargin: root.rowHeight + Theme.spacingXS
-        active: root.isExpanded || root.height > root.rowHeight
+        // Kept while the row animates closed; without the item check every new row switched it on while sizing.
+        active: root.isExpanded || (item !== null && root.height > root.rowHeight)
+        asynchronous: true
 
         sourceComponent: ProcessDetailStrip {
             process: root.process

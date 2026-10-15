@@ -9,6 +9,7 @@ Item {
     property string label: ""
     property string value: ""
     property string tooltip: ""
+    property bool loading: false
 
     height: Theme.iconButtonSize
 
@@ -24,7 +25,17 @@ Item {
         elide: Text.ElideRight
     }
 
+    Loader {
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        active: root.loading
+        sourceComponent: DSpinner {
+            size: Theme.iconSizeSmall
+        }
+    }
+
     NumericText {
+        visible: !root.loading
         anchors.left: labelText.right
         anchors.leftMargin: Theme.spacingM
         anchors.right: parent.right
@@ -43,14 +54,21 @@ Item {
         enabled: root.tooltip !== ""
         hoverEnabled: true
         acceptedButtons: Qt.NoButton
-        onContainsMouseChanged: containsMouse ? tip.schedule() : tip.dismiss()
+        onContainsMouseChanged: {
+            if (containsMouse) {
+                tip.text = root.tooltip;
+                tip.schedule();
+            } else {
+                tip.dismiss();
+            }
+        }
     }
 
+    // The tooltip is built on first hover; rows are rebuilt often and most are never hovered.
     DTooltipHost {
         id: tip
         target: root
         hoverArea: rowHover
-        multiline: root.tooltip.includes("\n")
-        text: root.tooltip
+        multiline: true
     }
 }

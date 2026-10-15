@@ -58,6 +58,7 @@ DevicePane {
         return max === null || max === undefined ? "" : I18n.tr("Max clock") + ": " + num(max, unit);
     }
 
+    loaded: off || suspended || (history.a ?? []).length > 0
     title: stat?.fullName ?? slot
     titleTooltip: title
     subtitle: stat?.driver ?? ""
@@ -144,7 +145,7 @@ DevicePane {
         color: Theme.surfaceVariantText
     }
 
-    SettingsGroup {
+    topContent: SettingsGroup {
         visible: root.stat !== null
         width: parent.width
 

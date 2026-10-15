@@ -71,41 +71,14 @@ Column {
     visible: state_ !== "idle"
     spacing: Theme.spacingS
 
-    Item {
-        width: parent.width
-        height: collapseButton.height
-
-        Rectangle {
-            anchors.fill: parent
-            anchors.margins: -Theme.spacingXS
-            radius: Theme.cornerRadiusS
-            color: "transparent"
-
-            StateLayer {
-                onClicked: root.collapsed = !root.collapsed
-            }
-        }
-
-        StyledText {
-            anchors.verticalCenter: parent.verticalCenter
-            text: I18n.tr("Full SMART report")
-            font.pixelSize: Theme.fontSizeMedium
-            font.weight: Theme.fontWeightMedium
-            color: Theme.surfaceText
-        }
-
-
-        DActionButton {
-            id: collapseButton
-            anchors.right: parent.right
-            iconName: "expand_more"
-            rotation: root.collapsed ? 0 : 180
-            tooltipText: root.collapsed ? I18n.tr("Expand") : I18n.tr("Collapse")
-            onClicked: root.collapsed = !root.collapsed
-        }
+    CollapsibleHeader {
+        text: I18n.tr("Full SMART report")
+        collapsed: root.collapsed
+        onToggled: root.collapsed = !root.collapsed
     }
 
-    DLoadingIndicator {
+    DSpinner {
+        size: Theme.iconSize
         visible: !root.collapsed && root.state_ === "running"
         anchors.horizontalCenter: parent.horizontalCenter
     }

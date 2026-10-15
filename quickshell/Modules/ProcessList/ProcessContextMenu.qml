@@ -251,7 +251,7 @@ Popup {
     }
 
     width: ProcessListMetrics.menuWidth
-    height: menuColumn.implicitHeight + Theme.spacingS * 2
+    height: menuColumn.implicitHeight
     padding: 0
     // Modal so the click that closes the menu doesn't also act on the row under it.
     modal: true
@@ -283,12 +283,22 @@ Popup {
         color: "transparent"
     }
 
-    contentItem: Rectangle {
-        color: Theme.foregroundColor(Theme.chipSurfaceNested, Theme.isFloatingWindow(processContextMenu))
-        radius: Theme.windowRadius
-        border.color: Theme.outlineMedium
-        border.width: Theme.layerOutlineWidth
+    // Groups split at separators; each is its own card, so the end actions stand apart from the copy actions.
+    readonly property var groups: {
+        const out = [[]];
+        menuItems.forEach((entry, index) => {
+            if (entry.type === "separator")
+                out.push([]);
+            else
+                out[out.length - 1].push({
+                    "entry": entry,
+                    "index": index
+                });
+        });
+        return out.filter(g => g.length > 0);
+    }
 
+    contentItem: Item {
         Item {
             id: keyboardHandler
             anchors.fill: parent
@@ -335,122 +345,128 @@ Popup {
 
         Column {
             id: menuColumn
-            anchors.fill: parent
-            anchors.margins: Theme.spacingS
-            spacing: Theme.groupedListGap
+            anchors.left: parent.left
+            anchors.right: parent.right
+            spacing: Theme.spacingXS
 
             Repeater {
-                model: menuItems
+                model: processContextMenu.groups
 
-                Item {
-                    width: parent.width
-                    height: modelData.type === "separator" ? Theme.spacingS : Theme.menuItemHeight
-                    visible: modelData.type !== "separator" || index > 0
+                Rectangle {
+                    id: groupCard
+                    required property var modelData
+                    width: menuColumn.width
+                    height: groupColumn.implicitHeight + Theme.spacingS * 2
+                    color: Theme.foregroundColor(Theme.chipSurfaceNested, Theme.isFloatingWindow(processContextMenu))
+                    radius: Theme.windowRadius
+                    border.color: Theme.outlineMedium
+                    border.width: Theme.layerOutlineWidth
 
-                    property int itemVisibleIndex: {
-                        let count = 0;
-                        for (let i = 0; i < index; i++) {
-                            if (menuItems[i].type !== "separator")
-                                count++;
-                        }
-                        return count;
-                    }
+                    Column {
+                        id: groupColumn
+                        anchors.fill: parent
+                        anchors.margins: Theme.spacingS
+                        spacing: Theme.groupedListGap
 
-                    Rectangle {
-                        visible: modelData.type === "separator"
-                        width: parent.width - Theme.spacingS * 2
-                        height: Theme.dividerWidth
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: Theme.outlineStrong
-                    }
+                        Repeater {
+                            model: groupCard.modelData
 
-                    Rectangle {
-                        id: menuItem
-                        visible: modelData.type !== "separator"
-                        width: parent.width
-                        height: Theme.menuItemHeight
-                        radius: Theme.cornerRadiusM
-                        color: {
-                            if (!modelData.enabled)
-                                return "transparent";
-                            const isSelected = keyboardNavigation && selectedIndex === index;
-                            if (modelData.dangerous) {
-                                if (isSelected)
-                                    return Theme.errorPressed;
-                                return menuItemArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0);
-                            }
-                            if (isSelected)
-                                return Theme.selectedContainer;
-                            return menuItemArea.pressed ? Theme.withAlpha(Theme.onSurface, Theme.stateLayerPressed) : menuItemArea.containsMouse ? Theme.withAlpha(Theme.onSurface, Theme.stateLayerHover) : "transparent";
-                        }
+                            Item {
+                                id: row
+                                required property var modelData
+                                readonly property var entry: modelData.entry
+                                readonly property int itemIndex: modelData.index
+                                width: groupColumn.width
+                                height: Theme.menuItemHeight
 
-                        Row {
-                            anchors.left: parent.left
-                            anchors.leftMargin: Theme.spacingS
-                            anchors.right: parent.right
-                            anchors.rightMargin: Theme.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingS
+                                Rectangle {
+                                    id: menuItem
+                                    width: parent.width
+                                    height: Theme.menuItemHeight
+                                    radius: Theme.cornerRadiusM
+                                    color: {
+                                        if (!row.entry.enabled)
+                                            return "transparent";
+                                        const isSelected = keyboardNavigation && selectedIndex === row.itemIndex;
+                                        if (row.entry.dangerous) {
+                                            if (isSelected)
+                                                return Theme.errorPressed;
+                                            return menuItemArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0);
+                                        }
+                                        if (isSelected)
+                                            return Theme.selectedContainer;
+                                        return menuItemArea.pressed ? Theme.withAlpha(Theme.onSurface, Theme.stateLayerPressed) : menuItemArea.containsMouse ? Theme.withAlpha(Theme.onSurface, Theme.stateLayerHover) : "transparent";
+                                    }
 
-                            DIcon {
-                                name: modelData.icon || ""
-                                size: Theme.iconSizeSmall
-                                color: {
-                                    if (!modelData.enabled)
-                                        return Theme.onSurface_38;
-                                    const isSelected = keyboardNavigation && selectedIndex === index;
-                                    if (modelData.dangerous && (menuItemArea.containsMouse || isSelected))
-                                        return Theme.error;
-                                    return Theme.surfaceText;
+                                    Row {
+                                        anchors.left: parent.left
+                                        anchors.leftMargin: Theme.spacingS
+                                        anchors.right: parent.right
+                                        anchors.rightMargin: Theme.spacingS
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: Theme.spacingS
+
+                                        DIcon {
+                                            name: row.entry.icon || ""
+                                            size: Theme.iconSizeSmall
+                                            color: {
+                                                if (!row.entry.enabled)
+                                                    return Theme.onSurface_38;
+                                                const isSelected = keyboardNavigation && selectedIndex === row.itemIndex;
+                                                if (row.entry.dangerous && (menuItemArea.containsMouse || isSelected))
+                                                    return Theme.error;
+                                                return Theme.surfaceText;
+                                            }
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
+                                        StyledText {
+                                            text: row.entry.text || ""
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            font.weight: Theme.fontWeight
+                                            color: {
+                                                if (!row.entry.enabled)
+                                                    return Theme.onSurface_38;
+                                                const isSelected = keyboardNavigation && selectedIndex === row.itemIndex;
+                                                if (row.entry.dangerous && (menuItemArea.containsMouse || isSelected))
+                                                    return Theme.error;
+                                                return Theme.surfaceText;
+                                            }
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            elide: Text.ElideRight
+                                            width: parent.width - Theme.iconSizeSmall * (row.entry.submenu ? 2 : 1) - Theme.spacingS * (row.entry.submenu ? 2 : 1)
+                                        }
+
+                                        DIcon {
+                                            visible: row.entry.submenu ?? false
+                                            name: "chevron_right"
+                                            size: Theme.iconSizeSmall - 2
+                                            color: row.entry.enabled ? Theme.surfaceText : Theme.onSurface_38
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+                                    }
+
+                                    DRipple {
+                                        id: menuItemRipple
+                                        rippleColor: row.entry.dangerous ? Theme.error : Theme.surfaceText
+                                        cornerRadius: menuItem.radius
+                                    }
+
+                                    MouseArea {
+                                        id: menuItemArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: row.entry.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                        enabled: row.entry.enabled ?? false
+                                        onEntered: {
+                                            keyboardNavigation = false;
+                                            selectedIndex = row.itemIndex;
+                                        }
+                                        onPressed: mouse => menuItemRipple.trigger(mouse.x, mouse.y)
+                                        onClicked: row.entry.action()
+                                    }
                                 }
-                                anchors.verticalCenter: parent.verticalCenter
                             }
-
-                            StyledText {
-                                text: modelData.text || ""
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Theme.fontWeight
-                                color: {
-                                    if (!modelData.enabled)
-                                        return Theme.onSurface_38;
-                                    const isSelected = keyboardNavigation && selectedIndex === index;
-                                    if (modelData.dangerous && (menuItemArea.containsMouse || isSelected))
-                                        return Theme.error;
-                                    return Theme.surfaceText;
-                                }
-                                anchors.verticalCenter: parent.verticalCenter
-                                elide: Text.ElideRight
-                                width: parent.width - Theme.iconSizeSmall * (modelData.submenu ? 2 : 1) - Theme.spacingS * (modelData.submenu ? 2 : 1)
-                            }
-
-                            DIcon {
-                                visible: modelData.submenu ?? false
-                                name: "chevron_right"
-                                size: Theme.iconSizeSmall - 2
-                                color: modelData.enabled ? Theme.surfaceText : Theme.onSurface_38
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        DRipple {
-                            id: menuItemRipple
-                            rippleColor: modelData.dangerous ? Theme.error : Theme.surfaceText
-                            cornerRadius: menuItem.radius
-                        }
-
-                        MouseArea {
-                            id: menuItemArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: modelData.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            enabled: modelData.enabled ?? false
-                            onEntered: {
-                                keyboardNavigation = false;
-                                selectedIndex = index;
-                            }
-                            onPressed: mouse => menuItemRipple.trigger(mouse.x, mouse.y)
-                            onClicked: modelData.action()
                         }
                     }
                 }

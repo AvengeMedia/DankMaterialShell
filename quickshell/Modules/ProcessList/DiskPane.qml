@@ -33,6 +33,7 @@ DevicePane {
         return v === null || v === undefined ? null : SysmonDevices.formatBytes(v);
     }
 
+    loaded: (history.a ?? []).length > 0
     title: drive?.model || deviceName
     titleTooltip: drive?.model ? deviceName : ""
     subtitle: drive ? [kindNames[drive.kind] ?? drive.kind ?? "", drive.pcieLink ?? ""].filter(x => x).join(", ") : ""
@@ -49,12 +50,12 @@ DevicePane {
     leftStats: [
         {
             label: I18n.tr("Busy"),
-            value: root.rates?.busy != null ? Math.round(root.rates.busy) + "%" : null
+            value: root.rates?.busy != null ? Math.round(root.rates.busy) + "%" : root.rates ? "—" : null
         },
         {
             advanced: true,
             label: I18n.tr("Response time"),
-            value: root.rates?.responseTime != null ? root.rates.responseTime.toFixed(2) + " ms" : null
+            value: root.rates?.responseTime != null ? root.rates.responseTime.toFixed(2) + " ms" : root.rates ? "—" : null
         },
         {
             label: I18n.tr("Capacity"),

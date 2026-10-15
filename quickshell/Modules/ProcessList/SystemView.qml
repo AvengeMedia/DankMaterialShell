@@ -57,7 +57,7 @@ Item {
     readonly property string doctorText: {
         const s = facts.doctor?.summary;
         if (!s)
-            return facts.doctorRunning ? I18n.tr("Checking...", "system check is running") : "";
+            return "";
         return I18n.tr("%1 errors, %2 warnings", "system check summary").arg(s.errors ?? 0).arg(s.warnings ?? 0);
     }
     readonly property var doctorIssues: (facts.doctor?.results ?? []).filter(r => r.status === "error" || r.status === "warn" || r.status === "warning")
@@ -132,18 +132,22 @@ Item {
         return NetworkService.networkAvailable ? I18n.tr("Disconnected") : "";
     }
 
-    function row(label, value, tooltip, isPrivate) {
+    // An empty row keeps its place with a spinner while it can still be filled: until the facts script is read, or
+    // `waiting` for rows from elsewhere. Afterwards empty rows are dropped.
+    function row(label, value, tooltip, isPrivate, waiting) {
+        const text = value === null || value === undefined ? "" : String(value);
         return {
             "label": label,
-            "value": value === null || value === undefined ? "" : String(value),
+            "value": text,
             "tooltip": tooltip ?? "",
-            "private": isPrivate === true
+            "private": isPrivate === true,
+            "loading": text === "" && (waiting ?? !facts.loaded)
         };
     }
 
     readonly property var aboutRows: [row("DMS", ShellVersionService.shellVersion), row("Quickshell", SystemInfo.version(f.qs)), row(I18n.tr("Compositor"), compositorText), row(I18n.tr("Distribution", "system info label"), DgopService.distribution), row(I18n.tr("Kernel", "system info label"), DgopService.kernelVersion), row(I18n.tr("CPU"), DgopService.cpuModel), row(I18n.tr("Memory"), memoryText), row(I18n.tr("GPU"), gpus.map(g => g.displayName).join(", ")), row(I18n.tr("Graphics driver", "GPU kernel driver and Mesa version"), graphicsDriver), row(I18n.tr("Display"), displays.map(d => d.value).join("; "))]
 
-    readonly property var dmsRows: [row(I18n.tr("Shell"), ShellVersionService.shellVersion), row(I18n.tr("Codename", "DMS release codename"), ShellVersionService.shellCodename), row(I18n.tr("Backend", "noun, settings label for the backend service in use"), DMSService.cliVersion), row(I18n.tr("API", "about page card title, application programming interface version"), DMSService.apiVersion > 0 ? DMSService.apiVersion : ""), row(I18n.tr("Capabilities"), (DMSService.capabilities ?? []).join(", "), (DMSService.capabilities ?? []).join("\n")), row(I18n.tr("Settings version", "version number of the settings file format"), SettingsData.settingsConfigVersion), row(I18n.tr("Plugins"), Object.keys(PluginService.loadedPlugins ?? {}).length || "", Object.keys(PluginService.loadedPlugins ?? {}).join("\n")), row(I18n.tr("System check"), doctorText, doctorIssues.map(r => r.name + ": " + r.message).join("\n"))]
+    readonly property var dmsRows: [row(I18n.tr("Shell"), ShellVersionService.shellVersion), row(I18n.tr("Codename", "DMS release codename"), ShellVersionService.shellCodename), row(I18n.tr("Backend", "noun, settings label for the backend service in use"), DMSService.cliVersion), row(I18n.tr("API", "about page card title, application programming interface version"), DMSService.apiVersion > 0 ? DMSService.apiVersion : ""), row(I18n.tr("Capabilities"), (DMSService.capabilities ?? []).join(", "), (DMSService.capabilities ?? []).join("\n")), row(I18n.tr("Settings version", "version number of the settings file format"), SettingsData.settingsConfigVersion), row(I18n.tr("Plugins"), Object.keys(PluginService.loadedPlugins ?? {}).length || "", Object.keys(PluginService.loadedPlugins ?? {}).join("\n")), row(I18n.tr("System check"), doctorText, doctorIssues.map(r => r.name + ": " + r.message).join("\n"), false, facts.doctorRunning)]
 
     readonly property var osRows: [row(I18n.tr("Distribution", "system info label"), DgopService.distribution), row(I18n.tr("Kernel", "system info label"), kernelText), row(I18n.tr("Init", "init system, e.g. systemd"), f.init ? f.init.replace(/\s*\(.*\)$/, "") : (DgopService.initSystem ?? "")), row(I18n.tr("Boot", "boot loader and firmware mode"), [f["boot.loader"], f["boot.uefi"] ? "UEFI" : (Object.keys(f).length > 0 ? "BIOS" : "")].filter(x => x).join(", ")), row(I18n.tr("Secure Boot"), f["boot.secure"] === "1" ? I18n.tr("On") : f["boot.secure"] === "0" ? I18n.tr("Off") : ""), row(I18n.tr("Packages", "installed package counts per package manager"), SystemInfo.packagesText(f)), row(I18n.tr("Uptime"), DgopService.uptime ? DgopService.uptime.slice(3) : "", "", true), row(I18n.tr("Hostname"), DgopService.hostname, "", true), row(I18n.tr("User"), UserInfoService.username, "", true)]
 
@@ -272,7 +276,7 @@ Item {
                 Layout.fillWidth: true
                 implicitHeight: aboutColumn.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadiusL
-                color: Theme.surfaceContainerLow
+                color: Theme.withAlpha(Theme.primaryContainer, 0.45)
 
                 ColumnLayout {
                     id: aboutColumn
@@ -294,12 +298,12 @@ Item {
 
                         Rows {
                             rows: root.aboutRows.slice(0, 5)
-                            slotColor: Theme.surfaceContainerHighest
+                            slotColor: Theme.surfaceContainer
                         }
 
                         Rows {
                             rows: root.aboutRows.slice(5)
-                            slotColor: Theme.surfaceContainerHighest
+                            slotColor: Theme.surfaceContainer
                         }
                     }
                 }
@@ -401,7 +405,7 @@ Item {
         id: rowsGroup
 
         property var rows: []
-        readonly property var shown: rows.filter(r => r && r.value !== "")
+        readonly property var shown: rows.filter(r => r && (r.value !== "" || r.loading))
 
         Layout.fillWidth: true
         Layout.preferredWidth: 1
@@ -417,6 +421,7 @@ Item {
                 required property var modelData
                 label: modelData.label
                 value: modelData.value
+                loading: modelData.loading === true
                 tooltip: modelData.tooltip ? modelData.tooltip : (modelData.private ? I18n.tr("Not included when copying", "tooltip on personal system info rows") : "")
             }
         }
@@ -430,7 +435,7 @@ Item {
         property var rows: []
 
         Layout.fillWidth: true
-        visible: rows.some(r => r && r.value !== "")
+        visible: rows.some(r => r && (r.value !== "" || r.loading))
         spacing: Theme.spacingM
 
         SectionTitle {

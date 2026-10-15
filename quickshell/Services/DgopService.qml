@@ -414,12 +414,15 @@ Singleton {
 
         isUpdating = true;
         const generation = subscriptionGeneration;
+        const asRoot = unlocked;
         request("dgop.meta", params, response => {
             if (!response.result) {
                 log.warn("dgop.meta failed:", response.error || "empty result");
             } else if (pollingActive && generation === subscriptionGeneration) {
                 parseData(response.result);
             }
+            if (asRoot && unlockLoading && ++_rootSamples >= 2)
+                unlockLoading = false;
 
             isUpdating = false;
             if (pendingUpdate && pollingActive) {
@@ -458,6 +461,9 @@ Singleton {
     // are readable, and runs process actions. It exits when lock() closes its stdin or the shell goes away.
     readonly property bool unlocked: helper.running && helper.ready
     readonly property bool unlocking: helper.running && !helper.ready
+    // Unlocked, but the rates read as root aren't in yet: they need two samples.
+    property bool unlockLoading: false
+    property int _rootSamples: 0
     property var _helperCallbacks: ({})
     property int _helperNextId: 1
 
@@ -511,6 +517,7 @@ Singleton {
                 ToastService.showError(I18n.tr("Failed to unlock", "toast title when the system monitor could not get root access"), lastError);
             }
             ready = false;
+            root.unlockLoading = false;
             lastError = "";
             const pending = root._helperCallbacks;
             root._helperCallbacks = {};
@@ -532,6 +539,11 @@ Singleton {
                 }
                 if (response.id === 0) {
                     helper.ready = !response.error;
+                    if (helper.ready && root.pollingActive) {
+                        root._rootSamples = 0;
+                        root.unlockLoading = true;
+                        Qt.callLater(root.updateAllStats);
+                    }
                     return;
                 }
                 const callback = root._helperCallbacks[response.id];
