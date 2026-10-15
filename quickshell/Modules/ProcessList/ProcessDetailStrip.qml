@@ -22,18 +22,12 @@ Rectangle {
     readonly property bool startedToday: started !== null && started.toDateString() === new Date().toDateString()
     readonly property var parentProcess: (live?.ppid ?? 0) > 0 ? (DgopService.allProcesses ?? []).find(p => p.pid === live.ppid) ?? null : null
     readonly property int connectionCount: live?.connections ?? 0
-    // Connections grouped by remote address, busiest first. dgop lists at most 32 sockets per process.
-    readonly property var remoteGroups: {
-        const counts = {};
-        for (const r of live?.remotes ?? [])
-            counts[r.remote] = (counts[r.remote] ?? 0) + 1;
-        return Object.keys(counts).map(k => ({
-                    "remote": k,
-                    "count": counts[k]
-                })).sort((a, b) => b.count - a.count);
-    }
+    readonly property int localConnectionCount: live?.localConnections ?? 0
+    readonly property var remoteGroups: groupRemotes(false)
+    readonly property var localGroups: groupRemotes(true)
     readonly property int shownGroups: 4
-    readonly property int hiddenConnections: connectionCount - remoteGroups.slice(0, shownGroups).reduce((n, g) => n + g.count, 0)
+    readonly property int hiddenConnections: hiddenCount(connectionCount, remoteGroups)
+    readonly property int hiddenLocalConnections: hiddenCount(localConnectionCount, localGroups)
 
     property var detail: null
     readonly property real groupWidth: Theme.fontSizeMedium * 16
@@ -47,6 +41,22 @@ Rectangle {
 
     function cell(id) {
         return ProcessColumns.formatCell(id, live ?? ({}), false) ?? "—";
+    }
+
+    function groupRemotes(local) {
+        const counts = {};
+        for (const r of live?.remotes ?? []) {
+            if ((r.local === true) === local)
+                counts[r.remote] = (counts[r.remote] ?? 0) + 1;
+        }
+        return Object.keys(counts).map(k => ({
+                    "remote": k,
+                    "count": counts[k]
+                })).sort((a, b) => b.count - a.count);
+    }
+
+    function hiddenCount(total, groups) {
+        return total - groups.slice(0, shownGroups).reduce((n, g) => n + g.count, 0);
     }
 
     function bytes(v) {
@@ -279,7 +289,7 @@ Rectangle {
                 StatRow {
                     height: Theme.buttonHeightXS
                     label: I18n.tr("Shared memory")
-                    value: root.live?.gpuGtt != null ? root.bytes(root.live.gpuGtt * 1024) : ""
+                    value: root.live?.gpuGttKB != null ? root.bytes(root.live.gpuGttKB * 1024) : ""
                     tooltip: I18n.tr("System memory the GPU uses for this process")
                 }
 
@@ -321,6 +331,31 @@ Rectangle {
                     visible: root.hiddenConnections > 0
                     height: Theme.buttonHeightXS
                     label: I18n.tr("+ %1 more", "overflow line, %1 is a count of hidden items").arg(root.hiddenConnections)
+                    value: " "
+                }
+
+                StatRow {
+                    visible: root.localConnectionCount > 0
+                    height: Theme.buttonHeightXS
+                    label: I18n.tr("Local network", "process detail: connections to LAN, VPN or link-local addresses, not the internet")
+                    value: String(root.localConnectionCount)
+                }
+
+                Repeater {
+                    model: root.localGroups.slice(0, root.shownGroups)
+
+                    StatRow {
+                        required property var modelData
+                        height: Theme.buttonHeightXS
+                        label: modelData.remote
+                        value: modelData.count > 1 ? "× " + modelData.count : " "
+                    }
+                }
+
+                StatRow {
+                    visible: root.hiddenLocalConnections > 0
+                    height: Theme.buttonHeightXS
+                    label: I18n.tr("+ %1 more", "overflow line, %1 is a count of hidden items").arg(root.hiddenLocalConnections)
                     value: " "
                 }
             }

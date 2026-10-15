@@ -30,7 +30,7 @@ Rectangle {
     readonly property real linkCeiling: Math.max(0, ...(DgopService.netRates ?? []).filter(r => r.linkType === "ethernet" || r.linkType === "wireless").map(r => (r.speed ?? 0) * 1e6 / 8))
     readonly property var meterMaxes: ({
             "memory": DgopService.totalMemoryKB,
-            "vram": Math.max(0, ...(DgopService.gpuStats ?? []).map(g => g.vramTotal ?? 0)),
+            "vram": Math.max(0, ...(DgopService.availableGpus ?? []).map(g => (g.memoryTotal ?? 0) * 1024)),
             "disk": root.driveCeiling > 0 ? root.driveCeiling : ProcessColumns.peakMax([DgopService.diskHistory.read, DgopService.diskHistory.write], 0) * 1024 * 1024,
             "net": root.linkCeiling > 0 ? root.linkCeiling : ProcessColumns.peakMax([DgopService.networkHistory.rx, DgopService.networkHistory.tx], 0) * 1024
         })

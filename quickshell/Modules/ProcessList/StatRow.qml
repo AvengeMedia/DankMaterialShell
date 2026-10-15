@@ -50,6 +50,7 @@ Item {
         id: tip
         target: root
         hoverArea: rowHover
+        multiline: root.tooltip.includes("\n")
         text: root.tooltip
     }
 }

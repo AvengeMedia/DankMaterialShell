@@ -70,27 +70,15 @@ Item {
             }
         ];
 
-        const gpus = (DgopService.gpuStats ?? []).map(g => ({
-                    slot: g.pciSlot,
-                    name: g.name,
-                    stat: g
-                }));
-        if (!DgopService.isModuleAvailable("gpu-stats"))
-            for (const g of (DgopService.availableGpus ?? []))
-                gpus.push({
-                    slot: g.pciId,
-                    name: g.displayName,
-                    stat: null
-                });
-        for (const g of gpus) {
-            const key = Devices.deviceKey("gpu", g.slot);
-            const suspended = g.stat?.suspended === true;
-            const off = g.stat !== null && !Devices.gpuMonitored(DgopService.gpuPciIds, g.stat.pciId, g.stat.pciSlot);
+        for (const g of DgopService.availableGpus ?? []) {
+            const key = Devices.deviceKey("gpu", Devices.gpuSlot(g));
+            const suspended = g.state === "suspended";
+            const off = !Devices.gpuMonitored(DgopService.gpuPciIds, g.pciId, g.busId);
             items.push({
                 key: key,
                 group: I18n.tr("Graphics"),
-                name: g.name,
-                value: off ? I18n.tr("Monitoring off") : suspended ? I18n.tr("Idle", "adjective, printer state", true) : (g.stat?.usage != null ? Math.round(g.stat.usage) + "%" : "—"),
+                name: g.fullName,
+                value: off ? I18n.tr("Monitoring off") : suspended ? I18n.tr("Idle", "adjective, printer state", true) : (g.usage != null ? Math.round(g.usage) + "%" : "—"),
                 values: suspended || off ? [] : (history(key).a ?? []),
                 maximum: 100
             });
@@ -132,7 +120,7 @@ Item {
 
     Ref {
         service: DgopService
-        modules: ["cpu", "memory", "system", "disk-rate", "net-rate", "diskmounts", "gpu-stats", "memory-modules"]
+        modules: ["cpu", "memory", "system", "disk-rate", "net-rate", "diskmounts", "gpu", "memory-modules"]
         active: root.visible
     }
 

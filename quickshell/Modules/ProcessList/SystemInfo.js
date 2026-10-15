@@ -27,15 +27,15 @@ function modeText(mode) {
     return mode.refresh > 0 ? size + ", " + Math.round(mode.refresh / 1000) + " Hz" : size;
 }
 
-// Sensor owner name: names = {cpu, gpu, memory} (translated), drives from DriveService, gpus = [{pciSlot, name}].
+// Sensor owner name: names = {cpu, gpu, memory} (translated), drives from DriveService, gpus = DgopService.availableGpus.
 function sensorOwner(sensor, drives, gpus, names, memoryIndex) {
     const chip = sensor.chip || "";
     if (CPU_CHIPS.includes(chip))
         return names.cpu;
     if (GPU_CHIPS.includes(chip)) {
         const list = gpus || [];
-        const gpu = list.length > 1 ? list.find(g => String(g.pciSlot).toLowerCase() === String(sensor.device).toLowerCase()) : null;
-        return (gpu && gpu.name) || names.gpu;
+        const gpu = list.length > 1 ? list.find(g => String(g.busId).toLowerCase() === String(sensor.device).toLowerCase()) : null;
+        return (gpu && gpu.fullName) || names.gpu;
     }
     if (chip === "nvme") {
         const drive = (drives || []).find(d => String(d.name).startsWith(sensor.device + "n"));

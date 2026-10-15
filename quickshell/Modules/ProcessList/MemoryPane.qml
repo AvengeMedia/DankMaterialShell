@@ -14,7 +14,7 @@ DevicePane {
     readonly property string moduleSummary: {
         const counts = {};
         mods.forEach(m => counts[m.size] = (counts[m.size] ?? 0) + 1);
-        return Object.keys(counts).map(Number).sort((a, b) => b - a).map(size => counts[size] + " × " + Devices.formatBytes(size)).join(", ");
+        return Object.keys(counts).map(Number).sort((a, b) => b - a).map(size => counts[size] + " × " + Devices.formatBytes(size * 1024)).join(", ");
     }
     readonly property var channels: Devices.memoryChannelCount(mods)
     readonly property real speedMT: mods.length > 0 ? (mods[0].configuredSpeed || mods[0].speed || 0) : 0

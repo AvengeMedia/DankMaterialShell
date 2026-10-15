@@ -104,10 +104,10 @@ function rateAxisMax(values, secondaryValues, floor) {
     return Math.max(floor, peak * 1.1);
 }
 
-// "32.0 GiB DDR4" from the installed modules, or "" when none are known.
+// "32.0 GiB DDR4" from the installed modules (sizes in KB), or "" when none are known.
 function memoryModulesSummary(modules) {
     const list = modules || [];
-    const total = list.reduce((sum, m) => sum + (m.size || 0), 0);
+    const total = list.reduce((sum, m) => sum + (m.size || 0), 0) * 1024;
     if (total <= 0)
         return "";
     const types = [];
@@ -123,10 +123,15 @@ function formatTemp(celsius, fahrenheit) {
     return fahrenheit ? Math.round(celsius * 9 / 5 + 32) + " °F" : Math.round(celsius) + " °C";
 }
 
-// Mirrors dgop: an id matches a GPU by vendor:device id or PCI slot, case-insensitively.
-function gpuMonitored(ids, pciId, pciSlot) {
-    const want = [pciId, pciSlot].filter(Boolean).map(v => String(v).toLowerCase());
+// Mirrors dgop: an id matches a GPU by vendor:device id or PCI bus id, case-insensitively.
+function gpuMonitored(ids, pciId, busId) {
+    const want = [pciId, busId].filter(Boolean).map(v => String(v).toLowerCase());
     return (ids || []).some(id => want.includes(String(id).toLowerCase()));
+}
+
+// Bus id tells identical cards apart; dgop leaves it empty where the platform has none.
+function gpuSlot(gpu) {
+    return gpu.busId || gpu.pciId || "";
 }
 
 function deviceKey(type, id) {

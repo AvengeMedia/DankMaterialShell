@@ -18,13 +18,13 @@ func TestMetaParamsFromAllKeys(t *testing.T) {
 		"procCursor":           "p",
 		"netRateCursor":        "n",
 		"diskRateCursor":       "d",
-		"gpuStatsCursor":       "g",
+		"gpuCursor":            "g",
 		"netRateAllInterfaces": true,
 	})
 	want := gops.MetaParams{
 		SortBy: gops.ProcSortBy("memory"), ProcLimit: 5, EnableCPU: false, MergeChildren: false,
 		GPUPciIds: []string{"0000:01:00.0"}, CPUCursor: "c", ProcCursor: "p", NetRateCursor: "n",
-		DiskRateCursor: "d", GPUStatsCursor: "g", NetRateAllInterfaces: true,
+		DiskRateCursor: "d", GPUCursor: "g", NetRateAllInterfaces: true,
 	}
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("got %+v, want %+v", got, want)
@@ -34,7 +34,7 @@ func TestMetaParamsFromAllKeys(t *testing.T) {
 func TestMetaParamsFromDefaults(t *testing.T) {
 	got := metaParamsFrom(nil)
 	if got.ProcLimit != 20 || !got.MergeChildren || !got.EnableCPU || got.SortBy != gops.SortByCPU ||
-		got.GPUStatsCursor != "" || got.NetRateAllInterfaces {
+		got.GPUCursor != "" || got.NetRateAllInterfaces {
 		t.Fatalf("unexpected defaults: %+v", got)
 	}
 }

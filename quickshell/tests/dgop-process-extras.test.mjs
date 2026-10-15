@@ -28,7 +28,7 @@ function service(modules, availableModules = ["processes", "process-gpu", "proce
         ProcessSort: loadScript(new URL("../Services/ProcessSort.js", import.meta.url)),
         SysmonDevices: vm.runInContext(`(function(){${devicesSource}\nreturn {appendHistory};})()`, vm.createContext({}))
     });
-    const methods = ["hasModule", "isModuleAvailable", "buildMetaParams", "parseData", "processComparator", "applySorting"];
+    const methods = ["hasModule", "isModuleAvailable", "buildMetaParams", "dgopSort", "parseData", "processComparator", "applySorting"];
     const found = [];
     for (const match of source.matchAll(/^    function (\w+)\([^\n]*\)(?:: \w+)? \{\n[\s\S]*?^    \}/gm)) {
         if (!methods.includes(match[1]))
@@ -91,16 +91,20 @@ test("name and pid sort ascending by default and descending after toggle", () =>
     }
 });
 
-test("server sort follows the table only when the module is requested and available", () => {
-    const sort = (m, avail, key) => service(m, avail, key).buildMetaParams().sort;
-    assert.equal(sort(mods, ["processes", "process-gpu", "process-io"], "gpu"), "gpu");
-    assert.equal(sort(mods, ["processes", "process-gpu", "process-io"], "vram"), "vram");
-    assert.equal(sort(mods, ["processes", "process-gpu", "process-io"], "disk"), "disk");
-    assert.equal(sort(mods, ["processes", "process-gpu", "process-io"], "diskRead"), "disk");
-    assert.equal(sort(mods, ["processes", "process-io"], "gpu"), "cpu");
-    assert.equal(sort(["processes", "process-io"], ["processes", "process-gpu", "process-io"], "gpu"), "cpu");
-    assert.equal(sort(["processes"], ["processes", "process-io"], "disk"), "cpu");
-    assert.equal(sort(mods, ["processes", "process-gpu", "process-io"], "memory"), "cpu");
+test("the limit applies only when dgop sorts like the table; otherwise every process is fetched", () => {
+    const params = (m, avail, key, ascending = false) => {
+        const s = service(m, avail, key);
+        s.sortAscending = ascending;
+        const p = s.buildMetaParams();
+        return p.sort + ":" + p.limit;
+    };
+    for (const key of ["cpu", "memory", "pid", "gpu", "vram"])
+        assert.equal(params(mods, mods, key), key + ":100", key);
+    for (const key of ["name", "diskRead", "disk", "netRx", "connections", "threads", "user", "gpuVideo"])
+        assert.equal(params(mods, mods, key), "cpu:0", key);
+    assert.equal(params(mods, mods, "memory", true), "cpu:0");
+    assert.equal(params(mods, ["processes", "process-io"], "gpu"), "cpu:0");
+    assert.equal(params(["processes", "process-io"], mods, "vram"), "cpu:0");
 });
 
 test("no extras requested when only processes is enabled", () => {
@@ -128,7 +132,7 @@ test("stat, gpu split and net fields pass through; absent stays null", () => {
     const s = service([...mods, "process-net"], [...mods, "process-net"]);
     s.gpuPciIds = ["1002:744c"];
     s.parseData({ processes: [
-        { pid: 1, command: "a", pticks: 12.5, status: "S", threads: 27, nice: -4, gpuVideo: 3, gpuGtt: 2048, connections: 2, remotes: [{ protocol: "tcp", remote: "1.2.3.4:443" }], netRx: 10, netTx: 0 },
+        { pid: 1, command: "a", pticks: 12.5, status: "S", threads: 27, nice: -4, gpuVideo: 3, gpuGttKB: 2048, connections: 2, localConnections: 1, remotes: [{ protocol: "tcp", remote: "1.2.3.4:443" }], netRx: 10, netTx: 0, netPartial: true },
         { pid: 2, command: "b", nice: 0 }
     ] });
     const [a, b] = s.allProcesses;
@@ -137,8 +141,12 @@ test("stat, gpu split and net fields pass through; absent stays null", () => {
     assert.equal(a.threads, 27);
     assert.equal(a.nice, -4);
     assert.equal(a.gpuVideo, 3);
-    assert.equal(a.gpuGtt, 2048);
+    assert.equal(a.gpuGttKB, 2048);
     assert.equal(a.connections, 2);
+    assert.equal(a.localConnections, 1);
+    assert.equal(a.netPartial, true);
+    assert.equal(b.netPartial, false);
+    assert.equal(b.localConnections, null);
     assert.equal(a.remotes.length, 1);
     assert.equal(a.netTx, 0);
     assert.equal(b.nice, 0);
@@ -151,7 +159,7 @@ test("stat, gpu split and net fields pass through; absent stays null", () => {
 
 test("openFileCount and initSystem are parsed from system and hardware", () => {
     const s = service(["system"], ["system"]);
-    s.parseData({ system: { processes: 600, threads: 1900, openFileCount: 9890 }, hardware: { hostname: "h", initSystem: "systemd" } });
+    s.parseData({ system: { processes: 600, threads: 1900, openFiles: 9890 }, hardware: { hostname: "h", initSystem: "systemd" } });
     assert.equal(s.openFileCount, 9890);
     assert.equal(s.threadCount, 1900);
     assert.equal(s.initSystem, "systemd");

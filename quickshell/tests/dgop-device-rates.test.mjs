@@ -37,7 +37,7 @@ function service(modules) {
         appendHistory: (h, v) => h.concat([v]),
         SysmonDevices: vm.runInContext(`(function(){${devicesSource}\nreturn {isWholeDisk, appendHistory, sumWholeDisks, deviceKey};})()`, vm.createContext({}))
     });
-    const methods = ["hasModule", "isModuleAvailable", "buildMetaParams", "parseData", "releaseUnusedData", "removeDeviceHistory", "pushDeviceHistory"];
+    const methods = ["hasModule", "isModuleAvailable", "buildMetaParams", "dgopSort", "parseData", "releaseUnusedData", "removeDeviceHistory", "pushDeviceHistory"];
     const found = [];
     for (const match of source.matchAll(/^    function (\w+)\([^\n]*\)(?:: \w+)? \{\n[\s\S]*?^    \}/gm)) {
         if (!methods.includes(match[1]))

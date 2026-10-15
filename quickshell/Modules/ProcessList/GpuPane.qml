@@ -11,18 +11,16 @@ DevicePane {
 
     property string slot: ""
 
-    readonly property var stat: (DgopService.gpuStats ?? []).find(g => g.pciSlot === slot) ?? null
-    // Used when gpu-stats is unavailable: the slot is then the device's pciId.
-    readonly property var fallback: stat ? null : ((DgopService.availableGpus ?? []).find(g => g.pciId === slot) ?? null)
-    readonly property bool monitored: stat !== null && Devices.gpuMonitored(DgopService.gpuPciIds, stat.pciId, stat.pciSlot)
+    readonly property var stat: (DgopService.availableGpus ?? []).find(g => Devices.gpuSlot(g) === slot) ?? null
+    readonly property bool monitored: stat !== null && Devices.gpuMonitored(DgopService.gpuPciIds, stat.pciId, stat.busId)
     readonly property bool off: stat !== null && !monitored
-    readonly property bool suspended: stat?.suspended === true
+    readonly property bool suspended: stat?.state === "suspended"
     readonly property bool live: stat !== null && !off && !suspended
     readonly property var history: DgopService.deviceHistory[Devices.deviceKey("gpu", slot)] ?? ({})
 
-    // allProcesses holds the top 100 by CPU, so a GPU-heavy process with low CPU use can be missing.
+    // allProcesses can be only the top 100 by the table's sort, so a GPU-heavy process can be missing.
     // Per-process GPU use is not per device, so it is only meaningful with a single GPU.
-    readonly property bool singleGpu: (DgopService.gpuStats ?? []).length === 1
+    readonly property bool singleGpu: (DgopService.availableGpus ?? []).length === 1
     readonly property var topProcess: {
         if (!singleGpu || !live)
             return null;
@@ -52,23 +50,23 @@ DevicePane {
         return v === null || v === undefined ? null : Devices.formatTemp(v, SettingsData.useFahrenheit);
     }
 
-    function usedOf(used, total) {
-        return used === null || used === undefined || !(total > 0) ? null : Devices.formatBytes(used) + " / " + Devices.formatBytes(total);
+    function usedOf(usedKB, totalKB) {
+        return usedKB === null || usedKB === undefined || !(totalKB > 0) ? null : Devices.formatBytes(usedKB * 1024) + " / " + Devices.formatBytes(totalKB * 1024);
     }
 
     function withMax(max, unit) {
         return max === null || max === undefined ? "" : I18n.tr("Max clock") + ": " + num(max, unit);
     }
 
-    title: stat?.name ?? fallback?.displayName ?? slot
+    title: stat?.fullName ?? slot
     titleTooltip: title
-    subtitle: stat?.driver ?? fallback?.driver ?? ""
-    subtitle2: stat?.vramTotal > 0 ? I18n.tr("%1 VRAM", "GPU memory size, e.g. 24 GiB VRAM").arg(Devices.formatBytes(stat.vramTotal)) : ""
+    subtitle: stat?.driver ?? ""
+    subtitle2: stat?.memoryTotal > 0 ? I18n.tr("%1 VRAM", "GPU memory size, e.g. 24 GiB VRAM").arg(Devices.formatBytes(stat.memoryTotal * 1024)) : ""
     showChart: live
     chartLabel: I18n.tr("Usage", "chart legend: CPU or GPU utilization")
     chartValue: pct(stat?.usage) ?? "—"
     chartSecondaryLabel: (history.b ?? []).length > 0 ? I18n.tr("VRAM") : ""
-    chartSecondaryValue: stat?.vramTotal > 0 && stat?.vramUsed != null ? Math.round(stat.vramUsed / stat.vramTotal * 100) + "%" : ""
+    chartSecondaryValue: stat?.memoryTotal > 0 && stat?.memoryUsed != null ? Math.round(stat.memoryUsed / stat.memoryTotal * 100) + "%" : ""
     values: live ? (history.a ?? []) : []
     secondaryValues: live ? (history.b ?? []) : []
     maximum: 100
@@ -77,7 +75,7 @@ DevicePane {
     leftStats: live ? [
         {
             label: I18n.tr("VRAM"),
-            value: root.usedOf(stat.vramUsed, stat.vramTotal)
+            value: root.usedOf(stat.memoryUsed, stat.memoryTotal)
         },
         {
             label: I18n.tr("Shared memory", "GPU memory borrowed from system RAM (GTT)"),
@@ -94,8 +92,8 @@ DevicePane {
         },
         {
             label: I18n.tr("Memory clock"),
-            value: root.num(stat.memClock, "MHz"),
-            tooltip: root.withMax(stat.memClockMax, "MHz")
+            value: root.num(stat.memoryClock, "MHz"),
+            tooltip: root.withMax(stat.memoryClockMax, "MHz")
         },
         {
             label: I18n.tr("Video encode", "GPU video encoder busy percentage"),
@@ -110,7 +108,7 @@ DevicePane {
     rightStats: live ? [
         {
             label: I18n.tr("Temperature"),
-            value: root.temp(stat.temperature)
+            value: root.temp(stat.temperature || null)
         },
         {
             label: I18n.tr("Hotspot", "GPU hotspot temperature", true),

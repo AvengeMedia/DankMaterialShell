@@ -7,13 +7,14 @@ const source = readFileSync(new URL("../Services/DgopService.qml", import.meta.u
 const devicesSource = readFileSync(new URL("../Services/SysmonDevices.js", import.meta.url), "utf8").replace(".pragma library", "");
 
 const pinnedModules = ["cpu", "memory", "network", "net-rate", "disk", "disk-rate", "diskmounts", "processes", "system", "hardware", "gpu", "gpu-temp"];
-const newModules = [...pinnedModules, "process-gpu", "process-io", "gpu-stats", "sensors", "memory-modules"];
+const newModules = [...pinnedModules, "process-gpu", "process-io", "sensors", "memory-modules"];
 
 function service(modules, availableModules = []) {
     const requests = [];
     const context = vm.createContext({
         refCount: 1,
         currentSort: "cpu",
+        sortAscending: false,
         fullProcessListRefs: 0,
         enabledModules: modules,
         availableModules,
@@ -27,7 +28,7 @@ function service(modules, availableModules = []) {
         procCursor: "",
         diskRateCursor: "",
         netRateCursor: "",
-        gpuStatsCursor: "",
+        gpuCursor: "",
         cpuSampleCount: 0,
         cpuHistory: [],
         memoryHistory: [],
@@ -36,7 +37,7 @@ function service(modules, availableModules = []) {
         memoryInfo: null,
         diskRates: [],
         netRates: [],
-        gpuStats: [],
+        availableGpus: [],
         sensors: [],
         memoryModules: null,
         deviceHistory: {},
@@ -45,9 +46,9 @@ function service(modules, availableModules = []) {
         statsUpdated() {},
         updateAllStats() {},
         appendHistory: (h, v) => h.concat([v]),
-        SysmonDevices: vm.runInContext(`(function(){${devicesSource}\nreturn {isWholeDisk, appendHistory, sumWholeDisks, deviceKey};})()`, vm.createContext({}))
+        SysmonDevices: vm.runInContext(`(function(){${devicesSource}\nreturn {isWholeDisk, appendHistory, sumWholeDisks, deviceKey, gpuSlot};})()`, vm.createContext({}))
     });
-    const methods = ["hasModule", "isModuleAvailable", "initializeModules", "buildMetaParams", "parseData", "releaseUnusedData", "removeDeviceHistory", "pushDeviceHistory"];
+    const methods = ["hasModule", "isModuleAvailable", "initializeModules", "buildMetaParams", "dgopSort", "parseData", "releaseUnusedData", "removeDeviceHistory", "pushDeviceHistory"];
     const found = [];
     for (const match of source.matchAll(/^    function (\w+)\([^\n]*\)(?:: \w+)? \{\n[\s\S]*?^    \}/gm)) {
         if (!methods.includes(match[1]))
@@ -59,13 +60,13 @@ function service(modules, availableModules = []) {
     return { ctx: context, requests };
 }
 
-const gpuStats = (cursor, gpus) => ({ gpustats: { cursor, gpus } });
+const gpuMeta = (cursor, gpus) => ({ gpu: { cursor, gpus } });
 
 test("modules missing from dgop.modules are never requested", () => {
-    const { ctx } = service(["cpu", "gpu-stats", "sensors"], pinnedModules);
+    const { ctx } = service(["cpu", "memory-modules", "sensors"], pinnedModules);
     assert.deepEqual(Array.from(ctx.buildMetaParams().modules), ["cpu"]);
     ctx.availableModules = newModules;
-    assert.deepEqual(Array.from(ctx.buildMetaParams().modules), ["cpu", "gpu-stats", "sensors"]);
+    assert.deepEqual(Array.from(ctx.buildMetaParams().modules), ["cpu", "memory-modules", "sensors"]);
 });
 
 test("before dgop.modules replies only the new modules are held back", () => {
@@ -74,7 +75,7 @@ test("before dgop.modules replies only the new modules are held back", () => {
 });
 
 test("a request made only of unavailable modules is not sent", () => {
-    const { ctx } = service(["gpu-stats"], pinnedModules);
+    const { ctx } = service(["sensors"], pinnedModules);
     assert.equal(ctx.buildMetaParams(), null);
 });
 
@@ -90,26 +91,48 @@ test("dgop.modules is fetched and stored, failures leave the list empty", () => 
     assert.deepEqual(Array.from(ctx.availableModules), []);
 });
 
-test("gpu-stats cursor is forwarded and histories keyed by pciSlot", () => {
-    const { ctx } = service(["gpu-stats"], newModules);
-    assert.equal(ctx.buildMetaParams().gpuStatsCursor, undefined);
-    ctx.parseData(gpuStats("g1", [{ pciSlot: "0000:03:00.0", usage: 40, vramUsed: 2, vramTotal: 8 }]));
-    assert.equal(ctx.buildMetaParams().gpuStatsCursor, "g1");
-    assert.equal(ctx.gpuStats.length, 1);
+test("gpu is only requested with enabled GPUs, and one request carries identity and stats", () => {
+    const { ctx } = service(["cpu", "gpu"], newModules);
+    assert.deepEqual(Array.from(ctx.buildMetaParams().modules), ["cpu"]);
+    ctx.gpuPciIds = ["0000:03:00.0"];
+    const params = ctx.buildMetaParams();
+    assert.deepEqual(Array.from(params.modules), ["cpu", "gpu"]);
+    assert.equal(params.gpuCursor, undefined);
+    ctx.parseData(gpuMeta("g1", [
+        { busId: "0000:03:00.0", pciId: "1002:744c", fullName: "dGPU", state: "active", usage: 40, memoryUsed: 2, memoryTotal: 8, temperature: 0 },
+        { busId: "0000:0c:00.0", pciId: "1002:164e", fullName: "iGPU", temperature: 0 }
+    ]));
+    assert.equal(ctx.buildMetaParams().gpuCursor, "g1");
+    assert.deepEqual(ctx.availableGpus.map(g => g.fullName), ["dGPU", "iGPU"]);
+    assert.equal(ctx.availableGpus[0].temperature, 0);
     assert.deepEqual(Array.from(ctx.deviceHistory["gpu:0000:03:00.0"].a), [40]);
     assert.deepEqual(Array.from(ctx.deviceHistory["gpu:0000:03:00.0"].b), [25]);
+    assert.equal(ctx.deviceHistory["gpu:0000:0c:00.0"], undefined);
 });
 
-test("a suspended GPU gets no history sample and VRAM needs both fields", () => {
-    const { ctx } = service(["gpu-stats"], newModules);
-    ctx.parseData(gpuStats("g1", [
-        { pciSlot: "0000:03:00.0", pciId: "1002:744c", name: "dGPU", suspended: true },
-        { pciSlot: "0000:0c:00.0", usage: 5, vramUsed: 1 }
+test("a suspended GPU gets no sample, VRAM needs both fields, a GPU dropped from the list loses its history", () => {
+    const { ctx } = service(["gpu"], newModules);
+    ctx.gpuPciIds = ["0000:03:00.0", "0000:0c:00.0"];
+    ctx.parseData(gpuMeta("", [
+        { busId: "0000:03:00.0", state: "active", usage: 5 },
+        { busId: "0000:0c:00.0", state: "active", usage: 5, memoryUsed: 1 }
     ]));
-    assert.equal(ctx.gpuStats.length, 2);
-    assert.equal(ctx.deviceHistory["gpu:0000:03:00.0"], undefined);
-    assert.deepEqual(Array.from(ctx.deviceHistory["gpu:0000:0c:00.0"].a), [5]);
-    assert.deepEqual(Array.from(ctx.deviceHistory["gpu:0000:0c:00.0"].b), []);
+    ctx.parseData(gpuMeta("", [
+        { busId: "0000:03:00.0", state: "suspended", usage: 0 },
+        { busId: "0000:0c:00.0" }
+    ]));
+    assert.deepEqual(Array.from(ctx.deviceHistory["gpu:0000:03:00.0"].a), [5]);
+    assert.equal(ctx.deviceHistory["gpu:0000:0c:00.0"], undefined);
+    assert.equal(ctx.gpuCursor, "");
+});
+
+test("the dgop.gpu identity list keeps the cursor and starts no history", () => {
+    const { ctx } = service(["gpu"], newModules);
+    ctx.gpuCursor = "g1";
+    ctx.parseData({ gpus: [{ busId: "0000:03:00.0", pciId: "10de:2684", state: "active", usage: 3 }] });
+    assert.equal(ctx.availableGpus.length, 1);
+    assert.equal(ctx.gpuCursor, "g1");
+    assert.deepEqual(Object.keys(ctx.deviceHistory), []);
 });
 
 test("net-rate asks for all interfaces", () => {
@@ -120,14 +143,14 @@ test("net-rate asks for all interfaces", () => {
 });
 
 test("sensors, memory modules and cpu extras are parsed and released", () => {
-    const { ctx } = service(["cpu", "sensors", "memory-modules", "gpu-stats"], newModules);
+    const { ctx } = service(["cpu", "sensors", "memory-modules", "gpu"], newModules);
     const cpu = { usage: 10, coreFrequencies: [3000], governor: "powersave" };
     const modules = { slots: 4, modules: [{ locator: "DIMM_A1", size: 17179869184 }] };
     ctx.parseData({
         cpu,
         sensors: { sensors: [{ chip: "k10temp", label: "Tctl", kind: "temperature", value: 50 }] },
         memorymodules: modules,
-        gpustats: { cursor: "g", gpus: [{ pciSlot: "s", usage: 1 }] }
+        gpu: { cursor: "g", gpus: [{ busId: "s", state: "active", usage: 1 }] }
     });
     assert.equal(ctx.cpuInfo, cpu);
     assert.equal(ctx.sensors.length, 1);
@@ -137,13 +160,12 @@ test("sensors, memory modules and cpu extras are parsed and released", () => {
     assert.equal(ctx.cpuInfo, null);
     assert.equal(ctx.sensors.length, 0);
     assert.equal(ctx.memoryModules, null);
-    assert.equal(ctx.gpuStats.length, 0);
-    assert.equal(ctx.gpuStatsCursor, "");
+    assert.equal(ctx.gpuCursor, "");
     assert.deepEqual(Object.keys(ctx.deviceHistory), []);
 });
 
 test("deviceHistory is assigned once per poll", () => {
-    const { ctx } = service(["cpu", "memory", "net-rate", "gpu-stats"], newModules);
+    const { ctx } = service(["cpu", "memory", "net-rate", "gpu"], newModules);
     let assignments = 0;
     let history = {};
     Object.defineProperty(ctx, "deviceHistory", {
@@ -157,14 +179,14 @@ test("deviceHistory is assigned once per poll", () => {
         cpu: { usage: 1 },
         memory: { total: 100, available: 50 },
         netrate: { cursor: "n", interfaces: [{ interface: "enp6s0", rxrate: 1, txrate: 1 }] },
-        gpustats: { cursor: "g", gpus: [{ pciSlot: "s", usage: 1 }] }
+        gpu: { cursor: "g", gpus: [{ busId: "s", state: "active", usage: 1 }] }
     });
     assert.equal(assignments, 1);
     assert.deepEqual(Object.keys(history).sort(), ["cpu", "gpu:s", "memory"]);
 });
 
 test("gpuPciIds is always sent so an empty list means no GPU, never all", () => {
-    const { ctx } = service(["cpu", "gpu-stats"], newModules);
+    const { ctx } = service(["cpu", "gpu"], newModules);
     assert.deepEqual(Array.from(ctx.buildMetaParams().gpuPciIds), []);
     ctx.gpuPciIds = ["10de:2684"];
     assert.deepEqual(Array.from(ctx.buildMetaParams().gpuPciIds), ["10de:2684"]);

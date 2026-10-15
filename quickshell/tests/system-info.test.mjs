@@ -41,7 +41,7 @@ test("sensorRows names owners, scales bars and orders by kind", () => {
 
 test("sensorRows uses GPU names only when there are several GPUs", () => {
     const s = [{ chip: "amdgpu", device: "0000:0C:00.0", label: "edge", kind: "temperature", value: 48 }];
-    const gpus = [{ pciSlot: "0000:0c:00.0", name: "RX 7900 XTX" }, { pciSlot: "0000:01:00.0", name: "RTX 3060" }];
+    const gpus = [{ busId: "0000:0c:00.0", fullName: "RX 7900 XTX" }, { busId: "0000:01:00.0", fullName: "RTX 3060" }];
     assert.equal(S.sensorRows(s, [], gpus, names, false)[0].name, "RX 7900 XTX (edge)");
     assert.equal(S.sensorRows(s, [], gpus.slice(0, 1), names, false)[0].name, "GPU (edge)");
     assert.equal(S.sensorRows(s, [], [], names, true)[0].value, "118 °F");

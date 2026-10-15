@@ -154,7 +154,8 @@ DListItem {
                     acceptedButtons: Qt.NoButton
                     onContainsMouseChanged: {
                         if (containsMouse) {
-                            absentTip.text = ProcessColumns.absentReason(cell.modelData, root.process) === "unmonitored" ? I18n.tr("Monitoring off") : I18n.tr("Not readable without privileges");
+                            const reason = ProcessColumns.absentReason(cell.modelData, root.process);
+                            absentTip.text = reason === "unmonitored" ? I18n.tr("Monitoring off") : reason === "unknown" ? I18n.tr("Unknown", "process network rate that could not be measured") : I18n.tr("Not readable without privileges");
                             absentTip.target = cell;
                             absentTip.hoverArea = absentArea;
                         } else if (absentTip.hoverArea === absentArea) {

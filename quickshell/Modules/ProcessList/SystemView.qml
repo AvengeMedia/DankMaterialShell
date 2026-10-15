@@ -128,11 +128,7 @@ Item {
             "gpu": I18n.tr("GPU"),
             "memory": I18n.tr("Memory")
         })
-    readonly property var gpuNames: (DgopService.gpuStats ?? []).map(g => ({
-                "pciSlot": g.pciSlot,
-                "name": g.name
-            }))
-    readonly property var sensorRows: SystemInfo.sensorRows(DgopService.sensors, DriveService.drives, gpuNames, sensorNames, SettingsData.useFahrenheit)
+    readonly property var sensorRows: SystemInfo.sensorRows(DgopService.sensors, DriveService.drives, DgopService.availableGpus, sensorNames, SettingsData.useFahrenheit)
     readonly property int sensorSplit: Math.ceil(sensorRows.length / 2)
 
     function copySystemInfo() {

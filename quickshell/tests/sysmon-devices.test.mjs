@@ -84,7 +84,12 @@ test("naturalCompare orders numeric runs by value and letters lexically", () => 
     assert.deepEqual(sort(["sdaa", "sdb", "sda"]), ["sda", "sdb", "sdaa"]);
 });
 
-test("gpuMonitored matches by vendor:device id or PCI slot, case-insensitively; empty means none", () => {
+test("gpuSlot prefers the bus id and falls back to the PCI id", () => {
+    assert.equal(lib.gpuSlot({ busId: "0000:01:00.0", pciId: "10de:2684" }), "0000:01:00.0");
+    assert.equal(lib.gpuSlot({ pciId: "10de:2684" }), "10de:2684");
+});
+
+test("gpuMonitored matches by vendor:device id or PCI bus id, case-insensitively; empty means none", () => {
     assert.equal(lib.gpuMonitored([], "10de:2684", "0000:01:00.0"), false);
     assert.equal(lib.gpuMonitored(undefined, "10de:2684", "0000:01:00.0"), false);
     assert.equal(lib.gpuMonitored(["10DE:2684"], "10de:2684", "0000:01:00.0"), true);
@@ -123,7 +128,7 @@ test("rateAxisMax is the peak of both series plus 10%, with a floor", () => {
 });
 
 test("memoryModulesSummary totals sizes and lists each type once", () => {
-    const g = 1073741824;
+    const g = 1048576;
     assert.equal(lib.memoryModulesSummary([{ size: 16 * g, type: "DDR4" }, { size: 16 * g, type: "DDR4" }]), "32 GiB DDR4");
     assert.equal(lib.memoryModulesSummary([{ size: 8 * g }]), "8 GiB");
     assert.equal(lib.memoryModulesSummary([{ size: 1.5 * g, type: "DDR5" }]), "1.5 GiB DDR5");

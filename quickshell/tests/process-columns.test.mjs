@@ -10,7 +10,7 @@ const plain = v => JSON.parse(JSON.stringify(v));
 
 test("modulesFor returns the modifier modules the columns need, once", () => {
     assert.deepEqual(plain(lib.modulesFor(["cpu", "gpu", "diskRead"])), ["process-gpu", "process-io", "disk"]);
-    assert.deepEqual(plain(lib.modulesFor(["gpu", "vram"])), ["process-gpu", "gpu-stats"]);
+    assert.deepEqual(plain(lib.modulesFor(["gpu", "vram"])), ["process-gpu", "gpu"]);
     assert.deepEqual(plain(lib.modulesFor(["connections", "netRx", "netTx"])), ["process-net", "network"]);
     assert.deepEqual(plain(lib.modulesFor(lib.POPOUT_COLUMNS)), []);
 });
@@ -59,6 +59,7 @@ test("peakMax is the history peak x1.1 with a floor, ignoring gaps", () => {
 test("new columns format and sort", () => {
     assert.equal(lib.formatCell("connections", {connections: 0}, false), "0");
     assert.equal(lib.formatCell("netTx", {netTx: 2048}, false), "2.0 KB/s");
+    assert.equal(lib.formatCell("netRx", {netRx: 2048, netPartial: true}, false), "≥ 2.0 KB/s");
     assert.equal(lib.formatCell("cpuTime", {pticks: 3725.4}, false), "1:02:05");
     assert.equal(lib.formatCell("cpuTime", {pticks: 65}, false), "1:05");
     assert.equal(lib.formatCell("nice", {nice: -5}, false), "-5");
@@ -104,4 +105,6 @@ test("absentReason separates measured, unreadable and unmonitored GPU cells", ()
     assert.equal(lib.absentReason("gpu", {pid: 1}), "unreadable");
     assert.equal(lib.absentReason("vram", {gpuUnmonitored: true}), "unmonitored");
     assert.equal(lib.absentReason("cpu", {gpuUnmonitored: true}), "unreadable");
+    assert.equal(lib.absentReason("netRx", {connections: 0}), "unknown");
+    assert.equal(lib.absentReason("netTx", {pid: 1}), "unreadable");
 });

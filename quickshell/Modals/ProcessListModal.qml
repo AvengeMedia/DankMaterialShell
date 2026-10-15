@@ -85,7 +85,7 @@ DFloatingWindow {
     Ref {
         service: DgopService
         // Device histories keep filling while the window is open, whichever page is shown.
-        modules: ["cpu", "memory", "network", "disk", "system", "gpu", "disk-rate", "net-rate", "gpu-stats"]
+        modules: ["cpu", "memory", "network", "disk", "system", "gpu", "disk-rate", "net-rate"]
         active: processListModal.visible
     }
 

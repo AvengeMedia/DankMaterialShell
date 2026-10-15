@@ -15,6 +15,8 @@ const metaTimeout = 10 * time.Second
 
 var util = gops.NewGopsUtil()
 
+func Close() { util.Close() }
+
 func HandleRequest(conn *ipc.ConnWriter, req ipc.Request) {
 	runLowPriority(func() {
 		result, err := Call(req.Method, req.Params)
@@ -64,7 +66,7 @@ func metaParamsFrom(p map[string]any) gops.MetaParams {
 		ProcCursor:           params.StringOpt(p, "procCursor", ""),
 		NetRateCursor:        params.StringOpt(p, "netRateCursor", ""),
 		DiskRateCursor:       params.StringOpt(p, "diskRateCursor", ""),
-		GPUStatsCursor:       params.StringOpt(p, "gpuStatsCursor", ""),
+		GPUCursor:            params.StringOpt(p, "gpuCursor", ""),
 		NetRateAllInterfaces: params.BoolLoose(p, "netRateAllInterfaces"),
 	}
 }

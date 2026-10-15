@@ -18,6 +18,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
 	serverDbus "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dbus"
+	serverDgop "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dgop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/location"
@@ -909,6 +910,7 @@ func cleanupManagers() {
 	if filesService != nil {
 		filesService.Close()
 	}
+	serverDgop.Close()
 }
 
 type Server struct {

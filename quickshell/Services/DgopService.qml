@@ -43,7 +43,7 @@ Singleton {
     property string procCursor: ""
     property string diskRateCursor: ""
     property string netRateCursor: ""
-    property string gpuStatsCursor: ""
+    property string gpuCursor: ""
     property int cpuSampleCount: 0
 
     property real cpuUsage: 0
@@ -79,7 +79,6 @@ Singleton {
     property var memoryInfo: null
     property var bios: null
     property var cpuInfo: null
-    property var gpuStats: []
     property var sensors: []
     property var memoryModules: null
     property var availableModules: []
@@ -237,9 +236,8 @@ Singleton {
             netRates = [];
             removeDeviceHistory("net");
         }
-        if (!hasModule("gpu-stats")) {
-            gpuStatsCursor = "";
-            gpuStats = [];
+        if (!hasModule("gpu")) {
+            gpuCursor = "";
             removeDeviceHistory("gpu");
         }
         if (!hasModule("sensors"))
@@ -278,16 +276,18 @@ Singleton {
                     "gpu": null,
                     "gpuVideo": null,
                     "vramKB": null,
-                    "gpuGtt": null,
+                    "gpuGttKB": null,
                     "gpuUnmonitored": true
                 } : {}, noIo ? {
                     "diskRead": null,
                     "diskWrite": null
                 } : {}, noNet ? {
                     "connections": null,
+                    "localConnections": null,
                     "remotes": [],
                     "netRx": null,
-                    "netTx": null
+                    "netTx": null,
+                    "netPartial": false
                 } : {}));
             applySorting();
         }
@@ -436,7 +436,9 @@ Singleton {
                 log.warn("dgop.gpu failed:", response.error || "empty result");
                 return;
             }
-            parseData(response.result);
+            // A poll may have answered first with live stats; this identity-only list would blank them.
+            if (availableGpus.length === 0)
+                parseData(response.result);
         });
     }
 
@@ -551,7 +553,7 @@ Singleton {
     function isModuleAvailable(module) {
         if (availableModules.length > 0)
             return availableModules.includes(module);
-        return !["gpu-stats", "sensors", "memory-modules", "process-gpu", "process-io", "process-net"].includes(module);
+        return !["sensors", "memory-modules", "process-gpu", "process-io", "process-net"].includes(module);
     }
 
     function initializeSystemMetadata() {
@@ -599,20 +601,8 @@ Singleton {
         if (enabledModules.length === 0)
             return null;
 
-        // Replace 'gpu' with 'gpu-temp' when we have PCI IDs to monitor
-        let finalModules = [];
-        for (const module of enabledModules) {
-            if (module === "gpu" && gpuPciIds.length > 0) {
-                finalModules.push("gpu-temp");
-            } else if (module !== "gpu") {
-                finalModules.push(module);
-            }
-        }
-
-        if (hasModule("gpu") && gpuPciIds.length > 0 && finalModules.indexOf("gpu-temp") === -1) {
-            finalModules.push("gpu-temp");
-        }
-        finalModules = finalModules.filter(module => module === "all" || isModuleAvailable(module));
+        // Without enabled GPUs the gpu module adds nothing to the identity list fetched once by initializeGpuMetadata.
+        const finalModules = enabledModules.filter(module => (module !== "gpu" || gpuPciIds.length > 0) && (module === "all" || isModuleAvailable(module)));
 
         const params = {};
         if (enabledModules.indexOf("all") !== -1) {
@@ -639,24 +629,40 @@ Singleton {
         if (finalModules.includes("net-rate")) {
             params.netRateAllInterfaces = true;
         }
-        if (finalModules.includes("gpu-stats") && gpuStatsCursor) {
-            params.gpuStatsCursor = gpuStatsCursor;
+        if (finalModules.includes("gpu") && gpuCursor) {
+            params.gpuCursor = gpuCursor;
         }
 
         // Always sent: a missing key means "all GPUs" to dgop, and [] means none.
         params.gpuPciIds = gpuPciIds;
 
         if (enabledModules.indexOf("processes") !== -1 || enabledModules.indexOf("all") !== -1) {
+            const sort = dgopSort();
+            params.sort = sort || "cpu";
             // 0 means no limit in dgop
-            params.limit = fullProcessListRefs > 0 ? 0 : 100;
-            const mod = currentSort === "gpu" || currentSort === "vram" ? "process-gpu" : currentSort.startsWith("disk") ? "process-io" : "";
-            params.sort = mod && enabledModules.includes(mod) && isModuleAvailable(mod) ? (mod === "process-io" ? "disk" : currentSort) : "cpu";
+            params.limit = fullProcessListRefs > 0 || !sort ? 0 : 100;
             if (noCpu) {
                 params.noCpu = true;
             }
         }
 
         return params;
+    }
+
+    // dgop cuts the limit after its own sort, so a limited list is only right when that sort is the table's.
+    function dgopSort() {
+        if (sortAscending)
+            return "";
+        switch (currentSort) {
+        case "cpu":
+        case "memory":
+        case "pid":
+            return currentSort;
+        case "gpu":
+        case "vram":
+            return enabledModules.includes("process-gpu") && isModuleAvailable("process-gpu") ? currentSort : "";
+        }
+        return "";
     }
 
     function parseData(data) {
@@ -833,24 +839,26 @@ Singleton {
             pushDeviceHistory(history, "net", samples, rates.map(r => SysmonDevices.deviceKey("net", r.iface)));
         }
 
-        if (hasModule("gpu-stats") && data.gpustats && Array.isArray(data.gpustats.gpus)) {
-            const gpus = data.gpustats.gpus;
-            gpuStats = gpus;
-            if (data.gpustats.cursor)
-                gpuStatsCursor = data.gpustats.cursor;
-            const samples = [];
-            for (const g of gpus) {
-                if (g.usage === undefined)
-                    continue;
-                const vram = g.vramUsed !== undefined && g.vramTotal > 0 ? g.vramUsed / g.vramTotal * 100 : undefined;
-                samples.push({
-                    key: SysmonDevices.deviceKey("gpu", g.pciSlot),
-                    a: g.usage,
-                    b: vram
-                });
-            }
+        const gpuData = data.gpu?.gpus ?? data.gpus;
+        if (Array.isArray(gpuData)) {
+            availableGpus = gpuData.map(gpu => Object.assign({}, gpu, {
+                    "displayName": gpu.displayName || gpu.name || "Unknown GPU",
+                    "fullName": gpu.fullName || gpu.name || "Unknown GPU",
+                    "temperature": gpu.temperature || 0
+                }));
+        }
+
+        // dgop fills state and stats only for the GPUs in gpuPciIds.
+        if (hasModule("gpu") && Array.isArray(data.gpu?.gpus)) {
+            gpuCursor = data.gpu.cursor ?? "";
+            const read = data.gpu.gpus.filter(g => g.state);
+            const samples = read.filter(g => g.state === "active" && g.usage !== undefined).map(g => ({
+                        key: SysmonDevices.deviceKey("gpu", SysmonDevices.gpuSlot(g)),
+                        a: g.usage,
+                        b: g.memoryUsed !== undefined && g.memoryTotal > 0 ? g.memoryUsed / g.memoryTotal * 100 : undefined
+                    }));
             historyChanged = true;
-            pushDeviceHistory(history, "gpu", samples, gpus.map(g => SysmonDevices.deviceKey("gpu", g.pciSlot)));
+            pushDeviceHistory(history, "gpu", samples, read.map(g => SysmonDevices.deviceKey("gpu", SysmonDevices.gpuSlot(g))));
         }
 
         if (hasModule("sensors") && data.sensors && Array.isArray(data.sensors.sensors))
@@ -892,56 +900,21 @@ Singleton {
                     "gpu": gpuPciIds.length > 0 ? (proc.gpu ?? null) : null,
                     "gpuVideo": gpuPciIds.length > 0 ? (proc.gpuVideo ?? null) : null,
                     "vramKB": gpuPciIds.length > 0 ? (proc.vramKB ?? null) : null,
-                    "gpuGtt": gpuPciIds.length > 0 ? (proc.gpuGtt ?? null) : null,
+                    "gpuGttKB": gpuPciIds.length > 0 ? (proc.gpuGttKB ?? null) : null,
                     "gpuUnmonitored": gpuPciIds.length > 0 ? (proc.gpuUnmonitored ?? false) : true,
                     "diskRead": proc.diskRead ?? null,
                     "diskWrite": proc.diskWrite ?? null,
                     "connections": proc.connections ?? null,
+                    "localConnections": proc.localConnections ?? null,
                     "remotes": proc.remotes ?? [],
                     "netRx": proc.netRx ?? null,
                     "netTx": proc.netTx ?? null,
+                    "netPartial": proc.netPartial ?? false,
                     "displayName": (proc.command && proc.command.length > 15) ? proc.command.substring(0, 15) + "..." : (proc.command || "")
                 });
             }
             allProcesses = newProcesses;
             applySorting();
-        }
-
-        const gpuData = (data.gpu && data.gpu.gpus) || data.gpus;
-        if (gpuData && Array.isArray(gpuData)) {
-            // Check if this is temperature update data (has PCI IDs being monitored)
-            if (gpuPciIds.length > 0 && availableGpus && availableGpus.length > 0) {
-                // This is temperature data - merge with existing GPU metadata
-                const updatedGpus = availableGpus.slice();
-                for (var i = 0; i < updatedGpus.length; i++) {
-                    const existingGpu = updatedGpus[i];
-                    const tempGpu = gpuData.find(g => g.pciId === existingGpu.pciId);
-                    // Only update temperature if this GPU's PCI ID is being monitored
-                    if (tempGpu && gpuPciIds.includes(existingGpu.pciId)) {
-                        updatedGpus[i] = Object.assign({}, existingGpu, {
-                            "temperature": tempGpu.temperature || 0
-                        });
-                    }
-                }
-                availableGpus = updatedGpus;
-            } else {
-                // This is initial GPU metadata - set the full list
-                const gpuList = [];
-                for (const gpu of gpuData) {
-                    let displayName = gpu.displayName || gpu.name || "Unknown GPU";
-                    let fullName = gpu.fullName || gpu.name || "Unknown GPU";
-
-                    gpuList.push({
-                        "driver": gpu.driver || "",
-                        "vendor": gpu.vendor || "",
-                        "displayName": displayName,
-                        "fullName": fullName,
-                        "pciId": gpu.pciId || "",
-                        "temperature": gpu.temperature || 0
-                    });
-                }
-                availableGpus = gpuList;
-            }
         }
 
         if (data.system?.boottime) {
@@ -954,7 +927,7 @@ Singleton {
             loadAverage = sys.loadavg || "";
             processCount = sys.processes || 0;
             threadCount = sys.threads || 0;
-            openFileCount = sys.openFileCount || 0;
+            openFileCount = sys.openFiles || 0;
         }
 
         const hwData = data.hardware || ((data.hostname || data.kernel || data.distro || data.arch) ? data : null);
@@ -1030,21 +1003,22 @@ Singleton {
     }
 
     function setSortBy(newSortBy) {
-        if (newSortBy !== currentSort) {
-            currentSort = newSortBy;
-            sortAscending = false;
-            applySorting();
-        }
+        if (newSortBy !== currentSort)
+            changeSort(newSortBy, false);
     }
 
     function toggleSort(column) {
-        if (column === currentSort) {
-            sortAscending = !sortAscending;
-        } else {
-            currentSort = column;
-            sortAscending = false;
-        }
+        changeSort(column, column === currentSort ? !sortAscending : false);
+    }
+
+    // A limited list sorted by something else lacks rows the new order needs, so fetch again right away.
+    function changeSort(column, ascending) {
+        const before = dgopSort();
+        currentSort = column;
+        sortAscending = ascending;
         applySorting();
+        if (before !== "" && dgopSort() !== before)
+            updateAllStats();
     }
 
     // Name and PID read ascending by default, so sortAscending inverts for them.

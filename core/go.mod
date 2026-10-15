@@ -108,4 +108,4 @@ require (
 // See: https://github.com/mattn/go-localereader/issues/2
 replace github.com/mattn/go-localereader v0.0.1 => github.com/mattn/go-localereader v0.0.2-0.20220822084749-2491eb6c1c75
 
-replace github.com/AvengeMedia/dgop => github.com/Conava/dgop v1.6.3-0.20261012150824-cd07efe93812
+replace github.com/AvengeMedia/dgop => github.com/Conava/dgop v1.6.3-0.20261015151609-488d8ef5ff3a

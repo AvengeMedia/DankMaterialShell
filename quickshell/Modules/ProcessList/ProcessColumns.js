@@ -7,7 +7,7 @@ const COLUMNS = [
     {id: "cpu", sortKey: "cpu", width: 7, meter: "percent"},
     {id: "memory", sortKey: "memory", width: 8, meter: "memory"},
     {id: "gpu", sortKey: "gpu", width: 6, meter: "percent", modules: ["process-gpu"]},
-    {id: "vram", sortKey: "vram", width: 7, meter: "vram", modules: ["process-gpu", "gpu-stats"]},
+    {id: "vram", sortKey: "vram", width: 7, meter: "vram", modules: ["process-gpu", "gpu"]},
     {id: "gpuVideo", sortKey: "gpuVideo", width: 6, meter: "percent", modules: ["process-gpu"]},
     {id: "diskRead", sortKey: "diskRead", group: "disk", width: 7, meter: "disk", modules: ["process-io", "disk"]},
     {id: "diskWrite", sortKey: "diskWrite", group: "disk", width: 7, meter: "disk", modules: ["process-io", "disk"]},
@@ -101,9 +101,10 @@ function formatCell(id, row, bits) {
     case "memory":
     case "vram": return Devices.formatBytes(v * 1024);
     case "diskRead":
-    case "diskWrite":
+    case "diskWrite": return Devices.formatRate(v, bits);
+    // UDP (QUIC) has no byte counters, so the TCP rate is only a lower bound.
     case "netRx":
-    case "netTx": return Devices.formatRate(v, bits);
+    case "netTx": return (row.netPartial ? "≥ " : "") + Devices.formatRate(v, bits);
     case "cpuTime": return formatDuration(v);
     case "connections":
     case "threads":
@@ -115,7 +116,12 @@ function formatCell(id, row, bits) {
     return null;
 }
 
-// Why a cell is absent: a GPU the user doesn't monitor, or a process we can't read.
+// Why a cell is absent: a GPU the user doesn't monitor, a rate dgop can't measure on a readable process
+// (UDP only, a container's network), or a process we can't read.
 function absentReason(id, row) {
-    return (id === "gpu" || id === "vram" || id === "gpuVideo") && row?.gpuUnmonitored === true ? "unmonitored" : "unreadable";
+    if ((id === "gpu" || id === "vram" || id === "gpuVideo") && row?.gpuUnmonitored === true)
+        return "unmonitored";
+    if ((id === "netRx" || id === "netTx") && row?.connections != null)
+        return "unknown";
+    return "unreadable";
 }
