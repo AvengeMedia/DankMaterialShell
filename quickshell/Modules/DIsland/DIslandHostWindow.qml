@@ -28,6 +28,14 @@ Item {
         return root.body?.containsGlobalPoint(gx, gy, padding) ?? false;
     }
 
+    // The focus grab must include the dismiss layer, or Hyprland eats the first outside click to end the grab.
+    Binding {
+        target: root.body
+        property: "dismissWindow"
+        value: dismissWindow
+        when: !!root.body
+    }
+
     PanelWindow {
         id: dismissWindow
 

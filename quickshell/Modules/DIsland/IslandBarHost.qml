@@ -177,6 +177,7 @@ Item {
     readonly property int keyboardFocusPolicy: KeyboardFocus.keyboardFocus(controller.keyboardDismissRequested && root.keyboardFocusArmed && !controller.keyboardYielded, null)
     readonly property bool wantsFocusGrab: KeyboardFocus.wantsGrab(controller.keyboardDismissRequested && !controller.keyboardYielded, null)
     readonly property var transientFocusWindows: islandTransientSurfaces.focusWindows
+    property var dismissWindow: null
     readonly property string registryKey: IslandHostRegistry.key(root.screen?.name, root.barId)
     property string registeredKey: ""
 
