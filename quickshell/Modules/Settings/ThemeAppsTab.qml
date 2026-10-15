@@ -158,6 +158,7 @@ Item {
 
             SettingsButtonGroupRow {
                 text: I18n.tr("Intensity")
+                description: I18n.tr("How far terminal colors shift toward the wallpaper color", "terminal wallpaper colors intensity description")
                 visible: SettingsData.terminalPalette !== "default"
                 enabled: Theme.matugenAvailable
                 model: [I18n.tr("Low"), I18n.tr("Medium"), I18n.tr("High")]
