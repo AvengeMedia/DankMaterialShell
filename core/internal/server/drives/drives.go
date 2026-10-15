@@ -92,6 +92,7 @@ type Partition struct {
 	Label      string `json:"label,omitempty"`
 	MountPoint string `json:"mountPoint,omitempty"`
 	Encrypted  bool   `json:"encrypted"`
+	Encryption string `json:"encryption,omitempty"`
 	Swap       bool   `json:"swap,omitempty"`
 	offset     uint64
 }
@@ -224,6 +225,9 @@ func partitions(objects objectMap, table dbus.ObjectPath, cleartext map[dbus.Obj
 		}
 		if _, ok := ifaces[ifaceEncrypted]; ok {
 			pt.Encrypted = true
+		}
+		if pt.FSType == "crypto_LUKS" {
+			pt.Encryption = "LUKS" + dbusutil.GetOr(blk, "IdVersion", "")
 		}
 		_, pt.Swap = ifaces[ifaceSwapspace]
 		// An unlocked LUKS partition is mounted through its cleartext mapping.

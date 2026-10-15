@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.Common
 import qs.Services
 
@@ -21,9 +20,6 @@ Singleton {
     // Shell command that installs smartmontools, empty when unknown
     property string installCommand: ""
     property bool loaded: false
-    // True while a full SMART report is running
-    readonly property bool reporting: reportProcess.running
-    readonly property string reportDevice: reporting ? reportProcess.device : ""
 
     readonly property bool polling: refCount > 0 && DMSService.isConnected && DMSService.capabilities.includes("drives")
 
@@ -46,28 +42,6 @@ Singleton {
             root.installCommand = response.result.installCommand || "";
             root.loaded = true;
         });
-    }
-
-    // Runs `pkexec smartctl -x --json` and calls done(exitCode, stdout, stderr).
-    // Exit 126 means the user dismissed the password prompt. smartctl also uses
-    // nonzero bits for warnings, so stdout is worth parsing whatever the code.
-    // A request for the drive already being read takes over its callback
-    // instead of starting a second pkexec; another drive's request is refused
-    // (the UI disables that button).
-    function fullReport(drive, done) {
-        if (!smartctlPath)
-            return false;
-        if (reportProcess.running) {
-            if (reportProcess.device !== drive.device)
-                return false;
-            reportProcess.done = done;
-            return true;
-        }
-        reportProcess.device = drive.device;
-        reportProcess.done = done;
-        reportProcess.command = ["pkexec", smartctlPath, "-x", "--json", drive.device];
-        reportProcess.running = true;
-        return true;
     }
 
     // Runs the install command in the configured terminal and waits for Enter
@@ -93,29 +67,5 @@ Singleton {
         running: root.polling
         triggeredOnStart: true
         onTriggered: root.refresh()
-    }
-
-    Process {
-        id: reportProcess
-        property var done: null
-        property string device: ""
-        running: false
-
-        stdout: StdioCollector {
-            id: reportOut
-        }
-
-        stderr: StdioCollector {
-            id: reportErr
-        }
-
-        onExited: exitCode => {
-            if (exitCode === 126)
-                root.log.info("SMART report cancelled at the auth prompt");
-            const cb = done;
-            done = null;
-            if (cb)
-                cb(exitCode, reportOut.text, reportErr.text.trim());
-        }
     }
 }

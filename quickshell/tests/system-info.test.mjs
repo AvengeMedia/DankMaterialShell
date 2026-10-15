@@ -47,7 +47,27 @@ test("sensorRows uses GPU names only when there are several GPUs", () => {
     assert.equal(S.sensorRows(s, [], [], names, true)[0].value, "118 °F");
 });
 
-test("plainText skips empty values", () => {
-    const text = S.plainText("rog", [{ title: "Software", rows: [{ label: "Kernel", value: "7.2" }, { label: "Init", value: "" }] }]);
-    assert.equal(text, "rog\n\nSoftware\nKernel: 7.2");
+test("report leaves out private and empty rows and empty sections", () => {
+    const text = S.report("System report", [
+        { title: "About", rows: [{ label: "Kernel", value: "7.2" }, { label: "Init", value: "" }, { label: "Hostname", value: "rog", private: true }] },
+        { title: "Network", rows: [{ label: "Wi-Fi", value: "home", private: true }] }
+    ]);
+    assert.equal(text, "### System report\n\n**About**\n- Kernel: 7.2");
+});
+
+test("summary is one bullet per line", () => {
+    assert.equal(S.summary(["DMS 1.7", "", "CachyOS"]), "- DMS 1.7\n- CachyOS");
+});
+
+test("version, packages, Mesa, DMI model and chassis", () => {
+    assert.equal(S.version("Hyprland 0.56.2 built from branch v0.56.2"), "0.56.2");
+    assert.equal(S.version("niri 25.08 (abc)"), "25.08");
+    assert.equal(S.packagesText({ "pkg.pacman": "2088", "pkg.rpm": "0", "pkg.flatpak": "17", "qs": "x" }), "2088 pacman, 17 flatpak");
+    assert.equal(S.mesaVersion({ "vk.info": "Mesa 26.2.4-arch3.1" }), "26.2.4");
+    assert.equal(S.mesaVersion({ gl: "4.6 (Compatibility Profile) Mesa 25.1" }), "25.1");
+    assert.equal(S.dmiModel({ "dmi.sys_vendor": "ASUS", "dmi.product_name": "System Product Name" }), "");
+    assert.equal(S.dmiModel({ "dmi.sys_vendor": "LENOVO", "dmi.product_name": "ThinkPad X1" }), "LENOVO ThinkPad X1");
+    assert.equal(S.chassisKind("3"), "desktop");
+    assert.equal(S.chassisKind(10), "laptop");
+    assert.equal(S.chassisKind(2), "");
 });

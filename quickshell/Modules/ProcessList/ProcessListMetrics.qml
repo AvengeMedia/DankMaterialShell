@@ -9,7 +9,6 @@ import qs.Modules.Settings.Widgets
 Singleton {
     readonly property real rowHeight: Theme.buttonHeightXS + Theme.spacingXS
     readonly property real headerHeight: Theme.buttonHeightXS + Theme.spacingXS
-    readonly property real groupHeaderHeight: Theme.buttonHeightXXS
     readonly property real appIconSize: Theme.iconSizeMedium
     readonly property real windowHeight: SettingsMetrics.windowHeight
     readonly property real menuWidth: 240
@@ -18,6 +17,78 @@ Singleton {
 
     // Shared by the window and the bar popout, like the user/system filter; not persisted.
     property bool onlineOnly: false
+    property bool showAdvanced: false
+    property string processTab: "overview"
+    property bool cpuPerThread: false
+
+    // Window app ids by PID: a window names its app more reliably than the process name does.
+    readonly property var windowAppIds: {
+        const ids = {};
+        for (const t of CompositorService.sortedToplevels ?? []) {
+            const pid = CompositorService.windowPid(t);
+            if (pid > 0 && t?.appId && !ids[pid])
+                ids[pid] = t.appId;
+        }
+        return ids;
+    }
+
+    // Desktop entries by the program their Exec= runs (full path and file name), with the first fixed argument they
+    // pass, so "dms run" names the shell's background process but not every other dms command.
+    readonly property var execEntries: {
+        const map = {};
+        for (const entry of DesktopEntries.applications?.values ?? []) {
+            const argv = entry?.command ?? [];
+            if (!argv[0])
+                continue;
+            const item = {
+                "entry": entry,
+                "arg": argv.slice(1).find(a => !a.startsWith("%")) ?? ""
+            };
+            for (const key of [argv[0], argv[0].split("/").pop()])
+                (map[key] = map[key] ?? []).push(item);
+        }
+        return map;
+    }
+
+    function execEntry(program, process) {
+        const arg = (process?.fullCommand ?? "").split(" ")[1] ?? "";
+        const items = execEntries[program] ?? [];
+        return (items.find(i => i.arg === arg) ?? items.find(i => i.arg === ""))?.entry ?? null;
+    }
+
+    // The desktop entry of a process (app name and icon), or null.
+    // Rows look up their app on every sample and every reorder; the answer only changes with the window list or the
+    // installed apps, so it is kept per process until one of those changes.
+    readonly property var _appMemo: ({
+            "entries": null,
+            "cache": new Map()
+        })
+
+    function appEntry(process, extraKeys) {
+        const windowId = windowAppIds[process?.pid];
+        const memo = _appMemo;
+        if (memo.entries !== execEntries || memo.cache.size > 4000) {
+            memo.entries = execEntries;
+            memo.cache = new Map();
+        }
+        const key = [process?.pid, process?.executablePath, process?.fullCommand, windowId].concat(extraKeys ?? []).join("\n");
+        if (memo.cache.has(key))
+            return memo.cache.get(key);
+        const entry = lookupAppEntry(process, windowId, extraKeys);
+        memo.cache.set(key, entry);
+        return entry;
+    }
+
+    function lookupAppEntry(process, windowId, extraKeys) {
+        const exe = process?.executablePath ?? "";
+        const keys = [windowId].concat(extraKeys ?? []);
+        for (const key of keys) {
+            const entry = key ? DesktopEntries.heuristicLookup(key) : null;
+            if (entry)
+                return entry;
+        }
+        return (exe && execEntry(exe, process)) || (process?.command ? DesktopEntries.heuristicLookup(process.command) : null) || execEntry(exe.split("/").pop(), process) || execEntry(process?.command ?? "", process);
+    }
 
     function columnLabel(id) {
         switch (id) {
@@ -26,11 +97,11 @@ Singleton {
         case "gpu": return I18n.tr("GPU");
         case "vram": return I18n.tr("VRAM");
         case "gpuVideo": return I18n.tr("Video", "process column: GPU video engine usage in percent");
-        case "diskRead": return I18n.tr("Read");
-        case "diskWrite": return I18n.tr("Write");
-        case "connections": return I18n.tr("Online", "process column: number of open internet connections");
-        case "netRx": return I18n.tr("Down", "network direction");
-        case "netTx": return I18n.tr("Up", "network direction");
+        case "diskRead": return I18n.tr("Disk read", "process column: disk read rate");
+        case "diskWrite": return I18n.tr("Disk write", "process column: disk write rate");
+        case "connections": return I18n.tr("Connections", "process column: number of open internet connections");
+        case "netRx": return I18n.tr("Download", "process column: network download rate");
+        case "netTx": return I18n.tr("Upload", "process column: network upload rate");
         case "status": return I18n.tr("Status");
         case "threads": return I18n.tr("Threads");
         case "nice": return I18n.tr("Nice", "process column: Linux nice value, scheduling priority");

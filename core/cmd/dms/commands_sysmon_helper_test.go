@@ -33,6 +33,8 @@ func TestSysmonHelperCallRejectsUnknownAndNonServices(t *testing.T) {
 	assert.Error(t, err)
 	_, err = sysmonHelperCall("process.restartService", map[string]any{"pid": float64(4242), "unit": "app-x.scope"})
 	assert.Error(t, err)
+	_, err = sysmonHelperCall("drives.smart", map[string]any{"device": "/etc/shadow"})
+	assert.Error(t, err)
 }
 
 func TestServeSysmonHelperAnswersEachLine(t *testing.T) {

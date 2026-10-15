@@ -5,7 +5,7 @@ import test from "node:test";
 import { loadScript } from "./qml-script.mjs";
 
 const ctx = loadScript(new URL("../Modules/ProcessList/ProcessColumns.js", import.meta.url));
-const lib = vm.runInContext("({COLUMNS, DEFAULT_COLUMNS, POPOUT_COLUMNS, modulesFor, meterMax, meterRatio, peakMax, formatCell, formatDuration, compare, rawValue, absentReason})", ctx);
+const lib = vm.runInContext("({COLUMNS, DEFAULT_COLUMNS, POPOUT_COLUMNS, modulesFor, formatCell, formatDuration, compare, rawValue, absentReason})", ctx);
 const plain = v => JSON.parse(JSON.stringify(v));
 
 test("modulesFor returns the modifier modules the columns need, once", () => {
@@ -35,25 +35,6 @@ test("formatCell distinguishes absent from zero", () => {
     assert.equal(lib.formatCell("vram", {vramKB: 2048}, false), "2.0 MiB");
     assert.equal(lib.formatCell("user", {username: ""}, false), null);
     assert.equal(lib.formatCell("pid", {pid: 42}, false), "42");
-});
-
-test("meterRatio follows the max rules and is clamped", () => {
-    const maxes = {memory: 1000, vram: 2048 * 1024, disk: 0, net: 0};
-    assert.equal(lib.meterRatio("cpu", {cpu: 50}, maxes), 0.5);
-    assert.equal(lib.meterRatio("gpu", {gpu: 150}, maxes), 1);
-    assert.equal(lib.meterRatio("gpu", {pid: 1}, maxes), 0);
-    assert.equal(lib.meterRatio("memory", {memoryKB: 250}, maxes), 0.25);
-    assert.equal(lib.meterRatio("vram", {vramKB: 1024}, maxes), 0.5);
-    assert.equal(lib.meterRatio("vram", {vramKB: 1024}, {}), 0);
-    assert.equal(lib.meterRatio("diskRead", {diskRead: 512 * 1024}, maxes), 0.5);
-    assert.equal(lib.meterRatio("netRx", {netRx: 50 * 1024}, maxes), 0.5);
-    assert.equal(lib.meterRatio("netRx", {netRx: 50 * 1024}, {net: 200 * 1024}), 0.25);
-    assert.equal(lib.meterRatio("pid", {pid: 5}, maxes), 0);
-});
-
-test("peakMax is the history peak x1.1 with a floor, ignoring gaps", () => {
-    assert.equal(lib.peakMax([[1, null, 10], [20]], 5), 22);
-    assert.equal(lib.peakMax([[], undefined], 5), 5);
 });
 
 test("new columns format and sort", () => {
@@ -107,4 +88,9 @@ test("absentReason separates measured, unreadable and unmonitored GPU cells", ()
     assert.equal(lib.absentReason("cpu", {gpuUnmonitored: true}), "unreadable");
     assert.equal(lib.absentReason("netRx", {connections: 0}), "unknown");
     assert.equal(lib.absentReason("netTx", {pid: 1}), "unreadable");
+});
+
+test("name sorts by the app name when one is known", () => {
+    assert.equal(lib.rawValue("name", {appName: "Zen Browser", command: "zen-bin"}), "zen browser");
+    assert.equal(lib.rawValue("name", {command: "zen-bin"}), "zen-bin");
 });

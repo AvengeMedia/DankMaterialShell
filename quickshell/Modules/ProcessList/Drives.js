@@ -104,19 +104,6 @@ function rootMostMount(drive) {
     return best;
 }
 
-// Size-weighted used share (0..1) over the drive's mounted partitions, or -1 when unknown.
-function spaceUsedRatio(drive, mounts) {
-    let used = 0, total = 0;
-    for (const p of (drive && drive.partitions) || []) {
-        const r = mountPercent(mounts, p.mountPoint);
-        if (r === null || !(p.size > 0))
-            continue;
-        used += r * p.size;
-        total += p.size;
-    }
-    return total > 0 ? used / total : -1;
-}
-
 // Rows with warn set, for the health pill tooltip.
 function warnRows(drive) {
     return summaryRows(drive).filter(r => r.warn);
@@ -164,6 +151,8 @@ function partitionStrip(drive, mounts) {
         mounted: !!p.mountPoint,
         size: sizes[i],
         swap: !!p.swap || p.fsType === "swap",
+        fsType: p.fsType || "",
+        encrypted: !!p.encrypted,
         usedRatio: mountPercent(mounts, p.mountPoint)
     }));
 }
@@ -191,21 +180,28 @@ function kindName(drive) {
 }
 
 // "NVMe SSD, 2 TB, PCIe 4.0 x4"
+// "nvme" is drawn by DeviceIcon (Material Symbols has no M.2 glyph); the rest are Material Symbols names.
+function driveIcon(drive) {
+    if (!drive)
+        return "storage";
+    if (drive.connectionBus === "usb")
+        return "usb";
+    if (drive.connectionBus === "sdio" || String(drive.name || "").startsWith("mmcblk"))
+        return "sd_card";
+    if (drive.removable)
+        return "usb";
+    switch (drive.kind) {
+    case "nvme": return "nvme";
+    case "ssd": return "hard_drive_2";
+    case "hdd": return "hard_disk";
+    }
+    return String(drive.name || "").startsWith("sr") ? "album" : "storage";
+}
+
 function driveSubtitle(drive) {
     if (!drive)
         return "";
     return [kindName(drive), drive.size > 0 ? formatCapacity(drive.size) : "", drive.pcieLink || ""].filter(s => s).join(", ");
-}
-
-// Rough sequential ceiling in bytes/s: PCIe lanes x per-lane rate, else a typical SATA SSD or HDD.
-const PCIE_LANE_BYTES = [0, 0.25e9, 0.5e9, 0.985e9, 1.969e9, 3.938e9, 7.877e9];
-
-function maxThroughput(drive) {
-    const link = /PCIe (\d+)\.\d+ x(\d+)/.exec((drive && drive.pcieLink) || "");
-    if (link && PCIE_LANE_BYTES[Number(link[1])])
-        return PCIE_LANE_BYTES[Number(link[1])] * Number(link[2]);
-    const kind = drive && drive.kind;
-    return kind === "hdd" ? 250e6 : kind === "nvme" ? 3.5e9 : 550e6;
 }
 
 function driveFor(name, drives) {

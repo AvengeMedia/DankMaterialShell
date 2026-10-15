@@ -33,7 +33,10 @@ Popup {
         }
     }
 
-    readonly property var menuItems: [
+    property bool inSubmenu: false
+    readonly property string endTitle: ProcessActions.restartKind(processData) === "reload" ? I18n.tr("Quit or reload", "process menu: opens the quit, force quit, end tree and reload actions") : I18n.tr("Quit or restart", "process menu: opens the quit, force quit, end tree and restart actions")
+
+    readonly property var mainItems: [
         {
             text: I18n.tr("Copy PID"),
             icon: "tag",
@@ -50,6 +53,25 @@ Popup {
             text: I18n.tr("Copy Full Command"),
             icon: "code",
             action: copyFullCommand,
+            enabled: true
+        },
+        {
+            type: "separator"
+        },
+        {
+            text: endTitle,
+            icon: "power_settings_new",
+            action: () => Qt.callLater(setSubmenu, true),
+            enabled: ProcessActions.canEnd(processData) || ProcessActions.canRestart(processData),
+            submenu: true
+        }
+    ]
+
+    readonly property var endItems: [
+        {
+            text: I18n.tr("Back"),
+            icon: "arrow_back",
+            action: () => Qt.callLater(setSubmenu, false),
             enabled: true
         },
         {
@@ -84,6 +106,19 @@ Popup {
         }
     ]
 
+    readonly property var menuItems: inSubmenu ? endItems : mainItems
+
+    function setSubmenu(on) {
+        inSubmenu = on;
+        selectedIndex = keyboardNavigation ? (on ? 2 : menuItems.length - 1) : -1;
+    }
+
+    // The end actions list is taller than the main one; keep it inside the parent.
+    onHeightChanged: {
+        if (visible && parent)
+            y = Math.max(0, Math.min(y, parent.height - height));
+    }
+
     readonly property int visibleItemCount: {
         let count = 0;
         for (let i = 0; i < menuItems.length; i++) {
@@ -111,6 +146,7 @@ Popup {
 
         processContextMenu.x = finalX;
         processContextMenu.y = finalY;
+        inSubmenu = false;
         keyboardNavigation = fromKeyboard || false;
         selectedIndex = fromKeyboard ? 0 : -1;
         open();
@@ -217,11 +253,14 @@ Popup {
     width: ProcessListMetrics.menuWidth
     height: menuColumn.implicitHeight + Theme.spacingS * 2
     padding: 0
-    modal: false
+    // Modal so the click that closes the menu doesn't also act on the row under it.
+    modal: true
+    dim: false
     closePolicy: Popup.CloseOnEscape
 
     onClosed: {
         closePolicy = Popup.CloseOnEscape;
+        inSubmenu = false;
         keyboardNavigation = false;
         selectedIndex = -1;
         menuClosed();
@@ -275,10 +314,19 @@ Popup {
                     activateSelected();
                     event.accepted = true;
                     return;
+                case Qt.Key_Right:
+                case Qt.Key_L:
+                    if (menuItems[selectedIndex]?.submenu && menuItems[selectedIndex].enabled)
+                        setSubmenu(true);
+                    event.accepted = true;
+                    return;
                 case Qt.Key_Escape:
                 case Qt.Key_Left:
                 case Qt.Key_H:
-                    close();
+                    if (inSubmenu)
+                        setSubmenu(false);
+                    else
+                        close();
                     event.accepted = true;
                     return;
                 }
@@ -373,7 +421,15 @@ Popup {
                                 }
                                 anchors.verticalCenter: parent.verticalCenter
                                 elide: Text.ElideRight
-                                width: parent.width - Theme.iconSizeSmall - Theme.spacingS
+                                width: parent.width - Theme.iconSizeSmall * (modelData.submenu ? 2 : 1) - Theme.spacingS * (modelData.submenu ? 2 : 1)
+                            }
+
+                            DIcon {
+                                visible: modelData.submenu ?? false
+                                name: "chevron_right"
+                                size: Theme.iconSizeSmall - 2
+                                color: modelData.enabled ? Theme.surfaceText : Theme.onSurface_38
+                                anchors.verticalCenter: parent.verticalCenter
                             }
                         }
 

@@ -4,7 +4,7 @@ import test from "node:test";
 import { loadScript } from "./qml-script.mjs";
 
 const ctx = loadScript(new URL("../Modules/ProcessList/Drives.js", import.meta.url));
-const D = vm.runInContext("({summaryRows, warnRows, healthLevel, healthWord, rootMostMount, spaceUsedRatio, partitionStrip, driveFor, driveByMount, parseReport, formatCapacity, driveSubtitle, maxThroughput})", ctx);
+const D = vm.runInContext("({summaryRows, warnRows, healthLevel, healthWord, rootMostMount, partitionStrip, driveFor, driveByMount, parseReport, formatCapacity, driveSubtitle, driveIcon})", ctx);
 const plain = v => JSON.parse(JSON.stringify(v));
 const ids = rows => plain(rows).map(r => r.id);
 const GiB = 1024 ** 3;
@@ -127,14 +127,6 @@ test("rootMostMount prefers / then the shortest path", () => {
     assert.equal(D.rootMostMount(null), "");
 });
 
-test("spaceUsedRatio weights mounted partitions by size", () => {
-    const drive = { partitions: [{ mountPoint: "/", size: 300 }, { mountPoint: "/home", size: 100 }, { size: 500 }, { mountPoint: "/x", size: 100 }] };
-    const mounts = [{ mount: "/", percent: "10%" }, { mount: "/home", percent: "50%" }];
-    assert.equal(D.spaceUsedRatio(drive, mounts), 80 / 400);
-    assert.equal(D.spaceUsedRatio(drive, []), -1);
-    assert.equal(D.spaceUsedRatio(null, mounts), -1);
-});
-
 test("selftest status maps udisks SmartSelftestStatus values", () => {
     const v = st => D.summaryRows({ ata: { selftestStatus: st } })[0].value;
     assert.deepEqual(["success", "inprogress", "aborted", "fatal", "error_read"].map(v), ["ok", "running", "error", "error", "error"]);
@@ -155,11 +147,13 @@ test("partitionStrip marks swap partitions and keeps sizes", () => {
     assert.deepEqual(strip.map(s => [s.swap, s.mounted, s.size]), [[true, false, 8], [true, false, 92], [false, true, 100]]);
 });
 
-test("maxThroughput: PCIe lanes, else drive kind", () => {
-    assert.equal(Math.round(D.maxThroughput({ kind: "nvme", pcieLink: "PCIe 4.0 x4" }) / 1e6), 7876);
-    assert.equal(Math.round(D.maxThroughput({ kind: "nvme", pcieLink: "PCIe 3.0 x2" }) / 1e6), 1970);
-    assert.equal(D.maxThroughput({ kind: "nvme" }), 3.5e9);
-    assert.equal(D.maxThroughput({ kind: "ssd" }), 550e6);
-    assert.equal(D.maxThroughput({ kind: "hdd" }), 250e6);
-    assert.equal(D.maxThroughput(null), 550e6);
+test("driveIcon: bus first, then kind", () => {
+    assert.equal(D.driveIcon({ kind: "nvme" }), "nvme");
+    assert.equal(D.driveIcon({ kind: "ssd" }), "hard_drive_2");
+    assert.equal(D.driveIcon({ kind: "hdd" }), "hard_disk");
+    assert.equal(D.driveIcon({ kind: "ssd", connectionBus: "usb" }), "usb");
+    assert.equal(D.driveIcon({ kind: "other", name: "mmcblk0" }), "sd_card");
+    assert.equal(D.driveIcon({ kind: "hdd", removable: true }), "usb");
+    assert.equal(D.driveIcon({ kind: "other", name: "sr0" }), "album");
+    assert.equal(D.driveIcon(null), "storage");
 });

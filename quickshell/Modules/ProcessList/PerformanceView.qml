@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Common
 import qs.Services
+import qs.Modules.Settings.Widgets
 import "../../Services/SysmonDevices.js" as Devices
 import "Drives.js" as Drives
 
@@ -55,6 +56,7 @@ Item {
             {
                 key: "cpu",
                 group: processor,
+                icon: "memory",
                 name: I18n.tr("CPU", "processor label in system monitor"),
                 value: DgopService.cpuSampleCount === 0 ? "—" : DgopService.cpuUsage.toFixed(0) + "%",
                 values: longer(history("cpu").a, DgopService.cpuHistory),
@@ -63,6 +65,7 @@ Item {
             {
                 key: "memory",
                 group: processor,
+                icon: "developer_board",
                 name: I18n.tr("Memory", "system RAM label in system monitor"),
                 value: DgopService.memoryInfo === null ? "—" : Devices.formatBytes(DgopService.usedMemoryKB * 1024) + " / " + Devices.formatBytes(DgopService.totalMemoryKB * 1024),
                 values: longer(history("memory").a, DgopService.memoryHistory),
@@ -77,6 +80,7 @@ Item {
             items.push({
                 key: key,
                 group: I18n.tr("Graphics"),
+                icon: "gpu",
                 name: g.fullName,
                 value: off ? I18n.tr("Monitoring off") : suspended ? I18n.tr("Idle", "adjective, printer state", true) : (g.usage != null ? Math.round(g.usage) + "%" : "—"),
                 values: suspended || off ? [] : (history(key).a ?? []),
@@ -90,6 +94,7 @@ Item {
             items.push({
                 key: key,
                 group: I18n.tr("Storage", "system monitor device group: disks"),
+                icon: Drives.driveIcon(Drives.driveFor(d.device, DriveService.drives)),
                 name: Drives.driveFor(d.device, DriveService.drives)?.model || d.device,
                 value: pairTotal(d.readRate, d.writeRate),
                 valueTooltip: I18n.tr("Read") + ": " + rate(d.readRate) + "\n" + I18n.tr("Write") + ": " + rate(d.writeRate),
@@ -105,6 +110,7 @@ Item {
             items.push({
                 key: key,
                 group: I18n.tr("Network"),
+                icon: kind === "wifi" ? "wifi" : kind === "vpn" ? "vpn_key" : "lan",
                 name: sameKind === 1 && netKindNames[kind] ? netKindNames[kind] : net.iface,
                 value: pairTotal(net.rxRate, net.txRate),
                 valueTooltip: I18n.tr("Down", "network direction") + ": " + rate(net.rxRate) + "\n" + I18n.tr("Up", "network direction") + ": " + rate(net.txRate),
@@ -113,6 +119,17 @@ Item {
             });
         }
         return items;
+    }
+
+    // Per-thread usage history for the CPU pane; it fills while the window is open, whichever page is shown.
+    property var threadHistory: []
+
+    Connections {
+        target: DgopService
+        function onPerCoreCpuUsageChanged() {
+            const usage = DgopService.perCoreCpuUsage;
+            root.threadHistory = usage.map((u, i) => Devices.appendHistory(root.threadHistory[i], u, DgopService.deviceHistorySize));
+        }
     }
 
     readonly property var activeEntry: railModel.find(e => e.key === currentKey) ?? railModel[0]
@@ -145,13 +162,24 @@ Item {
             onShowHiddenToggled: root.showHidden = !root.showHidden
         }
 
-        Loader {
-            id: pane
+        // The detail sits on its own pane, like a Settings page next to its sidebar.
+        Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            sourceComponent: {
-                const prefix = root.activeKey.split(":")[0];
-                return prefix === "disk" ? diskPane : prefix === "net" ? netPane : prefix === "memory" ? memoryPane : prefix === "gpu" ? gpuPane : cpuPane;
+            radius: SettingsMetrics.paneRadius
+            color: SettingsMetrics.paneColor
+            border.width: Theme.layerOutlineWidth
+            border.color: Theme.outlineMedium
+            clip: true
+
+            Loader {
+                id: pane
+                anchors.fill: parent
+                anchors.margins: SettingsMetrics.panePadding
+                sourceComponent: {
+                    const prefix = root.activeKey.split(":")[0];
+                    return prefix === "disk" ? diskPane : prefix === "net" ? netPane : prefix === "memory" ? memoryPane : prefix === "gpu" ? gpuPane : cpuPane;
+                }
             }
         }
     }
@@ -160,6 +188,7 @@ Item {
         id: cpuPane
         CpuPane {
             values: root.railModel[0].values
+            threadHistory: root.threadHistory
         }
     }
 

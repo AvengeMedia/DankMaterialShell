@@ -153,14 +153,15 @@ Singleton {
         if (hasModule("system"))
             updateUptime();
 
+        // Deferred so refs added together (a window and its pages) share one request.
         if (modulesChanged || refCount === 1) {
             enabledModules = enabledModules.slice(); // Force property change
             moduleRefCounts = Object.assign({}, moduleRefCounts); // Force property change
-            updateAllStats();
+            Qt.callLater(updateAllStats);
         } else if (gpuPciIds.length > 0 && refCount > 0) {
             // If we have GPU PCI IDs and active modules, make sure to update
             // This handles the case where PCI IDs were loaded after modules were added
-            updateAllStats();
+            Qt.callLater(updateAllStats);
         }
     }
 
@@ -423,7 +424,11 @@ Singleton {
             isUpdating = false;
             if (pendingUpdate && pollingActive) {
                 pendingUpdate = false;
-                primeTimer.restart();
+                // A reply dropped for a module change is refetched at once; otherwise wait so CPU deltas aren't noise.
+                if (generation !== subscriptionGeneration)
+                    Qt.callLater(updateAllStats);
+                else
+                    primeTimer.restart();
             }
         });
     }
@@ -888,8 +893,10 @@ Singleton {
                     "cpu": proc.cpu || 0,
                     "memoryPercent": proc.memoryPercent || proc.pssPercent || 0,
                     "memoryKB": proc.memoryKB || proc.pssKB || 0,
+                    "rssKB": proc.rssKB ?? null,
                     "command": proc.command || "",
                     "fullCommand": proc.fullCommand || "",
+                    "executablePath": proc.executablePath || "",
                     "username": proc.username || "",
                     "childCount": proc.childCount || 0,
                     "pticks": proc.pticks || 0,

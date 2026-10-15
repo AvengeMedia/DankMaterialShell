@@ -53,6 +53,7 @@ DevicePane {
             value: root.wifi?.signal > 0 ? root.wifi.signal + "%" : null
         },
         {
+            advanced: true,
             label: I18n.tr("Band"),
             value: SysmonDevices.wifiBand(root.wifiNetwork?.frequency ?? 0) || null
         },
@@ -62,11 +63,13 @@ DevicePane {
             tooltip: root.ipv4.join("\n")
         },
         {
+            advanced: true,
             label: I18n.tr("IPv6", "network IPv6 address"),
             value: root.ipv6Main || null,
             tooltip: root.ipv6.join("\n")
         },
         {
+            advanced: true,
             label: I18n.tr("MAC address"),
             value: root.netDevice?.hwAddress || null
         }
@@ -78,10 +81,12 @@ DevicePane {
             value: root.linkSpeed || null
         },
         {
+            advanced: true,
             label: I18n.tr("Driver"),
             value: root.ethernet?.driver || root.rates?.driver || null
         },
         {
+            advanced: true,
             label: I18n.tr("MTU", "network maximum transmission unit"),
             value: root.rates?.mtu > 0 ? String(root.rates.mtu) : null
         },

@@ -20,6 +20,8 @@ DevicePane {
     }
     readonly property real clockMHz: meanMHz > 0 ? meanMHz : DgopService.cpuFrequency
     readonly property int threads: info?.count ?? 0
+    property var threadHistory: []
+    readonly property bool perThread: ProcessListMetrics.cpuPerThread && DgopService.perCoreCpuUsage.length > 0
 
     function ghz(mhz) {
         return mhz > 0 ? (mhz / 1000).toFixed(2) + " GHz" : null;
@@ -36,10 +38,23 @@ DevicePane {
     title: I18n.tr("CPU", "processor label in system monitor")
     subtitle: DgopService.cpuModel
     subtitle2: info?.physicalCores > 0 && threads > 0 ? I18n.tr("%1 cores, %2 threads", "CPU core and thread count").arg(info.physicalCores).arg(threads) : ""
+    showChart: !perThread
     chartLabel: I18n.tr("Usage", "chart legend: CPU or GPU utilization")
     chartValue: DgopService.cpuSampleCount === 0 ? "—" : DgopService.cpuUsage.toFixed(0) + "%"
     maximum: 100
     maximumText: "100%"
+
+    headerActions: DButtonGroup {
+        visible: DgopService.perCoreCpuUsage.length > 0
+        size: "small"
+        checkEnabled: false
+        model: [I18n.tr("Overall", "CPU chart: usage of all threads together"), I18n.tr("Per thread")]
+        currentIndex: ProcessListMetrics.cpuPerThread ? 1 : 0
+        onSelectionChanged: (index, selected) => {
+            if (selected)
+                ProcessListMetrics.cpuPerThread = index === 1;
+        }
+    }
 
     leftStats: [
         {
@@ -48,13 +63,32 @@ DevicePane {
             tooltip: info?.governor ? I18n.tr("Governor") + ": " + info.governor : ""
         },
         {
+            label: I18n.tr("Max clock"),
+            value: root.ghz(info?.maxFrequency ?? 0)
+        },
+        {
             label: I18n.tr("Temperature"),
             value: DgopService.cpuTemperature > 0 ? Devices.formatTemp(DgopService.cpuTemperature, SettingsData.useFahrenheit) : null
         },
         {
-            label: I18n.tr("Load Average", "system info label"),
-            value: DgopService.loadAverage || null
+            advanced: true,
+            label: I18n.tr("Base clock", "CPU nominal frequency"),
+            value: root.ghz(info?.baseFrequency ?? 0)
         },
+        {
+            advanced: true,
+            label: I18n.tr("Virtualization", "CPU hardware virtualization, e.g. AMD-V"),
+            value: info?.virtualization || null
+        },
+        {
+            advanced: true,
+            label: I18n.tr("L3 cache"),
+            value: root.size(cache?.l3 ?? 0),
+            tooltip: [[I18n.tr("L1 cache", "CPU cache level"), root.size((cache?.l1d ?? 0) + (cache?.l1i ?? 0))], [I18n.tr("L2 cache", "CPU cache level"), root.size(cache?.l2 ?? 0)]].filter(p => p[1] !== null).map(p => p[0] + ": " + p[1]).join("\n")
+        }
+    ]
+
+    rightStats: [
         {
             label: I18n.tr("Processes"),
             value: root.count(DgopService.processCount)
@@ -64,103 +98,99 @@ DevicePane {
             value: root.count(DgopService.threadCount)
         },
         {
-            label: I18n.tr("Open files", "system-wide open file handles"),
-            value: root.count(DgopService.openFileCount ?? 0)
-        }
-    ]
-
-    rightStats: [
-        {
-            label: I18n.tr("Base clock", "CPU nominal frequency"),
-            value: root.ghz(info?.baseFrequency ?? 0)
-        },
-        {
-            label: I18n.tr("Max clock"),
-            value: root.ghz(info?.maxFrequency ?? 0)
-        },
-        {
-            label: I18n.tr("Sockets", "CPU sockets on the motherboard"),
-            value: root.count(info?.sockets ?? 0)
-        },
-        {
-            label: I18n.tr("Virtualization", "CPU hardware virtualization, e.g. AMD-V"),
-            value: info?.virtualization || null
-        },
-        {
-            label: I18n.tr("L3 cache"),
-            value: root.size(cache?.l3 ?? 0),
-            tooltip: [[I18n.tr("L1 cache", "CPU cache level"), root.size((cache?.l1d ?? 0) + (cache?.l1i ?? 0))], [I18n.tr("L2 cache", "CPU cache level"), root.size(cache?.l2 ?? 0)]].filter(p => p[1] !== null).map(p => p[0] + ": " + p[1]).join("\n")
-        },
-        {
             label: I18n.tr("Uptime"),
             value: DgopService.uptime ? DgopService.uptime.slice(3) : null
+        },
+        {
+            advanced: true,
+            label: I18n.tr("Load Average", "system info label"),
+            value: DgopService.loadAverage || null
+        },
+        {
+            advanced: true,
+            label: I18n.tr("Open files", "system-wide open file handles"),
+            value: root.count(DgopService.openFileCount ?? 0)
+        },
+        {
+            advanced: true,
+            label: I18n.tr("Sockets", "CPU sockets on the motherboard"),
+            value: root.count(info?.sockets ?? 0)
         }
     ]
 
     Rectangle {
-        visible: DgopService.perCoreCpuUsage.length > 0
+        visible: root.perThread
         width: parent.width
-        height: threadColumn.implicitHeight + Theme.spacingL * 2
+        height: threadGrid.implicitHeight + Theme.spacingL * 2
         radius: Theme.cornerRadiusL
         color: Theme.surfaceContainerLow
 
-        Column {
-            id: threadColumn
+        Grid {
+            id: threadGrid
+
+            readonly property real cellWidth: (width - spacing * (columns - 1)) / columns
+
             x: Theme.spacingL
             y: Theme.spacingL
             width: parent.width - Theme.spacingL * 2
+            columns: Math.max(1, Math.min(8, DgopService.perCoreCpuUsage.length))
             spacing: Theme.spacingS
 
-            StyledText {
-                text: I18n.tr("Per thread")
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceText
-            }
+            Repeater {
+                model: DgopService.perCoreCpuUsage.length
 
-            Grid {
-                id: threadGrid
+                Rectangle {
+                    id: thread
 
-                readonly property real cellWidth: (width - spacing * (columns - 1)) / columns
+                    required property int index
+                    readonly property real usage: DgopService.perCoreCpuUsage[index] ?? 0
+                    readonly property real mhz: root.freqs[index] ?? 0
 
-                width: parent.width
-                columns: Math.max(1, Math.min(16, DgopService.perCoreCpuUsage.length))
-                spacing: Theme.spacingXS
+                    width: threadGrid.cellWidth
+                    height: Theme.listItemHeight * 1.5
+                    radius: Theme.cornerRadiusS
+                    color: Theme.surfaceContainer
+                    clip: true
 
-                Repeater {
-                    model: DgopService.perCoreCpuUsage.length
+                    MetricChart {
+                        anchors.fill: parent
+                        anchors.topMargin: threadLabel.height
+                        compact: true
+                        values: root.threadHistory[thread.index] ?? []
+                        maximum: 100
+                        historyLength: DgopService.deviceHistorySize
+                    }
 
-                    Rectangle {
-                        id: thread
+                    StyledText {
+                        id: threadLabel
+                        x: Theme.spacingS
+                        topPadding: Theme.spacingXS
+                        text: String(thread.index)
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                    }
 
-                        required property int index
-                        readonly property real usage: DgopService.perCoreCpuUsage[index] ?? 0
-                        readonly property real mhz: root.freqs[index] ?? 0
+                    NumericText {
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        topPadding: Theme.spacingXS
+                        isMonospace: false
+                        text: Math.round(thread.usage) + "%"
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                    }
 
-                        width: threadGrid.cellWidth
-                        height: Theme.iconButtonSize * 0.7
-                        radius: Theme.cornerRadiusXS
-                        color: Theme.surfaceContainerHighest
-                        clip: true
+                    MouseArea {
+                        id: threadHover
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        acceptedButtons: Qt.NoButton
+                    }
 
-                        Rectangle {
-                            anchors.bottom: parent.bottom
-                            width: parent.width
-                            height: parent.height * Math.min(100, Math.max(0, thread.usage)) / 100
-                            color: Theme.withAlpha(Theme.primary, 0.7)
-                        }
-
-                        MouseArea {
-                            id: threadHover
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            acceptedButtons: Qt.NoButton
-                        }
-
-                        DTooltipHost {
-                            text: Math.round(thread.usage) + "%" + (thread.mhz > 0 ? ", " + root.ghz(thread.mhz) : "")
-                            target: thread
-                            hoverArea: threadHover
-                        }
+                    DTooltipHost {
+                        text: thread.mhz > 0 ? root.ghz(thread.mhz) : ""
+                        target: thread
+                        hoverArea: threadHover
                     }
                 }
             }

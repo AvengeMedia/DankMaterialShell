@@ -80,7 +80,7 @@ func machineFixture() objectMap {
 		}),
 		// listed before p1 on purpose: partitions must come back in offset order
 		bdPath + "nvme0n1p2": block("/dev/nvme0n1p2", samsung, 1996001172480, map[string]props{
-			ifaceBlock:     {"IdType": v("crypto_LUKS")},
+			ifaceBlock:     {"IdType": v("crypto_LUKS"), "IdVersion": v("2")},
 			ifacePartition: partition(bdPath+"nvme0n1", 2, 4397727744, 1996001172480),
 			ifaceEncrypted: {},
 		}),
@@ -153,6 +153,7 @@ func TestBuildDrivesNVMeLuksMachine(t *testing.T) {
 	p2 := d.Partitions[1]
 	assert.Equal(t, "/", p2.MountPoint)
 	assert.True(t, p2.Encrypted)
+	assert.Equal(t, "LUKS2", p2.Encryption)
 	assert.Equal(t, "btrfs", p2.FSType)
 
 	lex := byName(t, drives, "nvme1n1")

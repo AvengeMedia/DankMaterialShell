@@ -13,24 +13,22 @@ DListItem {
     required property var process
     property real rowHeight: ProcessListMetrics.rowHeight
     property bool isExpanded: false
-    property var meterMaxes: ({})
     readonly property string command: process?.command ?? ""
     readonly property string fullCommand: process?.fullCommand ?? command
 
     property var columns: ProcessColumns.DEFAULT_COLUMNS
     readonly property int childCount: process?.childCount ?? 0
+    readonly property var appEntry: ProcessListMetrics.appEntry(process)
+    readonly property string displayName: appEntry?.name || command
+
+    // The part of a sideways-scrolling table that is on screen; the details stay inside it.
+    property real detailX: 0
+    property real detailWidth: -1
 
     signal actionRequested(string action)
 
     listView: null
-    surfaceColor: "transparent"
-    color: "transparent"
-    border.width: 0
-    radius: Theme.cornerRadiusS
-    topLeftRadius: radius
-    topRightRadius: radius
-    bottomLeftRadius: radius
-    bottomRightRadius: radius
+    color: surfaceColor
 
     height: root.rowHeight + (isExpanded && details.item ? details.item.implicitHeight + Theme.spacingXS + Theme.spacingS : 0)
     clip: true
@@ -50,7 +48,10 @@ DListItem {
     Rectangle {
         width: parent.width
         height: root.rowHeight
-        radius: Theme.cornerRadiusS
+        topLeftRadius: root.topLeftRadius
+        topRightRadius: root.topRightRadius
+        bottomLeftRadius: root.height > root.rowHeight ? root.radius : root.bottomLeftRadius
+        bottomRightRadius: bottomLeftRadius
         color: Theme.selectedContainer
         visible: root.isSelected || root.visualFocus
     }
@@ -72,7 +73,7 @@ DListItem {
             IconImage {
                 id: appIcon
                 anchors.fill: parent
-                source: root.command ? Paths.getAppIcon(root.command, DesktopEntries.heuristicLookup(root.command)) : ""
+                source: root.command ? Paths.getAppIcon(root.appEntry?.id ?? root.command, root.appEntry) : ""
                 smooth: true
                 mipmap: true
                 asynchronous: true
@@ -96,70 +97,76 @@ DListItem {
         }
 
         StyledText {
+            id: nameText
             Layout.fillWidth: true
             Layout.preferredWidth: 0
-            text: root.childCount > 0 ? root.command + " (" + root.childCount + ")" : root.command
+            text: root.childCount > 0 ? root.displayName + " (" + root.childCount + ")" : root.displayName
             font.pixelSize: Theme.fontSizeMedium
             color: root.contentColor
             textFormat: Text.PlainText
             maximumLineCount: 1
             elide: Text.ElideRight
+
+            MouseArea {
+                id: nameHover
+                anchors.fill: parent
+                enabled: root.childCount > 0 || root.displayName !== root.command
+                hoverEnabled: true
+                acceptedButtons: Qt.NoButton
+                onContainsMouseChanged: {
+                    if (containsMouse) {
+                        rowTip.text = (root.displayName !== root.command ? root.command : "") + (root.childCount > 0 ? (root.displayName !== root.command ? "\n" : "") + I18n.tr("Includes %1 more processes of the same program; the values are their total", "process row tooltip, %1 is the count in parentheses").arg(root.childCount) : "");
+                        rowTip.target = nameText;
+                        rowTip.hoverArea = nameHover;
+                    } else if (rowTip.hoverArea === nameHover) {
+                        rowTip.hoverArea = null;
+                    }
+                }
+            }
         }
 
         Repeater {
             model: root.columns
 
-            Item {
+            StyledText {
                 id: cell
 
                 required property string modelData
                 readonly property var col: ProcessColumns.COLUMNS.find(c => c.id === modelData) ?? ({})
                 readonly property var raw: ProcessColumns.formatCell(modelData, root.process ?? ({}), false)
                 readonly property bool absent: raw === null
-                readonly property real fill: ProcessColumns.meterRatio(modelData, root.process ?? ({}), root.meterMaxes)
                 readonly property bool zero: !cell.absent && ProcessColumns.rawValue(cell.modelData, root.process ?? ({})) === 0
 
-                Layout.minimumWidth: Theme.fontSizeSmall * (col.width ?? 6)
+                Layout.minimumWidth: Theme.fontSizeSmall * (col.width ?? 6) - Theme.spacingS
                 Layout.maximumWidth: Layout.minimumWidth
+                Layout.rightMargin: Theme.spacingS
                 Layout.fillHeight: true
-
-                Rectangle {
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width * cell.fill
-                    height: parent.height - Theme.spacingXS * 2
-                    radius: Theme.cornerRadiusXS
-                    color: Theme.withAlpha(Theme.primary, 0.2)
-                    visible: cell.fill >= 0.01
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignRight
+                elide: Text.ElideRight
+                wrapMode: Text.NoWrap
+                maximumLineCount: 1
+                font.features: {
+                    "tnum": 1
                 }
-
-                NumericText {
-                    anchors.fill: parent
-                    anchors.rightMargin: Theme.spacingS
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignRight
-                    elide: Text.ElideRight
-                    maximumLineCount: 1
-                    isMonospace: false
-                    text: cell.absent ? "—" : cell.modelData === "status" ? ProcessListMetrics.statusLabel(cell.raw) : cell.raw
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: cell.absent || cell.zero ? Theme.surfaceVariantText : cell.col.meter ? root.contentColor : root.supportingContentColor
-                }
+                text: cell.absent ? "—" : cell.modelData === "status" ? ProcessListMetrics.statusLabel(cell.raw) : cell.raw
+                font.pixelSize: Theme.fontSizeSmall
+                color: cell.absent || cell.zero ? Theme.surfaceVariantText : cell.col.meter ? root.contentColor : root.supportingContentColor
 
                 MouseArea {
                     id: absentArea
                     anchors.fill: parent
                     enabled: cell.absent
-                    hoverEnabled: true
+                    hoverEnabled: enabled
                     acceptedButtons: Qt.NoButton
                     onContainsMouseChanged: {
                         if (containsMouse) {
                             const reason = ProcessColumns.absentReason(cell.modelData, root.process);
-                            absentTip.text = reason === "unmonitored" ? I18n.tr("Monitoring off") : reason === "unknown" ? I18n.tr("Unknown", "process network rate that could not be measured") : I18n.tr("Not readable without privileges");
-                            absentTip.target = cell;
-                            absentTip.hoverArea = absentArea;
-                        } else if (absentTip.hoverArea === absentArea) {
-                            absentTip.hoverArea = null;
+                            rowTip.text = reason === "unmonitored" ? I18n.tr("Monitoring off") : reason === "unknown" ? I18n.tr("Unknown", "process network rate that could not be measured") : I18n.tr("Not readable without privileges");
+                            rowTip.target = cell;
+                            rowTip.hoverArea = absentArea;
+                        } else if (rowTip.hoverArea === absentArea) {
+                            rowTip.hoverArea = null;
                         }
                     }
                 }
@@ -167,19 +174,18 @@ DListItem {
         }
     }
 
+    // One tooltip per row, created on first hover: building one up front for every row made sorting slow.
     DTooltipHost {
-        id: absentTip
-        text: I18n.tr("Not readable without privileges")
+        id: rowTip
+        multiline: true
     }
 
     Loader {
         id: details
-        anchors.left: parent.left
-        anchors.right: parent.right
+        x: root.detailX + Theme.spacingL
+        width: (root.detailWidth >= 0 ? root.detailWidth : root.width) - Theme.spacingL * 2
         anchors.top: parent.top
         anchors.topMargin: root.rowHeight + Theme.spacingXS
-        anchors.leftMargin: Theme.spacingL
-        anchors.rightMargin: Theme.spacingL
         active: root.isExpanded || root.height > root.rowHeight
 
         sourceComponent: ProcessDetailStrip {

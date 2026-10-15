@@ -94,8 +94,17 @@ FocusScope {
                             anchors.leftMargin: Theme.spacingL
                             anchors.rightMargin: Theme.spacingM
 
-                            Column {
+                            DeviceIcon {
+                                id: deviceIcon
                                 anchors.left: parent.left
+                                anchors.verticalCenter: parent.verticalCenter
+                                name: entry.modelData.icon ?? ""
+                                color: item.isSelected ? item.contentColor : item.supportingContentColor
+                            }
+
+                            Column {
+                                anchors.left: deviceIcon.right
+                                anchors.leftMargin: Theme.spacingM
                                 anchors.right: spark.left
                                 anchors.rightMargin: Theme.spacingM
                                 anchors.verticalCenter: parent.verticalCenter

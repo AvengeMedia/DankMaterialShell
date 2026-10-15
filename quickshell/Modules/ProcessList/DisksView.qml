@@ -11,8 +11,6 @@ import "Drives.js" as Drives
 Item {
     id: root
 
-    readonly property bool sheetOpen: reportSheet.shown
-    onVisibleChanged: if (!visible) reportSheet.dismiss()
 
     readonly property var drives: DriveService.drives ?? []
     readonly property bool hasDrives: drives.length > 0
@@ -71,7 +69,6 @@ Item {
                     expanded: index === 0
                     drive: modelData
                     mounts: root.mounts
-                    onReportRequested: d => reportSheet.open(d)
                     onInstallRequested: DriveService.install()
                 }
             }
@@ -176,11 +173,5 @@ Item {
                 color: Theme.surfaceVariantText
             }
         }
-    }
-
-    SmartReportSheet {
-        id: reportSheet
-        anchors.fill: parent
-        backdrop: scroll
     }
 }

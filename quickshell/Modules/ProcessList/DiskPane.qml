@@ -20,7 +20,6 @@ DevicePane {
             hdd: "HDD"
         })
     readonly property string health: Drives.healthLevel(drive)
-    readonly property real usedRatio: Drives.spaceUsedRatio(drive, DgopService.diskMounts)
     readonly property var healthText: {
         const w = Drives.healthWord(health);
         return w === "" ? null : w === "ok" ? I18n.tr("Healthy", "drive health status") : w === "warning" ? I18n.tr("Warning") : I18n.tr("Critical", "drive health");
@@ -53,16 +52,13 @@ DevicePane {
             value: root.rates?.busy != null ? Math.round(root.rates.busy) + "%" : null
         },
         {
+            advanced: true,
             label: I18n.tr("Response time"),
             value: root.rates?.responseTime != null ? root.rates.responseTime.toFixed(2) + " ms" : null
         },
         {
             label: I18n.tr("Capacity"),
             value: root.drive?.size > 0 ? SysmonDevices.formatBytes(root.drive.size) : null
-        },
-        {
-            label: I18n.tr("Space used"),
-            value: root.usedRatio >= 0 ? Math.round(root.usedRatio * 100) + "%" : null
         }
     ]
 
@@ -76,12 +72,20 @@ DevicePane {
             value: root.healthText
         },
         {
+            advanced: true,
             label: I18n.tr("Read since boot"),
             value: root.total(root.rates?.readTotal)
         },
         {
+            advanced: true,
             label: I18n.tr("Written since boot"),
             value: root.total(root.rates?.writeTotal)
         }
     ]
+
+    PartitionStrip {
+        width: parent.width
+        drive: root.drive
+        mounts: DgopService.diskMounts ?? []
+    }
 }

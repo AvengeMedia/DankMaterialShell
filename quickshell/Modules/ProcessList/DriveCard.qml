@@ -2,13 +2,12 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
-import Quickshell.Widgets
+import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
-import "../../Common/Format.js" as Format
 import "Drives.js" as Drives
 import "../../Services/SysmonDevices.js" as Devices
 
@@ -19,7 +18,6 @@ Rectangle {
     property var drive: null
     property var mounts: []
 
-    signal reportRequested(var drive)
     signal installRequested
 
     readonly property string level: Drives.healthLevel(drive)
@@ -27,7 +25,6 @@ Rectangle {
     readonly property var rates: (DgopService.diskRates ?? []).find(d => d.device === drive?.name) ?? null
     readonly property var history: DgopService.deviceHistory[Devices.deviceKey("disk", drive?.name ?? "")] ?? ({})
     readonly property real axisMax: Devices.rateAxisMax(history.a, history.b, 1024 * 1024)
-    readonly property var strip: Drives.partitionStrip(drive, mounts)
     readonly property var allRows: Drives.summaryRows(drive)
     readonly property var powerOn: allRows.find(r => r.id === "powerOnTime") ?? null
     readonly property var smartRows: allRows.filter(r => r.id !== "wear" && r.id !== "powerOnTime" && r.id !== "dataWritten")
@@ -35,6 +32,31 @@ Rectangle {
     readonly property color healthTint: level === "failing" ? Theme.error : level === "warning" ? Theme.warning : Theme.success
     readonly property real pad: Theme.spacingL
     property bool expanded: false
+    readonly property var filesystems: Drives.partitionStrip(drive, mounts)
+    // The rows the card shows, also what the copy button copies
+    readonly property var statRows: {
+        const rows = [];
+        const add = (label, value, tooltip) => rows.push({
+                    "label": label,
+                    "value": value,
+                    "tooltip": tooltip ?? ""
+                });
+        if (!asleep && rates?.busy != null)
+            add(I18n.tr("Busy"), Math.round(rates.busy) + "%");
+        if (!asleep && rates?.responseTime != null)
+            add(I18n.tr("Response time"), rates.responseTime.toFixed(2) + " ms");
+        if (wear !== null)
+            add(I18n.tr("Wear"), wear + "%", I18n.tr("Share of the rated write endurance used up"));
+        if (powerOn !== null)
+            add(I18n.tr("Power-on time"), rowValue(powerOn));
+        if (drive?.nvme?.dataWritten != null)
+            add(I18n.tr("Written total", "lifetime data written to a drive"), Devices.formatBytes(drive.nvme.dataWritten));
+        if (drive?.firmware)
+            add(I18n.tr("Firmware", "drive firmware revision"), drive.firmware);
+        for (const r of smartRows)
+            add(rowLabel(r.id), String(rowValue(r)));
+        return rows;
+    }
 
     implicitHeight: body.implicitHeight + pad * 2
     radius: Theme.cornerRadiusL
@@ -90,6 +112,26 @@ Rectangle {
         return r.value;
     }
 
+    function spaceText(fs) {
+        if (fs.usedRatio !== null && fs.size > 0)
+            return I18n.tr("%1 of %2 used", "partition space, e.g. 1.2 TB of 2 TB used").arg(Drives.formatCapacity(fs.size * fs.usedRatio)).arg(Drives.formatCapacity(fs.size));
+        return fs.size > 0 ? Drives.formatCapacity(fs.size) : "";
+    }
+
+    function cardText() {
+        const lines = [drive?.model || drive?.name || "", Drives.driveSubtitle(drive), drive?.device ?? ""];
+        if (drive?.temperature != null)
+            lines.push(I18n.tr("Temperature") + ": " + Devices.formatTemp(drive.temperature, SettingsData.useFahrenheit));
+        if (level !== "")
+            lines.push(I18n.tr("Health") + ": " + healthText());
+        for (const r of statRows)
+            lines.push(r.label + ": " + r.value);
+        for (const fs of filesystems)
+            lines.push([fs.swap ? I18n.tr("Swap") : fs.label, fs.fsType, spaceText(fs)].filter(x => x).join(", "));
+        const report = smartReport.reportText();
+        return lines.filter(l => l !== "").join("\n") + (report ? "\n\n" + report : "");
+    }
+
     function healthText() {
         const w = Drives.healthWord(level);
         return w === "critical" ? I18n.tr("Critical", "drive health") : w === "warning" ? I18n.tr("Warning") : I18n.tr("Healthy", "drive health");
@@ -99,18 +141,7 @@ Rectangle {
         return Drives.warnRows(drive).map(r => rowLabel(r.id) + ": " + rowValue(r)).join("\n");
     }
 
-    function partitionTooltip(device) {
-        const p = (drive?.partitions ?? []).find(x => x.device === device);
-        if (!p)
-            return "";
-        return [p.fsType ?? "", Devices.formatBytes(p.size)].filter(s => s !== "").join(", ");
-    }
 
-    function segmentDetail(seg) {
-        if (seg.usedRatio !== null && seg.size > 0)
-            return I18n.tr("%1 of %2 used", "partition space, e.g. 1.2 TB of 2 TB used").arg(Drives.formatCapacity(seg.size * seg.usedRatio)).arg(Drives.formatCapacity(seg.size));
-        return seg.size > 0 ? Drives.formatCapacity(seg.size) : "";
-    }
 
     ColumnLayout {
         id: body
@@ -119,87 +150,113 @@ Rectangle {
         width: root.width - root.pad * 2
         spacing: Theme.spacingL
 
-        RowLayout {
+        Item {
             Layout.fillWidth: true
-            spacing: Theme.spacingL
+            implicitHeight: header.implicitHeight
 
+            // The whole header bar toggles the card, not only the arrow.
             Rectangle {
-                Layout.preferredWidth: Theme.iconButtonSize
-                Layout.preferredHeight: Layout.preferredWidth
+                anchors.fill: parent
+                anchors.margins: -Theme.spacingS
                 radius: Theme.cornerRadiusM
-                color: Theme.secondaryContainer
+                color: "transparent"
 
-                DIcon {
-                    anchors.centerIn: parent
-                    name: root.drive?.kind === "hdd" ? "album" : "hard_drive"
-                    size: Theme.iconSize
-                    color: Theme.onSecondaryContainer
+                StateLayer {
+                    onClicked: root.expanded = !root.expanded
                 }
             }
 
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing: 0
+            RowLayout {
+                id: header
+                anchors.left: parent.left
+                anchors.right: parent.right
+                spacing: Theme.spacingL
 
-                StyledText {
-                    Layout.fillWidth: true
-                    text: root.drive?.model || root.drive?.name || ""
-                    font.pixelSize: Theme.fontSizeLarge
-                    color: Theme.surfaceText
-                    wrapMode: Text.NoWrap
-                    elide: Text.ElideRight
+                Rectangle {
+                    Layout.preferredWidth: Theme.iconButtonSize
+                    Layout.preferredHeight: Layout.preferredWidth
+                    radius: Theme.cornerRadiusM
+                    color: Theme.secondaryContainer
+
+                    DeviceIcon {
+                        anchors.centerIn: parent
+                        name: Drives.driveIcon(root.drive)
+                        size: Theme.iconSize
+                        color: Theme.onSecondaryContainer
+                    }
                 }
 
-                StyledText {
+                ColumnLayout {
                     Layout.fillWidth: true
-                    visible: text !== ""
-                    text: Drives.driveSubtitle(root.drive)
+                    spacing: 0
+
+                    StyledText {
+                        Layout.fillWidth: true
+                        text: root.drive?.model || root.drive?.name || ""
+                        font.pixelSize: Theme.fontSizeLarge
+                        color: Theme.surfaceText
+                        wrapMode: Text.NoWrap
+                        elide: Text.ElideRight
+                    }
+
+                    StyledText {
+                        Layout.fillWidth: true
+                        visible: text !== ""
+                        text: Drives.driveSubtitle(root.drive)
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.NoWrap
+                        elide: Text.ElideRight
+                    }
+                }
+
+                MetricChart {
+                    visible: !root.expanded
+                    Layout.preferredWidth: Theme.iconButtonSize * 2
+                    Layout.preferredHeight: Theme.buttonHeightXXS
+                    compact: true
+                    values: root.history.a ?? []
+                    secondaryValues: root.history.b ?? []
+                    maximum: root.axisMax
+                    historyLength: DgopService.deviceHistorySize
+                }
+
+                NumericText {
+                    visible: root.drive?.temperature != null
+                    isMonospace: false
+                    text: Devices.formatTemp(root.drive?.temperature ?? null, SettingsData.useFahrenheit)
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
-                    wrapMode: Text.NoWrap
-                    elide: Text.ElideRight
                 }
-            }
 
-            MetricChart {
-                visible: !root.expanded
-                Layout.preferredWidth: Theme.iconButtonSize * 2
-                Layout.preferredHeight: Theme.buttonHeightXXS
-                compact: true
-                values: root.history.a ?? []
-                secondaryValues: root.history.b ?? []
-                maximum: root.axisMax
-                historyLength: DgopService.deviceHistorySize
-            }
+                Pill {
+                    visible: root.asleep
+                    text: I18n.tr("Asleep")
+                    dotColor: Theme.surfaceVariantText
+                    tooltip: (root.drive?.smartUpdated ?? 0) > 0 ? Qt.formatDateTime(new Date(root.drive.smartUpdated * 1000), Locale.ShortFormat) : ""
+                }
 
-            NumericText {
-                visible: root.drive?.temperature != null
-                isMonospace: false
-                text: Devices.formatTemp(root.drive?.temperature ?? null, SettingsData.useFahrenheit)
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceVariantText
-            }
+                Pill {
+                    visible: root.level !== ""
+                    text: root.healthText()
+                    dotColor: root.healthTint
+                    textColor: root.level === "healthy" ? Theme.surfaceText : root.healthTint
+                    tooltip: root.warnTooltip()
+                }
 
-            Pill {
-                visible: root.asleep
-                text: I18n.tr("Asleep")
-                dotColor: Theme.surfaceVariantText
-                tooltip: (root.drive?.smartUpdated ?? 0) > 0 ? Qt.formatDateTime(new Date(root.drive.smartUpdated * 1000), Locale.ShortFormat) : ""
-            }
+                DActionButton {
+                    iconName: "content_copy"
+                    iconColor: Theme.surfaceText
+                    tooltipText: I18n.tr("Copy")
+                    onClicked: Quickshell.execDetached(["dms", "cl", "copy", root.cardText()])
+                }
 
-            Pill {
-                visible: root.level !== ""
-                text: root.healthText()
-                dotColor: root.healthTint
-                textColor: root.level === "healthy" ? Theme.surfaceText : root.healthTint
-                tooltip: root.warnTooltip()
-            }
-
-            DActionButton {
-                iconName: "expand_more"
-                rotation: root.expanded ? 180 : 0
-                tooltipText: root.expanded ? I18n.tr("Collapse") : I18n.tr("Expand")
-                onClicked: root.expanded = !root.expanded
+                DActionButton {
+                    iconName: "expand_more"
+                    rotation: root.expanded ? 180 : 0
+                    tooltipText: root.expanded ? I18n.tr("Collapse") : I18n.tr("Expand")
+                    onClicked: root.expanded = !root.expanded
+                }
             }
         }
 
@@ -233,57 +290,84 @@ Rectangle {
                 customPaddingV: 0
                 customPaddingH: Theme.spacingL
 
-                StatRow {
-                    visible: !root.asleep && root.rates?.busy != null
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Busy")
-                    value: Math.round(root.rates?.busy ?? 0) + "%"
-                }
-
-                StatRow {
-                    visible: !root.asleep && root.rates?.responseTime != null
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Response time")
-                    value: (root.rates?.responseTime ?? 0).toFixed(2) + " ms"
-                }
-
-                StatRow {
-                    visible: root.wear !== null
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Wear")
-                    value: root.wear + "%"
-                    tooltip: I18n.tr("Share of the rated write endurance used up")
-                }
-
-                StatRow {
-                    visible: root.powerOn !== null
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Power-on time")
-                    value: root.rowValue(root.powerOn)
-                }
-
-                StatRow {
-                    visible: root.drive?.nvme?.dataWritten != null
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Written total", "lifetime data written to a drive")
-                    value: Devices.formatBytes(root.drive?.nvme?.dataWritten ?? 0)
-                }
-
-                StatRow {
-                    visible: !!root.drive?.firmware
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Firmware", "drive firmware revision")
-                    value: root.drive?.firmware ?? ""
-                }
-
                 Repeater {
-                    model: root.smartRows
+                    model: root.statRows
 
                     StatRow {
                         required property var modelData
                         height: Theme.buttonHeightXS
-                        label: root.rowLabel(modelData.id)
-                        value: root.rowValue(modelData)
+                        label: modelData.label
+                        value: modelData.value
+                        tooltip: modelData.tooltip ?? ""
+                    }
+                }
+            }
+        }
+
+        SettingsGroup {
+            visible: root.expanded && root.filesystems.length > 0
+            Layout.fillWidth: true
+            customPaddingV: 0
+            customPaddingH: Theme.spacingL
+
+            Repeater {
+                model: root.filesystems
+
+                RowLayout {
+                    id: fsRow
+
+                    required property var modelData
+
+                    width: parent?.width ?? 0
+                    height: Theme.buttonHeightS
+                    spacing: Theme.spacingL
+
+                    DIcon {
+                        name: fsRow.modelData.swap ? "swap_horiz" : fsRow.modelData.encrypted ? "lock" : "folder"
+                        size: Theme.iconSizeSmall
+                        color: Theme.surfaceVariantText
+                    }
+
+                    StyledText {
+                        Layout.fillWidth: true
+                        text: fsRow.modelData.swap ? I18n.tr("Swap") : fsRow.modelData.label
+                        font.pixelSize: Theme.fontSizeMedium
+                        color: Theme.surfaceText
+                        wrapMode: Text.NoWrap
+                        elide: Text.ElideMiddle
+                    }
+
+                    StyledText {
+                        Layout.preferredWidth: Theme.fontSizeMedium * 7
+                        text: fsRow.modelData.fsType
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.NoWrap
+                        elide: Text.ElideRight
+                    }
+
+                    Rectangle {
+                        Layout.preferredWidth: Theme.fontSizeMedium * 10
+                        Layout.preferredHeight: Theme.spacingS
+                        radius: height / 2
+                        color: Theme.surfaceContainerHighest
+                        opacity: fsRow.modelData.usedRatio !== null ? 1 : 0
+
+                        Rectangle {
+                            width: parent.width * Math.min(1, fsRow.modelData.usedRatio ?? 0)
+                            height: parent.height
+                            radius: height / 2
+                            color: Theme.primary
+                        }
+                    }
+
+                    NumericText {
+                        Layout.preferredWidth: Theme.fontSizeMedium * 12
+                        isMonospace: false
+                        horizontalAlignment: Text.AlignRight
+                        text: root.spaceText(fsRow.modelData)
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
                     }
                 }
             }
@@ -295,71 +379,6 @@ Rectangle {
             spacing: Theme.spacingL
 
             Item {
-                id: stripRow
-                visible: root.strip.length > 0
-                Layout.fillWidth: true
-                Layout.preferredHeight: Theme.buttonHeightS
-
-                Row {
-                    anchors.fill: parent
-                    spacing: Theme.spacingXS
-
-                    Repeater {
-                        model: root.strip
-
-                        ClippingRectangle {
-                            id: seg
-
-                            required property var modelData
-
-                            width: Math.max(0, stripRow.width - Theme.spacingXS * (root.strip.length - 1)) * modelData.weight
-                            height: stripRow.height
-                            radius: Theme.cornerRadiusS
-                            color: Theme.surfaceContainerHighest
-
-                            Rectangle {
-                                visible: seg.modelData.usedRatio !== null
-                                width: parent.width * (seg.modelData.usedRatio ?? 0)
-                                height: parent.height
-                                color: Theme.withAlpha(Theme.primary, 0.28)
-                            }
-
-                            StyledText {
-                                anchors.fill: parent
-                                anchors.leftMargin: Theme.spacingS + Theme.spacingXXS
-                                anchors.rightMargin: Theme.spacingS + Theme.spacingXXS
-                                verticalAlignment: Text.AlignVCenter
-                                textFormat: Text.StyledText
-                                text: {
-                                    const name = seg.modelData.swap ? I18n.tr("Swap") : seg.modelData.label;
-                                    const detail = root.segmentDetail(seg.modelData);
-                                    return "<b>" + Format.escapeHtml(name) + "</b>" + (detail ? " " + Format.escapeHtml(detail) : "");
-                                }
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceText
-                                wrapMode: Text.NoWrap
-                                elide: Text.ElideRight
-                            }
-
-                            MouseArea {
-                                id: segHover
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                acceptedButtons: Qt.NoButton
-                            }
-
-                            DTooltipHost {
-                                text: root.partitionTooltip(seg.modelData.device)
-                                target: seg
-                                hoverArea: segHover
-                            }
-                        }
-                    }
-                }
-            }
-
-            Item {
-                visible: root.strip.length === 0
                 Layout.fillWidth: true
             }
 
@@ -380,15 +399,23 @@ Rectangle {
             }
 
             DButton {
-                visible: DriveService.smartctlPath !== ""
+                visible: DriveService.smartctlPath !== "" && !DgopService.unlocked
                 text: I18n.tr("Full SMART report")
                 iconName: "lock_open"
                 backgroundColor: Theme.secondaryContainer
                 textColor: Theme.onSecondaryContainer
                 tooltipText: I18n.tr("Authentication Required")
-                enabled: !DriveService.reporting || DriveService.reportDevice === root.drive.device
-                onClicked: root.reportRequested(root.drive)
+                enabled: !DgopService.unlocking
+                onClicked: DgopService.unlock()
             }
+
+        }
+
+        SmartReport {
+            id: smartReport
+            Layout.fillWidth: true
+            drive: root.drive
+            visible: root.expanded && state_ !== "idle"
         }
     }
 

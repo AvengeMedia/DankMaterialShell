@@ -59,17 +59,18 @@ DevicePane {
             value: info?.cached !== undefined ? bytes(info.cached + (info.buffers ?? 0)) : null
         },
         {
+            advanced: true,
             label: I18n.tr("Committed", "memory committed by processes, of the commit limit"),
             value: root.of(info?.committed, info?.commitLimit)
-        },
-        {
-            label: I18n.tr("Swap"),
-            value: root.of(DgopService.usedSwapKB, DgopService.totalSwapKB),
-            tooltip: root.swapTooltip()
         }
     ]
 
     rightStats: [
+        {
+            label: I18n.tr("Swap"),
+            value: root.of(DgopService.usedSwapKB, DgopService.totalSwapKB),
+            tooltip: root.swapTooltip()
+        },
         {
             label: I18n.tr("Speed"),
             value: speedMT > 0 ? speedMT + " MT/s" : null
@@ -79,10 +80,12 @@ DevicePane {
             value: slots > 0 && mods.length > 0 ? mods.length + " / " + slots : null
         },
         {
+            advanced: true,
             label: I18n.tr("Channels"),
             value: channels !== null ? String(channels) : null
         },
         {
+            advanced: true,
             label: I18n.tr("Form factor", "memory module form factor, e.g. DIMM"),
             value: mods.length > 0 ? (mods[0].formFactor || null) : null
         }

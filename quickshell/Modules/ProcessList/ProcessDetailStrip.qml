@@ -1,12 +1,14 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import "ProcessColumns.js" as ProcessColumns
+import "Connections.js" as Connections
 import "../../Services/SysmonDevices.js" as Devices
 
 Rectangle {
@@ -16,20 +18,42 @@ Rectangle {
 
     readonly property int pid: process?.pid ?? 0
     readonly property var live: (DgopService.allProcesses ?? []).find(p => p.pid === pid) ?? process
-    readonly property string fullCommand: live?.fullCommand || live?.command || ""
+    readonly property string command: live?.command ?? ""
+    readonly property string fullCommand: live?.fullCommand || command
+    readonly property var desktopEntry: ProcessListMetrics.appEntry(live, [sandbox?.id])
+    readonly property string appName: desktopEntry?.name || command
     readonly property var startTime: live?.startTime ?? null
     readonly property var started: startTime !== null ? new Date(startTime * 1000) : null
     readonly property bool startedToday: started !== null && started.toDateString() === new Date().toDateString()
     readonly property var parentProcess: (live?.ppid ?? 0) > 0 ? (DgopService.allProcesses ?? []).find(p => p.pid === live.ppid) ?? null : null
-    readonly property int connectionCount: live?.connections ?? 0
-    readonly property int localConnectionCount: live?.localConnections ?? 0
-    readonly property var remoteGroups: groupRemotes(false)
-    readonly property var localGroups: groupRemotes(true)
-    readonly property int shownGroups: 4
-    readonly property int hiddenConnections: hiddenCount(connectionCount, remoteGroups)
-    readonly property int hiddenLocalConnections: hiddenCount(localConnectionCount, localGroups)
 
     property var detail: null
+    readonly property string unit: Connections.unescapeUnit(detail?.unit ?? "")
+    readonly property string unitKind: Connections.unitKind(unit)
+    readonly property var sandbox: detail?.sandbox ?? null
+    readonly property var privileges: detail?.privileges ?? null
+
+    // Tailscale device names by address, from the peer list the Tailscale page loads.
+    readonly property var tailscaleNames: {
+        const names = {};
+        for (const p of TailscaleService.allPeersList ?? []) {
+            for (const ip of [p?.tailscaleIp, p?.tailscaleIpv6])
+                if (ip)
+                    names[ip] = p.hostname || p.dnsName || ip;
+        }
+        return names;
+    }
+    readonly property var connections: Connections.group(live?.remotes ?? [], tailscaleNames)
+    readonly property var listening: detail?.listening ?? []
+    readonly property int connectionCount: (live?.connections ?? 0) + (live?.localConnections ?? 0)
+    readonly property bool hasNetwork: connectionCount > 0 || listening.length > 0
+    readonly property bool otherNetwork: connections.tailscale.length > 0 || connections.local.length > 0 || listening.length > 0
+
+    readonly property var windows: (CompositorService.sortedToplevels ?? []).filter(t => CompositorService.windowPid(t) === pid)
+    // A merged row stands for its children too; their streams are matched by the binary's name.
+    readonly property var audioNodes: (AudioService.pipewireNodes ?? []).filter(n => n?.audio && n.isSink && n.isStream && (Number(n.properties?.["application.process.id"]) === pid || ((live?.childCount ?? 0) > 0 && n.properties?.["application.process.binary"] === command)))
+    readonly property int audioStreams: audioNodes.length
+
     readonly property real groupWidth: Theme.fontSizeMedium * 16
     readonly property bool own: ProcessActions.isOwn(live)
     readonly property bool endable: ProcessActions.canEnd(live)
@@ -37,30 +61,97 @@ Rectangle {
     readonly property string authTip: own ? "" : I18n.tr("Authentication Required")
     readonly property string unreadableTip: I18n.tr("Not readable without privileges")
 
+    readonly property var tabIds: ["overview", "resources"].concat(hasNetwork ? ["network"] : [], ["details"])
+    readonly property string age: {
+        if (!started)
+            return "";
+        const s = Math.max(0, (Date.now() - started.getTime()) / 1000);
+        return s >= 86400 ? I18n.tr("%1 days").arg(Math.floor(s / 86400)) : s >= 3600 ? I18n.tr("%1 hours").arg(Math.floor(s / 3600)) : I18n.tr("%1 min").arg(Math.max(1, Math.floor(s / 60)));
+    }
+    readonly property string parentChain: {
+        const names = [];
+        let p = parentProcess;
+        while (p && names.length < 6) {
+            names.push(p.command);
+            const ppid = p.ppid;
+            p = ppid > 0 ? (DgopService.allProcesses ?? []).find(x => x.pid === ppid) ?? null : null;
+        }
+        return names.join(" › ");
+    }
+    readonly property string currentTab: tabIds.includes(ProcessListMetrics.processTab) ? ProcessListMetrics.processTab : "overview"
+
     signal actionRequested(string action)
 
     function cell(id) {
         return ProcessColumns.formatCell(id, live ?? ({}), false) ?? "—";
     }
 
-    function groupRemotes(local) {
-        const counts = {};
-        for (const r of live?.remotes ?? []) {
-            if ((r.local === true) === local)
-                counts[r.remote] = (counts[r.remote] ?? 0) + 1;
+    function statusIcon(letter) {
+        switch (letter) {
+        case "R": return "play_circle";
+        case "D": return "hourglass_top";
+        case "Z": return "cancel";
+        case "T":
+        case "t": return "stop_circle";
         }
-        return Object.keys(counts).map(k => ({
-                    "remote": k,
-                    "count": counts[k]
-                })).sort((a, b) => b.count - a.count);
-    }
-
-    function hiddenCount(total, groups) {
-        return total - groups.slice(0, shownGroups).reduce((n, g) => n + g.count, 0);
+        return "pause_circle";
     }
 
     function bytes(v) {
         return v === null || v === undefined ? "" : Devices.formatBytes(v);
+    }
+
+    function sandboxName(kind) {
+        switch (kind) {
+        case "flatpak": return "Flatpak";
+        case "snap": return "Snap";
+        }
+        return I18n.tr("Container", "process runs in its own container namespace");
+    }
+
+    function row(label, value, tooltip) {
+        return {
+            "label": label,
+            "value": value === null || value === undefined ? null : String(value),
+            "tooltip": tooltip ?? ""
+        };
+    }
+
+    // A row whose missing value means "not readable", shown as a dash with the reason.
+    function known(label, value) {
+        return value === null || value === undefined || value === "" ? row(label, "—", unreadableTip) : row(label, value);
+    }
+
+    function kb(v) {
+        return v === null || v === undefined ? null : Devices.formatBytes(v * 1024);
+    }
+
+    function seconds(v) {
+        return v === null || v === undefined ? null : ProcessColumns.formatDuration(v);
+    }
+
+    function count(v) {
+        return v === null || v === undefined ? null : Number(v).toLocaleString(Qt.locale(), "f", 0);
+    }
+
+    function tabTitle(id) {
+        switch (id) {
+        case "overview": return I18n.tr("Overview");
+        case "resources": return I18n.tr("Resources", "process detail tab: CPU, memory, disk and GPU use");
+        case "network": return I18n.tr("Network");
+        }
+        return I18n.tr("Details", "process detail tab: less used information");
+    }
+
+    function connectionRows(list) {
+        return list.slice(0, 5).map(c => ({
+                    "label": c.name,
+                    "value": c.service,
+                    "tooltip": c.name !== c.host ? c.host : ""
+                })).concat(list.length > 5 ? [{
+                        "label": I18n.tr("+ %1 more", "overflow line, %1 is a count of hidden items").arg(list.length - 5),
+                        "value": " "
+                    }] : []);
     }
 
     function refreshDetail() {
@@ -77,9 +168,127 @@ Rectangle {
         onTriggered: root.refreshDetail()
     }
 
+    Ref {
+        service: TailscaleService
+        active: root.connections.tailscale.length > 0
+    }
+
+    component InfoChip: Rectangle {
+        id: chip
+
+        property string iconName: ""
+        property string text: ""
+        property string tip: ""
+        property bool emphasis: false
+
+        visible: text !== ""
+        implicitWidth: chipRow.implicitWidth + Theme.spacingM * 2
+        implicitHeight: Theme.buttonHeightXS
+        radius: Theme.cornerRadiusS
+        color: emphasis ? Theme.secondaryContainer : Theme.surfaceContainerHighest
+        Accessible.role: Accessible.StaticText
+        Accessible.name: tip ? tip + ": " + text : text
+
+        Row {
+            id: chipRow
+            anchors.centerIn: parent
+            spacing: Theme.spacingXS
+
+            DIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                name: chip.iconName
+                size: Theme.iconSizeSmall
+                color: chip.emphasis ? Theme.onSecondaryContainer : Theme.surfaceVariantText
+            }
+
+            StyledText {
+                anchors.verticalCenter: parent.verticalCenter
+                width: Math.min(implicitWidth, Theme.fontSizeMedium * 18)
+                text: chip.text
+                font.pixelSize: Theme.fontSizeSmall
+                color: chip.emphasis ? Theme.onSecondaryContainer : Theme.surfaceText
+                wrapMode: Text.NoWrap
+                elide: Text.ElideMiddle
+            }
+        }
+
+        MouseArea {
+            id: chipHover
+            anchors.fill: parent
+            enabled: chip.tip !== ""
+            hoverEnabled: true
+            acceptedButtons: Qt.NoButton
+        }
+
+        DTooltipHost {
+            target: chip
+            hoverArea: chipHover
+            multiline: chip.tip.includes("\n")
+            text: chip.tip
+        }
+    }
+
+    // A titled grouped list; rows are {label, value, tooltip}, rows without a value are left out.
+    component Section: Column {
+        id: section
+
+        property string title: ""
+        property string iconName: ""
+        property var rows: []
+        readonly property var shown: rows.filter(r => r && r.value !== null && r.value !== undefined && r.value !== "")
+
+        visible: shown.length > 0
+        spacing: Theme.spacingXS
+
+        Row {
+            visible: section.title !== ""
+            leftPadding: Theme.spacingXS
+            spacing: Theme.spacingXS
+
+            DeviceIcon {
+                visible: section.iconName !== ""
+                anchors.verticalCenter: parent.verticalCenter
+                name: section.iconName
+                size: Theme.iconSizeSmall
+                color: Theme.primary
+            }
+
+            StyledText {
+                text: section.title
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.primary
+            }
+        }
+
+        SettingsGroup {
+            width: parent.width
+            customPaddingV: 0
+            customPaddingH: Theme.spacingM
+            slotColor: Theme.surfaceContainerHighest
+
+            Repeater {
+                model: section.shown
+
+                StatRow {
+                    required property var modelData
+                    height: Theme.buttonHeightXS
+                    label: modelData.label
+                    value: String(modelData.value)
+                    tooltip: modelData.tooltip ?? ""
+                }
+            }
+        }
+    }
+
     implicitHeight: body.implicitHeight + Theme.spacingL * 2
     radius: Theme.cornerRadiusM
     color: Theme.surfaceContainerHigh
+
+    // Clicks between the controls stay here instead of reaching the row, which would collapse the strip.
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.AllButtons
+    }
 
     ColumnLayout {
         id: body
@@ -88,275 +297,340 @@ Rectangle {
         width: parent.width - Theme.spacingL * 2
         spacing: Theme.spacingL
 
-        ColumnLayout {
+        RowLayout {
             Layout.fillWidth: true
-            spacing: Theme.spacingXS
+            spacing: Theme.spacingM
 
-            StyledText {
-                text: I18n.tr("Command", "noun, the full command line of a process")
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceVariantText
-            }
+            Item {
+                Layout.preferredWidth: Theme.iconButtonSize
+                Layout.preferredHeight: Theme.iconButtonSize
 
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: Theme.spacingXS
-
-                // Long command lines (scripts passed inline) scroll inside four lines instead of growing the row.
-                DFlickable {
-                    id: commandScroll
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignTop
-                    Layout.preferredHeight: Math.min(commandText.implicitHeight, commandText.implicitHeight / Math.max(1, commandText.lineCount) * 4)
-                    contentWidth: width
-                    contentHeight: commandText.implicitHeight
-                    clip: true
-
-                    TextEdit {
-                        id: commandText
-                        width: commandScroll.width
-                        text: root.fullCommand
-                        readOnly: true
-                        activeFocusOnPress: false
-                        selectByMouse: true
-                        wrapMode: TextEdit.WrapAnywhere
-                        textFormat: TextEdit.PlainText
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceText
-                        selectedTextColor: Theme.primaryText
-                        selectionColor: Theme.primary
-                    }
+                IconImage {
+                    id: appIcon
+                    anchors.fill: parent
+                    source: root.command ? Paths.getAppIcon(root.desktopEntry?.id ?? root.command, root.desktopEntry) : ""
+                    smooth: true
+                    mipmap: true
+                    asynchronous: true
+                    visible: status === Image.Ready
                 }
 
-                DActionButton {
-                    Layout.alignment: Qt.AlignTop
-                    iconName: "content_copy"
-                    iconColor: Theme.surfaceText
-                    tooltipText: I18n.tr("Copy Full Command")
-                    onClicked: Quickshell.execDetached(["dms", "cl", "copy", root.fullCommand])
-                }
-            }
-
-            Row {
-                Layout.topMargin: Theme.spacingS
-                spacing: Theme.spacingXL
-
-                Row {
-                    spacing: Theme.spacingXS
+                Rectangle {
+                    anchors.fill: parent
+                    visible: !appIcon.visible
+                    radius: Theme.cornerRadiusM
+                    color: Theme.secondaryContainer
 
                     StyledText {
-                        text: I18n.tr("PID")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                    }
-
-                    NumericText {
-                        isMonospace: false
-                        text: String(root.pid)
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceText
+                        anchors.centerIn: parent
+                        text: root.command.charAt(0).toUpperCase()
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.weight: Theme.fontWeightMedium
+                        color: Theme.onSecondaryContainer
                     }
                 }
+            }
 
-                Item {
-                    visible: root.started !== null
-                    implicitWidth: startedRow.implicitWidth
-                    implicitHeight: startedRow.implicitHeight
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 0
 
-                    Row {
-                        id: startedRow
-                        spacing: Theme.spacingXS
+                StyledText {
+                    Layout.fillWidth: true
+                    text: root.appName
+                    font.pixelSize: Theme.fontSizeLarge
+                    color: Theme.surfaceText
+                    wrapMode: Text.NoWrap
+                    elide: Text.ElideRight
+                }
 
-                        StyledText {
-                            text: I18n.tr("Started")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                        }
-
-                        NumericText {
-                            isMonospace: false
-                            text: root.started ? Qt.formatTime(root.started, "HH:mm") : ""
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                        }
-                    }
+                StyledText {
+                    id: commandLine
+                    Layout.fillWidth: true
+                    text: root.fullCommand
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.NoWrap
+                    elide: Text.ElideMiddle
 
                     MouseArea {
-                        id: startedHover
+                        id: commandHover
                         anchors.fill: parent
+                        enabled: commandLine.truncated
                         hoverEnabled: true
                         acceptedButtons: Qt.NoButton
                     }
 
                     DTooltipHost {
-                        text: root.started && !root.startedToday ? Qt.formatDate(root.started, Locale.ShortFormat) : ""
-                        target: parent
-                        hoverArea: startedHover
+                        target: commandLine
+                        hoverArea: commandHover
+                        multiline: true
+                        text: root.fullCommand
                     }
                 }
+            }
+
+            DActionButton {
+                iconName: "content_copy"
+                iconColor: Theme.surfaceText
+                tooltipText: I18n.tr("Copy Full Command")
+                onClicked: Quickshell.execDetached(["dms", "cl", "copy", root.fullCommand])
             }
         }
 
-        GridLayout {
+        Flow {
             Layout.fillWidth: true
-            columns: Math.max(1, Math.min(3, Math.floor((width + columnSpacing) / (root.groupWidth + columnSpacing))))
+            spacing: Theme.spacingS
+
+            InfoChip {
+                iconName: "person"
+                text: root.live?.username ?? ""
+                tip: I18n.tr("User")
+            }
+
+            InfoChip {
+                iconName: root.statusIcon(root.live?.status ?? "")
+                text: root.live?.status ? ProcessListMetrics.statusLabel(root.live.status) : ""
+                tip: I18n.tr("Status")
+            }
+
+            InfoChip {
+                iconName: "tag"
+                text: I18n.tr("PID") + " " + root.pid
+            }
+
+            InfoChip {
+                iconName: "stacks"
+                text: (root.live?.childCount ?? 0) > 0 ? I18n.tr("%1 processes", "process count, plural, %1 is a number").arg(root.live.childCount + 1) : ""
+                tip: I18n.tr("Includes %1 more processes of the same program; the values are their total", "process row tooltip, %1 is the count in parentheses").arg(root.live?.childCount ?? 0)
+            }
+
+            InfoChip {
+                iconName: "schedule"
+                text: root.started ? (root.startedToday ? Qt.formatTime(root.started, "HH:mm") : Qt.formatDate(root.started, Locale.ShortFormat)) : ""
+                tip: I18n.tr("Started")
+            }
+
+            InfoChip {
+                iconName: "account_tree"
+                text: root.parentProcess ? root.parentProcess.command : (root.live?.ppid ?? 0) > 0 ? String(root.live.ppid) : ""
+                tip: I18n.tr("Parent", "the process that started this one") + (root.parentProcess ? ", " + I18n.tr("PID") + " " + root.parentProcess.pid : "")
+            }
+
+            // App launch scopes and login sessions say nothing the app name doesn't; only real services get a chip.
+            InfoChip {
+                iconName: "deployed_code"
+                text: root.unitKind === "service" ? root.unit.replace(/\.service$/, "") : ""
+                tip: I18n.tr("Service", "the systemd unit or app scope a process runs in")
+            }
+
+            InfoChip {
+                iconName: "inventory_2"
+                text: root.sandbox ? (root.sandbox.id || root.sandboxName(root.sandbox.kind)) : ""
+                tip: root.sandbox ? root.sandboxName(root.sandbox.kind) : ""
+            }
+
+            InfoChip {
+                iconName: "shield"
+                emphasis: true
+                text: root.privileges ? I18n.tr("Elevated", "process runs with more rights than its user") : ""
+                tip: root.privileges ? (root.privileges.setuid ? I18n.tr("Runs setuid", "process runs with another user's rights") + "\n" : "") + (root.privileges.capabilities ?? []).join("\n") : ""
+            }
+
+            InfoChip {
+                iconName: "web_asset"
+                text: root.windows.length === 0 ? "" : root.windows.length === 1 ? I18n.tr("1 window") : I18n.tr("%1 windows").arg(root.windows.length)
+                tip: root.windows.map(w => w.title ?? "").filter(t => t).join("\n")
+            }
+
+            InfoChip {
+                iconName: "volume_up"
+                text: root.audioStreams > 0 ? I18n.tr("Playing audio", "process has an open audio playback stream") : ""
+            }
+        }
+
+        DTabBar {
+            id: tabs
+            Layout.fillWidth: true
+            showIcons: false
+            equalWidthTabs: false
+            model: root.tabIds.map(id => ({
+                        "text": root.tabTitle(id)
+                    }))
+            currentIndex: root.tabIds.indexOf(root.currentTab)
+            onTabClicked: index => ProcessListMetrics.processTab = root.tabIds[index]
+        }
+
+        GridLayout {
+            id: grid
+
+            // Two columns at fixed halves, so a short column doesn't stretch the other.
+            readonly property real cellWidth: (width - columnSpacing * (columns - 1)) / columns
+
+            Layout.fillWidth: true
+            Layout.maximumWidth: Infinity
+            columns: width >= root.groupWidth * 2 + columnSpacing ? 2 : 1
             columnSpacing: Theme.spacingL
             rowSpacing: Theme.spacingL
 
-            SettingsGroup {
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
+            // Overview: what most people look for.
+            Section {
+                visible: root.currentTab === "overview"
+                Layout.preferredWidth: grid.cellWidth
                 Layout.alignment: Qt.AlignTop
-                customPaddingV: 0
-                customPaddingH: Theme.spacingM
-                slotColor: Theme.surfaceContainerHighest
+                rows: [root.row(I18n.tr("CPU time", "process column: total CPU time used"), root.cell("cpuTime")), root.row(I18n.tr("Running for", "how long a process has been running"), root.age, root.started ? root.started.toLocaleString(Qt.locale(), Locale.ShortFormat) : ""), root.row(I18n.tr("Threads"), root.cell("threads")), root.known(I18n.tr("Open files", "number of files and sockets a process has open"), root.detail?.openFiles)]
+            }
 
-                StatRow {
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("User")
-                    value: root.live?.username ?? ""
+            Section {
+                visible: root.currentTab === "overview"
+                Layout.preferredWidth: grid.cellWidth
+                Layout.alignment: Qt.AlignTop
+                rows: [root.row(I18n.tr("Memory"), root.cell("memory"), I18n.tr("This process's own share of the memory it uses")), root.known(I18n.tr("Read total", "bytes a process has read from storage since it started"), root.bytes(root.detail?.readTotal)), root.known(I18n.tr("Written total", "lifetime data written to a drive"), root.bytes(root.detail?.writeTotal)), root.known(I18n.tr("Connections", "process column: number of open internet connections"), root.live?.connections == null ? null : root.connectionCount)]
+            }
+
+            // Resources: every number dgop has about CPU, memory, disk and GPU use.
+            Section {
+                visible: root.currentTab === "resources"
+                Layout.preferredWidth: grid.cellWidth
+                Layout.alignment: Qt.AlignTop
+                title: I18n.tr("CPU")
+                iconName: "memory"
+                rows: [root.row(I18n.tr("Usage", "chart legend: CPU or GPU utilization"), root.cell("cpu")), root.row(I18n.tr("User time", "CPU time spent in the program itself"), root.seconds(root.detail?.userTime)), root.row(I18n.tr("System time", "CPU time the kernel spent on behalf of the program"), root.seconds(root.detail?.systemTime)), root.row(I18n.tr("Last core", "CPU core the process last ran on"), root.detail?.lastCpu), root.row(I18n.tr("Allowed cores", "CPU affinity list"), root.detail?.affinity), root.row(I18n.tr("Scheduling", "Linux scheduling policy"), root.detail?.policy), root.row(I18n.tr("Priority", "kernel scheduling priority"), root.detail?.priority), root.row(I18n.tr("Nice", "process column: Linux nice value, scheduling priority"), root.cell("nice")), root.row(I18n.tr("I/O priority", "disk scheduling class and level"), root.detail?.ioClass ? root.detail.ioClass + (root.detail.ioLevel != null ? " " + root.detail.ioLevel : "") : null), root.row(I18n.tr("Context switches", "times the process gave up the CPU voluntarily"), root.count(root.detail?.voluntarySwitches)), root.row(I18n.tr("Preempted", "times the process was forced off the CPU"), root.count(root.detail?.involuntarySwitches))]
+            }
+
+            Section {
+                visible: root.currentTab === "resources"
+                Layout.preferredWidth: grid.cellWidth
+                Layout.alignment: Qt.AlignTop
+                title: I18n.tr("Memory")
+                iconName: "developer_board"
+                rows: [root.row(I18n.tr("Own share", "proportional memory: the process's share of pages it shares with others"), root.cell("memory")), root.row(I18n.tr("Resident", "memory pages currently in RAM"), root.kb(root.detail?.rssKB ?? root.live?.rssKB)), root.row(I18n.tr("Anonymous", "resident memory not backed by a file"), root.kb(root.detail?.rssAnonKB)), root.row(I18n.tr("File-backed", "resident memory mapped from files"), root.kb(root.detail?.rssFileKB)), root.row(I18n.tr("Shared", "resident shared memory (shmem)"), root.kb(root.detail?.rssShmemKB)), root.row(I18n.tr("Peak", "highest resident memory so far"), root.kb(root.detail?.peakKB)), root.row(I18n.tr("Virtual", "virtual address space size"), root.kb(root.detail?.virtualKB)), root.known(I18n.tr("Swap"), root.detail?.swapKB != null ? root.kb(root.detail.swapKB) : null), root.row(I18n.tr("Page faults", "minor page faults"), root.count(root.detail?.minorFaults)), root.row(I18n.tr("Major page faults", "page faults that needed disk reads"), root.count(root.detail?.majorFaults)), root.row(I18n.tr("Out-of-memory score", "how likely the kernel kills this process first when memory runs out"), root.detail?.oomScore, root.detail?.oomScoreAdj != null ? I18n.tr("Adjustment", "oom_score_adj") + ": " + root.detail.oomScoreAdj : "")]
+            }
+
+            Section {
+                visible: root.currentTab === "resources"
+                Layout.preferredWidth: grid.cellWidth
+                Layout.alignment: Qt.AlignTop
+                title: I18n.tr("Disk")
+                iconName: "hard_drive"
+                rows: [root.row(ProcessListMetrics.columnLabel("diskRead"), ProcessColumns.formatCell("diskRead", root.live ?? ({}), false)), root.row(ProcessListMetrics.columnLabel("diskWrite"), ProcessColumns.formatCell("diskWrite", root.live ?? ({}), false)), root.known(I18n.tr("Read total", "bytes a process has read from storage since it started"), root.bytes(root.detail?.readTotal)), root.known(I18n.tr("Written total", "lifetime data written to a drive"), root.bytes(root.detail?.writeTotal))]
+            }
+
+            Section {
+                visible: root.currentTab === "resources" && shown.length > 0
+                Layout.preferredWidth: grid.cellWidth
+                Layout.alignment: Qt.AlignTop
+                title: I18n.tr("GPU")
+                iconName: "gpu"
+                rows: [root.row(I18n.tr("Usage", "chart legend: CPU or GPU utilization"), ProcessColumns.formatCell("gpu", root.live ?? ({}), false)), root.row(ProcessListMetrics.columnLabel("gpuVideo"), ProcessColumns.formatCell("gpuVideo", root.live ?? ({}), false)), root.row(I18n.tr("VRAM"), ProcessColumns.formatCell("vram", root.live ?? ({}), false)), root.row(I18n.tr("Shared memory"), root.live?.gpuGttKB != null ? root.kb(root.live.gpuGttKB) : null, I18n.tr("System memory the GPU uses for this process"))]
+            }
+
+            // Network: connections by kind, then the ports the process listens on.
+            Section {
+                visible: root.currentTab === "network" && shown.length > 0
+                Layout.columnSpan: root.otherNetwork ? 1 : grid.columns
+                Layout.preferredWidth: root.otherNetwork ? grid.cellWidth : grid.width
+                Layout.alignment: Qt.AlignTop
+                title: I18n.tr("Internet", "connections to public internet addresses")
+                iconName: "public"
+                rows: root.connectionRows(root.connections.internet)
+            }
+
+            Column {
+                visible: root.currentTab === "network" && root.otherNetwork
+                Layout.columnSpan: root.connections.internet.length > 0 ? 1 : grid.columns
+                Layout.preferredWidth: root.connections.internet.length > 0 ? grid.cellWidth : grid.width
+                Layout.alignment: Qt.AlignTop
+                spacing: Theme.spacingL
+
+                Section {
+                    width: parent.width
+                    title: "Tailscale"
+                    iconName: "vpn_key"
+                    rows: root.connectionRows(root.connections.tailscale)
                 }
 
-                StatRow {
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Status")
-                    value: root.live?.status ? ProcessListMetrics.statusLabel(root.live.status) : ""
+                Section {
+                    width: parent.width
+                    title: I18n.tr("Local network", "process detail: connections to LAN, VPN or link-local addresses, not the internet")
+                    iconName: "lan"
+                    rows: root.connectionRows(root.connections.local)
                 }
 
-                StatRow {
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("CPU time", "process column: total CPU time used")
-                    value: root.cell("cpuTime")
-                }
-
-                StatRow {
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Threads")
-                    value: root.cell("threads")
-                }
-
-                StatRow {
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Nice", "process column: Linux nice value, scheduling priority")
-                    value: root.cell("nice")
-                }
-
-                StatRow {
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Parent", "the process that started this one")
-                    value: root.parentProcess ? root.parentProcess.command : (root.live?.ppid ?? 0) > 0 ? String(root.live.ppid) : ""
-                    tooltip: root.parentProcess ? I18n.tr("PID") + " " + root.parentProcess.pid : ""
+                Section {
+                    width: parent.width
+                    title: I18n.tr("Listening", "network ports a process accepts connections on")
+                    iconName: "sensors"
+                    rows: root.listening.map(l => root.row(Connections.service(l.port, l.protocol) === String(l.port) ? String(l.port) : l.port + " (" + Connections.service(l.port, l.protocol) + ")", l.protocol.toUpperCase(), l.address))
                 }
             }
 
-            SettingsGroup {
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
+            // Details: who and where the process is.
+            Section {
+                visible: root.currentTab === "details"
+                Layout.preferredWidth: grid.cellWidth
                 Layout.alignment: Qt.AlignTop
-                customPaddingV: 0
-                customPaddingH: Theme.spacingM
-                slotColor: Theme.surfaceContainerHighest
-
-                StatRow {
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Read total", "bytes a process has read from storage since it started")
-                    value: root.bytes(root.detail?.readTotal)
-                    tooltip: value === "" ? root.unreadableTip : ""
-                }
-
-                StatRow {
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Written total", "lifetime data written to a drive")
-                    value: root.bytes(root.detail?.writeTotal)
-                    tooltip: value === "" ? root.unreadableTip : ""
-                }
-
-                StatRow {
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Swap")
-                    value: root.detail?.swapKB != null ? root.bytes(root.detail.swapKB * 1024) : ""
-                    tooltip: value === "" ? root.unreadableTip : ""
-                }
-
-                StatRow {
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Open files", "number of files and sockets a process has open")
-                    value: root.detail?.openFiles != null ? String(root.detail.openFiles) : ""
-                    tooltip: value === "" ? root.unreadableTip : ""
-                }
-
-                StatRow {
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Shared memory")
-                    value: root.live?.gpuGttKB != null ? root.bytes(root.live.gpuGttKB * 1024) : ""
-                    tooltip: I18n.tr("System memory the GPU uses for this process")
-                }
-
-                StatRow {
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Service", "the systemd unit or app scope a process runs in")
-                    value: root.detail?.unit ?? ""
-                    tooltip: root.detail?.unit ?? ""
-                }
+                title: I18n.tr("Process")
+                iconName: "info"
+                rows: [root.row(I18n.tr("User"), root.live?.username), root.row("UID", root.detail?.uid), root.row(I18n.tr("Group"), root.detail?.group ? root.detail.group + " (" + root.detail.gid + ")" : root.detail?.gid), root.row(I18n.tr("Started"), root.started ? root.started.toLocaleString(Qt.locale(), Locale.ShortFormat) : null), root.row(I18n.tr("Parents", "chain of processes that started this one"), root.parentChain), root.row(I18n.tr("Terminal", "controlling terminal of a process"), root.detail?.tty), root.row(I18n.tr("Session", "login session id of a process"), root.detail?.session), root.row(I18n.tr("Setuid", "process runs with another user's rights"), root.privileges?.setuid ? I18n.tr("Yes") : null)]
             }
 
-            SettingsGroup {
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
+            Section {
+                visible: root.currentTab === "details"
+                Layout.preferredWidth: grid.cellWidth
                 Layout.alignment: Qt.AlignTop
-                customPaddingV: 0
-                customPaddingH: Theme.spacingM
-                slotColor: Theme.surfaceContainerHighest
+                title: I18n.tr("System")
+                iconName: "settings"
+                rows: [root.row(I18n.tr("Executable", "path of the program file a process runs"), root.live?.executablePath, root.live?.executablePath), root.row(I18n.tr("Working directory", "the folder a process runs in"), root.detail?.cwd, root.detail?.cwd), root.row(I18n.tr("Systemd unit", "the systemd service or scope a process runs in"), root.unit, root.unit), root.row(I18n.tr("Control group", "the cgroup path of a process"), root.detail?.cgroup, root.detail?.cgroup), root.row(root.sandbox ? root.sandboxName(root.sandbox.kind) : "", root.sandbox ? (root.sandbox.id || "—") : null), root.row(I18n.tr("Capabilities", "Linux capabilities that give a process extra rights"), (root.privileges?.capabilities ?? []).join(", "), (root.privileges?.capabilities ?? []).join("\n"))]
+            }
 
-                StatRow {
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Internet connections", "process detail: list of internet addresses the process talks to")
-                    value: root.cell("connections")
-                    tooltip: root.live?.connections == null ? root.unreadableTip : I18n.tr("Connections to public internet addresses; local network and VPN peers are not counted")
+            Section {
+                visible: root.currentTab === "details" && shown.length > 0
+                Layout.columnSpan: grid.columns
+                Layout.fillWidth: true
+                title: I18n.tr("Windows")
+                iconName: "web_asset"
+                rows: root.windows.map(w => root.row(w.title || w.appId || "", w.appId || " ", w.title))
+            }
+
+            Section {
+                visible: root.currentTab === "details" && shown.length > 0
+                Layout.columnSpan: grid.columns
+                Layout.fillWidth: true
+                title: I18n.tr("Audio")
+                iconName: "volume_up"
+                rows: root.audioNodes.map(n => root.row(n.properties?.["media.name"] || n.properties?.["application.name"] || n.name, n.audio?.muted ? I18n.tr("Muted") : Math.round((n.audio?.volume ?? 0) * 100) + "%"))
+            }
+
+            Column {
+                visible: root.currentTab === "details"
+                Layout.columnSpan: grid.columns
+                Layout.fillWidth: true
+                spacing: Theme.spacingXS
+
+                StyledText {
+                    leftPadding: Theme.spacingXS
+                    text: I18n.tr("Command", "noun, the full command line of a process")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.primary
                 }
 
-                Repeater {
-                    model: root.remoteGroups.slice(0, root.shownGroups)
+                Rectangle {
+                    width: parent.width
+                    height: commandFull.implicitHeight + Theme.spacingS * 2
+                    radius: Theme.cornerRadiusL
+                    color: Theme.surfaceContainerHighest
 
-                    StatRow {
-                        required property var modelData
-                        height: Theme.buttonHeightXS
-                        label: modelData.remote
-                        value: modelData.count > 1 ? "× " + modelData.count : " "
+                    StyledText {
+                        id: commandFull
+                        x: Theme.spacingM
+                        y: Theme.spacingS
+                        width: parent.width - Theme.spacingM * 2
+                        text: root.fullCommand
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                        wrapMode: Text.WrapAnywhere
                     }
-                }
-
-                StatRow {
-                    visible: root.hiddenConnections > 0
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("+ %1 more", "overflow line, %1 is a count of hidden items").arg(root.hiddenConnections)
-                    value: " "
-                }
-
-                StatRow {
-                    visible: root.localConnectionCount > 0
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("Local network", "process detail: connections to LAN, VPN or link-local addresses, not the internet")
-                    value: String(root.localConnectionCount)
-                }
-
-                Repeater {
-                    model: root.localGroups.slice(0, root.shownGroups)
-
-                    StatRow {
-                        required property var modelData
-                        height: Theme.buttonHeightXS
-                        label: modelData.remote
-                        value: modelData.count > 1 ? "× " + modelData.count : " "
-                    }
-                }
-
-                StatRow {
-                    visible: root.hiddenLocalConnections > 0
-                    height: Theme.buttonHeightXS
-                    label: I18n.tr("+ %1 more", "overflow line, %1 is a count of hidden items").arg(root.hiddenLocalConnections)
-                    value: " "
                 }
             }
         }

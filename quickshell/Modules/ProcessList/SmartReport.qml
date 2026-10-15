@@ -3,18 +3,22 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
-import qs.Modules.ControlCenter.Widgets
 import qs.DCommon.Widgets
 import "Drives.js" as Drives
 
-CcSheetDialog {
+// A drive's full SMART report. It is read through the unlocked root helper, so one password prompt covers every drive.
+Column {
     id: root
 
-    // "running" | "done" | "error" | "missing"
-    property string state_: "running"
+    property var drive: null
+    property bool collapsed: true
+
+    // "idle" | "running" | "done" | "error"
+    property string state_: "idle"
     property var sections: []
     property string errorText: ""
     property int _gen: 0
+    readonly property bool unlocked: DgopService.unlocked
 
     readonly property var sectionTitles: ({
             "health": I18n.tr("Health"),
@@ -24,36 +28,34 @@ CcSheetDialog {
             "selftest": "self_test_log"
         })
 
-    // Covers every way of closing, so a running report can't write into a closed sheet
-    onShownChanged: {
-        if (!shown) {
-            _gen++;
-        }
+    function reportText() {
+        if (state_ !== "done" && state_ !== "error")
+            return "";
+        return [I18n.tr("Full SMART report")].concat(sections.map(sec => [sectionTitles[sec.id] || sec.id].concat(sec.rows.map(r => r.key + ": " + r.value)).join("\n")), errorText ? [errorText] : []).join("\n\n");
     }
 
-    function open(drive) {
-        title = drive.model || drive.name || drive.device;
-        subtitle = drive.device;
+    function run() {
         const gen = ++_gen;
         sections = [];
         errorText = "";
-        if (!DriveService.smartctlPath) {
-            state_ = "missing";
-            present();
+        if (!unlocked || !drive?.device) {
+            state_ = "idle";
             return;
         }
         state_ = "running";
-        present();
-        const started = DriveService.fullReport(drive, (exitCode, stdout, stderr) => {
+        DgopService.request("drives.smart", {
+            "device": drive.device
+        }, response => {
             if (gen !== _gen)
                 return;
-            if (exitCode === 126) {
-                dismiss();
+            if (!response.result) {
+                state_ = response.error === "locked" ? "idle" : "error";
+                errorText = response.error ?? "";
                 return;
             }
-            const r = Drives.parseReport(stdout);
-            if (exitCode === 127 || (!r.sections.length && r.error)) {
-                errorText = stderr || r.error || I18n.tr("Error");
+            const r = Drives.parseReport(response.result.output ?? "");
+            if (!r.sections.length && r.error) {
+                errorText = r.error;
                 state_ = "error";
                 return;
             }
@@ -61,54 +63,76 @@ CcSheetDialog {
             errorText = r.error;
             state_ = "done";
         });
-        if (!started) {
-            errorText = I18n.tr("Error");
-            state_ = DriveService.smartctlPath ? "error" : "missing";
+    }
+
+    onUnlockedChanged: run()
+    Component.onCompleted: run()
+
+    visible: state_ !== "idle"
+    spacing: Theme.spacingS
+
+    Item {
+        width: parent.width
+        height: collapseButton.height
+
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: -Theme.spacingXS
+            radius: Theme.cornerRadiusS
+            color: "transparent"
+
+            StateLayer {
+                onClicked: root.collapsed = !root.collapsed
+            }
+        }
+
+        StyledText {
+            anchors.verticalCenter: parent.verticalCenter
+            text: I18n.tr("Full SMART report")
+            font.pixelSize: Theme.fontSizeMedium
+            font.weight: Theme.fontWeightMedium
+            color: Theme.surfaceText
+        }
+
+
+        DActionButton {
+            id: collapseButton
+            anchors.right: parent.right
+            iconName: "expand_more"
+            rotation: root.collapsed ? 0 : 180
+            tooltipText: root.collapsed ? I18n.tr("Expand") : I18n.tr("Collapse")
+            onClicked: root.collapsed = !root.collapsed
         }
     }
 
-    iconName: "monitor_heart"
-    showScrollBar: false
-
     DLoadingIndicator {
-        visible: root.state_ === "running"
+        visible: !root.collapsed && root.state_ === "running"
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
     SettingsNoteRow {
         width: parent.width
-        visible: root.state_ === "missing"
-        text: I18n.tr("smartmontools is required to read SMART data")
-    }
-
-    SettingsNoteRow {
-        width: parent.width
-        visible: root.state_ === "done" && root.sections.length === 0 && root.errorText === ""
+        visible: !root.collapsed && root.state_ === "done" && root.sections.length === 0 && root.errorText === ""
         text: I18n.tr("No results")
     }
 
-    DButton {
-        visible: root.state_ === "missing" && DriveService.installCommand !== ""
-        text: I18n.tr("Install")
-        onClicked: DriveService.install()
-    }
-
     SettingsNoteRow {
         width: parent.width
-        visible: (root.state_ === "error" || root.state_ === "done") && root.errorText !== ""
+        visible: !root.collapsed && (root.state_ === "error" || root.state_ === "done") && root.errorText !== ""
         text: root.errorText
         monospace: true
         maxHeight: 160
     }
 
     Repeater {
-        model: root.state_ === "done" ? root.sections : []
+        model: !root.collapsed && root.state_ === "done" ? root.sections : []
 
         SettingsGroup {
             id: group
             required property var modelData
             width: parent.width
-            slotColor: Theme.chipSurface
+            customPaddingV: 0
+            customPaddingH: 0
 
             Item {
                 width: group.width
@@ -159,7 +183,7 @@ CcSheetDialog {
                         anchors.right: parent.right
                         anchors.margins: Theme.spacingM
                         anchors.verticalCenter: parent.verticalCenter
-                        text: line.modelData.value
+                        text: String(line.modelData.value)
                         font.pixelSize: Theme.fontSizeSmall
                         font.features: {
                             "tnum": 1

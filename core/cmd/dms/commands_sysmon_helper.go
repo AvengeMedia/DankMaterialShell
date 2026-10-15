@@ -15,12 +15,14 @@ import (
 	"time"
 
 	serverDgop "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dgop"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/drives"
 	"github.com/AvengeMedia/dankgo/ipc/params"
 	"github.com/spf13/cobra"
 )
 
 // The system monitor starts this through pkexec when the user unlocks it, so other users' processes can be read
-// and ended. It only reads dgop data and runs the three process actions below; it exits when stdin closes.
+// and ended. It only reads dgop data and SMART reports and runs the three process actions below; it exits when
+// stdin closes.
 var sysmonHelperCmd = &cobra.Command{
 	Use:    "sysmon-helper",
 	Short:  "Privileged process reader for the system monitor (started through pkexec)",
@@ -107,6 +109,8 @@ func sysmonHelperCall(method string, p map[string]any) (any, error) {
 			return nil, errors.New("not the main process of " + unit)
 		}
 		return true, exec.Command("systemctl", "restart", unit).Run()
+	case "drives.smart":
+		return drives.FullReport(params.StringOpt(p, "device", ""))
 	}
 	if strings.HasPrefix(method, "dgop.") {
 		return serverDgop.Call(method, p)

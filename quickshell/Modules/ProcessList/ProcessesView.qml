@@ -6,12 +6,11 @@ import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
 import "ProcessColumns.js" as ProcessColumns
-import "Drives.js" as Drives
 
 Rectangle {
     id: root
 
-    color: Theme.surfaceContainerLow
+    color: "transparent"
     radius: Theme.cornerRadiusL
     clip: true
 
@@ -24,16 +23,6 @@ Rectangle {
     readonly property bool filtered: searchText.length > 0 || processFilterTypes.length === 1 || onlineOnly
     readonly property int processCount: filtered ? cachedProcesses.length : Math.max(DgopService.processCount, cachedProcesses.length)
     readonly property string processCountText: processCount === 1 ? I18n.tr("%1 process", "process count, singular, %1 is 1").arg(1) : I18n.tr("%1 processes", "process count, plural, %1 is a number").arg(processCount)
-    // Rate bars show how hard a process uses the hardware: the fastest drive's ceiling and the fastest connected link.
-    // Without that information (the bar popout polls neither) they fall back to the recent system peak.
-    readonly property real driveCeiling: Math.max(0, ...(DriveService.drives ?? []).map(d => Drives.maxThroughput(d)))
-    readonly property real linkCeiling: Math.max(0, ...(DgopService.netRates ?? []).filter(r => r.linkType === "ethernet" || r.linkType === "wireless").map(r => (r.speed ?? 0) * 1e6 / 8))
-    readonly property var meterMaxes: ({
-            "memory": DgopService.totalMemoryKB,
-            "vram": Math.max(0, ...(DgopService.availableGpus ?? []).map(g => (g.memoryTotal ?? 0) * 1024)),
-            "disk": root.driveCeiling > 0 ? root.driveCeiling : ProcessColumns.peakMax([DgopService.diskHistory.read, DgopService.diskHistory.write], 0) * 1024 * 1024,
-            "net": root.linkCeiling > 0 ? root.linkCeiling : ProcessColumns.peakMax([DgopService.networkHistory.rx, DgopService.networkHistory.tx], 0) * 1024
-        })
     readonly property real rowHeight: ProcessListMetrics.rowHeight
     property bool active: visible
     readonly property alias listView: processListView
@@ -100,6 +89,11 @@ Rectangle {
             return [];
 
         let procs = DgopService.allProcesses.slice();
+        // App names only matter for searching and sorting by name; looking them up for every row each sample is wasted.
+        if (searchText.length > 0 || DgopService.currentSort === "name")
+            procs = procs.map(p => Object.assign({}, p, {
+                    "appName": ProcessListMetrics.appEntry(p)?.name ?? ""
+                }));
 
         if (processFilterTypes.length === 1)
             procs = procs.filter(p => processFilterTypes.includes(p.username === UserInfoService.username ? "user" : "system"));
@@ -110,9 +104,10 @@ Rectangle {
             const search = searchText.toLowerCase();
             procs = procs.filter(p => {
                 const cmd = (p.command || "").toLowerCase();
+                const app = (p.appName || "").toLowerCase();
                 const fullCmd = (p.fullCommand || "").toLowerCase();
                 const pid = p.pid.toString();
-                return cmd.includes(search) || fullCmd.includes(search) || pid.includes(search);
+                return cmd.includes(search) || app.includes(search) || fullCmd.includes(search) || pid.includes(search);
             });
         }
 
@@ -127,24 +122,7 @@ Rectangle {
     // Wider than the card when many columns are on: the whole table then scrolls sideways, the name keeps its minimum.
     readonly property real tableWidth: Math.max(root.width, (Theme.spacingS + Theme.spacingL) * 2 + root.leadWidth + root.nameMinWidth + visibleColumns.reduce((sum, c) => sum + root.columnWidth(c) + Theme.spacingXS * 2, 0))
     readonly property var visibleColumnIds: visibleColumns.map(c => c.id)
-    readonly property var headerGroups: {
-        const out = [];
-        for (const c of visibleColumns) {
-            const g = c.group ?? "";
-            const last = out[out.length - 1];
-            if (g !== "" && last && last.group === g)
-                last.cols.push(c);
-            else
-                out.push({
-                    group: g,
-                    cols: [c]
-                });
-        }
-        return out;
-    }
-
     readonly property real leadWidth: ProcessListMetrics.appIconSize + Theme.spacingS
-    readonly property bool hasGroups: visibleColumns.some(c => c.group)
 
     function columnWidth(c) {
         return Theme.fontSizeSmall * (c.width ?? 6);
@@ -205,10 +183,7 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                sh.forceActiveFocus(Qt.MouseFocusReason);
-                DgopService.toggleSort(sh.sortKey);
-            }
+            onClicked: DgopService.toggleSort(sh.sortKey)
         }
     }
 
@@ -409,11 +384,6 @@ Rectangle {
     }
 
     Ref {
-        service: DriveService
-        active: root.active && root.columns.some(id => id === "diskRead" || id === "diskWrite")
-    }
-
-    Ref {
         service: DgopService
         modules: ["processes", "cpu", "memory", "system", "gpu"].concat(ProcessColumns.modulesFor(root.columns), root.onlineOnly || root.expandedPid !== "" ? ["process-net"] : [])
         active: root.active
@@ -421,15 +391,19 @@ Rectangle {
 
     Component.onCompleted: updateProcesses()
 
-    readonly property string dgopCurrentSort: DgopService.currentSort
-    readonly property bool dgopSortAscending: DgopService.sortAscending
+    // Column and direction change together on a header click; one refresh covers both.
+    readonly property string sortOrder: DgopService.currentSort + (DgopService.sortAscending ? "+" : "-")
 
-    onDgopCurrentSortChanged: refreshFilter()
+    onSortOrderChanged: Qt.callLater(refreshFilter)
 
-    onDgopSortAscendingChanged: refreshFilter()
+    property real menuClosedAt: 0
 
     Connections {
         target: root.contextMenu
+        function onVisibleChanged() {
+            if (!root.contextMenu.visible)
+                root.menuClosedAt = Date.now();
+        }
         function onProcessKilled() {
             root.expandedPid = "";
             root.forceRefresh(3);
@@ -448,107 +422,72 @@ Rectangle {
         interactive: contentWidth > width
         clip: true
 
+        readonly property bool overflows: contentWidth > width
+
         ScrollBar.horizontal: ScrollBar {
-            policy: tableScroll.contentWidth > tableScroll.width ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
+            policy: tableScroll.overflows ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+            padding: 0
+
+            contentItem: Rectangle {
+                implicitHeight: Theme.scrollbarThickness
+                radius: height / 2
+                color: parent.pressed ? Theme.primary : Theme.outline
+            }
+
+            background: Item {}
+        }
+
+        function scrollBy(delta) {
+            contentX = Math.max(0, Math.min(contentWidth - width, contentX - delta));
         }
 
         ColumnLayout {
             width: root.tableWidth
-            height: tableScroll.height
+            height: tableScroll.height - (tableScroll.overflows ? Theme.scrollbarThickness + Theme.scrollbarGap : 0)
             spacing: 0
-
-            RowLayout {
-                Layout.fillWidth: true
-                Layout.leftMargin: Theme.spacingS + Theme.spacingL
-                Layout.rightMargin: Theme.spacingS + Theme.spacingL
-                Layout.preferredHeight: ProcessListMetrics.groupHeaderHeight
-                Layout.fillHeight: false
-                visible: root.hasGroups
-                spacing: Theme.spacingXS
-
-                Item {
-                    Layout.minimumWidth: root.leadWidth
-                }
-
-                Item {
-                    Layout.fillWidth: true
-                }
-
-                Repeater {
-                    model: root.headerGroups
-
-                    Item {
-                        id: groupCell
-
-                        required property var modelData
-                        readonly property real groupWidth: modelData.cols.reduce((sum, c) => sum + root.columnWidth(c), 0) + Theme.spacingXS * (modelData.cols.length - 1)
-
-                        Layout.minimumWidth: groupWidth
-                        Layout.maximumWidth: groupWidth
-                        Layout.preferredHeight: ProcessListMetrics.groupHeaderHeight
-
-                        StyledText {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.bottom: parent.bottom
-                            anchors.bottomMargin: Theme.spacingXXS
-                            width: parent.width
-                            horizontalAlignment: Text.AlignHCenter
-                            text: ProcessListMetrics.groupLabel(groupCell.modelData.group)
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            wrapMode: Text.NoWrap
-                            elide: Text.ElideRight
-                        }
-
-                        Rectangle {
-                            visible: groupCell.modelData.group !== ""
-                            anchors.bottom: parent.bottom
-                            width: parent.width
-                            height: 1
-                            color: Theme.outlineVariant
-                        }
-                    }
-                }
-            }
-
-            RowLayout {
-                id: header
-                Layout.fillWidth: true
-                Layout.leftMargin: Theme.spacingS + Theme.spacingL
-                Layout.rightMargin: Theme.spacingS + Theme.spacingL
-                spacing: Theme.spacingXS
-
-                Item {
-                    Layout.minimumWidth: root.leadWidth
-                }
-
-                SortHeader {
-                    id: nameHeader
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 0
-                    sortKey: "name"
-                    label: I18n.tr("Name")
-                    alignLeft: true
-                }
-
-                Repeater {
-                    model: root.visibleColumns
-
-                    SortHeader {
-                        required property var modelData
-                        Layout.minimumWidth: root.columnWidth(modelData)
-                        Layout.maximumWidth: Layout.minimumWidth
-                        sortKey: modelData.sortKey
-                        label: ProcessListMetrics.columnLabel(modelData.id)
-                    }
-                }
-            }
 
             Rectangle {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 1
-                Layout.bottomMargin: Theme.spacingXS
-                color: Theme.outlineVariant
+                Layout.leftMargin: Theme.spacingS
+                Layout.rightMargin: Theme.spacingS
+                Layout.bottomMargin: Theme.spacingM
+                implicitHeight: header.implicitHeight
+                radius: Theme.cornerRadiusS
+                color: Theme.surfaceContainerHigh
+
+                RowLayout {
+                    id: header
+                    anchors.fill: parent
+                    anchors.leftMargin: Theme.spacingL
+                    anchors.rightMargin: Theme.spacingL
+                    spacing: Theme.spacingXS
+
+                    Item {
+                        Layout.minimumWidth: root.leadWidth
+                    }
+
+                    SortHeader {
+                        id: nameHeader
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 0
+                        sortKey: "name"
+                        label: I18n.tr("Name")
+                        alignLeft: true
+                    }
+
+                    Repeater {
+                        model: root.visibleColumns
+
+                        SortHeader {
+                            required property var modelData
+                            Layout.minimumWidth: root.columnWidth(modelData)
+                            Layout.maximumWidth: Layout.minimumWidth
+                            sortKey: modelData.sortKey
+                            label: ProcessListMetrics.columnLabel(modelData.id)
+                        }
+                    }
+                }
+
             }
 
             DListView {
@@ -566,8 +505,16 @@ Rectangle {
                     if (activeFocus && root.selectedIndex < 0)
                         root.selectFirst();
                 }
-                spacing: 0
+                spacing: Theme.groupedListGap
                 currentIndex: root.selectedIndex
+                // Shift+wheel moves a table wider than the window sideways.
+                WheelHandler {
+                    target: null
+                    acceptedModifiers: Qt.ShiftModifier
+                    enabled: tableScroll.overflows
+                    onWheel: event => tableScroll.scrollBy(event.angleDelta.y || event.angleDelta.x)
+                }
+
                 add: null
                 remove: null
                 displaced: null
@@ -581,16 +528,22 @@ Rectangle {
                 delegate: ProcessRow {
                     required property var modelData
                     required property int index
+                    firstInGroup: index === 0
+                    lastInGroup: index === processListView.count - 1
                     width: processListView.width
                     rowHeight: root.rowHeight
+                    detailX: tableScroll.contentX
+                    detailWidth: Math.min(width, tableScroll.width - Theme.spacingS * 2)
                     keyForwardTargets: [processKeys]
                     KeyNavigation.backtab: nameHeader
                     columns: root.visibleColumnIds
-                    meterMaxes: root.meterMaxes
                     process: modelData
                     isExpanded: root.expandedPid === (modelData?.pid ?? -1).toString()
                     isSelected: root.keyboardNavigationActive && root.selectedIndex === index
                     onClicked: {
+                        // A click that opens or dismisses the context menu is not meant for the row.
+                        if (root.contextMenu?.visible || Date.now() - root.menuClosedAt < 400)
+                            return;
                         processListView.forceActiveFocus(Qt.MouseFocusReason);
                         root.keyboardNavigationActive = true;
                         root.selectedIndex = index;

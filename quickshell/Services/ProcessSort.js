@@ -26,7 +26,7 @@ function rawValue(key, row) {
     case "nice": return _num(row.nice);
     case "cpuTime": return _num(row.pticks);
     case "pid": return _num(row.pid);
-    case "name": return (row.command || "").toLowerCase();
+    case "name": return (row.appName || row.command || "").toLowerCase();
     case "user": return row.username ? row.username : null;
     }
     return null;

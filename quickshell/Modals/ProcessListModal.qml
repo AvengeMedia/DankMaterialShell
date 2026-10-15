@@ -91,7 +91,11 @@ DFloatingWindow {
 
     onClosed: hide()
 
+    // Pages load on their first visit and then stay, so their selection and scroll survive switching back.
+    property int visitedTabs: 0
+
     onCurrentTabChanged: {
+        visitedTabs |= 1 << currentTab;
         if (visible && currentTab === 0 && searchField.visible && !viewNavigation.activeFocus)
             searchField.forceActiveFocus();
     }
@@ -130,7 +134,7 @@ DFloatingWindow {
         focus: true
 
         Keys.onPressed: event => {
-            if (processContextMenu.visible || processContextMenu.confirmationOpen || columnPicker.shown || (disksTabLoader.item && disksTabLoader.item.sheetOpen))
+            if (processContextMenu.visible || processContextMenu.confirmationOpen || columnPicker.shown)
                 return;
 
             switch (event.key) {
@@ -326,7 +330,7 @@ DFloatingWindow {
                         Loader {
                             id: performanceTabLoader
                             anchors.fill: parent
-                            active: processListModal.visible
+                            active: processListModal.visible && (currentTab === 1 || (processListModal.visitedTabs & 2) !== 0)
                             visible: currentTab === 1
                             sourceComponent: PerformanceView {}
                         }
@@ -334,7 +338,7 @@ DFloatingWindow {
                         Loader {
                             id: disksTabLoader
                             anchors.fill: parent
-                            active: processListModal.visible
+                            active: processListModal.visible && (currentTab === 2 || (processListModal.visitedTabs & 4) !== 0)
                             visible: currentTab === 2
                             sourceComponent: DisksView {}
                         }
@@ -342,7 +346,7 @@ DFloatingWindow {
                         Loader {
                             id: systemTabLoader
                             anchors.fill: parent
-                            active: processListModal.visible
+                            active: processListModal.visible && (currentTab === 3 || (processListModal.visitedTabs & 8) !== 0)
                             visible: currentTab === 3
                             sourceComponent: SystemView {}
                         }

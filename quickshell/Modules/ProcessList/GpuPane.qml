@@ -78,42 +78,33 @@ DevicePane {
             value: root.usedOf(stat.memoryUsed, stat.memoryTotal)
         },
         {
-            label: I18n.tr("Shared memory", "GPU memory borrowed from system RAM (GTT)"),
-            value: root.usedOf(stat.gttUsed, stat.gttTotal)
-        },
-        {
-            label: I18n.tr("Memory controller", "GPU memory controller busy percentage"),
-            value: root.pct(stat.memoryBusy)
-        },
-        {
             label: I18n.tr("Core clock"),
             value: root.num(stat.coreClock, "MHz"),
             tooltip: root.withMax(stat.coreClockMax, "MHz")
         },
         {
-            label: I18n.tr("Memory clock"),
-            value: root.num(stat.memoryClock, "MHz"),
-            tooltip: root.withMax(stat.memoryClockMax, "MHz")
-        },
-        {
-            label: I18n.tr("Video encode", "GPU video encoder busy percentage"),
-            value: root.pct(stat.encoderUsage)
-        },
-        {
-            label: I18n.tr("Video decode", "GPU video decoder busy percentage"),
-            value: root.pct(stat.decoderUsage)
-        }
-    ] : []
-
-    rightStats: live ? [
-        {
             label: I18n.tr("Temperature"),
             value: root.temp(stat.temperature || null)
         },
         {
-            label: I18n.tr("Hotspot", "GPU hotspot temperature", true),
-            value: root.temp(stat.hotspot)
+            advanced: true,
+            label: I18n.tr("Shared memory", "GPU memory borrowed from system RAM (GTT)"),
+            value: root.usedOf(stat.gttUsed, stat.gttTotal)
         },
+        {
+            advanced: true,
+            label: I18n.tr("Memory controller", "GPU memory controller busy percentage"),
+            value: root.pct(stat.memoryBusy)
+        },
+        {
+            advanced: true,
+            label: I18n.tr("Memory clock"),
+            value: root.num(stat.memoryClock, "MHz"),
+            tooltip: root.withMax(stat.memoryClockMax, "MHz")
+        }
+    ] : []
+
+    rightStats: live ? [
         {
             label: I18n.tr("Power", "battery stat label, charge or discharge rate in watts", true),
             value: root.num(stat.power, "W"),
@@ -127,6 +118,21 @@ DevicePane {
             label: I18n.tr("Top process"),
             value: root.topProcess ? root.topProcess.command : null,
             tooltip: root.topProcess ? Math.round(root.topProcess.gpu) + "%" : ""
+        },
+        {
+            advanced: true,
+            label: I18n.tr("Video encode", "GPU video encoder busy percentage"),
+            value: root.pct(stat.encoderUsage)
+        },
+        {
+            advanced: true,
+            label: I18n.tr("Video decode", "GPU video decoder busy percentage"),
+            value: root.pct(stat.decoderUsage)
+        },
+        {
+            advanced: true,
+            label: I18n.tr("Hotspot", "GPU hotspot temperature", true),
+            value: root.temp(stat.hotspot)
         }
     ] : []
 
@@ -142,7 +148,7 @@ DevicePane {
         visible: root.stat !== null
         width: parent.width
 
-        DToggle {
+        SettingsToggleRow {
             readonly property bool heldByWidget: root.stat !== null && DgopService.gpuHeldByWidget(root.stat.pciId)
             text: I18n.tr("GPU Monitoring")
             checked: root.monitored || heldByWidget
