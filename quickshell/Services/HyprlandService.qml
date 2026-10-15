@@ -10,7 +10,7 @@ import "../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
 import qs.Services
 import "../Common/OutputModel.js" as OutputModel
 import "../Common/BlurStrength.js" as BlurStrength
-import "../Common/WorkspaceModel.js" as WorkspaceModel
+import "../Common/WorkspaceModel.js" as WorkspaceModel // qmllint disable unused-imports
 
 Singleton {
     id: root
@@ -42,6 +42,7 @@ Singleton {
     property bool hyprOptionsLoading: false
     property bool inputGenerationPending: false
     property bool inputGenerationRunning: false
+    property int followMouseMode: -1
     // Hyprland only has per-device touchpad speed; probed once per compositor, a hotplugged touchpad waits for the next shell start
     property var hyprTouchpadNames: []
     property bool hyprDevicesReady: false
@@ -106,6 +107,7 @@ Singleton {
 
     Component.onCompleted: {
         if (CompositorService.isHyprland) {
+            refreshFollowMouse();
             refreshWorkspaceRules();
             refreshLuaConfigStatus();
             if (luaConfigActive)
@@ -144,12 +146,14 @@ Singleton {
         target: CompositorService
         function onIsHyprlandChanged() {
             if (CompositorService.isHyprland) {
+                refreshFollowMouse();
                 refreshLuaConfigStatus();
                 if (luaConfigActive)
                     ensureDmsLuaConfigs();
                 generateLayoutConfig();
                 return;
             }
+            followMouseMode = -1;
             luaConfigDetected = false;
             luaConfigStatusReady = false;
             luaConfigStatusLoading = false;
@@ -217,6 +221,22 @@ Singleton {
 
     function hyprSupports(name) {
         return hyprOptionNames[name] === true;
+    }
+
+    function refreshFollowMouse() {
+        if (!CompositorService.isHyprland)
+            return;
+        Proc.runCommand("hypr-follow-mouse", ["hyprctl", "-j", "getoption", "input:follow_mouse"], (output, exitCode) => {
+            if (exitCode !== 0 || !CompositorService.isHyprland)
+                return;
+            try {
+                const mode = JSON.parse(output).int;
+                if (Number.isInteger(mode) && mode >= 0 && mode <= 3)
+                    followMouseMode = mode;
+            } catch (error) {
+                log.warn("hyprctl follow_mouse parse failed:", error);
+            }
+        });
     }
 
     function loadHyprOptionNames() {
@@ -549,6 +569,7 @@ hl.config({
 ${sections.join("\n")}
 })
 `;
+
         if (layoutXrayEnabled) {
             content += `
 hl.layer_rule({
@@ -818,6 +839,9 @@ hl.layer_rule({
             if (hyprSupports(option))
                 lines.push(line);
         };
+        // -1 leaves existing follow_mouse modes untouched until the user operates the toggle.
+        if (s.focusFollowsMouse === 0 || s.focusFollowsMouse === 1)
+            add("input:follow_mouse", `follow_mouse = ${s.focusFollowsMouse},`);
         if (s.mouseAccelSpeed !== 0)
             add("input:sensitivity", `sensitivity = ${s.mouseAccelSpeed.toFixed(2)},`);
         if (s.mouseAccelProfile !== "default")
@@ -895,6 +919,17 @@ hl.layer_rule({
         return names.map(name => `hl.device({ name = ${luaString(name)}, ${fields.join(", ")} })`);
     }
 
+    // renameWorkspace stores "<id> <name>"; hand back only the part the user typed.
+    function focusedWorkspaceName() {
+        const ws = Hyprland.focusedWorkspace;
+        if (!ws?.id)
+            return "";
+        const prefix = ws.id + " ";
+        if (ws.name.startsWith(prefix))
+            return ws.name.slice(prefix.length);
+        return ws.name === String(ws.id) ? "" : ws.name;
+    }
+
     function renameWorkspace(newName) {
         const ws = Hyprland.focusedWorkspace;
         if (!ws)
@@ -967,6 +1002,14 @@ hl.layer_rule({
             return;
         }
         Hyprland.dispatch(`hl.dsp.window.move({ workspace = ${luaValue(workspace)}, window = ${luaString(selector)}, follow = ${follow ? "true" : "false"} })`);
+    }
+
+    function cycleWindow(forward) {
+        if (!luaConfigActive) {
+            Hyprland.dispatch(forward ? "cyclenext" : "cyclenext prev");
+            return;
+        }
+        Hyprland.dispatch(`hl.dsp.window.cycle_next({ next = ${forward ? "true" : "false"} })`);
     }
 
     function focusMonitor(monitor) {

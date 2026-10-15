@@ -363,7 +363,7 @@ Singleton {
     }
 
     function keepUnchanged(previous, next) {
-        if (!Array.isArray(previous) || !Array.isArray(next))
+        if (!(previous instanceof Array) || !(next instanceof Array))
             return next;
         const byContent = new Map();
         for (const item of previous)
@@ -390,7 +390,7 @@ Singleton {
 
         if (!state.wifiNetworks && !state.savedWifiNetworks)
             return;
-        const hasSavedWifiState = DMSService.apiVersion >= savedWifiStateApiVersion && Array.isArray(state.savedWifiNetworks);
+        const hasSavedWifiState = DMSService.apiVersion >= savedWifiStateApiVersion && state.savedWifiNetworks instanceof Array;
         const sourceSavedNetworks = hasSavedWifiState ? state.savedWifiNetworks : (state.wifiNetworks || []).filter(network => network.saved);
         const normalized = sourceSavedNetworks.map(network => Object.assign({}, network, {
                 saved: true,

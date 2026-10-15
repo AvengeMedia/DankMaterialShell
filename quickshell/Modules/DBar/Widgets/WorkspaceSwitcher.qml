@@ -9,6 +9,7 @@ import qs.Modules.Plugins
 import qs.Services
 import qs.DCommon.Widgets
 import qs.Widgets
+import "../../../DCommon/Common/WheelInput.js" as WheelInput
 
 BasePill {
     id: root
@@ -230,7 +231,7 @@ BasePill {
     }
 
     onWheel: wheel => {
-        if (Math.abs(wheel.angleDelta.x) > Math.abs(wheel.angleDelta.y))
+        if (WheelInput.isHorizontal(wheel))
             return;
         wheel.accepted = true;
         workspaces.handleWheel(wheel);

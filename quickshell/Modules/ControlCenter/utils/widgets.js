@@ -4,17 +4,12 @@
 .import "../../../Common/GridLayout.js" as GridLayout
 .import "../../../Common/settings/SettingsSpec.js" as Spec
 
-var OPTION_IDS = ["diskUsage", "brightnessSlider", "idleInhibitor", "user"];
+var OPTION_IDS = ["diskUsage", "brightnessSlider", "idleInhibitor", "user", "battery", "quickTiles"];
+var GROUP_ID = "quickTiles";
+var BATTERY_STYLES = ["icon", "solid", "outline", "ring", "duo"];
 var ACTION_IDS = ["settings", "lock", "power"];
 var EDIT_ID = "edit";
 var BUTTON_IDS = ACTION_IDS.concat([EDIT_ID]);
-var FOOTER_CELLS = {
-    "runningApps": 4,
-    "user": 3,
-    "volumeSlider": 4,
-    "inputVolumeSlider": 4,
-    "brightnessSlider": 4
-};
 var USER_SHAPES = ["circle", "cookie4", "cookie7", "cookie12", "clover4", "clover8", "sunny", "pentagon", "arch", "slanted", "gem", "square"];
 
 function isSliderWidget(id) {
@@ -29,8 +24,24 @@ function isSmall(widget, rows) {
     return widget?.small === true && rows === 1 && canShrink(widget.id);
 }
 
-function inFooter(widget) {
-    return !!widget?.footer;
+function canGroup(widget) {
+    return canShrink(widget?.id) && widget?.id !== GROUP_ID;
+}
+
+// Members of a group that no longer exists fall back to the grid.
+function groupIds(widgets) {
+    return widgets.filter(widget => widget?.id === GROUP_ID).map(widget => widget.instanceId);
+}
+
+function inGroup(widget, ids) {
+    return !!widget?.group && ids.includes(widget.group);
+}
+
+function groupMembers(widgets, groupId) {
+    return widgets.reduce((members, widget, index) => widget?.group === groupId && isShown(widget) ? members.concat([{
+                "index": index,
+                "widget": widget
+            }]) : members, []);
 }
 
 function isRemovable(widget) {
@@ -44,47 +55,6 @@ function ensureEditButton() {
         return;
     const fallback = Spec.SPEC.controlCenterWidgets.def.find(widget => widget.id === EDIT_ID);
     Common.SettingsData.set("controlCenterWidgets", widgets.concat([Object.assign({}, fallback)]));
-}
-
-function footerMinCells(id) {
-    return isSliderWidget(id) ? 3 : 1;
-}
-
-function footerStep(value) {
-    const step = ControlCenter.CcMetrics.gridStep;
-    return Math.round(value / step) * step;
-}
-
-// `footerW` outlives the footer flag, so an item dragged back in returns at the width it left with.
-function footerCells(widget) {
-    return Math.max(footerMinCells(widget?.id), footerStep(Number(widget?.footerW) || FOOTER_CELLS[widget?.id] || 1));
-}
-
-function footerFills(widget) {
-    return widget?.footerFill === true;
-}
-
-function footerEnds(widget) {
-    return widget?.footerEnd === true;
-}
-
-function fitFooterCells(sizes, mins, capacity, keep, step) {
-    const fitted = sizes.slice();
-    let over = fitted.reduce((sum, cells) => sum + cells, 0) - capacity;
-    while (over > 0) {
-        const widest = fitted.reduce((best, cells, i) => cells > mins[i] && (best < 0 || cells > fitted[best]) ? i : best, -1);
-        if (widest < 0)
-            break;
-        fitted[widest] -= step;
-        over -= step;
-    }
-    for (let i = fitted.length - 1; over > 0 && i >= 0; i--) {
-        if (keep[i])
-            continue;
-        over -= fitted[i];
-        fitted[i] = 0;
-    }
-    return fitted;
 }
 
 function isShown(widget) {
@@ -174,6 +144,9 @@ function addWidget(widgetId, columns) {
         widget.showMountPath = true;
     }
 
+    if (widgetId === GROUP_ID)
+        widget.instanceId = generateUniqueId();
+
     if (widgetId === "brightnessSlider") {
         widget.instanceId = generateUniqueId();
         widget.deviceName = "";
@@ -191,8 +164,48 @@ function removeWidget(index) {
     const widgets = Common.SettingsData.controlCenterWidgets.slice();
     if (index < 0 || index >= widgets.length || !isRemovable(widgets[index]))
         return;
+    const [removed] = widgets.splice(index, 1);
+    Common.SettingsData.set("controlCenterWidgets", removed.id === GROUP_ID ? ungroup(widgets, removed.instanceId) : widgets);
+}
+
+function ungroup(widgets, groupId) {
+    return widgets.map(widget => {
+        if (widget?.group !== groupId)
+            return widget;
+        const freed = Object.assign({}, widget);
+        delete freed.group;
+        return freed;
+    });
+}
+
+// Lands just before `beforeIndex`, or after the group's last member.
+function moveToGroup(index, groupId, beforeIndex) {
+    const widgets = Common.SettingsData.controlCenterWidgets.slice();
+    const widget = widgets[index];
+    if (!widget || !canGroup(widget))
+        return;
+    const before = beforeIndex === index ? null : widgets[beforeIndex] ?? null;
     widgets.splice(index, 1);
+    const lastMember = widgets.reduce((last, other, i) => other?.group === groupId ? i : last, -1);
+    const at = before ? widgets.indexOf(before) : lastMember >= 0 ? lastMember + 1 : widgets.length;
+    const moved = Object.assign({}, widget, {
+        "group": groupId
+    });
+    delete moved.col;
+    delete moved.row;
+    widgets.splice(at, 0, moved);
     Common.SettingsData.set("controlCenterWidgets", widgets);
+}
+
+function placeFromGroup(widgets, index, col, row) {
+    const tile = Object.assign({}, widgets[index], {
+        "col": col,
+        "row": row
+    });
+    delete tile.group;
+    const placed = widgets.slice();
+    placed[index] = tile;
+    return placed;
 }
 
 function setOption(index, key, value) {
@@ -205,75 +218,12 @@ function setOption(index, key, value) {
     Common.SettingsData.set("controlCenterWidgets", widgets);
 }
 
-// Footer order is the saved order of footer entries, so the moved entry lands just before `beforeIndex`.
-function moveToFooter(index, beforeIndex, cells, end) {
-    const widgets = Common.SettingsData.controlCenterWidgets.slice();
-    const widget = widgets[index];
-    if (!widget)
-        return;
-    const before = beforeIndex === index ? null : widgets[beforeIndex] ?? null;
-    widgets.splice(index, 1);
-    const at = before ? widgets.indexOf(before) : widgets.length;
-    const moved = Object.assign({}, widget, {
-        "footer": true,
-        "footerW": cells
-    });
-    if (end)
-        moved.footerEnd = true;
-    else
-        delete moved.footerEnd;
-    widgets.splice(at, 0, moved);
-    Common.SettingsData.set("controlCenterWidgets", widgets);
-}
-
-// Hands spare cells to fill items, the earlier ones taking the remainder.
-function spreadFooterFill(cells, fills, spare, step) {
-    const count = fills.filter(Boolean).length;
-    if (count === 0 || spare <= 0)
-        return cells;
-    let left = spare;
-    return cells.map((size, i) => {
-        if (!fills[i] || size === 0)
-            return size;
-        const share = Math.ceil(left / count / step) * step;
-        left -= share;
-        return size + Math.max(0, share);
-    });
-}
-
-function setFooterSize(index, cells, fill) {
-    const widgets = Common.SettingsData.controlCenterWidgets.slice();
-    if (!widgets[index])
-        return;
-    const widget = Object.assign({}, widgets[index], {
-        "footerW": cells
-    });
-    if (fill)
-        widget.footerFill = true;
-    else
-        delete widget.footerFill;
-    widgets[index] = widget;
-    Common.SettingsData.set("controlCenterWidgets", widgets);
-}
-
-function placeFromFooter(widgets, index, col, row) {
-    const tile = Object.assign({}, widgets[index], {
-        "col": col,
-        "row": row
-    });
-    delete tile.footer;
-    delete tile.footerEnd;
-    const placed = widgets.slice();
-    placed[index] = tile;
-    return placed;
-}
-
 function setLayout(widgets) {
     Common.SettingsData.set("controlCenterWidgets", widgets);
 }
 
 function resetToDefault() {
-    Common.SettingsData.resetToDefault(["controlCenterWidgets", "controlCenterColumns", "controlCenterFooterPosition"]);
+    Common.SettingsData.resetToDefault(["controlCenterWidgets", "controlCenterColumns"]);
 }
 
 function clearAll() {

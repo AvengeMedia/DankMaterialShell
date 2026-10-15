@@ -24,6 +24,8 @@ Variants {
             return !CompositorService.reservesDesktopInput;
         }
     }
+    // niri skips place-within-backdrop surfaces when hit-testing, so the wallpaper never sees clicks there.
+    readonly property bool desktopMenuOnWallpaper: desktopMenuEnabled && !CompositorService.isNiri
     model: SettingsData.getFilteredScreens("wallpaper")
 
     PanelWindow {
@@ -51,14 +53,38 @@ Variants {
             id: emptyRegion
         }
 
-        mask: variants.desktopMenuEnabled ? null : emptyRegion
+        mask: variants.desktopMenuOnWallpaper ? null : emptyRegion
 
         MouseArea {
             anchors.fill: parent
             z: 1
-            enabled: variants.desktopMenuEnabled
+            enabled: variants.desktopMenuOnWallpaper
             acceptedButtons: Qt.RightButton
             onClicked: mouse => PopoutService.desktopContextMenu?.open(wallpaperWindow.screen, mouse.x, mouse.y, false)
+        }
+
+        Loader {
+            active: variants.desktopMenuEnabled && CompositorService.isNiri
+
+            sourceComponent: PanelWindow {
+                screen: wallpaperWindow.screen
+                color: "transparent"
+
+                WlrLayershell.namespace: "dms:desktop-input"
+                WlrLayershell.layer: WlrLayer.Background
+                WlrLayershell.exclusionMode: ExclusionMode.Ignore
+
+                anchors.top: true
+                anchors.bottom: true
+                anchors.left: true
+                anchors.right: true
+
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.RightButton
+                    onClicked: mouse => PopoutService.desktopContextMenu?.open(wallpaperWindow.screen, mouse.x, mouse.y, false)
+                }
+            }
         }
 
         Item {

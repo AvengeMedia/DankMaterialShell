@@ -54,9 +54,8 @@ FocusScope {
         property bool editMode: false
         property string expandedSection: ""
 
-        onEditModeChanged: root.controller.setEditing("controlcenter", editMode)
+        onEditModeChanged: root.controller.setEditing("controlcenter", editMode, CcMetrics.islandEditRoom)
 
-        readonly property vector4d chromeRoom: Qt.vector4d(root.sideInset, Theme.spacingXS, root.sideInset, root.bottomInset)
         readonly property int gridColumnCap: root.controller.controlCenterColumnCap
         readonly property int gridColumns: root.controller.controlCenterColumns
         readonly property real availableHeight: root.controller.controlCenterMaxHeight - Theme.spacingXS - root.bottomInset
@@ -65,6 +64,9 @@ FocusScope {
         readonly property real renderedAlignedY: root.resizeGeometry?.renderedY ?? 0
         readonly property bool shouldBeVisible: root.controller.activeActivity === "controlcenter" && root.controller.expanded
         readonly property bool headerTogglesClose: true
+        readonly property real editRoom: CcMetrics.islandEditRoom
+        readonly property bool editRoomShown: root.controller.editRoomGranted && root.controller.editingActivity === "controlcenter"
+        readonly property bool growsFromTop: root.controller.edge === "top"
         readonly property bool powerMenuOpen: PopoutService.powerMenuModalLoader?.item?.shouldBeVisible ?? false
         readonly property var screen: root.effectiveScreen
         readonly property var triggerScreen: root.effectiveScreen

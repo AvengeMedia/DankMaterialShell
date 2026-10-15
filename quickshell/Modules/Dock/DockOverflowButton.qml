@@ -6,8 +6,6 @@ Item {
     id: root
     required property var options
 
-    property real indicatorLane: 0
-    readonly property real laneOffset: (root.options.position === SettingsData.Position.Bottom || root.options.position === SettingsData.Position.Right ? -1 : 1) * root.indicatorLane / 2
     property color iconColor: Theme.surfaceText
     property real actualIconSize: 40
     property int overflowCount: 0
@@ -22,8 +20,6 @@ Item {
     Rectangle {
         id: buttonBackground
         anchors.centerIn: parent
-        anchors.horizontalCenterOffset: root.isVertical ? root.laneOffset : 0
-        anchors.verticalCenterOffset: root.isVertical ? 0 : root.laneOffset
         width: actualIconSize
         height: actualIconSize
         radius: Theme.cornerRadius

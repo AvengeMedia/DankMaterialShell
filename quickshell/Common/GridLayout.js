@@ -121,13 +121,79 @@ function slotRect(layout, col, row, cols, rows) {
     };
 }
 
+// Rows held only by shrinkable slots drop to `unit`; a slot sharing any row with a full one keeps the full height.
+function shrinkRows(layout, shrinkable, unit) {
+    const step = layout.step;
+    const bands = Math.round(layout.rows / step);
+    if (bands === 0 || !shrinkable.some(flag => flag))
+        return layout;
+    const span = slot => [Math.round(slot.row / step), Math.round(slot.rows / step)];
+    const holders = Array.from({
+        "length": bands
+    }, () => []);
+    layout.slots.forEach((slot, i) => {
+        if (!slot)
+            return;
+        const [first, count] = span(slot);
+        for (let b = first; b < first + count; b++)
+            holders[b].push(i);
+    });
+    const open = holders.map(indices => indices.every(i => shrinkable[i]));
+    const shrinks = layout.slots.map((slot, i) => {
+        if (!slot || !shrinkable[i])
+            return false;
+        const [first, count] = span(slot);
+        return open.slice(first, first + count).every(flag => flag);
+    });
+    const fullBand = step * layout.rowUnit - (1 - step) * layout.gap;
+    const shortBand = step * unit - (1 - step) * layout.gap;
+    const heights = holders.map(indices => indices.length > 0 && indices.every(i => shrinks[i]) ? shortBand : fullBand);
+    const tops = [];
+    let y = 0;
+    for (const height of heights) {
+        tops.push(y);
+        y += height + layout.gap;
+    }
+    const slots = layout.slots.map(slot => {
+        if (!slot)
+            return slot;
+        const [first, count] = span(slot);
+        const h = heights.slice(first, first + count).reduce((sum, band) => sum + band, 0) + layout.gap * (count - 1);
+        return Object.assign({}, slot, {
+            "y": tops[first],
+            "h": h
+        });
+    });
+    return Object.assign({}, layout, {
+        "slots": slots,
+        "totalHeight": y - layout.gap,
+        "bandTops": tops
+    });
+}
+
+function rowAt(layout, y) {
+    const pitch = (layout.rowUnit + layout.gap) * layout.step;
+    const tops = layout.bandTops;
+    if (!tops)
+        return Math.round(y / pitch) * layout.step;
+    const end = layout.totalHeight + layout.gap;
+    if (y >= end)
+        return (tops.length + Math.round((y - end) / pitch)) * layout.step;
+    const edges = tops.concat([end]);
+    let band = 0;
+    edges.forEach((edge, b) => {
+        if (Math.abs(y - edge) <= Math.abs(y - edges[band]))
+            band = b;
+    });
+    return band * layout.step;
+}
+
 function cellAt(layout, x, y, cols, rows) {
     const px = layout.mirror ? layout.width - x - (cols * layout.colW + (cols - 1) * layout.gap) : x;
     const col = Math.round(px / (layout.colW + layout.gap) / layout.step) * layout.step;
-    const row = Math.round(y / (layout.rowUnit + layout.gap) / layout.step) * layout.step;
     return {
         "col": Math.max(0, Math.min(layout.columns - cols, col)),
-        "row": Math.max(0, row)
+        "row": Math.max(0, rowAt(layout, y))
     };
 }
 

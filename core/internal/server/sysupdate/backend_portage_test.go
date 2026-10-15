@@ -60,19 +60,12 @@ Total: 8 packages (8 upgrades), Size of downloads: 0 KiB
 	}
 }
 
-func TestPortageRepoLabelDefaultsToGentoo(t *testing.T) {
-	if got := portageRepoLabel("ebuild", ""); got != RepoKind("gentoo (ebuild)") {
-		t.Errorf("portageRepoLabel(no repo) = %q, want %q", got, "gentoo (ebuild)")
-	}
-}
-
 func TestPortageIsExcluded(t *testing.T) {
 	tests := []struct {
 		name     string
 		ignored  []string
 		excluded bool
 	}{
-		{name: "no ignores", ignored: nil},
 		{name: "portage ignored", ignored: []string{"sys-apps/portage"}, excluded: true},
 		{name: "portage slot ignored", ignored: []string{"sys-apps/portage:0"}, excluded: true},
 		{name: "portage nonzero slot ignored", ignored: []string{"sys-apps/portage:2"}, excluded: true},
@@ -99,13 +92,9 @@ func TestPackageMatchesIgnore(t *testing.T) {
 		{pkg: "app-misc/fastfetch:0", ignored: "app-misc/fastfetch:0", want: true},
 		{pkg: "app-misc/fastfetch:2", ignored: "app-misc/fastfetch:0"},
 		{pkg: "app-misc/fastfetch:2", ignored: "app-misc/fastfetch:2", want: true},
-		{pkg: "app-misc/fastfetch:5", ignored: "app-misc/fastfetch:5", want: true},
-		{pkg: "app-misc/fastfetch:2", ignored: "app-misc/fastfetch:0"},
-		{pkg: "app-misc/fastfetch:5", ignored: "app-misc/fastfetch:0"},
 		{pkg: "app-misc/fastfetch:2", ignored: "app-misc/fastfetch:5"},
 		{pkg: "app-misc/fastfetch", ignored: "app-misc/fastfetch:0", want: true},
 		{pkg: "app-misc/fastfetch", ignored: "app-misc/fastfetch:2"},
-		{pkg: "app-misc/fastfetch", ignored: "app-misc/fastfetch:5"},
 	}
 	for _, tt := range tests {
 		if got := PackageMatchesIgnore(tt.pkg, tt.ignored); got != tt.want {

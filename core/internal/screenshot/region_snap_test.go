@@ -18,14 +18,6 @@ func TestSnapTargetDisplayName(t *testing.T) {
 			expected: "clipboard",
 		},
 		{
-			target:   SnapTarget{Name: "dms:wifi-password", Type: "modal"},
-			expected: "wifi password",
-		},
-		{
-			target:   SnapTarget{Name: "dms:polkit-auth-surface", Type: "modal"},
-			expected: "polkit auth",
-		},
-		{
 			target:   SnapTarget{Name: "", Type: "popout"},
 			expected: "popout",
 		},

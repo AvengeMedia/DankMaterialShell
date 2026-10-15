@@ -61,7 +61,7 @@ PanelWindow {
 
     screen: modelData
     readonly property var layoutInstance: body.layoutInstance
-    readonly property bool manualPlacement: ShellLayout.forScreen(screen)?.manualPlacement ?? false
+    readonly property bool manualPlacement: layoutInstance?.manualPlacement ?? false
     margins.top: manualPlacement ? layoutInstance?.margins.top ?? 0 : 0
     margins.bottom: manualPlacement ? layoutInstance?.margins.bottom ?? 0 : 0
     margins.left: manualPlacement ? layoutInstance?.margins.left ?? 0 : 0
@@ -139,12 +139,15 @@ PanelWindow {
             item: barWindow.sectionMasked && body.barRevealed ? body._rightSection : null
         }
 
+        // Kept as a 1px edge strip while revealed under auto-hide so a pointer resting on the screen edge
+        // stays inside the window; otherwise reveal/hide would toggle the mask and flicker.
         Region {
-            readonly property bool active: body.clickThroughEnabled && !body.inputMaskItem.showing
-            x: active ? body.inputMaskItem.x : 0
-            y: active ? body.inputMaskItem.y : 0
-            width: active ? body.inputMaskItem.width : 0
-            height: active ? body.inputMaskItem.height : 0
+            readonly property bool active: (body.clickThroughEnabled || isIsland) && (!body.inputMaskItem.showing || body.autoHideActive)
+            readonly property bool farEdge: body.barPos === SettingsData.Position.Bottom || body.barPos === SettingsData.Position.Right
+            x: active ? (barWindow.isVertical ? (farEdge ? body.width - 1 : 0) : body.inputMaskItem.x) : 0
+            y: active ? (barWindow.isVertical ? body.inputMaskItem.y : (farEdge ? body.height - 1 : 0)) : 0
+            width: active ? (barWindow.isVertical ? 1 : body.inputMaskItem.width) : 0
+            height: active ? (barWindow.isVertical ? body.inputMaskItem.height : 1) : 0
         }
 
         // The slide transform lives on an ancestor, so a hidden bar's pill would otherwise keep its input hole in place.

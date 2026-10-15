@@ -30,7 +30,16 @@ BasePill {
             itemSpacing: appOption("appsDockSpacing", 4),
             maxVisibleApps: appOption("barMaxVisibleApps", defaults.maxVisibleApps),
             maxVisibleRunningApps: appOption("barMaxVisibleRunningApps", defaults.maxVisibleRunningApps),
-            showOverflowBadge: appOption("barShowOverflowBadge", defaults.showOverflowBadge)
+            showOverflowBadge: appOption("barShowOverflowBadge", defaults.showOverflowBadge),
+            launcherEnabled: appOption("launcherEnabled"),
+            launcherLogoMode: appOption("launcherLogoMode"),
+            launcherLogoCustomPath: appOption("launcherLogoCustomPath"),
+            launcherLogoColorOverride: appOption("launcherLogoColorOverride"),
+            launcherLogoSizeOffset: appOption("launcherLogoSizeOffset"),
+            launcherLogoBrightness: appOption("launcherLogoBrightness"),
+            launcherLogoContrast: appOption("launcherLogoContrast"),
+            enlargeOnHover: appOption("appsDockEnlargeOnHover"),
+            enlargePercentage: appOption("appsDockEnlargePercentage")
         });
         return Object.assign(options, {
             iconSize: Math.min(options.iconSize, surfaceContext?.widgetThickness ?? options.iconSize),
@@ -39,13 +48,11 @@ BasePill {
             hideIndicators: appOption("appsDockHideIndicators", false),
             colorizeActive: appOption("appsDockColorizeActive", false),
             activeColorMode: appOption("appsDockActiveColorMode", "primary"),
-            enlargeOnHover: appOption("appsDockEnlargeOnHover", false),
-            enlargePercentage: appOption("appsDockEnlargePercentage", 125),
             magnification: dockHosted && (surfaceContext?.config?.magnification ?? false),
             magnificationScale: dockHosted ? (surfaceContext?.config?.magnificationScale ?? 130) : 130,
             magnificationProfile: dockHosted ? (surfaceContext?.config?.magnificationProfile ?? "parabolic") : "parabolic",
             magnificationExpand: dockHosted && (surfaceContext?.config?.magnificationExpand ?? false),
-            iconSizePercentage: appOption("appsDockIconSizePercentage", 100)
+            iconSizePercentage: dockHosted ? 100 : appOption("appsDockIconSizePercentage")
         });
     }
     property bool renderItems: true
@@ -59,7 +66,7 @@ BasePill {
     enableBackgroundHover: false
     enableCursor: false
     // Dock apps sit straight on the dock surface; a widget pill around them would read as a second dock.
-    noBackground: dockHosted || (barConfig?.noBackground ?? false)
+    noBackground: dockHosted || !widgetBackground
 
     content: Component {
         ApplicationStrip {

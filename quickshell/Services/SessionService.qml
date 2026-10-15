@@ -35,6 +35,7 @@ Singleton {
     property bool idleHint: false
     property bool lockedHint: false
     property bool preparingForSleep: false
+    property bool sleepRequested: false
     property string sessionType: ""
     property string userName: ""
     property string seat: ""
@@ -83,6 +84,21 @@ Singleton {
         interval: 2000
         repeat: false
         onTriggered: root.flushPendingSleep()
+    }
+
+    Timer {
+        id: sleepRequestTimeout
+        // A refused sleep or a command that skips logind never sends PrepareForSleep.
+        interval: 10000
+        repeat: false
+        onTriggered: root.sleepRequested = false
+    }
+
+    onPreparingForSleepChanged: {
+        if (!preparingForSleep)
+            return;
+        sleepRequestTimeout.stop();
+        sleepRequested = false;
     }
 
     Process {
@@ -444,7 +460,15 @@ printf 'uwsm=%s\nelogind=%s\nloginctl=%s\nsystemctl=%s\nusermgr=%s\nhibernate=%s
                 return;
             }
 
-            HyprlandService.exit();
+            if (CompositorService.isHyprland) {
+                HyprlandService.exit();
+                return;
+            }
+
+            DMSService.sendRequest("loginctl.terminate", null, response => {
+                if (response.error)
+                    log.warn("Failed to terminate session:", response.error);
+            });
         } else {
             Quickshell.execDetached(customActionCommand(SettingsData.customPowerActionLogout));
         }
@@ -498,6 +522,8 @@ printf 'uwsm=%s\nelogind=%s\nloginctl=%s\nsystemctl=%s\nusermgr=%s\nhibernate=%s
 
     function runSleepAction(run) {
         cancelPendingSleep();
+        sleepRequested = true;
+        sleepRequestTimeout.restart();
         if (!SleepLock.shouldWaitForLock(SettingsData.lockBeforeSuspend, IdleService.isSessionLockSecure)) {
             run();
             return;

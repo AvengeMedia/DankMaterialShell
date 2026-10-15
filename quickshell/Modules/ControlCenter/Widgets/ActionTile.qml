@@ -6,9 +6,12 @@ CcTile {
     id: root
 
     readonly property string action: widgetData?.id ?? ""
+    readonly property bool finishing: action === "edit" && (host?.editMode ?? false)
 
     toggle: false
-    iconName: widgetDef?.icon ?? ""
+    active: finishing
+    tooltips: !finishing
+    iconName: finishing ? "check" : widgetDef?.icon ?? ""
     title: widgetDef?.text ?? ""
     restIconColor: action === "power" ? Theme.error : CcMetrics.tileInactiveIcon
 

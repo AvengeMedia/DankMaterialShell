@@ -1586,7 +1586,8 @@
       "tint",
       "wallpaper"
     ],
-    "page": "personalization"
+    "page": "personalization",
+    "icon": "restore"
   },
   {
     "section": "matugenTargetMonitor",
@@ -2680,7 +2681,7 @@
       "wallpaper"
     ],
     "page": "personalization",
-    "icon": "lock",
+    "icon": "restore",
     "description": "Theme colors come from this display's wallpaper"
   },
   {
@@ -3996,6 +3997,7 @@
       "notification center",
       "open",
       "panel",
+      "power menu",
       "routing",
       "shortcuts",
       "statusbar",
@@ -4101,6 +4103,34 @@
     "icon": "vertical_align_center"
   },
   {
+    "section": "islandRoutePowerMenu",
+    "label": "Power menu",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "general",
+      "hibernate",
+      "ipc",
+      "island",
+      "menu",
+      "panel",
+      "power",
+      "reboot",
+      "restart",
+      "routing",
+      "shortcuts",
+      "shutdown",
+      "sleep",
+      "statusbar",
+      "suspend",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "islandEnabled"
+  },
+  {
     "section": "islandReserveThickness",
     "label": "Reserved width",
     "tabIndex": 3,
@@ -4161,7 +4191,7 @@
     "keywords": [
       "axis",
       "bar",
-      "column",
+      "focus",
       "general",
       "panel",
       "scroll",
@@ -4169,6 +4199,7 @@
       "taskbar",
       "topbar",
       "wheel",
+      "window",
       "workspace"
     ],
     "parentLabel": "Bar",
@@ -4390,6 +4421,29 @@
     ],
     "parentLabel": "Bar",
     "conditionKey": "frameEnabled"
+  },
+  {
+    "section": "islandMediaAutoSwitch",
+    "label": "Switch to media when playback starts",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "auto",
+      "bar",
+      "compact",
+      "general",
+      "island",
+      "media",
+      "panel",
+      "playback",
+      "starts",
+      "statusbar",
+      "switch",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "islandEnabled"
   },
   {
     "section": "barUseOverlayLayer",
@@ -4813,6 +4867,26 @@
     "parentLabel": "Bar"
   },
   {
+    "section": "frameSurfaceColor",
+    "label": "Background",
+    "tabIndex": 6,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "background",
+      "bar",
+      "color",
+      "frame",
+      "panel",
+      "statusbar",
+      "surface",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "frameEnabled"
+  },
+  {
     "section": "islandSatelliteBackground",
     "label": "Background",
     "tabIndex": 6,
@@ -4886,18 +4960,25 @@
     "keywords": [
       "appearance",
       "bar",
+      "between",
+      "components",
       "corner",
       "edge",
       "end",
+      "ends",
       "frame",
       "inset",
+      "modules",
+      "outermost",
       "padding",
       "panel",
       "statusbar",
       "taskbar",
-      "topbar"
+      "topbar",
+      "widgets"
     ],
     "parentLabel": "Bar",
+    "description": "Gap between the bar ends and the outermost widgets",
     "conditionKey": "frameEnabled"
   },
   {
@@ -5069,30 +5150,6 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "islandCompactThickness",
-    "label": "Compact width",
-    "tabIndex": 6,
-    "category": "Appearance",
-    "keywords": [
-      "appearance",
-      "bar",
-      "compact",
-      "height",
-      "island",
-      "panel",
-      "placement",
-      "satellite",
-      "size",
-      "statusbar",
-      "taskbar",
-      "thickness",
-      "topbar",
-      "width"
-    ],
-    "parentLabel": "Bar",
-    "conditionKey": "islandDocked"
-  },
-  {
     "section": "barCornerStyle",
     "label": "Corner style",
     "tabIndex": 6,
@@ -5190,18 +5247,25 @@
     "keywords": [
       "appearance",
       "bar",
+      "between",
       "border",
+      "components",
       "corner",
+      "ends",
       "frame",
+      "modules",
+      "outermost",
       "panel",
       "radius",
       "rounding",
       "statusbar",
       "taskbar",
-      "topbar"
+      "topbar",
+      "widgets"
     ],
     "parentLabel": "Bar",
     "icon": "border_outer",
+    "description": "Gap between the bar ends and the outermost widgets",
     "conditionKey": "frameEnabled"
   },
   {
@@ -5437,6 +5501,29 @@
       "widget"
     ],
     "parentLabel": "Bar"
+  },
+  {
+    "section": "frameSurfaceOpacity",
+    "label": "Opacity",
+    "tabIndex": 6,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "bar",
+      "frame",
+      "interface",
+      "opacity",
+      "override",
+      "panel",
+      "statusbar",
+      "style",
+      "taskbar",
+      "topbar",
+      "transparency"
+    ],
+    "parentLabel": "Bar",
+    "description": "Override",
+    "conditionKey": "frameEnabled"
   },
   {
     "section": "islandSatelliteTransparency",
@@ -5759,6 +5846,27 @@
     "parentLabel": "Bar"
   },
   {
+    "section": "frameThickness",
+    "label": "Thickness",
+    "tabIndex": 6,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "bar",
+      "border",
+      "frame",
+      "panel",
+      "size",
+      "statusbar",
+      "taskbar",
+      "thickness",
+      "topbar",
+      "width"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "frameEnabled"
+  },
+  {
     "section": "islandHomeVolumeDisplay",
     "label": "Volume style",
     "tabIndex": 6,
@@ -5882,16 +5990,19 @@
     "description": "Opacity"
   },
   {
-    "section": "frameThickness",
+    "section": "islandCompactThickness",
     "label": "Width",
     "tabIndex": 6,
     "category": "Appearance",
     "keywords": [
       "appearance",
       "bar",
-      "border",
-      "frame",
+      "compact",
+      "height",
+      "island",
       "panel",
+      "placement",
+      "satellite",
       "size",
       "statusbar",
       "taskbar",
@@ -5900,7 +6011,7 @@
       "width"
     ],
     "parentLabel": "Bar",
-    "conditionKey": "frameEnabled"
+    "conditionKey": "islandDocked"
   },
   {
     "section": "networkStatus",
@@ -8682,6 +8793,21 @@
     ]
   },
   {
+    "section": "osdTouchpadEnabled",
+    "label": "Touchpad",
+    "tabIndex": 18,
+    "category": "On-screen displays",
+    "keywords": [
+      "displays",
+      "indicator",
+      "osd",
+      "popup",
+      "screen",
+      "touchpad"
+    ],
+    "conditionKey": "isNiri"
+  },
+  {
     "section": "osdVolumeEnabled",
     "label": "Volume",
     "tabIndex": 18,
@@ -9642,7 +9768,7 @@
     "parentLabel": "Power & battery"
   },
   {
-    "section": "barWidgetOption:AppsDockOptions.qml:24",
+    "section": "barWidgetOption:AppsDockOptions.qml:23",
     "label": "Active color",
     "tabIndex": 22,
     "keywords": [],
@@ -9650,7 +9776,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:MusicOptions.qml:2",
+    "section": "barWidgetOption:MusicOptions.qml:3",
     "label": "Adaptive width",
     "tabIndex": 22,
     "keywords": [],
@@ -9666,7 +9792,7 @@
     "optionFile": "KeyboardLayoutOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:13",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:12",
     "label": "Advanced",
     "tabIndex": 22,
     "keywords": [],
@@ -9777,7 +9903,7 @@
     "optionFile": "PrivacyOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:25",
+    "section": "barWidgetOption:IslandOptions.qml:27",
     "label": "Charging",
     "tabIndex": 22,
     "keywords": [],
@@ -9785,7 +9911,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:27",
+    "section": "barWidgetOption:IslandOptions.qml:29",
     "label": "Clear badge on open",
     "tabIndex": 22,
     "keywords": [],
@@ -9825,7 +9951,7 @@
     "optionFile": "LauncherButtonOptions.qml"
   },
   {
-    "section": "barWidgetOption:AppsDockOptions.qml:23",
+    "section": "barWidgetOption:AppsDockOptions.qml:22",
     "label": "Colorize active",
     "tabIndex": 22,
     "keywords": [],
@@ -9913,7 +10039,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:MusicOptions.qml:4",
+    "section": "barWidgetOption:MusicOptions.qml:5",
     "label": "Cover art",
     "tabIndex": 22,
     "keywords": [],
@@ -9969,7 +10095,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:13",
+    "section": "barWidgetOption:IslandOptions.qml:14",
     "label": "Dashboard",
     "tabIndex": 22,
     "keywords": [],
@@ -9985,7 +10111,7 @@
     "optionFile": "SystemMonitorOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:20",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:19",
     "label": "Drag to reorder",
     "tabIndex": 22,
     "keywords": [],
@@ -9993,15 +10119,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:AppsDockOptions.qml:25",
-    "label": "Enlarge on hover",
-    "tabIndex": 22,
-    "keywords": [],
-    "runtimeType": "barWidgetOption",
-    "optionFile": "AppsDockOptions.qml"
-  },
-  {
-    "section": "barWidgetOption:IslandOptions.qml:26",
+    "section": "barWidgetOption:IslandOptions.qml:28",
     "label": "Expand by default",
     "tabIndex": 22,
     "keywords": [],
@@ -10009,7 +10127,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:17",
+    "section": "barWidgetOption:IslandOptions.qml:18",
     "label": "Expansion mode",
     "tabIndex": 22,
     "keywords": [],
@@ -10017,7 +10135,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:18",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:17",
     "label": "Follow display focus",
     "tabIndex": 22,
     "keywords": [],
@@ -10049,7 +10167,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:15",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:14",
     "label": "Group apps",
     "tabIndex": 22,
     "keywords": [],
@@ -10073,7 +10191,7 @@
     "optionFile": "RunningAppsOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:16",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:15",
     "label": "Group on active workspace",
     "tabIndex": 22,
     "keywords": [],
@@ -10081,7 +10199,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:20",
+    "section": "barWidgetOption:IslandOptions.qml:21",
     "label": "Hide delay",
     "tabIndex": 22,
     "keywords": [],
@@ -10105,7 +10223,7 @@
     "optionFile": "SystemUpdateOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:17",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:16",
     "label": "Highlight focused app",
     "tabIndex": 22,
     "keywords": [],
@@ -10121,7 +10239,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:18",
+    "section": "barWidgetOption:IslandOptions.qml:19",
     "label": "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open",
     "tabIndex": 22,
     "keywords": [],
@@ -10145,7 +10263,7 @@
     "optionFile": "LauncherButtonOptions.qml"
   },
   {
-    "section": "barWidgetOption:AppsDockOptions.qml:26",
+    "section": "barWidgetOption:AppsDockOptions.qml:25",
     "label": "Icon size",
     "tabIndex": 22,
     "keywords": [],
@@ -10153,7 +10271,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:10",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:9",
     "label": "Icon size",
     "tabIndex": 22,
     "keywords": [],
@@ -10169,20 +10287,12 @@
     "optionFile": "SystemTrayOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:6",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:5",
     "label": "Index numbers",
     "tabIndex": 22,
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "WorkspaceSwitcherOptions.qml"
-  },
-  {
-    "section": "barWidgetOption:AppsDockOptions.qml:22",
-    "label": "Indicator style",
-    "tabIndex": 22,
-    "keywords": [],
-    "runtimeType": "barWidgetOption",
-    "optionFile": "AppsDockOptions.qml"
   },
   {
     "section": "barWidgetOption:AppsDockOptions.qml:21",
@@ -10201,7 +10311,7 @@
     "optionFile": "ControlCenterOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:21",
+    "section": "barWidgetOption:IslandOptions.qml:22",
     "label": "Keep clock with media",
     "tabIndex": 22,
     "keywords": [],
@@ -10233,7 +10343,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:MusicOptions.qml:3",
+    "section": "barWidgetOption:MusicOptions.qml:4",
     "label": "Lyrics",
     "tabIndex": 22,
     "keywords": [],
@@ -10241,7 +10351,15 @@
     "optionFile": "MusicOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:9",
+    "section": "barWidgetOption:AppsDockOptions.qml:24",
+    "label": "Magnification",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "AppsDockOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:8",
     "label": "Max apps to show",
     "tabIndex": 22,
     "keywords": [],
@@ -10273,7 +10391,7 @@
     "optionFile": "SystemTrayOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:14",
+    "section": "barWidgetOption:IslandOptions.qml:15",
     "label": "Media",
     "tabIndex": 22,
     "keywords": [],
@@ -10281,7 +10399,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:MusicOptions.qml:6",
+    "section": "barWidgetOption:MusicOptions.qml:7",
     "label": "Media player",
     "tabIndex": 22,
     "keywords": [],
@@ -10297,7 +10415,7 @@
     "optionFile": "PrivacyOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:14",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:13",
     "label": "Minimum workspaces",
     "tabIndex": 22,
     "keywords": [],
@@ -10305,7 +10423,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:28",
+    "section": "barWidgetOption:IslandOptions.qml:30",
     "label": "Motion",
     "tabIndex": 22,
     "keywords": [],
@@ -10321,7 +10439,7 @@
     "optionFile": "SystemMonitorOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:7",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:6",
     "label": "Names",
     "tabIndex": 22,
     "keywords": [],
@@ -10353,7 +10471,7 @@
     "optionFile": "ClockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:22",
+    "section": "barWidgetOption:IslandOptions.qml:24",
     "label": "Notifications",
     "tabIndex": 22,
     "keywords": [],
@@ -10369,7 +10487,7 @@
     "optionFile": "BatteryOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:19",
+    "section": "barWidgetOption:IslandOptions.qml:20",
     "label": "Open delay",
     "tabIndex": 22,
     "keywords": [],
@@ -10409,16 +10527,16 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:19",
-    "label": "Reverse scroll direction",
+    "section": "barWidgetOption:IslandOptions.qml:13",
+    "label": "Power menu",
     "tabIndex": 22,
     "keywords": [],
     "runtimeType": "barWidgetOption",
-    "optionFile": "WorkspaceSwitcherOptions.qml"
+    "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:5",
-    "label": "Roundness",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:18",
+    "label": "Reverse scroll direction",
     "tabIndex": 22,
     "keywords": [],
     "runtimeType": "barWidgetOption",
@@ -10433,7 +10551,7 @@
     "optionFile": "PrivacyOptions.qml"
   },
   {
-    "section": "barWidgetOption:MusicOptions.qml:5",
+    "section": "barWidgetOption:MusicOptions.qml:6",
     "label": "Scroll wheel",
     "tabIndex": 22,
     "keywords": [],
@@ -10457,7 +10575,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:21",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:20",
     "label": "Show all tags",
     "tabIndex": 22,
     "keywords": [],
@@ -10465,7 +10583,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:8",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:7",
     "label": "Show apps",
     "tabIndex": 22,
     "keywords": [],
@@ -10529,7 +10647,7 @@
     "optionFile": "SystemMonitorOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:11",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:10",
     "label": "Show occupied only",
     "tabIndex": 22,
     "keywords": [],
@@ -10553,7 +10671,7 @@
     "optionFile": "BatteryOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:12",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:11",
     "label": "Show scratchpads",
     "tabIndex": 22,
     "keywords": [],
@@ -10593,7 +10711,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:MusicOptions.qml:1",
+    "section": "barWidgetOption:MusicOptions.qml:2",
     "label": "Size",
     "tabIndex": 22,
     "keywords": [],
@@ -10625,7 +10743,7 @@
     "optionFile": "SystemUpdateOptions.qml"
   },
   {
-    "section": "barWidgetOption:AppsDockOptions.qml:27",
+    "section": "barWidgetOption:AppsDockOptions.qml:26",
     "label": "Spacing",
     "tabIndex": 22,
     "keywords": [],
@@ -10633,7 +10751,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:30",
+    "section": "barWidgetOption:IslandOptions.qml:32",
     "label": "Spring damping",
     "tabIndex": 22,
     "keywords": [],
@@ -10641,7 +10759,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:31",
+    "section": "barWidgetOption:IslandOptions.qml:33",
     "label": "Spring mass",
     "tabIndex": 22,
     "keywords": [],
@@ -10649,7 +10767,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:29",
+    "section": "barWidgetOption:IslandOptions.qml:31",
     "label": "Spring stiffness",
     "tabIndex": 22,
     "keywords": [],
@@ -10665,12 +10783,28 @@
     "optionFile": "IslandOptions.qml"
   },
   {
+    "section": "barWidgetOption:MusicOptions.qml:1",
+    "label": "Style",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "MusicOptions.qml"
+  },
+  {
     "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:2",
     "label": "Style",
     "tabIndex": 22,
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "WorkspaceSwitcherOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:IslandOptions.qml:23",
+    "label": "Switch to media when playback starts",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
   },
   {
     "section": "barWidgetOption:ClockOptions.qml:4",
@@ -10721,7 +10855,7 @@
     "optionFile": "SystemTrayOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:24",
+    "section": "barWidgetOption:IslandOptions.qml:26",
     "label": "Use standard OSDs",
     "tabIndex": 22,
     "keywords": [],
@@ -10729,7 +10863,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:23",
+    "section": "barWidgetOption:IslandOptions.qml:25",
     "label": "Use standard popups",
     "tabIndex": 22,
     "keywords": [],
@@ -10753,7 +10887,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:16",
+    "section": "barWidgetOption:IslandOptions.qml:17",
     "label": "Wallpapers",
     "tabIndex": 22,
     "keywords": [],
@@ -10761,7 +10895,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:15",
+    "section": "barWidgetOption:IslandOptions.qml:16",
     "label": "Weather",
     "tabIndex": 22,
     "keywords": [],
@@ -12421,23 +12555,6 @@
     "conditionKey": "layoutCapable"
   },
   {
-    "section": "hyprlandBorderGrabArea",
-    "label": "Border grab area",
-    "tabIndex": 37,
-    "category": "System & integrations",
-    "keywords": [
-      "area",
-      "border",
-      "extend_border_grab_area",
-      "grab",
-      "hyprland",
-      "integrations",
-      "resize",
-      "system"
-    ],
-    "conditionKey": "layoutCapable"
-  },
-  {
     "section": "hyprlandBlurAcrylicClarity",
     "label": "Clarity",
     "tabIndex": 37,
@@ -13204,8 +13321,11 @@
     "tabIndex": 37,
     "category": "System & integrations",
     "keywords": [
+      "area",
       "border",
       "drag",
+      "extend_border_grab_area",
+      "grab",
       "hyprland",
       "integrations",
       "mouse",
@@ -14329,6 +14449,25 @@
     ],
     "parentLabel": "Input",
     "conditionKey": "pointerCapable"
+  },
+  {
+    "section": "focusFollowsMouse",
+    "label": "Focus follows mouse",
+    "tabIndex": 44,
+    "category": "Mouse & touchpad",
+    "keywords": [
+      "focus",
+      "follow",
+      "follows",
+      "input",
+      "mouse",
+      "pointer",
+      "sloppy",
+      "touchpad",
+      "window"
+    ],
+    "parentLabel": "Input",
+    "conditionKey": "inputCapable"
   },
   {
     "section": "mouseLeftHanded",
@@ -16086,6 +16225,34 @@
     "parentLabel": "Wallpaper & colors"
   },
   {
+    "section": "wallpaperCyclingRecursive",
+    "label": "Include subfolders",
+    "tabIndex": 52,
+    "category": "Automatic cycling",
+    "keywords": [
+      "automatic",
+      "background",
+      "bg",
+      "colors",
+      "colour",
+      "colours",
+      "cycling",
+      "desktop",
+      "directories",
+      "folders",
+      "hue",
+      "image",
+      "include",
+      "palette",
+      "picture",
+      "recursive",
+      "subfolders",
+      "tint",
+      "wallpaper"
+    ],
+    "parentLabel": "Wallpaper & colors"
+  },
+  {
     "section": "wallpaperCyclingInterval",
     "label": "Interval",
     "tabIndex": 52,
@@ -16479,14 +16646,17 @@
     "tabIndex": 54,
     "category": "Widget settings",
     "keywords": [
+      "background",
       "bar",
       "components",
       "modules",
       "panel",
+      "pill",
       "settings",
       "statusbar",
       "taskbar",
       "topbar",
+      "transparent",
       "widget",
       "widgets"
     ],
@@ -16936,6 +17106,28 @@
       "widget"
     ],
     "parentLabel": "Dock"
+  },
+  {
+    "section": "dockVisualEffects",
+    "label": "Visual effects",
+    "tabIndex": 58,
+    "category": "Appearance",
+    "keywords": [
+      "active",
+      "appearance",
+      "colorize",
+      "dock",
+      "effects",
+      "highlight",
+      "indicator",
+      "launcher bar",
+      "panel",
+      "running",
+      "taskbar",
+      "visual"
+    ],
+    "parentLabel": "Dock",
+    "icon": "auto_awesome"
   },
   {
     "section": "_tab_59",
@@ -17923,6 +18115,7 @@
       "notification center",
       "open",
       "panel",
+      "power menu",
       "routing",
       "shortcuts",
       "statusbar",
@@ -17948,6 +18141,34 @@
       "panel",
       "statusbar",
       "surface",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "dotEnabled"
+  },
+  {
+    "section": "dotRoutePowerMenu",
+    "label": "Power menu",
+    "tabIndex": 65,
+    "category": "Dot",
+    "keywords": [
+      "bar",
+      "dot",
+      "hibernate",
+      "ipc",
+      "island",
+      "menu",
+      "panel",
+      "power",
+      "reboot",
+      "restart",
+      "routing",
+      "shortcuts",
+      "shutdown",
+      "sleep",
+      "statusbar",
+      "suspend",
       "taskbar",
       "topbar"
     ],

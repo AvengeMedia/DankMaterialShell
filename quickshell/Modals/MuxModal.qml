@@ -131,8 +131,6 @@ DModal {
     modalWidth: 600
     modalHeight: 600
     backgroundColor: Theme.floatingWindowSurface
-    borderColor: Theme.outlineMedium
-    borderWidth: 1
     enableShadow: true
     keepContentLoaded: true
 

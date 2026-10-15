@@ -1617,6 +1617,7 @@ EOFCONFIG
 
         const maxVol = root.sinkMaxVolume;
         const clampedVolume = Math.max(0, Math.min(maxVol, percentage));
+        root.sinkVolumeWrites = [];
         root.sink.audio.volume = clampedVolume / 100;
         return `Volume set to ${clampedVolume}%`;
     }
@@ -1626,17 +1627,41 @@ EOFCONFIG
         return isNaN(parsed) ? 5 : Math.max(0, parsed);
     }
 
+    // Steps still awaiting PipeWire's echo; an older echo overwrites audio.volume, so stepping from it drops detents.
+    property var sinkVolumeWrites: []
+    property bool writingSinkVolume: false
+
+    onSinkChanged: sinkVolumeWrites = []
+
+    Connections {
+        target: root.sink?.audio ?? null
+
+        function onVolumeChanged() {
+            if (root.writingSinkVolume || root.sinkVolumeWrites.length === 0)
+                return;
+            const idx = root.sinkVolumeWrites.indexOf(Math.round(root.sink.audio.volume * 100));
+            root.sinkVolumeWrites = idx < 0 ? [] : root.sinkVolumeWrites.slice(idx + 1);
+        }
+    }
+
     function adjustDefaultSinkVolume(step, direction) {
         const audio = root.sink.audio;
         const maxVol = root.sinkMaxVolume;
         const stepValue = outputVolumeStep(step);
-        const currentVolume = Math.round(audio.volume * 100);
+        const pending = root.sinkVolumeWrites;
+        const currentVolume = pending.length > 0 ? pending[pending.length - 1] : Math.round(audio.volume * 100);
         const newVolume = Math.max(0, Math.min(maxVol, currentVolume + direction * stepValue));
 
         if (audio.muted)
             audio.muted = false;
 
+        if (newVolume === currentVolume)
+            return newVolume;
+
+        root.writingSinkVolume = true;
         audio.volume = newVolume / 100;
+        root.writingSinkVolume = false;
+        root.sinkVolumeWrites = pending.concat([newVolume]).slice(-8);
         return newVolume;
     }
 

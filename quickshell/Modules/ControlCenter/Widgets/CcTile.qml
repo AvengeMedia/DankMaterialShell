@@ -22,9 +22,11 @@ Item {
     property real rows: 1
     property bool compact: columns <= 2 && rows === 1
     property bool small: false
-    property bool docked: false
-    property string dockedText: title
-    readonly property real bodyInset: small ? Math.max(0, (height - CcMetrics.iconBoxSize) / 2) : 0
+    // Set by a background-less Quick tiles group.
+    property bool bare: false
+    property real quickContentWidth: 0
+    readonly property real quickWidth: Math.max(bare ? CcMetrics.quickBareWidth : CcMetrics.iconBoxSize, quickContentWidth + (bare ? CcMetrics.quickBarePadding : Theme.spacingM * 2))
+    property real bodyInset: small ? Math.max(0, (height - CcMetrics.iconBoxSize) / 2) : 0
     readonly property real bodyHeight: height - bodyInset * 2
     property bool toggle: !opensPage
     property Component expandedContent: null
@@ -42,10 +44,8 @@ Item {
     readonly property bool narrow: width < CcMetrics.expandedTileMinWidth
     readonly property bool denseText: narrow || small
     readonly property real labelHeight: titleLabel.implicitHeight + (showSubtitle ? Theme.spacingXXS + subtitleLabel.implicitHeight : 0)
-    readonly property real chevronRoom: Theme.iconSizeSmall + Theme.spacingXS
-    readonly property bool showChevron: docked && !compact && (opensPage || showExpand) && titleLabel.implicitWidth + chevronRoom <= width - tilePadding * 2 - baseIconExtent - textGap
-    readonly property real textGap: docked ? Theme.spacingS : CcMetrics.tileTextGap
-    readonly property bool showSubtitle: subtitle !== "" && !docked && (!stacked || height - tilePadding * 2 >= iconExtent + Theme.spacingS + titleLabel.implicitHeight + Theme.spacingXXS + subtitleLabel.implicitHeight)
+    readonly property real textGap: CcMetrics.tileTextGap
+    readonly property bool showSubtitle: subtitle !== "" && (!stacked || height - tilePadding * 2 >= iconExtent + Theme.spacingS + titleLabel.implicitHeight + Theme.spacingXXS + subtitleLabel.implicitHeight)
     property bool showExpand: false
     property bool opensPage: false
     property color restIconColor: CcMetrics.tileInactiveIcon
@@ -54,6 +54,7 @@ Item {
     property bool available: true
     property bool interactive: true
     property bool iconBlinking: false
+    property bool tooltips: true
     property real iconRotation: 0
 
     signal clicked
@@ -69,8 +70,10 @@ Item {
         return tall ? Math.min(CcMetrics.tallTileRadius, width / 2, height / 2) : Theme.fullRadius(width, bodyHeight);
     }
     property bool acceptsInput: interactive && enabled
-    readonly property bool bodyActive: showsActive && !hasIconBox
+    readonly property bool bodyActive: showsActive && !hasIconBox && !bare
     readonly property color bodyColor: {
+        if (bare)
+            return "transparent";
         if (!available)
             return Theme.onSurface_12;
         return bodyActive ? CcMetrics.tileActiveColor : CcMetrics.tileInactiveColor;
@@ -90,6 +93,11 @@ Item {
             return Theme.onSurface_38;
         if (hasIconBox)
             return showsActive ? CcMetrics.tileActiveContent : CcMetrics.tileInactiveContent;
+        // Without a body, toggles show their state in the icon tint alone.
+        if (bare && showsActive)
+            return CcMetrics.bareActiveIcon;
+        if (bare && toggle)
+            return CcMetrics.tileInactiveContent;
         return bodyActive ? CcMetrics.tileActiveContent : root.restIconColor;
     }
     readonly property color iconBoxColor: {
@@ -151,6 +159,16 @@ Item {
         }
     }
 
+    // Animated so a half-row resize reads as the body shrinking.
+    Behavior on bodyInset {
+        enabled: CcMetrics.animationsEnabled
+        NumberAnimation {
+            duration: Theme.expressiveDurations.expressiveFastSpatial
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
+        }
+    }
+
     Behavior on bodyRadius {
         enabled: CcMetrics.animationsEnabled && !SettingsData.reduceMotion
         NumberAnimation {
@@ -177,7 +195,7 @@ Item {
         anchors.bottomMargin: root.bodyInset
         radius: root.bodyRadius
         color: root.bodyColor
-        border.width: Theme.layerOutlineWidth
+        border.width: root.bare ? 0 : Theme.layerOutlineWidth
         border.color: Theme.outlineMedium
 
         Behavior on color {
@@ -196,7 +214,7 @@ Item {
             anchors.bottomMargin: root.expanded ? root.height - root.headerHeight - root.tilePadding * 2 : 0
             stateColor: root.contentColor
             cornerRadius: root.bodyRadius
-            tooltipText: root.compact || root.docked ? [root.title, root.subtitle].filter(text => text !== "").join(" · ") : ""
+            tooltipText: root.tooltips && root.compact ? [root.title, root.subtitle].filter(text => text !== "").join(" · ") : ""
             onClicked: root.activate()
             onPressAndHold: root.expand()
             onWheel: wheelEvent => {
@@ -338,7 +356,7 @@ Item {
                 id: labels
                 objectName: "tileLabels"
                 x: root.stacked || root.LayoutMirroring.enabled ? 0 : root.baseIconExtent + root.textGap
-                width: root.stacked ? parent.width : Math.max(0, parent.width - root.baseIconExtent - root.textGap - (root.showChevron ? root.chevronRoom : 0))
+                width: root.stacked ? parent.width : Math.max(0, parent.width - root.baseIconExtent - root.textGap)
                 y: root.stacked ? iconBox.y + iconBox.height + Theme.spacingS : root.expanded ? (root.headerHeight - height) / 2 : (parent.height - height) / 2
                 height: root.labelHeight
 
@@ -346,7 +364,7 @@ Item {
                     id: titleLabel
                     objectName: "tileTitle"
                     width: parent.width
-                    text: root.docked ? root.dockedText : root.title
+                    text: root.title
                     color: root.contentColor
                     font.pixelSize: root.denseText ? Theme.fontSizeMedium : Theme.fontSizeLarge
                     font.weight: Theme.fontWeightMedium
@@ -369,17 +387,6 @@ Item {
                     horizontalAlignment: root.stacked && root.narrow ? Text.AlignHCenter : Text.AlignLeft
                     visible: root.showSubtitle
                 }
-            }
-
-            DIcon {
-                id: chevron
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.spacingXS
-                anchors.verticalCenter: parent.verticalCenter
-                name: I18n.isRtl ? "chevron_left" : "chevron_right"
-                size: Theme.iconSizeSmall
-                color: root.subtitleColor
-                visible: root.showChevron
             }
 
             Loader {

@@ -49,6 +49,10 @@ const DMS_ACTIONS = [
         label: "DankIsland: Open Media"
     },
     {
+        id: "spawn dms ipc call island toggle media",
+        label: "DankIsland: Toggle Media"
+    },
+    {
         id: "spawn dms ipc call island open launcher",
         label: "DankIsland: Open Launcher"
     },
@@ -846,6 +850,10 @@ const NIRI_ACTIONS = {
             label: "Toggle Shortcuts Inhibit"
         },
         {
+            id: "toggle-touchpad",
+            label: "Toggle Touchpad"
+        },
+        {
             id: "quit",
             label: "Quit niri"
         },
@@ -923,6 +931,22 @@ const MANGOWC_ACTIONS = {
         {
             id: "exchange_client down",
             label: "Swap Down"
+        },
+        {
+            id: "move_client left",
+            label: "Move Left"
+        },
+        {
+            id: "move_client right",
+            label: "Move Right"
+        },
+        {
+            id: "move_client up",
+            label: "Move Up"
+        },
+        {
+            id: "move_client down",
+            label: "Move Down"
         },
         {
             id: "exchange_stack_client next",

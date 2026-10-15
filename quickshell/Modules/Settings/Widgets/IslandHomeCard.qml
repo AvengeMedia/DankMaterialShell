@@ -171,8 +171,6 @@ SettingsCard {
         settingKey: root.keyPrefix + "WidgetBackground"
         tags: ["island", "widget", "background", "pill", "transparent"]
         visible: root.hosted
-        resetStore: root.store
-        resetKeys: ["islandWidgetBackground"]
         text: I18n.tr("Background")
         description: I18n.tr("Bar widget background behind the compact face", "island widget settings: background toggle")
         checked: root.store.setting("islandWidgetBackground") === true

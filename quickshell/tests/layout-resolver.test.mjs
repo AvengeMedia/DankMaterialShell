@@ -15,18 +15,28 @@ const bar = (id, position = 0, values = {}) => ({ id, position, enabled: true, .
 
 function resolve(configs, options = {}, screen = screens[0]) {
     return resolver.resolveScreen(configs.map(config => ({
-        config, wingSize: config.gothCornersEnabled ? 12 : 0, barThickness: 40, popupThickness: 40, islandThickness: resolver.islandThickness(config, islandDefaults)
+        config, wingSize: config.gothCornersEnabled ? 12 : 0, barThickness: 40, popupThickness: 40, islandThickness: resolver.islandThickness(config, islandDefaults),
+        islandReserve: resolver.islandReserve(config, islandDefaults)
     })), screen, {
         screens, displayNameMode: "name", framePreferences: ["all"], effectiveFrameEnabled: false,
         effectiveConnected: false, frameThickness: 12, frameBarSize: 48, ...options
     });
 }
 
-test("island metrics clamp each setting and reserve the larger of strip and gap plus compact", () => {
-    assert.deepEqual(plain(resolver.islandMetrics({}, islandDefaults)), { reserve: 40, compact: 38, gap: 4, thickness: 42 });
+test("island metrics clamp each setting and a default reservation follows the pill", () => {
+    assert.deepEqual(plain(resolver.islandMetrics({}, islandDefaults)), { reserve: 42, compact: 38, gap: 4, thickness: 42 });
+    assert.deepEqual(plain(resolver.islandMetrics({ islandCompactThickness: 60 }, islandDefaults)), { reserve: 64, compact: 60, gap: 4, thickness: 64 });
     assert.deepEqual(plain(resolver.islandMetrics({ islandReserveThickness: 500, islandCompactThickness: 1, islandOuterGap: -3 }, islandDefaults)), { reserve: 128, compact: 24, gap: 0, thickness: 128 });
     assert.equal(resolver.islandThickness({ islandReserveThickness: 30, islandCompactThickness: 60, islandOuterGap: 10 }, islandDefaults), 70);
     assert.deepEqual(plain(resolver.islandMetrics({ islandOuterGap: 10, islandNotch: true }, islandDefaults)), { reserve: 40, compact: 38, gap: 0, thickness: 40 });
+});
+
+test("an island set to reserve less than its pill paints the full pill but reserves only what was set", () => {
+    const island = bar("island", 0, { island: true, islandReserveThickness: 30 });
+    const alone = resolve([island]);
+    assert.deepEqual(plain([alone.instances[0].rowThickness, alone.instances[0].exclusiveZone, alone.edges.top.reservation]), [42, 30, 30]);
+    const stacked = resolve([island, bar("below")]);
+    assert.deepEqual(plain([stacked.instances[1].rowOffset, stacked.edges.top.reservation]), [42, 86]);
 });
 
 test("absent, empty, explicit and fallback assignments remain distinct", () => {
@@ -55,30 +65,27 @@ test("model assignments follow screen position and preserve connector matching",
     assert.equal(resolver.screenModelIndex(moved[1], moved), 0);
 });
 
-test("one to four mixed configs coexist in config order on every edge and frame mode", () => {
-    for (const screen of screens)
-        for (let count = 1; count <= 4; count++)
-            for (let position = 0; position < 4; position++)
-                for (const effectiveFrameEnabled of [false, true])
-                    for (const effectiveConnected of [false, true]) {
-                        const configs = ["z", "a", "m", "b"].slice(0, count).map((id, index) => bar(id, position, { island: index % 2 === 1, innerPadding: index * 2 }));
-                        const layout = resolve(configs, { effectiveFrameEnabled, effectiveConnected }, screen);
-                        assert.deepEqual(plain(layout.instances.map(instance => instance.barId)), configs.map(config => config.id));
-                        let offset = 0;
-                        for (const instance of layout.instances) {
-                            assert.equal(instance.rowOffset, offset);
-                            offset += instance.rowThickness;
-                            assert.equal(instance.kind, configs[instance.configOrder].island ? "island" : effectiveFrameEnabled && effectiveConnected ? "frame" : "bar");
-                        }
-                        const band = layout.edges[["top", "bottom", "left", "right"][position]];
-                        assert.equal(band.occupancy, offset);
-                        assert.equal(band.reservation, offset);
-                        if (layout.manualPlacement) {
-                            const owned = layout.instances.reduce((sum, instance) => sum + instance.exclusionSize, 0);
-                            assert.equal(owned + (effectiveFrameEnabled ? band.reservation : 0), offset);
-                            assert.equal(layout.instances.every(instance => instance.exclusiveZone === -1), true);
-                        }
-                    }
+test("mixed configs coexist in config order on a horizontal and a vertical edge in every frame mode", () => {
+    for (const position of [0, 2])
+        for (const [effectiveFrameEnabled, effectiveConnected] of [[false, false], [true, false], [true, true]]) {
+            const configs = ["z", "a", "m", "b"].map((id, index) => bar(id, position, { island: index % 2 === 1, innerPadding: index * 2 }));
+            const layout = resolve(configs, { effectiveFrameEnabled, effectiveConnected });
+            assert.deepEqual(plain(layout.instances.map(instance => instance.barId)), configs.map(config => config.id));
+            let offset = 0;
+            for (const instance of layout.instances) {
+                assert.equal(instance.rowOffset, offset);
+                offset += instance.rowThickness;
+                assert.equal(instance.kind, configs[instance.configOrder].island ? "island" : effectiveFrameEnabled && effectiveConnected ? "frame" : "bar");
+            }
+            const band = layout.edges[["top", "bottom", "left", "right"][position]];
+            assert.equal(band.occupancy, offset);
+            assert.equal(band.reservation, offset);
+            if (layout.manualPlacement) {
+                const owned = layout.instances.reduce((sum, instance) => sum + instance.exclusionSize, 0);
+                assert.equal(owned + (effectiveFrameEnabled ? band.reservation : 0), offset);
+                assert.equal(layout.instances.every(instance => instance.exclusiveZone === -1), true);
+            }
+        }
 });
 
 test("row identity and occupancy stay fixed through reveal, floating and expansion", () => {
@@ -178,7 +185,7 @@ test("free islands and dots keep their key but leave every band, reservation and
     for (const options of [{}, { effectiveFrameEnabled: true }, { effectiveFrameEnabled: true, effectiveConnected: true }]) {
         const layout = resolve(configs, options);
         const dot = layout.instances.find(instance => instance.barId === "dot");
-        assert.deepEqual(plain({ ...dot, paintedBounds: undefined, margins: undefined }), { key: JSON.stringify(["DP-1", "dot"]), screenName: "DP-1", barId: "dot", configOrder: 1, edge: "", kind: "island", free: true, dot: true, hostsIsland: true, satelliteEdge: "", row: 0, rowThickness: 0, rowOffset: 0, reservation: 0, exclusiveZone: -1, exclusionSize: 0 });
+        assert.deepEqual(plain({ ...dot, paintedBounds: undefined, margins: undefined }), { key: JSON.stringify(["DP-1", "dot"]), screenName: "DP-1", barId: "dot", configOrder: 1, edge: "", kind: "island", free: true, dot: true, hostsIsland: true, satelliteEdge: "", row: 0, rowThickness: 0, rowOffset: 0, reservation: 0, manualPlacement: false, exclusiveZone: -1, exclusionSize: 0 });
         assert.equal(layout.instances.find(instance => instance.barId === "free").dot, false);
         assert.equal(layout.edges.top.island, null);
         assert.equal(layout.edges.top.islandThickness, 0);

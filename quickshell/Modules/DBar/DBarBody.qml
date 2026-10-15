@@ -21,6 +21,7 @@ Item {
     property var rightWidgetsModel
 
     readonly property bool barRevealed: inputMask.showing
+    readonly property bool autoHideActive: topBarCore.autoHide
 
     readonly property bool isIsland: barConfig?.island === true
     // Resolver-owned so the body, the frame and the dismiss window agree during the frame latch.
@@ -32,6 +33,7 @@ Item {
     property real hostOffsetY: 0
     // A free island's pill lives in IslandFreeHostWindow; this window only carries its satellites.
     readonly property bool islandFree: isIsland && SettingsData.islandFreePlacement(barConfig)
+    readonly property bool islandOverlay: isIsland && (islandHost?.floating ?? SettingsData.islandSetting(barConfig, "islandFloating")) && !islandFree
     readonly property var islandHost: islandLoader.item
     readonly property real islandStripThickness: isIsland ? SettingsData.islandStripThickness(barConfig) : 0
     readonly property string islandSatellitePosition: isIsland ? SettingsData.islandSetting(barConfig, "islandSatellitePosition") : "edges"
@@ -51,10 +53,16 @@ Item {
         return palette === "bright" ? Theme.surfaceBright : palette === "dim" ? Theme.surfaceDim : _hostSurface;
     }
     readonly property real islandSatelliteOpacity: isIsland ? SettingsData.islandSatelliteTransparency(barConfig) : 1
-    readonly property real islandChromePad: isIsland ? Theme.snap((barConfig?.innerPadding ?? 4) + Theme.spacingXS, _dpr) : 0
+    readonly property real islandChromePad: isIsland ? Theme.snap((barConfig?.innerPadding ?? 2) + Theme.spacingXS, _dpr) : 0
     readonly property real islandChromeInset: islandSatelliteBackground ? islandChromePad : 0
     readonly property real islandSatelliteSweep: islandSatelliteBackground && SettingsData.islandSetting(barConfig, "islandSatelliteGothCorners") ? islandGothRadius : 0
     readonly property real islandFlareClearance: ((islandHost?.notch ?? false) ? islandHost.surface.joinRadius * 2.5 : 0) + islandSatelliteSweep
+    // Satellites centre on the idle pill face, not the strip; backed ones reach its far edge instead.
+    readonly property bool islandSatellitesTrackPill: isIsland && !!islandHost && !islandFree
+    readonly property real islandPillFace: islandSatellitesTrackPill ? islandHost.islandController.homeCompactFaceThickness : 0
+    readonly property real islandSatelliteDepth: islandSatellitesTrackPill ? Theme.px(Math.min(islandStripThickness, islandHost.outerGap + islandPillFace), _dpr) : islandStripThickness
+    readonly property real islandSatelliteCrossCenter: !islandSatellitesTrackPill || islandSatelliteBackground ? islandSatelliteDepth / 2 : islandHost.outerGap + islandPillFace / 2
+    readonly property real islandSatelliteCrossShift: Theme.px(islandSatelliteCrossCenter - islandStripThickness / 2, _dpr) * (axis.edge === "bottom" || axis.edge === "right" ? -1 : 1)
     readonly property bool islandSatellitesClipToIsland: islandSatelliteBackground && !islandSatellitesHugIsland && !!islandHost
     readonly property bool islandMotionRunning: islandHost?.motionRunning ?? false
     onIslandMotionRunningChanged: {
@@ -132,7 +140,15 @@ Item {
         if (!loader.item)
             return;
         loader.item.screen = screen;
+        positionUnresolvedPopout(loader.item, systemUpdateButtonRef);
         PopoutManager.requestPopout(loader.item, undefined, "systemUpdate");
+    }
+
+    function positionUnresolvedPopout(popout, item) {
+        const section = item?.section || "right";
+        const anchor = item ?? dashSectionItem(section);
+        if (anchor)
+            topBarContent.surfaceContext.positionPopout(popout, anchor, section);
     }
 
     function triggerControlCenter() {
@@ -149,6 +165,7 @@ Item {
         if (!loader.item)
             return;
         loader.item.triggerScreen = screen;
+        positionUnresolvedPopout(loader.item, controlCenterButtonRef);
         loader.item.toggle();
         if (loader.item.shouldBeVisible && NetworkService.wifiEnabled)
             NetworkService.scanWifi();
@@ -332,15 +349,23 @@ Item {
     Component {
         id: blurIslandRegionComp
 
+        // Region geometry is int; keep it a pixel inside the fill so its antialiased edge never shows raw blur.
         Region {
-            x: topBarMouseArea.x + islandLoader.x + topBarSlide.x + (barWindow.islandHost?.currentVisualX ?? 0)
-            y: topBarMouseArea.y + islandLoader.y + topBarSlide.y + (barWindow.islandHost?.currentVisualY ?? 0)
-            width: barWindow.islandHost?.currentVisualWidth ?? 0
-            height: barWindow.islandHost?.currentVisualHeight ?? 0
-            topLeftRadius: barWindow.islandHost?.surface.surfaceMotion.currentTopLeftRadius ?? 0
-            topRightRadius: barWindow.islandHost?.surface.surfaceMotion.currentTopRightRadius ?? 0
-            bottomLeftRadius: barWindow.islandHost?.surface.surfaceMotion.currentBottomLeftRadius ?? 0
-            bottomRightRadius: barWindow.islandHost?.surface.surfaceMotion.currentBottomRightRadius ?? 0
+            readonly property real left: topBarMouseArea.x + islandLoader.x + topBarSlide.x + (barWindow.islandHost?.currentVisualX ?? 0)
+            readonly property real top: topBarMouseArea.y + islandLoader.y + topBarSlide.y + (barWindow.islandHost?.currentVisualY ?? 0)
+
+            function inset(r) {
+                return r > 0 ? Math.ceil(r) + 1 : 0;
+            }
+
+            x: Math.ceil(left) + 1
+            y: Math.ceil(top) + 1
+            width: Math.max(0, Math.floor(left + (barWindow.islandHost?.currentVisualWidth ?? 0)) - 1 - x)
+            height: Math.max(0, Math.floor(top + (barWindow.islandHost?.currentVisualHeight ?? 0)) - 1 - y)
+            topLeftRadius: inset(barWindow.islandHost?.surface.surfaceMotion.currentTopLeftRadius ?? 0)
+            topRightRadius: inset(barWindow.islandHost?.surface.surfaceMotion.currentTopRightRadius ?? 0)
+            bottomLeftRadius: inset(barWindow.islandHost?.surface.surfaceMotion.currentBottomLeftRadius ?? 0)
+            bottomRightRadius: inset(barWindow.islandHost?.surface.surfaceMotion.currentBottomRightRadius ?? 0)
         }
     }
 
@@ -661,7 +686,7 @@ Item {
     }
 
     readonly property int notificationCount: NotificationService.notifications.length
-    readonly property real effectiveBarThickness: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? SettingsData.frameBarSize : Theme.barThickness(barConfig?.innerPadding ?? 4, _dpr)
+    readonly property real effectiveBarThickness: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? SettingsData.frameBarSize : Theme.barThickness(barConfig?.innerPadding ?? 2, _dpr)
     readonly property real effectiveBarLengthPadding: {
         if (barLengthMode === "percent") {
             const percent = Math.min(100, Math.max(10, barConfig?.barLengthPercent ?? 80));
@@ -706,7 +731,7 @@ Item {
         onTriggered: barWindow._fitSettled = true
     }
     readonly property bool effectiveOpenOnOverview: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? SettingsData.frameShowOnOverview : (barConfig?.openOnOverview ?? false)
-    readonly property real widgetThickness: Theme.barWidgetThickness(barConfig?.innerPadding ?? 4, _dpr)
+    readonly property real widgetThickness: Theme.barWidgetThickness(barConfig?.innerPadding ?? 2, _dpr)
 
     readonly property bool hasAdjacentTopBar: isVertical && ShellLayout.adjacentBar(screen, "top", barConfig) !== null
     readonly property bool hasAdjacentBottomBar: isVertical && ShellLayout.adjacentBar(screen, "bottom", barConfig) !== null
@@ -764,7 +789,7 @@ Item {
 
     readonly property bool reserveExclusiveWhenAutoHidden: FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome && !!barWindow.screen && SettingsData.isScreenInPreferences(barWindow.screen, SettingsData.frameScreenPreferences)
 
-    readonly property real surfaceExclusiveZone: isIsland ? ((islandFree || (islandHost?.floating ?? false)) ? 0 : islandStripThickness) : (!(barConfig?.visible ?? true) || (topBarCore.autoHide && !barWindow.reserveExclusiveWhenAutoHidden)) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (usesFrameBarChrome ? 0 : (barConfig?.bottomGap ?? 0)))
+    readonly property real surfaceExclusiveZone: isIsland ? ((islandFree || (islandHost?.floating ?? false)) ? 0 : SettingsData.islandReserveThickness(barConfig)) : (!(barConfig?.visible ?? true) || (topBarCore.autoHide && !barWindow.reserveExclusiveWhenAutoHidden)) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (usesFrameBarChrome ? 0 : (barConfig?.bottomGap ?? 0)))
 
     readonly property alias inputMaskItem: inputMask
 
@@ -876,7 +901,7 @@ Item {
         anchors.fill: parent
         layer.enabled: false
 
-        property bool autoHide: !barWindow.isIsland && (barConfig?.autoHide ?? false)
+        property bool autoHide: (!barWindow.isIsland || barWindow.islandOverlay) && (barConfig?.autoHide ?? false)
         property bool revealSticky: false
         // In click-through mode the hidden bar's input mask covers the full
         // band while the revealed bar's mask covers only the widget sections,
@@ -990,7 +1015,7 @@ Item {
         readonly property var rootWindowBarConfig: rootWindow.barConfig
 
         onRootWindowBarConfigChanged: {
-            autoHide = !barWindow.isIsland && (barConfig?.autoHide ?? false);
+            autoHide = (!barWindow.isIsland || barWindow.islandOverlay) && (barConfig?.autoHide ?? false);
             evaluateReveal();
         }
 
@@ -1113,7 +1138,8 @@ Item {
                         alongPos: barWindow.isVertical ? topBarContent.y + (barWindow._leftSection?.y ?? 0) : topBarContent.x + (barWindow._leftSection?.x ?? 0)
                         alongSize: barWindow.leadingSectionSize
                         alongExtent: barWindow.isVertical ? barUnitInset.height : barUnitInset.width
-                        crossSize: barWindow.isVertical ? barUnitInset.width : barUnitInset.height
+                        crossSize: barWindow.islandSatelliteDepth
+                        crossExtent: barWindow.isVertical ? barUnitInset.width : barUnitInset.height
                         isVertical: barWindow.isVertical
                         crossFar: axis.edge === "bottom" || axis.edge === "right"
                         edgeAligned: !barWindow.islandSatellitesHugIsland
@@ -1132,7 +1158,8 @@ Item {
                         alongPos: barWindow.isVertical ? topBarContent.y + (barWindow._rightSection?.y ?? 0) : topBarContent.x + (barWindow._rightSection?.x ?? 0)
                         alongSize: barWindow.trailingSectionSize
                         alongExtent: barWindow.isVertical ? barUnitInset.height : barUnitInset.width
-                        crossSize: barWindow.isVertical ? barUnitInset.width : barUnitInset.height
+                        crossSize: barWindow.islandSatelliteDepth
+                        crossExtent: barWindow.isVertical ? barUnitInset.width : barUnitInset.height
                         isVertical: barWindow.isVertical
                         crossFar: axis.edge === "bottom" || axis.edge === "right"
                         edgeAligned: !barWindow.islandSatellitesHugIsland
@@ -1162,7 +1189,7 @@ Item {
                         propagateComposedEvents: true
                         z: -1
                         scrollEnabled: barWindow.barConfig?.scrollEnabled ?? true
-                        xBehavior: barWindow.barConfig?.scrollXBehavior ?? "column"
+                        xBehavior: barWindow.barConfig?.scrollXBehavior ?? "focusWindow"
                         yBehavior: barWindow.barConfig?.scrollYBehavior ?? "workspace"
                         screenName: barWindow.screenName
                         barConfig: barWindow.barConfig
@@ -1180,6 +1207,7 @@ Item {
                         visible: barWindow.islandSatellitesEnabled
                         leadingSectionOffset: barWindow.islandLeadingOffset
                         trailingSectionOffset: barWindow.islandTrailingOffset
+                        sectionCrossOffset: barWindow.islandSatelliteCrossShift
                         reservedStart: barWindow.islandReservesStrip ? barWindow.islandReachStart - barWindow.islandStripClearance - barWindow.contentAlongStart : NaN
                         reservedEnd: barWindow.islandReservesStrip ? barWindow.islandReachEnd + barWindow.islandStripClearance - barWindow.contentAlongStart : NaN
                     }

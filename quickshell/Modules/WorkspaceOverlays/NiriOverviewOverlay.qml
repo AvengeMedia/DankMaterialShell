@@ -208,13 +208,13 @@ Scope {
                         }
 
                         if (event.key === Qt.Key_Left) {
-                            NiriService.moveColumnLeft();
+                            NiriService.focusColumnLeft();
                             event.accepted = true;
                             return;
                         }
 
                         if (event.key === Qt.Key_Right) {
-                            NiriService.moveColumnRight();
+                            NiriService.focusColumnRight();
                             event.accepted = true;
                             return;
                         }

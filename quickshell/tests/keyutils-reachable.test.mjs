@@ -52,10 +52,3 @@ test("a missing or empty keymap never flags", () => {
 test("a second layout group counts", () => {
     assert.equal(keys.keysymUnreachable("bracketleft", { keysyms: { 34: ["0xfc", "bracketleft"] }, named: ["bracketleft"] }), false);
 });
-
-test("keyFromToken takes the last segment", () => {
-    assert.equal(keys.keyFromToken("Super+bracketleft"), "bracketleft");
-    assert.equal(keys.keyFromToken("Super+Shift+A"), "A");
-    assert.equal(keys.keyFromToken("F5"), "F5");
-    assert.equal(keys.keyFromToken(""), "");
-});

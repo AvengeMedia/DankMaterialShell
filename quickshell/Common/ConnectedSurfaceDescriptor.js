@@ -6,7 +6,8 @@ var VALID_KINDS = {
     "launcher": true,
     "dock": true,
     "notification": true,
-    "island": true
+    "island": true,
+    "slideout": true
 };
 
 var VALID_PHASES = {
@@ -103,6 +104,9 @@ function normalize(input, defaults) {
         "omitStartConnector": _bool(source.omitStartConnector, _bool(base.omitStartConnector, false)),
         "omitEndConnector": _bool(source.omitEndConnector, _bool(base.omitEndConnector, false)),
         "dockRetractSide": String(source.dockRetractSide !== undefined ? source.dockRetractSide : (base.dockRetractSide || "")),
+        // Chrome hung off the body; only the blur covers it.
+        "overflowTop": Math.max(0, _number(source.overflowTop, _number(base.overflowTop, 0))),
+        "overflowBottom": Math.max(0, _number(source.overflowBottom, _number(base.overflowBottom, 0))),
         "revision": Math.max(0, Math.floor(_number(source.revision, _number(base.revision, 0))))
     };
 }
@@ -146,5 +150,7 @@ function same(a, b, threshold) {
         && Math.abs(a.opacity - b.opacity) < 0.0001
         && a.omitStartConnector === b.omitStartConnector
         && a.omitEndConnector === b.omitEndConnector
+        && Math.abs(a.overflowTop - b.overflowTop) < epsilon
+        && Math.abs(a.overflowBottom - b.overflowBottom) < epsilon
         && a.dockRetractSide === b.dockRetractSide;
 }

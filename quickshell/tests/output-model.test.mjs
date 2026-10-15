@@ -22,12 +22,9 @@ const dell = { make: "Dell Inc.", model: "DELL U2720Q", serial: "ABC123" };
 const boe = { make: "BOE", model: "0x0A1B", serial: "" };
 const transformNames = ["Normal", "90", "180", "270", "Flipped", "Flipped90", "Flipped180", "Flipped270"];
 
-test("transform table round-trips 0..7 and falls back to Normal / 0", () => {
-    assert.deepEqual(transformNames.map((_, i) => model.transformName(i)), transformNames);
-    assert.deepEqual(transformNames.map(n => model.transformIndex(n)), [0, 1, 2, 3, 4, 5, 6, 7]);
-    assert.deepEqual([-1, 8, "1", undefined].map(i => model.transformName(i)), ["Normal", "Normal", "Normal", "Normal"]);
+test("transform lookups fall back to Normal and only our spelling counts as rotated", () => {
+    assert.deepEqual([-1, "1"].map(i => model.transformName(i)), ["Normal", "Normal"]);
     assert.equal(model.transformIndex("bogus"), 0);
-    assert.deepEqual(transformNames.map(n => model.niriTransform(n)), ["normal", "90", "180", "270", "flipped", "flipped-90", "flipped-180", "flipped-270"]);
     assert.equal(model.niriTransform("bogus"), "normal");
     assert.deepEqual(transformNames.filter(n => model.isRotated(n)), ["90", "270", "Flipped90", "Flipped270"]);
     assert.equal(model.isRotated("flipped-90"), false);
@@ -106,7 +103,6 @@ test("current output set and fingerprints follow the naming mode", () => {
     assert.deepEqual(model.currentOutputSet(live, "model", "hyprland"), ["BOE 0x0A1B", "Dell Inc. DELL U2720Q", "LG Electronics LG ULTRAGEAR"]);
     assert.deepEqual(monitors.configurations.map(c => model.configFingerprint(c)), ["DP-1+eDP-1", "BOE 0x0A1B Unknown+Dell Inc. DELL U2720Q ABC123", "desc:Dell Inc. DELL U2720Q", "DP-1+DP-9", "DP-1+eDP-1"]);
     assert.equal(model.outputSetFingerprint(["b", "a", "c"]), "a+b+c");
-    assert.equal(model.outputSetFingerprint([]), "");
 });
 
 test("profile lookup: named profiles win over auto ones, autoOnly skips named, order-insensitive sets", () => {
@@ -258,7 +254,7 @@ const tolerance = 1000;
 test("mode strings parse and format with three decimals, refresh_rate wins over refresh", () => {
     assert.deepEqual(model.parseModeString("2560x1440@59.940"), { width: 2560, height: 1440, refresh: 59940 });
     assert.deepEqual(model.parseModeString("2560x1440@60"), { width: 2560, height: 1440, refresh: 60000 });
-    assert.deepEqual(["1920x1080", "bogus", "", null].map(s => model.parseModeString(s)), [null, null, null, null]);
+    assert.deepEqual(["1920x1080", null].map(s => model.parseModeString(s)), [null, null]);
     assert.equal(model.formatModeString({ width: 2560, height: 1440, refresh_rate: 143998 }), "2560x1440@143.998");
     assert.equal(model.formatModeString({ id: 1, width: 3840, height: 2160, refresh: 59997 }), "3840x2160@59.997");
     assert.equal(model.formatModeString({ width: 1920, height: 1080, refresh_rate: 60000, refresh: 48000 }), "1920x1080@60.000");

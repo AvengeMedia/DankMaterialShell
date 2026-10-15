@@ -26,6 +26,11 @@ func QtengineConfigPath() string {
 	return qtengineConfigPath("")
 }
 
+// QtengineColorSchemePath returns the KColorScheme file DMS points qtengine at.
+func QtengineColorSchemePath() string {
+	return filepath.Join(utils.XDGDataHome(), "color-schemes", "DankMatugen.colors")
+}
+
 // SyncQtengineConfig merges the DMS colour scheme path and icon theme into
 // qtengine's config, preserving every other key, and writes it atomically. The
 // write's mtime bump is what trips qtengine's watcher and repaints running apps.
@@ -70,7 +75,7 @@ func SyncQtengineConfigAt(configDir, iconTheme string) error {
 
 	// Only written if the file exists: qtengine resolves a missing path to an
 	// empty config and resets the palette to its built-in default.
-	scheme := filepath.Join(utils.XDGDataHome(), "color-schemes", "DankMatugen.colors")
+	scheme := QtengineColorSchemePath()
 	if _, err := os.Stat(scheme); err == nil {
 		theme["colorScheme"] = scheme
 	}

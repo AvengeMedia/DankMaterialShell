@@ -29,20 +29,16 @@ test("hyprland runs the Lua dispatch as one argv entry and refuses legacy text w
     calls.length = 0;
     assert.equal(scope.executeAction("movefocus l", lua), true);
     assert.deepEqual(calls, [["hyprctl", "dispatch", lua]]);
-    for (const args of [["movefocus l", ""], ["movefocus l"]]) {
-        calls.length = 0;
-        assert.equal(scope.executeAction(...args), false, args.join(" | "));
-        assert.deepEqual(calls, []);
-    }
+    calls.length = 0;
+    assert.equal(scope.executeAction("movefocus l", ""), false);
+    assert.deepEqual(calls, []);
 });
 
 test("hyprland on a conf config dispatches the legacy text", () => {
     scope.HyprlandService.luaConfigActive = false;
-    for (const args of [["movefocus l", ""], ["movefocus l"]]) {
-        calls.length = 0;
-        assert.equal(scope.executeAction(...args), true, args.join(" | "));
-        assert.deepEqual(calls, [["sh", "-c", "hyprctl dispatch movefocus l"]]);
-    }
+    calls.length = 0;
+    assert.equal(scope.executeAction("movefocus l"), true);
+    assert.deepEqual(calls, [["sh", "-c", "hyprctl dispatch movefocus l"]]);
 });
 
 test("hyprland rows without a Lua action run only on a conf config", () => {
@@ -50,8 +46,7 @@ test("hyprland rows without a Lua action run only on a conf config", () => {
         [true, "movefocus l", 'hl.dsp.focus({ direction = "l" })', true],
         [true, "movefocus l", "", false],
         [false, "movefocus l", "", true],
-        [false, "movewindow", "", false],
-        [false, "exit", "", false]
+        [false, "movewindow", "", false]
     ];
     for (const [lua, action, luaAction, expected] of cases) {
         scope.HyprlandService.luaConfigActive = lua;

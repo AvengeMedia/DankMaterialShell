@@ -520,8 +520,8 @@ jobs:
           bash scripts/notify-issues.sh "$PREVIOUS_TAG" "$TAG"
 
   # Pin the satellite repos to this release's version. Each dispatch target
-  # decides for itself whether to tag: X.Y.0 always tags, X.Y.Z skips when the
-  # repo has no commits of its own since its last tag.
+  # decides for itself whether to tag: X.Y.0 always tags master and cuts
+  # stable-X.Y, X.Y.Z tags stable-X.Y and skips when it has nothing new.
   fanout:
     name: Pin ${{ matrix.repo }}
     runs-on: ubuntu-latest
@@ -537,6 +537,7 @@ jobs:
           - dankcalendar
           - danksearch
           - dank-greeter
+          - dfiles
     steps:
       - name: Create GitHub App token
         id: app_token

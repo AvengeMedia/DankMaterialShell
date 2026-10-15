@@ -707,14 +707,6 @@ func (b *NetworkManagerBackend) findConnection(ssid string) (gonetworkmanager.Co
 	return nil, fmt.Errorf("connection not found")
 }
 
-func (b *NetworkManagerBackend) createAndConnectWiFi(req ConnectionRequest) error {
-	devInfo, err := b.getWifiDeviceForConnection(req.Device)
-	if err != nil {
-		return err
-	}
-	return b.createAndConnectWiFiOnDevice(req, devInfo)
-}
-
 func (b *NetworkManagerBackend) createAndConnectWiFiOnDevice(req ConnectionRequest, devInfo *wifiDeviceInfo) error {
 	nm := b.nmConn.(gonetworkmanager.NetworkManager)
 	dev := devInfo.device

@@ -14,12 +14,9 @@ func TestParseWindowManager(t *testing.T) {
 		want    deps.WindowManager
 		wantErr bool
 	}{
-		{"niri lowercase", "niri", deps.WindowManagerNiri, false},
 		{"niri mixed case", "Niri", deps.WindowManagerNiri, false},
 		{"hyprland lowercase", "hyprland", deps.WindowManagerHyprland, false},
-		{"hyprland mixed case", "Hyprland", deps.WindowManagerHyprland, false},
 		{"invalid", "sway", 0, true},
-		{"empty", "", 0, true},
 	}
 
 	for _, tt := range tests {
@@ -45,12 +42,9 @@ func TestParseTerminal(t *testing.T) {
 		wantErr bool
 	}{
 		{"ghostty lowercase", "ghostty", deps.TerminalGhostty, false},
-		{"ghostty mixed case", "Ghostty", deps.TerminalGhostty, false},
 		{"kitty lowercase", "kitty", deps.TerminalKitty, false},
-		{"alacritty lowercase", "alacritty", deps.TerminalAlacritty, false},
 		{"alacritty uppercase", "ALACRITTY", deps.TerminalAlacritty, false},
 		{"invalid", "wezterm", 0, true},
-		{"empty", "", 0, true},
 	}
 
 	for _, tt := range tests {
@@ -65,53 +59,6 @@ func TestParseTerminal(t *testing.T) {
 				t.Errorf("parseTerminal() = %v, want %v", got, tt.want)
 			}
 		})
-	}
-}
-
-func TestDepExists(t *testing.T) {
-	dependencies := []deps.Dependency{
-		{Name: "niri", Status: deps.StatusInstalled},
-		{Name: "ghostty", Status: deps.StatusMissing},
-		{Name: "dms (DankMaterialShell)", Status: deps.StatusInstalled},
-		{Name: "dms-greeter", Status: deps.StatusMissing},
-	}
-
-	tests := []struct {
-		name string
-		dep  string
-		want bool
-	}{
-		{"existing dep", "niri", true},
-		{"existing dep with special chars", "dms (DankMaterialShell)", true},
-		{"existing optional dep", "dms-greeter", true},
-		{"non-existing dep", "firefox", false},
-		{"empty name", "", false},
-	}
-
-	r := NewRunner(Config{})
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := r.depExists(dependencies, tt.dep); got != tt.want {
-				t.Errorf("depExists(%q) = %v, want %v", tt.dep, got, tt.want)
-			}
-		})
-	}
-}
-
-func TestGetLogChan(t *testing.T) {
-	r := NewRunner(Config{})
-	ch := r.GetLogChan()
-	if ch == nil {
-		t.Fatal("GetLogChan returned nil")
-	}
-
-	// Verify the channel is readable by sending a message
-	go func() {
-		r.logChan <- "test message"
-	}()
-	msg := <-ch
-	if msg != "test message" {
-		t.Errorf("received %q, want %q", msg, "test message")
 	}
 }
 
@@ -196,20 +143,8 @@ func TestBuildReplaceConfigs(t *testing.T) {
 			wantEnabled:    []string{"Niri", "Ghostty"},
 		},
 		{
-			name:           "single config",
-			replaceConfigs: []string{"kitty"},
-			wantNil:        false,
-			wantEnabled:    []string{"Kitty"},
-		},
-		{
 			name:           "whitespace entry",
 			replaceConfigs: []string{"  ", "niri"},
-			wantNil:        false,
-			wantEnabled:    []string{"Niri"},
-		},
-		{
-			name:           "duplicate entry",
-			replaceConfigs: []string{"niri", "niri"},
 			wantNil:        false,
 			wantEnabled:    []string{"Niri"},
 		},

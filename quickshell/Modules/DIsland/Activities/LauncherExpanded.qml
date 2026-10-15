@@ -25,18 +25,22 @@ FocusScope {
     }
 
     function initializeSession() {
-        const targetQuery = root.controller.launcherPendingQuery || (SettingsData.rememberLastQuery ? (SessionData.launcherLastQuery || "") : "");
+        const pendingQuery = root.controller.launcherPendingQuery;
+        const targetQuery = pendingQuery || (SettingsData.rememberLastQuery ? (SessionData.launcherLastQuery || "") : "");
         const targetMode = root.controller.launcherPendingMode || SessionData.getLauncherRestoreMode();
+        // Used once: the face stays loaded between opens.
+        root.controller.launcherPendingQuery = "";
+        root.controller.launcherPendingMode = "";
 
         launcherContent.closeTransientUi?.();
         launcherContent.suspendSearchUpdates = true;
         launcherContent.searchField.text = targetQuery;
         launcherContent.suspendSearchUpdates = false;
-        launcherController.openSession(targetQuery, !!root.controller.launcherPendingQuery, targetMode, true);
+        launcherController.openSession(targetQuery, !!pendingQuery, targetMode, true);
 
         launcherContent.resetScroll();
         root.focusFace();
-        if (!root.controller.launcherPendingQuery) {
+        if (!pendingQuery) {
             launcherContent.searchField.selectAll();
             return;
         }
@@ -73,6 +77,7 @@ FocusScope {
         controllerOverride: root.launcherController
         transientSurfaceTracker: root.transientSurfaceTracker
         showResultsWithoutQuery: true
+        resizeAnimated: false
         maxResultsHeight: Math.max(120, root.controller.launcherExpandedTarget.height - Theme.spacingM - root.bottomInset - launcherContent.searchAreaHeight - launcherContent.actionPanelHeight)
     }
 
@@ -81,9 +86,10 @@ FocusScope {
     Connections {
         target: root.controller
 
+        // Synchronous so the results are ready before the first morph frame.
         function onSessionStarted(activityId) {
             if (activityId === "launcher")
-                Qt.callLater(root.initializeSession);
+                root.initializeSession();
         }
     }
 

@@ -458,25 +458,27 @@ Singleton {
         if (rule.enabled === false)
             return false;
 
-        const pattern = (rule.pattern || "").toString();
-        if (!pattern.trim())
-            return false;
-
-        const value = (_ruleFieldValue(rule.field, info) || "").toString();
-        const matchType = (rule.matchType || "contains").toString().toLowerCase();
-
-        if (matchType === "exact")
-            return value.toLowerCase() === pattern.toLowerCase();
-        if (matchType === "regex") {
-            try {
-                return new RegExp(pattern, "i").test(value);
-            } catch (e) {
-                log.warn("invalid notification rule regex:", pattern);
+        return [rule, ...(rule.conditions || [])].every(condition => {
+            const pattern = (condition.pattern || "").toString();
+            if (!pattern.trim())
                 return false;
-            }
-        }
 
-        return value.toLowerCase().includes(pattern.toLowerCase());
+            const value = (_ruleFieldValue(condition.field, info) || "").toString();
+            const matchType = (condition.matchType || "contains").toString().toLowerCase();
+
+            if (matchType === "exact")
+                return value.toLowerCase() === pattern.toLowerCase();
+            if (matchType === "regex") {
+                try {
+                    return new RegExp(pattern, "i").test(value);
+                } catch (e) {
+                    log.warn("invalid notification rule regex:", pattern);
+                    return false;
+                }
+            }
+
+            return value.toLowerCase().includes(pattern.toLowerCase());
+        });
     }
 
     function _allowedInDnd(urgency, bypassDnd) {
@@ -1047,6 +1049,17 @@ Singleton {
         const w = visibleNotifications[visibleNotifications.length - 1];
         if (w)
             dismissNotification(w);
+    }
+
+    function invokeLastNotification() {
+        const w = notifications[notifications.length - 1];
+        const actions = w?.actions || [];
+        const action = actions.find(a => a.identifier === "default") || actions[0];
+        if (!action?.invoke)
+            return false;
+        action.invoke();
+        dismissNotification(w);
+        return true;
     }
 
     function dismissAllPopups() {

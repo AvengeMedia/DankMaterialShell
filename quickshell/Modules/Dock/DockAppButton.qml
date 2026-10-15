@@ -28,10 +28,9 @@ Item {
     property bool showTooltip: mouseArea.containsMouse && !dragging
     property var cachedDesktopEntry: dockApps?.desktopEntries[appData?.appId] ?? null
     property real actualIconSize: 40
-    property real indicatorLane: 0
     readonly property bool indicatorAtFarEdge: root.options.position === SettingsData.Position.Bottom || root.options.position === SettingsData.Position.Right
     readonly property bool indicatorInPadding: !(root.dockApps?.barHosted ?? false)
-    readonly property real indicatorThickness: indicatorInPadding ? root.options.spacing : indicatorLane
+    readonly property real indicatorThickness: indicatorInPadding ? root.options.spacing : Math.max(0, ((isVertical ? width : height) - actualIconSize) / 2)
     property bool shouldShowIndicator: {
         if (root.options.hideIndicators)
             return false;
@@ -447,11 +446,8 @@ Item {
         Item {
             id: iconSlot
 
-            x: root.isVertical && !root.indicatorAtFarEdge ? root.indicatorLane : 0
-            y: !root.isVertical && !root.indicatorAtFarEdge ? root.indicatorLane : 0
-            width: parent.width - (root.isVertical ? root.indicatorLane : 0)
-            height: parent.height - (root.isVertical ? 0 : root.indicatorLane)
-            scale: !root.options?.magnification && root.options?.enlargeOnHover && root.isHovered ? (root.options?.enlargePercentage ?? 125) / 100 : 1
+            anchors.fill: parent
+            scale: root.options?.enlargeOnHover && root.isHovered ? (root.options?.enlargePercentage ?? 125) / 100 : 1
 
             AppIconRenderer {
                 id: coreIcon

@@ -92,6 +92,18 @@ Item {
         }
     }
 
+    ScriptModel {
+        id: savedModel
+        values: clipboardContent.modal.pinnedEntries
+        objectProp: "id"
+    }
+
+    ScriptModel {
+        id: recentsModel
+        values: clipboardContent.modal.unpinnedEntries
+        objectProp: "id"
+    }
+
     ClipboardContextMenu {
         id: contextMenu
         modal: clipboardContent.modal
@@ -223,10 +235,8 @@ Item {
             reuseItems: true
             highlightSelection: clipboardContent.modal.keyboardNavigationActive && clipboardContent.modal.selectedIndex >= 0
             anchors.fill: parent
-            model: ScriptModel {
-                values: clipboardContent.entries
-                objectProp: "id"
-            }
+            // one model per tab; a shared model diffs the whole list on every tab switch
+            model: clipboardContent.modal.activeTab === "saved" ? savedModel : recentsModel
 
             currentIndex: clipboardContent.modal ? clipboardContent.modal.selectedIndex : 0
             spacing: Theme.groupedListGap

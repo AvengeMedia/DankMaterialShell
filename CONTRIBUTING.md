@@ -57,12 +57,7 @@ The UI config dir resolves in order: `-c <dir>`, `DMS_SHELL_DIR`, the dir a runn
 The Go core depends on [dankgo](https://github.com/AvengeMedia/dankgo) for logging, XDG paths, the IPC transport, and the quickshell process lifecycle. To develop against a local dankgo checkout, create a gitignored `go.work` at the repo root:
 
 ```
-go 1.26.1
-
-use (
-	./core
-	../dankgo
-)
+go work init ./core ../dankgo
 ```
 
 ## Shared widgets (dank-qml-common)

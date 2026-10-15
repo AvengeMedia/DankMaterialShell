@@ -55,7 +55,7 @@ Column {
 
         SettingsDisplayPicker {
             displayPreferences: root.cfg.displayPreferences ?? ["all"]
-            onPreferencesChanged: prefs => root.updateConfig("displayPreferences", prefs)
+            preferencesHandler: prefs => root.updateConfig("displayPreferences", prefs)
         }
 
         SettingsRow {

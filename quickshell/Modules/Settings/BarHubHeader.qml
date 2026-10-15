@@ -65,10 +65,6 @@ Column {
         bar.select("default");
     }
 
-    function canToggleBar(config) {
-        return config.id !== "default" || SettingsData.isIslandBarConfig(config);
-    }
-
     function setBarEnabled(barId, enabled) {
         SettingsData.updateBarConfig(barId, {
             enabled
@@ -117,7 +113,6 @@ Column {
                 summary: root.barSummary(modelData)
                 selected: bar.selectedBarId === modelData.id
                 checked: modelData.enabled ?? false
-                toggleVisible: root.canToggleBar(modelData)
                 deletable: root.canDeleteBar(modelData)
                 onClicked: bar.select(modelData.id)
                 onToggled: checked => {
@@ -126,6 +121,14 @@ Column {
                 }
                 onDeleteRequested: root.deleteBar(modelData.id)
             }
+        }
+
+        SettingsNavRow {
+            iconName: "keyboard_command_key"
+            title: I18n.tr("Keyboard shortcuts")
+            hint: I18n.tr("With no bar, Dot or dock launcher on, shortcuts are the only way back to settings", "bars card hint shown when every bar, the Dot and every dock launcher button are off")
+            visible: !root.dotEnabled && !SettingsData.barConfigs.some(config => config.enabled && !SettingsData.isDotBarConfig(config)) && !SettingsData.dockConfigs.some(dock => dock.enabled && dock.launcherEnabled)
+            onClicked: keyboard => root.parentModal?.navigateTo("keybinds", keyboard)
         }
     }
 

@@ -21,10 +21,6 @@ Item {
     property bool checked: false
     property bool userToggled: false
 
-    property alias resetStore: header.resetStore
-    property alias resetKeys: header.resetKeys
-    property alias modified: header.modified
-
     default property alias content: expandedContent.data
     readonly property bool hasContent: expandedContent.height > 0
     readonly property bool standalone: !(parent?.isSettingsGroupHost ?? false)

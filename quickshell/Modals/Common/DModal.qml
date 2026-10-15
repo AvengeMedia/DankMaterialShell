@@ -135,6 +135,7 @@ Item {
 
             modalHandle: root
             connected: root._resolvedConnected
+            handleFocusScope: _modalFocusScope
 
             onShouldBeVisibleChanged: {
                 if (root.shouldBeVisible !== host.shouldBeVisible)

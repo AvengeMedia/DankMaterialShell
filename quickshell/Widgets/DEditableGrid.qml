@@ -32,6 +32,8 @@ Item {
     property var dropHandler: null
     // An item hovering from outside, placed first so the grid makes room for it.
     property var externalItem: null
+    // A callback, not a signal: Qt 6.12 hands signal array parameters over as a V4Sequence that fails Array.isArray.
+    property var commitHandler: null
     // The layout compacts upward, so a drop has to account for the hole the dragged item leaves.
     property bool gravity: false
     // Takes the items with the dragged one at its target and returns their packed cells, so a drop can tell
@@ -61,8 +63,6 @@ Item {
         const changed = items.map((item, i) => i === interactingIndex ? Object.assign({}, item, changes) : item);
         return gravity && dragCell && draggingSourceIndex >= 0 ? GridUtils.dropInto(changed, pinnedCells, draggingSourceIndex, dragCell, packer, rowStep) : changed;
     }
-
-    signal layoutCommitted(var items)
 
     implicitHeight: Math.max(minimumHeight, layoutHeight) + contentPadding * 2
     height: implicitHeight
@@ -138,7 +138,6 @@ Item {
         heldOutside = dragsOutside?.(draggingSourceIndex, dragScenePoint, Qt.rect(x - contentPadding, y - contentPadding, slot.w, slot.h)) ?? false;
         if (heldOutside) {
             dragCell = null;
-            heldHeight = pinnedHeight;
             return;
         }
         const cell = GridUtils.cellAt(slotLayout, x - contentPadding, y - contentPadding, slot.cols, slot.rows);
@@ -156,7 +155,7 @@ Item {
         const moved = pinnedCells.some((cell, i) => cell && (cell.col !== items[i].col || cell.row !== items[i].row));
         cancelInteraction();
         if (moved)
-            layoutCommitted(items);
+            commitHandler?.(items);
     }
 
     function previewExternal(item, x, y) {
@@ -196,7 +195,7 @@ Item {
         const changed = item && Object.keys(preview.changes).some(key => item[key] !== preview.changes[key]);
         const items = committedItems();
         if (changed)
-            layoutCommitted(items);
+            commitHandler?.(items);
         cancelInteraction();
     }
 

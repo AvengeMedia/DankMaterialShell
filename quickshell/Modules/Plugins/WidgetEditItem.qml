@@ -23,6 +23,8 @@ Item {
     readonly property bool automaticPlacement: lockScreen && widgetType === "desktopClock" && (instanceData?.config?.autoPosition ?? true) && !hasSavedPosition
     readonly property bool dragging: editChrome.item?.dragging ?? false
     readonly property var stock: hostLayer.stockRect(widgetType, root)
+    // Stock-placed lock widgets grow around their stock anchor; everything else keeps its top-left corner.
+    readonly property bool keepsCornerOnResize: !lockScreen || hasSavedPosition
     property bool snappedCenterX: false
     property bool snappedCenterY: false
 
@@ -219,16 +221,22 @@ Item {
                 snapped: geometry.squareSnapped
                 onRemoveRequested: root.removeRequested()
                 onOptionsRequested: root.optionsRequested()
+                // The chrome moves with the widget, so pointer deltas are taken in the layer's frame.
                 onResizeStarted: (px, py) => {
-                    startPos = Qt.point(px, py);
+                    startPos = chrome.mapToItem(root.hostLayer, px, py);
                     startWidth = geometry.widgetWidth;
                     startHeight = geometry.widgetHeight;
                     geometry.dragOverrideW = startWidth;
                     geometry.dragOverrideH = startHeight;
+                    if (root.keepsCornerOnResize) {
+                        geometry.dragOverrideX = geometry.widgetX;
+                        geometry.dragOverrideY = geometry.widgetY;
+                    }
                     resizing = true;
                 }
                 onResizeMoved: (px, py) => {
-                    const next = geometry.dragResizeTo(startWidth, startHeight, px - startPos.x, py - startPos.y);
+                    const current = chrome.mapToItem(root.hostLayer, px, py);
+                    const next = geometry.dragResizeTo(startWidth, startHeight, current.x - startPos.x, current.y - startPos.y);
                     geometry.dragOverrideW = next.width;
                     geometry.dragOverrideH = next.height;
                 }
@@ -236,6 +244,8 @@ Item {
                     geometry.saveSize(geometry.dragOverrideW, geometry.dragOverrideH);
                     if (root.automaticPlacement)
                         root.pinPosition();
+                    else if (root.keepsCornerOnResize)
+                        geometry.savePosition(geometry.widgetX, geometry.widgetY);
                     resizing = false;
                     geometry.clearDragOverrides();
                 }

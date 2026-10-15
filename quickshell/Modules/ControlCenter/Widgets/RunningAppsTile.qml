@@ -19,7 +19,7 @@ CcTile {
         }
         return ids;
     }
-    readonly property string countText: toplevels.length === 1 ? I18n.tr("%1 window", "singular, %1 is 1, open windows in the control center footer").arg(1) : I18n.tr("%1 windows", "plural, %1 is a count of open windows in the control center footer").arg(toplevels.length)
+    readonly property string countText: toplevels.length === 1 ? I18n.tr("%1 window", "singular, %1 is 1, open windows in the control center").arg(1) : I18n.tr("%1 windows", "plural, %1 is a count of open windows in the control center").arg(toplevels.length)
 
     opensPage: true
     iconName: widgetDef?.icon ?? ""
@@ -27,7 +27,7 @@ CcTile {
     subtitle: countText
     acceptsInput: interactive && toplevels.length > 0
     iconContent: appIds.length > 0 ? leadingApp : null
-    bodyContent: docked ? chip : null
+    bodyContent: small ? chip : null
     onClicked: expandClicked()
 
     Component {

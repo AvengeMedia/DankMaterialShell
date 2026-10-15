@@ -1,4 +1,5 @@
 import QtQuick
+import "../utils/widgets.js" as WidgetUtils
 
 Loader {
     id: root
@@ -10,7 +11,7 @@ Loader {
     property real rows: 1
     property bool compact: false
     property bool small: false
-    property bool docked: false
+    property bool bare: false
 
     sourceComponent: grid.model ? grid.model.componentForWidget(widgetData) : null
 
@@ -45,7 +46,7 @@ Loader {
     Binding {
         target: root.item
         property: "interactive"
-        value: !root.grid.editMode
+        value: !root.grid.editMode || root.widgetData.id === WidgetUtils.EDIT_ID
         when: root.item !== null
     }
 
@@ -79,9 +80,9 @@ Loader {
 
     Binding {
         target: root.item
-        property: "docked"
-        value: root.docked
-        when: root.item !== null && "docked" in root.item
+        property: "bare"
+        value: root.bare
+        when: root.item !== null && "bare" in root.item
     }
 
     Connections {

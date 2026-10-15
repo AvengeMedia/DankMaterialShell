@@ -4,6 +4,7 @@
 .import "../../DCommon/Common/Shape.js" as Shape
 .import "./BarWidgetDefaults.js" as WidgetDefaults
 .import "./DockConfig.js" as DockConfig
+.import "../GridLayout.js" as GridLayout
 
 var PIN_KEYS = ["brightnessDevicePins", "wifiNetworkPins", "bluetoothDevicePins", "audioInputDevicePins", "audioOutputDevicePins"];
 
@@ -18,6 +19,19 @@ var BAR_WIDGET_LIST_KEYS = ["leftWidgets", "centerWidgets", "rightWidgets"];
 var CC_HEADER_IDS = ["userCard", "quickActions", "header"];
 var CC_ACTION_TILE_IDS = ["settings", "lock", "power"];
 var CC_USER_KEYS = ["w", "h", "col", "row", "hostname", "compositor", "uptime", "badge", "background"];
+var CC_FULL_HEIGHT_IDS = ["user", "volumeSlider", "inputVolumeSlider", "brightnessSlider"];
+// Grid rules as of v41, frozen for that migration.
+var CC_V41_GRID_STEP = 0.5;
+var CC_V41_DEFAULT_COLUMNS = 8;
+var CC_V41_MINIMUM_COLUMNS = 6;
+var CC_V41_SLIDER_IDS = ["volumeSlider", "inputVolumeSlider", "brightnessSlider"];
+var CC_V41_FOOTER_CELLS = {
+    "runningApps": 4,
+    "user": 3,
+    "volumeSlider": 4,
+    "inputVolumeSlider": 4,
+    "brightnessSlider": 4
+};
 
 var REMOVED_KEYS_V21 = ["showBattery", "showCapsLockIndicator", "showClipboard", "showClock", "showControlCenterButton", "showCpuUsage", "showFocusedWindow", "showLauncherButton", "showMemUsage", "showMusic", "showNotificationButton", "showPrivacyButton", "showSystemTray", "showWeather", "showWorkspaceSwitcher", "hideBrightnessSlider", "updaterHideWidget", "workspaceScrolling", "appLauncherViewMode", "spotlightModalViewMode", "audioDeviceScrollVolumeEnabled", "desktopClockX", "desktopClockY", "desktopClockWidth", "desktopClockHeight", "desktopClockDisplayPreferences", "systemMonitorX", "systemMonitorY", "systemMonitorWidth", "systemMonitorHeight", "systemMonitorDisplayPreferences", "systemMonitorVariants"];
 
@@ -206,7 +220,8 @@ function toJson(root, setKeys) {
             value = withoutInstancePositions(value);
         if (k === "builtInPluginSettings")
             value = withoutSessionBackedPluginState(value);
-        if (!setKeys.has(k) && Util.isDefault(value, SPEC[k].def)) continue;
+        if (!setKeys.has(k) && Util.isDefault(value, SPEC[k].def))
+            continue;
         out[k] = value;
     }
     out.configVersion = root.settingsConfigVersion;
@@ -722,7 +737,133 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 39;
     }
 
+    if (currentVersion < 40 && targetVersion >= 40) {
+        migrateScrollColumnBehavior(settings);
+        settings.configVersion = 40;
+    }
+
+    if (currentVersion < 41 && targetVersion >= 41) {
+        migrateControlCenterFooter(settings);
+        settings.configVersion = 41;
+    }
+
+    if (currentVersion < 42 && targetVersion >= 42) {
+        migrateDockAppsSizing(settings);
+        settings.configVersion = 42;
+    }
+
     return settings;
+}
+
+// v42: dock apps follow the dock's icon size and magnification instead of their own copies
+function migrateDockAppsSizing(settings) {
+    if (!Array.isArray(settings.dockConfigs))
+        return;
+    for (const dock of settings.dockConfigs) {
+        for (const widget of Array.isArray(dock?.widgets) ? dock.widgets : []) {
+            if (!widget || typeof widget !== "object")
+                continue;
+            if (widget.appsDockEnlargeOnHover === true && dock.magnification !== true) {
+                dock.magnification = true;
+                dock.magnificationScale = Math.max(105, Math.min(160, Number(widget.appsDockEnlargePercentage) || 125));
+            }
+            const percentage = Number(widget.appsDockIconSizePercentage);
+            if (percentage > 0 && percentage !== 100)
+                dock.iconSize = Math.round((Number(dock.iconSize) || DockConfig.create("", "").iconSize) * percentage / 100);
+            delete widget.appsDockEnlargeOnHover;
+            delete widget.appsDockEnlargePercentage;
+            delete widget.appsDockIconSizePercentage;
+        }
+    }
+}
+
+// v41: footer entries became a grid row under the rest, keeping their order and widths
+function migrateControlCenterFooter(settings) {
+    delete settings.controlCenterFooterPosition;
+    if (!Array.isArray(settings.controlCenterWidgets))
+        return;
+    const kept = [];
+    const starts = [];
+    const ends = [];
+    for (const widget of settings.controlCenterWidgets) {
+        if (!widget || typeof widget !== "object") {
+            kept.push(widget);
+            continue;
+        }
+        const moved = Object.assign({}, widget);
+        const inFooter = moved.footer === true;
+        const atEnd = moved.footerEnd === true;
+        const fills = moved.footerFill === true;
+        const footerW = Number(moved.footerW);
+        // Stale footer keys can sit on any entry.
+        for (const key of ["footer", "footerEnd", "footerW", "footerFill"])
+            delete moved[key];
+        if (!inFooter) {
+            kept.push(moved);
+            continue;
+        }
+        const minW = CC_V41_SLIDER_IDS.includes(moved.id) ? 3 : 1;
+        const cells = Number.isFinite(footerW) && footerW > 0 ? Math.round(footerW / CC_V41_GRID_STEP) * CC_V41_GRID_STEP : CC_V41_FOOTER_CELLS[moved.id] || 1;
+        (atEnd ? ends : starts).push({
+            "widget": moved,
+            "fill": fills,
+            "w": Math.max(minW, fills ? minW : cells)
+        });
+    }
+    settings.controlCenterWidgets = kept;
+    const footer = starts.concat(ends);
+    if (footer.length === 0)
+        return;
+
+    const saved = Number(settings.controlCenterColumns);
+    const columns = Number.isFinite(saved) && saved > 0 ? Math.max(CC_V41_MINIMUM_COLUMNS, saved) : CC_V41_DEFAULT_COLUMNS;
+    for (const entry of footer)
+        entry.w = Math.min(columns, entry.w);
+    // Fill entries split the spare width as the strip did.
+    const fillers = footer.filter(entry => entry.fill);
+    const spare = Math.max(0, columns - footer.reduce((sum, entry) => sum + entry.w, 0));
+    if (fillers.length > 0 && spare > 0) {
+        const share = Math.floor(spare / fillers.length / CC_V41_GRID_STEP) * CC_V41_GRID_STEP;
+        fillers.forEach((entry, i) => entry.w += share + (i === 0 ? spare - share * fillers.length : 0));
+    }
+
+    const cards = kept.filter(widget => widget && typeof widget === "object" && !widget.group);
+    let row = GridLayout.packCells(cards, cards.map((card, i) => i), columns, null, CC_V41_GRID_STEP, true).rows;
+    let col = 0;
+    let rowHeight = 1;
+    const endWidth = ends.reduce((sum, entry) => sum + entry.w, 0);
+    for (const entry of footer) {
+        const widget = entry.widget;
+        if (!CC_FULL_HEIGHT_IDS.includes(widget.id)) {
+            widget.h = 1;
+            widget.small = true;
+        }
+        if (entry === ends[0])
+            col = Math.max(col, columns - endWidth);
+        if (col + entry.w > columns) {
+            col = 0;
+            row += rowHeight;
+            rowHeight = 1;
+        }
+        widget.w = entry.w;
+        widget.col = col;
+        widget.row = row;
+        rowHeight = Math.max(rowHeight, Number.isFinite(widget.h) ? widget.h : 1);
+        col += entry.w;
+        kept.push(widget);
+    }
+}
+
+// v40: the niri-only "column" scroll behavior became the compositor-neutral "focusWindow"
+function migrateScrollColumnBehavior(settings) {
+    for (const bar of Array.isArray(settings.barConfigs) ? settings.barConfigs : []) {
+        if (!bar || typeof bar !== "object")
+            continue;
+        for (const key of ["scrollXBehavior", "scrollYBehavior"]) {
+            if (bar[key] === "column")
+                bar[key] = "focusWindow";
+        }
+    }
 }
 
 // v39: the per-island toggle folded into the global reduceMotion; any bar that had it on turns the global one on

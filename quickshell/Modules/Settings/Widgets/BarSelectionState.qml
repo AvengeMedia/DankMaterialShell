@@ -53,7 +53,7 @@ Item {
         return root.selectedBarScreens.filter(screen => ShellLayout.forScreen(screen)?.frameConfigured).length;
     }
     readonly property bool selectedBarFrameStyled: SettingsData.frameEnabled && root.frameStyledScreenCount === root.selectedBarScreens.length
-    readonly property bool selectedBarFrameSanitized: SettingsData.connectedFrameModeActive || root.selectedBarFrameStyled
+    readonly property bool selectedBarFrameSanitized: SettingsData.barUsesConnectedFrameStyle(root.selectedBarConfig) || root.selectedBarFrameStyled
     readonly property var positionChoices: ShellLayout.positionChoices(selectedBarConfig)
 
     function positionLabel(pos) {
@@ -69,7 +69,7 @@ Item {
     }
 
     // inset padding stores < 0 as "auto", resolved here to the mode's natural inset
-    readonly property real insetPadAutoUI: (SettingsData.connectedFrameModeActive && root.selectedBarFrameStyled) ? SettingsData.frameThickness : (selectedBarIsVertical ? Theme.spacingXS : Math.max(Theme.spacingXS, (selectedBarConfig?.innerPadding ?? 4) * 0.8))
+    readonly property real insetPadAutoUI: (SettingsData.connectedFrameModeActive && root.selectedBarFrameStyled) ? SettingsData.frameThickness : (selectedBarIsVertical ? Theme.spacingXS : Math.max(Theme.spacingXS, (selectedBarConfig?.innerPadding ?? 2) * 0.8))
     readonly property int insetPadDisplayValue: {
         const raw = SettingsData.barInsetPaddingSyncAll ? SettingsData.barInsetPaddingShared : (selectedBarConfig?.barInsetPadding ?? -1);
         return raw < 0 ? Math.round(insetPadAutoUI) : raw;

@@ -27,6 +27,18 @@ func pluginInfoFromPlugin(plugin coreplugins.Plugin) PluginInfo {
 	}
 }
 
+func applyFeedback(info *PluginInfo, fb coreplugins.Feedback) {
+	info.Upvotes = fb.Upvotes
+	info.Status = fb.Status
+	info.IssueURL = fb.IssueURL
+	info.Similar = fb.Similar
+	info.Version = fb.Version
+	info.Icon = fb.Icon
+	info.Permissions = fb.Permissions
+	info.CreatedAt = fb.CreatedAt
+	info.UpdatedAt = fb.UpdatedAt
+}
+
 func isFirstPartyRepo(repo string) bool {
 	return strings.HasPrefix(repo, "https://github.com/AvengeMedia")
 }

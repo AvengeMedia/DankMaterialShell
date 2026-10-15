@@ -112,11 +112,14 @@ PanelWindow {
     Region {
         id: surfaceBlurRegion
 
-        x: body.x + body.currentVisualX
-        y: body.y + body.currentVisualY
-        width: body.currentVisualWidth
-        height: body.currentVisualHeight
-        radius: body.currentSurfaceRadius
+        readonly property real left: body.x + body.currentVisualX
+        readonly property real top: body.y + body.currentVisualY
+
+        x: Math.ceil(left) + 1
+        y: Math.ceil(top) + 1
+        width: Math.max(0, Math.floor(left + body.currentVisualWidth) - 1 - x)
+        height: Math.max(0, Math.floor(top + body.currentVisualHeight) - 1 - y)
+        radius: body.currentSurfaceRadius > 0 ? Math.ceil(body.currentSurfaceRadius) + 1 : 0
     }
 
     anchors {

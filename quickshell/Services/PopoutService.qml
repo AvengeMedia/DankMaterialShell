@@ -45,6 +45,7 @@ Singleton {
     property var powerMenuModalLoader: null
     property var powerMenuPopout: null
     property var powerMenuPopoutLoader: null
+    property var switchUserModalLoader: null
     property var durationPopout: null
     property var durationPopoutLoader: null
     property var processListModal: null
@@ -74,6 +75,7 @@ Singleton {
 
     property string pendingThemeInstall: ""
     property string pendingPluginInstall: ""
+    property string pendingWallpaperInstall: ""
 
     // Deferred unload: keep popouts warm while the session is active and reclaim them on lock/monitors-off.
     property var _pendingUnloads: ({})
@@ -1010,22 +1012,42 @@ Singleton {
         }
     }
 
+    function _powerMenuModalItem() {
+        if (powerMenuModalLoader)
+            powerMenuModalLoader.active = true;
+        return powerMenuModalLoader?.item ?? powerMenuModal;
+    }
+
     function openPowerMenu() {
-        powerMenuModal?.openCentered();
+        if (routeToIsland("powermenu", null, false))
+            return;
+        _powerMenuModalItem()?.openCentered();
     }
 
     function closePowerMenu() {
-        powerMenuModal?.close();
+        closeIslandActivity("powermenu");
+        (powerMenuModalLoader?.item ?? powerMenuModal)?.close();
     }
 
     function togglePowerMenu() {
-        if (powerMenuModal) {
-            if (powerMenuModal.shouldBeVisible) {
-                powerMenuModal.close();
-            } else {
-                powerMenuModal.openCentered();
-            }
+        const loaded = powerMenuModalLoader?.item ?? powerMenuModal;
+        if (loaded?.shouldBeVisible) {
+            loaded.close();
+            return;
         }
+        if (routeToIsland("powermenu", null, true))
+            return;
+        _powerMenuModalItem()?.openCentered();
+    }
+
+    function openSwitchUser() {
+        if (!switchUserModalLoader)
+            return;
+        switchUserModalLoader.active = true;
+        Qt.callLater(() => {
+            if (switchUserModalLoader.loadedModal)
+                switchUserModalLoader.loadedModal.showFromPowerMenu();
+        });
     }
 
     function openPowerProfileModal() {

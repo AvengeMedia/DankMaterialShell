@@ -538,7 +538,7 @@ Item {
                 visible: !greeterFabs.syncPending
                 text: I18n.tr("Edit widgets")
                 iconName: "edit"
-                colorRole: SettingsData.greeterFollowLockScreen ? "primary" : "secondaryContainer"
+                colorRole: "secondaryContainer"
                 onClicked: SessionService.greeterEditorRequested()
             }
 

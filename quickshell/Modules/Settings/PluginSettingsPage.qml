@@ -240,20 +240,12 @@ FocusScope {
                 visible: subtitle !== ""
             }
 
-            SettingsRow {
+            SettingsLinkRow {
                 iconName: "code"
                 title: I18n.tr("Plugin Source Code", "plugin settings page, plugin details")
                 subtitle: I18n.tr("Opens %1", "plugin settings page, plugin details, %1 is the link to the plugin source code").arg(root.pluginRepo)
-                clickable: true
                 visible: root.pluginRepo !== ""
-                onClicked: Qt.openUrlExternally(root.pluginRepo)
-
-                DIcon {
-                    anchors.verticalCenter: parent.verticalCenter
-                    name: "open_in_browser"
-                    size: Theme.iconSizeMedium
-                    color: Theme.primary
-                }
+                url: root.pluginRepo
             }
 
             SettingsRow {

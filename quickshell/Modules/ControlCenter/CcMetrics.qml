@@ -53,9 +53,16 @@ Singleton {
     readonly property real iconBoxActiveRadius: Theme.cornerRadiusL
     readonly property real iconBoxIconSize: Theme.iconSize * iconScale
     readonly property real tallMeterThickness: 28
+    readonly property real pillMeterThickness: Math.round(18 * iconScale)
     readonly property real tileTextGap: Theme.spacingM
-    readonly property real footerHeight: iconBoxSize
-    readonly property real footerGap: Theme.spacingS
+    readonly property real smallRowHeight: Math.min(iconBoxSize, tileHeight)
+    readonly property real trashSwallowScale: 0.6
+    // Joined to the sheet, whose own padding separates the buttons from the grid.
+    readonly property real editActionsHeight: Theme.iconButtonSize + sheetPadding
+    // Room around the popout surface for the edit chrome and action strip.
+    readonly property real editOverflow: Math.max(PopoutMetrics.editOverflow * 2, editActionsHeight)
+    // The island clips its faces, so its actions sit inside the sheet.
+    readonly property real islandEditRoom: editActionsHeight + Theme.spacingS
     readonly property real runningAppsIconSize: Theme.iconSize * iconScale
     // The resize corner counts a small tile as this many rows and snaps to the nearer of this and a full row.
     readonly property real smallRowFraction: 0.5
@@ -120,6 +127,10 @@ Singleton {
     readonly property color tileInactiveContent: Theme.surfaceText
     readonly property color tileInactiveSubtitle: Theme.surfaceVariantText
     readonly property color tileInactiveIcon: Theme.primary
+    readonly property color bareActiveIcon: Theme.primary
+    readonly property real quickBarePadding: Theme.spacingL
+    readonly property real quickBareWidth: iconBoxIconSize + quickBarePadding
+    readonly property real quickTileGap: Theme.spacingXS
 
     readonly property bool animationsEnabled: !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
 

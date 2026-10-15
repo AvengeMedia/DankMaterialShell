@@ -9,7 +9,7 @@ MouseArea {
     id: root
 
     property bool scrollEnabled: true
-    property string xBehavior: "column"
+    property string xBehavior: "focusWindow"
     property string yBehavior: "workspace"
     property string screenName: ""
     property var barConfig: null
@@ -18,6 +18,8 @@ MouseArea {
     property real mouseAccumulatorX: 0
     property real mouseAccumulatorY: 0
     property bool actionInProgress: false
+    property bool gestureActive: false
+    property bool gestureHorizontal: false
 
     signal workspaceSwitchRequested(int direction)
 
@@ -34,14 +36,8 @@ MouseArea {
         case "workspace":
             workspaceSwitchRequested(direction);
             return true;
-        case "column":
-            if (!CompositorService.isNiri)
-                return false;
-            if (direction > 0)
-                NiriService.moveColumnRight(screenName);
-            else
-                NiriService.moveColumnLeft(screenName);
-            return true;
+        case "focusWindow":
+            return CompositorService.stepWindowFocus(screenName, direction);
         default:
             return false;
         }
@@ -88,22 +84,34 @@ MouseArea {
         mouseAccumulatorY = 0;
     }
 
+    function horizontalGesture(wheel, isTouchpad) {
+        if (!isTouchpad)
+            return WheelInput.isHorizontal(wheel);
+        if (!gestureActive || wheel.phase === Qt.ScrollBegin)
+            gestureHorizontal = WheelInput.isHorizontal(wheel);
+        gestureActive = true;
+        return gestureHorizontal;
+    }
+
     function processWheel(wheel) {
         wheel.accepted = false;
+        if (wheel.phase === Qt.ScrollEnd)
+            gestureActive = false;
         if (!scrollEnabled || actionInProgress)
             return;
 
-        const deltaY = wheel.angleDelta.y;
-        const deltaX = wheel.angleDelta.x;
+        const delta = WheelInput.dominantDelta(wheel.angleDelta);
+        if (delta === 0)
+            return;
         const isTouchpad = WheelInput.isTouchpad(wheel);
-
-        if (CompositorService.isNiri && xBehavior !== "none" && Math.abs(deltaX) > Math.abs(deltaY)) {
-            accumulateX(isTouchpad, deltaX, xBehavior);
+        if (horizontalGesture(wheel, isTouchpad)) {
+            if (xBehavior !== "none")
+                accumulateX(isTouchpad, delta, xBehavior);
             return;
         }
         if (yBehavior === "none")
             return;
-        accumulateY(isTouchpad, deltaY, yBehavior);
+        accumulateY(isTouchpad, delta, yBehavior);
     }
 
     onWheel: wheel => processWheel(wheel)

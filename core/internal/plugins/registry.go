@@ -62,7 +62,7 @@ func (g *realGitClient) Pull(path string) error {
 	}
 
 	err = worktree.Pull(&git.PullOptions{})
-	if err != nil && err.Error() != "already up-to-date" {
+	if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
 		return err
 	}
 
@@ -116,12 +116,30 @@ func (g *realGitClient) HasUpdates(path string) (bool, string, string, error) {
 		}
 	}
 
-	localHash := head.Hash().String()
+	localHash := head.Hash()
 	if remoteHead == "" {
-		return false, localHash, "", nil
+		return false, localHash.String(), "", nil
+	}
+	if localHash.String() == remoteHead {
+		return false, localHash.String(), remoteHead, nil
 	}
 
-	return localHash != remoteHead, localHash, remoteHead, nil
+	remoteCommit, err := repo.CommitObject(plumbing.NewHash(remoteHead))
+	if errors.Is(err, plumbing.ErrObjectNotFound) {
+		return true, localHash.String(), remoteHead, nil
+	}
+	if err != nil {
+		return false, "", "", err
+	}
+	headCommit, err := repo.CommitObject(localHash)
+	if err != nil {
+		return false, "", "", err
+	}
+	contained, err := remoteCommit.IsAncestor(headCommit)
+	if err != nil {
+		return false, "", "", err
+	}
+	return !contained, localHash.String(), remoteHead, nil
 }
 
 func (g *realGitClient) CurrentRevision(path string) (string, error) {

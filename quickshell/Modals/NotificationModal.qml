@@ -190,6 +190,12 @@ DModal {
             return "NOTIFICATION_DISMISS_SUCCESS";
         }
 
+        function invokeLast(): string {
+            if (!NotificationService.invokeLastNotification())
+                return "NOTIFICATION_INVOKE_NO_ACTION";
+            return "NOTIFICATION_INVOKE_SUCCESS";
+        }
+
         target: "notifications"
     }
 
@@ -210,8 +216,6 @@ DModal {
                 NotificationHeader {
                     id: notificationHeader
                     modal: true
-                    keyboardController: modalKeyboardController
-                    historyView: historyList
                     transientSurfaceTracker: notificationModal.transientSurfaceTracker
                     onCloseRequested: notificationModal.hide()
                     onCurrentTabChanged: notificationModal.currentTab = currentTab

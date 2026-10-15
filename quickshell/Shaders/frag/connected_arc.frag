@@ -16,7 +16,7 @@ layout(std140, binding = 0) uniform buf {
     vec4 shadowColor;   // straight rgba; a = 0 disables both shadow terms
     vec4 shadowParam;   // key: x = blur px, y = spread px, z,w = offset px
     vec4 ambientParam;  // ambient: x = blur px, y = spread px, z = alpha
-    // Five chrome slots: rect = x,y,w,h px; corner and k = per-corner radii and junction fillets (TL, TR, BR, BL),
+    // Six chrome slots: rect = x,y,w,h px; corner and k = per-corner radii and junction fillets (TL, TR, BR, BL),
     // a corner is sharp exactly where its k > 0; param.x = active.
     vec4 chromeRect0;
     vec4 chromeCorner0;
@@ -38,6 +38,10 @@ layout(std140, binding = 0) uniform buf {
     vec4 chromeCorner4;
     vec4 chromeK4;
     vec4 chromeParam4;
+    vec4 chromeRect5;
+    vec4 chromeCorner5;
+    vec4 chromeK5;
+    vec4 chromeParam5;
 } ubuf;
 
 float sdRoundBox(vec2 p, vec2 c, vec2 hs, float r) {
@@ -85,6 +89,8 @@ float sceneDist(vec2 px) {
         d = smin(d, chromeDist(px, ubuf.chromeRect3, ubuf.chromeCorner3), chromeK(px, ubuf.chromeRect3, ubuf.chromeK3));
     if (ubuf.chromeParam4.x > 0.5)
         d = smin(d, chromeDist(px, ubuf.chromeRect4, ubuf.chromeCorner4), chromeK(px, ubuf.chromeRect4, ubuf.chromeK4));
+    if (ubuf.chromeParam5.x > 0.5)
+        d = smin(d, chromeDist(px, ubuf.chromeRect5, ubuf.chromeCorner5), chromeK(px, ubuf.chromeRect5, ubuf.chromeK5));
     return d;
 }
 

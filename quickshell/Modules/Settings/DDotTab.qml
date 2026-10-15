@@ -147,8 +147,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "dotHighContrast"
                 tags: ["dot", "contrast", "accessibility", "outline"]
-                resetStore: dot
-                resetKeys: ["islandHighContrast"]
                 text: I18n.tr("High contrast", "island settings: high contrast toggle")
                 checked: dot.setting("islandHighContrast")
                 onToggled: checked => dot.apply("islandHighContrast", checked)
@@ -167,7 +165,7 @@ Item {
                 allowEmpty: true
                 showLastDisplay: true
                 showOnLastDisplay: dot.config?.showOnLastDisplay ?? true
-                onPreferencesChanged: prefs => dot.apply("screenPreferences", prefs)
+                preferencesHandler: prefs => dot.apply("screenPreferences", prefs)
                 onLastDisplayToggled: checked => dot.apply("showOnLastDisplay", checked)
             }
         }

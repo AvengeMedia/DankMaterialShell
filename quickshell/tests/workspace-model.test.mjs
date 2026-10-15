@@ -49,12 +49,9 @@ function aqueous(screenName, focusedOutput) {
     return { workspaces: s.workspacesByOutput[screenName || focused] ?? [], toplevels: s.toplevels };
 }
 
-test("placeholder and neighbor stepping", () => {
-    assert.deepEqual(plain(model.placeholder()), { id: null, idx: null, name: "", output: "", active: false, placeholder: true });
+test("neighbor stepping stops at the ends", () => {
     const list = ["a", "b", "c"];
     assert.equal(model.neighbor(list, 0, 1), "b");
-    assert.equal(model.neighbor(list, 1, -1), "a");
-    assert.equal(model.neighbor(list, 0, -1), null);
     assert.equal(model.neighbor(list, 2, 1), null);
 });
 

@@ -98,6 +98,7 @@ DPopout {
 
     Ref {
         service: ClipboardService
+        active: root.shouldBeVisible
     }
 
     ConfirmModal {

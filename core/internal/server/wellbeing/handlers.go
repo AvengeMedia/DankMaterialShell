@@ -11,30 +11,30 @@ import (
 func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	switch req.Method {
 	case "wellbeing.getState":
-		models.Respond(conn, req.ID, manager.GetState())
+		conn.Respond(req.ID, manager.GetState())
 	case "wellbeing.setState":
 		handleSetState(conn, req, manager)
 	case "wellbeing.setLimits":
 		handleSetLimits(conn, req, manager)
 	case "wellbeing.summary":
 		days := min(max(params.IntOpt(req.Params, "days", 7), 1), retentionDays)
-		models.Respond(conn, req.ID, map[string]any{"days": manager.Summary(days)})
+		conn.Respond(req.ID, map[string]any{"days": manager.Summary(days)})
 	case "wellbeing.clear":
 		manager.Clear()
-		models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "wellbeing history cleared"})
+		conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "wellbeing history cleared"})
 	default:
-		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
+		conn.RespondError(req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
 }
 
 func handleSetState(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	active, err := params.Bool(req.Params, "active")
 	if err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+		conn.RespondError(req.ID, err.Error())
 		return
 	}
 	manager.SetState(params.StringOpt(req.Params, "appId", ""), active, int64(params.FloatOpt(req.Params, "seq", 0)))
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "wellbeing state set"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "wellbeing state set"})
 }
 
 func handleSetLimits(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
@@ -49,5 +49,5 @@ func handleSetLimits(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 		}
 	}
 	manager.SetLimits(limits)
-	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "wellbeing limits set"})
+	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "wellbeing limits set"})
 }

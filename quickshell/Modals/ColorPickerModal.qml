@@ -42,7 +42,12 @@ DModal {
         shouldBeVisible ? hideInstant() : show();
     }
 
-    onSelectedColorChanged: contentLoader?.item?.setColor(selectedColor)
+    // show() applies selectedColor on open. While the picker is open, a change to the
+    // recent colors (which selectedColor follows) must not reset the color being edited.
+    onSelectedColorChanged: {
+        if (!shouldBeVisible)
+            contentLoader?.item?.setColor(selectedColor);
+    }
     onBackgroundClicked: hide()
     onOpened: Qt.callLater(() => contentLoader?.item?.focusInitial())
     onDialogClosed: {

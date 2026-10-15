@@ -97,8 +97,10 @@ DCard {
         Row {
             anchors.top: parent.top
             anchors.left: parent.left
+            anchors.right: upvoteBadge.visible ? upvoteBadge.left : parent.right
             anchors.margins: Theme.spacingXS
             spacing: Theme.spacingXXS
+            clip: true
 
             Repeater {
                 model: root.badges
@@ -113,6 +115,7 @@ DCard {
         }
 
         PluginBadge {
+            id: upvoteBadge
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.margins: Theme.spacingXS

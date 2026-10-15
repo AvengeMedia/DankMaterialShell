@@ -225,6 +225,7 @@ Item {
         DFilterChips {
             id: filterChips
             width: parent.width
+            visible: root.visibleFilters.length > 1
             currentIndex: root.getChipIndex()
             showCounts: true
             model: root.visibleFilters
@@ -239,7 +240,7 @@ Item {
             id: historyListView
             x: -root.swipeBleed
             width: parent.width + root.swipeBleed * 2
-            height: parent.height - filterChips.height - Theme.spacingS
+            height: parent.height - (filterChips.visible ? filterChips.height + Theme.spacingS : 0)
             clip: true
             leftMargin: root.swipeBleed
             rightMargin: root.swipeBleed

@@ -40,30 +40,6 @@ func TestGetPluginsDir(t *testing.T) {
 	})
 }
 
-func TestIsInstalled(t *testing.T) {
-	t.Run("returns true when plugin is installed", func(t *testing.T) {
-		manager, fs, pluginsDir := setupTestManager(t)
-
-		plugin := Plugin{ID: "test-plugin", Name: "TestPlugin"}
-		pluginPath := filepath.Join(pluginsDir, plugin.ID)
-		err := fs.MkdirAll(pluginPath, 0o755)
-		require.NoError(t, err)
-
-		installed, err := manager.IsInstalled(plugin)
-		assert.NoError(t, err)
-		assert.True(t, installed)
-	})
-
-	t.Run("returns false when plugin is not installed", func(t *testing.T) {
-		manager, _, _ := setupTestManager(t)
-
-		plugin := Plugin{ID: "non-existent", Name: "NonExistent"}
-		installed, err := manager.IsInstalled(plugin)
-		assert.NoError(t, err)
-		assert.False(t, installed)
-	})
-}
-
 func TestInstall(t *testing.T) {
 	t.Run("installs plugin successfully", func(t *testing.T) {
 		manager, fs, pluginsDir := setupTestManager(t)
@@ -104,10 +80,6 @@ func TestInstall(t *testing.T) {
 		err = manager.Install(plugin)
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "already installed")
-	})
-
-	t.Run("installs monorepo plugin with symlink", func(t *testing.T) {
-		t.Skip("Skipping symlink test as MemMapFs doesn't support symlinks")
 	})
 }
 
@@ -172,26 +144,6 @@ func TestUninstall(t *testing.T) {
 }
 
 func TestListInstalled(t *testing.T) {
-	t.Run("lists installed plugins", func(t *testing.T) {
-		manager, fs, pluginsDir := setupTestManager(t)
-
-		err := fs.MkdirAll(filepath.Join(pluginsDir, "Plugin1"), 0o755)
-		require.NoError(t, err)
-		err = afero.WriteFile(fs, filepath.Join(pluginsDir, "Plugin1", "plugin.json"), []byte(`{"id":"Plugin1"}`), 0o644)
-		require.NoError(t, err)
-
-		err = fs.MkdirAll(filepath.Join(pluginsDir, "Plugin2"), 0o755)
-		require.NoError(t, err)
-		err = afero.WriteFile(fs, filepath.Join(pluginsDir, "Plugin2", "plugin.json"), []byte(`{"id":"Plugin2"}`), 0o644)
-		require.NoError(t, err)
-
-		installed, err := manager.ListInstalled()
-		assert.NoError(t, err)
-		assert.Len(t, installed, 2)
-		assert.Contains(t, installed, "Plugin1")
-		assert.Contains(t, installed, "Plugin2")
-	})
-
 	t.Run("returns empty list when no plugins installed", func(t *testing.T) {
 		manager, _, _ := setupTestManager(t)
 

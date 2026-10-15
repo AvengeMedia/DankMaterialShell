@@ -12,6 +12,7 @@ DockContextMenuBase {
     property var desktopEntry: null
     property var dockApps: null
     readonly property bool isDmsWindow: appData?.appId === "org.quickshell" || appData?.appId === "com.danklinux.dms"
+    readonly property var settingsJumpGroups: visible && appData?.appId === "dms_settings" ? buildSettingsJumpGroups() : []
 
     layerNamespace: "dms:dock-context-menu"
 
@@ -22,6 +23,21 @@ DockContextMenuBase {
         dockApps = parentDockApps || null;
         options = dockApps?.options ?? ({});
         show(button, dockHeight, dockScreen);
+    }
+
+    function buildSettingsJumpGroups() {
+        const groups = [[]];
+        for (const item of SettingsTabs.structure) {
+            if (item.separator) {
+                if (groups[groups.length - 1].length > 0)
+                    groups.push([]);
+                continue;
+            }
+            const entry = SettingsTabs.page(item.id);
+            if (SettingsTabs.isVisible(entry))
+                groups[groups.length - 1].push(entry);
+        }
+        return groups.filter(group => group.length > 0);
     }
 
     Repeater {
@@ -219,6 +235,50 @@ DockContextMenuBase {
                 }
             }
         }
+    }
+
+    Repeater {
+        model: root.settingsJumpGroups
+
+        Column {
+            id: jumpGroup
+
+            required property var modelData
+            required property int index
+
+            width: parent.width
+            spacing: 1
+
+            Rectangle {
+                visible: jumpGroup.index > 0
+                width: parent.width
+                height: 1
+                color: Theme.outlineHeavy
+            }
+
+            Repeater {
+                model: jumpGroup.modelData
+
+                DockTrashMenuItem {
+                    required property var modelData
+
+                    width: parent.width
+                    text: modelData.text
+                    iconName: modelData.icon
+                    onTriggered: {
+                        PopoutService.openSettingsWithTab(modelData.id);
+                        root.close();
+                    }
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        visible: root.settingsJumpGroups.length > 0 && !root.hidePin
+        width: parent.width
+        height: 1
+        color: Theme.outlineHeavy
     }
 
     Rectangle {

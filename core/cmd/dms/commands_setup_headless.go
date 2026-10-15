@@ -31,7 +31,7 @@ func init() {
 	setupHeadlessCmd.Flags().Bool("no-systemd", false, "Deploy session config without systemd integration")
 	setupHeadlessCmd.Flags().Bool("force", false, "Overwrite existing configs (timestamped backups are created)")
 	setupHeadlessCmd.Flags().Bool("skip-existing", false, "Warn and skip instead of failing when a config already exists")
-	setupHeadlessCmd.Flags().Bool("stock-binds", false, "Mango: replace existing binds with the DMS stock set (a backup is kept)")
+	setupHeadlessCmd.Flags().Bool("stock-binds", false, "Replace existing keybinds with the DMS stock set (a backup is kept)")
 	_ = setupHeadlessCmd.MarkFlagRequired("compositor")
 	setupHeadlessCmd.MarkFlagsMutuallyExclusive("force", "skip-existing")
 }
@@ -81,7 +81,7 @@ func runSetupHeadless(compositor, terminal string, noSystemd, force, skipExistin
 		close(logDone)
 	}()
 	deployer := config.NewConfigDeployer(logChan)
-	deployer.SetReplaceMangoBinds(stockBinds)
+	deployer.SetReplaceBinds(stockBinds)
 
 	var results []config.DeploymentResult
 	var deployErr error

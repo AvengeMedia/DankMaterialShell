@@ -13,8 +13,6 @@ Item {
     property var dockApps: null
     property var contextMenu: null
     property var parentDockScreen: null
-    property real indicatorLane: 0
-    readonly property real laneOffset: (root.options.position === SettingsData.Position.Bottom || root.options.position === SettingsData.Position.Right ? -1 : 1) * root.indicatorLane / 2
     property real actualIconSize: 40
     readonly property real hoverAnimOffset: hoverBounce.offset
 
@@ -67,11 +65,9 @@ Item {
 
         Item {
             anchors.centerIn: parent
-            anchors.horizontalCenterOffset: root.isVertical ? root.laneOffset : 0
-            anchors.verticalCenterOffset: root.isVertical ? 0 : root.laneOffset
             width: actualIconSize - 4
             height: actualIconSize - 4
-            scale: !root.options?.magnification && root.options?.enlargeOnHover && root.isHovered ? (root.options?.enlargePercentage ?? 125) / 100 : 1
+            scale: root.options?.enlargeOnHover && root.isHovered ? (root.options?.enlargePercentage ?? 125) / 100 : 1
 
             readonly property string iconPath: Paths.resolveIconPath(TrashService.isEmpty ? "user-trash" : "user-trash-full")
 

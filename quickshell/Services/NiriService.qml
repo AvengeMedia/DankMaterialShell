@@ -41,6 +41,10 @@ Singleton {
     property int currentKeyboardLayoutIndex: 0
     property var keyboardLayoutNames: []
 
+    property bool touchpadEnabled: true
+    property bool _touchpadStateInitialized: false
+    signal touchpadOsdRequested(bool enabled)
+
     property string configValidationOutput: ""
     property bool hasInitialConnection: false
     property bool suppressConfigToast: true
@@ -255,7 +259,8 @@ Singleton {
         connected: CompositorService.isNiri
 
         onConnectionStateChanged: {
-            if (connected) {
+            root._touchpadStateInitialized = false;
+            if (linkUp) {
                 send('"EventStream"');
                 fetchOutputs();
             }
@@ -424,6 +429,9 @@ Singleton {
         case 'KeyboardLayoutSwitched':
             handleKeyboardLayoutSwitched(event.KeyboardLayoutSwitched);
             break;
+        case 'TouchpadToggled':
+            handleTouchpadToggled(event.TouchpadToggled);
+            break;
         case 'WorkspaceUrgencyChanged':
             handleWorkspaceUrgencyChanged(event.WorkspaceUrgencyChanged);
             break;
@@ -443,6 +451,15 @@ Singleton {
             handleCastStopped(event.CastStopped);
             break;
         }
+    }
+
+    function handleTouchpadToggled(data) {
+        // Each subscription starts with a snapshot; only later changes show the OSD.
+        const showOsd = _touchpadStateInitialized && touchpadEnabled !== data.on;
+        touchpadEnabled = data.on;
+        _touchpadStateInitialized = true;
+        if (showOsd)
+            touchpadOsdRequested(touchpadEnabled);
     }
 
     function handleWorkspacesChanged(data) {
@@ -836,7 +853,7 @@ Singleton {
         });
     }
 
-    function moveColumnLeft(outputName) {
+    function focusColumnLeft(outputName) {
         if (outputName && outputName !== currentOutput)
             focusMonitor(outputName);
         return send({
@@ -846,7 +863,7 @@ Singleton {
         });
     }
 
-    function moveColumnRight(outputName) {
+    function focusColumnRight(outputName) {
         if (outputName && outputName !== currentOutput)
             focusMonitor(outputName);
         return send({
@@ -1748,6 +1765,10 @@ window-rule {
 `;
 
         let inputContent = dmsWarning + "input {\n";
+        // Niri flags take no false, so off can only leave it out
+        if (typeof SettingsData !== "undefined" && SettingsData.focusFollowsMouse === 1) {
+            inputContent += "    focus-follows-mouse max-scroll-amount=\"0%\"\n";
+        }
 
         // Mouse block
         inputContent += "    mouse {\n";
@@ -1917,6 +1938,13 @@ window-rule {
                 return "SCREENSHOT_WINDOW_SUCCESS";
             }
             return "SCREENSHOT_WINDOW_FAILED";
+        }
+
+        function showTouchpadOsd(enabled: bool): string {
+            if (!CompositorService.isNiri)
+                return "NIRI_NOT_AVAILABLE";
+            NiriService.touchpadOsdRequested(enabled);
+            return "TOUCHPAD_OSD_SHOWN";
         }
 
         target: "niri"

@@ -1,13 +1,12 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Effects
-import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
 import qs.Modals.Common
 import qs.Modules.Settings.Widgets
+import qs.Modules.SystemUpdate
 import "../../Common/Format.js" as Format
 
 Item {
@@ -63,11 +62,6 @@ Item {
     readonly property bool upgradeFailed: SystemUpdateService.hasError && !busy && (SystemUpdateService.recentLog || []).length > 0
     readonly property var installablePackages: SystemUpdateService.availableUpdates.filter(p => SettingsData.updaterIncludeFlatpak || p.repo !== "flatpak")
     readonly property bool anythingToInstall: installablePackages.length > 0 && SystemUpdateService.helperAvailable
-    readonly property string displayVersion: {
-        const semver = ShellVersionService.semverVersion.replace(/^v/, "");
-        const base = semver.match(/^\d+\.\d+/);
-        return base ? base[0] : semver || SystemUpdateService.shellRunning.replace(/^v/, "");
-    }
     readonly property var notesRelease: SystemUpdateService.notesRelease
     readonly property int serviceLastCheckUnix: SystemUpdateService.lastCheckUnix
 
@@ -185,14 +179,16 @@ Item {
     }
 
     function statusSubtitle() {
-        if (SystemUpdateService.restartPending)
-            return I18n.tr("Requires restart");
         if (SystemUpdateService.rebootRecommended)
             return I18n.tr("Reboot recommended", "chip shown after a kernel or systemd upgrade") + " · " + SystemUpdateService.rebootPackages.join(", ");
+        if (SystemUpdateService.restartPending)
+            return I18n.tr("Requires restart");
         return root.lastCheckedText();
     }
 
-    readonly property bool primaryIsCheck: !SystemUpdateService.isUpgrading && !root.anythingToInstall && !SystemUpdateService.restartPending
+    readonly property bool offerReboot: SystemUpdateService.rebootRecommended && !SystemUpdateService.isUpgrading && !root.anythingToInstall
+    readonly property bool needsRestart: SystemUpdateService.restartPending || SystemUpdateService.rebootRecommended
+    readonly property bool primaryIsCheck: !SystemUpdateService.isUpgrading && !root.anythingToInstall && !root.needsRestart
 
     function primaryLabel() {
         switch (true) {
@@ -200,6 +196,8 @@ Item {
             return I18n.tr("Cancel");
         case root.anythingToInstall:
             return I18n.tr("Install", "install action button");
+        case root.offerReboot:
+            return I18n.tr("Reboot", "verb, power menu action");
         case SystemUpdateService.restartPending:
             return I18n.tr("Restart DMS");
         default:
@@ -213,6 +211,7 @@ Item {
             return "stop";
         case root.anythingToInstall:
             return "system_update_alt";
+        case root.offerReboot:
         case SystemUpdateService.restartPending:
             return "restart_alt";
         default:
@@ -231,6 +230,14 @@ Item {
                 message: root.installSummary(),
                 confirmText: I18n.tr("Install", "install action button"),
                 onConfirm: () => root.runUpdateAll()
+            });
+            return;
+        case root.offerReboot:
+            installConfirm.showWithOptions({
+                title: I18n.tr("Reboot now?", "confirmation dialog title, reboot to finish a system update"),
+                message: I18n.tr("Save your work first. Open apps will close.", "reboot confirmation after a system update"),
+                confirmText: I18n.tr("Reboot", "verb, power menu action"),
+                onConfirm: () => SessionService.reboot()
             });
             return;
         case SystemUpdateService.restartPending:
@@ -272,83 +279,15 @@ Item {
     SettingsPage {
         id: mainColumn
 
-        DCard {
-            id: hero
-            width: parent.width
-            height: heroColumn.implicitHeight + SettingsMetrics.pagePaddingV * 2
-            restRadius: Theme.groupedListOuterRadius
-            color: SettingsMetrics.rowColor
-            pad: 0
-            showFocusRing: false
-
-            // Clips the image only: text inside a ClippingRectangle is drawn from a texture and blurs at fractional scales.
-            ClippingRectangle {
-                anchors.fill: parent
-                radius: hero.bodyRadius
-                color: "transparent"
-
-                Image {
-                    anchors.fill: parent
-                    source: "file://" + Theme.shellDir + "/assets/release-banner.svg"
-                    fillMode: Image.Stretch
-                    asynchronous: true
-                    cache: false
-                    sourceSize.width: SettingsMetrics.windowWidth
-                    opacity: Theme.pendingOpacity
-                    layer.enabled: true
-                    layer.effect: MultiEffect {
-                        colorization: 1
-                        colorizationColor: Theme.primary
-                    }
-                }
-            }
-
-            Column {
-                id: heroColumn
-                anchors.centerIn: parent
-                width: parent.width - SettingsMetrics.heroPadding * 2
-                spacing: Theme.spacingS
-
-                Row {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: Theme.spacingS
-
-                    StyledText {
-                        id: heroBrand
-                        text: "DMS"
-                        font.pixelSize: Theme.fontSizeDisplayLarge
-                        font.weight: Theme.fontWeightBold
-                        color: Theme.surfaceText
-                    }
-
-                    StyledText {
-                        text: root.displayVersion
-                        font: heroBrand.font
-                        color: Theme.primary
-                    }
-                }
-
-                StyledText {
-                    width: parent.width
-                    visible: ShellVersionService.shellCodename !== ""
-                    text: ShellVersionService.shellCodename.toUpperCase()
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Theme.fontWeightMedium
-                    color: Theme.primary
-                    horizontalAlignment: Text.AlignHCenter
-                    elide: Text.ElideRight
-                }
-
-                M3WaveProgress {
-                    id: upgradeWave
-                    width: parent.width
-                    height: Theme.spacingM
-                    visible: SystemUpdateService.isUpgrading
-                    isPlaying: visible
-                    value: 1
-                    trackColor: "transparent"
-                    playheadColor: "transparent"
-                }
+        SettingsHeroCard {
+            M3WaveProgress {
+                width: parent.width
+                height: Theme.spacingM
+                visible: SystemUpdateService.isUpgrading
+                isPlaying: visible
+                value: 1
+                trackColor: "transparent"
+                playheadColor: "transparent"
             }
         }
 
@@ -365,8 +304,8 @@ Item {
                 title: root.statusTitle()
                 titleColor: failed ? Theme.error : contentColor
                 subtitle: root.statusSubtitle()
-                iconName: failed ? "error_outline" : SystemUpdateService.restartPending ? "restart_alt" : "system_update_alt"
-                iconColor: failed ? Theme.error : SystemUpdateService.restartPending ? Theme.warning : Theme.primary
+                iconName: failed ? "error_outline" : root.needsRestart ? "restart_alt" : "system_update_alt"
+                iconColor: failed ? Theme.error : root.needsRestart ? Theme.warning : Theme.primary
 
                 DActionButton {
                     anchors.verticalCenter: parent.verticalCenter
@@ -569,15 +508,12 @@ Item {
                     height: Math.min(logText.implicitHeight, Math.floor(root.logViewHeight / lineHeight) * lineHeight)
                     clip: true
 
-                    StyledText {
+                    UpgradeLogText {
                         id: logText
                         anchors.bottom: parent.bottom
                         width: parent.width
-                        text: root.upgradeRunsInTerminal ? I18n.tr("Running in terminal") : (SystemUpdateService.recentLog || []).slice(-root.logTailLines).join("\n")
-                        font.family: Theme.monoFontFamily
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.onSurface
-                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        placeholder: root.upgradeRunsInTerminal ? I18n.tr("Running in terminal") : ""
+                        lines: (SystemUpdateService.recentLog || []).slice(-root.logTailLines)
                     }
                 }
             }
@@ -658,7 +594,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "systemUpdaterCheckOnStart"
                 tags: ["startup", "check", "boot"]
-                resetKeys: ["updaterCheckOnStart"]
                 text: I18n.tr("Check on startup")
                 checked: SettingsData.updaterCheckOnStart
                 onToggled: checked => SettingsData.set("updaterCheckOnStart", checked)
@@ -667,7 +602,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "systemUpdaterPauseOnBattery"
                 tags: ["battery", "power", "pause"]
-                resetKeys: ["updaterPauseOnBattery"]
                 visible: BatteryService.batteryAvailable
                 text: I18n.tr("Pause checks on battery", "software updates toggle, skip background checks on battery power")
                 checked: SettingsData.updaterPauseOnBattery
@@ -677,7 +611,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "systemUpdaterNotify"
                 tags: ["notify", "notification", "alert"]
-                resetKeys: ["updaterNotify"]
                 text: I18n.tr("Notify me on new updates", "software updates toggle")
                 description: I18n.tr("Checks in the background at the check interval. Notifies only when the count grows.", "notify on new updates toggle description")
                 checked: SettingsData.updaterNotify
@@ -702,7 +635,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "systemUpdaterFlatpak"
                 tags: ["flatpak", "include"]
-                resetKeys: ["updaterIncludeFlatpak"]
                 text: I18n.tr("Include Flatpak updates")
                 visible: (SystemUpdateService.backends || []).some(b => b.repo === "flatpak")
                 checked: SettingsData.updaterIncludeFlatpak
@@ -712,7 +644,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "systemUpdaterAUR"
                 tags: ["aur", "paru", "yay", "shelly"]
-                resetKeys: ["updaterAllowAUR"]
                 text: I18n.tr("Include AUR updates")
                 visible: (SystemUpdateService.backends || []).some(b => ["paru", "yay", "shelly"].includes(b.id))
                 checked: SettingsData.updaterAllowAUR
@@ -722,7 +653,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "systemUpdaterReopenAfterUpgrade"
                 tags: ["reopen", "popout", "terminal", "upgrade"]
-                resetKeys: ["updaterReopenAfterUpgrade"]
                 text: I18n.tr("Reopen panel after update")
                 visible: root.upgradeRunsInTerminal
                 checked: SettingsData.updaterReopenAfterUpgrade
@@ -732,7 +662,6 @@ Item {
             SettingsToggleRow {
                 settingKey: "systemUpdaterUpgradeInWindow"
                 tags: ["window", "popout", "floating", "log", "output"]
-                resetKeys: ["updaterUpgradeInWindow"]
                 text: I18n.tr("Show upgrade in a window", "software updates toggle")
                 description: I18n.tr("Opens a floating window with the live output", "show upgrade in a window toggle description")
                 visible: !root.upgradeRunsInTerminal

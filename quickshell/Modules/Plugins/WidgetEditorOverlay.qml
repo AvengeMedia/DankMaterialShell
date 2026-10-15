@@ -85,7 +85,13 @@ FocusScope {
         libraryOpen = DesktopWidgetRegistry.libraryScreen === editLayer.screenName;
         forceActiveFocus();
     }
-    Keys.onEscapePressed: dismiss()
+    Keys.onEscapePressed: event => {
+        if (PopoutManager.screenshotActive) {
+            event.accepted = false;
+            return;
+        }
+        dismiss();
+    }
 
     MouseArea {
         anchors.fill: parent

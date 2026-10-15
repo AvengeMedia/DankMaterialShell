@@ -92,11 +92,12 @@ func (m *MangoWCProvider) categorizeByCommand(command string) string {
 	switch {
 	case strings.Contains(command, "mon"):
 		return "Monitor"
-	case command == "toggleoverview":
+	case command == "toggleoverview" || command == "togglejump":
 		return "Overview"
 	case command == "toggle_scratchpad":
 		return "Scratchpad"
-	case strings.Contains(command, "layout") || strings.Contains(command, "proportion"):
+	case strings.Contains(command, "layout") || strings.Contains(command, "proportion") ||
+		strings.Contains(command, "scroller") || strings.HasPrefix(command, "dwindle"):
 		return "Layout"
 	case strings.Contains(command, "gaps"):
 		return "Gaps"
@@ -105,6 +106,7 @@ func (m *MangoWCProvider) categorizeByCommand(command string) string {
 	case command == "focusstack" ||
 		command == "focusdir" ||
 		command == "exchange_client" ||
+		command == "move_client" ||
 		command == "killclient" ||
 		command == "togglefloating" ||
 		command == "togglefullscreen" ||

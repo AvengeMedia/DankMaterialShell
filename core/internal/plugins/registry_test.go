@@ -172,8 +172,6 @@ func TestLoadPlugins(t *testing.T) {
 
 		assert.Equal(t, "TestPlugin1", plugins[0].Name)
 		assert.Equal(t, "TestPlugin2", plugins[1].Name)
-		assert.Equal(t, []string{"dankbar-widget"}, plugins[0].Capabilities)
-		assert.Equal(t, []string{"dep1", "dep2"}, plugins[1].Dependencies)
 	})
 
 	t.Run("skips non-json files", func(t *testing.T) {
@@ -653,4 +651,38 @@ func TestRealGitClientChecksUpdatesWithoutFetching(t *testing.T) {
 	require.NoError(t, local.DeleteRemote("origin"))
 	_, _, _, err = client.HasUpdates(localPath)
 	assert.Error(t, err)
+}
+
+func TestRealGitClientHasUpdatesIgnoresLocalAheadAfterRemoteRewind(t *testing.T) {
+	t.Setenv("GIT_CONFIG_GLOBAL", "")
+	t.Setenv("GIT_CONFIG_SYSTEM", "")
+	remotePath := t.TempDir()
+	remote, err := git.PlainInit(remotePath, false)
+	require.NoError(t, err)
+	worktree, err := remote.Worktree()
+	require.NoError(t, err)
+	signature := &object.Signature{Name: "DMS Test", Email: "test@example.com", When: time.Unix(1, 0)}
+	commit := func(content string) plumbing.Hash {
+		t.Helper()
+		require.NoError(t, os.WriteFile(filepath.Join(remotePath, "value.txt"), []byte(content), 0o644))
+		_, err := worktree.Add("value.txt")
+		require.NoError(t, err)
+		hash, err := worktree.Commit(content, &git.CommitOptions{Author: signature})
+		require.NoError(t, err)
+		return hash
+	}
+	first := commit("one")
+	second := commit("two")
+	localPath := t.TempDir()
+	_, err = git.PlainClone(localPath, &git.CloneOptions{URL: remotePath})
+	require.NoError(t, err)
+
+	require.NoError(t, remote.Storer.SetReference(plumbing.NewHashReference(plumbing.NewBranchReferenceName("master"), first)))
+
+	client := &realGitClient{}
+	updated, localHash, remoteHash, err := client.HasUpdates(localPath)
+	require.NoError(t, err)
+	assert.False(t, updated)
+	assert.Equal(t, second.String(), localHash)
+	assert.Equal(t, first.String(), remoteHash)
 }

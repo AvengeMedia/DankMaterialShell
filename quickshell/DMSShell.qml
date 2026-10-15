@@ -907,6 +907,14 @@ Item {
                 }
                 return;
             }
+            if (url.startsWith("dms://wallpaper/install/")) {
+                const payload = url.replace("dms://wallpaper/install/", "").split(/[?#]/)[0];
+                if (payload) {
+                    PopoutService.pendingWallpaperInstall = payload;
+                    PopoutService.openSettingsWithTab("wallpaper");
+                }
+                return;
+            }
             browserPickerModalLoader.active = true;
             const picker = browserPickerModalLoader.loadedModal;
             if (!picker)
@@ -1060,6 +1068,7 @@ Item {
             expandable: true
             expandedWidthValue: 960
             edgeGap: SettingsData.notepadEffectiveEdgeGap
+            frameSurfaceEnabled: true
             slideEdge: SettingsData.notepadSlideoutSide
             customTransparency: Theme.notepadTransparency
 
@@ -1143,11 +1152,7 @@ Item {
     }
 
     function _switchUserFromPowerMenu() {
-        switchUserModalLoader.active = true;
-        Qt.callLater(() => {
-            if (switchUserModalLoader.loadedModal)
-                switchUserModalLoader.loadedModal.showFromPowerMenu();
-        });
+        PopoutService.openSwitchUser();
     }
 
     LazyLoader {
@@ -1198,6 +1203,8 @@ Item {
         active: false
         readonly property SwitchUserModal loadedModal: item as SwitchUserModal
 
+        Component.onCompleted: PopoutService.switchUserModalLoader = switchUserModalLoader
+
         SwitchUserModal {
             id: switchUserModal
         }
@@ -1236,7 +1243,6 @@ Item {
     }
 
     DMSShellIPC {
-        powerMenuModalLoaderRef: powerMenuModalLoader
         processListModalLoaderRef: processListModalLoader
         controlCenterLoaderRef: controlCenterLoader
         dankDashPopoutLoaderRef: dankDashPopoutLoader
@@ -1307,6 +1313,12 @@ Item {
                     model: SettingsData.osdCapsLockEnabled ? root.legacySystemLevelOsdScreens : []
 
                     delegate: CapsLockOSD {}
+                }
+
+                Variants {
+                    model: (SettingsData.osdTouchpadEnabled && CompositorService.isNiri) ? root.legacySystemLevelOsdScreens : []
+
+                    delegate: TouchpadOSD {}
                 }
 
                 Variants {
