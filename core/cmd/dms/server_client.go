@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"path/filepath"
@@ -34,7 +35,11 @@ func dialServer() (net.Conn, *bufio.Scanner, error) {
 	scanner.Buffer(make([]byte, bufio.MaxScanTokenSize), maxIPCMessageSize)
 	if !scanner.Scan() { // initial capabilities message
 		conn.Close()
-		return nil, nil, fmt.Errorf("server did not respond: %w", scanner.Err())
+		err := scanner.Err()
+		if err == nil {
+			err = io.EOF
+		}
+		return nil, nil, fmt.Errorf("server did not respond: %w", err)
 	}
 	return conn, scanner, nil
 }

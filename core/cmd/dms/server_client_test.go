@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"net"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -72,5 +73,14 @@ func TestServerRequestWaitsForSlowReply(t *testing.T) {
 	}
 	if resp.Result == nil || *resp.Result != "ok" {
 		t.Fatalf("unexpected response: %+v", resp)
+	}
+}
+
+func TestServerRequestReportsClosedConnection(t *testing.T) {
+	fakeServer(t, func(conn net.Conn) {})
+
+	_, err := sendServerRequest(ipc.Request{Method: "test"})
+	if err == nil || strings.Contains(err.Error(), "%!") {
+		t.Fatalf("want a readable error for a server that hangs up, got %v", err)
 	}
 }
