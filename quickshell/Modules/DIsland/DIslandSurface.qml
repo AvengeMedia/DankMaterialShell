@@ -541,13 +541,14 @@ Item {
                 active: root.embedded
                 sourceComponent: Item {
                     id: overhangClip
+                    readonly property real shadowPad: root.shadowEnabled ? Theme.elevationRenderPadding(Theme.elevationLevel2, root.effectiveShadowDirection, Theme.spacingXS, Theme.spacingS, Theme.spacingL) : 0
 
                     visible: root.embeddedOverhang > 0
                     clip: true
-                    x: root.isVertical ? (root.farEdge ? -root.embeddedOverhang : root.crossExtent) : 0
-                    y: root.isVertical ? 0 : (root.farEdge ? -root.embeddedOverhang : root.crossExtent)
-                    width: root.isVertical ? root.embeddedOverhang : root.width
-                    height: root.isVertical ? root.height : root.embeddedOverhang
+                    x: root.isVertical ? (root.farEdge ? -root.embeddedOverhang - shadowPad : root.crossExtent) : -shadowPad
+                    y: root.isVertical ? -shadowPad : (root.farEdge ? -root.embeddedOverhang - shadowPad : root.crossExtent)
+                    width: root.isVertical ? root.embeddedOverhang + shadowPad : root.width + 2 * shadowPad
+                    height: root.isVertical ? root.height + 2 * shadowPad : root.embeddedOverhang + shadowPad
 
                     Loader {
                         anchors.fill: overhang
