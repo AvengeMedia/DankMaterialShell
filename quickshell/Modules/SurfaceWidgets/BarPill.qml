@@ -90,6 +90,9 @@ Item {
         return BarMetrics.widgetFill(barConfig);
     }
     property color fillColor: defaultFillColor
+    readonly property bool shadowEnabled: barConfig?.island === true && !SettingsData.islandSetting(barConfig, "islandSatelliteBackground") && !noBackground && fillColor.a > 0 && Theme.elevationEnabled && SettingsData.barElevationEnabled
+    readonly property string autoBarShadowDirection: axis?.edge ?? "top"
+    readonly property string effectiveShadowDirection: Theme.elevationLightDirection === "autoBar" ? autoBarShadowDirection : Theme.elevationLightDirection
 
     property real topLeftRadius: cornerRadius(startJoined)
     property real topRightRadius: cornerRadius(isVerticalOrientation ? startJoined : endJoined)
@@ -241,6 +244,21 @@ Item {
                 y: root.isVerticalOrientation ? along : 0
                 width: root.isVerticalOrientation ? visualContent.width : Math.max(0, length)
                 height: root.isVerticalOrientation ? Math.max(0, length) : visualContent.height
+
+                Loader {
+                    anchors.fill: parent
+                    active: root.shadowEnabled && width > 0 && height > 0
+                    sourceComponent: ElevationShadow {
+                        level: BarMetrics.elevationLevel
+                        direction: root.effectiveShadowDirection
+                        fallbackOffset: Theme.spacingXS
+                        targetColor: "transparent"
+                        topLeftRadius: fill.topLeftRadius
+                        topRightRadius: fill.topRightRadius
+                        bottomLeftRadius: fill.bottomLeftRadius
+                        bottomRightRadius: fill.bottomRightRadius
+                    }
+                }
 
                 Rectangle {
                     anchors.fill: parent

@@ -743,7 +743,8 @@ Item {
 
     readonly property real barSurfaceThickness: Theme.px(effectiveBarThickness + surfaceSpacing + ((renderBarConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel && spansEdge ? _wingR : 0), _dpr) + _shadowBuffer
     readonly property bool islandSheetOut: islandHost?.sheetOut ?? false
-    readonly property real hostThickness: isIsland ? (islandHost?.hostThickness ?? islandStripThickness) : Math.max(barSurfaceThickness, islandSheetOut ? islandHost.hostThickness : 0)
+    readonly property real islandSatelliteShadowBuffer: isIsland && islandSatellitesEnabled && !islandSatelliteBackground ? _shadowBuffer : 0
+    readonly property real hostThickness: isIsland ? Math.max(islandHost?.hostThickness ?? 0, islandStripThickness + islandSatelliteShadowBuffer) : Math.max(barSurfaceThickness, islandSheetOut ? islandHost.hostThickness : 0)
     readonly property real hideSlideThickness: isIsland ? hostThickness : barSurfaceThickness
     readonly property real surfaceImplicitHeight: !isVertical ? hostThickness : 0
     readonly property real surfaceImplicitWidth: isVertical ? hostThickness : 0
