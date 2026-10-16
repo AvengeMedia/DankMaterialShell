@@ -6273,6 +6273,34 @@
     ]
   },
   {
+    "section": "launcherKeybinds",
+    "label": "Keyboard shortcuts",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "bindings",
+      "category",
+      "drawer",
+      "hotkeys",
+      "keybind",
+      "keybinds",
+      "keyboard",
+      "keys",
+      "launcher",
+      "menu",
+      "mode",
+      "shortcut",
+      "shortcuts",
+      "start",
+      "start menu",
+      "tab"
+    ],
+    "icon": "keyboard"
+  },
+  {
     "section": "launchPrefix",
     "label": "Launch prefix",
     "tabIndex": 9,

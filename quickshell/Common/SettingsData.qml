@@ -138,6 +138,7 @@ Singleton {
         saveSettings();
     }
 
+    property var launcherKeybinds: Spec.SPEC.launcherKeybinds.def
     property var launcherPluginOrder: Spec.SPEC.launcherPluginOrder.def
     onLauncherPluginOrderChanged: saveSettings()
 

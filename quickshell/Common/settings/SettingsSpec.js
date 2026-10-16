@@ -1620,6 +1620,9 @@ var LOCAL_SPEC = {
     launcherPluginOrder: {
         def: []
     },
+    launcherKeybinds: {
+        def: {}
+    },
     frameEnabled: {
         def: false
     },
