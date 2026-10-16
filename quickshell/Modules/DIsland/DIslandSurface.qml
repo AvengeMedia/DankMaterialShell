@@ -75,6 +75,9 @@ Item {
     readonly property real islandOpacity: Math.max(0, Math.min(1, root.transparency))
     readonly property color effectiveSurfaceColor: root.embedded ? root.bandColor : root.highContrast ? Theme.surfaceContainerHighest : Theme.withAlpha(root.surfaceColor, root.islandOpacity)
     readonly property real surfaceOpacity: root.effectiveSurfaceColor.a
+    readonly property bool shadowEnabled: !root.chromeless && root.surfaceOpacity > 0 && Theme.elevationEnabled && SettingsData.barElevationEnabled
+    readonly property string autoBarShadowDirection: root.controller.edge
+    readonly property string effectiveShadowDirection: Theme.elevationLightDirection === "autoBar" ? autoBarShadowDirection : Theme.elevationLightDirection
     readonly property real currentSurfaceRadius: Math.max(0, motion.currentTopLeftRadius, motion.currentBottomLeftRadius)
     readonly property color notificationAccentColor: {
         if (!root.controller.notificationActive)
@@ -364,6 +367,13 @@ Item {
         height: (motion.running ? Math.max(root.motionStartBounds.y + root.motionStartBounds.height, root.targetVisualY + motion.targetHeight) : root.targetVisualY + motion.targetHeight) + overshootBudget - y
     }
 
+    Loader {
+        anchors.fill: island
+        z: island.z - 1
+        active: root.shadowEnabled && !root.embedded
+        sourceComponent: shadowComponent
+    }
+
     MorphSurface {
         id: island
         motion: root.surfaceMotion
@@ -539,7 +549,15 @@ Item {
                     width: root.isVertical ? root.embeddedOverhang : root.width
                     height: root.isVertical ? root.height : root.embeddedOverhang
 
+                    Loader {
+                        anchors.fill: overhang
+                        active: root.shadowEnabled
+                        sourceComponent: shadowComponent
+                    }
+
                     MorphSurface {
+                        id: overhang
+
                         motion: root.surfaceMotion
                         x: root.currentVisualX - overhangClip.x
                         y: root.currentVisualY - overhangClip.y
@@ -573,6 +591,21 @@ Item {
                 x: root.isVertical ? (root.farEdge ? root.joinCross - radiusX : root.joinCross) : root.currentVisualX + root.currentVisualWidth
                 y: root.isVertical ? root.currentVisualY + root.currentVisualHeight : (root.farEdge ? root.joinCross - radiusY : root.joinCross)
             }
+        }
+    }
+
+    Component {
+        id: shadowComponent
+
+        ElevationShadow {
+            level: Theme.elevationLevel2
+            direction: root.effectiveShadowDirection
+            fallbackOffset: Theme.spacingXS
+            targetColor: "transparent"
+            topLeftRadius: island.topLeftRadius
+            topRightRadius: island.topRightRadius
+            bottomLeftRadius: island.bottomLeftRadius
+            bottomRightRadius: island.bottomRightRadius
         }
     }
 
