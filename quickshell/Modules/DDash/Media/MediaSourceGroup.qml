@@ -82,7 +82,7 @@ Item {
         horizontalPadding: Theme.spacingM
         onClicked: root.player.togglePanel(panelId)
 
-        MediaSinkWheel {}
+        MediaSinkMute {}
     }
 
     DActionButton {
@@ -100,6 +100,6 @@ Item {
         tooltipText: root.deviceTooltip
         onClicked: root.player.togglePanel(panelId)
 
-        MediaSinkWheel {}
+        MediaSinkMute {}
     }
 }
