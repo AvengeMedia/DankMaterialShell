@@ -13,6 +13,7 @@ import "../../Common/PluginRanking.js" as PluginRanking
 RegistryBrowserWindow {
     id: root
 
+    readonly property var log: Log.scoped("PluginBrowser")
     property var allPlugins: []
     property var filteredPlugins: []
     property string typeFilter: ""
@@ -597,12 +598,16 @@ RegistryBrowserWindow {
         var deps = plugin ? (plugin.dependencies || []) : [];
         for (var i = 0; i < deps.length; i++)
             commands = commands.concat(PluginRanking.dependencyCommands(deps[i]));
+        // shortcut: a registry entry with more than 32 commands only gets the first ones checked; the rest stay unknown.
+        commands = commands.slice(0, 32);
         if (commands.length === 0)
             return;
         var script = 'for c in "$@"; do command -v "$c" >/dev/null 2>&1 && echo "$c"; done; true';
         Proc.runCommand("plugin-browser-dependencies", ["sh", "-c", script, "sh"].concat(commands), (output, exitCode) => {
-            if (exitCode !== 0)
+            if (exitCode !== 0) {
+                root.log.warn("dependency lookup failed", exitCode);
                 return;
+            }
             var found = String(output || "").split("\n").map(line => line.trim()).filter(line => commands.indexOf(line) >= 0);
             foundCommands = foundCommands.concat(found.filter(c => foundCommands.indexOf(c) < 0));
             checkedCommands = checkedCommands.concat(commands.filter(c => checkedCommands.indexOf(c) < 0));

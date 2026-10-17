@@ -1458,7 +1458,8 @@ Singleton {
             return;
         const path = PluginRanking.issueReactionsPath(plugin.issueUrl);
         if (!path) {
-            Qt.openUrlExternally(plugin.issueUrl);
+            if (/^https:\/\//.test(plugin.issueUrl))
+                Qt.openUrlExternally(plugin.issueUrl);
             return;
         }
         const pluginId = plugin.id;
@@ -1470,6 +1471,7 @@ Singleton {
             Proc.runCommand("plugin-upvote-" + pluginId, ["gh", "api", "--method", "DELETE", path + "/" + ownReaction], (output, exitCode) => {
                 _setUpvoting(pluginId, false);
                 if (exitCode !== 0) {
+                    root.log.warn("gh upvote removal failed", pluginId, exitCode);
                     ToastService.showInfo(I18n.tr("Opening GitHub to remove the upvote", "plugin upvote toast, shown when the GitHub CLI is missing or signed out"));
                     Qt.openUrlExternally(issueUrl);
                     return;
@@ -1483,6 +1485,7 @@ Singleton {
             _setUpvoting(pluginId, false);
             const reactionId = exitCode === 0 ? PluginRanking.reactionId(output) : 0;
             if (!reactionId) {
+                root.log.warn("gh upvote failed", pluginId, exitCode);
                 ToastService.showInfo(I18n.tr("Opening GitHub to upvote", "plugin upvote toast, shown when the GitHub CLI is missing or signed out"));
                 Qt.openUrlExternally(issueUrl);
                 return;
