@@ -344,7 +344,12 @@ const MAX_QUERY_LENGTH = 100;
 const MAX_QUERY_WORDS = 8;
 
 function _queryWords(query) {
-    return _words(String(query || "").slice(0, MAX_QUERY_LENGTH)).slice(0, MAX_QUERY_WORDS);
+    const text = String(query || "");
+    const words = _words(text.slice(0, MAX_QUERY_LENGTH));
+    // A word cut in half would match names it is not ("weather" cut to "w"); a lone word stays so it still finds nothing.
+    if (words.length > 1 && _words(text.charAt(MAX_QUERY_LENGTH)).length > 0)
+        words.pop();
+    return words.slice(0, MAX_QUERY_WORDS);
 }
 
 // The one-word form of a camelCase text, empty when it has no camelCase to undo.

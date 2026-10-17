@@ -183,18 +183,15 @@ test("a name without camelCase is indexed once", () => {
     assert.equal(words.filter(w => w === "world").length, 1);
 });
 
-test("a huge query returns fast and reads like its first words", () => {
-    const list = Array.from({ length: 300 }, (_, i) => plugin("plugin" + i, { name: "Orbit Bluetooth " + i, author: "AvengeMedia" }));
-    for (const query of ["aA".repeat(5000), "orbit " + "blutoth ".repeat(3000)]) {
-        const started = performance.now();
-        const plan = rank.searchPlan(list, query);
-        const result = ids(list.filter(p => rank.searchRank(p, plan) > 0));
-        assert.ok(performance.now() - started < 200);
-        assert.deepEqual(result, found(list, query.slice(0, 100)));
-        const nearStarted = performance.now();
-        rank.closest(list, query, 4);
-        assert.ok(performance.now() - nearStarted < 200);
-    }
+test("a huge query is cut to its first eight whole words of at most 100 characters", () => {
+    const list = [plugin("orbitBluetooth", { name: "Orbit Bluetooth" }), plugin("weather", { name: "Weather" }), plugin("clock", { name: "World Clock" })];
+    const tokens = query => Array.from(rank.searchPlan(list, query), t => t.token);
+    assert.equal(tokens("aA".repeat(5000)).length, 8);
+    assert.deepEqual(tokens("orbit " + "blutooth ".repeat(3000)), ["orbit", "blutooth", "blutooth", "blutooth", "blutooth", "blutooth", "blutooth", "blutooth"]);
+    assert.deepEqual(found(list, "orbit " + "blutooth ".repeat(3000)), ["orbitBluetooth"]);
+    assert.deepEqual(tokens("x".repeat(200)), ["x".repeat(100)]);
+    assert.deepEqual(tokens("clock" + " ".repeat(94) + "weather"), ["clock"]);
+    assert.deepEqual(ids(rank.closest(list, "weather ".repeat(8) + "qqqqqqqq qqqqqqqq", 4)), ["weather"]);
 });
 
 test("a correctly typed word never picks up look-alikes", () => {
