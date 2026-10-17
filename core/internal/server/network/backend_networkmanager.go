@@ -1,9 +1,11 @@
 package network
 
 import (
+	"context"
 	"fmt"
 	"maps"
 	"sync"
+	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/Wifx/gonetworkmanager/v2"
@@ -104,6 +106,20 @@ type NetworkManagerBackend struct {
 	cachedWiFiSecret      *cachedWiFiSecret
 	cachedWiFiSecretMu    sync.Mutex
 
+	openConnectSecretReads  map[openConnectSecretRead]uint
+	openConnectSecretReadMu sync.Mutex
+
+	openConnectHelperMu             sync.Mutex
+	openConnectHelperAttempts       map[openConnectHelperAttemptKey]*openConnectHelperAttempt
+	openConnectHelperRequests       map[*openConnectHelperRequest]struct{}
+	openConnectHelperClosed         bool
+	openConnectHelperAttemptTimeout time.Duration
+	openConnectActiveResolver       openConnectActiveResolver
+	openConnectActivePathsReader    func(context.Context) ([]dbus.ObjectPath, error)
+	openConnectHelperFinder         func() (string, error)
+	openConnectHelperRunner         openConnectHelperRunner
+	openConnectMetadataSaver        openConnectMetadataSaver
+
 	onStateChange func()
 }
 
@@ -142,9 +158,11 @@ type cachedWiFiSecret struct {
 }
 
 type cachedOpenConnectAuth struct {
+	ConnectionPath dbus.ObjectPath
 	ConnectionUUID string
 	Cookie         string
 	Host           string
+	Resolve        string
 	User           string
 	Fingerprint    string
 }
@@ -165,11 +183,12 @@ func NewNetworkManagerBackend(nmConn ...gonetworkmanager.NetworkManager) (*Netwo
 	}
 
 	backend := &NetworkManagerBackend{
-		nmConn:          nm,
-		stopChan:        make(chan struct{}),
-		ethernetDevices: make(map[string]*ethernetDeviceInfo),
-		cellularDevices: make(map[string]*cellularDeviceInfo),
-		wifiDevices:     make(map[string]*wifiDeviceInfo),
+		nmConn:                    nm,
+		stopChan:                  make(chan struct{}),
+		ethernetDevices:           make(map[string]*ethernetDeviceInfo),
+		cellularDevices:           make(map[string]*cellularDeviceInfo),
+		wifiDevices:               make(map[string]*wifiDeviceInfo),
+		openConnectHelperAttempts: make(map[openConnectHelperAttemptKey]*openConnectHelperAttempt),
 		state: &BackendState{
 			Backend: "networkmanager",
 		},
@@ -446,6 +465,7 @@ func (b *NetworkManagerBackend) removeCellularDeviceByPath(path dbus.ObjectPath)
 }
 
 func (b *NetworkManagerBackend) Close() {
+	b.cancelAllOpenConnectHelperAttempts()
 	close(b.stopChan)
 	b.StopMonitoring()
 
