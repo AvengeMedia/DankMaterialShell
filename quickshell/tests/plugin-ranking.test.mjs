@@ -195,8 +195,10 @@ test("closest proposes the nearest names when nothing matches", () => {
 });
 
 test("byAuthor lists one author's plugins whatever the case", () => {
-    const list = [plugin("a", { author: "Loc Huynh" }), plugin("b", { author: "loc huynh " }), plugin("c", { author: "Other" })];
+    const list = [plugin("a", { author: "Loc Huynh" }), plugin("b", { author: "loc huynh " }), plugin("c", { author: "Other" }), plugin("d", { author: "AvengeMedia" }), plugin("e", { author: "avengemedia" })];
     assert.deepEqual(ids(rank.byAuthor(list, "Loc Huynh")), ["a", "b"]);
+    assert.deepEqual(ids(rank.byAuthor(list, "AvengeMedia")), ["d", "e"]);
+    assert.deepEqual(ids(rank.byAuthor(list, "avengemedia")), ["d", "e"]);
     assert.deepEqual(ids(rank.byAuthor(list, "")), []);
 });
 

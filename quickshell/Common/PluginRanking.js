@@ -457,10 +457,10 @@ function closest(plugins, query, limit) {
 }
 
 function byAuthor(plugins, author) {
-    const wanted = _fold(author).trim();
+    const wanted = _unsplit(author).trim();
     if (!wanted)
         return [];
-    return _list(plugins).filter(p => _fold(p.author).trim() === wanted);
+    return _list(plugins).filter(p => _unsplit(p.author).trim() === wanted);
 }
 
 // --- Detail pane ------------------------------------------------------------
