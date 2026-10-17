@@ -107,3 +107,5 @@ require (
 // v0.0.1 tag is missing a LICENSE file; master has it.
 // See: https://github.com/mattn/go-localereader/issues/2
 replace github.com/mattn/go-localereader v0.0.1 => github.com/mattn/go-localereader v0.0.2-0.20220822084749-2491eb6c1c75
+
+replace github.com/AvengeMedia/dgop => github.com/Conava/dgop v1.6.3-0.20261015203807-a8d5655bf33a

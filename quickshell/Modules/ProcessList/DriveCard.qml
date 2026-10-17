@@ -1,0 +1,469 @@
+pragma ComponentBehavior: Bound
+
+import QtQuick
+import QtQuick.Layouts
+import Quickshell
+import qs.Common
+import qs.Services
+import qs.Widgets
+import qs.DCommon.Widgets
+import qs.Modules.Settings.Widgets
+import "Drives.js" as Drives
+import "../../Services/SysmonDevices.js" as Devices
+
+Rectangle {
+    id: root
+
+    // Drive object from drives.list; mounts is DgopService's diskmounts list
+    property var drive: null
+    property var mounts: []
+
+    signal installRequested
+
+    readonly property string level: Drives.healthLevel(drive)
+    readonly property bool asleep: drive?.asleep ?? false
+    readonly property var rates: (DgopService.diskRates ?? []).find(d => d.device === drive?.name) ?? null
+    readonly property var history: DgopService.deviceHistory[Devices.deviceKey("disk", drive?.name ?? "")] ?? ({})
+    readonly property real axisMax: Devices.rateAxisMax(history.a, history.b, 1024 * 1024)
+    readonly property var allRows: Drives.summaryRows(drive)
+    readonly property var powerOn: allRows.find(r => r.id === "powerOnTime") ?? null
+    readonly property var smartRows: allRows.filter(r => r.id !== "wear" && r.id !== "powerOnTime" && r.id !== "dataWritten")
+    readonly property var wear: drive?.nvme?.percentUsed ?? null
+    readonly property color healthTint: level === "failing" ? Theme.error : level === "warning" ? Theme.warning : Theme.success
+    readonly property real pad: Theme.spacingL
+    property bool expanded: false
+    readonly property var filesystems: Drives.partitionStrip(drive, mounts)
+    // The rows the card shows, also what the copy button copies
+    readonly property var statRows: {
+        const rows = [];
+        const add = (label, value, tooltip) => rows.push({
+                    "label": label,
+                    "value": value,
+                    "tooltip": tooltip ?? ""
+                });
+        if (!asleep && rates?.busy != null)
+            add(I18n.tr("Busy"), Math.round(rates.busy) + "%");
+        if (!asleep && rates?.responseTime != null)
+            add(I18n.tr("Response time"), rates.responseTime.toFixed(2) + " ms");
+        if (wear !== null)
+            add(I18n.tr("Wear"), wear + "%", I18n.tr("Share of the rated write endurance used up"));
+        if (powerOn !== null)
+            add(I18n.tr("Power-on time"), rowValue(powerOn));
+        if (drive?.nvme?.dataWritten != null)
+            add(I18n.tr("Written total", "lifetime data written to a drive"), Devices.formatBytes(drive.nvme.dataWritten));
+        if (drive?.firmware)
+            add(I18n.tr("Firmware", "drive firmware revision"), drive.firmware);
+        for (const r of smartRows)
+            add(rowLabel(r.id), String(rowValue(r)));
+        return rows;
+    }
+
+    implicitHeight: body.implicitHeight + pad * 2
+    radius: Theme.cornerRadiusL
+    color: Theme.surfaceContainerLow
+
+    function rowLabel(id) {
+        switch (id) {
+        case "criticalWarning":
+            return I18n.tr("Critical warning");
+        case "spare":
+            return I18n.tr("Spare blocks left");
+        case "mediaErrors":
+            return I18n.tr("Media errors");
+        case "dataRead":
+            return I18n.tr("Data read");
+        case "dataWritten":
+            return I18n.tr("Data written");
+        case "unsafeShutdowns":
+            return I18n.tr("Unsafe shutdowns");
+        case "powerOnTime":
+            return I18n.tr("Power-on time");
+        case "selftest":
+            return I18n.tr("Last self-test");
+        case "reallocated":
+            return I18n.tr("Reallocated sectors");
+        case "pending":
+            return I18n.tr("Current pending sectors");
+        case "uncorrectable":
+            return I18n.tr("Offline uncorrectable");
+        case "crc":
+            return I18n.tr("Cable errors");
+        case "startStop":
+            return I18n.tr("Start/stop count");
+        case "loadCycles":
+            return I18n.tr("Head load cycles");
+        case "spinUp":
+            return I18n.tr("Spin-up time");
+        }
+        return id;
+    }
+
+    function rowValue(r) {
+        if (!r)
+            return "";
+        if (r.id === "powerOnTime") {
+            const text = r.unit === "hours" ? I18n.tr("%1 hours") : r.unit === "days" ? I18n.tr("%1 days") : I18n.tr("%1 years");
+            return text.arg(r.value);
+        }
+        if (r.id === "criticalWarning" && r.value === "none")
+            return I18n.tr("None");
+        if (r.id === "selftest")
+            return r.value === "ok" ? I18n.tr("OK") : r.value === "running" ? I18n.tr("Running") : I18n.tr("Error");
+        return r.value;
+    }
+
+    function spaceText(fs) {
+        if (fs.usedRatio !== null && fs.size > 0)
+            return I18n.tr("%1 of %2 used", "partition space, e.g. 1.2 TB of 2 TB used").arg(Drives.formatCapacity(fs.size * fs.usedRatio)).arg(Drives.formatCapacity(fs.size));
+        return fs.size > 0 ? Drives.formatCapacity(fs.size) : "";
+    }
+
+    function cardText() {
+        const lines = [drive?.model || drive?.name || "", Drives.driveSubtitle(drive), drive?.device ?? ""];
+        if (drive?.temperature != null)
+            lines.push(I18n.tr("Temperature") + ": " + Devices.formatTemp(drive.temperature, SettingsData.useFahrenheit));
+        if (level !== "")
+            lines.push(I18n.tr("Health") + ": " + healthText());
+        for (const r of statRows)
+            lines.push(r.label + ": " + r.value);
+        for (const fs of filesystems)
+            lines.push([fs.swap ? I18n.tr("Swap") : fs.label, fs.fsType, spaceText(fs)].filter(x => x).join(", "));
+        const report = smartReport.reportText();
+        return lines.filter(l => l !== "").join("\n") + (report ? "\n\n" + report : "");
+    }
+
+    function healthText() {
+        const w = Drives.healthWord(level);
+        return w === "critical" ? I18n.tr("Critical", "drive health") : w === "warning" ? I18n.tr("Warning") : I18n.tr("Healthy", "drive health");
+    }
+
+    function warnTooltip() {
+        return Drives.warnRows(drive).map(r => rowLabel(r.id) + ": " + rowValue(r)).join("\n");
+    }
+
+
+
+    ColumnLayout {
+        id: body
+        x: root.pad
+        y: root.pad
+        width: root.width - root.pad * 2
+        spacing: Theme.spacingL
+
+        Item {
+            Layout.fillWidth: true
+            implicitHeight: header.implicitHeight
+
+            // The whole header bar toggles the card, not only the arrow.
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: -Theme.spacingS
+                radius: Theme.cornerRadiusM
+                color: "transparent"
+
+                StateLayer {
+                    onClicked: root.expanded = !root.expanded
+                }
+            }
+
+            RowLayout {
+                id: header
+                anchors.left: parent.left
+                anchors.right: parent.right
+                spacing: Theme.spacingL
+
+                Rectangle {
+                    Layout.preferredWidth: Theme.iconButtonSize
+                    Layout.preferredHeight: Layout.preferredWidth
+                    radius: Theme.cornerRadiusM
+                    color: Theme.secondaryContainer
+
+                    DeviceIcon {
+                        anchors.centerIn: parent
+                        name: Drives.driveIcon(root.drive)
+                        size: Theme.iconSize
+                        color: Theme.onSecondaryContainer
+                    }
+                }
+
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 0
+
+                    StyledText {
+                        Layout.fillWidth: true
+                        text: root.drive?.model || root.drive?.name || ""
+                        font.pixelSize: Theme.fontSizeLarge
+                        color: Theme.surfaceText
+                        wrapMode: Text.NoWrap
+                        elide: Text.ElideRight
+                    }
+
+                    StyledText {
+                        Layout.fillWidth: true
+                        visible: text !== ""
+                        text: Drives.driveSubtitle(root.drive)
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.NoWrap
+                        elide: Text.ElideRight
+                    }
+                }
+
+                MetricChart {
+                    visible: !root.expanded
+                    Layout.preferredWidth: Theme.iconButtonSize * 2
+                    Layout.preferredHeight: Theme.buttonHeightXXS
+                    compact: true
+                    values: root.history.a ?? []
+                    secondaryValues: root.history.b ?? []
+                    maximum: root.axisMax
+                    historyLength: DgopService.deviceHistorySize
+                }
+
+                NumericText {
+                    visible: root.drive?.temperature != null
+                    isMonospace: false
+                    text: Devices.formatTemp(root.drive?.temperature ?? null, SettingsData.useFahrenheit)
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                }
+
+                Pill {
+                    visible: root.asleep
+                    text: I18n.tr("Asleep")
+                    dotColor: Theme.surfaceVariantText
+                    tooltip: (root.drive?.smartUpdated ?? 0) > 0 ? Qt.formatDateTime(new Date(root.drive.smartUpdated * 1000), Locale.ShortFormat) : ""
+                }
+
+                Pill {
+                    visible: root.level !== ""
+                    text: root.healthText()
+                    dotColor: root.healthTint
+                    textColor: root.level === "healthy" ? Theme.surfaceText : root.healthTint
+                    tooltip: root.warnTooltip()
+                }
+
+                DActionButton {
+                    iconName: "content_copy"
+                    iconColor: Theme.surfaceText
+                    tooltipText: I18n.tr("Copy")
+                    onClicked: Quickshell.execDetached(["dms", "cl", "copy", root.cardText()])
+                }
+
+                DActionButton {
+                    iconName: "expand_more"
+                    rotation: root.expanded ? 180 : 0
+                    tooltipText: root.expanded ? I18n.tr("Collapse") : I18n.tr("Expand")
+                    onClicked: root.expanded = !root.expanded
+                }
+            }
+        }
+
+        RowLayout {
+            visible: root.expanded
+            Layout.fillWidth: true
+            spacing: Theme.spacingL
+
+            ChartCard {
+                Layout.fillWidth: true
+                Layout.horizontalStretchFactor: 3
+                Layout.alignment: Qt.AlignTop
+                cardColor: Theme.surfaceContainer
+                chartHeight: Math.max(Theme.listItemHeight * 1.5, stats.height - Theme.spacingL * 2 - Theme.spacingS * 2 - Theme.fontSizeSmall * 3)
+                label: I18n.tr("Read")
+                valueText: root.rates?.readRate != null ? Devices.formatRate(root.rates.readRate, false) : "—"
+                secondaryLabel: I18n.tr("Write")
+                secondaryValueText: root.rates?.writeRate != null ? Devices.formatRate(root.rates.writeRate, false) : "—"
+                values: root.history.a ?? []
+                secondaryValues: root.history.b ?? []
+                maximum: root.axisMax
+                maximumText: Devices.formatRate(root.axisMax, false)
+                historyLength: DgopService.deviceHistorySize
+            }
+
+            SettingsGroup {
+                id: stats
+                Layout.fillWidth: true
+                Layout.horizontalStretchFactor: 2
+                Layout.alignment: Qt.AlignTop
+                customPaddingV: 0
+                customPaddingH: Theme.spacingL
+
+                Repeater {
+                    model: root.statRows
+
+                    StatRow {
+                        required property var modelData
+                        height: Theme.buttonHeightXS
+                        label: modelData.label
+                        value: modelData.value
+                        tooltip: modelData.tooltip ?? ""
+                    }
+                }
+            }
+        }
+
+        SettingsGroup {
+            visible: root.expanded && root.filesystems.length > 0
+            Layout.fillWidth: true
+            customPaddingV: 0
+            customPaddingH: Theme.spacingL
+
+            Repeater {
+                model: root.filesystems
+
+                RowLayout {
+                    id: fsRow
+
+                    required property var modelData
+
+                    width: parent?.width ?? 0
+                    height: Theme.buttonHeightS
+                    spacing: Theme.spacingL
+
+                    DIcon {
+                        name: fsRow.modelData.swap ? "swap_horiz" : fsRow.modelData.encrypted ? "lock" : "folder"
+                        size: Theme.iconSizeSmall
+                        color: Theme.surfaceVariantText
+                    }
+
+                    StyledText {
+                        Layout.fillWidth: true
+                        text: fsRow.modelData.swap ? I18n.tr("Swap") : fsRow.modelData.label
+                        font.pixelSize: Theme.fontSizeMedium
+                        color: Theme.surfaceText
+                        wrapMode: Text.NoWrap
+                        elide: Text.ElideMiddle
+                    }
+
+                    StyledText {
+                        Layout.preferredWidth: Theme.fontSizeMedium * 7
+                        text: fsRow.modelData.fsType
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.NoWrap
+                        elide: Text.ElideRight
+                    }
+
+                    Rectangle {
+                        Layout.preferredWidth: Theme.fontSizeMedium * 10
+                        Layout.preferredHeight: Theme.spacingS
+                        radius: height / 2
+                        color: Theme.surfaceContainerHighest
+                        opacity: fsRow.modelData.usedRatio !== null ? 1 : 0
+
+                        Rectangle {
+                            width: parent.width * Math.min(1, fsRow.modelData.usedRatio ?? 0)
+                            height: parent.height
+                            radius: height / 2
+                            color: Theme.primary
+                        }
+                    }
+
+                    NumericText {
+                        Layout.preferredWidth: Theme.fontSizeMedium * 12
+                        isMonospace: false
+                        horizontalAlignment: Text.AlignRight
+                        text: root.spaceText(fsRow.modelData)
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                    }
+                }
+            }
+        }
+
+        RowLayout {
+            visible: root.expanded
+            Layout.fillWidth: true
+            spacing: Theme.spacingL
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            StyledText {
+                visible: DriveService.smartctlPath === "" && DriveService.installCommand === ""
+                text: I18n.tr("Requires %1", "missing program", true).arg("smartctl")
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceVariantText
+            }
+
+            DButton {
+                visible: DriveService.smartctlPath === "" && DriveService.installCommand !== ""
+                text: I18n.tr("Install smartmontools")
+                iconName: "download"
+                backgroundColor: Theme.secondaryContainer
+                textColor: Theme.onSecondaryContainer
+                onClicked: root.installRequested()
+            }
+
+            DButton {
+                visible: DriveService.smartctlPath !== "" && !DgopService.unlocked
+                text: I18n.tr("Full SMART report")
+                iconName: "lock_open"
+                backgroundColor: Theme.secondaryContainer
+                textColor: Theme.onSecondaryContainer
+                tooltipText: I18n.tr("Authentication Required")
+                enabled: !DgopService.unlocking
+                onClicked: DgopService.unlock()
+            }
+
+        }
+
+        SmartReport {
+            id: smartReport
+            Layout.fillWidth: true
+            drive: root.drive
+            visible: root.expanded && state_ !== "idle"
+        }
+    }
+
+    component Pill: Rectangle {
+        id: pill
+
+        property string text: ""
+        property color dotColor: Theme.success
+        property color textColor: Theme.surfaceText
+        property string tooltip: ""
+
+        implicitWidth: pillRow.implicitWidth + Theme.spacingM * 2
+        implicitHeight: Theme.buttonHeightXS
+        radius: height / 2
+        color: Theme.surfaceContainerHighest
+
+        Row {
+            id: pillRow
+            anchors.centerIn: parent
+            spacing: Theme.spacingS
+
+            Rectangle {
+                anchors.verticalCenter: parent.verticalCenter
+                width: Theme.spacingS
+                height: width
+                radius: width / 2
+                color: pill.dotColor
+            }
+
+            StyledText {
+                anchors.verticalCenter: parent.verticalCenter
+                text: pill.text
+                font.pixelSize: Theme.fontSizeSmall
+                color: pill.textColor
+            }
+        }
+
+        MouseArea {
+            id: pillHover
+            anchors.fill: parent
+            hoverEnabled: pill.tooltip !== ""
+            acceptedButtons: Qt.NoButton
+        }
+
+        DTooltipHost {
+            text: pill.tooltip
+            target: pill
+            hoverArea: pillHover
+        }
+    }
+}

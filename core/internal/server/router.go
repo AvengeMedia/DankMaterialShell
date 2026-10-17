@@ -11,6 +11,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
 	serverDbus "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dbus"
 	serverDgop "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dgop"
+	serverDrives "github.com/AvengeMedia/DankMaterialShell/core/internal/server/drives"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/location"
@@ -149,6 +150,8 @@ func newRequestMux(readiness *systemd.Readiness) *ipc.Mux {
 	})
 
 	mux.HandlePrefix("dgop.", requestHandler(serverDgop.HandleRequest))
+
+	mux.HandlePrefix("drives.", requestHandler(serverDrives.HandleRequest))
 
 	mux.HandlePrefix("lyrics.", requestHandler(serverLyrics.HandleRequest))
 
