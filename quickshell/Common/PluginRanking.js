@@ -470,11 +470,17 @@ function closest(plugins, query, limit) {
     return rows.slice(0, limit || 4).map(r => r.plugin);
 }
 
+// "Avenge Media", "AvengeMedia" and "avengemedia" are one author. Only spaces and
+// ASCII punctuation are dropped, so a name in another script keeps its letters.
+function _authorKey(author) {
+    return _unsplit(author).replace(/[\s!-/:-@[-`{-~]/g, "");
+}
+
 function byAuthor(plugins, author) {
-    const wanted = _unsplit(author).trim();
+    const wanted = _authorKey(author);
     if (!wanted)
         return [];
-    return _list(plugins).filter(p => _unsplit(p.author).trim() === wanted);
+    return _list(plugins).filter(p => _authorKey(p.author) === wanted);
 }
 
 // --- Detail pane ------------------------------------------------------------

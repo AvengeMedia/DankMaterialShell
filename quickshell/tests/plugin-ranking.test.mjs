@@ -214,10 +214,12 @@ test("closest proposes the nearest names when nothing matches", () => {
 });
 
 test("byAuthor lists one author's plugins whatever the case", () => {
-    const list = [plugin("a", { author: "Loc Huynh" }), plugin("b", { author: "loc huynh " }), plugin("c", { author: "Other" }), plugin("d", { author: "AvengeMedia" }), plugin("e", { author: "avengemedia" })];
-    assert.deepEqual(ids(rank.byAuthor(list, "Loc Huynh")), ["a", "b"]);
-    assert.deepEqual(ids(rank.byAuthor(list, "AvengeMedia")), ["d", "e"]);
-    assert.deepEqual(ids(rank.byAuthor(list, "avengemedia")), ["d", "e"]);
+    const list = [plugin("a", { author: "Jane Example" }), plugin("b", { author: "jane example " }), plugin("c", { author: "Other" }), plugin("d", { author: "AvengeMedia" }), plugin("e", { author: "avengemedia" }), plugin("f", { author: "Avenge Media" }), plugin("g", { author: "示例 作者" })];
+    assert.deepEqual(ids(rank.byAuthor(list, "示例作者")), ["g"]);
+    assert.deepEqual(ids(rank.byAuthor(list, "Jane Example")), ["a", "b"]);
+    assert.deepEqual(ids(rank.byAuthor(list, "AvengeMedia")), ["d", "e", "f"]);
+    assert.deepEqual(ids(rank.byAuthor(list, "avengemedia")), ["d", "e", "f"]);
+    assert.deepEqual(ids(rank.byAuthor(list, "Avenge Media")), ["d", "e", "f"]);
     assert.deepEqual(ids(rank.byAuthor(list, "")), []);
 });
 
