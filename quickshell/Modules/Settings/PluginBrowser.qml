@@ -1277,6 +1277,10 @@ RegistryBrowserWindow {
             function onDetailPluginIdChanged() {
                 detailPane.heroFallback = false;
                 detailFlickable.contentY = 0;
+                // Each opened detail looks again, so a program installed meanwhile is found.
+                root.foundCommands = [];
+                root.checkedCommands = [];
+                root.checkDependencies(root.detailPlugin);
             }
             // On the plugin itself, not its id: a detail opened before the list loads is checked once it arrives.
             function onDetailPluginChanged() {
@@ -1487,7 +1491,7 @@ RegistryBrowserWindow {
                             root.showAuthor(detailPane.plugin.author);
                         else if (url === "copy:")
                             root.copyLink(detailPane.plugin);
-                        else
+                        else if (/^https:\/\//.test(url))
                             Qt.openUrlExternally(url);
                     }
 
