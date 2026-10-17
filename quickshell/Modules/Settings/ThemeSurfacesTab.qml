@@ -273,7 +273,7 @@ Column {
             tags: ["niri", "overview", "background", "backdrop", "palette"]
             settingKey: "niriOverviewBackgroundEnabled"
             text: I18n.tr("Overview background", "niri palette integration toggle")
-            description: I18n.tr("Follow the DMS background palette in overview", "niri overview background integration description")
+            description: I18n.tr("Use Surface Container Highest from the DMS palette", "niri overview background integration description")
             enabled: niriLayoutInclude.included
             checked: SettingsData.niriOverviewBackgroundEnabled
             onToggled: checked => SettingsData.set("niriOverviewBackgroundEnabled", checked)
@@ -284,7 +284,7 @@ Column {
             tags: ["niri", "window", "focus", "border", "accent", "palette"]
             settingKey: "niriActiveWindowColorEnabled"
             text: I18n.tr("Active window outline", "niri palette integration toggle")
-            description: I18n.tr("Follow the DMS primary accent for the focused window", "niri active window color integration description")
+            description: I18n.tr("Use Primary from the DMS palette", "niri active window color integration description")
             enabled: niriLayoutInclude.included
             checked: SettingsData.niriActiveWindowColorEnabled
             onToggled: checked => SettingsData.set("niriActiveWindowColorEnabled", checked)
