@@ -571,7 +571,7 @@ func (a *SecretAgent) GetSecrets(
 		out[settingName] = secretsOnly
 
 		if identity, ok := reply.Secrets["identity"]; ok && identity != "" {
-			a.save8021xIdentity(path, identity)
+			save8021xIdentity(a.conn.Object("org.freedesktop.NetworkManager", path), identity)
 		}
 		log.Infof("[SecretAgent] Returning 802-1x enterprise secrets with %d fields", len(secretsOnly))
 	default:
@@ -685,54 +685,17 @@ func (a *SecretAgent) Introspect() (string, *dbus.Error) {
 	return introspectXML, nil
 }
 
-// save8021xIdentity persists a prompted identity into the profile. Update2
-// replaces the whole connection, so the full settings must round-trip with
-// stored secrets merged back, or system-owned passwords would be wiped.
-func (a *SecretAgent) save8021xIdentity(path dbus.ObjectPath, identity string) {
-	connObj := a.conn.Object("org.freedesktop.NetworkManager", path)
-	var settings map[string]map[string]dbus.Variant
-	if err := connObj.Call("org.freedesktop.NetworkManager.Settings.Connection.GetSettings", 0).Store(&settings); err != nil {
-		log.Warnf("[SecretAgent] Failed to get settings for identity save: %v", err)
-		return
-	}
-
-	dot1x, ok := settings["802-1x"]
-	if !ok {
-		dot1x = make(map[string]dbus.Variant)
-		settings["802-1x"] = dot1x
-	}
-	dot1x["identity"] = dbus.MakeVariant(identity)
-
-	mergeStoredSecretsRaw(connObj, settings)
-
-	var result map[string]dbus.Variant
-	if err := connObj.Call("org.freedesktop.NetworkManager.Settings.Connection.Update2", 0,
-		settings, uint32(0x1), map[string]dbus.Variant{}).Store(&result); err != nil {
+// save8021xIdentity persists a prompted identity into the profile.
+func save8021xIdentity(connObj dbus.BusObject, identity string) {
+	err := updateConnectionSettings(connObj, true, func(s nmSettings) error {
+		setSettingValue(s, "802-1x", "identity", identity)
+		return nil
+	})
+	if err != nil {
 		log.Warnf("[SecretAgent] Failed to save 802.1x identity: %v", err)
 		return
 	}
 	log.Infof("[SecretAgent] Saved 802.1x identity to connection profile")
-}
-
-func mergeStoredSecretsRaw(connObj dbus.BusObject, settings map[string]map[string]dbus.Variant) {
-	for _, setting := range []string{"802-11-wireless-security", "802-1x", "vpn"} {
-		section, ok := settings[setting]
-		if !ok {
-			continue
-		}
-
-		var secrets map[string]map[string]dbus.Variant
-		if err := connObj.Call("org.freedesktop.NetworkManager.Settings.Connection.GetSecrets", 0, setting).Store(&secrets); err != nil {
-			continue
-		}
-
-		for k, v := range secrets[setting] {
-			if _, exists := section[k]; exists {
-				continue
-			}
-			section[k] = v
-		}
-	}
 }
 
 func readConnUUID(conn map[string]nmVariantMap) string {

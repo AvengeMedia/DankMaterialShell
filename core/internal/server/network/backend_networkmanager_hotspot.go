@@ -1,13 +1,16 @@
 package network
 
 import (
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"net/netip"
 	"sort"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/Wifx/gonetworkmanager/v2"
+	"github.com/godbus/dbus/v5"
 )
 
 const (
@@ -32,6 +35,12 @@ func (b *NetworkManagerBackend) ConfigureHotspot(req HotspotRequest) error {
 	if err := validateHotspotBandName(req.Band); err != nil {
 		return err
 	}
+	if err := validateHotspotChannel(req.Band, req.Channel); err != nil {
+		return err
+	}
+	if _, err := parseHotspotAddress(req.Address); err != nil {
+		return err
+	}
 
 	b.stateMutex.RLock()
 	hotspotActive := b.state.HotspotEnabled || b.state.HotspotActivating
@@ -53,17 +62,20 @@ func (b *NetworkManagerBackend) ConfigureHotspot(req HotspotRequest) error {
 		return err
 	}
 
-	existing, existingSettings, err := b.findDMSHotspotConnection()
+	existing, _, err := b.findDMSHotspotConnection()
 	if err != nil {
 		return err
 	}
 
-	settings := buildHotspotSettings(req, existingSettings)
 	if existing != nil {
-		if err := existing.Update(settings); err != nil {
+		err := updateConnectionSettings(b.nmObject(existing.GetPath()), true, func(s nmSettings) error {
+			applyHotspotRequest(s, req)
+			return nil
+		})
+		if err != nil {
 			return fmt.Errorf("failed to update hotspot profile: %w", err)
 		}
-	} else if _, err := settingsMgr.AddConnection(settings); err != nil {
+	} else if _, err := settingsMgr.AddConnection(buildHotspotSettings(req)); err != nil {
 		return fmt.Errorf("failed to create hotspot profile: %w", err)
 	}
 
@@ -182,7 +194,7 @@ func (b *NetworkManagerBackend) networkManagerSettings() (gonetworkmanager.Setti
 	return settingsMgr, nil
 }
 
-func buildHotspotSettings(req HotspotRequest, existing gonetworkmanager.ConnectionSettings) gonetworkmanager.ConnectionSettings {
+func buildHotspotSettings(req HotspotRequest) gonetworkmanager.ConnectionSettings {
 	connection := map[string]any{
 		"id":          dmsHotspotConnectionID,
 		"type":        "802-11-wireless",
@@ -192,11 +204,6 @@ func buildHotspotSettings(req HotspotRequest, existing gonetworkmanager.Connecti
 	if req.Device != "" {
 		connection["interface-name"] = req.Device
 	}
-	if existingConnection, ok := existing["connection"]; ok {
-		if uuid, ok := existingConnection["uuid"].(string); ok && uuid != "" {
-			connection["uuid"] = uuid
-		}
-	}
 
 	wifi := map[string]any{
 		"mode": "ap",
@@ -204,6 +211,9 @@ func buildHotspotSettings(req HotspotRequest, existing gonetworkmanager.Connecti
 	}
 	if req.Band != "" {
 		wifi["band"] = req.Band
+	}
+	if req.Channel > 0 {
+		wifi["channel"] = req.Channel
 	}
 
 	settings := gonetworkmanager.ConnectionSettings{
@@ -222,7 +232,59 @@ func buildHotspotSettings(req HotspotRequest, existing gonetworkmanager.Connecti
 		}
 	}
 
+	if prefix, _ := parseHotspotAddress(req.Address); prefix.IsValid() {
+		settings["ipv4"]["address-data"] = []map[string]any{{
+			"address": prefix.Addr().String(),
+			"prefix":  uint32(prefix.Bits()),
+		}}
+	}
+
 	return settings
+}
+
+// applyHotspotRequest writes only the keys the hotspot card owns, leaving
+// everything set elsewhere (e.g. in the connection editor) untouched.
+// req must already be validated.
+func applyHotspotRequest(s nmSettings, req HotspotRequest) {
+	if req.Device != "" {
+		setSettingValue(s, "connection", "interface-name", req.Device)
+	} else {
+		deleteSettingValue(s, "connection", "interface-name")
+	}
+
+	setSettingValue(s, "802-11-wireless", "ssid", []byte(req.SSID))
+	setSettingValue(s, "802-11-wireless", "mode", "ap")
+	if req.Band != "" {
+		setSettingValue(s, "802-11-wireless", "band", req.Band)
+	} else {
+		deleteSettingValue(s, "802-11-wireless", "band")
+	}
+	if req.Channel > 0 {
+		setSettingValue(s, "802-11-wireless", "channel", req.Channel)
+	} else {
+		deleteSettingValue(s, "802-11-wireless", "channel")
+	}
+
+	if req.Password != "" {
+		setSettingValue(s, "802-11-wireless", "security", "802-11-wireless-security")
+		setSettingValue(s, "802-11-wireless-security", "key-mgmt", "wpa-psk")
+		setSettingValue(s, "802-11-wireless-security", "psk", req.Password)
+		setSettingValue(s, "802-11-wireless-security", "psk-flags", uint32(0))
+	} else {
+		deleteSettingValue(s, "802-11-wireless", "security")
+		delete(s, "802-11-wireless-security")
+	}
+
+	setSettingValue(s, "ipv4", "method", "shared")
+	if prefix, _ := parseHotspotAddress(req.Address); prefix.IsValid() {
+		setSettingValue(s, "ipv4", "address-data", []map[string]dbus.Variant{{
+			"address": dbus.MakeVariant(prefix.Addr().String()),
+			"prefix":  dbus.MakeVariant(uint32(prefix.Bits())),
+		}})
+	} else {
+		deleteSettingValue(s, "ipv4", "address-data")
+		deleteSettingValue(s, "ipv4", "addresses")
+	}
 }
 
 func (b *NetworkManagerBackend) findDMSHotspotConnection() (gonetworkmanager.Connection, gonetworkmanager.ConnectionSettings, error) {
@@ -250,10 +312,16 @@ func (b *NetworkManagerBackend) findDMSHotspotConnection() (gonetworkmanager.Con
 }
 
 func (b *NetworkManagerBackend) findActiveDMSHotspotConnection() (gonetworkmanager.ActiveConnection, error) {
+	active, _, _, err := b.findActiveDMSHotspot()
+	return active, err
+}
+
+// findActiveDMSHotspot also returns the profile and the settings it was matched on.
+func (b *NetworkManagerBackend) findActiveDMSHotspot() (gonetworkmanager.ActiveConnection, gonetworkmanager.Connection, gonetworkmanager.ConnectionSettings, error) {
 	nm := b.nmConn.(gonetworkmanager.NetworkManager)
 	activeConns, err := nm.GetPropertyActiveConnections()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get active connections: %w", err)
+		return nil, nil, nil, fmt.Errorf("failed to get active connections: %w", err)
 	}
 
 	for _, active := range activeConns {
@@ -272,11 +340,11 @@ func (b *NetworkManagerBackend) findActiveDMSHotspotConnection() (gonetworkmanag
 			continue
 		}
 		if isDMSHotspotConnection(settings) {
-			return active, nil
+			return active, conn, settings, nil
 		}
 	}
 
-	return nil, nil
+	return nil, nil, nil, nil
 }
 
 func isDMSHotspotConnection(settings gonetworkmanager.ConnectionSettings) bool {
@@ -517,6 +585,39 @@ func validateHotspotBandName(band string) error {
 	return nil
 }
 
+// validateHotspotChannel bounds the channel to the band; NM checks the rest.
+func validateHotspotChannel(band string, channel uint32) error {
+	if channel == 0 {
+		return nil
+	}
+	maxChannel := map[string]uint32{"bg": 14, "a": 196}[band]
+	if maxChannel == 0 {
+		return fmt.Errorf("channel requires a band")
+	}
+	if channel > maxChannel {
+		return fmt.Errorf("channel %d is not valid for band %s", channel, band)
+	}
+	return nil
+}
+
+// parseHotspotAddress parses the shared-mode gateway address. Empty yields
+// the zero prefix: NM's default range.
+func parseHotspotAddress(address string) (netip.Prefix, error) {
+	if address == "" {
+		return netip.Prefix{}, nil
+	}
+	prefix, err := netip.ParsePrefix(address)
+	if err != nil || !prefix.Addr().Is4() || prefix.Bits() < 8 || prefix.Bits() > 30 {
+		return netip.Prefix{}, fmt.Errorf("invalid hotspot address %q: use an IPv4 address with a /8 to /30 prefix", address)
+	}
+	addr := prefix.Addr().As4()
+	host := binary.BigEndian.Uint32(addr[:]) & (1<<(32-prefix.Bits()) - 1)
+	if host == 0 || host == 1<<(32-prefix.Bits())-1 {
+		return netip.Prefix{}, fmt.Errorf("invalid hotspot address %q: the network and broadcast addresses can't be used", address)
+	}
+	return prefix, nil
+}
+
 func validateHotspotBand(devInfo *wifiDeviceInfo, band string) error {
 	if band == "" || devInfo == nil || devInfo.wireless == nil {
 		return nil
@@ -605,6 +706,24 @@ func hotspotBandFromSettings(settings gonetworkmanager.ConnectionSettings) strin
 	return band
 }
 
+func hotspotChannelFromSettings(settings gonetworkmanager.ConnectionSettings) uint32 {
+	channel, _ := settings["802-11-wireless"]["channel"].(uint32)
+	return channel
+}
+
+func hotspotAddressFromSettings(settings gonetworkmanager.ConnectionSettings) string {
+	data, _ := settings["ipv4"]["address-data"].([]map[string]any)
+	if len(data) == 0 {
+		return ""
+	}
+	address, _ := data[0]["address"].(string)
+	prefix, _ := data[0]["prefix"].(uint32)
+	if address == "" {
+		return ""
+	}
+	return fmt.Sprintf("%s/%d", address, prefix)
+}
+
 func (b *NetworkManagerBackend) updateHotspotState() error {
 	available := false
 	for _, devInfo := range b.wifiDevicesSnapshot() {
@@ -671,6 +790,9 @@ func (b *NetworkManagerBackend) updateHotspotState() error {
 	b.state.HotspotDevice = hotspotDeviceFromSettings(settings)
 	b.state.HotspotBand = hotspotBandFromSettings(settings)
 	b.state.HotspotSecured = hotspotSecuredFromSettings(settings)
+	b.state.HotspotChannel = hotspotChannelFromSettings(settings)
+	b.state.HotspotAddress = hotspotAddressFromSettings(settings)
+	b.state.HotspotUUID, _ = settings["connection"]["uuid"].(string)
 	if wasStarting {
 		switch {
 		case enabled:

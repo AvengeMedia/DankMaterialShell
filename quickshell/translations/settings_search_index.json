@@ -1632,6 +1632,7 @@
       "network",
       "online",
       "status",
+      "tailscale",
       "vpn",
       "wi-fi",
       "wifi",
@@ -5890,6 +5891,30 @@
     "conditionKey": "islandDocked"
   },
   {
+    "section": "networkConnectivityCheck",
+    "label": "Connectivity checking",
+    "tabIndex": 7,
+    "category": "Status",
+    "keywords": [
+      "captive portal",
+      "checking",
+      "connection",
+      "connectivity",
+      "ethernet",
+      "internet",
+      "login",
+      "network",
+      "online",
+      "portal",
+      "status",
+      "wi-fi",
+      "wifi",
+      "wireless"
+    ],
+    "parentLabel": "Network",
+    "conditionKey": "networkAvailable"
+  },
+  {
     "section": "networkStatus",
     "label": "Status",
     "tabIndex": 7,
@@ -5907,6 +5932,7 @@
       "wireless"
     ],
     "parentLabel": "Network",
+    "icon": "login",
     "conditionKey": "networkAvailable"
   },
   {
@@ -13430,6 +13456,7 @@
     "category": "Wi-Fi",
     "keywords": [
       "access point",
+      "channel",
       "connection",
       "connectivity",
       "ethernet",
@@ -13437,6 +13464,7 @@
       "internet",
       "network",
       "online",
+      "qr code",
       "sharing",
       "ssid",
       "wi-fi",
@@ -18227,5 +18255,77 @@
       "wellbeing"
     ],
     "icon": "show_chart"
+  },
+  {
+    "section": "networkConnections",
+    "label": "Connections",
+    "tabIndex": 68,
+    "category": "Connections",
+    "keywords": [
+      "802.1x",
+      "apn",
+      "bluetooth",
+      "bond",
+      "bridge",
+      "connection",
+      "connections",
+      "connectivity",
+      "dns",
+      "dsl",
+      "ethernet",
+      "firewall",
+      "gateway",
+      "internet",
+      "ipv4",
+      "ipv6",
+      "mac",
+      "metered",
+      "mobile broadband",
+      "mtu",
+      "network",
+      "online",
+      "ports",
+      "pppoe",
+      "profiles",
+      "routes",
+      "static ip",
+      "vlan",
+      "wi-fi",
+      "wifi",
+      "wired",
+      "wireless",
+      "zone"
+    ],
+    "parentLabel": "Network",
+    "conditionKey": "connectionEditorAvailable"
+  },
+  {
+    "section": "networkTailscale",
+    "label": "Tailscale",
+    "tabIndex": 70,
+    "category": "Tailscale",
+    "keywords": [
+      "account",
+      "connection",
+      "connectivity",
+      "ethernet",
+      "exit node",
+      "internet",
+      "login",
+      "magicdns",
+      "network",
+      "online",
+      "ssh",
+      "subnet",
+      "tailnet",
+      "tailscale",
+      "vpn",
+      "wi-fi",
+      "wifi",
+      "wireless"
+    ],
+    "parentLabel": "Network",
+    "icon": "hub",
+    "conditionKey": "tailscaleAvailable"
   }
 ]

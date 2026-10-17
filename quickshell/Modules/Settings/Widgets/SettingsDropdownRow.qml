@@ -33,6 +33,10 @@ SettingsRow {
         dropdown.openDropdownMenu();
     }
 
+    function resync() {
+        dropdown.currentValue = currentValue;
+    }
+
     function closeDropdownMenu() {
         dropdown.closeDropdownMenu();
     }
