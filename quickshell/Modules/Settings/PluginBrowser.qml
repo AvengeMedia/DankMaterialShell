@@ -599,7 +599,7 @@ RegistryBrowserWindow {
         for (var i = 0; i < deps.length; i++)
             commands = commands.concat(PluginRanking.dependencyCommands(deps[i]));
         // shortcut: a registry entry with more than 32 commands only gets the first ones checked; the rest stay unknown.
-        commands = commands.slice(0, 32);
+        commands = commands.slice(0, 32).filter(c => checkedCommands.indexOf(c) < 0);
         if (commands.length === 0)
             return;
         var script = 'for c in "$@"; do command -v "$c" >/dev/null 2>&1 && echo "$c"; done; true';
@@ -618,7 +618,7 @@ RegistryBrowserWindow {
         var url = PluginRanking.shareUrl(plugin);
         if (!url)
             return;
-        Quickshell.execDetached(["dms", "cl", "copy", url]);
+        Quickshell.execDetached([Proc.dmsBin, "cl", "copy", url]);
         ToastService.showInfo(I18n.tr("Link copied", "plugin browser, link copied to clipboard"));
     }
 
@@ -1464,8 +1464,9 @@ RegistryBrowserWindow {
                     width: parent.width
                     text: {
                         const plugin = detailPane.plugin;
-                        const link = (href, label) => ` • <a href="${href}" style="text-decoration:none; color:${Theme.primary};">${label}</a>`;
-                        const authorName = plugin.author ? `<a href="author:" style="text-decoration:none; color:${Theme.primary};">${String(plugin.author).replace(/&/g, "&amp;").replace(/</g, "&lt;")}</a>` : I18n.tr("Unknown", "unknown author");
+                        const anchor = (href, label) => `<a href="${String(href).replace(/&/g, "&amp;").replace(/"/g, "&quot;")}" style="text-decoration:none; color:${Theme.primary};">${label}</a>`;
+                        const link = (href, label) => ` • ${anchor(href, label)}`;
+                        const authorName = plugin.author ? anchor("author:", String(plugin.author).replace(/&/g, "&amp;").replace(/</g, "&lt;")) : I18n.tr("Unknown", "unknown author");
                         const author = I18n.tr("by %1", "author attribution").arg(authorName);
                         const reportUrl = PluginRanking.issueReportUrl(plugin, {
                             "dms": ShellVersionService.shellVersion || DMSService.cliVersion,
@@ -1473,8 +1474,8 @@ RegistryBrowserWindow {
                         });
                         const report = reportUrl ? link(reportUrl, I18n.tr("report a problem", "plugin detail link, opens a prefilled issue")) : "";
                         const copy = PluginRanking.shareUrl(plugin) ? link("copy:", I18n.tr("copy link", "plugin detail link, copies the plugin page address")) : "";
-                        const source = plugin.repo ? ` • <a href="${plugin.repo}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("source", "source code link")}</a>` : "";
-                        const discuss = plugin.issueUrl ? ` • <a href="${plugin.issueUrl}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("discuss", "plugin discussion link")}</a>` : "";
+                        const source = plugin.repo ? link(plugin.repo, I18n.tr("source", "source code link")) : "";
+                        const discuss = plugin.issueUrl ? link(plugin.issueUrl, I18n.tr("discuss", "plugin discussion link")) : "";
                         return author + source + discuss + report + copy;
                     }
                     font.pixelSize: Theme.fontSizeSmall
