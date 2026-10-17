@@ -317,6 +317,20 @@ function _words(text) {
     return _fold(text).split(/[^a-z0-9]+/).filter(w => w.length > 0);
 }
 
+// Matching costs grow with every word of the query, so a pasted wall of text must not freeze the shell.
+const MAX_QUERY_LENGTH = 100;
+const MAX_QUERY_WORDS = 8;
+
+function _queryWords(query) {
+    return _words(String(query || "").slice(0, MAX_QUERY_LENGTH)).slice(0, MAX_QUERY_WORDS);
+}
+
+// The one-word form of a camelCase text, empty when it has no camelCase to undo.
+function _joined(text) {
+    const unsplit = _unsplit(text);
+    return unsplit === _fold(text) ? "" : unsplit;
+}
+
 // Edit distance, given up as soon as it is known to exceed max.
 function _distance(a, b, max) {
     if (Math.abs(a.length - b.length) > max)
@@ -352,8 +366,8 @@ function _typos(word) {
 // may type to find a plugin (author, category, capabilities, dependencies).
 function _searchText(plugin) {
     const p = plugin || {};
-    const name = [_fold(p.name), _fold(p.id), _unsplit(p.name), _unsplit(p.id)].join(" ");
-    const extra = [p.description, p.author, p.category].concat(_list(p.capabilities), _list(p.dependencies)).map(_fold).join(" ") + " " + _unsplit(p.author);
+    const name = [_fold(p.name), _fold(p.id), _joined(p.name), _joined(p.id)].join(" ");
+    const extra = [p.description, p.author, p.category].concat(_list(p.capabilities), _list(p.dependencies)).map(_fold).join(" ") + " " + _joined(p.author);
     return {
         name: name,
         all: name + " " + extra,
@@ -375,7 +389,7 @@ function _nearWord(token, words, max) {
 // A typo is forgiven only for a word no plugin contains as typed, so a correct
 // query never picks up look-alikes ("dark" does not match every "dank").
 function searchPlan(plugins, query) {
-    const tokens = _words(query);
+    const tokens = _queryWords(query);
     const texts = _list(plugins).map(_searchText);
     return tokens.map(token => ({
         token: token,
@@ -406,7 +420,7 @@ function searchRank(plugin, plan) {
 
 // The plugins whose name is nearest to a query that found nothing.
 function closest(plugins, query, limit) {
-    const tokens = _words(query);
+    const tokens = _queryWords(query);
     if (tokens.length === 0)
         return [];
     const rows = [];

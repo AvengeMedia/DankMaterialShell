@@ -162,6 +162,25 @@ test("a camelCase name, id or author typed as one word still matches", () => {
     assert.deepEqual(found(list, "bluetooth"), ["orbitBluetooth"]);
 });
 
+test("a name without camelCase is indexed once", () => {
+    const words = Array.from(rank._searchText(plugin("clock", { name: "World Clock" })).words);
+    assert.equal(words.filter(w => w === "world").length, 1);
+});
+
+test("a huge query returns fast and reads like its first words", () => {
+    const list = Array.from({ length: 300 }, (_, i) => plugin("plugin" + i, { name: "Orbit Bluetooth " + i, author: "AvengeMedia" }));
+    for (const query of ["aA".repeat(5000), "orbit " + "blutoth ".repeat(3000)]) {
+        const started = performance.now();
+        const plan = rank.searchPlan(list, query);
+        const result = ids(list.filter(p => rank.searchRank(p, plan) > 0));
+        assert.ok(performance.now() - started < 200);
+        assert.deepEqual(result, found(list, query.slice(0, 100)));
+        const nearStarted = performance.now();
+        rank.closest(list, query, 4);
+        assert.ok(performance.now() - nearStarted < 200);
+    }
+});
+
 test("a correctly typed word never picks up look-alikes", () => {
     const list = [plugin("dark", { name: "Dark Mode" }), plugin("dank", { name: "Dank Clock" }), plugin("lock", { name: "Lock" })];
     assert.deepEqual(found(list, "dark"), ["dark"]);
