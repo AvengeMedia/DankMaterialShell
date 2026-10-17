@@ -1885,7 +1885,7 @@ Item {
     }
 
     function transformFileResult(file) {
-        return Transform.transformFileResult(file, I18n.tr("Open"), I18n.tr("Open folder"), I18n.tr("Copy path"), I18n.tr("Open in terminal"));
+        return Transform.transformFileResult(file, I18n.tr("Open"), I18n.tr("Open folder"), I18n.tr("Copy path"), I18n.tr("Open in terminal"), I18n.tr("Open with") + "…");
     }
 
     function transformClipboardEntry(entry) {
@@ -2753,6 +2753,9 @@ Item {
         case "open_folder":
             openFolder(item.data.path);
             break;
+        case "open_with":
+            openWith(item.data.path);
+            break;
         case "copy_path":
             copyToClipboard(item.data.path);
             break;
@@ -2845,6 +2848,15 @@ Item {
         if (!path)
             return;
         SessionService.openPath(path.substring(0, path.lastIndexOf("/")));
+    }
+
+    function openWith(path) {
+        if (!path)
+            return;
+        // No mimeType: it would limit the picker to declared handlers, and any app must stay pickable.
+        DMSService.appPickerRequested({
+            target: path
+        });
     }
 
     function openTerminal(path) {
