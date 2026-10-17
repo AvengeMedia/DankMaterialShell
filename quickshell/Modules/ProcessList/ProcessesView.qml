@@ -28,6 +28,23 @@ DCard {
             updateProcesses();
     }
     onSearchTextChanged: refreshFilter()
+
+    // A search has to see every process, see DgopService.requestFullProcessList
+    readonly property bool needsFullProcessList: active && searchText.length > 0
+    property bool holdsFullProcessList: false
+    onNeedsFullProcessListChanged: {
+        if (needsFullProcessList === holdsFullProcessList)
+            return;
+        holdsFullProcessList = needsFullProcessList;
+        if (needsFullProcessList)
+            DgopService.requestFullProcessList();
+        else
+            DgopService.releaseFullProcessList();
+    }
+    Component.onDestruction: {
+        if (holdsFullProcessList)
+            DgopService.releaseFullProcessList();
+    }
     onProcessFilterTypesChanged: refreshFilter()
 
     property int selectedIndex: -1

@@ -26,6 +26,9 @@ Item {
     property bool resizeMotion: false
     property bool resizing: false
     property real surfacePadding: 0
+    // Content hung outside the surface, kept on screen, blurred and clickable.
+    property real bottomOverflow: 0
+    property real topOverflow: 0
     property real inputMargin: 0
     property bool suspendShadowWhileResizing: false
     property bool shouldBeVisible: false
@@ -41,7 +44,7 @@ Item {
     property bool _primeContent: false
     property bool _warmContent: false
 
-    property real storedBarThickness: Theme.barThickness(SettingsData.getPrimaryBarConfig()?.innerPadding ?? 4, 1)
+    property real storedBarThickness: Theme.barThickness(SettingsData.getPrimaryBarConfig()?.innerPadding ?? 2, 1)
     property real storedBarSpacing: 4
     property var storedBarConfig: null
     property var sourceRegistration: null
@@ -100,6 +103,7 @@ Item {
     }
     readonly property bool isClosing: impl.item ? (impl.item.isClosing ?? false) : false
     readonly property real dpr: impl.item ? impl.item.dpr : 1
+    readonly property color surfaceColor: impl.item?.usesConnectedSurfaceChrome ? Theme.connectedSurfaceColor : Theme.readableSurface
     readonly property real screenWidth: impl.item ? impl.item.screenWidth : 0
     readonly property real screenHeight: impl.item ? impl.item.screenHeight : 0
     readonly property real alignedX: impl.item ? impl.item.alignedX : 0
@@ -115,6 +119,10 @@ Item {
 
     function alignedXFor(width) {
         return impl.item?.alignedXFor(width) ?? 0;
+    }
+
+    function alignedYFor(overTop, overBottom) {
+        return impl.item?.alignedYFor(overTop, overBottom) ?? 0;
     }
     readonly property vector4d surfaceCornerRadii: impl.item?.surfaceCornerRadii ?? Qt.vector4d(Theme.windowRadius, Theme.windowRadius, Theme.windowRadius, Theme.windowRadius)
     readonly property real maskX: impl.item ? impl.item.maskX : 0
@@ -336,7 +344,7 @@ Item {
         triggerSection = section;
         screen = targetScreen;
 
-        storedBarThickness = barThickness !== undefined ? barThickness : Theme.barThickness(SettingsData.getPrimaryBarConfig()?.innerPadding ?? 4, 1);
+        storedBarThickness = barThickness !== undefined ? barThickness : Theme.barThickness(SettingsData.getPrimaryBarConfig()?.innerPadding ?? 2, 1);
         storedBarSpacing = barSpacing !== undefined ? barSpacing : 4;
         storedBarConfig = barConfig;
         triggerUsesOverlayLayer = _triggerBarUsesOverlayLayer(targetScreen, barConfig);

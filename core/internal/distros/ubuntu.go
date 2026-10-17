@@ -81,7 +81,7 @@ func (u *UbuntuDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 
 	dependencies = append(dependencies, u.detectMatugen())
 	dependencies = append(dependencies, u.detectDanksearch())
-	dependencies = append(dependencies, u.detectDankCalendar())
+	dependencies = append(dependencies, u.detectDankCalendarVariant(u.packageInstalled("dankcalendar-git")))
 
 	return dependencies, nil
 }
@@ -126,7 +126,7 @@ func (u *UbuntuDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 		"matugen":                 {Name: "matugen", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
 		"ghostty":                 {Name: "ghostty", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
 		"danksearch":              {Name: "danksearch", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
-		"dankcalendar":            {Name: "dankcalendar-git", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
+		"dankcalendar":            dankCalendarMapping(variants["dankcalendar"], RepoTypePPA, "ppa:avengemedia/danklinux"),
 	}
 
 	switch wm {

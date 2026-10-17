@@ -119,7 +119,6 @@ Column {
     SettingsCard {
         title: I18n.tr("Launcher button")
         settingKey: "dockLauncher"
-        visible: root.dockHosted
 
         SettingsToggleRow {
             text: I18n.tr("Show")
@@ -268,27 +267,12 @@ Column {
     SettingsCard {
         title: I18n.tr("Visual effects")
         settingKey: "barWidgetAppsDockEffects"
+        visible: !root.dockHosted
 
         SettingsToggleRow {
             text: I18n.tr("Indicators")
             checked: !root.page.value("appsDockHideIndicators")
             onToggled: checked => root.page.set("appsDockHideIndicators", !checked)
-        }
-
-        SettingsButtonGroupRow {
-            resetStore: root.apps
-            resetKeys: ["indicatorStyle"]
-            text: I18n.tr("Indicator style")
-            visible: root.dockHosted
-            enabled: !root.page.value("appsDockHideIndicators")
-            model: [I18n.tr("Circle", "dock indicator style option"), I18n.tr("Line", "dock indicator style option")]
-            buttonPadding: Theme.spacingS
-            currentIndex: root.apps.get("indicatorStyle") === "circle" ? 0 : 1
-            onSelectionChanged: (index, selected) => {
-                if (!selected)
-                    return;
-                root.apps.set("indicatorStyle", index === 0 ? "circle" : "line");
-            }
         }
 
         SettingsToggleRow {
@@ -310,7 +294,7 @@ Column {
         SettingsToggleSliderRow {
             resetStore: root.page
             valueKeys: ["appsDockEnlargePercentage"]
-            text: I18n.tr("Enlarge on hover")
+            text: I18n.tr("Magnification", "dock setting: enlarge icons near the cursor")
             checked: root.page.value("appsDockEnlargeOnHover")
             value: root.page.value("appsDockEnlargePercentage")
             minimum: 100
@@ -336,7 +320,6 @@ Column {
             resetStore: root.page
             resetKeys: ["appsDockSpacing"]
             text: I18n.tr("Spacing")
-            visible: !root.dockHosted
             value: root.page.value("appsDockSpacing")
             minimum: 0
             maximum: 32

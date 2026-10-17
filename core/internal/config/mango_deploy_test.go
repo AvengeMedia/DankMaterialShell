@@ -15,13 +15,11 @@ import (
 
 func stubMango(t *testing.T, dialect mangoconf.Dialect, target bool, addWants error) *int {
 	t.Helper()
-	calls := 0
-	prevDialect, prevTarget, prevWants := mangoDialect, mangoSessionTargetInstalled, mangoAddWants
+	prevDialect, prevTarget := mangoDialect, mangoSessionTargetInstalled
 	mangoDialect = func() mangoconf.Dialect { return dialect }
 	mangoSessionTargetInstalled = func() bool { return target }
-	mangoAddWants = func() error { calls++; return addWants }
-	t.Cleanup(func() { mangoDialect, mangoSessionTargetInstalled, mangoAddWants = prevDialect, prevTarget, prevWants })
-	return &calls
+	t.Cleanup(func() { mangoDialect, mangoSessionTargetInstalled = prevDialect, prevTarget })
+	return stubAddWants(t, addWants)
 }
 
 func readMango(t *testing.T, home, rel string) string {

@@ -19,12 +19,11 @@ Item {
     property real columns: 2
     property real rows: 2
     property bool compact: false
-    property bool docked: false
 
     signal optionChanged(string key, var value)
 
     readonly property bool wide: width >= height * 2
-    readonly property bool background: docked || widgetData?.background === true
+    readonly property bool background: widgetData?.background === true
     readonly property bool tall: height >= CcMetrics.gridRowUnit * 2
     readonly property real inset: background ? (tall ? Theme.spacingM : Theme.spacingS) : 0
     readonly property real avatarSide: Math.min(width, height) - inset * 2
@@ -62,12 +61,9 @@ Item {
         anchors.margins: root.inset
         visible: root.wide
         live: root.live && root.wide
-        options: root.docked ? Object.assign({}, DashRegistry.resolvedOptions("user", root.widgetData), {
-            "compositor": false,
-            "uptime": false
-        }) : DashRegistry.resolvedOptions("user", root.widgetData)
+        options: DashRegistry.resolvedOptions("user", root.widgetData)
         avatarSize: height
-        textGap: root.docked ? Theme.spacingS : Theme.spacingM
+        textGap: Theme.spacingM
         stacked: root.rows >= 2
         contentColor: Theme.onSurface
         mutedColor: Theme.onSurfaceVariant

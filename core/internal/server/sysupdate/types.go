@@ -26,7 +26,6 @@ const (
 	ErrCodeBusy           ErrorCode = "busy"
 	ErrCodeBackendFailed  ErrorCode = "backend-failed"
 	ErrCodeTimeout        ErrorCode = "timeout"
-	ErrCodeCancelled      ErrorCode = "cancelled"
 	ErrCodeInvalidRequest ErrorCode = "invalid-request"
 )
 

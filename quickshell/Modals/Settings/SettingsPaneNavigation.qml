@@ -1,4 +1,5 @@
 import QtQuick
+import qs.Common
 
 FocusScope {
     id: root
@@ -131,6 +132,15 @@ FocusScope {
         }
         if ((event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) && (mods === Qt.ControlModifier || mods === (Qt.ControlModifier | Qt.ShiftModifier))) {
             if (activePane === "sidebar")
+                focusContent();
+            else
+                focusSidebar();
+            event.accepted = true;
+        } else if (mods === Qt.AltModifier && (event.key === Qt.Key_Left || event.key === Qt.Key_Right)) {
+            const forward = (event.key === Qt.Key_Right) !== I18n.isRtl;
+            if (forward !== (activePane === "sidebar"))
+                return;
+            if (forward)
                 focusContent();
             else
                 focusSidebar();

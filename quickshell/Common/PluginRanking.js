@@ -330,6 +330,11 @@ function _fold(text) {
     return String(text || "").replace(/([a-z0-9])([A-Z])/g, "$1 $2").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
+// Lowercased first, so camelCase is not split: "AvengeMedia" stays "avengemedia".
+function _unsplit(text) {
+    return _fold(String(text || "").toLowerCase());
+}
+
 function _words(text) {
     return _fold(text).split(/[^a-z0-9]+/).filter(w => w.length > 0);
 }
@@ -369,8 +374,8 @@ function _typos(word) {
 // may type to find a plugin (author, category, capabilities, dependencies).
 function _searchText(plugin) {
     const p = plugin || {};
-    const name = _fold(p.name) + " " + _fold(p.id);
-    const extra = [p.description, p.author, p.category].concat(_list(p.capabilities), _list(p.dependencies)).map(_fold).join(" ");
+    const name = [_fold(p.name), _fold(p.id), _unsplit(p.name), _unsplit(p.id)].join(" ");
+    const extra = [p.description, p.author, p.category].concat(_list(p.capabilities), _list(p.dependencies)).map(_fold).join(" ") + " " + _unsplit(p.author);
     return {
         name: name,
         all: name + " " + extra,

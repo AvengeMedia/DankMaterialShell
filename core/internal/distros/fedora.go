@@ -29,6 +29,25 @@ func init() {
 	Register("ultramarine", "#00078b", FamilyFedora, func(config DistroConfig, logChan chan<- string) Distribution {
 		return NewFedoraDistribution(config, logChan)
 	})
+	Register("rhel", "#EE0000", FamilyFedora, func(config DistroConfig, logChan chan<- string) Distribution {
+		return NewFedoraDistribution(config, logChan)
+	})
+	Register("centos", "#9CCD2A", FamilyFedora, func(config DistroConfig, logChan chan<- string) Distribution {
+		return NewFedoraDistribution(config, logChan)
+	})
+	Register("rocky", "#10B981", FamilyFedora, func(config DistroConfig, logChan chan<- string) Distribution {
+		return NewFedoraDistribution(config, logChan)
+	})
+	Register("almalinux", "#0069DA", FamilyFedora, func(config DistroConfig, logChan chan<- string) Distribution {
+		return NewFedoraDistribution(config, logChan)
+	})
+}
+
+var enterpriseLinuxIDs = map[string]bool{"rhel": true, "centos": true, "rocky": true, "almalinux": true}
+
+// IsEnterpriseLinux reports whether id is RHEL or a rebuild; EL 10 installs from EPEL 10 and the COPRs' epel-10 chroots.
+func IsEnterpriseLinux(id string) bool {
+	return enterpriseLinuxIDs[id]
 }
 
 type FedoraDistribution struct {
@@ -60,6 +79,10 @@ func (f *FedoraDistribution) GetFamily() DistroFamily {
 
 func (f *FedoraDistribution) GetPackageManager() PackageManagerType {
 	return PackageManagerDNF
+}
+
+func (f *FedoraDistribution) isEL() bool {
+	return IsEnterpriseLinux(f.config.ID)
 }
 
 func (f *FedoraDistribution) DetectDependencies(ctx context.Context, wm deps.WindowManager) ([]deps.Dependency, error) {
@@ -105,7 +128,7 @@ func (f *FedoraDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 
 	dependencies = append(dependencies, f.detectMatugen())
 	dependencies = append(dependencies, f.detectDanksearch())
-	dependencies = append(dependencies, f.detectDankCalendar())
+	dependencies = append(dependencies, f.detectDankCalendarVariant(f.packageInstalled("dankcalendar-git")))
 
 	return dependencies, nil
 }
@@ -140,7 +163,7 @@ func (f *FedoraDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 		"matugen":                 {Name: "matugen", Repository: RepoTypeCOPR, RepoURL: "avengemedia/danklinux"},
 		"dms (DankMaterialShell)": f.getDmsMapping(variants["dms (DankMaterialShell)"]),
 		"danksearch":              {Name: "danksearch", Repository: RepoTypeCOPR, RepoURL: "avengemedia/danklinux"},
-		"dankcalendar":            {Name: "dankcalendar-git", Repository: RepoTypeCOPR, RepoURL: "avengemedia/danklinux"},
+		"dankcalendar":            dankCalendarMapping(variants["dankcalendar"], RepoTypeCOPR, "avengemedia/danklinux"),
 	}
 
 	switch wm {
@@ -156,6 +179,15 @@ func (f *FedoraDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 		// mangowm resolves via Terra, enabled automatically by enableTerraRepo.
 		packages["mango"] = PackageMapping{Name: "mangowm", Repository: RepoTypeSystem}
 		packages["xwayland-satellite"] = PackageMapping{Name: "xwayland-satellite", Repository: RepoTypeSystem}
+	}
+
+	if f.isEL() {
+		// EPEL 10 has neither, so the danklinux COPR builds them for the epel-10 chroots.
+		for _, name := range []string{"alacritty", "xwayland-satellite"} {
+			if _, ok := packages[name]; ok {
+				packages[name] = PackageMapping{Name: name, Repository: RepoTypeCOPR, RepoURL: "avengemedia/danklinux"}
+			}
+		}
 	}
 
 	return packages
@@ -227,7 +259,44 @@ func (f *FedoraDistribution) getPrerequisites() []string {
 	}
 }
 
+// enableEPEL installs epel-release on EL hosts; kitty and the COPR chroots' build deps live there.
+// RHEL has no epel-release in its own repos, the rebuilds ship it in extras.
+func (f *FedoraDistribution) enableEPEL(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	if exec.CommandContext(ctx, "rpm", "-q", "epel-release").Run() == nil {
+		f.log("EPEL already enabled, skipping")
+		return nil
+	}
+
+	pkg := "epel-release"
+	if f.config.ID == "rhel" {
+		pkg = "https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(rpm -E %rhel).noarch.rpm"
+	}
+	progressChan <- InstallProgressMsg{
+		Phase:       PhasePrerequisites,
+		Progress:    0.07,
+		Step:        "Enabling EPEL repository...",
+		IsComplete:  false,
+		NeedsSudo:   true,
+		CommandInfo: "sudo dnf install -y " + pkg,
+		LogOutput:   "Enabling EPEL for Enterprise Linux",
+	}
+	output, err := privesc.ExecCommand(ctx, sudoPassword, "dnf install -y "+pkg+" 2>&1").CombinedOutput()
+	if err != nil {
+		f.logError("failed to enable EPEL", err)
+		f.log(fmt.Sprintf("EPEL enable output: %s", string(output)))
+		return fmt.Errorf("failed to enable EPEL: %w", err)
+	}
+	f.log("EPEL enabled")
+	return nil
+}
+
 func (f *FedoraDistribution) InstallPrerequisites(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	if f.isEL() {
+		if err := f.enableEPEL(ctx, sudoPassword, progressChan); err != nil {
+			return err
+		}
+	}
+
 	prerequisites := f.getPrerequisites()
 	var missingPkgs []string
 

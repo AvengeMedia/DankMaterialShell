@@ -9,6 +9,7 @@ Item {
     property real alongSize: 0
     property real alongExtent: 0
     property real crossSize: 0
+    property real crossExtent: crossSize
     property bool isVertical: false
     property bool crossFar: false
     property bool trailing: false
@@ -58,8 +59,8 @@ Item {
     }
 
     visible: chromeAlongSize > 0
-    x: isVertical ? 0 : chromeAlongPos
-    y: isVertical ? chromeAlongPos : 0
+    x: isVertical ? (crossFar ? crossExtent - crossSize : 0) : chromeAlongPos
+    y: isVertical ? chromeAlongPos : (crossFar ? crossExtent - crossSize : 0)
     width: isVertical ? crossSize : chromeAlongSize
     height: isVertical ? chromeAlongSize : crossSize
 

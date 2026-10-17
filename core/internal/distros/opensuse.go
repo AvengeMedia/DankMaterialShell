@@ -92,7 +92,7 @@ func (o *OpenSUSEDistribution) DetectDependenciesWithTerminal(ctx context.Contex
 
 	dependencies = append(dependencies, o.detectMatugen())
 	dependencies = append(dependencies, o.detectDanksearch())
-	dependencies = append(dependencies, o.detectDankCalendar())
+	dependencies = append(dependencies, o.detectDankCalendarVariant(o.packageInstalled("dankcalendar-git")))
 
 	return dependencies, nil
 }
@@ -131,7 +131,7 @@ func (o *OpenSUSEDistribution) GetPackageMappingWithVariants(wm deps.WindowManag
 		"ghostty":                 {Name: "ghostty", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
 		"matugen":                 {Name: "matugen", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
 		"danksearch":              {Name: "danksearch", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
-		"dankcalendar":            {Name: "dankcalendar-git", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
+		"dankcalendar":            dankCalendarMapping(variants["dankcalendar"], RepoTypeOBS, "home:AvengeMedia:danklinux"),
 	}
 
 	switch wm {

@@ -84,7 +84,7 @@ Item {
                                 width: parent.width
                                 height: isExpanded ? 56 + ethExpandedContent.height : 56
                                 radius: Theme.cornerRadius
-                                color: isConnected ? Theme.selectedContainer : ethDeviceMouseArea.containsMouse ? Theme.primaryHoverLight : SettingsMetrics.controlColor
+                                color: isConnected ? Theme.selectedContainer : SettingsMetrics.controlColor
                                 border.width: Theme.layerOutlineWidth
                                 border.color: Theme.outlineMedium
                                 clip: true
@@ -197,13 +197,6 @@ Item {
                                                 visible: isConnected
                                                 onClicked: NetworkService.disconnectEthernetDevice(modelData.name)
                                             }
-                                        }
-
-                                        MouseArea {
-                                            id: ethDeviceMouseArea
-                                            anchors.fill: parent
-                                            anchors.rightMargin: ethDeviceActions.width + Theme.spacingM
-                                            hoverEnabled: true
                                         }
                                     }
 

@@ -66,6 +66,7 @@ Item {
     property bool ccWidgetIsActive: false
     property bool ccWidgetIsToggle: true
     property Component ccExpandedContent: null
+    // Unused; kept so older plugins still load.
     property Component ccFooterContent: null
     property real ccExpandedMinimumHeight: Theme.listItemHeight
     property Component ccDetailContent: null

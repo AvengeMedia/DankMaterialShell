@@ -6,6 +6,7 @@ import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
 import qs.Modals.DLauncherV2.Components
+import "../../Common/LauncherKeybinds.js" as LauncherKeybinds
 
 FocusScope {
     id: root
@@ -22,6 +23,8 @@ FocusScope {
     property bool showResultsWithoutQuery: false
     property bool suspendSearchUpdates: false
     property real maxResultsHeight: 0
+    // Off for fixed-height hosts, where the resize would only slide the bottom fade.
+    property bool resizeAnimated: true
     property real resultsInset: LauncherMetrics.spotlightInset
 
     property bool editMode: false
@@ -119,7 +122,6 @@ FocusScope {
         }
 
         const hasCtrl = event.modifiers & Qt.ControlModifier;
-        const hasAlt = event.modifiers & Qt.AltModifier;
 
         if (root.controller.searchMode === "dmenu") {
             const kbN = root.controller.matchDmenuKeybind(event);
@@ -128,6 +130,17 @@ FocusScope {
                 event.accepted = true;
                 return;
             }
+        }
+
+        const launcherAction = LauncherKeybinds.actionForEvent(event, SettingsData.launcherKeybinds);
+        if (launcherAction) {
+            actionPanel.hide();
+            if (launcherAction.mode)
+                root.controller.setMode(launcherAction.mode);
+            else
+                _cycleCategory(launcherAction.id === "previousMode");
+            event.accepted = true;
+            return;
         }
 
         switch (event.key) {
@@ -222,19 +235,13 @@ FocusScope {
             event.accepted = true;
             return;
         case Qt.Key_Tab:
-            if (hasCtrl) {
-                actionPanel.hide();
-                _cycleCategory(false);
-            } else if (actionPanel.hasActions) {
+            if (!hasCtrl && actionPanel.hasActions) {
                 actionPanel.expanded ? actionPanel.cycleAction() : actionPanel.show();
             }
             event.accepted = true;
             return;
         case Qt.Key_Backtab:
-            if (hasCtrl) {
-                actionPanel.hide();
-                _cycleCategory(true);
-            } else if (actionPanel.hasActions) {
+            if (!hasCtrl && actionPanel.hasActions) {
                 actionPanel.expanded ? actionPanel.cycleAction(true) : actionPanel.show();
             }
             event.accepted = true;
@@ -258,34 +265,6 @@ FocusScope {
             if (contextMenu.hasContextMenuActions(root.controller.selectedItem)) {
                 const scenePos = resultsList.getSelectedItemPosition();
                 _showContextMenu(root.controller.selectedItem, scenePos.x, scenePos.y, true);
-                event.accepted = true;
-                return;
-            }
-            break;
-        case Qt.Key_1:
-            if (hasCtrl || hasAlt) {
-                root.controller.setMode("all");
-                event.accepted = true;
-                return;
-            }
-            break;
-        case Qt.Key_2:
-            if (hasCtrl || hasAlt) {
-                root.controller.setMode("apps");
-                event.accepted = true;
-                return;
-            }
-            break;
-        case Qt.Key_3:
-            if (hasCtrl || hasAlt) {
-                root.controller.setMode("files");
-                event.accepted = true;
-                return;
-            }
-            break;
-        case Qt.Key_4:
-            if (hasCtrl || hasAlt) {
-                root.controller.setMode("plugins");
                 event.accepted = true;
                 return;
             }
@@ -447,7 +426,7 @@ FocusScope {
         visible: !root.editMode
 
         Behavior on height {
-            enabled: root._animateResize
+            enabled: root.resizeAnimated && root._animateResize
             NumberAnimation {
                 duration: root._resizeDuration
                 easing.type: Easing.BezierSpline

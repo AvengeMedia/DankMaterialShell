@@ -75,6 +75,9 @@ Item {
     readonly property real islandOpacity: Math.max(0, Math.min(1, root.transparency))
     readonly property color effectiveSurfaceColor: root.embedded ? root.bandColor : root.highContrast ? Theme.surfaceContainerHighest : Theme.withAlpha(root.surfaceColor, root.islandOpacity)
     readonly property real surfaceOpacity: root.effectiveSurfaceColor.a
+    readonly property bool shadowEnabled: !root.chromeless && root.surfaceOpacity > 0 && Theme.elevationEnabled && SettingsData.barElevationEnabled
+    readonly property string autoBarShadowDirection: root.controller.edge
+    readonly property string effectiveShadowDirection: Theme.elevationLightDirection === "autoBar" ? autoBarShadowDirection : Theme.elevationLightDirection
     readonly property real currentSurfaceRadius: Math.max(0, motion.currentTopLeftRadius, motion.currentBottomLeftRadius)
     readonly property color notificationAccentColor: {
         if (!root.controller.notificationActive)
@@ -274,6 +277,19 @@ Item {
         root.motionStartBounds = Qt.rect(left, top, right - left, bottom - top);
     }
 
+    // Without a face to swap to, a right-click falls through to the bar's own right-click action.
+    function acceptsClick(button) {
+        return button !== Qt.RightButton || root.controller.mediaFaceToggleAvailable;
+    }
+
+    function handleClick(button) {
+        SettingsData.recordBarInteraction(root.effectiveScreen, root.controller.barConfig?.id);
+        if (button === Qt.RightButton)
+            root.controller.toggleMediaFace();
+        else
+            root.controller.requestToggle(true);
+    }
+
     function requestActivityFocus() {
         return contentHost.requestActivityFocus();
     }
@@ -351,6 +367,13 @@ Item {
         height: (motion.running ? Math.max(root.motionStartBounds.y + root.motionStartBounds.height, root.targetVisualY + motion.targetHeight) : root.targetVisualY + motion.targetHeight) + overshootBudget - y
     }
 
+    Loader {
+        anchors.fill: island
+        z: island.z - 1
+        active: root.shadowEnabled && !root.embedded
+        sourceComponent: shadowComponent
+    }
+
     MorphSurface {
         id: island
         motion: root.surfaceMotion
@@ -391,12 +414,10 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            acceptedButtons: Qt.LeftButton
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onPressed: mouse => mouse.accepted = root.acceptsClick(mouse.button)
             enabled: !root.controller.expanded || !root.controller.activityOwnsBlankClicks
-            onClicked: {
-                SettingsData.recordBarInteraction(root.effectiveScreen, root.controller.barConfig?.id);
-                root.controller.requestToggle(true);
-            }
+            onClicked: mouse => root.handleClick(mouse.button)
             onWheel: wheel => {
                 if (root.controller.expanded) {
                     wheel.accepted = false;
@@ -411,6 +432,7 @@ Item {
             id: contentHost
 
             controller: root.controller
+            surfaceColor: root.effectiveSurfaceColor
             freeMode: root.freeMode
             compactFaceOverride: root.compactFaceOverride
             resolveTarget: target => root.resolveTarget(target)
@@ -444,6 +466,8 @@ Item {
             notificationCenterExpandedComponent: expandedNotificationCenterComponent
             clipboardCompactComponent: compactClipboardComponent
             clipboardExpandedComponent: expandedClipboardComponent
+            powerMenuCompactComponent: compactPowerMenuComponent
+            powerMenuExpandedComponent: expandedPowerMenuComponent
         }
 
         HoverHandler {
@@ -483,11 +507,9 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            acceptedButtons: Qt.LeftButton
-            onClicked: {
-                SettingsData.recordBarInteraction(root.effectiveScreen, root.controller.barConfig?.id);
-                root.controller.requestToggle(true);
-            }
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onPressed: mouse => mouse.accepted = root.acceptsClick(mouse.button)
+            onClicked: mouse => root.handleClick(mouse.button)
             onWheel: wheel => {
                 root.scrollWheel(wheel);
                 wheel.accepted = true;
@@ -519,15 +541,24 @@ Item {
                 active: root.embedded
                 sourceComponent: Item {
                     id: overhangClip
+                    readonly property real shadowPad: root.shadowEnabled ? Theme.elevationRenderPadding(Theme.elevationLevel2, root.effectiveShadowDirection, Theme.spacingXS, Theme.spacingS, Theme.spacingL) : 0
 
                     visible: root.embeddedOverhang > 0
                     clip: true
-                    x: root.isVertical ? (root.farEdge ? -root.embeddedOverhang : root.crossExtent) : 0
-                    y: root.isVertical ? 0 : (root.farEdge ? -root.embeddedOverhang : root.crossExtent)
-                    width: root.isVertical ? root.embeddedOverhang : root.width
-                    height: root.isVertical ? root.height : root.embeddedOverhang
+                    x: root.isVertical ? (root.farEdge ? -root.embeddedOverhang - shadowPad : root.crossExtent) : -shadowPad
+                    y: root.isVertical ? -shadowPad : (root.farEdge ? -root.embeddedOverhang - shadowPad : root.crossExtent)
+                    width: root.isVertical ? root.embeddedOverhang + shadowPad : root.width + 2 * shadowPad
+                    height: root.isVertical ? root.height + 2 * shadowPad : root.embeddedOverhang + shadowPad
+
+                    Loader {
+                        anchors.fill: overhang
+                        active: root.shadowEnabled
+                        sourceComponent: shadowComponent
+                    }
 
                     MorphSurface {
+                        id: overhang
+
                         motion: root.surfaceMotion
                         x: root.currentVisualX - overhangClip.x
                         y: root.currentVisualY - overhangClip.y
@@ -561,6 +592,21 @@ Item {
                 x: root.isVertical ? (root.farEdge ? root.joinCross - radiusX : root.joinCross) : root.currentVisualX + root.currentVisualWidth
                 y: root.isVertical ? root.currentVisualY + root.currentVisualHeight : (root.farEdge ? root.joinCross - radiusY : root.joinCross)
             }
+        }
+    }
+
+    Component {
+        id: shadowComponent
+
+        ElevationShadow {
+            level: Theme.elevationLevel2
+            direction: root.effectiveShadowDirection
+            fallbackOffset: Theme.spacingXS
+            targetColor: "transparent"
+            topLeftRadius: island.topLeftRadius
+            topRightRadius: island.topRightRadius
+            bottomLeftRadius: island.bottomLeftRadius
+            bottomRightRadius: island.bottomRightRadius
         }
     }
 
@@ -800,6 +846,25 @@ Item {
             effectiveScreen: root.effectiveScreen
             alignedX: root.targetScreenX
             alignedY: root.targetScreenY
+        }
+    }
+
+    Component {
+        id: compactPowerMenuComponent
+
+        DestinationCompact {
+            controller: root.controller
+            activityId: "powermenu"
+            iconName: "power_settings_new"
+            label: I18n.tr("Power menu", "island compact face: power menu label")
+        }
+    }
+
+    Component {
+        id: expandedPowerMenuComponent
+
+        PowerMenuExpanded {
+            controller: root.controller
         }
     }
 

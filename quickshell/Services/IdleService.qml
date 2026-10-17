@@ -147,13 +147,13 @@ Singleton {
         }
     }
 
-    // Lock.qml's own wake handlers sit outside the session-lock surface and
-    // never receive input, so wake on input via seat-level idle-notify instead.
+    // Rearming the timeout monitors while idle resets their isIdle without a wake
+    // transition, so this listener, never rearmed, catches input while outputs are off.
     IdleMonitor {
-        id: lockWakeMonitor
+        id: wakeMonitor
         timeout: 1
         respectInhibitors: false
-        enabled: root.enabled && root.isShellLocked && root.monitorsOff
+        enabled: root.enabled && root.monitorsOff
         onIsIdleChanged: {
             if (!enabled)
                 return;

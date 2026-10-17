@@ -136,6 +136,8 @@ type Options struct {
 	StockColors         string
 	SyncModeWithPortal  bool
 	TerminalsAlwaysDark bool
+	TerminalOpacity     int
+	TerminalPalette     string
 	SkipTemplates       string
 	AppChecker          utils.AppChecker
 }
@@ -441,8 +443,9 @@ func buildOnce(opts *Options) (bool, error) {
 			primaryLight = primaryDark
 		}
 
-		dank16JSON = generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode)
-		importData := fmt.Sprintf(`{"colors": %s, "dank16": %s}`, opts.StockColors, dank16JSON)
+		dank16JSON = generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode, "")
+		dank16TermJSON := generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode, opts.TerminalPalette)
+		importData := fmt.Sprintf(`{"colors": %s, "dank16": %s, "dank16term": %s}`, opts.StockColors, dank16JSON, dank16TermJSON)
 		importArgs = []string{"--import-json-string", importData}
 
 		log.Info("Running matugen color hex with stock color overrides")
@@ -510,9 +513,10 @@ func buildOnce(opts *Options) (bool, error) {
 			primaryLight = primaryDark
 		}
 
-		injections := InjectedPalettes(opts.ConfigDir, sourceImage, opts.Mode)
-
-		dank16JSON = generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode)
+		dank16JSON = generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode, "")
+		// The terminal palette only reaches the terminal templates; editor themes and user templates keep dank16.
+		dank16Term := paletteInjection{Namespace: "dank16term", JSON: generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode, opts.TerminalPalette)}
+		injections := append([]paletteInjection{dank16Term}, InjectedPalettes(opts.ConfigDir, sourceImage, opts.Mode)...)
 		importArgs = []string{"--import-json-string", buildImportData(dank16JSON, sourceImage, specColors, injections)}
 
 		log.Infof("Running matugen %s with dank16 injection", opts.Kind)
@@ -537,6 +541,7 @@ func buildOnce(opts *Options) (bool, error) {
 	if err := renderTemplates(opts, args, tmpDir); err != nil {
 		return false, err
 	}
+	signalTerminals(opts)
 	if !changed {
 		return false, nil
 	}
@@ -569,7 +574,6 @@ func buildOnce(opts *Options) (bool, error) {
 		}
 	}
 
-	signalTerminals(opts)
 	if !opts.ShouldSkipTemplate("fcitx5") && appExists(opts.AppChecker, []string{"fcitx5"}, nil) {
 		refreshFcitx5()
 	}
@@ -836,7 +840,7 @@ func appendTerminalConfig(opts *Options, cfgFile *os.File, tmpDir string, checkC
 
 	content := string(data)
 
-	if !opts.TerminalsAlwaysDark {
+	if !opts.TerminalsAlwaysDark && !terminalOpacityManaged(opts) {
 		cfgFile.WriteString(substituteVars(content, opts.ShellDir))
 		cfgFile.WriteString("\n")
 		return
@@ -864,7 +868,7 @@ func appendTerminalConfig(opts *Options, cfgFile *os.File, tmpDir string, checkC
 			continue
 		}
 
-		modified := strings.ReplaceAll(string(origData), ".default.", ".dark.")
+		modified := applyTerminalTemplate(templateName, string(origData), opts)
 		tmpPath := filepath.Join(tmpDir, templateName)
 		if err := os.WriteFile(tmpPath, []byte(modified), 0o644); err != nil {
 			continue
@@ -877,6 +881,37 @@ func appendTerminalConfig(opts *Options, cfgFile *os.File, tmpDir string, checkC
 
 	cfgFile.WriteString(substituteVars(content, opts.ShellDir))
 	cfgFile.WriteString("\n")
+}
+
+func terminalOpacityManaged(opts *Options) bool {
+	return opts.TerminalOpacity >= 1 && opts.TerminalOpacity <= 99
+}
+
+func applyTerminalTemplate(name, content string, opts *Options) string {
+	if opts.TerminalsAlwaysDark {
+		content = strings.ReplaceAll(content, ".default.", ".dark.")
+	}
+	if !terminalOpacityManaged(opts) {
+		return content
+	}
+	v := strconv.FormatFloat(float64(opts.TerminalOpacity)/100, 'f', -1, 64)
+	var snippet string
+	switch name {
+	case "kitty.conf":
+		snippet = "background_opacity " + v + "\ndynamic_background_opacity yes\n"
+	case "foot.ini":
+		snippet = "alpha=" + v + "\n"
+	case "ghostty.conf":
+		snippet = "background-opacity = " + v + "\n"
+	case "alacritty.toml":
+		snippet = "[window]\nopacity = " + v + "\n"
+	default:
+		return content
+	}
+	if content != "" && !strings.HasSuffix(content, "\n") {
+		content += "\n"
+	}
+	return content + snippet
 }
 
 func templateSessionActive(tmpl TemplateDef) bool {
@@ -1331,7 +1366,7 @@ func extractNestedColor(jsonStr, colorName, variant string) string {
 	return color
 }
 
-func generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight string, mode ColorMode) string {
+func generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight string, mode ColorMode, profile string) string {
 	variantOpts := dank16.VariantOptions{
 		PrimaryDark:     primaryDark,
 		PrimaryLight:    primaryLight,
@@ -1341,6 +1376,7 @@ func generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight
 		ContainerLight:  containerLight,
 		UseDPS:          true,
 		IsLightMode:     mode == ColorModeLight,
+		Profile:         profile,
 	}
 	variantColors := dank16.GenerateVariantPalette(variantOpts)
 	return dank16.GenerateVariantJSON(variantColors)

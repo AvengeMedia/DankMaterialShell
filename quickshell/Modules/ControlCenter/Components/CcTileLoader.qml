@@ -11,7 +11,6 @@ Loader {
     property real rows: 1
     property bool compact: false
     property bool small: false
-    property bool docked: false
     property bool bare: false
 
     sourceComponent: grid.model ? grid.model.componentForWidget(widgetData) : null
@@ -77,13 +76,6 @@ Loader {
         property: "small"
         value: root.small
         when: root.item !== null && "small" in root.item
-    }
-
-    Binding {
-        target: root.item
-        property: "docked"
-        value: root.docked
-        when: root.item !== null && "docked" in root.item
     }
 
     Binding {

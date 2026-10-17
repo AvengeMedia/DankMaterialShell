@@ -135,12 +135,7 @@ func (a *ArchDistribution) detectDanksearch() deps.Dependency {
 }
 
 func (a *ArchDistribution) detectDankCalendar() deps.Dependency {
-	dep := a.BaseDistribution.detectDankCalendar()
-	dep.CanToggle = true
-	if a.packageInstalled("dankcalendar-git") {
-		dep.Variant = deps.VariantGit
-	}
-	return dep
+	return a.detectDankCalendarVariant(a.packageInstalled("dankcalendar-git"))
 }
 
 func (a *ArchDistribution) detectXDGPortal() deps.Dependency {

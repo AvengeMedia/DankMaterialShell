@@ -14,7 +14,7 @@ SettingsCard {
 
     readonly property var routingValues: ["normal", "always", "last-used"]
     readonly property var interactionModeValues: ["click", "hybrid"]
-    readonly property var routeActivities: ["launcher", "controlcenter", "notificationcenter", "clipboard", "home", "media", "weather", "wallpaper"]
+    readonly property var routeActivities: ["launcher", "controlcenter", "notificationcenter", "clipboard", "powermenu", "home", "media", "weather", "wallpaper"]
     readonly property var routeKeys: routeActivities.map(activity => SettingsData.islandRouteKey(activity))
     readonly property string sharedRouting: SettingsData.islandSharedRoutingMode(root.store.config)
 
@@ -39,7 +39,7 @@ SettingsCard {
 
     SettingsRow {
         settingKey: root.keyPrefix + "RouteActivities"
-        tags: ["island", "routing", "shortcuts", "launcher", "control center", "notification center", "clipboard", "dashboard", "media", "weather", "wallpaper", "ipc"]
+        tags: ["island", "routing", "shortcuts", "launcher", "control center", "notification center", "clipboard", "power menu", "dashboard", "media", "weather", "wallpaper", "ipc"]
         visible: root.hosted || root.sharedRouting !== "always"
         resetStore: root.store
         resetKeys: root.routeKeys
@@ -77,6 +77,14 @@ SettingsCard {
         hosted: root.hosted
         activity: "clipboard"
         text: I18n.tr("Clipboard")
+    }
+
+    IslandRouteRow {
+        settingKey: root.keyPrefix + "RoutePowerMenu"
+        store: root.store
+        hosted: root.hosted
+        activity: "powermenu"
+        text: I18n.tr("Power menu", "island settings: route the power menu to the island")
     }
 
     IslandRouteRow {
@@ -173,5 +181,14 @@ SettingsCard {
         text: I18n.tr("Keep clock with media", "island settings: clock in media face toggle")
         checked: root.store.setting("islandMediaClockVisible")
         onToggled: checked => root.store.apply("islandMediaClockVisible", checked)
+    }
+
+    SettingsToggleRow {
+        settingKey: root.keyPrefix + "MediaAutoSwitch"
+        tags: ["island", "media", "playback", "auto", "switch", "compact"]
+        visible: !root.isDot
+        text: I18n.tr("Switch to media when playback starts", "island settings: auto-switch the compact face to media toggle")
+        checked: root.store.setting("islandMediaAutoSwitch")
+        onToggled: checked => root.store.apply("islandMediaAutoSwitch", checked)
     }
 }

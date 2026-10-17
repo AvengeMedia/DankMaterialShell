@@ -113,6 +113,22 @@ func (b *BaseDistribution) detectDankCalendar() deps.Dependency {
 	return b.detectOptionalPackage("dankcalendar", "Calendar application", b.commandExists("dcal") || b.commandExists("dankcalendar"))
 }
 
+func (b *BaseDistribution) detectDankCalendarVariant(gitInstalled bool) deps.Dependency {
+	dep := b.detectDankCalendar()
+	dep.CanToggle = true
+	if gitInstalled {
+		dep.Variant = deps.VariantGit
+	}
+	return dep
+}
+
+func dankCalendarMapping(variant deps.PackageVariant, repo RepositoryType, repoURL string) PackageMapping {
+	if variant == deps.VariantGit {
+		return PackageMapping{Name: "dankcalendar-git", Repository: repo, RepoURL: repoURL}
+	}
+	return PackageMapping{Name: "dankcalendar", Repository: repo, RepoURL: repoURL}
+}
+
 func (b *BaseDistribution) detectDMS() deps.Dependency {
 	dmsPath := filepath.Join(os.Getenv("HOME"), ".config/quickshell/dms")
 
@@ -584,18 +600,13 @@ TERMINAL=%s
 	return nil
 }
 
-func (b *BaseDistribution) EnableDMSService(ctx context.Context, wm deps.WindowManager) error {
-	switch wm {
-	case deps.WindowManagerNiri:
-		if err := exec.CommandContext(ctx, "systemctl", "--user", "add-wants", "niri.service", "dms").Run(); err != nil {
-			b.log("Warning: failed to add dms as a want for niri.service")
-		}
-	case deps.WindowManagerHyprland:
-		if err := exec.CommandContext(ctx, "systemctl", "--user", "add-wants", "hyprland-session.target", "dms").Run(); err != nil {
-			b.log("Warning: failed to add dms as a want for hyprland-session.target")
-		}
+func (b *BaseDistribution) EnableDMSService(_ context.Context, wm deps.WindowManager) error {
+	unit, err := config.EnableSession(wm)
+	if err != nil {
+		b.log(fmt.Sprintf("Warning: %v", err))
+		return nil
 	}
-
+	b.log("dms.service starts with " + unit)
 	return nil
 }
 

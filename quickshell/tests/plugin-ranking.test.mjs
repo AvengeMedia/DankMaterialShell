@@ -168,6 +168,16 @@ test("a typo is forgiven, accents and camelCase do not matter", () => {
     assert.deepEqual(found(list, "dokcer"), ["dockerManager"]);
 });
 
+test("a camelCase name, id or author typed as one word still matches", () => {
+    const list = [plugin("orbitBluetooth", { author: "AvengeMedia" }), plugin("clock", { name: "World Clock", author: "Ada" })];
+    assert.deepEqual(found(list, "avengemedia"), ["orbitBluetooth"]);
+    assert.deepEqual(found(list, "orbitbluetooth"), ["orbitBluetooth"]);
+    assert.deepEqual(found(list, "orbitbluetoth"), ["orbitBluetooth"]);
+    assert.deepEqual(found(list, "avenge"), ["orbitBluetooth"]);
+    assert.deepEqual(found(list, "media"), ["orbitBluetooth"]);
+    assert.deepEqual(found(list, "bluetooth"), ["orbitBluetooth"]);
+});
+
 test("a correctly typed word never picks up look-alikes", () => {
     const list = [plugin("dark", { name: "Dark Mode" }), plugin("dank", { name: "Dank Clock" }), plugin("lock", { name: "Lock" })];
     assert.deepEqual(found(list, "dark"), ["dark"]);

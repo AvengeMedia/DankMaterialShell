@@ -32,6 +32,19 @@ Item {
             settingKey: "mouseSettings"
             iconName: "mouse"
 
+            SettingsToggleRow {
+                // Only Hyprland can report the live mode; untouched niri and Mango show their defaults
+                readonly property int inheritedMode: CompositorService.isHyprland ? HyprlandService.followMouseMode : CompositorService.isMango ? 1 : 0
+                visible: CompositorService.supportsInputConfig && (!CompositorService.isHyprland || HyprlandService.hyprSupports("input:follow_mouse"))
+                enabled: inputInclude.included && !inputInclude.readOnly && (!CompositorService.isHyprland || (HyprlandService.luaConfigActive && HyprlandService.followMouseMode >= 0))
+                tags: ["mouse", "focus", "follow", "pointer", "window", "sloppy"]
+                settingKey: "focusFollowsMouse"
+                resetKeys: ["focusFollowsMouse"]
+                text: I18n.tr("Focus follows mouse", "Toggle that focuses a window when the pointer moves over it")
+                checked: (SettingsData.focusFollowsMouse < 0 ? inheritedMode : SettingsData.focusFollowsMouse) === 1
+                onToggled: checked => SettingsData.set("focusFollowsMouse", checked ? 1 : 0)
+            }
+
             SettingsSliderRow {
                 tags: ["mouse", "sensitivity", "speed", "accel"]
                 settingKey: "mouseAccelSpeed"

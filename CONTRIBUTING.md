@@ -185,10 +185,11 @@ mockery
 
 ## Generative AI
 
-Using an LLM to help write code, issues, or comments is fine. Submitting its output unread is not.
+Using an LLM to help write code is fine. Submitting its output unread is not.
 
 - You are responsible for every line you submit. You have read it, tested it, and can explain it in review.
-- Say in the PR when a meaningful part of it was AI generated.
+- Say in the PR when a meaningful part of the code was AI generated.
+- Write PR descriptions, issues, and comments yourself. No AI-written or AI-rewritten text. A few plain sentences in your own words beat a page of generated summary. PRs and issues with AI-written text get closed without review.
 - Do not file issues or leave comments you have not verified yourself. Reports that do not reproduce get closed.
 - PRs that read like unreviewed output, with narrating comments, invented APIs, or style that ignores the file they are in, get closed without review.
 

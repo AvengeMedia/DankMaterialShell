@@ -446,3 +446,14 @@ test("LHDC codecs carry a name, description and category", () => {
     assert.equal(context.codecNameFromProfile("a2dp-sink"), "");
     assert.equal(context.codecNameFromProfile("a2dp-sink-aac"), "AAC");
 });
+
+// BlueZ Alias falls back to the dashed address when a device sends no name.
+test("scan list sorts named devices above alias-is-address devices", () => {
+    const context = methods(["hasRealName", "sortDevices"]);
+    const sorted = context.sortDevices([
+        { name: "23-5F-24-05-F3-4A", address: "23:5F:24:05:F3:4A" },
+        { name: "ATH-M20xBT", address: "AA:BB:CC:DD:EE:FF" },
+        { name: "", deviceName: "", address: "01:02:03:04:05:06" }
+    ]);
+    assert.deepEqual(sorted.map(d => d.address), ["AA:BB:CC:DD:EE:FF", "01:02:03:04:05:06", "23:5F:24:05:F3:4A"]);
+});

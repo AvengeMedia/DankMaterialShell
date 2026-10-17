@@ -76,3 +76,65 @@ test("toggleReveal only works on auto hide bars and unhides first", () => {
     assert.deepEqual(reveals.slice(1), [["toggle", "hidden"], ["toggle", "hidden"]]);
     bars[2].visible = false;
 });
+
+const ipcBarBody = source.slice(source.indexOf("    function getPreferredBar("), source.indexOf("    readonly property var defaultAppMimeTypes"));
+const serviceSource = readFileSync(new URL("../Services/BarWidgetService.qml", import.meta.url), "utf8");
+const serviceFunctions = ["registrationActive", "registrationShown", "registrationLive", "resolveWidget", "resolveIpcWidget"].map(name => serviceSource.match(new RegExp(`^ {4}function ${name}\\([\\s\\S]*?^ {4}\\}$`, "m"))[0]);
+const registrySource = readFileSync(new URL("../Common/InstanceRegistry.js", import.meta.url), "utf8").replace(/^\.pragma.*$/m, "");
+
+// Both IPC paths, getPreferredBar for control center and updates, resolveIpcWidget for `widget`, over one registry.
+function ipcBarChoice(bars, { focused = "", lastUsed = {}, screens = ["A", "B"] } = {}) {
+    const registry = vm.createContext({});
+    vm.runInContext(registrySource, registry);
+    const widgetRegistry = {};
+    const windows = bars.map(spec => {
+        const instanceId = `bar:${spec.id}:right:cc`;
+        const config = { id: spec.id, enabled: true, visible: !spec.hidden, position: spec.position ?? 0 };
+        const entry = {
+            key: registry.key(spec.screen, instanceId),
+            widgetId: "controlCenterButton",
+            screenName: spec.screen,
+            instanceId,
+            item: { effectiveVisible: true },
+            context: { barId: spec.id, kind: "bar", section: "right", occurrenceOrder: 0, owner: { active: true, widgetEnabled: !spec.disabled }, surface: { screen: { name: spec.screen }, config, host: { barRevealed: false } } }
+        };
+        widgetRegistry[entry.key] = entry;
+        return { id: spec.id, modelData: { name: spec.screen }, barConfig: config, isIsland: false, controlCenterButtonRef: entry.item };
+    });
+    const context = vm.createContext({
+        Registry: registry,
+        widgetRegistry,
+        Quickshell: { screens: screens.map(name => ({ name })) },
+        SettingsData: { barConfigs: windows.map(bar => bar.barConfig), dockConfigs: [], lastUsedBarByScreen: lastUsed, Position: { Top: 0, Bottom: 1, Left: 2, Right: 3 } },
+        ShellLayout: { forScreen: name => ({ instances: windows.filter(bar => bar.modelData.name === name).map(bar => ({ barId: bar.id })) }) },
+        root: { dankBarRepeater: { count: windows.length, itemAt: i => ({ item: { barVariants: { instances: [windows[i]] } } }) } },
+        getFocusedScreenName: () => focused
+    });
+    for (const fn of serviceFunctions)
+        vm.runInContext(fn.replace(/^ {4}/gm, ""), context);
+    context.BarWidgetService = {
+        getFocusedScreenName: () => focused,
+        frameHostedBars: {},
+        frameBarsForScreen: () => [],
+        registrationForItem: item => Object.values(widgetRegistry).find(entry => entry.item === item) ?? null,
+        registrationShown: context.registrationShown,
+        registrationLive: context.registrationLive
+    };
+    vm.runInContext(ipcBarBody.replace(/^ {4}/gm, ""), context);
+    return [context.getPreferredBar("controlCenterButtonRef")?.id ?? null, context.resolveIpcWidget("controlCenterButton")?.context.barId ?? null];
+}
+
+test("every IPC path picks the same bar, visible first", () => {
+    const cases = [
+        ["visible bar beats a hidden one on the same screen", [{ id: "main", screen: "A", hidden: true }, { id: "second", screen: "A" }], { focused: "A" }, "second"],
+        ["last used bar wins among visible bars", [{ id: "main", screen: "A" }, { id: "second", screen: "A" }], { focused: "A", lastUsed: { A: "second" } }, "second"],
+        ["a visible bar beats a hidden last used one", [{ id: "main", screen: "A", hidden: true }, { id: "second", screen: "A" }], { focused: "A", lastUsed: { A: "main" } }, "second"],
+        ["a shown bar beats a disabled last used one", [{ id: "main", screen: "A", disabled: true }, { id: "second", screen: "A" }], { focused: "A", lastUsed: { A: "main" } }, "second"],
+        ["a hidden bar still answers when it is the only one", [{ id: "main", screen: "A", hidden: true }], { focused: "A" }, "main"],
+        ["focused screen beats visibility elsewhere", [{ id: "main", screen: "A" }, { id: "other", screen: "B", hidden: true }], { focused: "B" }, "other"],
+        ["unknown focus falls back to screen order", [{ id: "main", screen: "A" }, { id: "other", screen: "B" }], { screens: ["B", "A"] }, "other"],
+        ["horizontal bar beats vertical in a tie", [{ id: "side", screen: "A", position: 2 }, { id: "top", screen: "A" }], { focused: "A" }, "top"]
+    ];
+    for (const [name, bars, opts, expected] of cases)
+        assert.deepEqual(ipcBarChoice(bars, opts), [expected, expected], name);
+});

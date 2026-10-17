@@ -54,6 +54,8 @@ func unsupportedDistroMessage(info *distros.OSInfo) string {
 		return fmt.Sprintf("Debian %s is not supported.\n\nOnly Debian 13+ (Trixie) is supported.\n\nPlease upgrade to Debian 13 or later.", info.VersionID)
 	case "nixos":
 		return "See the NixOS documentation for installation instructions: " + site.Docs + "/dankmaterialshell/nixos."
+	case "rhel", "centos", "rocky", "almalinux":
+		return fmt.Sprintf("%s is not supported.\n\nOnly Enterprise Linux 10+ (RHEL, CentOS Stream, Rocky, AlmaLinux) is supported.", info.PrettyName)
 	default:
 		return fmt.Sprintf("%s is not supported.\nFeel free to request on https://github.com/AvengeMedia/DankMaterialShell", info.PrettyName)
 	}
@@ -96,6 +98,10 @@ func (m Model) writeSystemSummary(b *strings.Builder) {
 	b.WriteByte('\n')
 	if m.isGentoo() {
 		b.WriteString(m.styles.SubtleItalic.Render("* Will set per-package USE flags and unmask testing packages as needed"))
+		b.WriteByte('\n')
+	}
+	if m.isEL() {
+		b.WriteString(m.styles.Warning.Render("* Enterprise Linux support is in testing: niri only, EPEL 10 will be enabled"))
 		b.WriteByte('\n')
 	}
 	b.WriteByte('\n')

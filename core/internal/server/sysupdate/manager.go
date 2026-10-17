@@ -475,14 +475,17 @@ func (m *Manager) runUpgrade(ctx context.Context, opts UpgradeOptions) {
 	m.markDirty()
 
 	onLine := func(line string) { m.appendLog(line) }
+	var installed []Package
 	for _, b := range backends {
 		m.appendLog(fmt.Sprintf("== %s ==", b.DisplayName()))
 		if err := b.Upgrade(ctx, opts, onLine); err != nil {
+			if errors.Is(ctx.Err(), context.Canceled) || isAuthDismissed(err) {
+				m.stopUpgrade(installed, ctx.Err() != nil || len(installed) > 0)
+				return
+			}
 			code := ErrCodeBackendFailed
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 				code = ErrCodeTimeout
-			} else if errors.Is(ctx.Err(), context.Canceled) {
-				code = ErrCodeCancelled
 			}
 			m.mu.Lock()
 			m.state.Phase = PhaseError
@@ -490,6 +493,11 @@ func (m *Manager) runUpgrade(ctx context.Context, opts UpgradeOptions) {
 			m.mu.Unlock()
 			m.markDirty()
 			return
+		}
+		for _, p := range opts.Targets {
+			if p.Backend == b.ID() {
+				installed = append(installed, p)
+			}
 		}
 	}
 
@@ -521,7 +529,7 @@ func (m *Manager) runCustomUpgrade(ctx context.Context, command, title string, o
 			m.failCustomUpgrade(ErrCodeTimeout, err)
 			return
 		case errors.Is(ctx.Err(), context.Canceled):
-			m.failCustomUpgrade(ErrCodeCancelled, err)
+			m.stopUpgrade(nil, true)
 			return
 		}
 		m.failCustomUpgrade(ErrCodeBackendFailed, err)
@@ -555,6 +563,26 @@ func (m *Manager) failCustomUpgrade(code ErrorCode, err error) {
 	m.state.Error = &ErrorInfo{Code: code, Message: err.Error()}
 	m.mu.Unlock()
 	m.markDirty()
+}
+
+// A cancel or a dismissed password prompt is the user's choice, not a failure.
+func (m *Manager) stopUpgrade(installed []Package, refresh bool) {
+	m.appendLog("Upgrade stopped.")
+	m.mu.Lock()
+	m.state.Phase = PhaseIdle
+	m.state.OperationID = ""
+	m.state.OperationStarted = 0
+	if names := rebootPackages(installed); len(names) > 0 {
+		m.state.Reboot = RebootInfo{Recommended: true, Packages: names}
+	}
+	persist := m.persistedLocked()
+	m.mu.Unlock()
+	savePersisted(persist)
+	m.markDirty()
+	// Packages may have landed before the stop, so the cached list is stale.
+	if refresh {
+		m.runRefresh(context.Background(), false)
+	}
 }
 
 func (m *Manager) finishSuccessfulUpgrade(clearPackages bool, installed []Package) {

@@ -2,18 +2,18 @@ pragma ComponentBehavior: Bound
 
 import Qt.labs.folderlistmodel
 import QtQuick
-import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
 import qs.Widgets
-import "../DCommon/Common/WheelInput.js" as WheelInput
+import "../DCommon/Common/MaterialWallpaper.js" as Art
 
 DContextMenu {
     id: root
 
     property bool settingsExpanded: false
-    property var stripPaths: []
+    property var stripItems: []
+    property string widgetInstanceId: ""
 
     readonly property int stripCount: 4
     readonly property real stripUnit: Theme.listItemHeight
@@ -23,46 +23,55 @@ DContextMenu {
         return SessionData.wallpaperPath || "";
     }
     readonly property string wallpaperDir: currentWallpaper.startsWith("/") ? currentWallpaper.substring(0, currentWallpaper.lastIndexOf("/")) : ""
+    readonly property bool materialWallpaper: currentWallpaper === ""
+    readonly property var materialTarget: SessionData.materialWallpaperTarget(targetScreen?.name ?? "")
+    readonly property var materialEntry: SessionData.materialWallpaperEntry(materialTarget)
+    readonly property string currentKey: materialWallpaper ? Art.resolvePreset(materialEntry.preset, SessionData.materialWallpaperProfiles) : currentWallpaper
 
     layerNamespace: "dms:desktop-context-menu"
     keyboardNavigable: true
     itemHeight: Theme.listItemHeight
-    itemRadius: Theme.cornerRadiusFull
     itemFontSize: Theme.fontSizeMedium
-    containerRadius: Theme.cornerRadiusXL
     minMenuWidth: stripUnit * (stripCount + 1) + Theme.spacingS * (stripCount + 1)
 
     menuItems: {
-        const items = [
+        const instanceId = widgetInstanceId;
+        const items = instanceId === "" ? [] : [
             {
                 type: "item",
-                icon: "add",
-                text: I18n.tr("Add widget"),
-                action: () => DesktopWidgetRegistry.startEditing(root.targetScreen, true)
+                icon: "tune",
+                text: I18n.tr("Widget settings"),
+                action: () => DesktopWidgetRegistry.editOptions(root.targetScreen, instanceId)
             },
             {
-                type: "item",
-                icon: "edit",
-                text: I18n.tr("Edit widgets"),
-                action: () => DesktopWidgetRegistry.startEditing(root.targetScreen, false)
-            },
-            {
-                type: "item",
-                icon: "palette",
-                text: I18n.tr("Wallpaper & colors"),
-                action: () => PopoutService.openSettingsWithTab("personalization")
+                type: "separator"
             }
         ];
-        if (wallpaperDir)
+        items.push({
+            type: "item",
+            icon: "edit",
+            text: I18n.tr("Edit widgets"),
+            action: () => DesktopWidgetRegistry.startEditing(root.targetScreen, false)
+        }, {
+            type: "item",
+            icon: "extension",
+            text: I18n.tr("Plugins"),
+            action: () => PopoutService.openSettingsWithTab("plugins")
+        }, {
+            type: "item",
+            icon: "palette",
+            text: I18n.tr("Wallpaper & colors"),
+            action: () => PopoutService.openSettingsWithTab("personalization")
+        });
+        if (wallpaperDir || materialWallpaper)
             items.push({
                 type: "component",
                 component: wallpaperStrip,
                 height: stripUnit * 2 + Theme.spacingS
             });
-        return items.concat([settingsEntry, allSettingsEntry, desktopWidgetsEntry, displaysEntry, pluginsEntry]);
+        return items.concat([settingsEntry, allSettingsEntry, desktopWidgetsEntry, displaysEntry]);
     }
 
-    // Stable objects so expanding Settings doesn't rebuild every row.
     component MenuEntry: QtObject {
         property string type: "item"
         property string icon
@@ -106,22 +115,27 @@ DContextMenu {
         action: () => PopoutService.openSettingsWithTab("displays")
     }
 
-    MenuEntry {
-        id: pluginsEntry
-        icon: "extension"
-        text: I18n.tr("Plugins")
-        hidden: !root.settingsExpanded
-        action: () => PopoutService.openSettingsWithTab("plugins")
+    onBackdropRightClicked: (x, y) => openForWidget(targetScreen, x, y, "")
+    onRenderActiveChanged: {
+        settingsExpanded = false;
+        stripItems = renderActive && materialWallpaper ? leadWithCurrent(presetItems()) : [];
+        if (!renderActive)
+            widgetInstanceId = "";
+    }
+    onWallpaperDirChanged: stripItems = []
+
+    function openForWidget(screen, x, y, instanceId) {
+        widgetInstanceId = instanceId;
+        open(screen, x, y, false);
     }
 
-    onBackdropRightClicked: (x, y) => open(targetScreen, x, y, false)
-    onRenderActiveChanged: {
-        if (renderActive)
+    function pick(item) {
+        if (item.path) {
+            setWallpaper(item.path);
             return;
-        settingsExpanded = false;
-        stripPaths = [];
+        }
+        SessionData.setMaterialWallpaperPreset(materialTarget, item.key);
     }
-    onWallpaperDirChanged: stripPaths = []
 
     function setWallpaper(path) {
         if (SessionData.perMonitorWallpaper && targetScreen) {
@@ -134,13 +148,34 @@ DContextMenu {
         SessionData.saveSettings();
     }
 
-    // Current wallpaper leads; the order is fixed per open so a pick moves the check, not the list.
+    // Order is fixed per open so a pick moves the check, not the list.
+    function leadWithCurrent(items) {
+        const start = Math.max(0, items.findIndex(item => item.key === currentKey));
+        return items.slice(start).concat(items.slice(0, start));
+    }
+
+    function presetItems() {
+        const profiles = SessionData.materialWallpaperProfiles;
+        return Art.profiles(profiles).map(profile => ({
+                    key: profile.id,
+                    path: "",
+                    composition: Art.composition({
+                        preset: profile.id,
+                        seed: materialEntry.seed
+                    }, profiles)
+                }));
+    }
+
     function loadStrip(model) {
-        const paths = [];
-        for (let i = 0; i < model.count; i++)
-            paths.push(model.get(i, "filePath"));
-        const start = Math.max(0, paths.indexOf(currentWallpaper));
-        stripPaths = paths.slice(start).concat(paths.slice(0, start));
+        const items = [];
+        for (let i = 0; i < model.count; i++) {
+            const path = model.get(i, "filePath");
+            items.push({
+                key: path,
+                path
+            });
+        }
+        stripItems = leadWithCurrent(items);
     }
 
     Loader {
@@ -166,66 +201,45 @@ DContextMenu {
         id: wallpaperStrip
 
         Item {
-            // Not a Dank* wrapper: DListView only scrolls vertically.
-            ListView {
-                id: strip
+            DCarousel {
+                y: Theme.spacingXS
+                width: parent.width
+                height: root.stripUnit * 2
+                preferredItemWidth: width / 2
+                itemRadius: Theme.cornerRadiusM
+                model: root.stripItems
 
-                readonly property real unit: (width - spacing * (root.stripCount - 1)) / (root.stripCount + 1)
-                function scrollBy(wheel) {
-                    const delta = WheelInput.isTouchpad(wheel) ? WheelInput.dominantDelta(wheel.pixelDelta) : WheelInput.dominantDelta(wheel.angleDelta) / 120 * (unit + spacing);
-                    const maxX = originX + Math.max(0, contentWidth - width);
-                    contentX = Math.max(originX, Math.min(maxX, contentX - delta));
-                }
-
-                anchors.fill: parent
-                orientation: ListView.Horizontal
-                spacing: Theme.spacingS
-                clip: true
-                boundsBehavior: Flickable.StopAtBounds
-                model: root.stripPaths
-
-                delegate: Item {
+                delegate: DCarouselItem {
                     id: thumb
 
-                    required property string modelData
-                    readonly property bool current: thumb.modelData === root.currentWallpaper
+                    required property var modelData
+                    readonly property bool current: thumb.modelData.key === root.currentKey
 
-                    y: Theme.spacingXS
-                    width: strip.unit * (thumb.current ? 2 : 1)
-                    height: root.stripUnit * 2
-
-                    Behavior on width {
-                        NumberAnimation {
-                            duration: SettingsData.reduceMotion ? 0 : Theme.expressiveDurations.expressiveDefaultSpatial
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
-                        }
+                    onClicked: {
+                        if (!thumb.current)
+                            root.pick(thumb.modelData);
                     }
 
-                    ClippingRectangle {
-                        id: thumbClip
+                    Loader {
                         anchors.fill: parent
-                        radius: thumb.current ? Theme.cornerRadiusXL : Math.min(Theme.cornerRadiusFull, width / 2)
-                        color: Theme.surfaceContainerHigh
+                        sourceComponent: thumb.modelData.path ? imageThumb : materialThumb
 
-                        Behavior on radius {
-                            NumberAnimation {
-                                duration: SettingsData.reduceMotion ? 0 : Theme.expressiveDurations.expressiveDefaultSpatial
-                                easing.type: Easing.BezierSpline
-                                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                        Component {
+                            id: imageThumb
+
+                            CachingImage {
+                                imagePath: thumb.modelData.path
+                                maxCacheSize: 256
+                                animate: false
                             }
                         }
 
-                        CachingImage {
-                            anchors.fill: parent
-                            imagePath: thumb.modelData
-                            maxCacheSize: 256
-                            animate: false
-                        }
+                        Component {
+                            id: materialThumb
 
-                        Rectangle {
-                            anchors.fill: parent
-                            color: Theme.withAlpha(Theme.onSurface, thumbMouse.pressed ? Theme.stateLayerPressed : thumbMouse.containsMouse ? Theme.stateLayerHover : 0)
+                            MaterialWallpaper {
+                                composition: thumb.modelData.composition
+                            }
                         }
                     }
 
@@ -253,26 +267,6 @@ DContextMenu {
                             color: Theme.onPrimaryContainer
                         }
                     }
-
-                    MouseArea {
-                        id: thumbMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            if (!thumb.current)
-                                root.setWallpaper(thumb.modelData);
-                        }
-                    }
-                }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                acceptedButtons: Qt.NoButton
-                onWheel: wheel => {
-                    strip.scrollBy(wheel);
-                    wheel.accepted = true;
                 }
             }
         }

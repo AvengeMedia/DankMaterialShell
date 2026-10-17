@@ -105,7 +105,8 @@ Item {
     readonly property real targetSize: barHosted ? iconSize * (options.iconSizePercentage ?? 100) / 100 : iconSize
     readonly property real indicatorLane: root.barHosted && !root.options.hideIndicators ? DockConfig.indicatorLane(root.options) : 0
     readonly property real crossSize: {
-        const needed = root.targetSize + root.indicatorLane;
+        // The lane is mirrored so icons stay centered on the bar.
+        const needed = root.targetSize + root.indicatorLane * 2;
         if (!root.barHosted)
             return needed;
         // A bar pill cannot grow past its widget thickness, so the lane yields there.

@@ -77,8 +77,7 @@ Item {
     }
 
     readonly property var _dockAppsDefaults: ({
-            "appsDockHideIndicators": false,
-            "appsDockIconSizePercentage": 100
+            "appsDockHideIndicators": false
         })
 
     function defaultOption(key) {
