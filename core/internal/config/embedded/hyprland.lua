@@ -78,6 +78,7 @@ hl.window_rule({
 hl.window_rule({ match = { class = "^(zoom)$" }, float = true })
 hl.layer_rule({ match = { namespace = "^(quickshell)$" }, no_anim = true })
 hl.layer_rule({ match = { namespace = "^dms:.*" }, no_anim = true })
+hl.window_rule({ match = { class = ".*" }, suppress_event = "maximize" })
 
 require("dms.colors")
 require("dms.outputs")
