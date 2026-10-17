@@ -232,6 +232,7 @@ Column {
     function uninstall(row) {
         const id = row.pluginId;
         const wasEnabled = PluginService.isPluginLoaded(id);
+        const repo = DMSService.installedPlugins.find(entry => entry.id === id)?.repo ?? "";
         uninstalling = Object.assign({}, uninstalling, {
             [id]: true
         });
@@ -249,7 +250,7 @@ Column {
                 return;
             }
             PluginService.scanPlugins();
-            PluginService.noteUninstalled(id, row.text, wasEnabled);
+            PluginService.noteUninstalled(id, row.text, wasEnabled, repo);
         });
     }
 

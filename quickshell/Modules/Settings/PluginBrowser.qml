@@ -32,6 +32,7 @@ RegistryBrowserWindow {
     property string authorFilter: ""
     property var searchSuggestions: []
     property var foundCommands: []
+    property var checkedCommands: []
     property var discoverShelves: []
 
     readonly property var detailPlugin: resolveDetailPlugin(detailPluginId, allPlugins)
@@ -600,8 +601,11 @@ RegistryBrowserWindow {
             return;
         var script = 'for c in "$@"; do command -v "$c" >/dev/null 2>&1 && echo "$c"; done; true';
         Proc.runCommand("plugin-browser-dependencies", ["sh", "-c", script, "sh"].concat(commands), (output, exitCode) => {
-            var found = String(output || "").split("\n").map(line => line.trim()).filter(line => line.length > 0);
+            if (exitCode !== 0)
+                return;
+            var found = String(output || "").split("\n").map(line => line.trim()).filter(line => commands.indexOf(line) >= 0);
             foundCommands = foundCommands.concat(found.filter(c => foundCommands.indexOf(c) < 0));
+            checkedCommands = checkedCommands.concat(commands.filter(c => checkedCommands.indexOf(c) < 0));
         }, 0);
     }
 
@@ -1268,6 +1272,9 @@ RegistryBrowserWindow {
             function onDetailPluginIdChanged() {
                 detailPane.heroFallback = false;
                 detailFlickable.contentY = 0;
+            }
+            // On the plugin itself, not its id: a detail opened before the list loads is checked once it arrives.
+            function onDetailPluginChanged() {
                 root.checkDependencies(root.detailPlugin);
             }
         }
@@ -1581,7 +1588,7 @@ RegistryBrowserWindow {
                         spacing: Theme.spacingXS
 
                         Repeater {
-                            model: PluginRanking.dependencyStates(detailPane.plugin.dependencies, root.foundCommands)
+                            model: PluginRanking.dependencyStates(detailPane.plugin.dependencies, root.foundCommands, root.checkedCommands)
 
                             PluginBadge {
                                 required property var modelData

@@ -320,8 +320,19 @@ function reactionId(output) {
 // "https://github.com/owner/repo/issues/12" -> "repos/owner/repo/issues/12/reactions",
 // the GitHub API path an upvote is posted to. Empty for anything else.
 function issueReactionsPath(url) {
-    const m = /^https:\/\/github\.com\/([\w.-]+)\/([\w.-]+)\/issues\/(\d+)\/?(?:[?#].*)?$/.exec(url || "");
+    const m = /^https:\/\/github\.com\/((?!\.\.?\/)[\w.-]+)\/((?!\.\.?\/)[\w.-]+)\/issues\/(\d+)\/?(?:[?#].*)?$/.exec(url || "");
     return m ? "repos/" + m[1] + "/" + m[2] + "/issues/" + m[3] + "/reactions" : "";
+}
+
+// Votes shown for a plugin: the registry count plus what this session changed, never below zero.
+function upvoteCount(upvotes, delta) {
+    return Math.max(0, (upvotes || 0) + (delta || 0));
+}
+
+// This session's change after a vote request. A new +1 adds one; a +1 the account
+// already had is in the registry count, so it adds nothing; taking a vote back removes one.
+function nextUpvoteDelta(delta, removed, created) {
+    return (delta || 0) + (removed ? -1 : created ? 1 : 0);
 }
 
 // --- Search -----------------------------------------------------------------
@@ -490,12 +501,14 @@ function byAuthor(plugins, author) {
 
 // --- Detail pane ------------------------------------------------------------
 
-// Permissions that reach outside the plugin's own settings come first.
+// Permissions that reach outside the plugin's own settings, most far-reaching first.
+const _SENSITIVE_PERMISSIONS = ["shell_execute", "process", "network", "filesystem_write", "filesystem_read", "clipboard_read"];
+
+// Sensitive permissions come first.
 function sortPermissions(permissions) {
-    const order = ["shell_execute", "process", "network", "filesystem_write", "filesystem_read", "clipboard_read"];
     const rank = id => {
-        const i = order.indexOf(id);
-        return i < 0 ? order.length : i;
+        const i = _SENSITIVE_PERMISSIONS.indexOf(id);
+        return i < 0 ? _SENSITIVE_PERMISSIONS.length : i;
     };
     return _list(permissions).map((id, i) => ({
             id: id,
@@ -504,7 +517,7 @@ function sortPermissions(permissions) {
 }
 
 function permissionIsSensitive(id) {
-    return ["process", "shell_execute", "network", "clipboard_read", "filesystem_read", "filesystem_write"].indexOf(id) >= 0;
+    return _SENSITIVE_PERMISSIONS.indexOf(id) >= 0;
 }
 
 const _DEPENDENCY_COMMANDS = {
@@ -540,13 +553,16 @@ function dependencyCommands(name) {
 }
 
 // "ok", "missing" or "unknown" for each dependency, from the commands found.
-function dependencyStates(dependencies, found) {
+// A dependency is only "missing" once every command for it was looked up: until then it stays "unknown".
+function dependencyStates(dependencies, found, checked) {
     const have = _list(found);
+    const done = _list(checked);
     return _list(dependencies).map(name => {
         const commands = dependencyCommands(name);
+        const ok = commands.some(c => have.indexOf(c) >= 0);
         return {
             name: name,
-            state: commands.length === 0 ? "unknown" : commands.some(c => have.indexOf(c) >= 0) ? "ok" : "missing"
+            state: ok ? "ok" : commands.length > 0 && commands.every(c => done.indexOf(c) >= 0) ? "missing" : "unknown"
         };
     });
 }

@@ -98,8 +98,28 @@ test("no taste, no dates, no votes: still a deterministic order", () => {
 test("an upvote is posted to the reactions of the plugin's GitHub issue only", () => {
     assert.equal(rank.issueReactionsPath("https://github.com/AvengeMedia/dms-plugin-registry/issues/42"), "repos/AvengeMedia/dms-plugin-registry/issues/42/reactions");
     assert.equal(rank.issueReactionsPath("https://github.com/a/b.c/issues/7#issuecomment-1"), "repos/a/b.c/issues/7/reactions");
-    for (const url of ["", undefined, "https://example.com/a/b/issues/1", "https://github.com/a/b/pull/1", "https://github.com/a/b/issues/1/../../x", "https://github.com/a/b/issues/1 -f x=y", "http://github.com/a/b/issues/1"])
+    for (const url of ["", undefined, "https://example.com/a/b/issues/1", "https://github.com/a/b/pull/1", "https://github.com/a/b/issues/1/../../x", "https://github.com/a/b/issues/1 -f x=y", "http://github.com/a/b/issues/1", "https://github.com/../b/issues/1", "https://github.com/a/../issues/1", "https://github.com/./b/issues/1", "https://github.com/a/./issues/1"])
         assert.equal(rank.issueReactionsPath(url), "");
+    assert.equal(rank.issueReactionsPath("https://github.com/a/.github/issues/3"), "repos/a/.github/issues/3/reactions");
+});
+
+test("the upvote count follows each click without double counting a vote the registry already has", () => {
+    const click = (state, removed, created) => rank.nextUpvoteDelta(state, removed, created);
+    // New vote, taken back, voted again.
+    let delta = click(0, false, true);
+    assert.equal(rank.upvoteCount(10, delta), 11);
+    delta = click(delta, true, false);
+    assert.equal(rank.upvoteCount(10, delta), 10);
+    delta = click(delta, false, true);
+    assert.equal(rank.upvoteCount(10, delta), 11);
+    // The account had already voted before this session: GitHub answers 200, the registry count already holds it.
+    delta = click(0, false, false);
+    assert.equal(rank.upvoteCount(10, delta), 10);
+    delta = click(delta, true, false);
+    assert.equal(rank.upvoteCount(10, delta), 9);
+    // A stale registry count never shows below zero.
+    assert.equal(rank.upvoteCount(0, click(0, true, false)), 0);
+    assert.equal(rank.upvoteCount(undefined, undefined), 0);
 });
 
 test("a card is marked new for two weeks, then updated for a week after a release", () => {
@@ -228,8 +248,12 @@ test("permissions that reach outside the plugin come first", () => {
 });
 
 test("dependencies are checked by command, libraries stay unknown", () => {
-    const states = rank.dependencyStates(["curl", "jq", "wl-clipboard", "qt6-websockets", "imagemagick"], ["curl", "wl-copy", "convert"]);
+    const deps = ["curl", "jq", "wl-clipboard", "qt6-websockets", "imagemagick"];
+    const states = rank.dependencyStates(deps, ["curl", "wl-copy", "convert"], ["curl", "jq", "wl-copy", "magick", "convert"]);
     assert.deepEqual(Array.from(states, s => s.name + ":" + s.state), ["curl:ok", "jq:missing", "wl-clipboard:ok", "qt6-websockets:unknown", "imagemagick:ok"]);
+    // Before the lookup answers, or when it fails, nothing is reported missing.
+    assert.deepEqual(Array.from(rank.dependencyStates(deps, [], []), s => s.state), ["unknown", "unknown", "unknown", "unknown", "unknown"]);
+    assert.deepEqual(Array.from(rank.dependencyStates(["imagemagick"], [], ["magick"]), s => s.state), ["unknown"]);
     assert.deepEqual(Array.from(rank.dependencyCommands("lib; rm -rf")), []);
 });
 

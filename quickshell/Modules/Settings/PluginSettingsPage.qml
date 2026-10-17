@@ -138,6 +138,7 @@ FocusScope {
         const id = pluginId;
         const name = pluginName;
         const wasEnabled = isLoaded;
+        const repo = pluginRepo;
         operationPending = true;
         actionError = "";
         DMSService.uninstall(id, response => {
@@ -147,7 +148,7 @@ FocusScope {
                 return;
             }
             PluginService.scanPlugins();
-            PluginService.noteUninstalled(id, name, wasEnabled);
+            PluginService.noteUninstalled(id, name, wasEnabled, repo);
             root.parentModal?.setPage("plugins");
         });
     }

@@ -1394,7 +1394,14 @@ Singleton {
         onTriggered: root.lastUninstalledPlugin = null
     }
 
-    function noteUninstalled(pluginId, pluginName, wasEnabled) {
+    // Only a registry plugin (one with a repo in the installed list) can be put back:
+    // a plugin the registry does not know would otherwise be swapped for another one.
+    function noteUninstalled(pluginId, pluginName, wasEnabled, repo) {
+        if (!repo) {
+            undoUninstallTimer.stop();
+            lastUninstalledPlugin = null;
+            return;
+        }
         lastUninstalledPlugin = {
             id: pluginId,
             name: pluginName || pluginId,
@@ -1419,7 +1426,7 @@ Singleton {
     property var upvotingPlugins: ({})
 
     function upvoteCount(plugin) {
-        return Math.max(0, (plugin.upvotes || 0) + (upvoteDeltas[plugin.id] || 0));
+        return PluginRanking.upvoteCount(plugin.upvotes, upvoteDeltas[plugin.id]);
     }
 
     function _setUpvote(pluginId, reactionId, delta) {
@@ -1467,7 +1474,7 @@ Singleton {
                     Qt.openUrlExternally(issueUrl);
                     return;
                 }
-                _setUpvote(pluginId, 0, delta - 1);
+                _setUpvote(pluginId, 0, PluginRanking.nextUpvoteDelta(delta, true, false));
                 ToastService.showInfo(I18n.tr("Upvote removed", "plugin upvote toast"));
             }, 0, 15000);
             return;
@@ -1481,7 +1488,7 @@ Singleton {
                 return;
             }
             const added = /^HTTP\/\S+ 201/.test(output || "");
-            _setUpvote(pluginId, reactionId, added ? delta + 1 : delta);
+            _setUpvote(pluginId, reactionId, PluginRanking.nextUpvoteDelta(delta, false, added));
             ToastService.showInfo(added ? I18n.tr("Upvoted on GitHub", "plugin upvote toast") : I18n.tr("Already upvoted, click again to remove", "plugin upvote toast"));
         }, 0, 15000);
     }
