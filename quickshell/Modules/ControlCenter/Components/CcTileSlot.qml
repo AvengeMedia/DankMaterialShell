@@ -15,9 +15,44 @@ DEditableGridSlot {
     readonly property bool compact: cols <= 2 && rows === 1
     readonly property bool small: WidgetUtils.isSmall(grid.layoutItems[index] ?? widgetData, rows)
     readonly property var tileItem: tileLoader.item
+    // Edit chrome hugs a small tile's pill, not its slot.
+    readonly property real bodyInset: tileItem?.bodyInset ?? 0
     // Small tiles resize from a virtual half row so growing them passes through full size first.
     property real biasH: 0
     readonly property real smallSpanLimit: (1 + CcMetrics.smallRowFraction) / 2
+
+    readonly property bool swallowed: dragging && grid.swallowPoint !== null
+    property real swallowProgress: swallowed ? 1 : 0
+    // Outlives the grid's point so the release animation can still use it.
+    property var swallowAnchor: null
+
+    onSwallowedChanged: {
+        if (swallowed)
+            swallowAnchor = grid.swallowPoint;
+    }
+
+    Behavior on swallowProgress {
+        enabled: CcMetrics.animationsEnabled
+        NumberAnimation {
+            duration: Theme.expressiveDurations.expressiveFastSpatial
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Theme.expressiveCurves.standard
+        }
+    }
+
+    transform: [
+        Scale {
+            origin.x: root.width / 2
+            origin.y: root.height / 2
+            xScale: 1 - root.swallowProgress * (1 - CcMetrics.trashSwallowScale)
+            yScale: xScale
+        },
+        // Gated so resting tiles don't track every layout animation.
+        Translate {
+            x: root.swallowProgress > 0 ? root.swallowProgress * ((root.swallowAnchor?.x ?? 0) - root.x - root.width / 2) : 0
+            y: root.swallowProgress > 0 ? root.swallowProgress * ((root.swallowAnchor?.y ?? 0) - root.y - root.height / 2) : 0
+        }
+    ]
 
     passthrough: tileItem?.passthrough ?? null
     restCursor: widgetData.id === WidgetUtils.EDIT_ID ? Qt.PointingHandCursor : Qt.OpenHandCursor
@@ -87,6 +122,8 @@ DEditableGridSlot {
 
         anchors.fill: parent
         anchors.margins: -contentInset
+        anchors.topMargin: -contentInset + root.bodyInset
+        anchors.bottomMargin: -contentInset + root.bodyInset
         z: 2
         visible: root.grid.editMode
         enabled: root.interactionEnabled
@@ -94,10 +131,10 @@ DEditableGridSlot {
         passthrough: root.passthrough
         dragging: root.dragging
         resizing: root.resizing
-        cornerRadius: root.small ? Theme.fullRadius(root.width, root.height) : (root.tileItem?.bodyRadius ?? Theme.fullRadius(root.width, root.height))
+        cornerRadius: root.small ? Theme.fullRadius(root.width, root.height - root.bodyInset * 2) : (root.tileItem?.bodyRadius ?? Theme.fullRadius(root.width, root.height))
         sizeText: root.cols + "×" + (root.small ? CcMetrics.smallRowFraction : root.rows)
         onResizeStarted: (px, py) => {
-            root.biasH = root.small ? (CcMetrics.smallRowFraction - 1) * root.grid.cellWidth : 0;
+            root.biasH = root.small ? CcMetrics.smallRowFraction * root.grid.cellWidth - CcMetrics.gridGap - root.height : 0;
             root.beginResize(px, py);
         }
         onResizeMoved: (px, py) => root.resizeTo(px, py)

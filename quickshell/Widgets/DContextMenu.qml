@@ -22,9 +22,7 @@ Item {
     property real menuMargin: Theme.spacingS
     property real minMenuWidth: Theme.fieldDefaultWidth
     property real itemHeight: Theme.menuItemHeight
-    property real itemRadius: Theme.cornerRadiusS
     property real itemFontSize: Theme.fontSizeSmall
-    property real containerRadius: Theme.windowRadius
     property bool keyboardNavigable: false
     property var transientSurfaceTracker: null
     property var targetScreen: null
@@ -32,11 +30,13 @@ Item {
     property real anchorY: 0
     property real originX: 0
     property real originY: 0
+    property string menuEdge: "top"
     property bool openState: false
     property bool renderActive: false
     property int selectedMenuIndex: -1
     property bool keyboardNavigation: false
     readonly property alias contextWindow: menuWindow
+    readonly property alias customContentItem: customContentLoader.item
     readonly property bool blurActive: renderActive && openState && BlurService.enabled
 
     readonly property real maxMenuWidth: Math.max(0, (targetScreen?.width ?? Theme.launcherWidthMicro) - menuMargin * 2)
@@ -249,7 +249,7 @@ Item {
             blurY: root.blurActive ? menuContainer.y + openScaleTransform.origin.y * (1 - menuContainer.openScale) : 0
             blurWidth: root.blurActive ? menuContainer.width * menuContainer.openScale : 0
             blurHeight: root.blurActive ? menuContainer.height * menuContainer.openScale : 0
-            blurRadius: root.containerRadius * menuContainer.openScale
+            blurRadius: Theme.windowRadius * menuContainer.openScale
         }
 
         MouseArea {
@@ -296,12 +296,22 @@ Item {
 
             Rectangle {
                 id: menuContainer
-                x: Math.max(root.menuMargin, Math.min(menuWindow.width - width - root.menuMargin, root.anchorX))
-                y: Math.max(root.menuMargin, Math.min(menuWindow.height - height - root.menuMargin, root.anchorY))
+                x: {
+                    if (root.menuEdge === "right")
+                        return Math.max(root.menuMargin, Math.min(menuWindow.width - width - root.menuMargin, root.anchorX - width));
+                    return Math.max(root.menuMargin, Math.min(menuWindow.width - width - root.menuMargin, root.anchorX));
+                }
+                y: {
+                    if (root.menuEdge === "bottom")
+                        return Math.max(root.menuMargin, Math.min(menuWindow.height - height - root.menuMargin, root.anchorY - height));
+                    if (root.menuEdge === "left" || root.menuEdge === "right")
+                        return Math.max(root.menuMargin, Math.min(menuWindow.height - height - root.menuMargin, root.anchorY - height / 2));
+                    return Math.max(root.menuMargin, Math.min(menuWindow.height - height - root.menuMargin, root.anchorY));
+                }
                 width: root.effectiveMenuWidth
                 height: root.effectiveMenuHeight
                 color: Theme.readableSurface
-                radius: root.containerRadius
+                radius: Theme.windowRadius
                 border.color: BlurService.borderColor
                 border.width: BlurService.borderWidth
                 opacity: root.openState ? 1 : 0
@@ -423,7 +433,7 @@ Item {
                                     }
                                     visible: !menuItemDelegate.isSeparator && !menuItemDelegate.isComponent
                                     anchors.fill: parent
-                                    radius: root.itemRadius
+                                    radius: Theme.cornerRadiusS
                                     color: {
                                         if (!itemEnabled)
                                             return "transparent";
@@ -472,7 +482,7 @@ Item {
                                     DRipple {
                                         id: menuItemRipple
                                         rippleColor: menuRow.contentColor
-                                        cornerRadius: Math.min(root.itemRadius, menuRow.height / 2)
+                                        cornerRadius: Theme.cornerRadiusS
                                     }
 
                                     MouseArea {

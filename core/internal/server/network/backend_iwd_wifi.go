@@ -634,6 +634,10 @@ func (b *IWDBackend) ConnectWiFi(req ConnectionRequest) error {
 		return fmt.Errorf("network not found: %w", err)
 	}
 
+	if req.Password != "" {
+		b.storePendingPSK(req.SSID, req.Password)
+	}
+
 	att := &connectAttempt{
 		ssid:     req.SSID,
 		netPath:  networkPath,

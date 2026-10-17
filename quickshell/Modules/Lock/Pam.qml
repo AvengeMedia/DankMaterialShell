@@ -24,6 +24,11 @@ Scope {
     property string u2fPendingMode
     property string buffer
 
+    // the prompt pam asked for, e.g. "PIN: "
+    property string authPromptText: ""
+    property bool responseSubmitted: false
+    property bool awaitingUserInput: false
+    readonly property bool authBusy: passwd.active && !root.awaitingUserInput
     property var attemptInfoMessages: []
     property bool lockoutAnnouncedThisAttempt: false
 
@@ -51,6 +56,24 @@ Scope {
         stateReset.restart();
         fprint.checkAvail();
         u2f.checkAvail();
+    }
+
+    // start() runs every auth module before the first prompt (howdy, fprintd), so only on submit
+    function submitPassword(): void {
+        root.responseSubmitted = true;
+        if (!passwd.active) {
+            passwd.start();
+            return;
+        }
+        if (passwd.responseRequired) {
+            root.responseSubmitted = false;
+            root.awaitingUserInput = false;
+            passwdActiveTimeout.restart();
+            passwd.respond(root.buffer);
+        } else {
+            // kept and sent when the prompt arrives; a stack that never asks still times out
+            passwdActiveTimeout.restart();
+        }
     }
 
     function completeUnlock(): void {
@@ -187,9 +210,13 @@ Scope {
                 root.attemptInfoMessages = root.attemptInfoMessages.concat([message]);
         }
 
-        onResponseRequiredChanged: {
+        // not responseRequiredChanged: that only fires on change, so two prompts in
+        // a row leave the second unhandled
+        onPamMessage: {
             if (!responseRequired)
                 return;
+
+            root.authPromptText = (message || "").replace(/:\s*$/, "").trim();
 
             const notice = root.attemptInfoMessages.filter(m => m !== message);
             if (notice.length > 0) {
@@ -198,7 +225,15 @@ Scope {
             }
             root.attemptInfoMessages = [];
 
-            respond(root.buffer);
+            // each prompt needs its own submission, or the second gets the first answer
+            if (root.responseSubmitted) {
+                root.responseSubmitted = false;
+                root.awaitingUserInput = false;
+                respond(root.buffer);
+            } else {
+                root.awaitingUserInput = true;
+                passwdActiveTimeout.running = false;
+            }
         }
 
         onCompleted: res => {
@@ -236,6 +271,7 @@ Scope {
             else if (res === PamResult.Failed)
                 root.state = "fail";
 
+            root.responseSubmitted = false;
             root.flashMsg();
             stateReset.restart();
         }
@@ -245,10 +281,15 @@ Scope {
         target: passwd
 
         function onActiveChanged() {
+            root.authPromptText = "";
+            root.awaitingUserInput = false;
             if (passwd.active) {
                 root.attemptInfoMessages = [];
                 root.lockoutAnnouncedThisAttempt = false;
-                passwdActiveTimeout.restart();
+                if (root.responseSubmitted)
+                    passwdActiveTimeout.restart();
+                else
+                    passwdActiveTimeout.running = false;
             } else {
                 passwdActiveTimeout.running = false;
             }
@@ -270,7 +311,7 @@ Scope {
         readonly property int verifyStartSlackMs: 10000
         readonly property bool retrying: errorRetry.running
         readonly property int retryInterval: errorRetry.interval
-        readonly property bool allowed: available && SettingsData.enableFprint && root.lockSecured && !root.fprintSuppressedByPrimaryPam && !root.unlockInProgress && !root.u2fPending && !SessionService.preparingForSleep && !IdleService.monitorsOff && tries < SettingsData.maxFprintTries
+        readonly property bool allowed: available && SettingsData.enableFprint && root.lockSecured && !root.fprintSuppressedByPrimaryPam && !root.unlockInProgress && !root.u2fPending && !SessionService.preparingForSleep && !SessionService.sleepRequested && !IdleService.monitorsOff && tries < SettingsData.maxFprintTries
         readonly property string status: {
             if (!available || !SettingsData.enableFprint || !root.lockSecured || root.fprintSuppressedByPrimaryPam)
                 return "disabled";
@@ -431,7 +472,7 @@ Scope {
         }
 
         function startForAlternativeAuth(): void {
-            if (!available || !SettingsData.enableU2f || root.u2fSuppressedByPrimaryPam || SettingsData.u2fMode !== "or" || root.unlockInProgress || passwd.active || active)
+            if (!available || !SettingsData.enableU2f || root.u2fSuppressedByPrimaryPam || SettingsData.u2fMode !== "or" || root.unlockInProgress || root.authBusy || active)
                 return;
             abort();
             root.u2fPending = true;
@@ -602,6 +643,7 @@ Scope {
         root.attemptInfoMessages = [];
         root.lockoutAnnouncedThisAttempt = false;
         root.resetAuthFlows();
+        root.responseSubmitted = false;
         fprint.tries = 0;
         fprint.errorTries = 0;
         if (!SettingsData.lockPamExternallyManaged && !dankshellConfigWatcher.loaded && !userPamWatcher.loaded)

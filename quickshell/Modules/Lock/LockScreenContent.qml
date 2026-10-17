@@ -145,8 +145,14 @@ FocusScope {
     }
 
     Keys.onPressed: event => {
-        if (widgetLayer.handleKey(event))
+        if (widgetLayer.handleKey(event)) {
             event.accepted = true;
+            return;
+        }
+        if (event.key !== Qt.Key_Escape || !editorLoader.item)
+            return;
+        editorLoader.item.dismiss();
+        event.accepted = true;
     }
 
     WidgetEditLayer {
@@ -160,7 +166,7 @@ FocusScope {
         editMode: root.demoMode
         bottomInset: editorLoader.item?.fabReserved ?? 0
         onFocusStolen: root.focusPasswordField()
-        onOptionsRequested: instanceData => editorLoader.item?.showOptions(instanceData)
+        onOptionsRequested: instanceId => editorLoader.item?.showOptions(instanceId)
     }
 
     Pam {

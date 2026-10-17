@@ -3,6 +3,7 @@ package sysupdate
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -46,7 +47,12 @@ func Run(ctx context.Context, argv []string, opts RunOptions) error {
 		if cmd.Process == nil {
 			return nil
 		}
-		return syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+		err := syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+		// Once pkexec authenticates, the group is root-owned and cannot be signalled.
+		if errors.Is(err, syscall.EPERM) && opts.OnLine != nil {
+			opts.OnLine("Cannot stop a privileged upgrade; waiting for it to finish.")
+		}
+		return err
 	}
 
 	stdout, err := cmd.StdoutPipe()
@@ -68,7 +74,18 @@ func Run(ctx context.Context, argv []string, opts RunOptions) error {
 	go pump(stderr, opts.OnLine, &wg)
 	wg.Wait()
 
-	return cmd.Wait()
+	err = cmd.Wait()
+	// The kill was refused and the process then exited cleanly, so the run succeeded.
+	if errors.Is(err, syscall.EPERM) {
+		return nil
+	}
+	return err
+}
+
+// pkexec exits 126 when the authentication dialog is dismissed.
+func isAuthDismissed(err error) bool {
+	var exitErr *exec.ExitError
+	return errors.As(err, &exitErr) && exitErr.ExitCode() == 126
 }
 
 func pump(r io.Reader, onLine func(string), wg *sync.WaitGroup) {

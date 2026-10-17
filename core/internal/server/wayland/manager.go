@@ -1539,7 +1539,8 @@ func (m *Manager) applyConfiguredICCForOutput(out *outputState, outputName strin
 		changed = true
 	}
 
-	if iccPath, ok := iccProfiles[outputName]; ok {
+	if profileName, ok := iccProfiles[outputName]; ok {
+		iccPath := resolveICCProfile(profileName)
 		profile, err := icc.ParseFile(iccPath)
 		switch {
 		case err != nil:
@@ -1559,7 +1560,7 @@ func (m *Manager) applyConfiguredICCForOutput(out *outputState, outputName strin
 }
 
 // validateOutputName rejects names no wl_output can report, so a typo or an
-// empty argument cannot persist an entry in wayland.json that nothing will ever
+// empty argument cannot persist an entry in icc.json that nothing will ever
 // match.
 func validateOutputName(name string) error {
 	switch {
@@ -1571,9 +1572,7 @@ func validateOutputName(name string) error {
 	return nil
 }
 
-// validateICCProfilePath rejects paths that cannot be resolved later: the path
-// is persisted and read again on the next start, when the daemon no longer has
-// the working directory the caller had.
+// validateICCProfilePath rejects relative paths, the daemon does not share the caller's working directory.
 func validateICCProfilePath(path string) error {
 	switch {
 	case path == "":
@@ -1584,9 +1583,8 @@ func validateICCProfilePath(path string) error {
 	return nil
 }
 
-// ApplyICC loads and applies an ICC profile to a specific output.
+// ApplyICC copies an ICC profile into ICCProfilesDir and applies it to an output.
 // outputName is the wl_output name (e.g., "DP-1").
-// iccPath is the path to the .icm/.icc profile file.
 func (m *Manager) ApplyICC(outputName, iccPath string) error {
 	if err := validateOutputName(outputName); err != nil {
 		return err
@@ -1595,7 +1593,6 @@ func (m *Manager) ApplyICC(outputName, iccPath string) error {
 		return err
 	}
 
-	// 1. Parse and validate the ICC profile
 	profile, err := icc.ParseFile(iccPath)
 	if err != nil {
 		return fmt.Errorf("icc: failed to parse %s: %w", iccPath, err)
@@ -1610,7 +1607,13 @@ func (m *Manager) ApplyICC(outputName, iccPath string) error {
 		return fmt.Errorf("icc: %s has no vcgt table, so it has no gamma ramp to apply", iccPath)
 	}
 
-	// 2. Post to wayland actor thread to apply
+	profilesDir := ICCProfilesDir()
+	profileName, err := stageICCProfile(profilesDir, iccPath)
+	if err != nil {
+		return fmt.Errorf("icc: failed to store %s in %s: %w", iccPath, profilesDir, err)
+	}
+	stagedPath := filepath.Join(profilesDir, profileName)
+
 	m.post(func() {
 		defer m.updateStateFromSchedule()
 
@@ -1620,12 +1623,11 @@ func (m *Manager) ApplyICC(outputName, iccPath string) error {
 			return
 		}
 
-		// Find the output by name
 		var targetOutput *outputState
 		m.outputs.Range(func(_ uint32, out *outputState) bool {
 			if name, ok := m.outputNames.Load(out.id); ok && name == outputName {
 				targetOutput = out
-				return false // stop
+				return false
 			}
 			return true
 		})
@@ -1634,7 +1636,7 @@ func (m *Manager) ApplyICC(outputName, iccPath string) error {
 			return
 		}
 
-		targetOutput.iccPath = iccPath
+		targetOutput.iccPath = stagedPath
 		targetOutput.iccProfile = profile
 		m.publishICCState()
 
@@ -1644,17 +1646,14 @@ func (m *Manager) ApplyICC(outputName, iccPath string) error {
 		m.applyCurrentTemp("icc-apply")
 	})
 
-	// 3. Persist to config
 	m.configMutex.Lock()
 	if m.config.ICCProfiles == nil {
 		m.config.ICCProfiles = make(map[string]string)
 	}
-	m.config.ICCProfiles[outputName] = iccPath
+	m.config.ICCProfiles[outputName] = profileName
 	savedConfig := cloneConfig(m.config)
 	m.configMutex.Unlock()
 
-	// Save to disk. Only the ICC fields are written: the night light fields in
-	// this config belong to the shell, not to the daemon.
 	if err := SaveICCConfig(savedConfig.ICCProfiles, savedConfig.OutputTemps); err != nil {
 		log.Warnf("icc: failed to save config: %v", err)
 	}

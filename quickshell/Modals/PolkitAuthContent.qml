@@ -84,7 +84,6 @@ DDialog {
             }
             root.awaitingFprintForPassword = false;
             root.isLoading = false;
-            root.passwordInput = "";
             passwordField.forceActiveFocus();
         }
 

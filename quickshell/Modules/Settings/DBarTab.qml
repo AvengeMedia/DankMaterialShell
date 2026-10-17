@@ -19,6 +19,7 @@ Item {
     readonly property bool selectedIslandEnabled: bar.selectedBarIsIsland && (bar.selectedBarConfig?.enabled ?? false)
     readonly property string clickThroughHint: I18n.tr("Disabled by Click through", "bar hover popouts card, Click through is the Advanced toggle name")
     readonly property bool selectedIslandFree: bar.selectedBarIsIsland && SettingsData.islandFreePlacement(bar.selectedBarConfig)
+    readonly property bool selectedIslandOverlay: bar.selectedBarIsIsland && bar.islandSetting("islandFloating") && !selectedIslandFree
     readonly property bool selectedIslandDocked: bar.selectedBarIsIsland && !selectedIslandFree
     readonly property bool popupGapsZeroed: SettingsData.barUsesConnectedFrameStyle(bar.selectedBarConfig) && !(bar.selectedBarConfig?.useOverlayLayer ?? false)
     readonly property int placementIndex: !bar.islandSetting("islandFloating") ? 0 : (bar.islandSetting("islandPlacement") === "free" ? 2 : 1)
@@ -233,7 +234,7 @@ Item {
             settingKey: "barVisibility"
             collapsible: true
             expanded: false
-            visible: (bar.selectedBarConfig?.enabled ?? false) && !bar.selectedBarIsIsland
+            visible: (bar.selectedBarConfig?.enabled ?? false) && (!bar.selectedBarIsIsland || dankBarTab.selectedIslandOverlay)
 
             SettingsRow {
                 iconName: "info"
@@ -247,7 +248,7 @@ Item {
                 resetStore: bar
                 settingKey: "barAutoHide"
                 tags: ["autohide", "auto-hide", "reveal", "intellihide", "delay", "hide"]
-                visible: !bar.islandOwnsSelectedBarTop
+                visible: !bar.islandShadowsSelectedBar && (!bar.selectedBarIsIsland || dankBarTab.selectedIslandOverlay)
                 text: I18n.tr("Auto-hide", "toggle to automatically hide the bar or dock")
                 valueKeys: ["autoHideDelay"]
                 checked: bar.selectedBarConfig?.autoHide ?? false
@@ -268,7 +269,7 @@ Item {
 
             SettingsToggleRow {
                 settingKey: "barAutoHideStrict"
-                visible: (bar.selectedBarConfig?.autoHide ?? false) && !bar.islandOwnsSelectedBarTop
+                visible: (bar.selectedBarConfig?.autoHide ?? false) && !bar.islandShadowsSelectedBar && (!bar.selectedBarIsIsland || dankBarTab.selectedIslandOverlay)
                 tags: ["autohide", "strict", "popout"]
                 text: I18n.tr("Strict auto-hide", "Dank bar setting: hide the bar when the pointer leaves even if a menu or bar popover is still open")
                 description: I18n.tr("Hides even while a bar popout or menu is open", "bar strict auto-hide toggle description")
@@ -284,7 +285,7 @@ Item {
             SettingsToggleRow {
                 settingKey: "barHideWhenWindowsOpen"
                 tags: ["hide", "windows", "empty", "workspace"]
-                visible: (bar.selectedBarConfig?.autoHide ?? false) && !bar.islandOwnsSelectedBarTop && CompositorService.supportsBarAutoHideReveal
+                visible: (bar.selectedBarConfig?.autoHide ?? false) && !bar.islandShadowsSelectedBar && (!bar.selectedBarIsIsland || dankBarTab.selectedIslandOverlay) && CompositorService.supportsBarAutoHideReveal
                 text: I18n.tr("Hide when windows open")
                 description: I18n.tr("Stays visible while the workspace has no windows", "bar hide when windows open toggle description")
                 checked: bar.selectedBarConfig?.showOnWindowsOpen ?? false

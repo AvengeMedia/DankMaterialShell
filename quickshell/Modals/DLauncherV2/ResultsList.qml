@@ -493,49 +493,6 @@ Item {
     }
 
     Rectangle {
-        id: bottomShadow
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: bottomSectionHeader.visible ? bottomSectionHeader.height : 0
-        height: Theme.spacingXL
-        z: 100
-        visible: {
-            if (BlurService.enabled)
-                return false;
-            if (mainListView.contentHeight <= mainListView.height)
-                return false;
-            var atBottom = mainListView.contentY >= mainListView.contentHeight - mainListView.height + mainListView.originY - Theme.spacingXS;
-            if (atBottom)
-                return false;
-
-            var flatModel = root.controller?.flatModel;
-            if (!flatModel || flatModel.length === 0)
-                return false;
-            var lastItemIdx = -1;
-            for (var i = flatModel.length - 1; i >= 0; i--) {
-                if (!flatModel[i].isHeader) {
-                    lastItemIdx = i;
-                    break;
-                }
-            }
-            if (lastItemIdx >= 0 && root.controller?.selectedFlatIndex === lastItemIdx)
-                return false;
-            return true;
-        }
-        gradient: Gradient {
-            GradientStop {
-                position: 0.0
-                color: "transparent"
-            }
-            GradientStop {
-                position: 1.0
-                color: Theme.readableSurface
-            }
-        }
-    }
-
-    Rectangle {
         id: stickyHeader
         anchors.left: parent.left
         anchors.right: parent.right

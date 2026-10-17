@@ -61,6 +61,8 @@ T.Control {
     // Keyboard focus on the row or any control inside it tints the row, so navigation reads without a focus ring
     readonly property Item activeItem: Window.activeFocusItem
     readonly property bool focusWithin: (activeItem?.visualFocus ?? false) && _contains(activeItem)
+    readonly property real headerBand: paddingV * 2 + headerLine.height
+    readonly property bool headerHovered: rowHover.hovered && (!hasBody || rowHover.point.position.y < headerBand)
 
     function _contains(item) {
         for (let p = item; p; p = p.parent) {
@@ -159,14 +161,17 @@ T.Control {
 
     Rectangle {
         id: stateLayer
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        height: root.hasBody && !root.focusWithin ? root.headerBand : root.height
         visible: root.clickable || root.focusWithin
         color: root.contentColor
-        opacity: !root.enabled ? 0 : (clickControl.down ? Theme.stateLayerPressed : root.focusWithin ? Theme.stateLayerFocus : (clickControl.hovered ? Theme.stateLayerHover : 0))
+        opacity: !root.enabled ? 0 : (clickControl.down ? Theme.stateLayerPressed : root.focusWithin ? Theme.stateLayerFocus : (root.headerHovered ? Theme.stateLayerHover : 0))
         topLeftRadius: root.topRadius
         topRightRadius: root.topRadius
-        bottomLeftRadius: root.bottomRadius
-        bottomRightRadius: root.bottomRadius
+        bottomLeftRadius: height < root.height ? 0 : root.bottomRadius
+        bottomRightRadius: bottomLeftRadius
 
         Behavior on opacity {
             enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
@@ -178,14 +183,39 @@ T.Control {
         }
     }
 
-    DRipple {
-        id: ripple
-        visible: root.clickable
-        rippleColor: root.contentColor
-        topLeftRadius: root.topRadius
-        topRightRadius: root.topRadius
-        bottomLeftRadius: root.bottomRadius
-        bottomRightRadius: root.bottomRadius
+    Item {
+        id: pressSurface
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        height: root.hasBody ? root.headerBand : root.height
+
+        DRipple {
+            id: ripple
+            visible: root.clickable
+            rippleColor: root.contentColor
+            topLeftRadius: root.topRadius
+            topRightRadius: root.topRadius
+            bottomLeftRadius: root.hasBody ? 0 : root.bottomRadius
+            bottomRightRadius: bottomLeftRadius
+        }
+
+        StyledButton {
+            id: clickControl
+            anchors.fill: parent
+            enabled: root.clickable && root.enabled
+            hoverEnabled: false
+            focusPolicy: Qt.NoFocus
+            background: null
+            Accessible.ignored: true
+            onPressedChanged: {
+                if (pressed) {
+                    root.forceActiveFocus(Qt.MouseFocusReason);
+                    ripple.trigger(pressX, pressY);
+                }
+            }
+            onClicked: root.clicked(false)
+        }
     }
 
     Rectangle {
@@ -201,25 +231,11 @@ T.Control {
         visible: root.visualFocus && root.clickable
     }
 
-    StyledButton {
-        id: clickControl
-        anchors.fill: parent
-        enabled: root.clickable && root.enabled
-        hoverEnabled: root.clickable
-        focusPolicy: Qt.NoFocus
-        background: null
-        Accessible.ignored: true
-        onPressedChanged: {
-            if (pressed) {
-                root.forceActiveFocus(Qt.MouseFocusReason);
-                ripple.trigger(pressX, pressY);
-            }
-        }
-        onClicked: root.clicked(false)
-
-        HoverHandler {
-            cursorShape: root.clickable ? Qt.PointingHandCursor : Qt.ArrowCursor
-        }
+    // Hover must live on the row itself: Qt skips siblings once a hover-enabled child is hovered
+    HoverHandler {
+        id: rowHover
+        enabled: root.clickable
+        cursorShape: root.headerHovered ? Qt.PointingHandCursor : Qt.ArrowCursor
     }
 
     Column {

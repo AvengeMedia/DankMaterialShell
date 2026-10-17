@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -51,9 +50,6 @@ var (
 var (
 	mangoDialect                = mangoconf.Detect
 	mangoSessionTargetInstalled = mangoconf.SessionTargetInstalled
-	mangoAddWants               = func() error {
-		return exec.Command("systemctl", "--user", "add-wants", mangoconf.SessionTarget, "dms").Run()
-	}
 )
 
 // MangoExistingBinds returns where the user's Mango binds live: a non-empty
@@ -88,24 +84,6 @@ func extractMangoLines(text string, match *regexp.Regexp) string {
 	return strings.Join(out, "\n") + "\n"
 }
 
-// mangoSystemdAutostart starts dms.service from mango-session.target and
-// returns false when that is not possible, so the config keeps exec-once.
-func (cd *ConfigDeployer) mangoSystemdAutostart(useSystemd bool) bool {
-	link := mangoconf.WantsLink()
-	if !useSystemd || !mangoSessionTargetInstalled() {
-		if err := os.Remove(link); err == nil {
-			cd.log("Removed dms.service from " + mangoconf.SessionTarget)
-		}
-		return false
-	}
-	if err := mangoAddWants(); err != nil {
-		cd.log(fmt.Sprintf("Warning: add-wants %s dms failed (%v); starting DMS from the Mango config instead", mangoconf.SessionTarget, err))
-		return false
-	}
-	cd.log("DMS starts as dms.service with " + mangoconf.SessionTarget)
-	return true
-}
-
 func (cd *ConfigDeployer) deployMangoConfig(terminalCommand string, useSystemd bool) (DeploymentResult, error) {
 	configDir := mangoconf.Dir()
 	result := DeploymentResult{
@@ -134,7 +112,7 @@ func (cd *ConfigDeployer) deployMangoConfig(terminalCommand string, useSystemd b
 
 	dialect := mangoDialect()
 	newConfig := strings.ReplaceAll(MangoConfig, "{{TERMINAL_COMMAND}}", terminalCommand)
-	if cd.mangoSystemdAutostart(useSystemd) {
+	if cd.systemdAutostart(deps.WindowManagerMango, useSystemd) {
 		newConfig = mangoExecOnceDMS.ReplaceAllString(newConfig, "")
 	}
 	if err := os.WriteFile(result.Path, []byte(dialect.Translate(newConfig)), 0o644); err != nil {

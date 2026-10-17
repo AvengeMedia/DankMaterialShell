@@ -79,6 +79,7 @@ func TestNiriCategorizeByAction(t *testing.T) {
 		{"close-window", "Window"},
 		{"spawn", "Execute"},
 		{"power-off-monitors", "System"},
+		{"toggle-touchpad", "System"},
 		{"screenshot-window", "Screenshot"},
 		{"toggle-overview", "Overview"},
 		{"next-window", "Alt-Tab"},

@@ -792,6 +792,7 @@ func getCommonCommands() []*cobra.Command {
 		blurCmd,
 		trashCmd,
 		systemCmd,
+		systemdCmd,
 		switchUserCmd,
 		dmenuCmd,
 	}...)

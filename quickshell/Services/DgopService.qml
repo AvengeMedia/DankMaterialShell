@@ -30,6 +30,8 @@ Singleton {
     property var gpuPciIds: []
     property var gpuPciIdRefCounts: ({})
     property int processLimit: 20
+    // Views that search processes need every process, not just the top ones by CPU
+    property int fullProcessListRefs: 0
     property string processSort: "cpu"
     property bool noCpu: false
 
@@ -141,6 +143,18 @@ Singleton {
             // This handles the case where PCI IDs were loaded after modules were added
             updateAllStats();
         }
+    }
+
+    // Searching only the top processes by CPU makes idle matches appear and
+    // vanish between refreshes (#3641), so a search asks for the whole list.
+    function requestFullProcessList() {
+        fullProcessListRefs++;
+        if (fullProcessListRefs === 1)
+            updateAllStats();
+    }
+
+    function releaseFullProcessList() {
+        fullProcessListRefs = Math.max(0, fullProcessListRefs - 1);
     }
 
     function removeRef(modules = null) {
@@ -385,7 +399,8 @@ Singleton {
         }
 
         if (enabledModules.indexOf("processes") !== -1 || enabledModules.indexOf("all") !== -1) {
-            params.limit = 100; // Get more data for client sorting
+            // 0 means no limit in dgop
+            params.limit = fullProcessListRefs > 0 ? 0 : 100;
             params.sort = "cpu";
             if (noCpu) {
                 params.noCpu = true;

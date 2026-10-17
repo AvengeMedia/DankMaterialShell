@@ -102,6 +102,11 @@ func IsUnsupportedDistro(distroID, versionID string) bool {
 		return true
 	}
 
+	if IsEnterpriseLinux(distroID) {
+		major, err := strconv.Atoi(strings.SplitN(versionID, ".", 2)[0])
+		return err != nil || major < 10
+	}
+
 	if distroID == "debian" {
 		// unstable/sid support
 		if versionID == "sid" || versionID == "testing" {

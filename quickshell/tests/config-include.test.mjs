@@ -61,7 +61,7 @@ test("mango input fragment maps choices onto libinput numbers and spells numlock
     assert.ok(found, "mangoInputLines not found in MangoService.qml");
     const scope = vm.createContext({});
     vm.runInContext(found[0], scope);
-    const defaults = Object.fromEntries(Object.keys(SPEC).filter(key => /^(mouse|touchpad|keyboard)[A-Z]/.test(key)).map(key => [key, SPEC[key].def]));
+    const defaults = Object.fromEntries(Object.keys(SPEC).filter(key => /^(mouse|touchpad|keyboard)[A-Z]|^focusFollowsMouse$/.test(key)).map(key => [key, SPEC[key].def]));
     const lines = (overrides, snake = false) => [...scope.mangoInputLines(Object.assign({}, defaults, overrides), snake)];
     const value = (list, key) => list.find(line => line.startsWith(key + "="))?.slice(key.length + 1);
 
@@ -81,4 +81,8 @@ test("mango input fragment maps choices onto libinput numbers and spells numlock
     assert.equal(value(chosen, "repeat_delay"), "300");
     assert.equal(value(chosen, "numlockon"), "0");
     assert.equal(value(lines({ keyboardNumlock: true }, true), "numlock_on"), "1");
+
+    assert.equal(value(stock, "sloppy_focus"), undefined, "untouched focus mode stays Mango's");
+    for (const mode of [0, 1])
+        assert.equal(value(lines({ focusFollowsMouse: mode }), "sloppy_focus"), String(mode));
 });

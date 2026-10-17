@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
@@ -17,18 +19,37 @@ import (
 // overhead in the line-delimited IPC response.
 const maxIPCMessageSize = 96 * 1024 * 1024
 
-func sendServerRequest(req ipc.Request) (*ipc.Response[any], error) {
-	socketPath := getServerSocketPath()
+// serverHandshakeTimeout bounds connecting, the greeting and sending the
+// request, so a stuck server can't hang the CLI. Replies get no limit because
+// some requests (matugen queue --wait) legitimately take long.
+var serverHandshakeTimeout = 2 * time.Second
 
-	conn, err := net.Dial("unix", socketPath)
+func dialServer() (net.Conn, *bufio.Scanner, error) {
+	conn, err := net.DialTimeout("unix", getServerSocketPath(), serverHandshakeTimeout)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to server (is it running?): %w", err)
+		return nil, nil, fmt.Errorf("failed to connect to server (is it running?): %w", err)
 	}
-	defer conn.Close()
+	_ = conn.SetDeadline(time.Now().Add(serverHandshakeTimeout))
 
 	scanner := bufio.NewScanner(conn)
 	scanner.Buffer(make([]byte, bufio.MaxScanTokenSize), maxIPCMessageSize)
-	scanner.Scan() // discard initial capabilities message
+	if !scanner.Scan() { // initial capabilities message
+		conn.Close()
+		err := scanner.Err()
+		if err == nil {
+			err = io.EOF
+		}
+		return nil, nil, fmt.Errorf("server did not respond: %w", err)
+	}
+	return conn, scanner, nil
+}
+
+func sendServerRequest(req ipc.Request) (*ipc.Response[any], error) {
+	conn, scanner, err := dialServer()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
 
 	reqData, err := json.Marshal(req)
 	if err != nil {
@@ -43,6 +64,7 @@ func sendServerRequest(req ipc.Request) (*ipc.Response[any], error) {
 		return nil, fmt.Errorf("failed to write newline: %w", err)
 	}
 
+	_ = conn.SetDeadline(time.Time{})
 	if !scanner.Scan() {
 		return nil, fmt.Errorf("failed to read response")
 	}
@@ -58,17 +80,11 @@ func sendServerRequest(req ipc.Request) (*ipc.Response[any], error) {
 // sendServerRequestFireAndForget sends a request without waiting for a response.
 // Useful for commands that trigger UI or async operations.
 func sendServerRequestFireAndForget(req ipc.Request) error {
-	socketPath := getServerSocketPath()
-
-	conn, err := net.Dial("unix", socketPath)
+	conn, _, err := dialServer()
 	if err != nil {
-		return fmt.Errorf("failed to connect to server (is it running?): %w", err)
+		return err
 	}
 	defer conn.Close()
-
-	scanner := bufio.NewScanner(conn)
-	scanner.Buffer(make([]byte, bufio.MaxScanTokenSize), maxIPCMessageSize)
-	scanner.Scan() // discard initial capabilities message
 
 	reqData, err := json.Marshal(req)
 	if err != nil {

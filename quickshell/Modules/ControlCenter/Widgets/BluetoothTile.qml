@@ -47,7 +47,6 @@ CcTile {
             return I18n.tr("Connecting...", "bluetooth status");
         return primaryDevice ? deviceLabel(primaryDevice) : I18n.tr("No devices", "bluetooth status");
     }
-    dockedText: primaryDevice && adapterOn ? subtitle : I18n.tr("Bluetooth", "bluetooth status")
     active: adapterOn
     showExpand: true
     enabled: widgetDef?.enabled ?? true

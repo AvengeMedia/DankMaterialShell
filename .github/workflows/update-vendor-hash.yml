@@ -8,6 +8,7 @@ on:
       - "core/go.sum"
     branches:
       - master
+      - "stable-*"
 
 permissions:
   contents: write
