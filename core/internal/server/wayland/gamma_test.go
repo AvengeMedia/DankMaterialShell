@@ -243,3 +243,12 @@ func TestProfileRampWithTempAppliesGammaAndContrast(t *testing.T) {
 		})
 	}
 }
+
+func TestBrightnessScale_NeverReachesBlack(t *testing.T) {
+	if got := brightnessScale(0); got != outputBrightnessFloor {
+		t.Errorf("brightnessScale(0) = %v, want the floor %v", got, outputBrightnessFloor)
+	}
+	if got := brightnessScale(100); got != 1 {
+		t.Errorf("brightnessScale(100) = %v, want 1", got)
+	}
+}

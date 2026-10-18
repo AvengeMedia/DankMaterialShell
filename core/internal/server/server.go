@@ -243,6 +243,9 @@ func InitializeBrightnessManager() error {
 	}
 
 	brightnessManager = manager
+	if waylandManager != nil {
+		manager.AttachGamma(waylandManager)
+	}
 
 	log.Info("Brightness manager initialized")
 	return nil

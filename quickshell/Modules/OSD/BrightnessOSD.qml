@@ -17,6 +17,7 @@ LevelOSD {
         switch (device?.class) {
         case "backlight":
         case "ddc":
+        case "software":
             return "monitor";
         default:
             return BrightnessService.brightnessIconName(device);
