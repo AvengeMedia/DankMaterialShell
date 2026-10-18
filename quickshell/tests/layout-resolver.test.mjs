@@ -49,6 +49,9 @@ test("absent, empty, explicit and fallback assignments remain distinct", () => {
         assert.equal(covers({ screenPreferences: ["DP-2"] }), false);
         assert.equal(covers({ screenPreferences: [], showOnLastDisplay: true }), count === 1);
         assert.equal(covers({ screenPreferences: ["missing"], showOnLastDisplay: true }), count === 1);
+        assert.equal(covers({ hideOnLastDisplay: true }), count !== 1);
+        assert.equal(covers({ screenPreferences: ["DP-1"], hideOnLastDisplay: true }), count !== 1);
+        assert.equal(covers({ screenPreferences: [], showOnLastDisplay: true, hideOnLastDisplay: true }), false);
     }
 });
 

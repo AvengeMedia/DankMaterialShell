@@ -47,7 +47,8 @@ Column {
             enabled: true,
             position: freeEdge >= 0 ? freeEdge : (defaultBar.position ?? 0),
             screenPreferences: ["all"],
-            showOnLastDisplay: true
+            showOnLastDisplay: true,
+            hideOnLastDisplay: false
         });
         delete newBar.island;
         delete newBar.dot;

@@ -32,6 +32,8 @@ function screenMatches(screen, preferences, screens, displayNameMode) {
 }
 
 function coversScreen(config, screen, screens, displayNameMode) {
+    if ((config?.hideOnLastDisplay ?? false) && screens.length === 1)
+        return false;
     const preferences = config?.screenPreferences || ["all"];
     return preferences.includes("all") || screenMatches(screen, preferences, screens, displayNameMode) || ((config?.showOnLastDisplay ?? false) && screens.length === 1);
 }

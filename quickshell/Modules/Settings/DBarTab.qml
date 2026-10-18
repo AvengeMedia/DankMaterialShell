@@ -32,8 +32,22 @@ Item {
     }
 
     function setBarShowOnLastDisplay(barId, value) {
-        SettingsData.updateBarConfig(barId, {
-            showOnLastDisplay: value
+        SettingsData.updateBarConfig(barId, value ? {
+            showOnLastDisplay: true,
+            hideOnLastDisplay: false
+        } : {
+            showOnLastDisplay: false
+        });
+        if (Quickshell.screens.length === 1)
+            bar.notifyHorizontalBarChange();
+    }
+
+    function setBarHideOnLastDisplay(barId, value) {
+        SettingsData.updateBarConfig(barId, value ? {
+            hideOnLastDisplay: true,
+            showOnLastDisplay: false
+        } : {
+            hideOnLastDisplay: false
         });
         if (Quickshell.screens.length === 1)
             bar.notifyHorizontalBarChange();
@@ -223,8 +237,11 @@ Item {
                 allowEmpty: true
                 showLastDisplay: true
                 showOnLastDisplay: bar.selectedBarConfig?.showOnLastDisplay ?? true
+                allowHideOnLastDisplay: true
+                hideOnLastDisplay: bar.selectedBarConfig?.hideOnLastDisplay ?? false
                 preferencesHandler: prefs => dankBarTab.setBarScreenPreferences(bar.selectedBarId, prefs)
                 onLastDisplayToggled: checked => dankBarTab.setBarShowOnLastDisplay(bar.selectedBarId, checked)
+                onHideOnLastDisplayToggled: checked => dankBarTab.setBarHideOnLastDisplay(bar.selectedBarId, checked)
             }
         }
 
