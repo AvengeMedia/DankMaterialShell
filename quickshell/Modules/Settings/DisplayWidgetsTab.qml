@@ -104,6 +104,25 @@ Item {
         SettingsData.set("showOnLastDisplay", newPrefs);
     }
 
+    function getHideOnLastDisplay(componentId) {
+        if (!componentId.startsWith("bar:"))
+            return false;
+        const barId = componentId.substring(4);
+        return SettingsData.getBarConfig(barId)?.hideOnLastDisplay ?? false;
+    }
+
+    function setHideOnLastDisplay(componentId, enabled) {
+        if (!componentId.startsWith("bar:"))
+            return;
+        const barId = componentId.substring(4);
+        SettingsData.updateBarConfig(barId, enabled ? {
+            "hideOnLastDisplay": true,
+            "showOnLastDisplay": false
+        } : {
+            "hideOnLastDisplay": false
+        });
+    }
+
     SettingsPage {
         id: mainColumn
 
@@ -157,8 +176,11 @@ Item {
                     allowEmpty: true
                     showLastDisplay: ["notifications", "osd", "toast", "notepad"].includes(componentCard.modelData.id) || componentCard.modelData.id.startsWith("bar:")
                     showOnLastDisplay: root.getShowOnLastDisplay(componentCard.modelData.id)
+                    allowHideOnLastDisplay: componentCard.modelData.id.startsWith("bar:")
+                    hideOnLastDisplay: root.getHideOnLastDisplay(componentCard.modelData.id)
                     preferencesHandler: prefs => root.setScreenPreferences(componentCard.modelData.id, prefs)
                     onLastDisplayToggled: checked => root.setShowOnLastDisplay(componentCard.modelData.id, checked)
+                    onHideOnLastDisplayToggled: checked => root.setHideOnLastDisplay(componentCard.modelData.id, checked)
                 }
 
                 SettingsToggleRow {
