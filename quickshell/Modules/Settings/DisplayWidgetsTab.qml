@@ -90,8 +90,11 @@ Item {
     function setShowOnLastDisplay(componentId, enabled) {
         if (componentId.startsWith("bar:")) {
             const barId = componentId.substring(4);
-            SettingsData.updateBarConfig(barId, {
-                "showOnLastDisplay": enabled
+            SettingsData.updateBarConfig(barId, enabled ? {
+                "showOnLastDisplay": true,
+                "hideOnLastDisplay": false
+            } : {
+                "showOnLastDisplay": false
             });
             return;
         }
