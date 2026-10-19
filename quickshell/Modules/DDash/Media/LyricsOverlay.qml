@@ -14,6 +14,7 @@ FocusScope {
     property var lyrics: null
     property bool smoothHighlight: root.player?.smoothLyrics ?? MediaOptions.defaults.smoothLyrics
     property real radius: DashMetrics.mediaInnerRadius
+    property real contentInset: 0
     property Item blurSource: null
     property Item backgroundParent: null
     property real backgroundRadius: radius
@@ -219,7 +220,7 @@ FocusScope {
     Item {
         id: content
         anchors.fill: parent
-        anchors.margins: Math.max(0, root.shapeInset - Theme.spacingM)
+        anchors.margins: Math.max(0, Math.max(root.shapeInset, root.contentInset) - Theme.spacingM)
 
         StyledText {
             id: heading
