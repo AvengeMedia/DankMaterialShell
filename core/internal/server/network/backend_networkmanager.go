@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"maps"
 	"sync"
+	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/Wifx/gonetworkmanager/v2"
@@ -80,6 +81,9 @@ type NetworkManagerBackend struct {
 	signals  chan *dbus.Signal
 	sigWG    sync.WaitGroup
 	stopChan chan struct{}
+
+	wifiRefreshTimer *time.Timer
+	wifiRefreshMu    sync.Mutex
 
 	secretAgent  *SecretAgent
 	promptBroker PromptBroker

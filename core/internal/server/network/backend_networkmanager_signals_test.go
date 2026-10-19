@@ -1,7 +1,9 @@
 package network
 
 import (
+	"sync/atomic"
 	"testing"
+	"time"
 
 	mock_gonetworkmanager "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/github.com/Wifx/gonetworkmanager/v2"
 	"github.com/Wifx/gonetworkmanager/v2"
@@ -97,4 +99,34 @@ func TestNetworkManagerBackend_HandleDeviceChange_UnmanagedRefreshesHotspotState
 	backend.stateMutex.RLock()
 	defer backend.stateMutex.RUnlock()
 	assert.False(t, backend.state.HotspotAvailable, "availability must be recomputed when the only AP-capable radio becomes unmanaged")
+}
+
+func TestNetworkManagerBackend_HandleWiFiChange_CoalescesAccessPointBurst(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	mockWiFi := mock_gonetworkmanager.NewMockDeviceWireless(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
+	backend.settings = emptySettingsMock(t)
+	backend.wifiDevice = mockWiFi
+	backend.wifiDev = mockWiFi
+
+	var stateChangeCalls atomic.Int32
+	backend.onStateChange = func() {
+		stateChangeCalls.Add(1)
+	}
+
+	mockWiFi.EXPECT().GetAccessPoints().Return([]gonetworkmanager.AccessPoint{}, nil).Once()
+
+	changes := map[string]dbus.Variant{
+		"AccessPoints": dbus.MakeVariant([]dbus.ObjectPath{}),
+	}
+	for range 5 {
+		backend.handleWiFiChange(changes)
+	}
+	assert.Zero(t, stateChangeCalls.Load(), "the list must not be rebuilt per access point")
+
+	assert.Eventually(t, func() bool {
+		return stateChangeCalls.Load() == 1
+	}, 4*wifiNetworksUpdateDelay, 10*time.Millisecond)
 }
