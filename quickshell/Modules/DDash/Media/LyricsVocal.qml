@@ -90,6 +90,7 @@ Item {
     }
 
     Item {
+        y: (root.implicitHeight - height) / 2
         width: parent.width
         height: Math.ceil(line.implicitHeight * root.textScale)
 

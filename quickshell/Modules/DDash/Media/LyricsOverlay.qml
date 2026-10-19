@@ -340,6 +340,18 @@ FocusScope {
                         }
                     }
                 }
+
+                StateLayer {
+                    anchors.fill: parent
+                    enabled: root.controller.canSeekLines
+                    stateColor: Theme.onSurfaceVariant
+                    cornerRadius: Theme.cornerRadius
+                    onClicked: {
+                        root.following = true;
+                        root.forceActiveFocus(Qt.MouseFocusReason);
+                        root.controller.seekToLine(lyric.index);
+                    }
+                }
             }
         }
 
