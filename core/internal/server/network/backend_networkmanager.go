@@ -84,6 +84,7 @@ type NetworkManagerBackend struct {
 
 	wifiRefreshTimer *time.Timer
 	wifiRefreshMu    sync.Mutex
+	wifiRefreshWG    sync.WaitGroup
 
 	secretAgent  *SecretAgent
 	promptBroker PromptBroker

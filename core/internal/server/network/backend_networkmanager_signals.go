@@ -209,8 +209,6 @@ func (b *NetworkManagerBackend) stopSignalPump() {
 		return
 	}
 
-	b.cancelWiFiNetworksUpdate()
-
 	b.dbusConn.RemoveMatchSignal(
 		dbus.WithMatchObjectPath(dbus.ObjectPath(dbusNMPath)),
 		dbus.WithMatchInterface(dbusPropsInterface),
@@ -293,7 +291,8 @@ func (b *NetworkManagerBackend) stopSignalPump() {
 	}
 
 	b.sigWG.Wait()
-
+	b.cancelWiFiNetworksUpdate()
+	b.wifiRefreshWG.Wait()
 }
 
 func (b *NetworkManagerBackend) handleDBusSignal(sig *dbus.Signal) {
@@ -572,7 +571,10 @@ func (b *NetworkManagerBackend) scheduleWiFiNetworksUpdate() {
 	if b.wifiRefreshTimer != nil {
 		return
 	}
+	b.wifiRefreshWG.Add(1)
 	b.wifiRefreshTimer = time.AfterFunc(wifiNetworksUpdateDelay, func() {
+		defer b.wifiRefreshWG.Done()
+
 		b.wifiRefreshMu.Lock()
 		b.wifiRefreshTimer = nil
 		b.wifiRefreshMu.Unlock()
@@ -588,9 +590,11 @@ func (b *NetworkManagerBackend) cancelWiFiNetworksUpdate() {
 	b.wifiRefreshMu.Lock()
 	defer b.wifiRefreshMu.Unlock()
 
-	if b.wifiRefreshTimer != nil && b.wifiRefreshTimer.Stop() {
-		b.wifiRefreshTimer = nil
+	if b.wifiRefreshTimer == nil || !b.wifiRefreshTimer.Stop() {
+		return
 	}
+	b.wifiRefreshTimer = nil
+	b.wifiRefreshWG.Done()
 }
 
 func (b *NetworkManagerBackend) handleAccessPointChange(changes map[string]dbus.Variant) {
