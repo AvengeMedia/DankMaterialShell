@@ -39,6 +39,8 @@ ClippingRectangle {
     layer.effect: MultiEffect {
         maskEnabled: true
         maskSource: artStyle === "slanted" ? slantedShapeMask.item : cookieShapeMask.item
+        maskThresholdMin: 0.5
+        maskSpreadAtMin: 1
     }
 
     Loader {
