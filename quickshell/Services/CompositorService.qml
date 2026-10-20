@@ -94,6 +94,34 @@ Singleton {
     property int windowStateRevision: 0
     onToplevelsChanged: windowStateRevision++
     onWorkspaceStateChanged: windowStateRevision++
+
+    // Hyprland emits no event for a pure move/resize (verified via socket2,
+    // see issue #3168), so smart auto-hide overlap goes stale until the next
+    // workspace switch. Poll at low frequency: compare the geometry from the
+    // previous refresh, bump the revision only on change, then request the
+    // next refresh (async, so its result is read on the following tick).
+    property string _hyprlandGeometryKey: ""
+    readonly property bool _dockSmartAutoHideActive: SettingsData.dockConfigs.some(config => config?.enabled && config?.smartAutoHide)
+
+    Timer {
+        interval: 1000
+        repeat: true
+        running: root.isHyprland && root._dockSmartAutoHideActive
+        onTriggered: {
+            const toplevels = Hyprland.toplevels?.values ?? [];
+            const key = toplevels.map(t => {
+                const ipc = t.lastIpcObject;
+                return ipc ? `${ipc.address}:${ipc.at}:${ipc.size}:${ipc.workspace?.id}` : "";
+            }).join("|");
+            if (key !== root._hyprlandGeometryKey) {
+                root._hyprlandGeometryKey = key;
+                root.windowStateRevision++;
+            }
+            try {
+                Hyprland.refreshToplevels();
+            } catch (e) {}
+        }
+    }
     readonly property var _edgePositions: ({
             top: SettingsData.Position.Top,
             bottom: SettingsData.Position.Bottom,
