@@ -12,7 +12,7 @@ local config_home = vim.env.XDG_CONFIG_HOME
 if config_home == nil or #config_home == 0 then
 	config_home = vim.fs.joinpath(vim.env.HOME, ".config")
 end
-local settings_file_path = vim.fs.joinpath(config_home, "Dux Shell", "settings.json")
+local settings_file_path = vim.fs.joinpath(config_home, "dms", "settings.json")
 local settings_file = io.open(settings_file_path, "r")
 if settings_file == nil then
 	vim.notify(
