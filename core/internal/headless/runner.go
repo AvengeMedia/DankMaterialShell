@@ -6,11 +6,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
+	"github.com/duxlabs-dev/dux-shell/core/internal/config"
+	"github.com/duxlabs-dev/dux-shell/core/internal/deps"
+	"github.com/duxlabs-dev/dux-shell/core/internal/distros"
+	"github.com/duxlabs-dev/dux-shell/core/internal/privesc"
+	"github.com/duxlabs-dev/dux-shell/core/internal/utils"
 )
 
 // ErrConfirmationRequired is returned when --yes is not set and the user
@@ -331,7 +331,7 @@ func (r *Runner) applyGitVariants(dependencies []deps.Dependency, hasGitVariant 
 
 	// InstallPackages skips StatusInstalled deps unless marked for reinstall
 	markGit := func(dep *deps.Dependency) {
-		if dep.Variant == deps.VariantStable && dep.Status == deps.StatusInstalled {
+		if dep.Variant == deps.VariantStable && dep.Status != deps.StatusMissing {
 			reinstallItems[dep.Name] = true
 		}
 		dep.Variant = deps.VariantGit
@@ -366,7 +366,7 @@ func (r *Runner) applyGitVariants(dependencies []deps.Dependency, hasGitVariant 
 
 func findDepFold(dependencies []deps.Dependency, lowerName string) *deps.Dependency {
 	if lowerName == "dms" {
-		lowerName = "dms (dankmaterialshell)"
+		lowerName = "dms (dux shell)"
 	}
 	for i := range dependencies {
 		if strings.ToLower(dependencies[i].Name) == lowerName {
@@ -432,7 +432,7 @@ func (r *Runner) buildDisabledItems(dependencies []deps.Dependency) (map[string]
 			return nil, fmt.Errorf("--exclude-deps: unknown dependency %q", name)
 		}
 		// Don't allow excluding DMS itself
-		if name == "dms (DankMaterialShell)" {
+		if name == "dms (Dux Shell)" {
 			return nil, fmt.Errorf("--exclude-deps: cannot exclude required package %q", name)
 		}
 		disabledItems[name] = true

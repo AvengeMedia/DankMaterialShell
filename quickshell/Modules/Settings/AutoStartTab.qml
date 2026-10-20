@@ -388,7 +388,7 @@ Item {
                 iconName: "menu_book"
                 title: I18n.tr("Docs")
                 subtitle: Site.domain
-                url: Site.docs + "/dankmaterialshell/autostart#target-not-active"
+                url: Site.docs + "/dms/autostart#target-not-active"
             }
 
             SettingsCard {

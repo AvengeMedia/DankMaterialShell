@@ -237,17 +237,17 @@ fi
 case "$PACKAGE_NAME" in
 dms-git)
     IS_GIT_PACKAGE=true
-    GIT_REPO="AvengeMedia/DankMaterialShell"
+    GIT_REPO="duxlabs-dev/dux-shell"
     SOURCE_DIR="dms-git-repo"
     ;;
 dms)
-    GIT_REPO="AvengeMedia/DankMaterialShell"
+    GIT_REPO="duxlabs-dev/dux-shell"
     ;;
 danksearch)
-    GIT_REPO="AvengeMedia/danksearch"
+    GIT_REPO="duxlabs-dev/dux-search"
     ;;
 dgop)
-    GIT_REPO="AvengeMedia/dgop"
+    GIT_REPO="duxlabs-dev/dux-gop"
     ;;
 esac
 
@@ -336,7 +336,7 @@ EOF
         info "Downloading pre-built binaries and source for dms..."
         if [ ! -f "dms-distropkg-amd64.gz" ]; then
             info "Downloading dms binary for amd64..."
-            if wget -O dms-distropkg-amd64.gz "https://github.com/AvengeMedia/DankMaterialShell/releases/download/v${VERSION}/dms-distropkg-amd64.gz"; then
+            if wget -O dms-distropkg-amd64.gz "https://github.com/duxlabs-dev/dux-shell/releases/download/v${VERSION}/dms-distropkg-amd64.gz"; then
                 success "amd64 binary downloaded"
             else
                 error "Failed to download dms-distropkg-amd64.gz"
@@ -347,7 +347,7 @@ EOF
         if [ ! -f "dms-distropkg-arm64.gz" ]; then
             info "Downloading dms binary for arm64..."
             # Try to download arm64 binary, but don't fail if it doesn't exist (yet)
-            if wget -O dms-distropkg-arm64.gz "https://github.com/AvengeMedia/DankMaterialShell/releases/download/v${VERSION}/dms-distropkg-arm64.gz"; then
+            if wget -O dms-distropkg-arm64.gz "https://github.com/duxlabs-dev/dux-shell/releases/download/v${VERSION}/dms-distropkg-arm64.gz"; then
                 success "arm64 binary downloaded"
             else
                 warn "Failed to download dms-distropkg-arm64.gz (skipping)"
@@ -357,7 +357,7 @@ EOF
 
         if [ ! -f "dms-source.tar.gz" ]; then
             info "Downloading dms source for QML files..."
-            if wget -O dms-source.tar.gz "https://github.com/AvengeMedia/DankMaterialShell/releases/download/v${VERSION}/dms-source.tar.gz"; then
+            if wget -O dms-source.tar.gz "https://github.com/duxlabs-dev/dux-shell/releases/download/v${VERSION}/dms-source.tar.gz"; then
                 success "source tarball downloaded"
             else
                 error "Failed to download dms-source.tar.gz"
@@ -544,7 +544,7 @@ danksearch)
 
     if [ ! -f "dsearch-amd64" ]; then
         info "Downloading dsearch binary for amd64..."
-        if wget -O dsearch-amd64.gz "https://github.com/AvengeMedia/danksearch/releases/download/v${VERSION}/dsearch-linux-amd64.gz"; then
+        if wget -O dsearch-amd64.gz "https://github.com/duxlabs-dev/dux-search/releases/download/v${VERSION}/dsearch-linux-amd64.gz"; then
             gunzip dsearch-amd64.gz
             chmod +x dsearch-amd64
             success "amd64 binary downloaded"
@@ -556,7 +556,7 @@ danksearch)
 
     if [ ! -f "dsearch-arm64" ]; then
         info "Downloading dsearch binary for arm64..."
-        if wget -O dsearch-arm64.gz "https://github.com/AvengeMedia/danksearch/releases/download/v${VERSION}/dsearch-linux-arm64.gz"; then
+        if wget -O dsearch-arm64.gz "https://github.com/duxlabs-dev/dux-search/releases/download/v${VERSION}/dsearch-linux-arm64.gz"; then
             gunzip dsearch-arm64.gz
             chmod +x dsearch-arm64
             success "arm64 binary downloaded"

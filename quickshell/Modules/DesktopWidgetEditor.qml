@@ -63,7 +63,7 @@ Scope {
                     screenName: editorWindow.screen?.name ?? ""
                     editMode: true
                     bottomInset: overlay.fabReserved
-                    onOptionsRequested: instanceData => overlay.showOptions(instanceData)
+                    onOptionsRequested: instanceId => overlay.showOptions(instanceId)
                 }
 
                 WidgetEditorOverlay {

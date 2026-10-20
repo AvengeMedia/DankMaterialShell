@@ -146,11 +146,17 @@
   "%1 ms": {
     "%1 ms": "%1 ms"
   },
+  "%1 not found": {
+    "%1 not found": ""
+  },
   "%1 notifications": {
     "%1 notifications": "%1 알림"
   },
   "%1 online": {
     "%1 online": "%1명 온라인"
+  },
+  "%1 only": {
+    "%1 only": ""
   },
   "%1 other": {
     "%1 other": ""
@@ -178,6 +184,9 @@
   },
   "%1 tasks": {
     "%1 tasks": "%1개 작업"
+  },
+  "%1 uninstalled": {
+    "%1 uninstalled": ""
   },
   "%1 update": {
     "%1 update": "%1 업데이트"
@@ -260,8 +269,8 @@
   "A floating companion that works alongside any bar layout": {
     "A floating companion that works alongside any bar layout": "모든 바 레이아웃과 함께 사용할 수 있는 플로팅 도우미"
   },
-  "A modern desktop shell for Wayland compositors": {
-    "A modern desktop shell for Wayland compositors": "Wayland 컴포지터를 위한 모던 데스크톱 셸"
+  "A modern desktop shell for Wayland": {
+    "A modern desktop shell for Wayland": ""
   },
   "A newer dms binary is installed.": {
     "A newer dms binary is installed.": ""
@@ -500,6 +509,9 @@
   "All displays": {
     "All displays": "모든 디스플레이"
   },
+  "All plugins": {
+    "All plugins": ""
+  },
   "All settings": {
     "All settings": ""
   },
@@ -529,6 +541,9 @@
   },
   "Already on that session": {
     "Already on that session": "이미 해당 세션에 있습니다"
+  },
+  "Already upvoted, click again to remove": {
+    "Already upvoted, click again to remove": ""
   },
   "Also runs the templates in your matugen config.toml": {
     "Also runs the templates in your matugen config.toml": ""
@@ -1364,6 +1379,9 @@
   "Changes save to %1": {
     "Changes save to %1": ""
   },
+  "Changes volume and audio devices": {
+    "Changes volume and audio devices": ""
+  },
   "Channel": {
     "Channel": "채널"
   },
@@ -1676,14 +1694,8 @@
   "Compact": {
     "Compact": "컴팩트"
   },
-  "Compact height": {
-    "Compact height": "컴팩트 높이"
-  },
   "Compact mode": {
     "Compact mode": "컴팩트 모드"
-  },
-  "Compact width": {
-    "Compact width": "컴팩트 너비"
   },
   "Completed": {
     "Completed": "완료됨"
@@ -1787,6 +1799,9 @@
   "Connections and autoconnect": {
     "Connections and autoconnect": "연결 및 자동 연결"
   },
+  "Connects to the internet": {
+    "Connects to the internet": ""
+  },
   "Consumes the key only when a dispatcher runs": {
     "Consumes the key only when a dispatcher runs": ""
   },
@@ -1810,6 +1825,9 @@
   },
   "Controls": {
     "Controls": ""
+  },
+  "Controls media players": {
+    "Controls media players": ""
   },
   "Convert to DMS": {
     "Convert to DMS": "DMS로 변환"
@@ -2045,8 +2063,8 @@
   "DMS chooser": {
     "DMS chooser": "DMS 선택기"
   },
-  "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
-    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": "DMS는 %1에서 영감을 받은 디자인을 갖춘, 고도로 사용자 지정 가능한 현대적인 데스크톱 셸입니다.<br/><br/>데스크톱 셸을 구축하기 위한 QT6 프레임워크인 %2와 정적 타입 컴파일 언어인 %3로 만들어졌습니다."
+  "DMS is a modern, highly customizable desktop shell that looks great out of the box, without sacrificing the freedom to make it your own.<br/><br/>Built with %1 and %2, it brings together panels, widgets, system controls, and more into a cohesive desktop experience.": {
+    "DMS is a modern, highly customizable desktop shell that looks great out of the box, without sacrificing the freedom to make it your own.<br/><br/>Built with %1 and %2, it brings together panels, widgets, system controls, and more into a cohesive desktop experience.": ""
   },
   "DMS out of date": {
     "DMS out of date": "DMS가 구버전임"
@@ -2290,6 +2308,9 @@
   },
   "Dew point %1": {
     "Dew point %1": "이슬점 %1"
+  },
+  "Did you mean": {
+    "Did you mean": ""
   },
   "Digital": {
     "Digital": "디지털"
@@ -2711,9 +2732,6 @@
   "End must be after start": {
     "End must be after start": "끝은 시작 이후여야 합니다"
   },
-  "Enlarge on hover": {
-    "Enlarge on hover": "호버 시 확대"
-  },
   "Enter 6-digit passkey": {
     "Enter 6-digit passkey": "6자리 패스키 입력"
   },
@@ -2846,8 +2864,8 @@
   "Expressive": {
     "Expressive": "표현력 풍부함"
   },
-  "Extend DankMaterialShell with powerful plugins for widgets, launchers, and more": {
-    "Extend DankMaterialShell with powerful plugins for widgets, launchers, and more": "위젯, 런처 등 강력한 플러그인으로 DankMaterialShell을 확장하세요"
+  "Extend %1 with powerful plugins for widgets, launchers, and more": {
+    "Extend %1 with powerful plugins for widgets, launchers, and more": ""
   },
   "Extend battery life": {
     "Extend battery life": "배터리 수명 연장"
@@ -3137,8 +3155,8 @@
   "Family": {
     "Family": "글꼴 패밀리"
   },
-  "Features": {
-    "Features": "기능"
+  "Featured plugin": {
+    "Featured plugin": ""
   },
   "Feels Like %1°": {
     "Feels Like %1°": "체감 온도 %1°"
@@ -3235,6 +3253,9 @@
   },
   "Fits the song title instead of keeping a fixed width": {
     "Fits the song title instead of keeping a fixed width": ""
+  },
+  "Fits your setup": {
+    "Fits your setup": ""
   },
   "Fixed": {
     "Fixed": "고정"
@@ -3379,6 +3400,9 @@
   },
   "For %1": {
     "For %1": "%1 동안"
+  },
+  "For you": {
+    "For you": ""
   },
   "Force HDR": {
     "Force HDR": "HDR 강제"
@@ -3743,6 +3767,9 @@
   "Hide installed": {
     "Hide installed": "설치됨 숨기기"
   },
+  "Hide on last display": {
+    "Hide on last display": ""
+  },
   "Hide until typing": {
     "Hide until typing": ""
   },
@@ -3797,6 +3824,9 @@
   "History size, retention, paste behavior": {
     "History size, retention, paste behavior": "기록 크기, 보존 기간, 붙여넣기 동작"
   },
+  "Hold Ctrl, Alt or Super and press a key. Esc cancels.": {
+    "Hold Ctrl, Alt or Super and press a key. Esc cancels.": ""
+  },
   "Hold duration": {
     "Hold duration": "길게 누르는 시간"
   },
@@ -3847,6 +3877,9 @@
   },
   "Hover popouts": {
     "Hover popouts": "호버 팝아웃"
+  },
+  "How far terminal colors shift toward the wallpaper color": {
+    "How far terminal colors shift toward the wallpaper color": ""
   },
   "Hue": {
     "Hue": "색조"
@@ -4469,6 +4502,9 @@
   "Lightest": {
     "Lightest": "가장 밝음"
   },
+  "Like your plugins": {
+    "Like your plugins": ""
+  },
   "Limit": {
     "Limit": ""
   },
@@ -4486,6 +4522,9 @@
   },
   "Lines: %1": {
     "Lines: %1": "줄 수: %1"
+  },
+  "Link copied": {
+    "Link copied": ""
   },
   "Link your DMS settings so the login screen follows them.": {
     "Link your DMS settings so the login screen follows them.": ""
@@ -5078,6 +5117,9 @@
   "Near island": {
     "Near island": "아일랜드 근처"
   },
+  "Needs": {
+    "Needs": ""
+  },
   "Nested chip": {
     "Nested chip": "중첩 칩"
   },
@@ -5120,6 +5162,9 @@
   "New": {
     "New": "새로 만들기"
   },
+  "New & updated": {
+    "New & updated": ""
+  },
   "New Session": {
     "New Session": "새 세션"
   },
@@ -5158,6 +5203,9 @@
   },
   "Next Transition": {
     "Next Transition": "다음 전환"
+  },
+  "Next category": {
+    "Next category": ""
   },
   "Next page": {
     "Next page": "다음 페이지"
@@ -5582,6 +5630,9 @@
   "Not set": {
     "Not set": "설정되지 않음"
   },
+  "Not shown on this bar, so its section widgets stay hidden": {
+    "Not shown on this bar, so its section widgets stay hidden": ""
+  },
   "Not synchronized": {
     "Not synchronized": "동기화되지 않음"
   },
@@ -5671,6 +5722,9 @@
   },
   "Office": {
     "Office": "사무실"
+  },
+  "Official only": {
+    "Official only": ""
   },
   "Offline Report": {
     "Offline Report": "오프라인 보고서"
@@ -5764,6 +5818,12 @@
   },
   "Open with": {
     "Open with": "다음으로 열기"
+  },
+  "Opening GitHub to remove the upvote": {
+    "Opening GitHub to remove the upvote": ""
+  },
+  "Opening GitHub to upvote": {
+    "Opening GitHub to upvote": ""
   },
   "Opening terminal: ": {
     "Opening terminal: ": "터미널 여는 중:"
@@ -6071,6 +6131,12 @@
   "Pick how long to stay awake": {
     "Pick how long to stay awake": "절전하지 않을 시간 선택"
   },
+  "Pick of the day": {
+    "Pick of the day": ""
+  },
+  "Pick of the week": {
+    "Pick of the week": ""
+  },
   "Pill": {
     "Pill": ""
   },
@@ -6176,6 +6242,9 @@
   "Plugins": {
     "Plugins": "플러그인"
   },
+  "Plugins by %1": {
+    "Plugins by %1": ""
+  },
   "Plugins shown in All mode without a trigger. Drag to reorder": {
     "Plugins shown in All mode without a trigger. Drag to reorder": "트리거 없이 전체 모드에 표시되는 플러그인입니다. 드래그하여 순서를 변경하세요"
   },
@@ -6199,6 +6268,9 @@
   },
   "Popouts and modals use the main animation duration": {
     "Popouts and modals use the main animation duration": ""
+  },
+  "Popular": {
+    "Popular": ""
   },
   "Popular Plugins": {
     "Popular Plugins": "인기 플러그인"
@@ -6340,6 +6412,9 @@
   },
   "Previous": {
     "Previous": "이전"
+  },
+  "Previous category": {
+    "Previous category": ""
   },
   "Previous page": {
     "Previous page": "이전 페이지"
@@ -6536,11 +6611,32 @@
   "Read:": {
     "Read:": "읽기:"
   },
+  "Reads audio devices and volume": {
+    "Reads audio devices and volume": ""
+  },
+  "Reads its own settings": {
+    "Reads its own settings": ""
+  },
+  "Reads its saved state": {
+    "Reads its saved state": ""
+  },
+  "Reads the clipboard": {
+    "Reads the clipboard": ""
+  },
+  "Reads the list of running programs": {
+    "Reads the list of running programs": ""
+  },
+  "Reads your files": {
+    "Reads your files": ""
+  },
   "Ready": {
     "Ready": "준비됨"
   },
   "Reason": {
     "Reason": "이유"
+  },
+  "Reboot now?": {
+    "Reboot now?": ""
   },
   "Reboot recommended": {
     "Reboot recommended": ""
@@ -6659,6 +6755,9 @@
   "Remove condition": {
     "Remove condition": ""
   },
+  "Remove from recent colors": {
+    "Remove from recent colors": ""
+  },
   "Remove greeter access?": {
     "Remove greeter access?": "로그인 화면 접근 권한을 제거하시겠습니까?"
   },
@@ -6676,6 +6775,9 @@
   },
   "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": {
     "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": "바로 가기 %1을(를) 제거하시겠습니까? 바인딩 해제 항목이 dms/binds-user.lua에 저장되므로 DMS 업데이트 후에도 제거된 상태로 유지됩니다."
+  },
+  "Remove upvote": {
+    "Remove upvote": ""
   },
   "Removed administrator privileges": {
     "Removed administrator privileges": "관리자 권한 제거됨"
@@ -6854,6 +6956,9 @@
   "Root Filesystem": {
     "Root Filesystem": "루트 파일 시스템"
   },
+  "Rotating Cookie": {
+    "Rotating Cookie": ""
+  },
   "Rounded": {
     "Rounded": "둥근 모서리"
   },
@@ -6920,6 +7025,12 @@
   "Runs in a terminal.": {
     "Runs in a terminal.": ""
   },
+  "Runs programs on your computer": {
+    "Runs programs on your computer": ""
+  },
+  "Runs shell commands": {
+    "Runs shell commands": ""
+  },
   "S": {
     "S": "남"
   },
@@ -6974,6 +7085,9 @@
   "Save password": {
     "Save password": "비밀번호 저장"
   },
+  "Save your work first. Open apps will close.": {
+    "Save your work first. Open apps will close.": ""
+  },
   "Saved": {
     "Saved": "저장됨"
   },
@@ -6988,6 +7102,12 @@
   },
   "Saved networks": {
     "Saved networks": "저장된 네트워크"
+  },
+  "Saves its own settings": {
+    "Saves its own settings": ""
+  },
+  "Saves its state": {
+    "Saves its state": ""
   },
   "Saving...": {
     "Saving...": "저장 중..."
@@ -7376,6 +7496,9 @@
   "Show discharge rate": {
     "Show discharge rate": "방전 전력 표시"
   },
+  "Show every author": {
+    "Show every author": ""
+  },
   "Show filename": {
     "Show filename": "파일 이름 표시"
   },
@@ -7615,6 +7738,9 @@
   },
   "Soft square": {
     "Soft square": "둥근 사각형"
+  },
+  "Software dimming": {
+    "Software dimming": ""
   },
   "Software updates": {
     "Software updates": ""
@@ -7874,6 +8000,9 @@
   "Switch layout shortcut": {
     "Switch layout shortcut": "레이아웃 전환 단축키"
   },
+  "Switch to media when playback starts": {
+    "Switch to media when playback starts": ""
+  },
   "Switches to power saver at the low battery threshold": {
     "Switches to power saver at the low battery threshold": ""
   },
@@ -8072,6 +8201,9 @@
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
     "The Island holds this edge on a display this bar covers, so the bar stays hidden there": "아일랜드가 이 표시줄이 표시되는 디스플레이의 이 가장자리를 점유하므로, 표시줄은 그곳에서 숨겨진 상태로 유지됩니다"
   },
+  "The Island takes its place on this bar": {
+    "The Island takes its place on this bar": ""
+  },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "Wi-Fi 어댑터가 액세스 포인트 모드를 시작하지 못했습니다."
   },
@@ -8201,8 +8333,8 @@
   "Third-party plugins": {
     "Third-party plugins": "타사 플러그인"
   },
-  "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": {
-    "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "타사 플러그인은 커뮤니티에서 만들었으며 DankMaterialShell에서 공식적으로 지원하지 않습니다.\n\n이러한 플러그인은 보안 및 개인 정보 보호 위험을 초래할 수 있습니다. 본인의 책임하에 설치하세요."
+  "Third-party plugins are created by the community and are not officially supported by %1.\n\nThese plugins may pose security and privacy risks - install at your own risk.": {
+    "Third-party plugins are created by the community and are not officially supported by %1.\n\nThese plugins may pose security and privacy risks - install at your own risk.": ""
   },
   "This bar is the Island": {
     "This bar is the Island": ""
@@ -8230,6 +8362,9 @@
   },
   "This output is disabled in the current profile": {
     "This output is disabled in the current profile": "현재 프로필에서 이 출력이 비활성화됨"
+  },
+  "This plugin can": {
+    "This plugin can": ""
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "이 플러그인에는 'settings_write' 권한이 없습니다.\n\nplugin.json에 \"permissions\": [\"settings_read\", \"settings_write\"]를 추가하세요."
@@ -8459,6 +8594,9 @@
   "Tray icon tint": {
     "Tray icon tint": "트레이 아이콘 색조"
   },
+  "Trending": {
+    "Trending": ""
+  },
   "Trigger": {
     "Trigger": "트리거"
   },
@@ -8686,6 +8824,15 @@
   },
   "Uptime": {
     "Uptime": "가동 시간"
+  },
+  "Upvote on GitHub": {
+    "Upvote on GitHub": ""
+  },
+  "Upvote removed": {
+    "Upvote removed": ""
+  },
+  "Upvoted on GitHub": {
+    "Upvoted on GitHub": ""
   },
   "Urgent": {
     "Urgent": "긴급"
@@ -8972,11 +9119,14 @@
   "Welcome": {
     "Welcome": "환영합니다"
   },
-  "Welcome to DankMaterialShell": {
-    "Welcome to DankMaterialShell": "DankMaterialShell에 오신 것을 환영합니다"
+  "Welcome to %1": {
+    "Welcome to %1": ""
   },
   "What changed": {
     "What changed": ""
+  },
+  "What's New": {
+    "What's New": ""
   },
   "When locked": {
     "When locked": "잠겼을 때"
@@ -9128,6 +9278,9 @@
   "Working...": {
     "Working...": "작업 중..."
   },
+  "Works here": {
+    "Works here": ""
+  },
   "Works in every submap": {
     "Works in every submap": ""
   },
@@ -9154,6 +9307,9 @@
   },
   "Write:": {
     "Write:": "쓰기:"
+  },
+  "Writes to your files": {
+    "Writes to your files": ""
   },
   "X axis": {
     "X axis": "X축"
@@ -9262,6 +9418,9 @@
   },
   "checked just now": {
     "checked just now": "방금 확인함"
+  },
+  "copy link": {
+    "copy link": ""
   },
   "deprecated": {
     "deprecated": "사용되지 않음"
@@ -9436,6 +9595,9 @@
   },
   "remote": {
     "remote": "원격"
+  },
+  "report a problem": {
+    "report a problem": ""
   },
   "reviewed": {
     "reviewed": "검토됨"

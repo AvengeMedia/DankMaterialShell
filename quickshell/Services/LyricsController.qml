@@ -20,6 +20,7 @@ QtObject {
     property bool enabled: false
 
     readonly property bool available: DMSService.capabilities.includes("lyrics")
+    readonly property bool canSeekLines: synced && (player?.canSeek ?? false) && duration > 0
     readonly property string fileUrl: url.startsWith("file://") ? url : ""
     readonly property string trackKey: track ? JSON.stringify([track.key, track.title, track.artist, track.album, fileUrl, MediaOptions.enabledLyricsProviders]) : ""
     readonly property int duration: Math.round(track?.length ?? 0)
@@ -369,6 +370,16 @@ QtObject {
         synced = false;
         shownSong = requestedSong;
         state = "ready";
+    }
+
+    function seekToLine(index) {
+        if (!synced || duration <= 0 || !player?.canSeek)
+            return false;
+        const line = lines[index];
+        if (!line || !Number.isFinite(line.t))
+            return false;
+        player.position = Math.max(0.1, Math.min(line.t, duration * 0.99));
+        return true;
     }
 
     function currentTime() {

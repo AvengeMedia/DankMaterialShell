@@ -137,7 +137,7 @@ Item {
             return false;
         const prefs = c.screenPreferences || ["all"];
         if (prefs.length > 0)
-            return true;
+            return !(c.hideOnLastDisplay ?? false) || Quickshell.screens.length !== 1;
         return (c.showOnLastDisplay ?? true) && Quickshell.screens.length === 1;
     }
 

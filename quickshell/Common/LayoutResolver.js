@@ -32,6 +32,8 @@ function screenMatches(screen, preferences, screens, displayNameMode) {
 }
 
 function coversScreen(config, screen, screens, displayNameMode) {
+    if ((config?.hideOnLastDisplay ?? false) && screens.length === 1)
+        return false;
     const preferences = config?.screenPreferences || ["all"];
     return preferences.includes("all") || screenMatches(screen, preferences, screens, displayNameMode) || ((config?.showOnLastDisplay ?? false) && screens.length === 1);
 }
@@ -253,7 +255,7 @@ function adjacentBar(layout, edge, config) {
     return layout.bars.find(input => input.config.id !== config?.id && !input.config.autoHide && (input.config.visible ?? true) && input.config.position === position) ?? null;
 }
 
-function adjacentInfo(layout, config, defaults) {
+function adjacentInfo(layout, config, defaults, includeAutoHide) {
     const result = {
         topBar: 0,
         bottomBar: 0,
@@ -269,7 +271,7 @@ function adjacentInfo(layout, config, defaults) {
             const other = input.config;
             if (instance.kind === "island")
                 return sum + instance.rowThickness;
-            if (other.autoHide || other.visible === false)
+            if (other.visible === false || (other.autoHide && !includeAutoHide))
                 return sum;
             const spacing = option(other, "spacing", defaults, 4);
             const gap = option(other, "popupGapsAuto", defaults, true) ? Math.max(4, spacing) : option(other, "popupGapsManual", defaults, 4);

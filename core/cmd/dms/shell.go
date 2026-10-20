@@ -13,9 +13,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/qsipc"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/site"
+	"github.com/duxlabs-dev/dux-shell/core/internal/log"
+	"github.com/duxlabs-dev/dux-shell/core/internal/qsipc"
+	"github.com/duxlabs-dev/dux-shell/core/internal/site"
 )
 
 type ipcTargets map[string]map[string][]string
@@ -228,7 +228,7 @@ func printIPCHelpFailure(err error) {
 		fmt.Printf("  %v\n", err)
 	}
 	fmt.Println()
-	fmt.Println("  Full docs:  " + site.Docs + "/dankmaterialshell/keybinds-ipc")
+	fmt.Println("  Full docs:  " + site.Docs + "/dms/keybinds-ipc")
 	fmt.Println("  Try:        dms ipc call <target> <function>")
 }
 
@@ -243,7 +243,7 @@ func ensureFontCache() {
 	var fontsToCheck []string
 
 	if configDir, err := os.UserConfigDir(); err == nil {
-		settingsPath := filepath.Join(configDir, "DankMaterialShell", "settings.json")
+		settingsPath := filepath.Join(configDir, "dms", "settings.json")
 		if data, err := os.ReadFile(settingsPath); err == nil {
 			var settings struct {
 				FontFamily        string `json:"fontFamily"`

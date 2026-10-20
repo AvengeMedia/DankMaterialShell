@@ -53,7 +53,7 @@ Row {
         tooltipText: I18n.tr("Devices", "Media player output device picker") + ": " + AudioService.displayName(AudioService.sink)
         iconName: AudioService.sinkIcon(AudioService.sink)
 
-        MediaSinkWheel {}
+        MediaSinkMute {}
     }
 
     GroupButton {

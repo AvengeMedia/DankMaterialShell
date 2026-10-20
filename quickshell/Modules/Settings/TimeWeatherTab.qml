@@ -384,7 +384,7 @@ Item {
                 settingKey: "calendarBackend"
                 text: I18n.tr("Calendar backend")
                 readonly property var _backendValues: ["auto", "khal", "dankcal"]
-                readonly property var _backendLabels: [I18n.tr("Auto", "calendar backend option"), I18n.tr("khal", "calendar backend option"), I18n.tr("DankCalendar", "calendar backend option")]
+                readonly property var _backendLabels: [I18n.tr("Auto", "calendar backend option"), I18n.tr("khal", "calendar backend option"), I18n.tr("Dux Calendar", "calendar backend option")]
                 options: _backendLabels
                 currentValue: _backendLabels[Math.max(0, _backendValues.indexOf(SettingsData.calendarBackend))]
                 onValueChanged: value => {

@@ -622,7 +622,7 @@ FocusScope {
                             StyledText {
                                 text: I18n.tr("All")
                                 color: allTab.contentColor
-                                font.weight: allTab.isSelected ? Theme.fontWeightMedium : Theme.fontWeightNormal
+                                font.weight: allTab.isSelected ? Theme.fontWeightMedium : Theme.fontWeight
                                 Layout.fillWidth: true
                                 elide: Text.ElideRight
                             }
@@ -675,7 +675,7 @@ FocusScope {
                                 StyledText {
                                     text: I18n.tr(catTab.catName)
                                     color: catTab.contentColor
-                                    font.weight: catTab.isSelected ? Theme.fontWeightMedium : Theme.fontWeightNormal
+                                    font.weight: catTab.isSelected ? Theme.fontWeightMedium : Theme.fontWeight
                                     Layout.fillWidth: true
                                     elide: Text.ElideRight
                                 }

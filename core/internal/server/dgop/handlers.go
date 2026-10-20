@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/AvengeMedia/dankgo/ipc"
-	"github.com/AvengeMedia/dankgo/ipc/params"
-	"github.com/AvengeMedia/dgop/gops"
+	"github.com/duxlabs-dev/dux-go/ipc"
+	"github.com/duxlabs-dev/dux-go/ipc/params"
+	"github.com/duxlabs-dev/dux-gop/gops"
 )
 
 const metaTimeout = 10 * time.Second

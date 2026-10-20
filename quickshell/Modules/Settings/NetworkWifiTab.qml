@@ -954,7 +954,7 @@ Item {
             SettingsRow {
                 visible: hotspotCard.showForm
                 body: DTextField {
-                    expressive: true
+                    outlined: true
                     width: parent.width
                     labelText: I18n.tr("Hotspot name", "hotspot SSID field label")
                     placeholderText: I18n.tr("SSID", "hotspot network name placeholder")
@@ -969,7 +969,7 @@ Item {
             SettingsRow {
                 visible: hotspotCard.showForm
                 body: DTextField {
-                    expressive: true
+                    outlined: true
                     width: parent.width
                     labelText: I18n.tr("Password", "hotspot password field label")
                     placeholderText: I18n.tr("Optional; leave blank for open hotspot", "hotspot password field placeholder")
@@ -1032,7 +1032,7 @@ Item {
             SettingsRow {
                 visible: hotspotCard.showForm && NetworkService.hotspotExtendedSupported
                 body: DTextField {
-                    expressive: true
+                    outlined: true
                     width: parent.width
                     labelText: I18n.tr("IP address")
                     placeholderText: "10.42.0.1/24"

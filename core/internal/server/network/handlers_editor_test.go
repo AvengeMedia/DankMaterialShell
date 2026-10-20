@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	mocks "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/network"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
-	"github.com/AvengeMedia/dankgo/ipc"
+	"github.com/duxlabs-dev/dux-go/ipc"
+	mocks "github.com/duxlabs-dev/dux-shell/core/internal/mocks/network"
+	"github.com/duxlabs-dev/dux-shell/core/internal/server/network"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"

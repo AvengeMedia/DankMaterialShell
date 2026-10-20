@@ -7,8 +7,8 @@ import (
 	"maps"
 	"sort"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/Wifx/gonetworkmanager/v2"
+	"github.com/duxlabs-dev/dux-shell/core/internal/log"
 )
 
 func (b *NetworkManagerBackend) GetWiFiEnabled() (bool, error) {
@@ -35,10 +35,6 @@ func (b *NetworkManagerBackend) SetWiFiEnabled(enabled bool) error {
 }
 
 func (b *NetworkManagerBackend) ScanWiFi() error {
-	if b.wifiDevice == nil {
-		return fmt.Errorf("no WiFi device available")
-	}
-
 	b.stateMutex.RLock()
 	enabled := b.state.WiFiEnabled
 	b.stateMutex.RUnlock()
@@ -47,12 +43,20 @@ func (b *NetworkManagerBackend) ScanWiFi() error {
 		return fmt.Errorf("WiFi is disabled")
 	}
 
-	if err := b.ensureWiFiDevice(); err != nil {
+	changed, err := b.refreshWiFiDevices()
+	if err != nil {
+		return err
+	}
+	if changed {
+		b.updateWiFiState()
+		b.updateAllWiFiDevices()
+	}
+	w, err := b.ensureWiFiDevice()
+	if err != nil {
 		return err
 	}
 
-	w := b.wifiDev.(gonetworkmanager.DeviceWireless)
-	err := w.RequestScan()
+	err = w.RequestScan()
 	if err != nil {
 		return fmt.Errorf("scan request failed: %w", err)
 	}
@@ -62,16 +66,10 @@ func (b *NetworkManagerBackend) ScanWiFi() error {
 }
 
 func (b *NetworkManagerBackend) GetWiFiNetworkDetails(ssid string) (*NetworkInfoResponse, error) {
-	if b.wifiDevice == nil {
-		return nil, fmt.Errorf("no WiFi device available")
-	}
-
-	if err := b.ensureWiFiDevice(); err != nil {
+	w, err := b.ensureWiFiDevice()
+	if err != nil {
 		return nil, err
 	}
-	wifiDev := b.wifiDev
-
-	w := wifiDev.(gonetworkmanager.DeviceWireless)
 	apPaths, err := w.GetAccessPoints()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get access points: %w", err)
@@ -507,16 +505,10 @@ func (b *NetworkManagerBackend) IsConnectingTo(ssid string) bool {
 }
 
 func (b *NetworkManagerBackend) updateWiFiNetworks() ([]WiFiNetwork, error) {
-	if b.wifiDevice == nil {
-		return nil, fmt.Errorf("no WiFi device available")
-	}
-
-	if err := b.ensureWiFiDevice(); err != nil {
+	w, err := b.ensureWiFiDevice()
+	if err != nil {
 		return nil, err
 	}
-	wifiDev := b.wifiDev
-
-	w := wifiDev.(gonetworkmanager.DeviceWireless)
 	apPaths, err := w.GetAccessPoints()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get access points: %w", err)
@@ -1054,17 +1046,24 @@ func (b *NetworkManagerBackend) SetWiFiAutoconnect(ssid string, autoconnect bool
 }
 
 func (b *NetworkManagerBackend) ScanWiFiDevice(device string) error {
-	devInfo, ok := b.wifiDeviceByIface(device)
-	if !ok {
-		return fmt.Errorf("WiFi device not found: %s", device)
-	}
-
 	b.stateMutex.RLock()
 	enabled := b.state.WiFiEnabled
 	b.stateMutex.RUnlock()
 
 	if !enabled {
 		return fmt.Errorf("WiFi is disabled")
+	}
+
+	changed, err := b.refreshWiFiDevices()
+	if err != nil {
+		return err
+	}
+	if changed {
+		b.updateWiFiState()
+	}
+	devInfo, ok := b.wifiDeviceByIface(device)
+	if !ok {
+		return fmt.Errorf("WiFi device not found: %s", device)
 	}
 
 	if err := devInfo.wireless.RequestScan(); err != nil {
@@ -1316,11 +1315,10 @@ func (b *NetworkManagerBackend) getWifiDeviceForConnection(deviceName string) (*
 		return devInfo, nil
 	}
 
-	if b.wifiDevice == nil {
+	dev, _ := b.selectedWiFiDevice()
+	if dev == nil {
 		return nil, fmt.Errorf("no WiFi device available")
 	}
-
-	dev := b.wifiDevice.(gonetworkmanager.Device)
 	iface, _ := dev.GetPropertyInterface()
 	if devInfo, ok := b.wifiDeviceByIface(iface); ok {
 		return devInfo, nil

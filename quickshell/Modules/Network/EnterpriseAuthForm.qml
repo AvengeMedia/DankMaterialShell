@@ -9,7 +9,6 @@ import "../../Common/ConnectionEditor.js" as CE
 Column {
     id: root
 
-    property bool expressive: false
     property string usernameSuffix: ""
     property bool usernameSuffixRequired: false
     property string caDisplayName: ""
@@ -151,8 +150,7 @@ Column {
 
     component FormField: DTextField {
         width: parent.width
-        expressive: root.expressive
-        outlined: !root.expressive
+        outlined: true
     }
 
     component ChoiceRow: SettingsDropdownRow {
@@ -238,7 +236,6 @@ Column {
             id: passwordField
             leftIconName: "lock"
             showPasswordToggle: true
-            morph: root.expressive
             echoMode: passwordVisible ? TextInput.Normal : TextInput.Password
             labelText: root.isTls ? I18n.tr("Private Key Password") : I18n.tr("Password")
             text: root.isTls ? draft.privateKeyPassword : draft.password

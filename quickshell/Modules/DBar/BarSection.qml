@@ -97,6 +97,8 @@ Item {
         const layout = inlineLayout();
         return layout.indices.filter((index, position) => layout.sizes[position] !== null);
     }
+    readonly property var leadingInlineItem: inlineItemAt(0)
+    readonly property var trailingInlineItem: inlineItemAt(inlineOrder.length - 1)
 
     signal layoutRequested
 
@@ -124,6 +126,16 @@ Item {
 
     function inlineLayout() {
         return OverflowLayout.section(inlineEntries, hiddenEntries.map(entry => entry.occurrenceOrder), widgetSpacing, overflowTriggerSize, overflowPosition);
+    }
+
+    function inlineItemAt(position) {
+        root.entryRevision;
+        const index = inlineOrder[position];
+        if (index === undefined)
+            return null;
+        if (index === -1)
+            return overflowButton;
+        return entryRepeater?.itemAt(index)?.widgetItem ?? null;
     }
 
     Item {

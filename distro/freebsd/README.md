@@ -1,6 +1,6 @@
 # FreeBSD support
 
-DankMaterialShell contains native FreeBSD code paths and does not require
+Dux Shell contains native FreeBSD code paths and does not require
 PulseAudio, PipeWire, systemd, NetworkManager, or Linux sysfs to provide its
 core shell features.
 

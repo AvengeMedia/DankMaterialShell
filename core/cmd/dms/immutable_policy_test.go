@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipolicy"
+	"github.com/duxlabs-dev/dux-shell/core/internal/clipolicy"
 )
 
 func TestDefaultImmutablePolicyAllowsSyncButBlocksEnable(t *testing.T) {

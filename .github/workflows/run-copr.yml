@@ -78,7 +78,7 @@ jobs:
           echo "📦 Downloading DMS QML source for v${VERSION}..."
 
           # Download DMS QML source
-          wget "https://github.com/AvengeMedia/DankMaterialShell/releases/download/v${VERSION}/dms-qml.tar.gz" || {
+          wget "https://github.com/duxlabs-dev/dux-shell/releases/download/v${VERSION}/dms-qml.tar.gz" || {
             echo "❌ Failed to download dms-qml.tar.gz for v${VERSION}"
             exit 1
           }

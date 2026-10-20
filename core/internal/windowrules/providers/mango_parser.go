@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/mangoconf"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/windowrules"
+	"github.com/duxlabs-dev/dux-shell/core/internal/mangoconf"
+	"github.com/duxlabs-dev/dux-shell/core/internal/windowrules"
 )
 
 // Mango window rules are flat `windowrule=key:value,...` lines (`window_rule=`

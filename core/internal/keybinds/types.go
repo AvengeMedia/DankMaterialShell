@@ -3,7 +3,7 @@ package keybinds
 import (
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/configfrag"
+	"github.com/duxlabs-dev/dux-shell/core/internal/configfrag"
 )
 
 type Keybind struct {

@@ -1385,6 +1385,117 @@ Singleton {
 
     property var installingPlugins: ({})
 
+    // The plugin removed last ({id, name, wasEnabled}), kept a few seconds so the plugins page can offer to put it back.
+    property var lastUninstalledPlugin: null
+
+    Timer {
+        id: undoUninstallTimer
+        interval: 8000
+        onTriggered: root.lastUninstalledPlugin = null
+    }
+
+    // Only a registry plugin (one with a repo in the installed list) can be put back:
+    // a plugin the registry does not know would otherwise be swapped for another one.
+    function noteUninstalled(pluginId, pluginName, wasEnabled, repo) {
+        if (!repo) {
+            undoUninstallTimer.stop();
+            lastUninstalledPlugin = null;
+            return;
+        }
+        lastUninstalledPlugin = {
+            id: pluginId,
+            name: pluginName || pluginId,
+            wasEnabled: wasEnabled === true
+        };
+        undoUninstallTimer.restart();
+    }
+
+    function undoUninstall() {
+        const plugin = lastUninstalledPlugin;
+        if (!plugin)
+            return;
+        undoUninstallTimer.stop();
+        lastUninstalledPlugin = null;
+        installFromRegistry(plugin.id, plugin.name, plugin.wasEnabled);
+    }
+
+    // Plugin id -> id of the user's own +1 reaction on the registry issue, once a click has found or created it.
+    property var upvotedPlugins: ({})
+    // Plugin id -> what this session changed on top of the registry count (+1, 0 or -1).
+    property var upvoteDeltas: ({})
+    property var upvotingPlugins: ({})
+
+    function upvoteCount(plugin) {
+        return PluginRanking.upvoteCount(plugin.upvotes, upvoteDeltas[plugin.id]);
+    }
+
+    function _setUpvote(pluginId, reactionId, delta) {
+        const voted = Object.assign({}, upvotedPlugins);
+        if (reactionId)
+            voted[pluginId] = reactionId;
+        else
+            delete voted[pluginId];
+        upvotedPlugins = voted;
+        upvoteDeltas = Object.assign({}, upvoteDeltas, {
+            [pluginId]: delta
+        });
+    }
+
+    function _setUpvoting(pluginId, active) {
+        const pending = Object.assign({}, upvotingPlugins);
+        if (active)
+            pending[pluginId] = true;
+        else
+            delete pending[pluginId];
+        upvotingPlugins = pending;
+    }
+
+    // One click: a thumbs-up on the plugin's GitHub issue through the gh CLI when
+    // it is installed and signed in, otherwise the issue opens in the browser.
+    // One click votes, a second click on a vote takes it back. GitHub keeps one +1 per account.
+    function upvotePlugin(plugin) {
+        if (!plugin || !plugin.issueUrl || upvotingPlugins[plugin.id])
+            return;
+        const path = PluginRanking.issueReactionsPath(plugin.issueUrl);
+        if (!path) {
+            if (/^https:\/\//.test(plugin.issueUrl))
+                Qt.openUrlExternally(plugin.issueUrl);
+            return;
+        }
+        const pluginId = plugin.id;
+        const issueUrl = plugin.issueUrl;
+        const delta = upvoteDeltas[pluginId] || 0;
+        const ownReaction = upvotedPlugins[pluginId];
+        _setUpvoting(pluginId, true);
+        if (ownReaction) {
+            Proc.runCommand("plugin-upvote-" + pluginId, ["gh", "api", "--method", "DELETE", path + "/" + ownReaction], (output, exitCode) => {
+                _setUpvoting(pluginId, false);
+                if (exitCode !== 0) {
+                    root.log.warn("gh upvote removal failed", pluginId, exitCode);
+                    ToastService.showInfo(I18n.tr("Opening GitHub to remove the upvote", "plugin upvote toast, shown when the GitHub CLI is missing or signed out"));
+                    Qt.openUrlExternally(issueUrl);
+                    return;
+                }
+                _setUpvote(pluginId, 0, PluginRanking.nextUpvoteDelta(delta, true, false));
+                ToastService.showInfo(I18n.tr("Upvote removed", "plugin upvote toast"));
+            }, 0, 15000);
+            return;
+        }
+        Proc.runCommand("plugin-upvote-" + pluginId, ["gh", "api", "--include", "--method", "POST", path, "-f", "content=+1"], (output, exitCode) => {
+            _setUpvoting(pluginId, false);
+            const reactionId = exitCode === 0 ? PluginRanking.reactionId(output) : 0;
+            if (!reactionId) {
+                root.log.warn("gh upvote failed", pluginId, exitCode);
+                ToastService.showInfo(I18n.tr("Opening GitHub to upvote", "plugin upvote toast, shown when the GitHub CLI is missing or signed out"));
+                Qt.openUrlExternally(issueUrl);
+                return;
+            }
+            const added = /^HTTP\/\S+ 201/.test(output || "");
+            _setUpvote(pluginId, reactionId, PluginRanking.nextUpvoteDelta(delta, false, added));
+            ToastService.showInfo(added ? I18n.tr("Upvoted on GitHub", "plugin upvote toast") : I18n.tr("Already upvoted, click again to remove", "plugin upvote toast"));
+        }, 0, 15000);
+    }
+
     Component {
         id: installedPluginWaiter
         Timer {

@@ -43,7 +43,7 @@ Singleton {
 
     property bool touchpadEnabled: true
     property bool _touchpadStateInitialized: false
-    signal touchpadOsdRequested(bool enabled)
+    signal touchpadToggled
 
     property string configValidationOutput: ""
     property bool hasInitialConnection: false
@@ -459,7 +459,7 @@ Singleton {
         touchpadEnabled = data.on;
         _touchpadStateInitialized = true;
         if (showOsd)
-            touchpadOsdRequested(touchpadEnabled);
+            touchpadToggled();
     }
 
     function handleWorkspacesChanged(data) {
@@ -1283,7 +1283,7 @@ layer-rule {${excludeLines}
 }
 
 window-rule {
-    match app-id="^com.danklinux.dms$"
+    match app-id="^(dev.duxlabs.shell|com.danklinux.dms)$"
     background-effect {
         xray false
     }
@@ -1938,13 +1938,6 @@ window-rule {
                 return "SCREENSHOT_WINDOW_SUCCESS";
             }
             return "SCREENSHOT_WINDOW_FAILED";
-        }
-
-        function showTouchpadOsd(enabled: bool): string {
-            if (!CompositorService.isNiri)
-                return "NIRI_NOT_AVAILABLE";
-            NiriService.touchpadOsdRequested(enabled);
-            return "TOUCHPAD_OSD_SHOWN";
         }
 
         target: "niri"

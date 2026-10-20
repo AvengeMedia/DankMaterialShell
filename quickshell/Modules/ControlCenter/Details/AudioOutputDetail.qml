@@ -146,7 +146,7 @@ Item {
                 Repeater {
                     id: playbackRepeater
                     model: ScriptModel {
-                        values: AudioService.pipewireNodes.filter(node => node.audio && node.isSink && node.isStream)
+                        values: AudioService.pipewireNodes.filter(node => node.audio && node.isSink && node.isStream && !AudioService.isOwnStream(node))
                     }
 
                     CcListRow {
@@ -161,7 +161,6 @@ Item {
                             sliderLabel: streamRow.title
                             playFeedback: true
                         }
-
                     }
                 }
             }

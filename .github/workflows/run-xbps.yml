@@ -61,7 +61,7 @@ jobs:
     name: Build & Deploy XBPS packages
     runs-on: ubuntu-latest
     needs: preflight
-    if: github.repository == 'AvengeMedia/DankMaterialShell' && needs.preflight.outputs.should_build == 'true'
+    if: github.repository == 'duxlabs-dev/dux-shell' && needs.preflight.outputs.should_build == 'true'
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}

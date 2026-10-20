@@ -215,23 +215,10 @@ Column {
         requiresEnterprise = setting === "802-1x";
 
         Qt.callLater(() => {
-            if (reason === "wrong-password")
-                shakeSecretFields();
+            if (reason === "wrong-password" && fieldsInfo.length === 0)
+                passwordInput.text = "";
             focusFirstField();
         });
-    }
-
-    function shakeSecretFields() {
-        if (fieldsInfo.length === 0) {
-            passwordInput.text = "";
-            passwordInput.shake();
-            return;
-        }
-        for (let i = 0; i < dynamicFieldsRepeater.count; i++) {
-            const item = dynamicFieldsRepeater.itemAt(i) as DynamicFieldRow;
-            if (item?.field.morph)
-                item.field.shake();
-        }
     }
 
     function getFieldLabel(fieldName) {
@@ -350,8 +337,7 @@ Column {
         body: DTextField {
             id: fieldInput
             width: parent.width
-            expressive: true
-            morph: fieldRow.modelData.isSecret
+            outlined: true
             leftIconName: fieldRow.modelData.isSecret ? "lock" : "person"
             showPasswordToggle: fieldRow.modelData.isSecret
             isError: fieldRow.modelData.isSecret && root.isPromptMode && root.promptReason === "wrong-password" && text.length === 0
@@ -412,7 +398,7 @@ Column {
             body: DTextField {
                 id: ssidInput
                 width: parent.width
-                expressive: true
+                outlined: true
                 leftIconName: "wifi"
                 labelText: I18n.tr("Network Name (SSID)")
                 onAccepted: {
@@ -445,7 +431,7 @@ Column {
             body: DTextField {
                 id: usernameInput
                 width: parent.width
-                expressive: true
+                outlined: true
                 leftIconName: "person"
                 text: root.wifiUsernameInput
                 labelText: I18n.tr("Username", "text field label for network, vpn and account forms")
@@ -459,8 +445,7 @@ Column {
             body: DTextField {
                 id: passwordInput
                 width: parent.width
-                expressive: true
-                morph: true
+                outlined: true
                 leftIconName: "lock"
                 text: root.wifiPasswordInput
                 showPasswordToggle: true
@@ -475,7 +460,6 @@ Column {
 
         EnterpriseAuthForm {
             id: enterpriseForm
-            expressive: true
             // System CA needs a server domain, which most users don't know when connecting.
             defaultCa: "none"
             visible: root.showEnterpriseForm

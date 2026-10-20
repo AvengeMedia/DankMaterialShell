@@ -1,12 +1,12 @@
 # Void Linux packaging
 
-XBPS templates for DankMaterialShell on [Void Linux](https://voidlinux.org).
+XBPS templates for Dux Shell on [Void Linux](https://voidlinux.org).
 
 | Package | Source repo | Template |
 | --- | --- | --- |
-| `dms` | DankMaterialShell | [`srcpkgs/dms/template`](srcpkgs/dms/template) |
-| `dgop` | AvengeMedia/dgop | maintained in the **danklinux** repo (`distro/void/srcpkgs/dgop`) |
-| `danksearch` | AvengeMedia/danksearch | maintained in the **danklinux** repo (`distro/void/srcpkgs/danksearch`) |
+| `dms` | Dux Shell | [`srcpkgs/dms/template`](srcpkgs/dms/template) |
+| `dgop` | duxlabs-dev/dux-gop | maintained in the **danklinux** repo (`distro/void/srcpkgs/dgop`) |
+| `danksearch` | duxlabs-dev/dux-search | maintained in the **danklinux** repo (`distro/void/srcpkgs/danksearch`) |
 
 All build from source.
 

@@ -2,15 +2,37 @@ package config
 
 import (
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
+	"github.com/duxlabs-dev/dux-shell/core/internal/deps"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+// Tests never reach the user's systemd; stubAddWants counts the add-wants calls a deploy makes.
+func TestMain(m *testing.M) {
+	systemctlUser = func(...string) error { return nil }
+	os.Exit(m.Run())
+}
+
+func stubAddWants(t *testing.T, addWants error) *int {
+	t.Helper()
+	calls := 0
+	prev := systemctlUser
+	systemctlUser = func(args ...string) error {
+		if args[0] != "add-wants" {
+			return nil
+		}
+		calls++
+		return addWants
+	}
+	t.Cleanup(func() { systemctlUser = prev })
+	return &calls
+}
 
 func TestCleanupStrayHyprlandConfFile(t *testing.T) {
 	if os.Getenv("HYPRLAND_INSTANCE_SIGNATURE") == "" {
@@ -803,6 +825,67 @@ func TestDeployHyprlandConfigWritesLuaBeforeRemovingLegacyConf(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, userConfig, string(backup))
 	assert.Equal(t, filepath.Join(filepath.Dir(result.BackupPath), "hyprland.conf"), result.BackupPath)
+}
+
+func TestDeployHyprlandConfigSystemdAutostart(t *testing.T) {
+	cases := []struct {
+		name       string
+		useSystemd bool
+		addWants   error
+		wantExec   bool
+		wantCalls  int
+		wantLink   bool
+	}{
+		{"systemd", true, nil, false, 1, true},
+		{"add-wants fails", true, errors.New("no user bus"), true, 1, true},
+		{"no systemd", false, nil, true, 0, false},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			home := t.TempDir()
+			t.Setenv("HOME", home)
+			calls := stubAddWants(t, tc.addWants)
+			link := WantsLink(HyprlandSessionTarget)
+			require.NoError(t, os.MkdirAll(filepath.Dir(link), 0o755))
+			require.NoError(t, os.Symlink("/dev/null", link))
+
+			result, err := NewConfigDeployer(nil).deployHyprlandConfig("kitty", tc.useSystemd)
+			require.NoError(t, err)
+			content, err := os.ReadFile(result.Path)
+			require.NoError(t, err)
+			assert.Equal(t, tc.wantExec, strings.Contains(string(content), `hl.exec_cmd("dms run")`))
+			assert.Equal(t, !tc.wantExec, strings.Contains(string(content), "systemctl --user start hyprland-session.target"))
+			assert.Equal(t, tc.wantCalls, *calls)
+			_, statErr := os.Lstat(link)
+			assert.Equal(t, tc.wantLink, statErr == nil)
+		})
+	}
+}
+
+func TestDeployNiriConfigSystemdAutostart(t *testing.T) {
+	cases := []struct {
+		name       string
+		useSystemd bool
+		addWants   error
+		wantSpawn  bool
+		wantCalls  int
+	}{
+		{"systemd", true, nil, false, 1},
+		{"add-wants fails", true, errors.New("no user bus"), true, 1},
+		{"no systemd", false, nil, true, 0},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Setenv("HOME", t.TempDir())
+			calls := stubAddWants(t, tc.addWants)
+			result, err := NewConfigDeployer(nil).deployNiriConfig("kitty", tc.useSystemd)
+			require.NoError(t, err)
+			content, err := os.ReadFile(result.Path)
+			require.NoError(t, err)
+			assert.Equal(t, tc.wantSpawn, strings.Contains(string(content), `spawn-at-startup "dms" "run"`))
+			assert.Equal(t, tc.wantCalls, *calls)
+		})
+	}
 }
 
 func TestHyprlandLuaUnsupported(t *testing.T) {

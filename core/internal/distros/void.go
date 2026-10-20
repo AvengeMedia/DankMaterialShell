@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/site"
+	"github.com/duxlabs-dev/dux-shell/core/internal/deps"
+	"github.com/duxlabs-dev/dux-shell/core/internal/privesc"
+	"github.com/duxlabs-dev/dux-shell/core/internal/site"
 )
 
 const (
@@ -108,7 +108,7 @@ func (v *VoidDistribution) detectDMS() deps.Dependency {
 	}
 
 	return deps.Dependency{
-		Name:        "dms (DankMaterialShell)",
+		Name:        "dms (Dux Shell)",
 		Status:      status,
 		Version:     version,
 		Description: "Desktop Management System package",
@@ -129,7 +129,9 @@ func (v *VoidDistribution) detectXDGPortal() deps.Dependency {
 }
 
 func (v *VoidDistribution) detectDMSGreeter() deps.Dependency {
-	return v.detectOptionalPackage("dms-greeter", "DankMaterialShell greetd greeter", v.packageInstalled("dms-greeter"))
+	gitInstalled := v.packageInstalled("dms-greeter-git")
+	dep := v.detectOptionalPackage("dms-greeter", "Dux Shell greetd greeter", gitInstalled || v.packageInstalled("dms-greeter"))
+	return withGitVariant(dep, gitInstalled)
 }
 
 func (v *VoidDistribution) detectAccountsService() deps.Dependency {
@@ -156,6 +158,41 @@ func (v *VoidDistribution) packageInstalled(pkg string) bool {
 	return exec.Command("xbps-query", pkg).Run() == nil
 }
 
+func (v *VoidDistribution) InstalledVariant(stable, git PackageMapping) (deps.PackageVariant, bool) {
+	return installedVariantByName(v.packageInstalled, stable, git)
+}
+
+// SwapVariants removes before installing because xbps has no replace-in-place; a failed install
+// puts the old packages back from the local cache so the greeter is never left missing.
+func (v *VoidDistribution) SwapVariants(ctx context.Context, swaps []VariantSwap, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	if err := v.enableXBPSRepos(ctx, swapTargets(swaps, RepoTypeXBPS), sudoPassword, progressChan); err != nil {
+		return err
+	}
+
+	from, to := swapNames(swaps)
+	remove := "xbps-remove -Fy " + strings.Join(from, " ")
+	progressChan <- InstallProgressMsg{
+		Phase:       PhaseSystemPackages,
+		Progress:    0.40,
+		Step:        "Removing current package variants...",
+		NeedsSudo:   true,
+		CommandInfo: "sudo " + remove,
+	}
+	if err := v.runWithProgress(privesc.ExecCommand(ctx, sudoPassword, remove), progressChan, PhaseSystemPackages, 0.40, 0.50); err != nil {
+		return fmt.Errorf("failed to remove %s: %w", strings.Join(from, ", "), err)
+	}
+
+	installErr := v.installXBPSPackages(ctx, to, sudoPassword, progressChan)
+	if installErr == nil {
+		return nil
+	}
+	restore := privesc.ExecCommand(ctx, sudoPassword, "xbps-install -y "+strings.Join(from, " "))
+	if err := v.runWithProgress(restore, progressChan, PhaseSystemPackages, 0.85, 0.90); err != nil {
+		return fmt.Errorf("failed to install %s (%w) and to restore %s: %v", strings.Join(to, ", "), installErr, strings.Join(from, ", "), err)
+	}
+	return fmt.Errorf("failed to install %s, restored %s: %w", strings.Join(to, ", "), strings.Join(from, ", "), installErr)
+}
+
 func (v *VoidDistribution) packageVersion(pkg string) string {
 	output, err := exec.Command("xbps-query", "-p", "pkgver", pkg).Output()
 	if err != nil {
@@ -180,12 +217,12 @@ func (v *VoidDistribution) GetPackageMappingWithVariants(wm deps.WindowManager, 
 		"elogind":                {Name: "elogind", Repository: RepoTypeSystem},
 		"mesa-dri":               {Name: "mesa-dri", Repository: RepoTypeSystem},
 
-		"quickshell":              {Name: "quickshell", Repository: RepoTypeSystem},
-		"matugen":                 {Name: "matugen", Repository: RepoTypeSystem},
-		"dms (DankMaterialShell)": v.getDmsMapping(variants["dms (DankMaterialShell)"]),
-		"dms-greeter":             {Name: "dms-greeter", Repository: RepoTypeXBPS, RepoURL: VoidDMSRepo},
-		"danksearch":              {Name: "danksearch", Repository: RepoTypeXBPS, RepoURL: VoidDankLinuxRepo},
-		"dankcalendar":            {Name: "dankcalendar", Repository: RepoTypeXBPS, RepoURL: VoidDankLinuxRepo},
+		"quickshell":      {Name: "quickshell", Repository: RepoTypeSystem},
+		"matugen":         {Name: "matugen", Repository: RepoTypeSystem},
+		"dms (Dux Shell)": v.getDmsMapping(variants["dms (Dux Shell)"]),
+		"dms-greeter":     variantMapping("dms-greeter", variants["dms-greeter"], RepoTypeXBPS, VoidDMSRepo),
+		"danksearch":      {Name: "danksearch", Repository: RepoTypeXBPS, RepoURL: VoidDankLinuxRepo},
+		"dankcalendar":    {Name: "dankcalendar", Repository: RepoTypeXBPS, RepoURL: VoidDankLinuxRepo},
 	}
 
 	switch wm {
@@ -251,7 +288,12 @@ func (v *VoidDistribution) InstallPackages(ctx context.Context, dependencies []d
 		return fmt.Errorf("failed to install prerequisites: %w", err)
 	}
 
-	systemPkgs, xbpsPkgs := v.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
+	skipFlags, err := swapReinstalledVariants(ctx, v, dependencies, wm, reinstallFlags, disabledFlags, sudoPassword, progressChan)
+	if err != nil {
+		return err
+	}
+
+	systemPkgs, xbpsPkgs := v.categorizePackages(dependencies, wm, reinstallFlags, skipFlags)
 
 	if len(xbpsPkgs) > 0 {
 		progressChan <- InstallProgressMsg{

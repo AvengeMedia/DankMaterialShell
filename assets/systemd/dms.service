@@ -1,5 +1,5 @@
 [Unit]
-Description=Dank Material Shell (DMS)
+Description=Dux Shell (DMS)
 PartOf=graphical-session.target
 After=graphical-session.target
 Requisite=graphical-session.target

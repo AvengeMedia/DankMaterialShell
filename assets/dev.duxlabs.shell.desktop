@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
-Name=DankMaterialShell
+Name=Dux Shell
 GenericName=Desktop Shell
 Comment=Material 3 inspired shell for Wayland compositors
 Exec=dms run
-Icon=com.danklinux.dms
+Icon=dev.duxlabs.shell
 Terminal=false
 NoDisplay=true
 StartupNotify=false

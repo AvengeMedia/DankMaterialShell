@@ -776,6 +776,9 @@ var LOCAL_SPEC = {
         def: true,
         onChange: "syncLauncherHistory"
     },
+    launcherEnterAction: {
+        def: "launch"
+    },
     rememberLastMode: {
         def: true
     },
@@ -1119,6 +1122,14 @@ var LOCAL_SPEC = {
     },
     terminalsAlwaysDark: {
         def: false,
+        onChange: "regenSystemThemes"
+    },
+    terminalOpacity: {
+        def: 100,
+        onChange: "regenSystemThemes"
+    },
+    terminalPalette: {
+        def: "default",
         onChange: "regenSystemThemes"
     },
     muxType: {
@@ -1611,6 +1622,9 @@ var LOCAL_SPEC = {
     },
     launcherPluginOrder: {
         def: []
+    },
+    launcherKeybinds: {
+        def: {}
     },
     frameEnabled: {
         def: false

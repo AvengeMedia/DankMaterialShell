@@ -22,7 +22,7 @@ DFloatingWindow {
     minimumSize: Qt.size(SettingsMetrics.windowMinWidth, SettingsMetrics.windowMinHeight)
     implicitWidth: SettingsMetrics.formDialogWidth + SettingsMetrics.pagePaddingH * 2
     readonly property real defaultHeight: SettingsMetrics.windowHeight - SettingsMetrics.pagePaddingV * 4
-    implicitHeight: screen ? Math.min(defaultHeight, screen.height - SettingsMetrics.pagePaddingH * 2 - Theme.spacingL) : defaultHeight
+    implicitHeight: heightWithin(defaultHeight, SettingsMetrics.pagePaddingH * 2 + Theme.spacingL)
     visible: false
 
     Ref {

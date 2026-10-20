@@ -11,8 +11,8 @@ in {
 
   options.programs.dank-material-shell = {
     niri = {
-      enableKeybinds = lib.mkEnableOption "DankMaterialShell niri keybinds";
-      enableSpawn = lib.mkEnableOption "DankMaterialShell niri spawn-at-startup";
+      enableKeybinds = lib.mkEnableOption "Dux Shell niri keybinds";
+      enableSpawn = lib.mkEnableOption "Dux Shell niri spawn-at-startup";
       includes = {
         enable =
           (lib.mkEnableOption "includes for niri-flake")
@@ -159,16 +159,6 @@ in {
               allow-when-locked = true;
               repeat = false;
               action = spawn "niri" "msg" "action" "toggle-touchpad";
-            };
-            "XF86TouchpadOn" = {
-              allow-when-locked = true;
-              repeat = false;
-              action = dms-ipc "niri" "showTouchpadOsd" "true";
-            };
-            "XF86TouchpadOff" = {
-              allow-when-locked = true;
-              repeat = false;
-              action = dms-ipc "niri" "showTouchpadOsd" "false";
             };
             "Mod+Alt+N" = {
               allow-when-locked = true;

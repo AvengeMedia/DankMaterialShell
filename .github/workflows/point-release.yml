@@ -81,8 +81,8 @@ jobs:
           if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
             echo "::error::tag ${TAG} already exists"; exit 1
           fi
-          git config user.name "dms-ci[bot]"
-          git config user.email "dms-ci[bot]@users.noreply.github.com"
+          git config user.name "dux-ci[bot]"
+          git config user.email "344434142+dux-ci[bot]@users.noreply.github.com"
 
           echo "${TAG}" > quickshell/VERSION
           git add quickshell/VERSION

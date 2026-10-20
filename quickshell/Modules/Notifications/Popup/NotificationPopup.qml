@@ -382,7 +382,7 @@ PanelWindow {
             id: "notification-popup",
             screenPreferences: [screen.name],
             autoHide: false
-        });
+        }, true);
     }
 
     function _frameEdgeInset(side) {
@@ -992,7 +992,7 @@ PanelWindow {
         repeat: false
         onTriggered: {
             if (notificationData && notificationData.timer && !contextMenuActive && !hovered && !exiting && !_isDestroying)
-                notificationData.timer.restart();
+                notificationData.timer.start();
         }
     }
 

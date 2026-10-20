@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/duxlabs-dev/dux-shell/core/internal/errdefs"
+	"github.com/duxlabs-dev/dux-shell/core/internal/log"
 	"github.com/godbus/dbus/v5"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -20,7 +20,7 @@ const (
 	nmAgentManagerIface = "org.freedesktop.NetworkManager.AgentManager"
 	nmSecretAgentIface  = "org.freedesktop.NetworkManager.SecretAgent"
 	agentObjectPath     = "/org/freedesktop/NetworkManager/SecretAgent"
-	agentIdentifier     = "com.danklinux.NMAgent"
+	agentIdentifier     = "dev.duxlabs.NMAgent"
 )
 
 const (

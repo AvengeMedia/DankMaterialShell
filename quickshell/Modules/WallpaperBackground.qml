@@ -14,16 +14,7 @@ Variants {
     // An entry present in PanelWindow.onCompleted means we're recreating
     // after a wl_output rebind, not at initial startup.
     property var _seenScreens: ({})
-    readonly property bool desktopMenuEnabled: {
-        switch (SettingsData.desktopContextMenu) {
-        case "on":
-            return true;
-        case "off":
-            return false;
-        default:
-            return !CompositorService.reservesDesktopInput;
-        }
-    }
+    readonly property bool desktopMenuEnabled: CompositorService.desktopContextMenuEnabled
     // niri skips place-within-backdrop surfaces when hit-testing, so the wallpaper never sees clicks there.
     readonly property bool desktopMenuOnWallpaper: desktopMenuEnabled && !CompositorService.isNiri
     model: SettingsData.getFilteredScreens("wallpaper")
@@ -222,7 +213,7 @@ Variants {
 
             function regenerate() {
                 invalidate();
-                if (!root.currentSource || currentWallpaper.source.toString())
+                if (!root.currentSource || currentWallpaper.source.toString() || nextWallpaper.source.toString())
                     return;
                 currentWallpaper.source = root.currentSource;
             }

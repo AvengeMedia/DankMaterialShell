@@ -97,7 +97,7 @@ Singleton {
 grep -qs dms-greeter /etc/greetd/config.toml && echo config
 [ "$(systemctl is-enabled greetd 2>/dev/null)" = enabled ] && echo enabled
 id -nG | tr ' ' '\n' | grep -qxE 'greeter|greetd|_greeter' && echo group
-own=$(readlink -f "$HOME/.config/DankMaterialShell/settings.json")
+own=$(readlink -f "$HOME/.config/dms/settings.json")
 for f in "/var/cache/dms-greeter/users/$USER/settings.json" /var/cache/dms-greeter/settings.json; do
     [ -L "$f" ] && [ "$(readlink -f "$f")" = "$own" ] && echo live && break
 done

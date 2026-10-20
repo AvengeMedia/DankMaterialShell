@@ -10,10 +10,10 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds/providers"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/keymap"
+	"github.com/duxlabs-dev/dux-shell/core/internal/keybinds"
+	"github.com/duxlabs-dev/dux-shell/core/internal/keybinds/providers"
+	"github.com/duxlabs-dev/dux-shell/core/internal/log"
+	"github.com/duxlabs-dev/dux-shell/core/internal/wayland/keymap"
 	"github.com/spf13/cobra"
 )
 

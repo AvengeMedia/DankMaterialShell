@@ -8,6 +8,7 @@ import Quickshell.I3
 import qs.Common
 import qs.Services
 import "../Common/SleepLock.js" as SleepLock
+import "../Common/LaunchUnit.js" as LaunchUnit
 
 Singleton {
     id: root
@@ -367,7 +368,7 @@ printf 'uwsm=%s\nelogind=%s\nloginctl=%s\nsystemctl=%s\nusermgr=%s\nhibernate=%s
         }
 
         if (prefix.length > 0)
-            cmd = prefix.split(" ").concat(cmd);
+            cmd = LaunchUnit.prefixArgs(prefix, desktopEntry.id, LaunchUnit.randomSuffix()).concat(cmd);
 
         Quickshell.execDetached({
             command: cmd,
@@ -406,7 +407,7 @@ printf 'uwsm=%s\nelogind=%s\nloginctl=%s\nsystemctl=%s\nusermgr=%s\nhibernate=%s
         }
 
         if (prefix.length > 0)
-            cmd = prefix.split(" ").concat(cmd);
+            cmd = LaunchUnit.prefixArgs(prefix, desktopEntry.id, LaunchUnit.randomSuffix()).concat(cmd);
 
         Quickshell.execDetached({
             command: cmd,

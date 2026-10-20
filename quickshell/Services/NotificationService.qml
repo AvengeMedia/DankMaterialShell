@@ -1088,7 +1088,7 @@ Singleton {
     }
 
     function sendTestNotification(index) {
-        const notifications = [["Notification Position Test", "DMS test notification 1 of 3 ~ Hi there!", "preferences-system"], ["Second Test", "DMS Notification 2 of 3 ~ Check it out!", "applications-graphics"], ["Third Test", "DMS notification 3 of 3 ~ Enjoy!", "face-smile"]];
+        const notifications = [["Notification Position Test", "dms test notification 1 of 3 ~ Hi there!", "preferences-system"], ["Second Test", "dms notification 2 of 3 ~ Check it out!", "applications-graphics"], ["Third Test", "DMS notification 3 of 3 ~ Enjoy!", "face-smile"]];
 
         if (index < 0 || index >= notifications.length) {
             return;

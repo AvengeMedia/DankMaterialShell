@@ -312,7 +312,7 @@ BasePill {
                     asynchronous: true
                     visible: status === Image.Ready
                     opacity: delegateItem.isMinimized ? 0.4 : 1
-                    layer.enabled: appId === "org.quickshell" || appId === "com.danklinux.dms"
+                    layer.enabled: Paths.isDmsAppId(appId)
                     layer.smooth: true
                     layer.mipmap: true
                     layer.effect: MultiEffect {

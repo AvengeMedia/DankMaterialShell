@@ -2,9 +2,9 @@
 Type=Application
 Name=DMS Notepad
 GenericName=Text Editor
-Comment=Quick notes and text files in the dank desktop shell
+Comment=Quick notes and text files in Dux Shell
 Exec=dms ipc call notepad openFile %f
-Icon=com.danklinux.dms
+Icon=dev.duxlabs.shell
 Terminal=false
 NoDisplay=true
 Categories=Utility;TextEditor;

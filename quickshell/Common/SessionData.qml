@@ -46,7 +46,6 @@ Singleton {
     property string terminalOverride: ""
     property int updaterNotifiedUnix: 0
     property int updaterNotifiedCount: 0
-    property string changelogSeenVersion: ""
     property bool isSwitchingMode: false
     property bool suppressOSD: true
 
@@ -1539,7 +1538,7 @@ Singleton {
     function setPluginBrowserSortMode(mode) {
         if (mode === "type" || mode === "contributor")
             mode = "author";
-        if (mode !== "default" && mode !== "name" && mode !== "author" && mode !== "category")
+        if (mode !== "default" && mode !== "recommended" && mode !== "name" && mode !== "author" && mode !== "category")
             mode = "default";
         pluginBrowserSortMode = mode;
         saveSettings();
@@ -1884,7 +1883,7 @@ Singleton {
     FileView {
         id: settingsFile
 
-        path: isGreeterMode ? "" : StandardPaths.writableLocation(StandardPaths.GenericStateLocation) + "/DankMaterialShell/session.json"
+        path: isGreeterMode ? "" : StandardPaths.writableLocation(StandardPaths.GenericStateLocation) + "/dms/session.json"
         blockLoading: true
         blockWrites: true
         atomicWrites: true

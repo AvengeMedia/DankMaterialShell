@@ -97,7 +97,7 @@ BasePill {
             const key = groupThisWs ? moddedId : (w.aqueousKey || `${moddedId}_${i}`);
 
             if (!byApp[key]) {
-                const isQuickshell = keyBase === "org.quickshell" || keyBase === "com.danklinux.dms";
+                const isQuickshell = Paths.isDmsAppId(keyBase);
                 const isSteamApp = Paths.isSteamApp(moddedId);
                 const desktopEntry = DesktopEntries.heuristicLookup(moddedId);
                 const icon = Paths.getAppIcon(moddedId, desktopEntry);

@@ -164,7 +164,7 @@ Item {
     function showContextMenu() {
         if (!contextMenu)
             return;
-        const shouldHidePin = appData.appId === "org.quickshell" || appData.appId === "com.danklinux.dms";
+        const shouldHidePin = Paths.isDmsAppId(appData.appId);
         contextMenu.showForButton(root, appData, root.height, shouldHidePin, cachedDesktopEntry, parentDockScreen, dockApps);
     }
     function activate() {
@@ -466,7 +466,7 @@ Item {
                 id: iconImg
 
                 anchors.centerIn: parent
-                implicitSize: appData && (appData.appId === "org.quickshell" || appData.appId === "com.danklinux.dms") ? actualIconSize * 0.85 : actualIconSize
+                implicitSize: appData && Paths.isDmsAppId(appData.appId) ? actualIconSize * 0.85 : actualIconSize
                 source: {
                     if (!appData || appData.appId === "__SEPARATOR__") {
                         return "";
@@ -481,7 +481,7 @@ Item {
                 asynchronous: true
                 visible: status === Image.Ready && !coreIcon.visible
                 opacity: root.isMinimized ? 0.4 : 1
-                layer.enabled: appData && (appData.appId === "org.quickshell" || appData.appId === "com.danklinux.dms")
+                layer.enabled: appData && Paths.isDmsAppId(appData.appId)
                 layer.smooth: true
                 layer.mipmap: true
                 layer.effect: MultiEffect {

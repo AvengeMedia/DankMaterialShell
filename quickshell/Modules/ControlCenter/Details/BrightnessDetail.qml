@@ -103,12 +103,12 @@ Item {
 
     function deviceIcon(device, brightness) {
         const deviceClass = device.class || "";
-        if (deviceClass === "backlight" || deviceClass === "ddc") {
-            if (brightness <= CcMetrics.brightnessLowMax)
-                return "brightness_low";
-            return brightness <= CcMetrics.brightnessMediumMax ? "brightness_medium" : "brightness_high";
-        }
-        return (device.name || "").includes("kbd") ? "keyboard" : "lightbulb";
+        if (deviceClass !== "backlight" && deviceClass !== "ddc" && deviceClass !== "software")
+            return (device.name || "").includes("kbd") ? "keyboard" : "lightbulb";
+        if (brightness <= CcMetrics.brightnessLowMax)
+            return "brightness_low";
+
+        return brightness <= CcMetrics.brightnessMediumMax ? "brightness_medium" : "brightness_high";
     }
 
     function deviceClassLabel(device) {
@@ -119,6 +119,8 @@ Item {
             return I18n.tr("DDC/CI monitor");
         case "leds":
             return I18n.tr("LED device");
+        case "software":
+            return I18n.tr("Software dimming", "brightness device class label, dimmed through the gamma ramp");
         default:
             return device.class || "";
         }
@@ -192,14 +194,14 @@ Item {
                         }
 
                         CcToggleRow {
-                            visible: deviceItem.active
+                            visible: deviceItem.active && deviceItem.modelData.class !== "software"
                             text: I18n.tr("Exponential", "adjective, toggle for an exponential brightness curve per device")
                             checked: deviceItem.exponential
                             onToggled: checked => SessionData.setBrightnessExponential(deviceItem.deviceName, checked)
                         }
 
                         CcListRow {
-                            visible: deviceItem.active && deviceItem.exponential
+                            visible: deviceItem.active && deviceItem.exponential && deviceItem.modelData.class !== "software"
                             title: I18n.tr("Curve")
 
                             DNumberStepper {

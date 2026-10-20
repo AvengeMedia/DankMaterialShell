@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/registries"
+	"github.com/duxlabs-dev/dux-shell/core/internal/registries"
 	"github.com/go-git/go-git/v6"
 	"github.com/go-git/go-git/v6/plumbing"
 	"github.com/spf13/afero"
@@ -293,6 +293,12 @@ func (r *Registry) resetLegacyCache() {
 // declaration order (first occurrence of an ID wins). A failing registry is
 // reported in the joined error but does not block the others.
 func (r *Registry) Update() error {
+	unlock, err := registries.LockCache()
+	if err != nil {
+		return err
+	}
+	defer unlock()
+
 	r.resetLegacyCache()
 	r.plugins = []Plugin{}
 	seen := make(map[string]struct{})

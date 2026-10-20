@@ -75,6 +75,9 @@ Item {
     readonly property real islandOpacity: Math.max(0, Math.min(1, root.transparency))
     readonly property color effectiveSurfaceColor: root.embedded ? root.bandColor : root.highContrast ? Theme.surfaceContainerHighest : Theme.withAlpha(root.surfaceColor, root.islandOpacity)
     readonly property real surfaceOpacity: root.effectiveSurfaceColor.a
+    readonly property bool shadowEnabled: !root.chromeless && root.surfaceOpacity > 0 && Theme.elevationEnabled && SettingsData.barElevationEnabled
+    readonly property string autoBarShadowDirection: root.controller.edge
+    readonly property string effectiveShadowDirection: Theme.elevationLightDirection === "autoBar" ? autoBarShadowDirection : Theme.elevationLightDirection
     readonly property real currentSurfaceRadius: Math.max(0, motion.currentTopLeftRadius, motion.currentBottomLeftRadius)
     readonly property color notificationAccentColor: {
         if (!root.controller.notificationActive)
@@ -364,6 +367,13 @@ Item {
         height: (motion.running ? Math.max(root.motionStartBounds.y + root.motionStartBounds.height, root.targetVisualY + motion.targetHeight) : root.targetVisualY + motion.targetHeight) + overshootBudget - y
     }
 
+    Loader {
+        anchors.fill: island
+        z: island.z - 1
+        active: root.shadowEnabled && !root.embedded
+        sourceComponent: shadowComponent
+    }
+
     MorphSurface {
         id: island
         motion: root.surfaceMotion
@@ -511,8 +521,7 @@ Item {
     readonly property real embeddedOverhang: !root.embedded || root.chromeless ? 0 : Math.max(0, root.farEdge ? -(root.isVertical ? root.currentVisualX : root.currentVisualY) : (root.isVertical ? root.currentVisualX + root.currentVisualWidth : root.currentVisualY + root.currentVisualHeight) - root.crossExtent)
     readonly property real joinRadius: root.notch ? root.notchRadius : Math.min(Theme.connectedCornerRadius, root.embeddedOverhang)
     // Depth is capped so the flare never passes the pill's far corner; the slider still drives the along radius.
-    readonly property real notchCross: Math.min(root.controller.homeCompactFaceThickness, root.controller.compactFaceThickness)
-    readonly property real joinCrossRadius: root.notch ? Math.max(0, Math.min(root.joinRadius, root.notchCross - Math.min(root.notchCross / 2, root.controller.pillRadius))) : root.joinRadius
+    readonly property real joinCrossRadius: root.notch ? Math.max(0, Math.min(root.joinRadius, root.controller.compactFaceThickness - Math.min(root.controller.compactFaceThickness / 2, root.controller.pillRadius))) : root.joinRadius
     // Where the join corners sit: the band's inner edge when embedded, the screen edge for a notch.
     readonly property real joinCross: root.notch === root.farEdge ? root.crossExtent : 0
     readonly property var joinCorners: joinChrome.item ? [joinChrome.item.leadingCorner, joinChrome.item.trailingCorner] : []
@@ -531,15 +540,24 @@ Item {
                 active: root.embedded
                 sourceComponent: Item {
                     id: overhangClip
+                    readonly property real shadowPad: root.shadowEnabled ? Theme.elevationRenderPadding(Theme.elevationLevel2, root.effectiveShadowDirection, Theme.spacingXS, Theme.spacingS, Theme.spacingL) : 0
 
                     visible: root.embeddedOverhang > 0
                     clip: true
-                    x: root.isVertical ? (root.farEdge ? -root.embeddedOverhang : root.crossExtent) : 0
-                    y: root.isVertical ? 0 : (root.farEdge ? -root.embeddedOverhang : root.crossExtent)
-                    width: root.isVertical ? root.embeddedOverhang : root.width
-                    height: root.isVertical ? root.height : root.embeddedOverhang
+                    x: root.isVertical ? (root.farEdge ? -root.embeddedOverhang - shadowPad : root.crossExtent) : -shadowPad
+                    y: root.isVertical ? -shadowPad : (root.farEdge ? -root.embeddedOverhang - shadowPad : root.crossExtent)
+                    width: root.isVertical ? root.embeddedOverhang + shadowPad : root.width + 2 * shadowPad
+                    height: root.isVertical ? root.height + 2 * shadowPad : root.embeddedOverhang + shadowPad
+
+                    Loader {
+                        anchors.fill: overhang
+                        active: root.shadowEnabled
+                        sourceComponent: shadowComponent
+                    }
 
                     MorphSurface {
+                        id: overhang
+
                         motion: root.surfaceMotion
                         x: root.currentVisualX - overhangClip.x
                         y: root.currentVisualY - overhangClip.y
@@ -573,6 +591,21 @@ Item {
                 x: root.isVertical ? (root.farEdge ? root.joinCross - radiusX : root.joinCross) : root.currentVisualX + root.currentVisualWidth
                 y: root.isVertical ? root.currentVisualY + root.currentVisualHeight : (root.farEdge ? root.joinCross - radiusY : root.joinCross)
             }
+        }
+    }
+
+    Component {
+        id: shadowComponent
+
+        ElevationShadow {
+            level: Theme.elevationLevel2
+            direction: root.effectiveShadowDirection
+            fallbackOffset: Theme.spacingXS
+            targetColor: "transparent"
+            topLeftRadius: island.topLeftRadius
+            topRightRadius: island.topRightRadius
+            bottomLeftRadius: island.bottomLeftRadius
+            bottomRightRadius: island.bottomRightRadius
         }
     }
 

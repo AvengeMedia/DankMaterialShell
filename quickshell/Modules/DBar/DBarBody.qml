@@ -59,7 +59,7 @@ Item {
     readonly property real islandFlareClearance: ((islandHost?.notch ?? false) ? islandHost.surface.joinRadius * 2.5 : 0) + islandSatelliteSweep
     // Satellites centre on the idle pill face, not the strip; backed ones reach its far edge instead.
     readonly property bool islandSatellitesTrackPill: isIsland && !!islandHost && !islandFree
-    readonly property real islandPillFace: islandSatellitesTrackPill ? islandHost.islandController.homeCompactFaceThickness : 0
+    readonly property real islandPillFace: islandSatellitesTrackPill ? islandHost.islandController.compactFaceThickness : 0
     readonly property real islandSatelliteDepth: islandSatellitesTrackPill ? Theme.px(Math.min(islandStripThickness, islandHost.outerGap + islandPillFace), _dpr) : islandStripThickness
     readonly property real islandSatelliteCrossCenter: !islandSatellitesTrackPill || islandSatelliteBackground ? islandSatelliteDepth / 2 : islandHost.outerGap + islandPillFace / 2
     readonly property real islandSatelliteCrossShift: Theme.px(islandSatelliteCrossCenter - islandStripThickness / 2, _dpr) * (axis.edge === "bottom" || axis.edge === "right" ? -1 : 1)
@@ -743,7 +743,8 @@ Item {
 
     readonly property real barSurfaceThickness: Theme.px(effectiveBarThickness + surfaceSpacing + ((renderBarConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel && spansEdge ? _wingR : 0), _dpr) + _shadowBuffer
     readonly property bool islandSheetOut: islandHost?.sheetOut ?? false
-    readonly property real hostThickness: isIsland ? (islandHost?.hostThickness ?? islandStripThickness) : Math.max(barSurfaceThickness, islandSheetOut ? islandHost.hostThickness : 0)
+    readonly property real islandSatelliteShadowBuffer: isIsland && islandSatellitesEnabled && !islandSatelliteBackground ? _shadowBuffer : 0
+    readonly property real hostThickness: isIsland ? Math.max(islandHost?.hostThickness ?? 0, islandStripThickness + islandSatelliteShadowBuffer) : Math.max(barSurfaceThickness, islandSheetOut ? islandHost.hostThickness : 0)
     readonly property real hideSlideThickness: isIsland ? hostThickness : barSurfaceThickness
     readonly property real surfaceImplicitHeight: !isVertical ? hostThickness : 0
     readonly property real surfaceImplicitWidth: isVertical ? hostThickness : 0
@@ -1229,6 +1230,52 @@ Item {
 
                         onHoveredChanged: {
                             topBarContent.updateHoverBarHovered(hovered);
+                        }
+                    }
+                }
+
+                // Qt 6.11+ drops pointer delivery outside an ancestor's bounds once its clip cache is set
+                // (QQuickItemPrivate::effectivelyClipsEventHandlingChildren), so an edge pill cannot reach the screen edge on its own.
+                Repeater {
+                    model: 2
+
+                    MouseArea {
+                        id: edgeStrip
+
+                        required property int index
+                        readonly property bool leading: index === 0
+                        readonly property var section: leading ? barWindow._leftSection : barWindow._rightSection
+                        readonly property var edgeItem: {
+                            const item = leading ? section?.leadingInlineItem : section?.trailingInlineItem;
+                            if (!item || !("handlePress" in item) || !item.enabled || !item.visible)
+                                return null;
+                            if (leading)
+                                return item.isFirst && (barWindow.isVertical ? item.isTopBarEdge : item.isLeftBarEdge) ? item : null;
+                            return item.isLast && (barWindow.isVertical ? item.isBottomBarEdge : item.isRightBarEdge) ? item : null;
+                        }
+                        readonly property real sectionStart: !section ? 0 : barWindow.isVertical ? barUnitInset.y + topBarContent.y + section.y : barUnitInset.x + topBarContent.x + section.x
+                        readonly property real sectionEnd: !section ? 0 : sectionStart + (barWindow.isVertical ? section.height : section.width)
+
+                        x: barWindow.isVertical || leading ? 0 : sectionEnd
+                        y: barWindow.isVertical && !leading ? sectionEnd : 0
+                        width: barWindow.isVertical ? parent.width : Math.max(0, leading ? sectionStart : parent.width - sectionEnd)
+                        height: barWindow.isVertical ? Math.max(0, leading ? sectionStart : parent.height - sectionEnd) : parent.height
+                        visible: !!edgeItem && width > 0 && height > 0
+                        hoverEnabled: true
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton
+                        cursorShape: (edgeItem?.enableCursor ?? false) ? Qt.PointingHandCursor : Qt.ArrowCursor
+                        onPressed: mouse => edgeItem.handlePress(mouse, edgeStrip)
+                        onWheel: wheelEvent => {
+                            wheelEvent.accepted = false;
+                            edgeItem.wheel(wheelEvent);
+                        }
+
+                        Binding {
+                            target: edgeStrip.edgeItem
+                            property: "edgeHovered"
+                            value: edgeStrip.containsMouse
+                            when: !!edgeStrip.edgeItem
+                            restoreMode: Binding.RestoreBindingOrValue
                         }
                     }
                 }

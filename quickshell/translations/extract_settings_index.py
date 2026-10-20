@@ -347,6 +347,40 @@ def own_scope(block):
     return "".join(kept)
 
 
+def child_blocks(block):
+    children = []
+    depth = 0
+    i = 0
+    while i < len(block):
+        char = block[i]
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+        elif depth == 1:
+            match = re.match(r"[A-Z]\w*\s*\{", block[i:])
+            if match and (i == 0 or not (block[i - 1].isalnum() or block[i - 1] in "_.")):
+                child = parse_component_block(block, i, None)
+                children.append(child)
+                i = block.index(child, i) + len(child)
+                continue
+        i += 1
+    return children
+
+
+def borrowed_description(block, setting_key):
+    """First description among the nested rows that have no index entry of their own."""
+    for child in child_blocks(block):
+        own = own_scope(child)
+        key = extract_property(own, "settingKey")
+        if key and key.strip("\"'") != setting_key:
+            continue
+        found = extract_property(own, "description") or extract_property(own, "summary") or borrowed_description(child, setting_key)
+        if found:
+            return found
+    return None
+
+
 def load_wrapper_components(root_dir):
     widgets_dir = Path(root_dir) / "Modules" / "Settings" / "Widgets"
     wrappers = {}
@@ -459,7 +493,7 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
             if tags_raw:
                 tags = extract_tags(tags_raw)
 
-            desc_raw = extract_property(block, "description") or extract_property(block, "summary") or defaults.get("description")
+            desc_raw = extract_property(own, "description") or extract_property(own, "summary") or defaults.get("description") or borrowed_description(block, setting_key)
             description = None
             if desc_raw:
                 description = extract_i18n_string(desc_raw)

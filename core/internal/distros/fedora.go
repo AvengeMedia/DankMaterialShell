@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
+	"github.com/duxlabs-dev/dux-shell/core/internal/deps"
+	"github.com/duxlabs-dev/dux-shell/core/internal/privesc"
 )
 
 func init() {
@@ -29,6 +29,25 @@ func init() {
 	Register("ultramarine", "#00078b", FamilyFedora, func(config DistroConfig, logChan chan<- string) Distribution {
 		return NewFedoraDistribution(config, logChan)
 	})
+	Register("rhel", "#EE0000", FamilyFedora, func(config DistroConfig, logChan chan<- string) Distribution {
+		return NewFedoraDistribution(config, logChan)
+	})
+	Register("centos", "#9CCD2A", FamilyFedora, func(config DistroConfig, logChan chan<- string) Distribution {
+		return NewFedoraDistribution(config, logChan)
+	})
+	Register("rocky", "#10B981", FamilyFedora, func(config DistroConfig, logChan chan<- string) Distribution {
+		return NewFedoraDistribution(config, logChan)
+	})
+	Register("almalinux", "#0069DA", FamilyFedora, func(config DistroConfig, logChan chan<- string) Distribution {
+		return NewFedoraDistribution(config, logChan)
+	})
+}
+
+var enterpriseLinuxIDs = map[string]bool{"rhel": true, "centos": true, "rocky": true, "almalinux": true}
+
+// IsEnterpriseLinux reports whether id is RHEL or a rebuild; EL 10 installs from EPEL 10 and the COPRs' epel-10 chroots.
+func IsEnterpriseLinux(id string) bool {
+	return enterpriseLinuxIDs[id]
 }
 
 type FedoraDistribution struct {
@@ -60,6 +79,10 @@ func (f *FedoraDistribution) GetFamily() DistroFamily {
 
 func (f *FedoraDistribution) GetPackageManager() PackageManagerType {
 	return PackageManagerDNF
+}
+
+func (f *FedoraDistribution) isEL() bool {
+	return IsEnterpriseLinux(f.config.ID)
 }
 
 func (f *FedoraDistribution) DetectDependencies(ctx context.Context, wm deps.WindowManager) ([]deps.Dependency, error) {
@@ -105,7 +128,7 @@ func (f *FedoraDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 
 	dependencies = append(dependencies, f.detectMatugen())
 	dependencies = append(dependencies, f.detectDanksearch())
-	dependencies = append(dependencies, f.detectDankCalendar())
+	dependencies = append(dependencies, withGitVariant(f.detectDankCalendar(), f.packageInstalled("dankcalendar-git")))
 
 	return dependencies, nil
 }
@@ -118,6 +141,68 @@ func (f *FedoraDistribution) packageInstalled(pkg string) bool {
 	cmd := exec.Command("rpm", "-q", pkg)
 	err := cmd.Run()
 	return err == nil
+}
+
+func (f *FedoraDistribution) InstalledVariant(stable, git PackageMapping) (deps.PackageVariant, bool) {
+	if stable.Name != git.Name {
+		return installedVariantByName(f.packageInstalled, stable, git)
+	}
+	if !f.packageInstalled(stable.Name) {
+		return deps.VariantStable, false
+	}
+	if git.Repository == RepoTypeCOPR && fedoraInstalledFromCOPR(stable.Name, git.RepoURL) {
+		return deps.VariantGit, true
+	}
+	return deps.VariantStable, true
+}
+
+// fedoraInstalledFromCOPR tells same-named variants apart (dms, niri), which only differ by COPR.
+func fedoraInstalledFromCOPR(pkg, coprRepo string) bool {
+	out, err := exec.Command("dnf", "repoquery", "--installed", "--qf", "%{from_repo}", pkg).Output()
+	if err != nil {
+		return false
+	}
+	return strings.HasSuffix(strings.TrimSpace(string(out)), ":"+strings.ReplaceAll(coprRepo, "/", ":"))
+}
+
+func (f *FedoraDistribution) SwapVariants(ctx context.Context, swaps []VariantSwap, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	if err := f.enableCOPRRepos(ctx, swapTargets(swaps, RepoTypeCOPR), sudoPassword, progressChan); err != nil {
+		return err
+	}
+
+	for _, swap := range swaps {
+		command := fmt.Sprintf("dnf swap -y %s %s", swap.From.Name, swap.To.Name)
+		disabledRepo := ""
+		if swap.From.Name == swap.To.Name {
+			// Left enabled, the old COPR wins distro-sync whenever its version sorts higher (dms-git has Epoch 2).
+			if swap.From.Repository == RepoTypeCOPR {
+				disable := privesc.ExecCommand(ctx, sudoPassword, "dnf copr disable -y "+swap.From.RepoURL)
+				if err := f.runWithProgress(disable, progressChan, PhaseSystemPackages, 0.30, 0.35); err != nil {
+					return fmt.Errorf("failed to disable COPR repo %s: %w", swap.From.RepoURL, err)
+				}
+				disabledRepo = swap.From.RepoURL
+			}
+			command = "dnf distro-sync -y " + swap.To.Name
+		}
+
+		progressChan <- InstallProgressMsg{
+			Phase:       PhaseSystemPackages,
+			Progress:    0.40,
+			Step:        fmt.Sprintf("Switching %s to %s...", swap.From.Name, swap.To.Name),
+			NeedsSudo:   true,
+			CommandInfo: "sudo " + command,
+		}
+		if err := f.runWithProgress(privesc.ExecCommand(ctx, sudoPassword, command), progressChan, PhaseSystemPackages, 0.40, 0.85); err != nil {
+			if disabledRepo != "" {
+				reenable := privesc.ExecCommand(ctx, sudoPassword, "dnf copr enable -y "+disabledRepo)
+				if reErr := reenable.Run(); reErr != nil {
+					f.log(fmt.Sprintf("Warning: could not re-enable COPR repo %s: %v", disabledRepo, reErr))
+				}
+			}
+			return fmt.Errorf("failed to switch %s to %s: %w", swap.From.Name, swap.To.Name, err)
+		}
+	}
+	return nil
 }
 
 func (f *FedoraDistribution) GetPackageMapping(wm deps.WindowManager) map[string]PackageMapping {
@@ -135,12 +220,12 @@ func (f *FedoraDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 		"accountsservice":        {Name: "accountsservice", Repository: RepoTypeSystem},
 
 		// COPR packages
-		"quickshell":              f.getQuickshellMapping(variants["quickshell"]),
-		"dms-greeter":             {Name: "dms-greeter", Repository: RepoTypeCOPR, RepoURL: "avengemedia/danklinux"},
-		"matugen":                 {Name: "matugen", Repository: RepoTypeCOPR, RepoURL: "avengemedia/danklinux"},
-		"dms (DankMaterialShell)": f.getDmsMapping(variants["dms (DankMaterialShell)"]),
-		"danksearch":              {Name: "danksearch", Repository: RepoTypeCOPR, RepoURL: "avengemedia/danklinux"},
-		"dankcalendar":            {Name: "dankcalendar-git", Repository: RepoTypeCOPR, RepoURL: "avengemedia/danklinux"},
+		"quickshell":      f.getQuickshellMapping(variants["quickshell"]),
+		"dms-greeter":     variantMapping("dms-greeter", variants["dms-greeter"], RepoTypeCOPR, "avengemedia/danklinux"),
+		"matugen":         {Name: "matugen", Repository: RepoTypeCOPR, RepoURL: "avengemedia/danklinux"},
+		"dms (Dux Shell)": f.getDmsMapping(variants["dms (Dux Shell)"]),
+		"danksearch":      {Name: "danksearch", Repository: RepoTypeCOPR, RepoURL: "avengemedia/danklinux"},
+		"dankcalendar":    variantMapping("dankcalendar", variants["dankcalendar"], RepoTypeCOPR, "avengemedia/danklinux"),
 	}
 
 	switch wm {
@@ -156,6 +241,15 @@ func (f *FedoraDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 		// mangowm resolves via Terra, enabled automatically by enableTerraRepo.
 		packages["mango"] = PackageMapping{Name: "mangowm", Repository: RepoTypeSystem}
 		packages["xwayland-satellite"] = PackageMapping{Name: "xwayland-satellite", Repository: RepoTypeSystem}
+	}
+
+	if f.isEL() {
+		// EPEL 10 has neither, so the danklinux COPR builds them for the epel-10 chroots.
+		for _, name := range []string{"alacritty", "xwayland-satellite"} {
+			if _, ok := packages[name]; ok {
+				packages[name] = PackageMapping{Name: name, Repository: RepoTypeCOPR, RepoURL: "avengemedia/danklinux"}
+			}
+		}
 	}
 
 	return packages
@@ -215,7 +309,9 @@ func (f *FedoraDistribution) detectAccountsService() deps.Dependency {
 }
 
 func (f *FedoraDistribution) detectDMSGreeter() deps.Dependency {
-	return f.detectOptionalPackage("dms-greeter", "DankMaterialShell greetd greeter", f.packageInstalled("dms-greeter"))
+	gitInstalled := f.packageInstalled("dms-greeter-git")
+	dep := f.detectOptionalPackage("dms-greeter", "Dux Shell greetd greeter", gitInstalled || f.packageInstalled("dms-greeter"))
+	return withGitVariant(dep, gitInstalled)
 }
 
 func (f *FedoraDistribution) getPrerequisites() []string {
@@ -227,7 +323,44 @@ func (f *FedoraDistribution) getPrerequisites() []string {
 	}
 }
 
+// enableEPEL installs epel-release on EL hosts; kitty and the COPR chroots' build deps live there.
+// RHEL has no epel-release in its own repos, the rebuilds ship it in extras.
+func (f *FedoraDistribution) enableEPEL(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	if exec.CommandContext(ctx, "rpm", "-q", "epel-release").Run() == nil {
+		f.log("EPEL already enabled, skipping")
+		return nil
+	}
+
+	pkg := "epel-release"
+	if f.config.ID == "rhel" {
+		pkg = "https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(rpm -E %rhel).noarch.rpm"
+	}
+	progressChan <- InstallProgressMsg{
+		Phase:       PhasePrerequisites,
+		Progress:    0.07,
+		Step:        "Enabling EPEL repository...",
+		IsComplete:  false,
+		NeedsSudo:   true,
+		CommandInfo: "sudo dnf install -y " + pkg,
+		LogOutput:   "Enabling EPEL for Enterprise Linux",
+	}
+	output, err := privesc.ExecCommand(ctx, sudoPassword, "dnf install -y "+pkg+" 2>&1").CombinedOutput()
+	if err != nil {
+		f.logError("failed to enable EPEL", err)
+		f.log(fmt.Sprintf("EPEL enable output: %s", string(output)))
+		return fmt.Errorf("failed to enable EPEL: %w", err)
+	}
+	f.log("EPEL enabled")
+	return nil
+}
+
 func (f *FedoraDistribution) InstallPrerequisites(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	if f.isEL() {
+		if err := f.enableEPEL(ctx, sudoPassword, progressChan); err != nil {
+			return err
+		}
+	}
+
 	prerequisites := f.getPrerequisites()
 	var missingPkgs []string
 
@@ -298,7 +431,12 @@ func (f *FedoraDistribution) InstallPackages(ctx context.Context, dependencies [
 		return fmt.Errorf("failed to install prerequisites: %w", err)
 	}
 
-	dnfPkgs, coprPkgs, manualPkgs, variantMap := f.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
+	skipFlags, err := swapReinstalledVariants(ctx, f, dependencies, wm, reinstallFlags, disabledFlags, sudoPassword, progressChan)
+	if err != nil {
+		return err
+	}
+
+	dnfPkgs, coprPkgs, manualPkgs, variantMap := f.categorizePackages(dependencies, wm, reinstallFlags, skipFlags)
 
 	// Phase 2: Enable COPR repositories
 	if len(coprPkgs) > 0 {

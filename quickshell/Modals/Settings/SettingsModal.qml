@@ -173,7 +173,7 @@ DFloatingWindow {
     title: I18n.tr("Settings", "settings window title")
     minimumSize: Qt.size(SettingsMetrics.windowMinWidth, SettingsMetrics.windowMinHeight)
     implicitWidth: SettingsMetrics.windowWidth
-    implicitHeight: screen ? Math.min(SettingsMetrics.windowHeight, screen.height - SettingsMetrics.pagePaddingH * 2 - Theme.spacingL) : SettingsMetrics.windowHeight
+    implicitHeight: heightWithin(SettingsMetrics.windowHeight, SettingsMetrics.pagePaddingH * 2 + Theme.spacingL)
     visible: false
 
     onClosed: hide()
