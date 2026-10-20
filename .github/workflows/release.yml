@@ -73,6 +73,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version-file: ./core/go.mod
+          cache-dependency-path: core/go.sum
 
       - name: Format check
         if: matrix.goos == 'linux'
@@ -247,6 +248,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version-file: ./core/go.mod
+          cache-dependency-path: core/go.sum
 
       - name: Download core artifacts
         uses: actions/download-artifact@v5
