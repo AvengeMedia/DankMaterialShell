@@ -160,6 +160,7 @@ Singleton {
             "children": [
                 {
                     "id": "dock_general",
+                    "hidden": true,
                     "text": I18n.tr("General"),
                     "icon": "tune",
                     "tabIndex": 5,
@@ -167,6 +168,7 @@ Singleton {
                 },
                 {
                     "id": "dock_widgets",
+                    "hidden": true,
                     "text": I18n.tr("Apps & widgets"),
                     "icon": "widgets",
                     "tabIndex": 57,
@@ -174,6 +176,7 @@ Singleton {
                 },
                 {
                     "id": "dock_appearance",
+                    "hidden": true,
                     "text": I18n.tr("Appearance"),
                     "icon": "palette",
                     "tabIndex": 58,

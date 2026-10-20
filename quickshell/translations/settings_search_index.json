@@ -942,6 +942,26 @@
     "description": "Position, pinned apps, trash"
   },
   {
+    "section": "dockPlacement",
+    "label": "Dock",
+    "tabIndex": -1,
+    "category": "Dock",
+    "keywords": [
+      "dock",
+      "edge",
+      "launcher bar",
+      "layout",
+      "name",
+      "panel",
+      "placement",
+      "position",
+      "rename",
+      "taskbar"
+    ],
+    "page": "dock",
+    "icon": "dock_to_bottom"
+  },
+  {
     "section": "dockConfiguration",
     "label": "Docks",
     "tabIndex": -1,
@@ -953,7 +973,6 @@
       "docks",
       "enable",
       "launcher bar",
-      "name",
       "panel",
       "remove",
       "show",
@@ -1406,24 +1425,6 @@
     ],
     "page": "theme_surfaces",
     "description": "Faint edge on cards, pills and widgets"
-  },
-  {
-    "section": "dockPlacement",
-    "label": "Layout",
-    "tabIndex": -1,
-    "category": "Dock",
-    "keywords": [
-      "dock",
-      "edge",
-      "launcher bar",
-      "layout",
-      "panel",
-      "placement",
-      "position",
-      "taskbar"
-    ],
-    "page": "dock",
-    "icon": "dock_to_bottom"
   },
   {
     "section": "iconThemeLight",
