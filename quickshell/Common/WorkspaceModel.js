@@ -439,7 +439,7 @@ function mangoActiveWorkspace(raw, screenName) {
 
 function mangoWindowsOnWorkspace(windows, workspace) {
     // mangoTags are 1-based; workspace.id is 0-based.
-    return windows.filter(win => win && (win.mangoTags || []).includes(workspace.id + 1));
+    return windows.filter(win => win && win.mangoMonitor === workspace.output && (win.mangoTags || []).includes(workspace.id + 1));
 }
 
 function i3Key(ws) {

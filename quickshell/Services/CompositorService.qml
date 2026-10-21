@@ -468,7 +468,7 @@ Singleton {
             const yKey = y.niriWindowId !== undefined ? y.niriWindowId : y.mangoWindowId;
             if (xKey === undefined || yKey === undefined)
                 return false;
-            if (xKey !== yKey || x.niriWorkspaceId !== y.niriWorkspaceId || x.appId !== y.appId || x.title !== y.title || !!x.activated !== !!y.activated || !!x.fullscreen !== !!y.fullscreen || !!x.maximized !== !!y.maximized || !!x.minimized !== !!y.minimized)
+            if (xKey !== yKey || x.niriWorkspaceId !== y.niriWorkspaceId || x.mangoMonitor !== y.mangoMonitor || x.appId !== y.appId || x.title !== y.title || !!x.activated !== !!y.activated || !!x.fullscreen !== !!y.fullscreen || !!x.maximized !== !!y.maximized || !!x.minimized !== !!y.minimized)
                 return false;
         }
         return true;
