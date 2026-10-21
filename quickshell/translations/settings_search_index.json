@@ -11276,7 +11276,6 @@
     "tabIndex": 25,
     "category": "Gamma control",
     "keywords": [
-      "available",
       "blue light",
       "color",
       "color temperature",
@@ -11291,15 +11290,13 @@
       "output",
       "outputs",
       "redshift",
-      "requires",
       "resolution",
       "screen",
       "screens",
       "temperature",
       "warm"
     ],
-    "parentLabel": "Displays",
-    "description": "Gamma control not available. Requires DMS API v6+."
+    "parentLabel": "Displays"
   },
   {
     "section": "nightModeTransitionMinutes",
@@ -15897,12 +15894,10 @@
       "schedule",
       "settings",
       "share",
-      "shared",
       "tint",
       "wallpaper"
     ],
-    "parentLabel": "Wallpaper & colors",
-    "description": "Using shared settings from Gamma Control"
+    "parentLabel": "Wallpaper & colors"
   },
   {
     "section": "wallpaperCycling",

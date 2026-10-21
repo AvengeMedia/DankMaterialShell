@@ -286,6 +286,11 @@ def extract_i18n_string(value):
     return None
 
 
+def is_status_notice(value):
+    """A description with an empty branch only shows while some state holds; it is not searchable text."""
+    return re.search(r"""\?\s*(""|'')\s*:|:\s*(""|'')\s*$""", value.strip()) is not None
+
+
 def extract_tags(value):
     match = re.search(r"\[([^\]]+)\]", value)
     if not match:
@@ -489,7 +494,7 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
 
             desc_raw = extract_property(own, "description") or extract_property(own, "summary") or defaults.get("description") or borrowed_description(block, setting_key)
             description = None
-            if desc_raw:
+            if desc_raw and not is_status_notice(desc_raw):
                 description = extract_i18n_string(desc_raw)
 
             visible_raw = extract_property(own_scope(block), "visible")

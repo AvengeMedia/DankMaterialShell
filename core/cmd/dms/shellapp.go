@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/duxlabs-dev/dux-go/shellapp"
@@ -83,12 +85,36 @@ func preLaunch() {
 	ensureFontCache()
 }
 
+// The elapsed-timer driver keeps the scrolling wallpaper spring in step above 60 Hz,
+// but it makes every other animation jump after a dropped frame (#3837).
+func scrollingWallpaperConfigured() bool {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return false
+	}
+	data, err := os.ReadFile(filepath.Join(configDir, "dms", "settings.json"))
+	if err != nil {
+		return false
+	}
+	return wantsSimpleAnimationDriver(data)
+}
+
+func wantsSimpleAnimationDriver(settings []byte) bool {
+	var parsed struct {
+		WallpaperFillMode string `json:"wallpaperFillMode"`
+	}
+	if json.Unmarshal(settings, &parsed) != nil {
+		return false
+	}
+	return parsed.WallpaperFillMode == "Scrolling"
+}
+
 func dmsExtraEnv(string) []string {
 	var env []string
 	if selfPath, err := os.Executable(); err == nil {
 		env = append(env, "DMS_EXECUTABLE="+selfPath)
 	}
-	if os.Getenv("QSG_USE_SIMPLE_ANIMATION_DRIVER") == "" {
+	if os.Getenv("QSG_USE_SIMPLE_ANIMATION_DRIVER") == "" && scrollingWallpaperConfigured() {
 		env = append(env, "QSG_USE_SIMPLE_ANIMATION_DRIVER=1")
 	}
 	if _, set := os.LookupEnv("MALLOC_CONF"); !set {
