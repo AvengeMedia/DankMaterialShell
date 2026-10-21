@@ -2496,6 +2496,36 @@ Singleton {
         onTriggered: dynamicColorsFileView.reload()
     }
 
+    readonly property bool publishTypography: typeof SettingsData !== "undefined" && SettingsData._hasLoaded && !SessionData.isGreeterMode
+    readonly property string typographyJson: JSON.stringify({
+        "fontFamily": fontFamily,
+        "monoFontFamily": monoFontFamily,
+        "displayFontFamily": displayFontFamily,
+        "fontWeight": fontWeight,
+        "fontScale": fontScale
+    }, null, 2)
+
+    onPublishTypographyChanged: typographyPublishDebounce.restart()
+    onTypographyJsonChanged: typographyPublishDebounce.restart()
+
+    FileView {
+        id: typographyFileView
+        path: root.publishTypography ? root.stateDir + "/dms-typography.json" : ""
+        blockLoading: false
+        printErrors: false
+    }
+
+    Timer {
+        id: typographyPublishDebounce
+        interval: 250
+        repeat: false
+        onTriggered: {
+            if (!root.publishTypography)
+                return;
+            typographyFileView.setText(root.typographyJson);
+        }
+    }
+
     IpcHandler {
         target: "theme"
 
