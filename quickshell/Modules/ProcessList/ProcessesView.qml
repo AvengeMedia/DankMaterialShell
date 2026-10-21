@@ -36,8 +36,8 @@ Rectangle {
     }
     onSearchTextChanged: refreshFilter()
 
-    // A search has to see every process, see DgopService.requestFullProcessList
-    readonly property bool needsFullProcessList: active && searchText.length > 0
+    // A search, or a sort dgop can't apply itself, has to see every process.
+    readonly property bool needsFullProcessList: active && (searchText.length > 0 || DgopService.dgopSort() === "")
     property bool holdsFullProcessList: false
     onNeedsFullProcessListChanged: {
         if (needsFullProcessList === holdsFullProcessList)
@@ -54,7 +54,7 @@ Rectangle {
     }
     onColumnsChanged: {
         const sort = DgopService.currentSort;
-        if (sort !== "name" && sort !== "pid" && !columns.some(id => (ProcessColumns.COLUMNS.find(c => c.id === id) ?? {}).sortKey === sort))
+        if (sort !== "name" && sort !== "pid" && !columns.includes(sort))
             DgopService.setSortBy("cpu");
     }
     onProcessFilterTypesChanged: refreshFilter()
@@ -389,7 +389,10 @@ Rectangle {
         active: root.active
     }
 
-    Component.onCompleted: updateProcesses()
+    Component.onCompleted: {
+        onColumnsChanged();
+        updateProcesses();
+    }
 
     // The first details panel compiles its type, which stalled the first expand; build one hidden in the background.
     Loader {
@@ -494,7 +497,7 @@ Rectangle {
                             required property var modelData
                             Layout.minimumWidth: root.columnWidth(modelData)
                             Layout.maximumWidth: Layout.minimumWidth
-                            sortKey: modelData.sortKey
+                            sortKey: modelData.id
                             label: ProcessListMetrics.columnLabel(modelData.id)
                         }
                     }

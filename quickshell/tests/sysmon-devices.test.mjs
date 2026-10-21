@@ -1,10 +1,8 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import vm from "node:vm";
 import test from "node:test";
+import { loadScript } from "./qml-script.mjs";
 
-const lib = vm.createContext({});
-vm.runInContext(readFileSync(new URL("../Services/SysmonDevices.js", import.meta.url), "utf8").replace(/^\.pragma.*$/m, ""), lib);
+const lib = loadScript(new URL("../Services/SysmonDevices.js", import.meta.url));
 const plain = value => JSON.parse(JSON.stringify(value));
 
 test("isWholeDisk accepts physical disks and rejects partitions and virtual devices", () => {
@@ -38,32 +36,6 @@ test("sumWholeDisks counts the whole disk once, not partitions or mappings", () 
     ];
     assert.deepEqual(plain(lib.sumWholeDisks(entries, "r", "w")), { read: 100, write: 10 });
     assert.deepEqual(plain(lib.sumWholeDisks([{ device: "sda", r: 5 }], "r", "w")), { read: 5, write: 0 });
-});
-
-test("appendHistory returns a new array bounded to the last size items", () => {
-    const a = [1, 2, 3];
-    assert.deepEqual(plain(lib.appendHistory(a, 4, 3)), [2, 3, 4]);
-    assert.deepEqual(a, [1, 2, 3]);
-    assert.deepEqual(plain(lib.appendHistory(undefined, 1, 3)), [1]);
-});
-
-test("formatRate switches units at the 1024 (bytes) and 1000 (bits) boundaries", () => {
-    assert.equal(lib.formatRate(1023, false), "1023 B/s");
-    assert.equal(lib.formatRate(1024, false), "1.0 KB/s");
-    assert.equal(lib.formatRate(1024 * 1024, false), "1.0 MB/s");
-    assert.equal(lib.formatRate(1024 ** 3, false), "1.0 GB/s");
-    assert.equal(lib.formatRate(124, true), "992 bit/s");
-    assert.equal(lib.formatRate(125, true), "1.0 kbit/s");
-    assert.equal(lib.formatRate(125000, true), "1.0 Mbit/s");
-    assert.equal(lib.formatRate(125000000, true), "1.0 Gbit/s");
-});
-
-test("formatBytes uses IEC units with one decimal from MiB up", () => {
-    assert.equal(lib.formatBytes(512), "512 B");
-    assert.equal(lib.formatBytes(2048), "2 KiB");
-    assert.equal(lib.formatBytes(1.5 * 1024 ** 2), "1.5 MiB");
-    assert.equal(lib.formatBytes(16 * 1024 ** 3), "16.0 GiB");
-    assert.equal(lib.formatBytes(2 * 1024 ** 4), "2.0 TiB");
 });
 
 test("formatTemp honors the unit and shows a dash when absent", () => {

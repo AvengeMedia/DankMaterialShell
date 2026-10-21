@@ -7,7 +7,6 @@ import qs.Widgets
 import qs.DCommon.Widgets
 import "../../Common/Format.js" as Format
 import "Drives.js" as Drives
-import "../../Services/SysmonDevices.js" as Devices
 
 // A drive's partitions side by side, sized by partition, each filled to its used space.
 Item {
@@ -21,7 +20,7 @@ Item {
         const p = (drive?.partitions ?? []).find(x => x.device === device);
         if (!p)
             return "";
-        return [p.fsType ?? "", Devices.formatBytes(p.size)].filter(s => s !== "").join(", ");
+        return [p.fsType ?? "", Format.formatBytes(p.size, true)].filter(s => s !== "").join(", ");
     }
 
     function segmentDetail(seg) {

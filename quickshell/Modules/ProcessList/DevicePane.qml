@@ -24,16 +24,14 @@ DFlickable {
     property var secondaryValues: []
     property real maximum: 0
     property string maximumText: ""
-    // Each entry: { label, value, tooltip, advanced }; entries without a value are left out,
-    // advanced ones only show while Advanced is expanded.
+    // Entries: { label, value, tooltip, advanced }; advanced ones show only when expanded.
     property var leftStats: []
     property var rightStats: []
     default property alias content: slot.data
     property alias headerActions: headerActionsRow.data
     property alias topContent: topSlot.data
 
-    // Until the device's first samples arrive every row is shown with a spinner, so nothing pops in later. Labels that
-    // had a value on this device keep their row (showing "—") so samples without the value don't make the grid jump.
+    // Rows that had a value keep their place, as "—", so the grid doesn't jump.
     property bool loaded: true
     property var seenLabels: ({})
 
@@ -152,7 +150,7 @@ DFlickable {
             secondaryValues: root.secondaryValues
             maximum: root.maximum
             maximumText: root.maximumText
-            historyLength: DgopService.deviceHistorySize
+            historyLength: DgopService.historySize
         }
 
         Column {

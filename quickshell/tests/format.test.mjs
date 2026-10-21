@@ -31,3 +31,16 @@ test("formatRemaining rounds 59m59s up to one hour, not 60 min", () => {
 test("formatRemaining formats hours and minutes together", () => {
     assert.equal(format.formatRemaining(2 * HOUR_MS + 5 * 60 * 1000, "", "%1 min", "%1 h", "%1 h %2 m"), "2 h 5 m");
 });
+
+test("formatBytes keeps the compact form unless IEC units are asked for", () => {
+    assert.equal(format.formatBytes(2048), "2K");
+    assert.equal(format.formatBytes(2048, true), "2 KiB");
+    assert.equal(format.formatBytes(1.5 * 1024 ** 2, true), "1.5 MiB");
+    assert.equal(format.formatBytes(2 * 1024 ** 4, true), "2.0 TiB");
+});
+
+test("formatDuration shows hours only when asked for", () => {
+    assert.equal(format.formatDuration(3725.4), "62:05");
+    assert.equal(format.formatDuration(3725.4, true), "1:02:05");
+    assert.equal(format.formatDuration(65, true), "1:05");
+});

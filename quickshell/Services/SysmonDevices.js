@@ -1,4 +1,5 @@
 .pragma library
+.import "../Common/Format.js" as Format
 
 const WHOLE_DISK = /^(nvme\d+n\d+|sd[a-z]+|vd[a-z]+|xvd[a-z]+|hd[a-z]+|mmcblk\d+)$/;
 
@@ -34,11 +35,6 @@ function isHiddenByDefault(kind) {
     return kind === "loopback" || kind === "virtual";
 }
 
-function appendHistory(arr, value, size) {
-    const next = (arr || []).concat([value]);
-    return size > 0 ? next.slice(-size) : [];
-}
-
 function sumWholeDisks(entries, readKey, writeKey) {
     const total = {
         read: 0,
@@ -51,32 +47,6 @@ function sumWholeDisks(entries, readKey, writeKey) {
         total.write += entry[writeKey] || 0;
     }
     return total;
-}
-
-function scale(value, base, units, decimals) {
-    let i = 0;
-    while (value >= base && i < units.length - 1) {
-        value /= base;
-        i++;
-    }
-    return value.toFixed(i === 0 ? 0 : decimals) + " " + units[i];
-}
-
-function formatRate(bytesPerSec, bits) {
-    if (bits)
-        return scale(bytesPerSec * 8, 1000, ["bit/s", "kbit/s", "Mbit/s", "Gbit/s"], 1);
-    return scale(bytesPerSec, 1024, ["B/s", "KB/s", "MB/s", "GB/s"], 1);
-}
-
-function formatBytes(bytes) {
-    const units = ["B", "KiB", "MiB", "GiB", "TiB"];
-    let value = bytes;
-    let i = 0;
-    while (value >= 1024 && i < units.length - 1) {
-        value /= 1024;
-        i++;
-    }
-    return value.toFixed(i < 2 ? 0 : 1) + " " + units[i];
 }
 
 function formatLinkSpeed(mbit) {
@@ -114,7 +84,7 @@ function memoryModulesSummary(modules) {
     for (const m of list)
         if (m.type && !types.includes(m.type))
             types.push(m.type);
-    return [formatBytes(total).replace(/\.0 /, " ")].concat(types).join(" ");
+    return [Format.formatBytes(total, true).replace(/\.0 /, " ")].concat(types).join(" ");
 }
 
 function formatTemp(celsius, fahrenheit) {

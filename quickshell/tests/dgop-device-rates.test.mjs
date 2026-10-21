@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import test from "node:test";
+import { loadScript } from "./qml-script.mjs";
 
 const source = readFileSync(new URL("../Services/DgopService.qml", import.meta.url), "utf8");
-const devicesSource = readFileSync(new URL("../Services/SysmonDevices.js", import.meta.url), "utf8").replace(".pragma library", "");
 
 function service(modules) {
     const context = vm.createContext({
@@ -23,7 +23,7 @@ function service(modules) {
         diskRates: [],
         netRates: [],
         deviceHistory: {},
-        deviceHistorySize: 60,
+        historySize: 60,
         procCursor: "",
         cpuCursor: "",
         cpuSampleCount: 0,
@@ -34,8 +34,8 @@ function service(modules) {
         bios: null,
         primeTimer: { restart() {} },
         statsUpdated() {},
-        appendHistory: (h, v) => h.concat([v]),
-        SysmonDevices: vm.runInContext(`(function(){${devicesSource}\nreturn {isWholeDisk, appendHistory, sumWholeDisks, deviceKey};})()`, vm.createContext({}))
+        Format: loadScript(new URL("../Common/Format.js", import.meta.url)),
+        SysmonDevices: loadScript(new URL("../Services/SysmonDevices.js", import.meta.url))
     });
     const methods = ["hasModule", "isModuleAvailable", "buildMetaParams", "dgopSort", "parseData", "releaseUnusedData", "removeDeviceHistory", "pushDeviceHistory"];
     const found = [];
@@ -106,7 +106,7 @@ test("busy and responseTime are copied only when present", () => {
 
 test("history is bounded and vanished interfaces are dropped", () => {
     const ctx = service(["net-rate"]);
-    ctx.deviceHistorySize = 3;
+    ctx.historySize = 3;
     const net = (...names) => ({ netrate: { cursor: "c", interfaces: names.map(n => ({ interface: n, rxrate: 1, txrate: 2 })) } });
     for (let i = 0; i < 6; i++)
         ctx.parseData(net("enp6s0", "wg0"));

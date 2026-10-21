@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import "../../Common/Format.js" as Format
 import "../../Services/SysmonDevices.js" as SysmonDevices
 import "Drives.js" as Drives
 
@@ -14,52 +15,47 @@ DevicePane {
     readonly property real axisMax: SysmonDevices.rateAxisMax(history.a, history.b, 1048576)
 
     readonly property var drive: Drives.driveFor(deviceName, DriveService.drives)
-    readonly property var kindNames: ({
-            nvme: "NVMe",
-            ssd: "SSD",
-            hdd: "HDD"
-        })
-    readonly property string health: Drives.healthLevel(drive)
-    readonly property var healthText: {
-        const w = Drives.healthWord(health);
-        return w === "" ? null : w === "ok" ? I18n.tr("Healthy", "drive health status") : w === "warning" ? I18n.tr("Warning") : I18n.tr("Critical", "drive health");
+
+    DriveHealth {
+        id: health
+        level: Drives.healthLevel(root.drive)
     }
 
     function rate(v) {
-        return v === null || v === undefined ? "—" : SysmonDevices.formatRate(v, false);
+        return v === null || v === undefined ? "—" : Format.formatRate(v, 1);
     }
 
     function total(v) {
-        return v === null || v === undefined ? null : SysmonDevices.formatBytes(v);
+        return v === null || v === undefined ? null : Format.formatBytes(v, true);
     }
 
     loaded: (history.a ?? []).length > 0
     title: drive?.model || deviceName
     titleTooltip: drive?.model ? deviceName : ""
-    subtitle: drive ? [kindNames[drive.kind] ?? drive.kind ?? "", drive.pcieLink ?? ""].filter(x => x).join(", ") : ""
+    subtitle: Drives.driveSubtitle(drive)
     subtitle2: Drives.rootMostMount(drive)
-    chartLabel: I18n.tr("Read")
+    chartLabel: I18n.tr("Disk read", "disk read rate")
     chartValue: rate(rates?.readRate)
-    chartSecondaryLabel: I18n.tr("Write")
+    chartSecondaryLabel: I18n.tr("Disk write", "disk write rate")
     chartSecondaryValue: rate(rates?.writeRate)
     values: history.a ?? []
     secondaryValues: history.b ?? []
     maximum: axisMax
-    maximumText: SysmonDevices.formatRate(axisMax, false)
+    maximumText: Format.formatRate(axisMax, 1)
 
     leftStats: [
         {
-            label: I18n.tr("Busy"),
+            label: I18n.tr("Busy", "share of time a disk is busy"),
             value: root.rates?.busy != null ? Math.round(root.rates.busy) + "%" : root.rates ? "—" : null
         },
         {
             advanced: true,
-            label: I18n.tr("Response time"),
+            label: I18n.tr("Response time", "average time a disk takes per request"),
             value: root.rates?.responseTime != null ? root.rates.responseTime.toFixed(2) + " ms" : root.rates ? "—" : null
         },
         {
             label: I18n.tr("Capacity"),
-            value: root.drive?.size > 0 ? SysmonDevices.formatBytes(root.drive.size) : null
+            value: root.drive?.size > 0 ? Format.formatBytes(root.drive.size, true) : null
         }
     ]
 
@@ -70,16 +66,16 @@ DevicePane {
         },
         {
             label: I18n.tr("Health"),
-            value: root.healthText
+            value: health.text || null
         },
         {
             advanced: true,
-            label: I18n.tr("Read since boot"),
+            label: I18n.tr("Read total", "total data read"),
             value: root.total(root.rates?.readTotal)
         },
         {
             advanced: true,
-            label: I18n.tr("Written since boot"),
+            label: I18n.tr("Written total", "total data written"),
             value: root.total(root.rates?.writeTotal)
         }
     ]

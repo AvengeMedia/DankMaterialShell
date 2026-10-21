@@ -99,7 +99,7 @@ Popup {
             dangerous: true
         },
         {
-            text: actionTitle("restart", processData),
+            text: ProcessActions.title("restart", processData),
             icon: "restart_alt",
             action: () => requestAction("restart"),
             enabled: ProcessActions.canRestart(processData)
@@ -205,15 +205,6 @@ Popup {
         close();
     }
 
-    function killProcess() {
-        requestAction("quit");
-    }
-
-    function actionTitle(action, process) {
-        return ProcessActions.title(action, process);
-    }
-
-    // Ending a critical process warns and offers a restart instead; everything else gets a plain confirmation.
     function requestAction(action) {
         if (!processData || !(action === "restart" ? ProcessActions.canRestart(processData) : ProcessActions.canEnd(processData)))
             return;

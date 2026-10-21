@@ -1,25 +1,25 @@
 .pragma library
-.import "../../Services/SysmonDevices.js" as Devices
+.import "../../Common/Format.js" as Format
 .import "../../Services/ProcessSort.js" as ProcessSort
 
 // width is in Theme.fontSizeSmall units. meter marks resource columns, drawn in the stronger text color.
 const COLUMNS = [
-    {id: "cpu", sortKey: "cpu", width: 7, meter: "percent"},
-    {id: "memory", sortKey: "memory", width: 8, meter: "memory"},
-    {id: "gpu", sortKey: "gpu", width: 6, meter: "percent", modules: ["process-gpu"]},
-    {id: "vram", sortKey: "vram", width: 7, meter: "vram", modules: ["process-gpu", "gpu"]},
-    {id: "gpuVideo", sortKey: "gpuVideo", width: 6, meter: "percent", modules: ["process-gpu"]},
-    {id: "diskRead", sortKey: "diskRead", group: "disk", width: 7, meter: "disk", modules: ["process-io", "disk"]},
-    {id: "diskWrite", sortKey: "diskWrite", group: "disk", width: 7, meter: "disk", modules: ["process-io", "disk"]},
-    {id: "connections", sortKey: "connections", group: "network", width: 7, modules: ["process-net"]},
-    {id: "netRx", sortKey: "netRx", group: "network", width: 7, meter: "net", modules: ["process-net", "network"]},
-    {id: "netTx", sortKey: "netTx", group: "network", width: 7, meter: "net", modules: ["process-net", "network"]},
-    {id: "status", sortKey: "status", width: 7},
-    {id: "threads", sortKey: "threads", width: 5},
-    {id: "nice", sortKey: "nice", width: 4},
-    {id: "cpuTime", sortKey: "cpuTime", width: 6},
-    {id: "pid", sortKey: "pid", width: 5},
-    {id: "user", sortKey: "user", width: 8}
+    {id: "cpu", width: 7, meter: "percent"},
+    {id: "memory", width: 8, meter: "memory"},
+    {id: "gpu", width: 6, meter: "percent", modules: ["process-gpu"]},
+    {id: "vram", width: 7, meter: "vram", modules: ["process-gpu", "gpu"]},
+    {id: "gpuVideo", width: 6, meter: "percent", modules: ["process-gpu"]},
+    {id: "diskRead", group: "disk", width: 7, meter: "disk", modules: ["process-io", "disk"]},
+    {id: "diskWrite", group: "disk", width: 7, meter: "disk", modules: ["process-io", "disk"]},
+    {id: "connections", group: "network", width: 7, modules: ["process-net"]},
+    {id: "netRx", group: "network", width: 7, meter: "net", modules: ["process-net", "network"]},
+    {id: "netTx", group: "network", width: 7, meter: "net", modules: ["process-net", "network"]},
+    {id: "status", width: 7},
+    {id: "threads", width: 5},
+    {id: "nice", width: 4},
+    {id: "cpuTime", width: 6},
+    {id: "pid", width: 5},
+    {id: "user", width: 8}
 ];
 
 const DEFAULT_COLUMNS = ["cpu", "memory", "gpu", "vram", "diskRead", "diskWrite", "connections", "netRx", "netTx"];
@@ -40,21 +40,9 @@ function modulesFor(columnIds) {
     return out;
 }
 
-function rawValue(id, row) {
-    return ProcessSort.rawValue(id, row);
-}
-const compare = ProcessSort.compare;
-
-function formatDuration(seconds) {
-    const s = Math.floor(seconds);
-    const pad = n => String(n).padStart(2, "0");
-    const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60;
-    return h > 0 ? h + ":" + pad(m) + ":" + pad(s % 60) : m + ":" + pad(s % 60);
-}
-
 // null means absent: the caller shows an em dash. status stays the raw letter.
-function formatCell(id, row, bits) {
-    const v = rawValue(id, row);
+function formatCell(id, row) {
+    const v = ProcessSort.rawValue(id, row);
     if (v === null)
         return null;
     switch (id) {
@@ -62,13 +50,13 @@ function formatCell(id, row, bits) {
     case "gpu":
     case "gpuVideo": return v.toFixed(0) + "%";
     case "memory":
-    case "vram": return Devices.formatBytes(v * 1024);
+    case "vram": return Format.formatBytes(v * 1024, true);
     case "diskRead":
-    case "diskWrite": return Devices.formatRate(v, bits);
+    case "diskWrite": return Format.formatRate(v, 1);
     // UDP (QUIC) has no byte counters, so the TCP rate is only a lower bound.
     case "netRx":
-    case "netTx": return (row.netPartial ? "≥ " : "") + Devices.formatRate(v, bits);
-    case "cpuTime": return formatDuration(v);
+    case "netTx": return (row.netPartial ? "≥ " : "") + Format.formatRate(v, 1);
+    case "cpuTime": return Format.formatDuration(v, true);
     case "connections":
     case "threads":
     case "nice":

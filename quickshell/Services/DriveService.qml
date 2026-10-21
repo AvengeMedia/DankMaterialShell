@@ -13,11 +13,8 @@ Singleton {
 
     property int refCount: 0
 
-    // Drive objects as documented for drives.list
     property var drives: []
-    // Absolute path of smartctl, empty when smartmontools is missing
     property string smartctlPath: ""
-    // Shell command that installs smartmontools, empty when unknown
     property string installCommand: ""
     property bool loaded: false
 

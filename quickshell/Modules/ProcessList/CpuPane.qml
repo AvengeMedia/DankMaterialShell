@@ -6,6 +6,7 @@ import qs.Services
 import qs.Widgets
 import qs.DCommon.Widgets
 import "../../Services/SysmonDevices.js" as Devices
+import "../../Common/Format.js" as Format
 
 DevicePane {
     id: root
@@ -28,7 +29,7 @@ DevicePane {
     }
 
     function size(bytes) {
-        return bytes > 0 ? Devices.formatBytes(bytes) : null;
+        return bytes > 0 ? Format.formatBytes(bytes, true) : null;
     }
 
     function count(n) {
@@ -49,7 +50,7 @@ DevicePane {
         visible: DgopService.perCoreCpuUsage.length > 0
         size: "small"
         checkEnabled: false
-        model: [I18n.tr("Overall", "CPU chart: usage of all threads together"), I18n.tr("Per thread")]
+        model: [I18n.tr("Overall", "CPU chart: usage of all threads together"), I18n.tr("Per thread", "CPU chart mode: one graph per thread")]
         currentIndex: ProcessListMetrics.cpuPerThread ? 1 : 0
         onSelectionChanged: (index, selected) => {
             if (selected)
@@ -61,10 +62,10 @@ DevicePane {
         {
             label: I18n.tr("Clock"),
             value: root.ghz(root.clockMHz),
-            tooltip: info?.governor ? I18n.tr("Governor") + ": " + info.governor : ""
+            tooltip: info?.governor ? I18n.tr("Governor", "CPU frequency scaling governor") + ": " + info.governor : ""
         },
         {
-            label: I18n.tr("Max clock"),
+            label: I18n.tr("Max clock", "highest clock speed of a CPU or GPU"),
             value: root.ghz(info?.maxFrequency ?? 0)
         },
         {
@@ -83,7 +84,7 @@ DevicePane {
         },
         {
             advanced: true,
-            label: I18n.tr("L3 cache"),
+            label: I18n.tr("L3 cache", "CPU cache level"),
             value: root.size(cache?.l3 ?? 0),
             tooltip: [[I18n.tr("L1 cache", "CPU cache level"), root.size((cache?.l1d ?? 0) + (cache?.l1i ?? 0))], [I18n.tr("L2 cache", "CPU cache level"), root.size(cache?.l2 ?? 0)]].filter(p => p[1] !== null).map(p => p[0] + ": " + p[1]).join("\n")
         }
@@ -95,7 +96,7 @@ DevicePane {
             value: root.count(DgopService.processCount)
         },
         {
-            label: I18n.tr("Threads"),
+            label: I18n.tr("Threads", "number of threads, CPU or process"),
             value: root.count(DgopService.threadCount)
         },
         {
@@ -159,7 +160,7 @@ DevicePane {
                         compact: true
                         values: root.threadHistory[thread.index] ?? []
                         maximum: 100
-                        historyLength: DgopService.deviceHistorySize
+                        historyLength: DgopService.historySize
                     }
 
                     StyledText {

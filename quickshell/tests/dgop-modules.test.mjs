@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import test from "node:test";
+import { loadScript } from "./qml-script.mjs";
 
 const source = readFileSync(new URL("../Services/DgopService.qml", import.meta.url), "utf8");
-const devicesSource = readFileSync(new URL("../Services/SysmonDevices.js", import.meta.url), "utf8").replace(".pragma library", "");
 
 const pinnedModules = ["cpu", "memory", "network", "net-rate", "disk", "disk-rate", "diskmounts", "processes", "system", "hardware", "gpu", "gpu-temp"];
 const newModules = [...pinnedModules, "process-gpu", "process-io", "sensors", "memory-modules"];
@@ -41,12 +41,12 @@ function service(modules, availableModules = []) {
         sensors: [],
         memoryModules: null,
         deviceHistory: {},
-        deviceHistorySize: 60,
+        historySize: 60,
         primeTimer: { restart() {} },
         statsUpdated() {},
         updateAllStats() {},
-        appendHistory: (h, v) => h.concat([v]),
-        SysmonDevices: vm.runInContext(`(function(){${devicesSource}\nreturn {isWholeDisk, appendHistory, sumWholeDisks, deviceKey, gpuSlot};})()`, vm.createContext({}))
+        Format: loadScript(new URL("../Common/Format.js", import.meta.url)),
+        SysmonDevices: loadScript(new URL("../Services/SysmonDevices.js", import.meta.url))
     });
     const methods = ["hasModule", "isModuleAvailable", "initializeModules", "buildMetaParams", "dgopSort", "parseData", "releaseUnusedData", "removeDeviceHistory", "pushDeviceHistory"];
     const found = [];

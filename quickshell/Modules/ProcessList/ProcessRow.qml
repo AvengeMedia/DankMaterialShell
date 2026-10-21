@@ -6,6 +6,7 @@ import qs.Services
 import qs.DCommon.Widgets
 import Quickshell.Widgets
 import "ProcessColumns.js" as ProcessColumns
+import "../../Services/ProcessSort.js" as ProcessSort
 
 DListItem {
     id: root
@@ -115,7 +116,7 @@ DListItem {
                 acceptedButtons: Qt.NoButton
                 onContainsMouseChanged: {
                     if (containsMouse) {
-                        rowTip.text = (root.displayName !== root.command ? root.command : "") + (root.childCount > 0 ? (root.displayName !== root.command ? "\n" : "") + I18n.tr("Includes %1 more processes of the same program; the values are their total", "process row tooltip, %1 is the count in parentheses").arg(root.childCount) : "");
+                        rowTip.text = (root.displayName !== root.command ? root.command : "");
                         rowTip.target = nameText;
                         rowTip.hoverArea = nameHover;
                     } else if (rowTip.hoverArea === nameHover) {
@@ -133,10 +134,10 @@ DListItem {
 
                 required property string modelData
                 readonly property var col: ProcessColumns.COLUMNS.find(c => c.id === modelData) ?? ({})
-                readonly property var raw: ProcessColumns.formatCell(modelData, root.process ?? ({}), false)
+                readonly property var raw: ProcessColumns.formatCell(modelData, root.process ?? ({}))
                 readonly property bool absent: raw === null
                 readonly property bool waiting: absent && DgopService.unlockLoading
-                readonly property bool zero: !cell.absent && ProcessColumns.rawValue(cell.modelData, root.process ?? ({})) === 0
+                readonly property bool zero: !cell.absent && ProcessSort.rawValue(cell.modelData, root.process ?? ({})) === 0
 
                 Layout.minimumWidth: Theme.fontSizeSmall * (col.width ?? 6) - Theme.spacingS
                 Layout.maximumWidth: Layout.minimumWidth
@@ -172,7 +173,7 @@ DListItem {
                     onContainsMouseChanged: {
                         if (containsMouse) {
                             const reason = ProcessColumns.absentReason(cell.modelData, root.process);
-                            rowTip.text = reason === "unmonitored" ? I18n.tr("Monitoring off") : reason === "unknown" ? I18n.tr("Unknown", "process network rate that could not be measured") : I18n.tr("Not readable without privileges");
+                            rowTip.text = reason === "unmonitored" ? I18n.tr("Monitoring off", "GPU monitoring is turned off in settings") : reason === "unknown" ? I18n.tr("Unknown", "process network rate that could not be measured") : I18n.tr("Not readable without privileges", "process value that needs root access to read");
                             rowTip.target = cell;
                             rowTip.hoverArea = absentArea;
                         } else if (rowTip.hoverArea === absentArea) {

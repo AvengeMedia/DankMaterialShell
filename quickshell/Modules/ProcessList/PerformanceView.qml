@@ -4,6 +4,7 @@ import qs.Common
 import qs.Services
 import qs.Modules.Settings.Widgets
 import "../../Services/SysmonDevices.js" as Devices
+import "../../Common/Format.js" as Format
 import "Drives.js" as Drives
 
 Item {
@@ -31,11 +32,11 @@ Item {
     }
 
     function rate(value) {
-        return value === null || value === undefined ? "—" : Devices.formatRate(value, false);
+        return value === null || value === undefined ? "—" : Format.formatRate(value, 1);
     }
 
     function pairTotal(a, b) {
-        return a === null || a === undefined || b === null || b === undefined ? "—" : Devices.formatRate(a + b, false);
+        return a === null || a === undefined || b === null || b === undefined ? "—" : Format.formatRate(a + b, 1);
     }
 
     readonly property var nets: {
@@ -67,7 +68,7 @@ Item {
                 group: processor,
                 icon: "developer_board",
                 name: I18n.tr("Memory", "system RAM label in system monitor"),
-                value: DgopService.memoryInfo === null ? "—" : Devices.formatBytes(DgopService.usedMemoryKB * 1024) + " / " + Devices.formatBytes(DgopService.totalMemoryKB * 1024),
+                value: DgopService.memoryInfo === null ? "—" : Format.formatBytes(DgopService.usedMemoryKB * 1024, true) + " / " + Format.formatBytes(DgopService.totalMemoryKB * 1024, true),
                 values: longer(history("memory").a, DgopService.memoryHistory),
                 maximum: 100
             }
@@ -82,7 +83,7 @@ Item {
                 group: I18n.tr("Graphics"),
                 icon: "gpu",
                 name: g.fullName,
-                value: off ? I18n.tr("Monitoring off") : suspended ? I18n.tr("Idle", "adjective, printer state", true) : (g.usage != null ? Math.round(g.usage) + "%" : "—"),
+                value: off ? I18n.tr("Monitoring off", "GPU monitoring is turned off in settings") : suspended ? I18n.tr("Idle", "adjective, printer state", true) : (g.usage != null ? Math.round(g.usage) + "%" : "—"),
                 values: suspended || off ? [] : (history(key).a ?? []),
                 maximum: 100
             });
@@ -97,7 +98,7 @@ Item {
                 icon: Drives.driveIcon(Drives.driveFor(d.device, DriveService.drives)),
                 name: Drives.driveFor(d.device, DriveService.drives)?.model || d.device,
                 value: pairTotal(d.readRate, d.writeRate),
-                valueTooltip: I18n.tr("Read") + ": " + rate(d.readRate) + "\n" + I18n.tr("Write") + ": " + rate(d.writeRate),
+                valueTooltip: I18n.tr("Disk read", "disk read rate") + ": " + rate(d.readRate) + "\n" + I18n.tr("Disk write", "disk write rate") + ": " + rate(d.writeRate),
                 values: history(key).a ?? [],
                 secondaryValues: history(key).b ?? []
             });
@@ -128,7 +129,7 @@ Item {
         target: DgopService
         function onPerCoreCpuUsageChanged() {
             const usage = DgopService.perCoreCpuUsage;
-            root.threadHistory = usage.map((u, i) => Devices.appendHistory(root.threadHistory[i], u, DgopService.deviceHistorySize));
+            root.threadHistory = usage.map((u, i) => Format.addToHistory(root.threadHistory[i] || [], u, DgopService.historySize));
         }
     }
 
@@ -155,14 +156,13 @@ Item {
             Layout.fillHeight: true
             model: root.railModel
             currentKey: root.activeKey
-            historyLength: DgopService.deviceHistorySize
+            historyLength: DgopService.historySize
             hiddenCount: root.hiddenCount
             showHidden: root.showHidden
             onSelected: key => root.currentKey = key
             onShowHiddenToggled: root.showHidden = !root.showHidden
         }
 
-        // The detail sits on its own pane, like a Settings page next to its sidebar.
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true

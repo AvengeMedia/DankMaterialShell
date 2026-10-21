@@ -8,6 +8,7 @@ import Quickshell.Services.UPower
 import qs.Common
 import qs.Services
 import "SysmonDevices.js" as SysmonDevices
+import "../Common/Format.js" as Format
 import "ProcessSort.js" as ProcessSort
 
 Singleton {
@@ -115,7 +116,6 @@ Singleton {
             "read": [],
             "write": []
         })
-    property int deviceHistorySize: 60
     property var deviceHistory: ({})
 
     function ensureMeta() {
@@ -321,8 +321,8 @@ Singleton {
                 b: []
             };
             history[sample.key] = {
-                a: SysmonDevices.appendHistory(old.a, sample.a, deviceHistorySize),
-                b: sample.b === undefined ? old.b : SysmonDevices.appendHistory(old.b, sample.b, deviceHistorySize)
+                a: Format.addToHistory(old.a, sample.a, historySize),
+                b: sample.b === undefined ? old.b : Format.addToHistory(old.b, sample.b, historySize)
             };
         }
     }
@@ -376,6 +376,10 @@ Singleton {
             if (index > -1) {
                 gpuPciIds = gpuPciIds.slice();
                 gpuPciIds.splice(index, 1);
+            }
+            if (gpuPciIds.length === 0) {
+                gpuCursor = "";
+                removeDeviceHistory("gpu");
             }
 
             // Clear temperature data for this GPU when no longer monitored
@@ -457,8 +461,7 @@ Singleton {
         }, response => callback(response.result ?? null));
     }
 
-    // Unlock: after one polkit prompt a root `dms sysmon-helper` answers dgop requests, so other users' processes
-    // are readable, and runs process actions. It exits when lock() closes its stdin or the shell goes away.
+    // Unlocked: a root helper (one polkit prompt) answers dgop requests and runs process actions.
     readonly property bool unlocked: helper.running && helper.ready
     readonly property bool unlocking: helper.running && !helper.ready
     // Unlocked, but the rates read as root aren't in yet: they need two samples.
@@ -619,7 +622,7 @@ Singleton {
             return null;
 
         // Without enabled GPUs the gpu module adds nothing to the identity list fetched once by initializeGpuMetadata.
-        const finalModules = enabledModules.filter(module => (module !== "gpu" || gpuPciIds.length > 0) && (module === "all" || isModuleAvailable(module)));
+        const finalModules = enabledModules.filter(module => ((module !== "gpu" && module !== "process-gpu") || gpuPciIds.length > 0) && (module === "all" || isModuleAvailable(module)));
 
         const params = {};
         if (enabledModules.indexOf("all") !== -1) {
@@ -650,14 +653,13 @@ Singleton {
             params.gpuCursor = gpuCursor;
         }
 
-        // Always sent: a missing key means "all GPUs" to dgop, and [] means none.
         params.gpuPciIds = gpuPciIds;
 
         if (enabledModules.indexOf("processes") !== -1 || enabledModules.indexOf("all") !== -1) {
             const sort = dgopSort();
             params.sort = sort || "cpu";
             // 0 means no limit in dgop
-            params.limit = fullProcessListRefs > 0 || !sort ? 0 : 100;
+            params.limit = fullProcessListRefs > 0 ? 0 : 100;
             if (noCpu) {
                 params.noCpu = true;
             }
@@ -697,7 +699,7 @@ Singleton {
             cpuModel = cpu.model || "";
             perCoreCpuUsage = cpu.coreUsage || [];
             cpuInfo = cpu;
-            cpuHistory = appendHistory(cpuHistory, cpuUsage);
+            cpuHistory = Format.addToHistory(cpuHistory, cpuUsage, historySize);
             historyChanged = true;
             pushDeviceHistory(history, "cpu", [
                 {
@@ -734,7 +736,7 @@ Singleton {
             totalSwapKB = mem.swaptotal || 0;
             usedSwapKB = (mem.swaptotal || 0) - (mem.swapfree || 0);
 
-            memoryHistory = appendHistory(memoryHistory, memoryUsage);
+            memoryHistory = Format.addToHistory(memoryHistory, memoryUsage, historySize);
             memoryInfo = mem;
             historyChanged = true;
             pushDeviceHistory(history, "memory", [
@@ -762,8 +764,8 @@ Singleton {
                 networkRxRate = Math.max(0, rxDiff / timeDiff);
                 networkTxRate = Math.max(0, txDiff / timeDiff);
                 networkHistory = {
-                    rx: appendHistory(networkHistory.rx, networkRxRate / 1024),
-                    tx: appendHistory(networkHistory.tx, networkTxRate / 1024)
+                    rx: Format.addToHistory(networkHistory.rx, networkRxRate / 1024, historySize),
+                    tx: Format.addToHistory(networkHistory.tx, networkTxRate / 1024, historySize)
                 };
             }
             lastNetworkStats = {
@@ -787,8 +789,8 @@ Singleton {
                 diskReadRate = Math.max(0, readDiff / timeDiff);
                 diskWriteRate = Math.max(0, writeDiff / timeDiff);
                 diskHistory = {
-                    read: appendHistory(diskHistory.read, diskReadRate / (1024 * 1024)),
-                    write: appendHistory(diskHistory.write, diskWriteRate / (1024 * 1024))
+                    read: Format.addToHistory(diskHistory.read, diskReadRate / (1024 * 1024), historySize),
+                    write: Format.addToHistory(diskHistory.write, diskWriteRate / (1024 * 1024), historySize)
                 };
             }
             lastDiskStats = {
@@ -962,11 +964,6 @@ Singleton {
         }
 
         statsUpdated();
-    }
-
-    function appendHistory(history, value) {
-        const next = history.concat([value]);
-        return next.length > historySize ? next.slice(next.length - historySize) : next;
     }
 
     function formatSystemMemory(memoryKB) {

@@ -9,6 +9,7 @@ import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import "ProcessColumns.js" as ProcessColumns
 import "Connections.js" as Connections
+import "../../Common/Format.js" as Format
 import "../../Services/SysmonDevices.js" as Devices
 
 Rectangle {
@@ -59,7 +60,7 @@ Rectangle {
     readonly property bool endable: ProcessActions.canEnd(live)
     readonly property string restartKind: ProcessActions.restartKind(live)
     readonly property string authTip: own ? "" : I18n.tr("Authentication Required")
-    readonly property string unreadableTip: I18n.tr("Not readable without privileges")
+    readonly property string unreadableTip: I18n.tr("Not readable without privileges", "process value that needs root access to read")
 
     readonly property var tabIds: ["overview", "resources"].concat(hasNetwork ? ["network"] : [], ["details"])
     readonly property string age: {
@@ -87,7 +88,7 @@ Rectangle {
     }
 
     function bytes(v) {
-        return v === null || v === undefined ? "" : Devices.formatBytes(v);
+        return v === null || v === undefined ? "" : Format.formatBytes(v, true);
     }
 
     function sandboxName(kind) {
@@ -112,11 +113,11 @@ Rectangle {
     }
 
     function kb(v) {
-        return v === null || v === undefined ? null : Devices.formatBytes(v * 1024);
+        return v === null || v === undefined ? null : Format.formatBytes(v * 1024, true);
     }
 
     function seconds(v) {
-        return v === null || v === undefined ? null : ProcessColumns.formatDuration(v);
+        return v === null || v === undefined ? null : Format.formatDuration(v, true);
     }
 
     function count(v) {
@@ -384,13 +385,12 @@ Rectangle {
             InfoChip {
                 iconName: "stacks"
                 text: (root.live?.childCount ?? 0) > 0 ? I18n.tr("%1 processes", "process count, plural, %1 is a number").arg(root.live.childCount + 1) : ""
-                tip: I18n.tr("Includes %1 more processes of the same program; the values are their total", "process row tooltip, %1 is the count in parentheses").arg(root.live?.childCount ?? 0)
             }
 
             InfoChip {
                 iconName: "schedule"
                 text: root.started ? (root.startedToday ? Qt.formatTime(root.started, "HH:mm") : Qt.formatDate(root.started, Locale.ShortFormat)) : ""
-                tip: I18n.tr("Started")
+                tip: I18n.tr("Started", "when a process was started")
             }
 
             InfoChip {
@@ -416,12 +416,12 @@ Rectangle {
                 iconName: "shield"
                 emphasis: true
                 text: root.privileges ? I18n.tr("Elevated", "process runs with more rights than its user") : ""
-                tip: root.privileges ? (root.privileges.setuid ? I18n.tr("Runs setuid", "process runs with another user's rights") + "\n" : "") + (root.privileges.capabilities ?? []).join("\n") : ""
+                tip: root.privileges ? (root.privileges.setuid ? I18n.tr("Setuid", "process runs with another user's rights") + "\n" : "") + (root.privileges.capabilities ?? []).join("\n") : ""
             }
 
             InfoChip {
                 iconName: "web_asset"
-                text: root.windows.length === 0 ? "" : root.windows.length === 1 ? I18n.tr("1 window") : I18n.tr("%1 windows").arg(root.windows.length)
+                text: root.windows.length === 0 ? "" : root.windows.length === 1 ? I18n.tr("%1 window", "singular, %1 is 1, open windows in the system monitor").arg(1) : I18n.tr("%1 windows", "plural, %1 is a count of open windows in the system monitor").arg(root.windows.length)
                 tip: root.windows.map(w => w.title ?? "").filter(t => t).join("\n")
             }
 
@@ -460,14 +460,14 @@ Rectangle {
                 visible: root.currentTab === "overview"
                 Layout.preferredWidth: grid.cellWidth
                 Layout.alignment: Qt.AlignTop
-                rows: [root.row(I18n.tr("CPU time", "process column: total CPU time used"), root.cell("cpuTime")), root.row(I18n.tr("Running for", "how long a process has been running"), root.age, root.started ? root.started.toLocaleString(Qt.locale(), Locale.ShortFormat) : ""), root.row(I18n.tr("Threads"), root.cell("threads")), root.known(I18n.tr("Open files", "number of files and sockets a process has open"), root.detail?.openFiles)]
+                rows: [root.row(I18n.tr("CPU time", "process column: total CPU time used"), root.cell("cpuTime")), root.row(I18n.tr("Running for", "how long a process has been running"), root.age, root.started ? root.started.toLocaleString(Qt.locale(), Locale.ShortFormat) : ""), root.row(I18n.tr("Threads", "number of threads, CPU or process"), root.cell("threads")), root.known(I18n.tr("Open files", "number of files and sockets a process has open"), root.detail?.openFiles)]
             }
 
             Section {
                 visible: root.currentTab === "overview"
                 Layout.preferredWidth: grid.cellWidth
                 Layout.alignment: Qt.AlignTop
-                rows: [root.row(I18n.tr("Memory"), root.cell("memory"), I18n.tr("This process's own share of the memory it uses")), root.known(I18n.tr("Read total", "bytes a process has read from storage since it started"), root.bytes(root.detail?.readTotal)), root.known(I18n.tr("Written total", "lifetime data written to a drive"), root.bytes(root.detail?.writeTotal)), root.known(I18n.tr("Connections", "process column: number of open internet connections"), root.live?.connections == null ? null : root.connectionCount)]
+                rows: [root.row(I18n.tr("Memory"), root.cell("memory")), root.known(I18n.tr("Read total", "total data read"), root.bytes(root.detail?.readTotal)), root.known(I18n.tr("Written total", "total data written"), root.bytes(root.detail?.writeTotal)), root.known(I18n.tr("Connections", "process column: number of open internet connections"), root.live?.connections == null ? null : root.connectionCount)]
             }
 
             // Resources: every number dgop has about CPU, memory, disk and GPU use.
@@ -495,7 +495,7 @@ Rectangle {
                 Layout.alignment: Qt.AlignTop
                 title: I18n.tr("Disk")
                 iconName: "hard_drive"
-                rows: [root.row(ProcessListMetrics.columnLabel("diskRead"), ProcessColumns.formatCell("diskRead", root.live ?? ({}), false)), root.row(ProcessListMetrics.columnLabel("diskWrite"), ProcessColumns.formatCell("diskWrite", root.live ?? ({}), false)), root.known(I18n.tr("Read total", "bytes a process has read from storage since it started"), root.bytes(root.detail?.readTotal)), root.known(I18n.tr("Written total", "lifetime data written to a drive"), root.bytes(root.detail?.writeTotal))]
+                rows: [root.row(ProcessListMetrics.columnLabel("diskRead"), ProcessColumns.formatCell("diskRead", root.live ?? ({}), false)), root.row(ProcessListMetrics.columnLabel("diskWrite"), ProcessColumns.formatCell("diskWrite", root.live ?? ({}), false)), root.known(I18n.tr("Read total", "total data read"), root.bytes(root.detail?.readTotal)), root.known(I18n.tr("Written total", "total data written"), root.bytes(root.detail?.writeTotal))]
             }
 
             Section {
@@ -504,7 +504,7 @@ Rectangle {
                 Layout.alignment: Qt.AlignTop
                 title: I18n.tr("GPU")
                 iconName: "gpu"
-                rows: [root.row(I18n.tr("Usage", "chart legend: CPU or GPU utilization"), ProcessColumns.formatCell("gpu", root.live ?? ({}), false)), root.row(ProcessListMetrics.columnLabel("gpuVideo"), ProcessColumns.formatCell("gpuVideo", root.live ?? ({}), false)), root.row(I18n.tr("VRAM"), ProcessColumns.formatCell("vram", root.live ?? ({}), false)), root.row(I18n.tr("Shared memory"), root.live?.gpuGttKB != null ? root.kb(root.live.gpuGttKB) : null, I18n.tr("System memory the GPU uses for this process"))]
+                rows: [root.row(I18n.tr("Usage", "chart legend: CPU or GPU utilization"), ProcessColumns.formatCell("gpu", root.live ?? ({}), false)), root.row(ProcessListMetrics.columnLabel("gpuVideo"), ProcessColumns.formatCell("gpuVideo", root.live ?? ({}), false)), root.row(I18n.tr("VRAM", "GPU video memory"), ProcessColumns.formatCell("vram", root.live ?? ({}), false)), root.row(I18n.tr("Shared memory", "GPU memory borrowed from system RAM (GTT)"), root.live?.gpuGttKB != null ? root.kb(root.live.gpuGttKB) : null)]
             }
 
             // Network: connections by kind, then the ports the process listens on.
@@ -552,9 +552,9 @@ Rectangle {
                 visible: root.currentTab === "details"
                 Layout.preferredWidth: grid.cellWidth
                 Layout.alignment: Qt.AlignTop
-                title: I18n.tr("Process")
+                title: I18n.tr("Process", "section title: details of one process")
                 iconName: "info"
-                rows: [root.row(I18n.tr("User"), root.live?.username), root.row(I18n.tr("Status"), root.live?.status ? ProcessListMetrics.statusLabel(root.live.status) : null), root.row("UID", root.detail?.uid), root.row(I18n.tr("Group"), root.detail?.group ? root.detail.group + " (" + root.detail.gid + ")" : root.detail?.gid), root.row(I18n.tr("Started"), root.started ? root.started.toLocaleString(Qt.locale(), Locale.ShortFormat) : null), root.row(I18n.tr("Parents", "chain of processes that started this one"), root.parentChain), root.row(I18n.tr("Terminal", "controlling terminal of a process"), root.detail?.tty), root.row(I18n.tr("Session", "login session id of a process"), root.detail?.session), root.row(I18n.tr("Setuid", "process runs with another user's rights"), root.privileges?.setuid ? I18n.tr("Yes") : null)]
+                rows: [root.row(I18n.tr("User"), root.live?.username), root.row(I18n.tr("Status"), root.live?.status ? ProcessListMetrics.statusLabel(root.live.status) : null), root.row("UID", root.detail?.uid), root.row(I18n.tr("Group"), root.detail?.group ? root.detail.group + " (" + root.detail.gid + ")" : root.detail?.gid), root.row(I18n.tr("Started", "when a process was started"), root.started ? root.started.toLocaleString(Qt.locale(), Locale.ShortFormat) : null), root.row(I18n.tr("Parents", "chain of processes that started this one"), root.parentChain), root.row(I18n.tr("Terminal", "controlling terminal of a process"), root.detail?.tty), root.row(I18n.tr("Session", "login session id of a process"), root.detail?.session), root.row(I18n.tr("Setuid", "process runs with another user's rights"), root.privileges?.setuid ? I18n.tr("Yes") : null)]
             }
 
             Section {
@@ -570,7 +570,7 @@ Rectangle {
                 visible: root.currentTab === "details" && shown.length > 0
                 Layout.columnSpan: grid.columns
                 Layout.fillWidth: true
-                title: I18n.tr("Windows")
+                title: I18n.tr("Windows", "section title: windows a process has open")
                 iconName: "web_asset"
                 rows: root.windows.map(w => root.row(w.title || w.appId || "", w.appId || " ", w.title))
             }
@@ -638,7 +638,7 @@ Rectangle {
             }
 
             DButton {
-                text: root.restartKind === "reload" ? I18n.tr("Reload", "process action: reload a compositor's configuration") : I18n.tr("Restart")
+                text: root.restartKind === "reload" ? I18n.tr("Reload", "process action: reload a compositor's configuration") : I18n.tr("Restart", "process action: start the process again")
                 iconName: "restart_alt"
                 visible: root.restartKind !== "" && !(root.restartKind === "relaunch" && (root.detail?.terminal ?? false))
                 backgroundColor: Theme.secondaryContainer

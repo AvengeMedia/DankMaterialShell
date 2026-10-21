@@ -39,11 +39,10 @@ v snap && p pkg.snap "$(snap list 2>/dev/null | tail -n +2 | wc -l)"
 [ -d /run/current-system ] && v nix-store && p pkg.nix "$(nix-store -qR /run/current-system 2>/dev/null | wc -l)"
 v pipewire && p pipewire "$(pipewire --version 2>/dev/null | sed -n 's/.*libpipewire \\([0-9.]*\\).*/\\1/p')"
 v glxinfo && p gl "$(glxinfo -B 2>/dev/null | grep -m1 'OpenGL version string' | sed 's/.*: //')"
-if v vulkaninfo; then
-  vk=$(vulkaninfo --summary 2>/dev/null)
-  p vk.api "$(printf '%s\\n' "$vk" | grep -m1 apiVersion | sed 's/.*= //')"
-  p vk.driver "$(printf '%s\\n' "$vk" | grep -m1 driverName | sed 's/.*= //')"
-  p vk.info "$(printf '%s\\n' "$vk" | grep -m1 driverInfo | sed 's/.*= //')"
+icd=$(ls /usr/share/vulkan/icd.d/*.json /etc/vulkan/icd.d/*.json 2>/dev/null)
+if [ -n "$icd" ]; then
+  p vk.api "$(cat $icd | grep -o '"api_version" *: *"[^"]*"' | sed 's/.*: *"//;s/"//' | sort -V | tail -n1)"
+  p vk.driver "$(cat $icd | grep -o '"library_path" *: *"[^"]*"' | sed 's/"$//;s/.*[/"]//;s/^lib\\(vulkan\\|GLX\\)_//;s/\\.so.*//;s/^radeon$/radv/;s/^intel$/anv/;s/^intel_hasvk$/hasvk/;s/^nouveau$/nvk/' | grep -v '^lvp' | sort -u | paste -sd, - | sed 's/,/, /g')"
 fi
 [ -d /sys/firmware/efi ] && p boot.uefi yes
 f=$(ls /sys/firmware/efi/efivars/LoaderInfo-* 2>/dev/null | head -n1)

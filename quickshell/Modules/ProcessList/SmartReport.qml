@@ -31,7 +31,7 @@ Column {
     function reportText() {
         if (state_ !== "done" && state_ !== "error")
             return "";
-        return [I18n.tr("Full SMART report")].concat(sections.map(sec => [sectionTitles[sec.id] || sec.id].concat(sec.rows.map(r => r.key + ": " + r.value)).join("\n")), errorText ? [errorText] : []).join("\n\n");
+        return [I18n.tr("Full SMART report", "drive health report from smartctl")].concat(sections.map(sec => [sectionTitles[sec.id] || sec.id].concat(sec.rows.map(r => r.key + ": " + r.value)).join("\n")), errorText ? [errorText] : []).join("\n\n");
     }
 
     function run() {
@@ -72,7 +72,7 @@ Column {
     spacing: Theme.spacingS
 
     CollapsibleHeader {
-        text: I18n.tr("Full SMART report")
+        text: I18n.tr("Full SMART report", "drive health report from smartctl")
         collapsed: root.collapsed
         onToggled: root.collapsed = !root.collapsed
     }

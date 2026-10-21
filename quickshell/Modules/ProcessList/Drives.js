@@ -1,7 +1,5 @@
 .pragma library
-.import "../../Services/SysmonDevices.js" as Devices
-
-// Pure helpers over the `drives.list` payload (see Drive contract in the core drives package).
+.import "../../Common/Format.js" as Format
 
 const MIN_STRIP_WEIGHT = 0.04;
 const HOURS_AS_DAYS = 48;
@@ -52,8 +50,8 @@ function summaryRows(drive) {
         add("spare", n.availableSpare, has(n.spareThreshold) && n.availableSpare < n.spareThreshold, v => v + "%");
         add("wear", n.percentUsed, false, v => v + "%");
         add("mediaErrors", n.mediaErrors, false);
-        add("dataRead", n.dataRead, false, Devices.formatBytes);
-        add("dataWritten", n.dataWritten, false, Devices.formatBytes);
+        add("dataRead", n.dataRead, false, v => Format.formatBytes(v, true));
+        add("dataWritten", n.dataWritten, false, v => Format.formatBytes(v, true));
         add("unsafeShutdowns", n.unsafeShutdowns, false);
         if (has(n.powerOnHours))
             rows.push(powerOnRow(n.powerOnHours));
@@ -179,7 +177,6 @@ function kindName(drive) {
     return KIND_NAMES[drive && drive.kind] || "";
 }
 
-// "NVMe SSD, 2 TB, PCIe 4.0 x4"
 // "nvme" is drawn by DeviceIcon (Material Symbols has no M.2 glyph); the rest are Material Symbols names.
 function driveIcon(drive) {
     if (!drive)
@@ -198,6 +195,7 @@ function driveIcon(drive) {
     return String(drive.name || "").startsWith("sr") ? "album" : "storage";
 }
 
+// "NVMe SSD, 2 TB, PCIe 4.0 x4"
 function driveSubtitle(drive) {
     if (!drive)
         return "";

@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import "../../Common/Format.js" as Format
 import "../../Services/SysmonDevices.js" as Devices
 
 DevicePane {
@@ -14,7 +15,7 @@ DevicePane {
     readonly property string moduleSummary: {
         const counts = {};
         mods.forEach(m => counts[m.size] = (counts[m.size] ?? 0) + 1);
-        return Object.keys(counts).map(Number).sort((a, b) => b - a).map(size => counts[size] + " × " + Devices.formatBytes(size * 1024)).join(", ");
+        return Object.keys(counts).map(Number).sort((a, b) => b - a).map(size => counts[size] + " × " + Format.formatBytes(size * 1024, true)).join(", ");
     }
     readonly property var channels: Devices.memoryChannelCount(mods)
     readonly property real speedMT: mods.length > 0 ? (mods[0].configuredSpeed || mods[0].speed || 0) : 0
@@ -22,7 +23,7 @@ DevicePane {
 
     // dgop reports memory in KB
     function bytes(kb) {
-        return kb === null || kb === undefined ? null : Devices.formatBytes(kb * 1024);
+        return kb === null || kb === undefined ? null : Format.formatBytes(kb * 1024, true);
     }
 
     function of(usedKb, totalKb) {
@@ -32,7 +33,7 @@ DevicePane {
     function swapTooltip() {
         const lines = (info?.swapDevices ?? []).map(d => d.name + " (" + d.kind + "): " + of(d.used, d.size));
         if (hasZram)
-            lines.push(I18n.tr("Compression") + ": " + (info.zramOrig / info.zramCompr).toFixed(1) + "×");
+            lines.push(I18n.tr("Compression", "memory compression (zram) ratio") + ": " + (info.zramOrig / info.zramCompr).toFixed(1) + "×");
         return lines.join("\n");
     }
 
@@ -40,23 +41,23 @@ DevicePane {
     title: I18n.tr("Memory", "system RAM label in system monitor")
     subtitle: Devices.memoryModulesSummary(mods)
     subtitle2: moduleSummary
-    chartLabel: I18n.tr("Used")
+    chartLabel: I18n.tr("Used", "memory in use")
     chartValue: info ? bytes(DgopService.usedMemoryKB) : "—"
     maximum: 100
     maximumText: DgopService.totalMemoryKB > 0 ? bytes(DgopService.totalMemoryKB) : ""
 
     leftStats: [
         {
-            label: I18n.tr("Used"),
+            label: I18n.tr("Used", "memory in use"),
             value: info ? bytes(DgopService.usedMemoryKB) : null,
-            tooltip: info?.shared !== undefined ? I18n.tr("Shared") + ": " + bytes(info.shared) : ""
+            tooltip: info?.shared !== undefined ? I18n.tr("Shared", "RAM shared between processes (shmem)") + ": " + bytes(info.shared) : ""
         },
         {
             label: I18n.tr("Available"),
             value: bytes(info?.available)
         },
         {
-            label: I18n.tr("Cached"),
+            label: I18n.tr("Cached", "memory used as file cache"),
             value: info?.cached !== undefined ? bytes(info.cached + (info.buffers ?? 0)) : null
         },
         {
@@ -77,12 +78,12 @@ DevicePane {
             value: speedMT > 0 ? speedMT + " MT/s" : null
         },
         {
-            label: I18n.tr("Slots used"),
+            label: I18n.tr("Slots used", "memory slots with a module installed, of all slots"),
             value: slots > 0 && mods.length > 0 ? mods.length + " / " + slots : null
         },
         {
             advanced: true,
-            label: I18n.tr("Channels"),
+            label: I18n.tr("Channels", "memory channels in use"),
             value: channels !== null ? String(channels) : null
         },
         {

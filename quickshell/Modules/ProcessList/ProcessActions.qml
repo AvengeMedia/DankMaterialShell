@@ -8,13 +8,11 @@ import qs.Services
 Singleton {
     id: root
 
-    // The session's backbone: ending one of these takes the desktop down, so every action on them is confirmed with
-    // a warning that offers a restart instead.
+    // Ending one of these takes the desktop down.
     readonly property var sessionNames: ["systemd", "(sd-pam)", "sd-pam", "dbus-broker", "dbus-broker-launch", "dbus-daemon"].concat(Object.keys(reloadCommands))
     // Skipped, with their subtrees, when ending a process tree.
     readonly property var treeSkipNames: sessionNames.concat(["qs", "quickshell", "dms"])
-    // A compositor cannot restart in place, so "restart" reloads its configuration over its own IPC. Hyprland and Mango
-    // reload through their services; any other empty entry has no reload command and no restart.
+    // Compositors can't restart in place; "restart" reloads their config. Empty entries have no reload command.
     readonly property var reloadCommands: ({
             "hyprland": [],
             "niri": ["niri", "msg", "action", "load-config-file"],
@@ -32,12 +30,10 @@ Singleton {
     // Children first; a skipped child keeps its whole subtree.
     readonly property string treeScript: 'walk() { for c in $(pgrep -P "$1"); do n=$(tr "[:upper:]" "[:lower:]" < /proc/$c/comm 2>/dev/null) || continue; case " $2 " in *" $n "*) continue ;; esac; walk "$c" "$2"; kill "$c" 2>/dev/null; done; }; walk "$1" "$2"; kill "$1"'
 
-    // $1 pid, $2 its systemd unit. Only the unit's main process restarts through systemd: apps a session manager
-    // started share the compositor's unit, and restarting that would end the session. A terminal program (tty_nr
-    // set) exits 3, it cannot run detached. Anything else: capture command line, environment and working directory,
-    // quit, and relaunch in its own scope once it has exited; one still alive after 10 s is left alone.
+    // $1 pid, $2 its systemd unit. Only a unit's main process restarts through systemd (apps share the compositor's
+    // unit). Terminal programs exit 3. Anything else is relaunched with its command line, environment and directory.
     readonly property string restartScript: 'p=$1; u=$2; case "$u" in *.service) [ "$(systemctl --user show -p MainPID --value "$u" 2>/dev/null)" = "$p" ] && exec systemctl --user restart "$u" ;; esac; s=$(cat "/proc/$p/stat") || exit 1; set -- ${s##*) }; [ "$5" = 0 ] || exit 3; t=$(mktemp -d) || exit 1; trap "rm -r \\"$t\\"" EXIT; cp "/proc/$p/cmdline" "$t/cmd" && cp "/proc/$p/environ" "$t/env" && cwd=$(readlink "/proc/$p/cwd") || exit 1; kill "$p" || exit 1; i=0; while kill -0 "$p" 2>/dev/null; do i=$((i + 1)); [ "$i" -gt 100 ] && exit 1; sleep 0.1; done; cd "$cwd" 2>/dev/null || cd; run="setsid -f"; command -v systemd-run >/dev/null && run="$run systemd-run --user --scope --quiet --collect"; cat "$t/env" "$t/cmd" | xargs -0 $run env -i'
-    // Root's side of a restart, run through pkexec: a system service's main process restarts its unit; nothing else.
+    // Root's side of a restart, run through pkexec.
     readonly property string systemRestartScript: 'p=$1; u=$2; case "$u" in *.service) [ "$(systemctl show -p MainPID --value "$u" 2>/dev/null)" = "$p" ] && exec systemctl restart "$u" ;; esac; exit 4'
 
     function name(process) {
@@ -48,7 +44,7 @@ Singleton {
         return (process?.username ?? "") === UserInfoService.username;
     }
 
-    // This shell (qs) or its backend (dms run); both restart together through `dms restart`.
+    // This shell (qs) or its backend (dms run).
     function isDms(process) {
         return (process?.pid ?? 0) === Quickshell.processId || (name(process) === "dms" && isOwn(process));
     }
@@ -57,7 +53,6 @@ Singleton {
         return sessionNames.includes(name(process));
     }
 
-    // Ending these breaks the desktop: the UI warns first and offers a restart.
     function isCritical(process) {
         return isSession(process) || isDms(process);
     }
@@ -98,7 +93,7 @@ Singleton {
         case "tree":
             return I18n.tr("End process tree", "process action: quit the process and every process it started");
         case "restart":
-            return restartKind(process) === "reload" ? I18n.tr("Reload", "process action: reload a compositor's configuration") : I18n.tr("Restart");
+            return restartKind(process) === "reload" ? I18n.tr("Reload", "process action: reload a compositor's configuration") : I18n.tr("Restart", "process action: start the process again");
         }
         return I18n.tr("Quit", "process action: ask the process to exit (SIGTERM)");
     }

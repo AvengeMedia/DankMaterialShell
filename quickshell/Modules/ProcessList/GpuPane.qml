@@ -4,6 +4,7 @@ import qs.Services
 import qs.Widgets
 import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
+import "../../Common/Format.js" as Format
 import "../../Services/SysmonDevices.js" as Devices
 
 DevicePane {
@@ -51,22 +52,22 @@ DevicePane {
     }
 
     function usedOf(usedKB, totalKB) {
-        return usedKB === null || usedKB === undefined || !(totalKB > 0) ? null : Devices.formatBytes(usedKB * 1024) + " / " + Devices.formatBytes(totalKB * 1024);
+        return usedKB === null || usedKB === undefined || !(totalKB > 0) ? null : Format.formatBytes(usedKB * 1024, true) + " / " + Format.formatBytes(totalKB * 1024, true);
     }
 
     function withMax(max, unit) {
-        return max === null || max === undefined ? "" : I18n.tr("Max clock") + ": " + num(max, unit);
+        return max === null || max === undefined ? "" : I18n.tr("Max clock", "highest clock speed of a CPU or GPU") + ": " + num(max, unit);
     }
 
     loaded: off || suspended || (history.a ?? []).length > 0
     title: stat?.fullName ?? slot
     titleTooltip: title
     subtitle: stat?.driver ?? ""
-    subtitle2: stat?.memoryTotal > 0 ? I18n.tr("%1 VRAM", "GPU memory size, e.g. 24 GiB VRAM").arg(Devices.formatBytes(stat.memoryTotal * 1024)) : ""
+    subtitle2: stat?.memoryTotal > 0 ? I18n.tr("%1 VRAM", "GPU memory size, e.g. 24 GiB VRAM").arg(Format.formatBytes(stat.memoryTotal * 1024, true)) : ""
     showChart: live
     chartLabel: I18n.tr("Usage", "chart legend: CPU or GPU utilization")
     chartValue: pct(stat?.usage) ?? "—"
-    chartSecondaryLabel: (history.b ?? []).length > 0 ? I18n.tr("VRAM") : ""
+    chartSecondaryLabel: (history.b ?? []).length > 0 ? I18n.tr("VRAM", "GPU video memory") : ""
     chartSecondaryValue: stat?.memoryTotal > 0 && stat?.memoryUsed != null ? Math.round(stat.memoryUsed / stat.memoryTotal * 100) + "%" : ""
     values: live ? (history.a ?? []) : []
     secondaryValues: live ? (history.b ?? []) : []
@@ -75,11 +76,11 @@ DevicePane {
 
     leftStats: live ? [
         {
-            label: I18n.tr("VRAM"),
+            label: I18n.tr("VRAM", "GPU video memory"),
             value: root.usedOf(stat.memoryUsed, stat.memoryTotal)
         },
         {
-            label: I18n.tr("Core clock"),
+            label: I18n.tr("Core clock", "GPU core clock speed"),
             value: root.num(stat.coreClock, "MHz"),
             tooltip: root.withMax(stat.coreClockMax, "MHz")
         },
@@ -99,7 +100,7 @@ DevicePane {
         },
         {
             advanced: true,
-            label: I18n.tr("Memory clock"),
+            label: I18n.tr("Memory clock", "GPU memory clock speed"),
             value: root.num(stat.memoryClock, "MHz"),
             tooltip: root.withMax(stat.memoryClockMax, "MHz")
         }
@@ -109,14 +110,14 @@ DevicePane {
         {
             label: I18n.tr("Power", "battery stat label, charge or discharge rate in watts", true),
             value: root.num(stat.power, "W"),
-            tooltip: stat.powerLimit != null ? I18n.tr("Power limit") + ": " + root.num(stat.powerLimit, "W") : ""
+            tooltip: stat.powerLimit != null ? I18n.tr("Power limit", "GPU power limit in watts") + ": " + root.num(stat.powerLimit, "W") : ""
         },
         {
-            label: I18n.tr("Fan"),
+            label: I18n.tr("Fan", "GPU fan speed"),
             value: stat.fanRpm != null ? stat.fanRpm + " rpm" : root.pct(stat.fanPercent)
         },
         {
-            label: I18n.tr("Top process"),
+            label: I18n.tr("Top process", "process using the most of a resource, e.g. GPU memory"),
             value: root.topProcess ? root.topProcess.command : null,
             tooltip: root.topProcess ? Math.round(root.topProcess.gpu) + "%" : ""
         },
@@ -140,7 +141,7 @@ DevicePane {
     StyledText {
         visible: root.off || root.suspended
         width: parent.width
-        text: root.off ? I18n.tr("Monitoring off") : I18n.tr("Idle", "adjective, printer state", true)
+        text: root.off ? I18n.tr("Monitoring off", "GPU monitoring is turned off in settings") : I18n.tr("Idle", "adjective, printer state", true)
         font.pixelSize: Theme.fontSizeLarge
         color: Theme.surfaceVariantText
     }

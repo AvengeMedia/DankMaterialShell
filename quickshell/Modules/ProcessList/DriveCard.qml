@@ -9,18 +9,24 @@ import qs.Widgets
 import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import "Drives.js" as Drives
+import "../../Common/Format.js" as Format
 import "../../Services/SysmonDevices.js" as Devices
 
 Rectangle {
     id: root
 
-    // Drive object from drives.list; mounts is DgopService's diskmounts list
     property var drive: null
     property var mounts: []
 
     signal installRequested
 
     readonly property string level: Drives.healthLevel(drive)
+
+    DriveHealth {
+        id: health
+        level: root.level
+    }
+
     readonly property bool asleep: drive?.asleep ?? false
     readonly property var rates: (DgopService.diskRates ?? []).find(d => d.device === drive?.name) ?? null
     readonly property var history: DgopService.deviceHistory[Devices.deviceKey("disk", drive?.name ?? "")] ?? ({})
@@ -33,7 +39,6 @@ Rectangle {
     readonly property real pad: Theme.spacingL
     property bool expanded: false
     readonly property var filesystems: Drives.partitionStrip(drive, mounts)
-    // The rows the card shows, also what the copy button copies
     readonly property var statRows: {
         const rows = [];
         const add = (label, value, tooltip) => rows.push({
@@ -42,15 +47,15 @@ Rectangle {
                     "tooltip": tooltip ?? ""
                 });
         if (!asleep && rates?.busy != null)
-            add(I18n.tr("Busy"), Math.round(rates.busy) + "%");
+            add(I18n.tr("Busy", "share of time a disk is busy"), Math.round(rates.busy) + "%");
         if (!asleep && rates?.responseTime != null)
-            add(I18n.tr("Response time"), rates.responseTime.toFixed(2) + " ms");
+            add(I18n.tr("Response time", "average time a disk takes per request"), rates.responseTime.toFixed(2) + " ms");
         if (wear !== null)
-            add(I18n.tr("Wear"), wear + "%", I18n.tr("Share of the rated write endurance used up"));
+            add(I18n.tr("Wear", "SSD wear level, percent of rated endurance used"), wear + "%");
         if (powerOn !== null)
-            add(I18n.tr("Power-on time"), rowValue(powerOn));
+            add(I18n.tr("Power-on time", "total time a drive has been powered on"), rowValue(powerOn));
         if (drive?.nvme?.dataWritten != null)
-            add(I18n.tr("Written total", "lifetime data written to a drive"), Devices.formatBytes(drive.nvme.dataWritten));
+            add(I18n.tr("Written total", "total data written"), Format.formatBytes(drive.nvme.dataWritten, true));
         if (drive?.firmware)
             add(I18n.tr("Firmware", "drive firmware revision"), drive.firmware);
         for (const r of smartRows)
@@ -65,35 +70,35 @@ Rectangle {
     function rowLabel(id) {
         switch (id) {
         case "criticalWarning":
-            return I18n.tr("Critical warning");
+            return I18n.tr("Critical warning", "SSD health: critical warning flags");
         case "spare":
-            return I18n.tr("Spare blocks left");
+            return I18n.tr("Spare blocks left", "SSD health: share of spare blocks still available");
         case "mediaErrors":
-            return I18n.tr("Media errors");
+            return I18n.tr("Media errors", "SSD health: unrecovered data integrity errors");
         case "dataRead":
-            return I18n.tr("Data read");
+            return I18n.tr("Read total", "total data read");
         case "dataWritten":
-            return I18n.tr("Data written");
+            return I18n.tr("Written total", "total data written");
         case "unsafeShutdowns":
-            return I18n.tr("Unsafe shutdowns");
+            return I18n.tr("Unsafe shutdowns", "SSD health: power losses without a clean shutdown");
         case "powerOnTime":
-            return I18n.tr("Power-on time");
+            return I18n.tr("Power-on time", "total time a drive has been powered on");
         case "selftest":
-            return I18n.tr("Last self-test");
+            return I18n.tr("Last self-test", "drive health: result of the last self-test");
         case "reallocated":
-            return I18n.tr("Reallocated sectors");
+            return I18n.tr("Reallocated sectors", "HDD health: sectors remapped after errors");
         case "pending":
-            return I18n.tr("Current pending sectors");
+            return I18n.tr("Current pending sectors", "HDD health: sectors waiting to be remapped");
         case "uncorrectable":
-            return I18n.tr("Offline uncorrectable");
+            return I18n.tr("Offline uncorrectable", "HDD health: sectors that could not be read or fixed");
         case "crc":
-            return I18n.tr("Cable errors");
+            return I18n.tr("Cable errors", "drive health: data cable CRC errors");
         case "startStop":
-            return I18n.tr("Start/stop count");
+            return I18n.tr("Start/stop count", "HDD health: spindle start and stop count");
         case "loadCycles":
-            return I18n.tr("Head load cycles");
+            return I18n.tr("Head load cycles", "HDD health: read head load/unload count");
         case "spinUp":
-            return I18n.tr("Spin-up time");
+            return I18n.tr("Spin-up time", "HDD health: time to spin the platters up");
         }
         return id;
     }
@@ -102,7 +107,7 @@ Rectangle {
         if (!r)
             return "";
         if (r.id === "powerOnTime") {
-            const text = r.unit === "hours" ? I18n.tr("%1 hours") : r.unit === "days" ? I18n.tr("%1 days") : I18n.tr("%1 years");
+            const text = r.unit === "hours" ? I18n.tr("%1 hours") : r.unit === "days" ? I18n.tr("%1 days") : I18n.tr("%1 years", "duration in years, %1 is a number");
             return text.arg(r.value);
         }
         if (r.id === "criticalWarning" && r.value === "none")
@@ -123,18 +128,13 @@ Rectangle {
         if (drive?.temperature != null)
             lines.push(I18n.tr("Temperature") + ": " + Devices.formatTemp(drive.temperature, SettingsData.useFahrenheit));
         if (level !== "")
-            lines.push(I18n.tr("Health") + ": " + healthText());
+            lines.push(I18n.tr("Health") + ": " + health.text);
         for (const r of statRows)
             lines.push(r.label + ": " + r.value);
         for (const fs of filesystems)
             lines.push([fs.swap ? I18n.tr("Swap") : fs.label, fs.fsType, spaceText(fs)].filter(x => x).join(", "));
         const report = smartReport.reportText();
         return lines.filter(l => l !== "").join("\n") + (report ? "\n\n" + report : "");
-    }
-
-    function healthText() {
-        const w = Drives.healthWord(level);
-        return w === "critical" ? I18n.tr("Critical", "drive health") : w === "warning" ? I18n.tr("Warning") : I18n.tr("Healthy", "drive health");
     }
 
     function warnTooltip() {
@@ -218,7 +218,7 @@ Rectangle {
                     values: root.history.a ?? []
                     secondaryValues: root.history.b ?? []
                     maximum: root.axisMax
-                    historyLength: DgopService.deviceHistorySize
+                    historyLength: DgopService.historySize
                 }
 
                 NumericText {
@@ -231,14 +231,14 @@ Rectangle {
 
                 Pill {
                     visible: root.asleep
-                    text: I18n.tr("Asleep")
+                    text: I18n.tr("Asleep", "drive is in standby and was not woken")
                     dotColor: Theme.surfaceVariantText
                     tooltip: (root.drive?.smartUpdated ?? 0) > 0 ? Qt.formatDateTime(new Date(root.drive.smartUpdated * 1000), Locale.ShortFormat) : ""
                 }
 
                 Pill {
                     visible: root.level !== ""
-                    text: root.healthText()
+                    text: health.text
                     dotColor: root.healthTint
                     textColor: root.level === "healthy" ? Theme.surfaceText : root.healthTint
                     tooltip: root.warnTooltip()
@@ -271,15 +271,15 @@ Rectangle {
                 Layout.alignment: Qt.AlignTop
                 cardColor: Theme.surfaceContainer
                 chartHeight: Math.max(Theme.listItemHeight * 1.5, stats.height - Theme.spacingL * 2 - Theme.spacingS * 2 - Theme.fontSizeSmall * 3)
-                label: I18n.tr("Read")
-                valueText: root.rates?.readRate != null ? Devices.formatRate(root.rates.readRate, false) : "—"
-                secondaryLabel: I18n.tr("Write")
-                secondaryValueText: root.rates?.writeRate != null ? Devices.formatRate(root.rates.writeRate, false) : "—"
+                label: I18n.tr("Disk read", "disk read rate")
+                valueText: root.rates?.readRate != null ? Format.formatRate(root.rates.readRate, 1) : "—"
+                secondaryLabel: I18n.tr("Disk write", "disk write rate")
+                secondaryValueText: root.rates?.writeRate != null ? Format.formatRate(root.rates.writeRate, 1) : "—"
                 values: root.history.a ?? []
                 secondaryValues: root.history.b ?? []
                 maximum: root.axisMax
-                maximumText: Devices.formatRate(root.axisMax, false)
-                historyLength: DgopService.deviceHistorySize
+                maximumText: Format.formatRate(root.axisMax, 1)
+                historyLength: DgopService.historySize
             }
 
             SettingsGroup {
@@ -391,7 +391,7 @@ Rectangle {
 
             DButton {
                 visible: DriveService.smartctlPath === "" && DriveService.installCommand !== ""
-                text: I18n.tr("Install smartmontools")
+                text: I18n.tr("Install smartmontools", "button, installs the smartmontools package")
                 iconName: "download"
                 backgroundColor: Theme.secondaryContainer
                 textColor: Theme.onSecondaryContainer
@@ -400,7 +400,7 @@ Rectangle {
 
             DButton {
                 visible: DriveService.smartctlPath !== "" && !DgopService.unlocked
-                text: I18n.tr("Full SMART report")
+                text: I18n.tr("Full SMART report", "drive health report from smartctl")
                 iconName: "lock_open"
                 backgroundColor: Theme.secondaryContainer
                 textColor: Theme.onSecondaryContainer

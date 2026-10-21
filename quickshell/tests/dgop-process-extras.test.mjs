@@ -5,7 +5,6 @@ import test from "node:test";
 import { loadScript } from "./qml-script.mjs";
 
 const source = readFileSync(new URL("../Services/DgopService.qml", import.meta.url), "utf8");
-const devicesSource = readFileSync(new URL("../Services/SysmonDevices.js", import.meta.url), "utf8").replace(".pragma library", "");
 
 function service(modules, availableModules = ["processes", "process-gpu", "process-io"], currentSort = "cpu") {
     const context = vm.createContext({
@@ -22,11 +21,12 @@ function service(modules, availableModules = ["processes", "process-gpu", "proce
         noCpu: false,
         procCursor: "",
         deviceHistory: {},
-        deviceHistorySize: 3,
+        historySize: 3,
         cpuSampleCount: 0,
         statsUpdated() {},
         ProcessSort: loadScript(new URL("../Services/ProcessSort.js", import.meta.url)),
-        SysmonDevices: vm.runInContext(`(function(){${devicesSource}\nreturn {appendHistory};})()`, vm.createContext({}))
+        Format: loadScript(new URL("../Common/Format.js", import.meta.url)),
+        SysmonDevices: loadScript(new URL("../Services/SysmonDevices.js", import.meta.url))
     });
     const methods = ["hasModule", "isModuleAvailable", "buildMetaParams", "dgopSort", "parseData", "processComparator", "applySorting"];
     const found = [];
@@ -91,20 +91,24 @@ test("name and pid sort ascending by default and descending after toggle", () =>
     }
 });
 
-test("the limit applies only when dgop sorts like the table; otherwise every process is fetched", () => {
-    const params = (m, avail, key, ascending = false) => {
+test("dgop sorts and limits only when its sort is the table's; otherwise the view needs the full list", () => {
+    const sortOf = (m, avail, key, ascending = false) => {
         const s = service(m, avail, key);
         s.sortAscending = ascending;
-        const p = s.buildMetaParams();
-        return p.sort + ":" + p.limit;
+        return s.dgopSort();
     };
     for (const key of ["cpu", "memory", "pid", "gpu", "vram"])
-        assert.equal(params(mods, mods, key), key + ":100", key);
+        assert.equal(sortOf(mods, mods, key), key, key);
     for (const key of ["name", "diskRead", "disk", "netRx", "connections", "threads", "user", "gpuVideo"])
-        assert.equal(params(mods, mods, key), "cpu:0", key);
-    assert.equal(params(mods, mods, "memory", true), "cpu:0");
-    assert.equal(params(mods, ["processes", "process-io"], "gpu"), "cpu:0");
-    assert.equal(params(["processes", "process-io"], mods, "vram"), "cpu:0");
+        assert.equal(sortOf(mods, mods, key), "", key);
+    assert.equal(sortOf(mods, mods, "memory", true), "");
+    assert.equal(sortOf(mods, ["processes", "process-io"], "gpu"), "");
+    assert.equal(sortOf(["processes", "process-io"], mods, "vram"), "");
+
+    const s = service(mods, mods, "name");
+    assert.equal(s.buildMetaParams().limit, 100, "nobody holds the full list");
+    s.fullProcessListRefs = 1;
+    assert.equal(s.buildMetaParams().limit, 0);
 });
 
 test("no extras requested when only processes is enabled", () => {

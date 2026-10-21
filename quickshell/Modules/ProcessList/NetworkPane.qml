@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import "../../Common/Format.js" as Format
 import "../../Services/SysmonDevices.js" as SysmonDevices
 
 DevicePane {
@@ -24,11 +25,11 @@ DevicePane {
     readonly property string linkSpeed: SysmonDevices.formatLinkSpeed(ethernet?.speed || rates?.speed || wifiNetwork?.rate || 0)
 
     function rate(v) {
-        return v === null || v === undefined ? "—" : SysmonDevices.formatRate(v, false);
+        return v === null || v === undefined ? "—" : Format.formatRate(v, 1);
     }
 
     function total(v) {
-        return v === null || v === undefined ? null : SysmonDevices.formatBytes(v);
+        return v === null || v === undefined ? null : Format.formatBytes(v, true);
     }
 
     loaded: (history.a ?? []).length > 0
@@ -42,7 +43,7 @@ DevicePane {
     values: history.a ?? []
     secondaryValues: history.b ?? []
     maximum: axisMax
-    maximumText: SysmonDevices.formatRate(axisMax, false)
+    maximumText: Format.formatRate(axisMax, 1)
 
     leftStats: [
         {
@@ -71,7 +72,7 @@ DevicePane {
         },
         {
             advanced: true,
-            label: I18n.tr("MAC address"),
+            label: I18n.tr("MAC address", "network hardware address"),
             value: root.netDevice?.hwAddress || null
         }
     ]
@@ -92,11 +93,11 @@ DevicePane {
             value: root.rates?.mtu > 0 ? String(root.rates.mtu) : null
         },
         {
-            label: I18n.tr("Received since boot"),
+            label: I18n.tr("Received since boot", "network data received since the system started"),
             value: root.total(root.rates?.rxTotal)
         },
         {
-            label: I18n.tr("Sent since boot"),
+            label: I18n.tr("Sent since boot", "network data sent since the system started"),
             value: root.total(root.rates?.txTotal)
         }
     ]

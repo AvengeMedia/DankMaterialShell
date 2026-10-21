@@ -6,12 +6,6 @@ const S = loadScript(new URL("../Modules/ProcessList/SystemInfo.js", import.meta
 const plain = v => JSON.parse(JSON.stringify(v));
 const names = { cpu: "CPU", gpu: "GPU", memory: "Memory" };
 
-test("storageSummary adds the kind only when all drives share it", () => {
-    assert.equal(S.storageSummary([{ size: 2000398934016, kind: "nvme" }, { size: 4000787030016, kind: "nvme" }]), "2 TB + 4 TB NVMe");
-    assert.equal(S.storageSummary([{ size: 2e12, kind: "nvme" }, { size: 4e12, kind: "hdd" }]), "2 TB + 4 TB");
-    assert.equal(S.storageSummary([]), "");
-});
-
 test("modeText formats wlr-output modes", () => {
     assert.equal(S.modeText({ width: 2560, height: 1440, refresh: 164958 }), "2560 × 1440, 165 Hz");
     assert.equal(S.modeText({ width: 1920, height: 1080 }), "1920 × 1080");

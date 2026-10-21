@@ -46,13 +46,13 @@ Item {
                 spacing: Theme.spacingL
 
                 StyledText {
-                    text: I18n.tr("Read", "disk read label") + " " + Format.formatRate(DgopService.diskReadRate)
+                    text: I18n.tr("Disk read", "disk read rate") + " " + Format.formatRate(DgopService.diskReadRate)
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.primary
                 }
 
                 StyledText {
-                    text: I18n.tr("Write", "disk write label") + " " + Format.formatRate(DgopService.diskWriteRate)
+                    text: I18n.tr("Disk write", "disk write rate") + " " + Format.formatRate(DgopService.diskWriteRate)
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.tertiary
                 }

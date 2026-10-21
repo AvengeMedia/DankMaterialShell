@@ -32,8 +32,7 @@ Singleton {
         return ids;
     }
 
-    // Desktop entries by the program their Exec= runs (full path and file name), with the first fixed argument they
-    // pass, so "dms run" names the shell's background process but not every other dms command.
+    // Desktop entries by the program their Exec= runs, plus its first fixed argument ("dms run" is the shell).
     readonly property var execEntries: {
         const map = {};
         for (const entry of DesktopEntries.applications?.values ?? []) {
@@ -56,9 +55,7 @@ Singleton {
         return (items.find(i => i.arg === arg) ?? items.find(i => i.arg === ""))?.entry ?? null;
     }
 
-    // The desktop entry of a process (app name and icon), or null.
-    // Rows look up their app on every sample and every reorder; the answer only changes with the window list or the
-    // installed apps, so it is kept per process until one of those changes.
+    // Cached per process until the window list or installed apps change.
     readonly property var _appMemo: ({
             "entries": null,
             "cache": new Map()
@@ -95,15 +92,15 @@ Singleton {
         case "cpu": return I18n.tr("CPU");
         case "memory": return I18n.tr("Memory");
         case "gpu": return I18n.tr("GPU");
-        case "vram": return I18n.tr("VRAM");
+        case "vram": return I18n.tr("VRAM", "GPU video memory");
         case "gpuVideo": return I18n.tr("Video", "process column: GPU video engine usage in percent");
-        case "diskRead": return I18n.tr("Disk read", "process column: disk read rate");
-        case "diskWrite": return I18n.tr("Disk write", "process column: disk write rate");
+        case "diskRead": return I18n.tr("Disk read", "disk read rate");
+        case "diskWrite": return I18n.tr("Disk write", "disk write rate");
         case "connections": return I18n.tr("Connections", "process column: number of open internet connections");
         case "netRx": return I18n.tr("Download", "process column: network download rate");
         case "netTx": return I18n.tr("Upload", "process column: network upload rate");
         case "status": return I18n.tr("Status");
-        case "threads": return I18n.tr("Threads");
+        case "threads": return I18n.tr("Threads", "number of threads, CPU or process");
         case "nice": return I18n.tr("Nice", "process column: Linux nice value, scheduling priority");
         case "cpuTime": return I18n.tr("CPU time", "process column: total CPU time used");
         case "pid": return I18n.tr("PID");

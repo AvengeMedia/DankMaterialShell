@@ -1,23 +1,11 @@
 .pragma library
 .import "../../Services/SysmonDevices.js" as Devices
-.import "Drives.js" as Drives
 
 const CPU_CHIPS = ["k10temp", "coretemp", "zenpower", "cpu_thermal"];
 const GPU_CHIPS = ["amdgpu", "radeon", "nouveau", "nvidia", "i915", "xe"];
 const MEMORY_CHIPS = ["jc42", "spd5118"];
 const KIND_ORDER = ["temperature", "fan", "power"];
 const FALLBACK_TEMP_LIMIT = 100;
-
-// "2 TB + 4 TB NVMe"; the kind is added only when every drive shares it.
-function storageSummary(drives) {
-    const list = (drives || []).filter(d => d.size > 0);
-    if (!list.length)
-        return "";
-    const sizes = list.map(d => Drives.formatCapacity(d.size)).join(" + ");
-    const kinds = [...new Set(list.map(d => d.kind))];
-    const kind = kinds.length === 1 ? ({ nvme: "NVMe", ssd: "SSD", hdd: "HDD" })[kinds[0]] : "";
-    return kind ? sizes + " " + kind : sizes;
-}
 
 // wlr-output mode {width, height, refresh (mHz)} -> "2560 × 1440, 165 Hz".
 function modeText(mode) {
