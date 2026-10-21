@@ -100,7 +100,7 @@ Notification center with grouping, rich text support, and keyboard navigation.
 MPRIS player controls, calendar sync, weather widgets, and clipboard history with image previews.
 
 **Session Management**
-Lock screen, idle detection, auto-lock/suspend with separate AC/battery settings, and a settings front-end for [dank-greeter](https://github.com/duxlabs-dev/dux-greeter).
+Lock screen, idle detection, auto-lock/suspend with separate AC/battery settings, and a settings front-end for [dux-greeter](https://github.com/duxlabs-dev/dux-greeter).
 
 **Plugin System**
 Extend functionality with the [plugin registry](https://plugins.duxlabs.dev). DMS keeps
@@ -138,16 +138,16 @@ dms plugins restore ~/plugins.lock.json
 - **Plugins:** [Development guide](https://duxlabs.dev/docs/dms/plugins-overview)
 - **Support:** [Ko-fi](https://ko-fi.com/duxlabs)
 
-## Dank Projects
+## Dux Projects
 
 DMS is one piece of the suite. The rest lives in its own repos:
 
-- [dank-greeter](https://github.com/duxlabs-dev/dux-greeter) - greetd login screen with the Dux Shell aesthetic. The Greeter tab in DMS settings is the front-end for it.
-- [dankcalendar](https://github.com/duxlabs-dev/dux-calendar) - Local, Google, Microsoft, and CalDAV calendars for the Dux desktop.
+- [dux-greeter](https://github.com/duxlabs-dev/dux-greeter) - greetd login screen with the Dux Shell aesthetic. The Greeter tab in DMS settings is the front-end for it.
+- [dux-calendar](https://github.com/duxlabs-dev/dux-calendar) - Local, Google, Microsoft, and CalDAV calendars for the Dux desktop.
 - [dgop](https://github.com/duxlabs-dev/dux-gop) - System monitoring TUI and Go library; its library powers the process list and dashboard widgets inside the dms daemon.
 - [dsearch](https://github.com/duxlabs-dev/dux-search) - Fast file search that powers file results in the launcher.
-- [dux-qml-common](https://github.com/duxlabs-dev/dux-qml-common) - Shared QML widgets and components used by DMS, dank-greeter, and dankcalendar.
-- [dankgo](https://github.com/duxlabs-dev/dux-go) - Common Go modules behind the single binary apps.
+- [dux-qml-common](https://github.com/duxlabs-dev/dux-qml-common) - Shared QML widgets and components used by DMS, dux-greeter, and dux-calendar.
+- [dux-go](https://github.com/duxlabs-dev/dux-go) - Common Go modules behind the single binary apps.
 
 ## Development
 
@@ -193,7 +193,7 @@ Contributions welcome. Bug fixes, widgets, features, documentation, and plugins 
 3. Test thoroughly
 4. Open a pull request
 
-For documentation contributions, see [DankLinux-Docs](https://github.com/duxlabs-dev/dux-docs).
+For documentation contributions, see [dux-docs](https://github.com/duxlabs-dev/dux-docs).
 
 ## Credits
 
