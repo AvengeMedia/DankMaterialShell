@@ -227,7 +227,7 @@ Item {
                 isPlaying: activePlayer && activePlayer.playbackState === MprisPlaybackState.Playing
                 onFrameTicked: {
                     if (!root.isSeeking)
-                        activePlayer.positionChanged();
+                        MprisController.refreshPosition(activePlayer);
                 }
 
                 MouseArea {

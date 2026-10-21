@@ -90,7 +90,11 @@ QtObject {
         if (enabled && (state === "none" || state === "error"))
             useEmbeddedText(state);
     }
-    onPositionChanged: scheduleAnchor()
+    onPositionChanged: {
+        if (MprisController.refreshingPosition || flooredEcho())
+            return;
+        scheduleAnchor();
+    }
     onRateChanged: updatePlaybackClock()
     onPlayingChanged: {
         probe = null;
@@ -379,6 +383,7 @@ QtObject {
         if (!line || !Number.isFinite(line.t))
             return false;
         player.position = Math.max(0.1, Math.min(line.t, duration * 0.99));
+        reanchor();
         return true;
     }
 
@@ -432,6 +437,13 @@ QtObject {
         anchorPlaying = playing;
         anchorRate = rate;
         resync();
+    }
+
+    // pear-desktop floors Position to whole seconds on pause, resume and track events.
+    function flooredEcho() {
+        const lead = currentTime() - position;
+        const whole = Math.abs(position - Math.round(position)) < DashMetrics.mediaLyricsWholeSecondSlack;
+        return whole && lead >= 0 && lead < 1 + DashMetrics.mediaLyricsPositionTolerance;
     }
 
     function scheduleAnchor() {

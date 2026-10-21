@@ -25,6 +25,7 @@ Item {
     readonly property Item focusTarget: grid
     readonly property bool blocksTabNavigation: editMode || addMenu.open || optionsSheet.shown
     readonly property bool cardResizing: grid.sizePreview !== null
+    readonly property bool cardInteracting: grid.interacting
 
     implicitHeight: Math.max(DashMetrics.tabMinHeight, grid.implicitHeight)
     LayoutMirroring.enabled: I18n.isRtl

@@ -680,6 +680,8 @@ DPopout {
                         readonly property bool ready: targetHeight >= 0 && settledHeight === targetHeight
                         readonly property real availableHeight: root.screen ? root.screen.height - mainContainer.horizontalChromeHeight - DashMetrics.contentPadding * 2 - Theme.barHeight - Theme.spacingL * 2 : contentHeight
                         readonly property int rowBudget: DashMetrics.rowCapFor(availableHeight)
+                        // Growing a panel not hung from a top bar moves the grid under a held card, which retargets the drop.
+                        readonly property bool heightHeld: (currentItem?.cardInteracting ?? false) && root.effectiveBarPosition % 4 !== SettingsData.Top
 
                         x: (root.verticalNavigation && root.navigationEdge === SettingsData.Left ? root.navigationWidth : 0) - root.editGutter
                         y: (!root.verticalNavigation && root.navigationEdge !== SettingsData.Bottom ? mainContainer.horizontalChromeHeight : 0) - root.editGutter
@@ -691,12 +693,13 @@ DPopout {
                         clip: contentHeight > height
 
                         function updateContentHeight() {
-                            if (targetHeight < 0)
+                            if (targetHeight < 0 || heightHeld)
                                 return;
                             settledHeight = targetHeight;
                         }
 
                         onTargetHeightChanged: Qt.callLater(updateContentHeight)
+                        onHeightHeldChanged: Qt.callLater(updateContentHeight)
 
                         Column {
                             id: emptyContent

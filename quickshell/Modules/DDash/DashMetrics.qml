@@ -214,6 +214,7 @@ Singleton {
     readonly property int mediaLyricsRequestTimeout: 16000
     readonly property int mediaLyricsLoadingDelay: 300
     readonly property real mediaLyricsPositionTolerance: 0.05
+    readonly property real mediaLyricsWholeSecondSlack: 0.005
     readonly property int mediaLyricsPositionProbeInterval: 5000
     readonly property real mediaLyricsPositionProbeDrift: 1.5
     readonly property real mediaLyricsPositionProbeThreshold: 1

@@ -53,7 +53,7 @@ Card {
         interval: DashMetrics.mediaPositionPollInterval
         running: root.live && root.visible && root.interactive && root.showSeekbar && root.playing && !root.isSeeking
         repeat: true
-        onTriggered: root.activePlayer?.positionSupported && root.activePlayer.positionChanged()
+        onTriggered: MprisController.refreshPosition(root.activePlayer)
     }
 
     Loader {
