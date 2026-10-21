@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
+	"github.com/duxlabs-dev/dux-shell/core/internal/deps"
+	"github.com/duxlabs-dev/dux-shell/core/internal/privesc"
 )
 
 func init() {
@@ -81,7 +81,7 @@ func (u *UbuntuDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 
 	dependencies = append(dependencies, u.detectMatugen())
 	dependencies = append(dependencies, u.detectDanksearch())
-	dependencies = append(dependencies, u.detectDankCalendar())
+	dependencies = append(dependencies, withGitVariant(u.detectDankCalendar(), u.packageInstalled("dankcalendar-git")))
 
 	return dependencies, nil
 }
@@ -99,11 +99,28 @@ func (u *UbuntuDistribution) detectAccountsService() deps.Dependency {
 }
 
 func (u *UbuntuDistribution) detectDMSGreeter() deps.Dependency {
-	return u.detectOptionalPackage("dms-greeter", "DankMaterialShell greetd greeter", u.packageInstalled("dms-greeter"))
+	gitInstalled := u.packageInstalled("dms-greeter-git")
+	dep := u.detectOptionalPackage("dms-greeter", "Dux Shell greetd greeter", gitInstalled || u.packageInstalled("dms-greeter"))
+	return withGitVariant(dep, gitInstalled)
 }
 
 func (u *UbuntuDistribution) packageInstalled(pkg string) bool {
 	return debianPackageInstalledPrecisely(pkg)
+}
+
+func (u *UbuntuDistribution) InstalledVariant(stable, git PackageMapping) (deps.PackageVariant, bool) {
+	return installedVariantByName(u.packageInstalled, stable, git)
+}
+
+// SwapVariants installs the new variants directly: their Conflicts/Replaces make apt remove the old ones.
+func (u *UbuntuDistribution) SwapVariants(ctx context.Context, swaps []VariantSwap, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	if ppas := swapTargets(swaps, RepoTypePPA); len(ppas) > 0 {
+		if err := u.enablePPARepos(ctx, ppas, sudoPassword, progressChan); err != nil {
+			return err
+		}
+	}
+	_, to := swapNames(swaps)
+	return u.installAPTPackages(ctx, to, sudoPassword, progressChan)
 }
 
 func (u *UbuntuDistribution) GetPackageMapping(wm deps.WindowManager) map[string]PackageMapping {
@@ -120,13 +137,13 @@ func (u *UbuntuDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 		"accountsservice":        {Name: "accountsservice", Repository: RepoTypeSystem},
 
 		// DMS packages from PPAs
-		"dms (DankMaterialShell)": u.getDmsMapping(variants["dms (DankMaterialShell)"]),
-		"quickshell":              u.getQuickshellMapping(variants["quickshell"]),
-		"dms-greeter":             {Name: "dms-greeter", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
-		"matugen":                 {Name: "matugen", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
-		"ghostty":                 {Name: "ghostty", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
-		"danksearch":              {Name: "danksearch", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
-		"dankcalendar":            {Name: "dankcalendar-git", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
+		"dms (Dux Shell)": u.getDmsMapping(variants["dms (Dux Shell)"]),
+		"quickshell":      u.getQuickshellMapping(variants["quickshell"]),
+		"dms-greeter":     variantMapping("dms-greeter", variants["dms-greeter"], RepoTypePPA, "ppa:avengemedia/danklinux"),
+		"matugen":         {Name: "matugen", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
+		"ghostty":         {Name: "ghostty", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
+		"danksearch":      {Name: "danksearch", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
+		"dankcalendar":    variantMapping("dankcalendar", variants["dankcalendar"], RepoTypePPA, "ppa:avengemedia/danklinux"),
 	}
 
 	switch wm {

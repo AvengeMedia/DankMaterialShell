@@ -385,6 +385,13 @@ Column {
                 iconName: "restore"
                 onClicked: SessionData.restoreMaterialWallpaperProfiles()
             }
+
+            DButton {
+                text: I18n.tr("Create")
+                iconName: "open_in_new"
+                tooltipText: Site.wallpaperCreator
+                onClicked: Qt.openUrlExternally(Site.wallpaperCreator)
+            }
         }
 
         SettingsDropdownRow {

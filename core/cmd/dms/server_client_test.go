@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/AvengeMedia/dankgo/ipc"
+	"github.com/duxlabs-dev/dux-go/ipc"
 )
 
 func fakeServer(t *testing.T, handle func(net.Conn)) {

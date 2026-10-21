@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/windowrules"
+	"github.com/duxlabs-dev/dux-shell/core/internal/windowrules"
 )
 
 func TestParseWindowRuleV1(t *testing.T) {

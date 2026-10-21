@@ -34,7 +34,7 @@ in
   };
   config = lib.mkIf cfg.enable {
     systemd.user.services.dms = lib.mkIf cfg.systemd.enable {
-      description = "DankMaterialShell";
+      description = "Dux Shell";
       path = lib.mkForce [ ];
 
       partOf = [ cfg.systemd.target ];

@@ -30,8 +30,8 @@ PanelWindow {
     readonly property var storedAnchor: SessionData.islandFreePositions[root.positionKey] ?? null
     readonly property real storedAnchorX: root.clampAnchorX((typeof root.storedAnchor?.x === "number" ? root.storedAnchor.x : 0.5) * root.screenWidth)
     readonly property real storedAnchorY: root.clampAnchorY((typeof root.storedAnchor?.y === "number" ? root.storedAnchor.y : 0.5) * root.screenHeight)
-    readonly property int surfaceX: Math.floor(body.currentVisualX - root.hitPadding)
-    readonly property int surfaceY: Math.floor(body.currentVisualY - root.hitPadding)
+    readonly property int surfaceX: Math.floor(body.currentVisualX - root.hitPadding - body.shadowPadding)
+    readonly property int surfaceY: Math.floor(body.currentVisualY - root.hitPadding - body.shadowPadding)
 
     readonly property bool expanded: body.expanded
     readonly property bool pointerInside: body.islandController.pointerInside
@@ -130,8 +130,8 @@ PanelWindow {
         left: root.surfaceX
         top: root.surfaceY
     }
-    implicitWidth: Math.ceil(body.currentVisualX + body.currentVisualWidth + root.hitPadding) - root.surfaceX
-    implicitHeight: Math.ceil(body.currentVisualY + body.currentVisualHeight + root.hitPadding) - root.surfaceY
+    implicitWidth: Math.ceil(body.currentVisualX + body.currentVisualWidth + root.hitPadding + body.shadowPadding) - root.surfaceX
+    implicitHeight: Math.ceil(body.currentVisualY + body.currentVisualHeight + root.hitPadding + body.shadowPadding) - root.surfaceY
 
     Component.onCompleted: {
         root.wake();
@@ -164,6 +164,7 @@ PanelWindow {
     Item {
         id: hitTarget
         anchors.fill: parent
+        anchors.margins: body.shadowPadding
     }
 
     // Keep the animated buffer tight; the unmoving input-only window catches outside clicks.
@@ -185,10 +186,10 @@ PanelWindow {
             width: dismissWindow.width
             height: dismissWindow.height
             Region {
-                x: root.surfaceX
-                y: root.surfaceY
-                width: root.width
-                height: root.height
+                x: root.surfaceX + hitTarget.x
+                y: root.surfaceY + hitTarget.y
+                width: hitTarget.width
+                height: hitTarget.height
                 intersection: Intersection.Subtract
             }
         }

@@ -604,7 +604,7 @@ Singleton {
 
     function tryNominatim(lat, lon, reqId) {
         const url = "https://nominatim.openstreetmap.org/reverse?lat=" + lat + "&lon=" + lon + "&format=json&addressdetails=1&accept-language=en";
-        nominatimFetcher.command = lowPriorityCmd.concat(fetchCmd, ["--user-agent", "DankMaterialShell Weather Widget", url]);
+        nominatimFetcher.command = lowPriorityCmd.concat(fetchCmd, ["--user-agent", "Dux Shell Weather Widget", url]);
         nominatimFetcher.reqId = reqId;
         nominatimFetcher.running = true;
     }

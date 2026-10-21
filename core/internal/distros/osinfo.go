@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
+	"github.com/duxlabs-dev/dux-shell/core/internal/errdefs"
 )
 
 // DistroInfo contains basic information about a distribution
@@ -100,6 +100,11 @@ func IsUnsupportedDistro(distroID, versionID string) bool {
 			}
 		}
 		return true
+	}
+
+	if IsEnterpriseLinux(distroID) {
+		major, err := strconv.Atoi(strings.SplitN(versionID, ".", 2)[0])
+		return err != nil || major < 10
 	}
 
 	if distroID == "debian" {

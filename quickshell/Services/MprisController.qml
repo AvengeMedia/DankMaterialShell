@@ -496,7 +496,7 @@ Singleton {
         return {
             "lease": lease,
             "enabled": enabled,
-            "identity": "DankMaterialShell",
+            "identity": "Dux Shell",
             "playbackStatus": _mprisPlaybackStatus(player),
             "title": player ? stableTitle : "",
             "artist": player ? stableArtist : "",

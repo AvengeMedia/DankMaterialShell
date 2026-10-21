@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
+	"github.com/duxlabs-dev/dux-shell/core/internal/deps"
+	"github.com/duxlabs-dev/dux-shell/core/internal/privesc"
 )
 
 func init() {
@@ -70,9 +70,14 @@ func (d *DebianDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 		dependencies = append(dependencies, d.detectXwaylandSatellite())
 	}
 
+	if wm == deps.WindowManagerHyprland && d.isPika() {
+		dependencies = append(dependencies, d.detectHyprlandTools()...)
+		dependencies = append(dependencies, d.detectHyprlandGuiutils())
+	}
+
 	dependencies = append(dependencies, d.detectMatugen())
 	dependencies = append(dependencies, d.detectDanksearch())
-	dependencies = append(dependencies, d.detectDankCalendar())
+	dependencies = append(dependencies, withGitVariant(d.detectDankCalendar(), d.packageInstalled("dankcalendar-git")))
 
 	return dependencies, nil
 }
@@ -90,11 +95,29 @@ func (d *DebianDistribution) detectAccountsService() deps.Dependency {
 }
 
 func (d *DebianDistribution) detectDMSGreeter() deps.Dependency {
-	return d.detectOptionalPackage("dms-greeter", "DankMaterialShell greetd greeter", d.packageInstalled("dms-greeter"))
+	gitInstalled := d.packageInstalled("dms-greeter-git")
+	dep := d.detectOptionalPackage("dms-greeter", "Dux Shell greetd greeter", gitInstalled || d.packageInstalled("dms-greeter"))
+	return withGitVariant(dep, gitInstalled)
 }
 
 func (d *DebianDistribution) packageInstalled(pkg string) bool {
 	return debianPackageInstalledPrecisely(pkg)
+}
+
+func (d *DebianDistribution) InstalledVariant(stable, git PackageMapping) (deps.PackageVariant, bool) {
+	return installedVariantByName(d.packageInstalled, stable, git)
+}
+
+// SwapVariants installs the new variants directly: their Conflicts/Replaces make apt remove the old ones.
+func (d *DebianDistribution) SwapVariants(ctx context.Context, swaps []VariantSwap, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	if err := d.enableOBSRepos(ctx, swapTargets(swaps, RepoTypeOBS), sudoPassword, progressChan); err != nil {
+		return err
+	}
+	_, to := swapNames(swaps)
+	if err := d.ensureQuickshellBackports(ctx, to, sudoPassword, progressChan); err != nil {
+		return err
+	}
+	return d.installAPTPackages(ctx, to, sudoPassword, progressChan)
 }
 
 func debianPackageInstalledPrecisely(pkg string) bool {
@@ -122,6 +145,9 @@ func (d *DebianDistribution) GetPackageMapping(wm deps.WindowManager) map[string
 }
 
 func (d *DebianDistribution) GetPackageMappingWithVariants(wm deps.WindowManager, variants map[string]deps.PackageVariant) map[string]PackageMapping {
+	if d.isPika() {
+		return d.pikaPackageMapping(wm, variants)
+	}
 	packages := map[string]PackageMapping{
 		// Standard APT packages
 		"git":                    {Name: "git", Repository: RepoTypeSystem},
@@ -131,13 +157,13 @@ func (d *DebianDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 		"accountsservice":        {Name: "accountsservice", Repository: RepoTypeSystem},
 
 		// DMS packages from OBS with variant support
-		"dms (DankMaterialShell)": d.getDmsMapping(variants["dms (DankMaterialShell)"]),
-		"quickshell":              d.getQuickshellMapping(variants["quickshell"]),
-		"dms-greeter":             {Name: "dms-greeter", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
-		"matugen":                 {Name: "matugen", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
-		"ghostty":                 {Name: "ghostty", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
-		"danksearch":              {Name: "danksearch", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
-		"dankcalendar":            {Name: "dankcalendar-git", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
+		"dms (Dux Shell)": d.getDmsMapping(variants["dms (Dux Shell)"]),
+		"quickshell":      d.getQuickshellMapping(variants["quickshell"]),
+		"dms-greeter":     variantMapping("dms-greeter", variants["dms-greeter"], RepoTypeOBS, "home:AvengeMedia:danklinux"),
+		"matugen":         {Name: "matugen", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
+		"ghostty":         {Name: "ghostty", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
+		"danksearch":      {Name: "danksearch", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
+		"dankcalendar":    variantMapping("dankcalendar", variants["dankcalendar"], RepoTypeOBS, "home:AvengeMedia:danklinux"),
 	}
 
 	if wm == deps.WindowManagerNiri {

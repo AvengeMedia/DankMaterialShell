@@ -165,27 +165,15 @@ DModal {
 
         open();
         Qt.callLater(() => {
-            if (reason === "wrong-password")
-                shakeSecretFields();
+            if (reason === "wrong-password" && fieldsInfo.length === 0) {
+                passwordInput.text = "";
+            }
             focusFirstField();
         });
     }
 
     function hide() {
         close();
-    }
-
-    function shakeSecretFields() {
-        if (fieldsInfo.length === 0) {
-            passwordInput.text = "";
-            passwordInput.shake();
-            return;
-        }
-        for (var i = 0; i < dynamicFieldsRepeater.count; i++) {
-            const item = dynamicFieldsRepeater.itemAt(i);
-            if (item?.morph)
-                item.shake();
-        }
     }
 
     function getFieldLabel(fieldName) {
@@ -381,10 +369,13 @@ DModal {
         DTextField {
             id: ssidInput
             visible: isHiddenNetwork
-            expressive: true
+            outlined: true
+            controlHeight: Theme.fieldHeightLarge
             leftIconName: "wifi"
 
             width: parent.width
+            font.pixelSize: Theme.fontSizeMedium
+            textColor: Theme.surfaceText
             labelText: I18n.tr("Network Name (SSID)")
             enabled: root.shouldBeVisible
 
@@ -399,10 +390,12 @@ DModal {
                 id: fieldInput
                 required property var modelData
                 required property int index
-                expressive: true
-                morph: modelData.isSecret
+                outlined: true
+                controlHeight: Theme.fieldHeightLarge
                 leftIconName: modelData.isSecret ? "lock" : "person"
                 width: contentFocusScope.contentItem.width
+                font.pixelSize: Theme.fontSizeMedium
+                textColor: Theme.surfaceText
                 showPasswordToggle: modelData.isSecret
                 isError: modelData.isSecret && isPromptMode && promptReason === "wrong-password" && text.length === 0
                 supportingText: isError ? I18n.tr("Incorrect password") : ""
@@ -483,10 +476,13 @@ DModal {
         DTextField {
             id: usernameInput
             visible: showUsernameField
-            expressive: true
+            outlined: true
+            controlHeight: Theme.fieldHeightLarge
             leftIconName: "person"
 
             width: parent.width
+            font.pixelSize: Theme.fontSizeMedium
+            textColor: Theme.surfaceText
             text: wifiUsernameInput
             labelText: I18n.tr("Username", "text field label for network, vpn and account forms")
             enabled: root.shouldBeVisible
@@ -498,11 +494,13 @@ DModal {
         DTextField {
             id: passwordInput
             visible: showPasswordField
-            expressive: true
-            morph: true
+            outlined: true
+            controlHeight: Theme.fieldHeightLarge
             leftIconName: "lock"
 
             width: parent.width
+            font.pixelSize: Theme.fontSizeMedium
+            textColor: Theme.surfaceText
             text: wifiPasswordInput
             showPasswordToggle: true
             isError: isPromptMode && promptReason === "wrong-password" && text.length === 0
@@ -524,10 +522,13 @@ DModal {
         DTextField {
             id: anonInput
             visible: showAnonField
-            expressive: true
+            outlined: true
+            controlHeight: Theme.fieldHeightLarge
             leftIconName: "person_off"
 
             width: parent.width
+            font.pixelSize: Theme.fontSizeMedium
+            textColor: Theme.surfaceText
             text: wifiAnonymousIdentityInput
             labelText: I18n.tr("Anonymous Identity (optional)")
             enabled: root.shouldBeVisible
@@ -539,10 +540,13 @@ DModal {
         DTextField {
             id: domainMatchInput
             visible: showDomainField
-            expressive: true
+            outlined: true
+            controlHeight: Theme.fieldHeightLarge
             leftIconName: "domain"
 
             width: parent.width
+            font.pixelSize: Theme.fontSizeMedium
+            textColor: Theme.surfaceText
             text: wifiDomainInput
             labelText: I18n.tr("Domain (optional)")
             enabled: root.shouldBeVisible

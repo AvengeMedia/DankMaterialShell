@@ -12,7 +12,7 @@ DEBUG_MODE=0
 
 show_help() {
     cat << EOF
-dms-greeter - DankMaterialShell greeter launcher
+dms-greeter - Dux Shell greeter launcher
 
 Usage: dms-greeter --command COMPOSITOR [OPTIONS]
 

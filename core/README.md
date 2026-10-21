@@ -1,6 +1,6 @@
 # DMS Backend & CLI
 
-Go-based backend for DankMaterialShell providing system integration, IPC, and installation tools.
+Go-based backend for Dux Shell providing system integration, IPC, and installation tools.
 
 **See [root README](../README.md) for project overview and installation.**
 
@@ -78,7 +78,7 @@ Custom IPC via unix socket (JSON API) for shell communication.
 - `dms brightness [list|set]` - Control display/monitor brightness
 - `dms color pick` - Native color picker (see below)
 - `dms update` - Update DMS and dependencies (disabled in distro packages)
-- `dms greeter` - Deprecated; forwards to the standalone [dms-greeter](https://github.com/AvengeMedia/dank-greeter) binary
+- `dms greeter` - Deprecated; forwards to the standalone [dms-greeter](https://github.com/duxlabs-dev/dux-greeter) binary
 
 ### Color Picker
 
@@ -132,10 +132,10 @@ This runs gofmt, golangci-lint, tests, and builds before each commit when `core/
 
 **Regenerating Wayland Protocol Bindings:**
 
-Protocol XML files live in `internal/proto/xml/`. Bindings are generated with the [dankgo](https://github.com/AvengeMedia/dankgo) `go-wayland-scanner`:
+Protocol XML files live in `internal/proto/xml/`. Bindings are generated with the [dankgo](https://github.com/duxlabs-dev/dux-go) `go-wayland-scanner`:
 
 ```bash
-go run github.com/AvengeMedia/dankgo/cmd/go-wayland-scanner@latest \
+go run github.com/duxlabs-dev/dux-go/cmd/go-wayland-scanner@latest \
   -i internal/proto/xml/wlr-gamma-control-unstable-v1.xml \
   -pkg wlr_gamma_control -o internal/proto/wlr_gamma_control/gamma_control.go
 ```
@@ -152,7 +152,7 @@ go run github.com/AvengeMedia/dankgo/cmd/go-wayland-scanner@latest \
 **Interactive (TUI):**
 
 ```bash
-curl -fsSL https://install.danklinux.com | sh
+curl -fsSL https://install.duxlabs.dev | sh
 ```
 
 **Headless (unattended):**
@@ -160,9 +160,9 @@ curl -fsSL https://install.danklinux.com | sh
 Headless mode requires cached credentials or a passwordless rule for your privilege escalation tool (sudo, doas, or run0). With sudo, run `sudo -v` first:
 
 ```bash
-sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c niri -t ghostty -y
-sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c hyprland -t kitty --dms-greeter -y
-sudo -v && curl -fsSL https://install.danklinux.com | sh -s -- -c niri -t ghostty --git-deps niri,quickshell --all-features -y
+sudo -v && curl -fsSL https://install.duxlabs.dev | sh -s -- -c niri -t ghostty -y
+sudo -v && curl -fsSL https://install.duxlabs.dev | sh -s -- -c hyprland -t kitty --dms-greeter -y
+sudo -v && curl -fsSL https://install.duxlabs.dev | sh -s -- -c niri -t ghostty --git-deps niri,quickshell --all-features -y
 ```
 
 | Flag | Short | Description |
@@ -225,6 +225,6 @@ Most packages available in standard repos. Minimal building required.
 Uses Portage with GURU overlay. Automatically configures USE flags. Variable success depending on system configuration.
 
 **Void Linux**
-Uses XBPS with the DMS and DankLinux self-hosted repositories.
+Uses XBPS with the DMS and Dux Labs self-hosted repositories.
 
 See installer output for distribution-specific details during installation.

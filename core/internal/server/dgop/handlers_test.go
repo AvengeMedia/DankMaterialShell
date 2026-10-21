@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/AvengeMedia/dgop/gops"
+	"github.com/duxlabs-dev/dux-gop/gops"
 )
 
 func TestMetaParamsFromAllKeys(t *testing.T) {

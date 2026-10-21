@@ -1490,14 +1490,26 @@ Singleton {
                 log.warn("failed to parse window rules", e);
                 return;
             }
-            syncDmsWindowFloatingRule(rules);
-            if (ensureOpaque)
-                ensureDmsOpaqueRule(rules);
+            // Each rule write rewrites the whole rules file, so writes must not overlap.
+            syncDmsWindowFloatingRule(rules, () => {
+                if (ensureOpaque)
+                    ensureDmsOpaqueRule(rules);
+            });
         });
     }
 
-    function syncDmsWindowFloatingRule(rules) {
-        dmsWindowFloatingActive = rules.some(rule => rule.id === dmsFloatingRuleId && rule.enabled !== false && rule.actions?.openFloating === true);
+    function dmsRuleMatchesCurrentAppId(rule) {
+        return (rule.matchCriteria?.appId || "").includes("duxlabs");
+    }
+
+    function syncDmsWindowFloatingRule(rules, onDone) {
+        const rule = rules.find(rule => rule.id === dmsFloatingRuleId && rule.enabled !== false && rule.actions?.openFloating === true);
+        dmsWindowFloatingActive = rule !== undefined;
+        if (!rule || dmsRuleMatchesCurrentAppId(rule)) {
+            onDone?.();
+            return;
+        }
+        setDmsWindowFloatingRule(true, onDone);
     }
 
     function reloadAfterWindowRuleWrite() {
@@ -1530,7 +1542,7 @@ Singleton {
         setDmsRule(dmsFloatingRuleId, enabled ? {
             "name": "DMS Floating Windows",
             "matchCriteria": {
-                "appId": "^com.danklinux.dms$"
+                "appId": "^(dev\\.duxlabs\\.shell|com\\.danklinux\\.dms)$"
             },
             "actions": {
                 "openFloating": true
@@ -1542,7 +1554,7 @@ Singleton {
     }
 
     function ensureDmsOpaqueRule(rules) {
-        if (rules.some(rule => rule.id === dmsOpaqueRuleId))
+        if (rules.some(rule => rule.id === dmsOpaqueRuleId && dmsRuleMatchesCurrentAppId(rule)))
             return;
         // DMS windows are translucent via client alpha; Hyprland's opaque keeps that alpha, force_rgbx would drop it.
         let actions;
@@ -1559,7 +1571,7 @@ Singleton {
         setDmsRule(dmsOpaqueRuleId, {
             "name": "DMS Window Opaque",
             "matchCriteria": {
-                "appId": "^com\\.danklinux\\.dms$"
+                "appId": "^(dev\\.duxlabs\\.shell|com\\.danklinux\\.dms)$"
             },
             "actions": actions
         });

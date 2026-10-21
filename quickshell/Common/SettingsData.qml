@@ -81,7 +81,7 @@ Singleton {
     readonly property string _homeUrl: StandardPaths.writableLocation(StandardPaths.HomeLocation)
     readonly property string _configUrl: StandardPaths.writableLocation(StandardPaths.ConfigLocation)
     readonly property string _configDir: Paths.strip(_configUrl)
-    readonly property string pluginSettingsPath: _configDir + "/DankMaterialShell/plugin_settings.json"
+    readonly property string pluginSettingsPath: _configDir + "/dms/plugin_settings.json"
     readonly property bool qtengineActive: Quickshell.env("QT_QPA_PLATFORMTHEME") === "qtengine" || Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") === "qtengine"
 
     property bool _loading: false
@@ -138,6 +138,7 @@ Singleton {
         saveSettings();
     }
 
+    property var launcherKeybinds: Spec.SPEC.launcherKeybinds.def
     property var launcherPluginOrder: Spec.SPEC.launcherPluginOrder.def
     onLauncherPluginOrderChanged: saveSettings()
 
@@ -460,6 +461,7 @@ Singleton {
     property bool closeNiriOverviewOnWindowFocus: Spec.SPEC.closeNiriOverviewOnWindowFocus.def
     property bool rememberLastQuery: Spec.SPEC.rememberLastQuery.def
     property bool launcherHistoryEnabled: Spec.SPEC.launcherHistoryEnabled.def
+    property string launcherEnterAction: Spec.SPEC.launcherEnterAction.def
     property bool rememberLastMode: Spec.SPEC.rememberLastMode.def
     property var spotlightSectionViewModes: Spec.SPEC.spotlightSectionViewModes.def
     onSpotlightSectionViewModesChanged: saveSettings()
@@ -1838,6 +1840,10 @@ Singleton {
         let loadedSettings = JSON.stringify(obj);
 
         const oldVersion = obj?.configVersion ?? 0;
+        if (oldVersion > settingsConfigVersion && !isGreeterMode) {
+            newerSettingsBackup.path = `${_configDir}/dms/settings.v${oldVersion}.json`;
+            newerSettingsBackup.setText(JSON.stringify(obj, null, 2));
+        }
         const legacyPins = oldVersion < 13 ? Store.extractPins(obj) : null;
         const sessionPayload = oldVersion < 15 ? Store.extractSessionPayload(obj) : null;
         const cachePayload = oldVersion < 15 ? Store.extractCachePayload(obj) : null;
@@ -2276,8 +2282,8 @@ Singleton {
         return ShellLayout.popupTrigger(pos, screen, barThickness, widgetWidth, barSpacing, barPosition, barConfig);
     }
 
-    function getAdjacentBarInfo(screen, barPosition, barConfig) {
-        return ShellLayout.adjacentInfo(screen, barConfig);
+    function getAdjacentBarInfo(screen, barPosition, barConfig, includeAutoHide) {
+        return ShellLayout.adjacentInfo(screen, barConfig, includeAutoHide);
     }
 
     function getBarBounds(screen, barThickness, barPosition, barConfig) {
@@ -3908,7 +3914,7 @@ Singleton {
     SettingsFile {
         id: defaultSettingsFile
 
-        filePath: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/DankMaterialShell/settings.json"
+        filePath: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/dms/settings.json"
 
         Component.onCompleted: {
             _registerSettingsFile(defaultSettingsFile);
@@ -3964,7 +3970,7 @@ Singleton {
         sourceComponent: FolderListModel {
             id: settingsFolderModel
 
-            property url dir: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/DankMaterialShell/config.d"
+            property url dir: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/dms/config.d"
 
             folder: dir
             showDirs: false
@@ -4057,6 +4063,16 @@ Singleton {
             if (isGreeterMode)
                 loadGreeterSettings("");
         }
+    }
+
+    // Our first save drops the keys a newer shell wrote, so its settings are kept for going back.
+    FileView {
+        id: newerSettingsBackup
+
+        preload: false
+        blockWrites: true
+        atomicWrites: true
+        printErrors: false
     }
 
     FileView {

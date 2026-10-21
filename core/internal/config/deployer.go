@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/version"
+	"github.com/duxlabs-dev/dux-shell/core/internal/deps"
+	"github.com/duxlabs-dev/dux-shell/core/internal/version"
 )
 
 const hyprlandBackupDirName = ".dms-backups"
@@ -262,7 +262,7 @@ func (cd *ConfigDeployer) deployNiriConfig(terminalCommand string, useSystemd bo
 
 	newConfig := strings.ReplaceAll(NiriConfig, "{{TERMINAL_COMMAND}}", terminalCommand)
 
-	if !useSystemd {
+	if !cd.systemdAutostart(deps.WindowManagerNiri, useSystemd) {
 		newConfig = cd.transformNiriConfigForNonSystemd(newConfig, terminalCommand)
 	}
 
@@ -652,7 +652,7 @@ func (cd *ConfigDeployer) deployHyprlandConfig(terminalCommand string, useSystem
 
 	newConfig := strings.ReplaceAll(HyprlandLuaConfig, "{{TERMINAL_COMMAND}}", terminalCommand)
 
-	if !useSystemd {
+	if !cd.systemdAutostart(deps.WindowManagerHyprland, useSystemd) {
 		newConfig = transformHyprlandLuaForNonSystemd(newConfig, terminalCommand)
 	}
 
@@ -669,14 +669,6 @@ func (cd *ConfigDeployer) deployHyprlandConfig(terminalCommand string, useSystem
 	if err := os.WriteFile(result.Path, []byte(newConfig), 0o644); err != nil {
 		result.Error = fmt.Errorf("failed to write config: %w", err)
 		return result, result.Error
-	}
-
-	if useSystemd {
-		if targetPath, err := EnsureHyprlandSessionTarget(); err != nil {
-			cd.log(fmt.Sprintf("Warning: failed to write hyprland-session.target: %v", err))
-		} else {
-			cd.log(fmt.Sprintf("Ensured hyprland session target at %s", targetPath))
-		}
 	}
 
 	movedLegacy, mainConfBackup, err := backupLegacyHyprlandConfFiles(configDir, dmsDir, backupDir)

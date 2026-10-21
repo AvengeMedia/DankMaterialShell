@@ -2,7 +2,7 @@ package providers
 
 import (
 	"fmt"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/configfrag"
+	"github.com/duxlabs-dev/dux-shell/core/internal/configfrag"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -12,7 +12,7 @@ import (
 	"github.com/sblinch/kdl-go"
 	"github.com/sblinch/kdl-go/document"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/windowrules"
+	"github.com/duxlabs-dev/dux-shell/core/internal/windowrules"
 )
 
 type NiriMatch struct {
@@ -804,7 +804,7 @@ func (p *NiriWritableProvider) WriteDMSRules(rules []windowrules.WindowRule) err
 	}
 
 	var lines []string
-	lines = append(lines, "// DMS Window Rules - Managed by DankMaterialShell")
+	lines = append(lines, "// DMS Window Rules - Managed by Dux Shell")
 	lines = append(lines, "// Do not edit manually - changes may be overwritten")
 	lines = append(lines, "")
 

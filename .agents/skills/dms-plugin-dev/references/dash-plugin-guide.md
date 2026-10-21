@@ -32,6 +32,7 @@ Add the optional `dash` block for labels, card size and options (see plugin-mani
 import QtQuick
 import qs.Common
 import qs.Widgets
+import qs.DCommon.Widgets
 import qs.Modules.Plugins
 import qs.Modules.DankDash
 
@@ -79,7 +80,7 @@ DashTabComponent {
             color: Theme.surfaceText
         }
 
-        DankButton {
+        DButton {
             id: button
             text: I18n.trFor("myPlugin", "Refresh")
             onClicked: root.refresh()

@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/netfetch"
+	"github.com/duxlabs-dev/dux-shell/core/internal/netfetch"
 )
 
 func TestGitBuildCount(t *testing.T) {

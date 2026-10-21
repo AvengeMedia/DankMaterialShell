@@ -5,10 +5,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/headless"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/tui"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/duxlabs-dev/dux-shell/core/internal/headless"
+	"github.com/duxlabs-dev/dux-shell/core/internal/log"
+	"github.com/duxlabs-dev/dux-shell/core/internal/tui"
 	"github.com/spf13/cobra"
 )
 
@@ -33,8 +33,8 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:   "dankinstall",
-	Short: "Install DankMaterialShell and its dependencies",
-	Long: `dankinstall sets up DankMaterialShell with your chosen compositor and terminal.
+	Short: "Install Dux Shell and its dependencies",
+	Long: `dankinstall sets up Dux Shell with your chosen compositor and terminal.
 
 Without flags, it launches an interactive TUI. Providing either --compositor
 or --term activates headless (unattended) mode, which requires both flags.

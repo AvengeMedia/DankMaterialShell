@@ -73,6 +73,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version-file: ./core/go.mod
+          cache-dependency-path: core/go.sum
 
       - name: Format check
         if: matrix.goos == 'linux'
@@ -207,8 +208,8 @@ jobs:
   #         GH_TOKEN: ${{ steps.app_token.outputs.token }}
   #       run: |
   #         set -euo pipefail
-  #         git config user.name "dms-ci[bot]"
-  #         git config user.email "dms-ci[bot]@users.noreply.github.com"
+  #         git config user.name "dux-ci[bot]"
+  #         git config user.email "344434142+dux-ci[bot]@users.noreply.github.com"
 
   #         version="${GITHUB_REF#refs/tags/}"
   #         echo "Updating to version: $version"
@@ -247,6 +248,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version-file: ./core/go.mod
+          cache-dependency-path: core/go.sum
 
       - name: Download core artifacts
         uses: actions/download-artifact@v5
@@ -280,7 +282,7 @@ jobs:
           ## Installation
 
           ```bash
-          curl -fsSL https://install.danklinux.com | sh
+          curl -fsSL https://install.duxlabs.dev | sh
           ```
 
           ## Assets
@@ -354,13 +356,13 @@ jobs:
 
           # Replace the DCommon symlink with real submodule content for packaging
           rm quickshell/DCommon
-          cp -r dank-qml-common/DCommon quickshell/DCommon
+          cp -r dux-qml-common/DCommon quickshell/DCommon
 
           # Create full source tarball (GitHub tag archives never contain submodule content)
           VERSION_NUM=${TAG#v}
           tar --exclude='.git' \
               --exclude='.github' \
-              --exclude='dank-qml-common' \
+              --exclude='dux-qml-common' \
               --exclude='_release_assets' \
               --exclude='_core_assets' \
               --exclude='RELEASE_BODY.md' \
@@ -420,7 +422,7 @@ jobs:
 
             # Create installation guide
             cat > _temp_full/INSTALL.md << 'EOFINSTALL'
-          # DankMaterialShell Installation
+          # Dux Shell Installation
 
           ## Requirements
 
@@ -458,8 +460,8 @@ jobs:
 
           ## Configuration
 
-          - Settings are stored in `~/.config/DankMaterialShell/settings.json`
-          - Plugins go in `~/.config/DankMaterialShell/plugins/`
+          - Settings are stored in `~/.config/dms/settings.json`
+          - Plugins go in `~/.config/dms/plugins/`
           - See the documentation in the `dms/` directory for more details
 
           ## Troubleshooting
@@ -531,13 +533,13 @@ jobs:
       fail-fast: false
       matrix:
         repo:
-          - dgop
-          - dankgo
-          - dank-qml-common
-          - dankcalendar
-          - danksearch
-          - dank-greeter
-          - dfiles
+          - dux-gop
+          - dux-go
+          - dux-qml-common
+          - dux-calendar
+          - dux-search
+          - dux-greeter
+          - dux-files
     steps:
       - name: Create GitHub App token
         id: app_token

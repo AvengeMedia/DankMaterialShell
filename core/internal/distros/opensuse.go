@@ -9,8 +9,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
+	"github.com/duxlabs-dev/dux-shell/core/internal/deps"
+	"github.com/duxlabs-dev/dux-shell/core/internal/privesc"
 )
 
 func init() {
@@ -92,7 +92,7 @@ func (o *OpenSUSEDistribution) DetectDependenciesWithTerminal(ctx context.Contex
 
 	dependencies = append(dependencies, o.detectMatugen())
 	dependencies = append(dependencies, o.detectDanksearch())
-	dependencies = append(dependencies, o.detectDankCalendar())
+	dependencies = append(dependencies, withGitVariant(o.detectDankCalendar(), o.packageInstalled("dankcalendar-git")))
 
 	return dependencies, nil
 }
@@ -107,8 +107,35 @@ func (o *OpenSUSEDistribution) packageInstalled(pkg string) bool {
 	return err == nil
 }
 
+func (o *OpenSUSEDistribution) InstalledVariant(stable, git PackageMapping) (deps.PackageVariant, bool) {
+	return installedVariantByName(o.packageInstalled, stable, git)
+}
+
+func (o *OpenSUSEDistribution) SwapVariants(ctx context.Context, swaps []VariantSwap, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	if err := o.enableOBSRepos(ctx, swapTargets(swaps, RepoTypeOBS), sudoPassword, progressChan); err != nil {
+		return err
+	}
+
+	args := []string{"zypper", "install", "-y"}
+	for _, swap := range swaps {
+		args = append(args, swap.To.Name, "'!"+swap.From.Name+"'")
+	}
+	command := strings.Join(args, " ")
+
+	progressChan <- InstallProgressMsg{
+		Phase:       PhaseSystemPackages,
+		Progress:    0.40,
+		Step:        "Switching package variants...",
+		NeedsSudo:   true,
+		CommandInfo: "sudo " + command,
+	}
+	return o.runWithProgress(privesc.ExecCommand(ctx, sudoPassword, command), progressChan, PhaseSystemPackages, 0.40, 0.85)
+}
+
 func (o *OpenSUSEDistribution) detectDMSGreeter() deps.Dependency {
-	return o.detectOptionalPackage("dms-greeter", "DankMaterialShell greetd greeter", o.packageInstalled("dms-greeter"))
+	gitInstalled := o.packageInstalled("dms-greeter-git")
+	dep := o.detectOptionalPackage("dms-greeter", "Dux Shell greetd greeter", gitInstalled || o.packageInstalled("dms-greeter"))
+	return withGitVariant(dep, gitInstalled)
 }
 
 func (o *OpenSUSEDistribution) GetPackageMapping(wm deps.WindowManager) map[string]PackageMapping {
@@ -125,13 +152,13 @@ func (o *OpenSUSEDistribution) GetPackageMappingWithVariants(wm deps.WindowManag
 		"accountsservice":        {Name: "accountsservice", Repository: RepoTypeSystem},
 
 		// DMS packages from OBS
-		"dms (DankMaterialShell)": o.getDmsMapping(variants["dms (DankMaterialShell)"]),
-		"quickshell":              o.getQuickshellMapping(variants["quickshell"]),
-		"dms-greeter":             {Name: "dms-greeter", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
-		"ghostty":                 {Name: "ghostty", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
-		"matugen":                 {Name: "matugen", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
-		"danksearch":              {Name: "danksearch", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
-		"dankcalendar":            {Name: "dankcalendar-git", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
+		"dms (Dux Shell)": o.getDmsMapping(variants["dms (Dux Shell)"]),
+		"quickshell":      o.getQuickshellMapping(variants["quickshell"]),
+		"dms-greeter":     variantMapping("dms-greeter", variants["dms-greeter"], RepoTypeOBS, "home:AvengeMedia:danklinux"),
+		"ghostty":         {Name: "ghostty", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
+		"matugen":         {Name: "matugen", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
+		"danksearch":      {Name: "danksearch", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
+		"dankcalendar":    variantMapping("dankcalendar", variants["dankcalendar"], RepoTypeOBS, "home:AvengeMedia:danklinux"),
 	}
 
 	switch wm {
@@ -285,7 +312,12 @@ func (o *OpenSUSEDistribution) InstallPackages(ctx context.Context, dependencies
 		return fmt.Errorf("failed to install prerequisites: %w", err)
 	}
 
-	systemPkgs, obsPkgs, manualPkgs, variantMap := o.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
+	skipFlags, err := swapReinstalledVariants(ctx, o, dependencies, wm, reinstallFlags, disabledFlags, sudoPassword, progressChan)
+	if err != nil {
+		return err
+	}
+
+	systemPkgs, obsPkgs, manualPkgs, variantMap := o.categorizePackages(dependencies, wm, reinstallFlags, skipFlags)
 
 	// Enable OBS repositories
 	if len(obsPkgs) > 0 {

@@ -30,9 +30,6 @@ var LOCAL_SPEC = {
     updaterNotifiedCount: {
         def: 0
     },
-    changelogSeenVersion: {
-        def: ""
-    },
     terminalOverride: {
         def: ""
     },

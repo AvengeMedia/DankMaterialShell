@@ -12,7 +12,6 @@ Singleton {
     readonly property real segmentGap: Theme.groupedListGap
     readonly property real pillGap: Theme.spacingXS
     readonly property real bareGap: Theme.spacingXXS
-    readonly property real fittsReach: 1000
     readonly property real iconSlot: Theme.iconSizeSmall + Theme.spacingXXS
     readonly property real indicatorDot: Theme.spacingS - Theme.spacingXXS
     readonly property real badgeSize: Theme.spacingS

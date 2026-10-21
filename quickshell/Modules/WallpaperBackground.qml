@@ -213,7 +213,7 @@ Variants {
 
             function regenerate() {
                 invalidate();
-                if (!root.currentSource || currentWallpaper.source.toString())
+                if (!root.currentSource || currentWallpaper.source.toString() || nextWallpaper.source.toString())
                     return;
                 currentWallpaper.source = root.currentSource;
             }

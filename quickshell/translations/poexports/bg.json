@@ -146,11 +146,17 @@
   "%1 ms": {
     "%1 ms": ""
   },
+  "%1 not found": {
+    "%1 not found": ""
+  },
   "%1 notifications": {
     "%1 notifications": "%1 известия"
   },
   "%1 online": {
     "%1 online": "%1 на линия"
+  },
+  "%1 only": {
+    "%1 only": ""
   },
   "%1 other": {
     "%1 other": ""
@@ -178,6 +184,9 @@
   },
   "%1 tasks": {
     "%1 tasks": "%1 задачи"
+  },
+  "%1 uninstalled": {
+    "%1 uninstalled": ""
   },
   "%1 update": {
     "%1 update": "%1 обновление"
@@ -260,8 +269,8 @@
   "A floating companion that works alongside any bar layout": {
     "A floating companion that works alongside any bar layout": ""
   },
-  "A modern desktop shell for Wayland compositors": {
-    "A modern desktop shell for Wayland compositors": "Модерен графичен шел за Wayland композитори"
+  "A modern desktop shell for Wayland": {
+    "A modern desktop shell for Wayland": ""
   },
   "A newer dms binary is installed.": {
     "A newer dms binary is installed.": ""
@@ -500,6 +509,9 @@
   "All displays": {
     "All displays": "Всички дисплеи"
   },
+  "All plugins": {
+    "All plugins": ""
+  },
   "All settings": {
     "All settings": ""
   },
@@ -529,6 +541,9 @@
   },
   "Already on that session": {
     "Already on that session": "Вече сте в тази сесия"
+  },
+  "Already upvoted, click again to remove": {
+    "Already upvoted, click again to remove": ""
   },
   "Also runs the templates in your matugen config.toml": {
     "Also runs the templates in your matugen config.toml": ""
@@ -1364,6 +1379,9 @@
   "Changes save to %1": {
     "Changes save to %1": ""
   },
+  "Changes volume and audio devices": {
+    "Changes volume and audio devices": ""
+  },
   "Channel": {
     "Channel": "Канал"
   },
@@ -1676,14 +1694,8 @@
   "Compact": {
     "Compact": "Компактен"
   },
-  "Compact height": {
-    "Compact height": ""
-  },
   "Compact mode": {
     "Compact mode": ""
-  },
-  "Compact width": {
-    "Compact width": ""
   },
   "Completed": {
     "Completed": "Завършено"
@@ -1787,6 +1799,9 @@
   "Connections and autoconnect": {
     "Connections and autoconnect": ""
   },
+  "Connects to the internet": {
+    "Connects to the internet": ""
+  },
   "Consumes the key only when a dispatcher runs": {
     "Consumes the key only when a dispatcher runs": ""
   },
@@ -1810,6 +1825,9 @@
   },
   "Controls": {
     "Controls": ""
+  },
+  "Controls media players": {
+    "Controls media players": ""
   },
   "Convert to DMS": {
     "Convert to DMS": "Преобразуване към DMS"
@@ -2045,8 +2063,8 @@
   "DMS chooser": {
     "DMS chooser": ""
   },
-  "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
-    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": "DMS е силно персонализируем модерен десктоп шел с дизайн, вдъхновен от %1.<br/><br/>Създаден е с %2 (QT6 рамка за графични шелове) и %3 (статично типизиран компилиран език за програмиране)."
+  "DMS is a modern, highly customizable desktop shell that looks great out of the box, without sacrificing the freedom to make it your own.<br/><br/>Built with %1 and %2, it brings together panels, widgets, system controls, and more into a cohesive desktop experience.": {
+    "DMS is a modern, highly customizable desktop shell that looks great out of the box, without sacrificing the freedom to make it your own.<br/><br/>Built with %1 and %2, it brings together panels, widgets, system controls, and more into a cohesive desktop experience.": ""
   },
   "DMS out of date": {
     "DMS out of date": "DMS е остарял"
@@ -2290,6 +2308,9 @@
   },
   "Dew point %1": {
     "Dew point %1": ""
+  },
+  "Did you mean": {
+    "Did you mean": ""
   },
   "Digital": {
     "Digital": "Цифров"
@@ -2711,9 +2732,6 @@
   "End must be after start": {
     "End must be after start": "Краят трябва да е след началото"
   },
-  "Enlarge on hover": {
-    "Enlarge on hover": ""
-  },
   "Enter 6-digit passkey": {
     "Enter 6-digit passkey": "Въведете 6-цифрен ключ за достъп"
   },
@@ -2846,8 +2864,8 @@
   "Expressive": {
     "Expressive": "Експресивен"
   },
-  "Extend DankMaterialShell with powerful plugins for widgets, launchers, and more": {
-    "Extend DankMaterialShell with powerful plugins for widgets, launchers, and more": ""
+  "Extend %1 with powerful plugins for widgets, launchers, and more": {
+    "Extend %1 with powerful plugins for widgets, launchers, and more": ""
   },
   "Extend battery life": {
     "Extend battery life": "Удължаване живота на батерията"
@@ -3137,8 +3155,8 @@
   "Family": {
     "Family": ""
   },
-  "Features": {
-    "Features": "Функции"
+  "Featured plugin": {
+    "Featured plugin": ""
   },
   "Feels Like %1°": {
     "Feels Like %1°": "Усеща се като %1°"
@@ -3235,6 +3253,9 @@
   },
   "Fits the song title instead of keeping a fixed width": {
     "Fits the song title instead of keeping a fixed width": ""
+  },
+  "Fits your setup": {
+    "Fits your setup": ""
   },
   "Fixed": {
     "Fixed": ""
@@ -3379,6 +3400,9 @@
   },
   "For %1": {
     "For %1": ""
+  },
+  "For you": {
+    "For you": ""
   },
   "Force HDR": {
     "Force HDR": "Принудителен HDR"
@@ -3743,6 +3767,9 @@
   "Hide installed": {
     "Hide installed": "Скриване на инсталираните"
   },
+  "Hide on last display": {
+    "Hide on last display": ""
+  },
   "Hide until typing": {
     "Hide until typing": ""
   },
@@ -3797,6 +3824,9 @@
   "History size, retention, paste behavior": {
     "History size, retention, paste behavior": ""
   },
+  "Hold Ctrl, Alt or Super and press a key. Esc cancels.": {
+    "Hold Ctrl, Alt or Super and press a key. Esc cancels.": ""
+  },
   "Hold duration": {
     "Hold duration": ""
   },
@@ -3847,6 +3877,9 @@
   },
   "Hover popouts": {
     "Hover popouts": ""
+  },
+  "How far terminal colors shift toward the wallpaper color": {
+    "How far terminal colors shift toward the wallpaper color": ""
   },
   "Hue": {
     "Hue": ""
@@ -4469,6 +4502,9 @@
   "Lightest": {
     "Lightest": ""
   },
+  "Like your plugins": {
+    "Like your plugins": ""
+  },
   "Limit": {
     "Limit": ""
   },
@@ -4486,6 +4522,9 @@
   },
   "Lines: %1": {
     "Lines: %1": "Редове: %1"
+  },
+  "Link copied": {
+    "Link copied": ""
   },
   "Link your DMS settings so the login screen follows them.": {
     "Link your DMS settings so the login screen follows them.": ""
@@ -5078,6 +5117,9 @@
   "Near island": {
     "Near island": ""
   },
+  "Needs": {
+    "Needs": ""
+  },
   "Nested chip": {
     "Nested chip": ""
   },
@@ -5120,6 +5162,9 @@
   "New": {
     "New": "Ново"
   },
+  "New & updated": {
+    "New & updated": ""
+  },
   "New Session": {
     "New Session": "Нова сесия"
   },
@@ -5158,6 +5203,9 @@
   },
   "Next Transition": {
     "Next Transition": "Следващ преход"
+  },
+  "Next category": {
+    "Next category": ""
   },
   "Next page": {
     "Next page": "Следваща страница"
@@ -5582,6 +5630,9 @@
   "Not set": {
     "Not set": "Не е зададено"
   },
+  "Not shown on this bar, so its section widgets stay hidden": {
+    "Not shown on this bar, so its section widgets stay hidden": ""
+  },
   "Not synchronized": {
     "Not synchronized": ""
   },
@@ -5671,6 +5722,9 @@
   },
   "Office": {
     "Office": "Офис"
+  },
+  "Official only": {
+    "Official only": ""
   },
   "Offline Report": {
     "Offline Report": "Отчет в офлайн режим"
@@ -5764,6 +5818,12 @@
   },
   "Open with": {
     "Open with": ""
+  },
+  "Opening GitHub to remove the upvote": {
+    "Opening GitHub to remove the upvote": ""
+  },
+  "Opening GitHub to upvote": {
+    "Opening GitHub to upvote": ""
   },
   "Opening terminal: ": {
     "Opening terminal: ": "Отваряне на терминал: "
@@ -6071,6 +6131,12 @@
   "Pick how long to stay awake": {
     "Pick how long to stay awake": ""
   },
+  "Pick of the day": {
+    "Pick of the day": ""
+  },
+  "Pick of the week": {
+    "Pick of the week": ""
+  },
   "Pill": {
     "Pill": ""
   },
@@ -6176,6 +6242,9 @@
   "Plugins": {
     "Plugins": "Приставки"
   },
+  "Plugins by %1": {
+    "Plugins by %1": ""
+  },
   "Plugins shown in All mode without a trigger. Drag to reorder": {
     "Plugins shown in All mode without a trigger. Drag to reorder": ""
   },
@@ -6199,6 +6268,9 @@
   },
   "Popouts and modals use the main animation duration": {
     "Popouts and modals use the main animation duration": ""
+  },
+  "Popular": {
+    "Popular": ""
   },
   "Popular Plugins": {
     "Popular Plugins": "Популярни приставки"
@@ -6340,6 +6412,9 @@
   },
   "Previous": {
     "Previous": ""
+  },
+  "Previous category": {
+    "Previous category": ""
   },
   "Previous page": {
     "Previous page": "Предишна страница"
@@ -6536,11 +6611,32 @@
   "Read:": {
     "Read:": "Четене:"
   },
+  "Reads audio devices and volume": {
+    "Reads audio devices and volume": ""
+  },
+  "Reads its own settings": {
+    "Reads its own settings": ""
+  },
+  "Reads its saved state": {
+    "Reads its saved state": ""
+  },
+  "Reads the clipboard": {
+    "Reads the clipboard": ""
+  },
+  "Reads the list of running programs": {
+    "Reads the list of running programs": ""
+  },
+  "Reads your files": {
+    "Reads your files": ""
+  },
   "Ready": {
     "Ready": "Готово"
   },
   "Reason": {
     "Reason": "Причина"
+  },
+  "Reboot now?": {
+    "Reboot now?": ""
   },
   "Reboot recommended": {
     "Reboot recommended": ""
@@ -6659,6 +6755,9 @@
   "Remove condition": {
     "Remove condition": ""
   },
+  "Remove from recent colors": {
+    "Remove from recent colors": ""
+  },
   "Remove greeter access?": {
     "Remove greeter access?": "Да се премахне ли достъпа до входния екран?"
   },
@@ -6676,6 +6775,9 @@
   },
   "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": {
     "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": "Да се премахне ли прекия път %1? Запис за отвързване ще бъде запазен в dms/binds-user.lua, за да се запази при обновяване на DMS."
+  },
+  "Remove upvote": {
+    "Remove upvote": ""
   },
   "Removed administrator privileges": {
     "Removed administrator privileges": "Администраторските права бяха отнети"
@@ -6854,6 +6956,9 @@
   "Root Filesystem": {
     "Root Filesystem": "Коренна файлова система"
   },
+  "Rotating Cookie": {
+    "Rotating Cookie": ""
+  },
   "Rounded": {
     "Rounded": "Заоблени"
   },
@@ -6920,6 +7025,12 @@
   "Runs in a terminal.": {
     "Runs in a terminal.": ""
   },
+  "Runs programs on your computer": {
+    "Runs programs on your computer": ""
+  },
+  "Runs shell commands": {
+    "Runs shell commands": ""
+  },
   "S": {
     "S": ""
   },
@@ -6974,6 +7085,9 @@
   "Save password": {
     "Save password": "Запазване на паролата"
   },
+  "Save your work first. Open apps will close.": {
+    "Save your work first. Open apps will close.": ""
+  },
   "Saved": {
     "Saved": "Запазено"
   },
@@ -6988,6 +7102,12 @@
   },
   "Saved networks": {
     "Saved networks": ""
+  },
+  "Saves its own settings": {
+    "Saves its own settings": ""
+  },
+  "Saves its state": {
+    "Saves its state": ""
   },
   "Saving...": {
     "Saving...": "Запазване..."
@@ -7376,6 +7496,9 @@
   "Show discharge rate": {
     "Show discharge rate": ""
   },
+  "Show every author": {
+    "Show every author": ""
+  },
   "Show filename": {
     "Show filename": ""
   },
@@ -7615,6 +7738,9 @@
   },
   "Soft square": {
     "Soft square": ""
+  },
+  "Software dimming": {
+    "Software dimming": ""
   },
   "Software updates": {
     "Software updates": ""
@@ -7874,6 +8000,9 @@
   "Switch layout shortcut": {
     "Switch layout shortcut": ""
   },
+  "Switch to media when playback starts": {
+    "Switch to media when playback starts": ""
+  },
   "Switches to power saver at the low battery threshold": {
     "Switches to power saver at the low battery threshold": ""
   },
@@ -8072,6 +8201,9 @@
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
     "The Island holds this edge on a display this bar covers, so the bar stays hidden there": "Островът заема този ръб на дисплея, така че лентата остава скрита там"
   },
+  "The Island takes its place on this bar": {
+    "The Island takes its place on this bar": ""
+  },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "Wi-Fi адаптерът не успя да стартира режим на точка за достъп."
   },
@@ -8201,8 +8333,8 @@
   "Third-party plugins": {
     "Third-party plugins": ""
   },
-  "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": {
-    "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "Приставките от трети страни са създадени от общността и нямат официална поддръжка от DankMaterialShell.\n\nТе могат да крият рискове за сигурността – инсталирайте на своя отговорност."
+  "Third-party plugins are created by the community and are not officially supported by %1.\n\nThese plugins may pose security and privacy risks - install at your own risk.": {
+    "Third-party plugins are created by the community and are not officially supported by %1.\n\nThese plugins may pose security and privacy risks - install at your own risk.": ""
   },
   "This bar is the Island": {
     "This bar is the Island": ""
@@ -8230,6 +8362,9 @@
   },
   "This output is disabled in the current profile": {
     "This output is disabled in the current profile": "Този изход е изключен в текущия профил"
+  },
+  "This plugin can": {
+    "This plugin can": ""
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Тази приставка няма разрешение 'settings_write'.\n\nДобавете \"permissions\": [\"settings_read\", \"settings_write\"] в plugin.json"
@@ -8459,6 +8594,9 @@
   "Tray icon tint": {
     "Tray icon tint": ""
   },
+  "Trending": {
+    "Trending": ""
+  },
   "Trigger": {
     "Trigger": "Задействащ символ"
   },
@@ -8686,6 +8824,15 @@
   },
   "Uptime": {
     "Uptime": "Време на работа"
+  },
+  "Upvote on GitHub": {
+    "Upvote on GitHub": ""
+  },
+  "Upvote removed": {
+    "Upvote removed": ""
+  },
+  "Upvoted on GitHub": {
+    "Upvoted on GitHub": ""
   },
   "Urgent": {
     "Urgent": "Спешно"
@@ -8972,11 +9119,14 @@
   "Welcome": {
     "Welcome": "Добре дошли"
   },
-  "Welcome to DankMaterialShell": {
-    "Welcome to DankMaterialShell": "Добре дошли в DankMaterialShell"
+  "Welcome to %1": {
+    "Welcome to %1": ""
   },
   "What changed": {
     "What changed": ""
+  },
+  "What's New": {
+    "What's New": ""
   },
   "When locked": {
     "When locked": "При заключен екран"
@@ -9128,6 +9278,9 @@
   "Working...": {
     "Working...": "Обработка..."
   },
+  "Works here": {
+    "Works here": ""
+  },
   "Works in every submap": {
     "Works in every submap": ""
   },
@@ -9154,6 +9307,9 @@
   },
   "Write:": {
     "Write:": "Запис:"
+  },
+  "Writes to your files": {
+    "Writes to your files": ""
   },
   "X axis": {
     "X axis": ""
@@ -9262,6 +9418,9 @@
   },
   "checked just now": {
     "checked just now": "проверено току-що"
+  },
+  "copy link": {
+    "copy link": ""
   },
   "deprecated": {
     "deprecated": "остарял"
@@ -9436,6 +9595,9 @@
   },
   "remote": {
     "remote": "отдалечена"
+  },
+  "report a problem": {
+    "report a problem": ""
   },
   "reviewed": {
     "reviewed": "проверен"

@@ -6,12 +6,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/plugins"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/sysupdate"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/shellembed"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/site"
+	"github.com/duxlabs-dev/dux-shell/core/internal/log"
+	"github.com/duxlabs-dev/dux-shell/core/internal/plugins"
+	"github.com/duxlabs-dev/dux-shell/core/internal/server"
+	"github.com/duxlabs-dev/dux-shell/core/internal/server/sysupdate"
+	"github.com/duxlabs-dev/dux-shell/core/internal/shellembed"
+	"github.com/duxlabs-dev/dux-shell/core/internal/site"
 	"github.com/spf13/cobra"
 )
 
@@ -29,7 +29,7 @@ var ipcCmd = &cobra.Command{
   dms ipc call <target> <function> [args...]   invoke a command
   dms ipc list                                 list all targets and functions
 
-Full reference: ` + site.Docs + "/dankmaterialshell/keybinds-ipc",
+Full reference: ` + site.Docs + "/dms/keybinds-ipc",
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return getShellIPCCompletions(args, toComplete), cobra.ShellCompDirectiveNoFileComp
 	},
@@ -793,7 +793,9 @@ func getCommonCommands() []*cobra.Command {
 		blurCmd,
 		trashCmd,
 		systemCmd,
+		systemdCmd,
 		switchUserCmd,
+		switchCmd,
 		dmenuCmd,
 	}...)
 }

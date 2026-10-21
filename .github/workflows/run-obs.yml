@@ -23,7 +23,7 @@ jobs:
   check-updates:
     name: Check for updates
     runs-on: ubuntu-latest
-    if: github.repository == 'AvengeMedia/DankMaterialShell'
+    if: github.repository == 'duxlabs-dev/dux-shell'
 
     outputs:
       has_updates: ${{ steps.check.outputs.has_updates }}
@@ -61,7 +61,7 @@ jobs:
           # Helper function to check dms stable tag
           # Sets LATEST_TAG variable in parent scope if update needed
           check_dms_stable() {
-            LATEST_TAG=$(curl -s https://api.github.com/repos/AvengeMedia/DankMaterialShell/releases/latest | grep '"tag_name"' | sed 's/.*"tag_name": "\([^"]*\)".*/\1/' || echo "")
+            LATEST_TAG=$(curl -s https://api.github.com/repos/duxlabs-dev/dux-shell/releases/latest | grep '"tag_name"' | sed 's/.*"tag_name": "\([^"]*\)".*/\1/' || echo "")
             local OBS_SPEC=$(curl -s -u "$OBS_USERNAME:$OBS_PASSWORD" "https://api.opensuse.org/source/home:AvengeMedia:dms/dms/dms.spec" 2>/dev/null || echo "")
             local OBS_VERSION=$(echo "$OBS_SPEC" | grep "^Version:" | awk '{print $2}' | xargs || echo "")
 
@@ -192,7 +192,7 @@ jobs:
             # Determine version for dms stable using the API
             # GITHUB_REF is unreliable when "Use workflow from" a tag; API works from any ref
             if [[ "${{ github.event.inputs.package }}" == "dms" ]] || [[ "${{ github.event.inputs.package }}" == "all" ]]; then
-              LATEST_TAG=$(curl -s https://api.github.com/repos/AvengeMedia/DankMaterialShell/releases/latest | grep '"tag_name"' | sed 's/.*"tag_name": "\([^"]*\)".*/\1/' || echo "")
+              LATEST_TAG=$(curl -s https://api.github.com/repos/duxlabs-dev/dux-shell/releases/latest | grep '"tag_name"' | sed 's/.*"tag_name": "\([^"]*\)".*/\1/' || echo "")
               if [[ -n "$LATEST_TAG" ]]; then
                 echo "version=$LATEST_TAG" >> $GITHUB_OUTPUT
                 echo "Using latest release from API: $LATEST_TAG"
@@ -308,6 +308,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version-file: ./core/go.mod
+          cache-dependency-path: core/go.sum
 
       - name: Install OSC
         run: |

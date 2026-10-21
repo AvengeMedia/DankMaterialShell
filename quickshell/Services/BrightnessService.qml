@@ -30,7 +30,6 @@ Singleton {
 
         return getDeviceBrightness(deviceToUse);
     }
-    property int maxBrightness: 100
     property bool brightnessInitialized: false
     property bool suppressOsd: true
 
@@ -209,9 +208,8 @@ Singleton {
             if (deviceExists) {
                 setCurrentDevice(lastDevice, false);
             } else {
-                const backlight = internalPanelActive() ? devices.find(d => d.class === "backlight") : null;
                 const nonKbdDevice = devices.find(d => !d.id.includes("kbd"));
-                const defaultDevice = backlight || nonKbdDevice || devices[0];
+                const defaultDevice = internalPanelDevice() || nonKbdDevice || devices[0];
                 setCurrentDevice(defaultDevice.id, false);
             }
         }
@@ -239,7 +237,7 @@ Singleton {
         }
 
         const deviceInfo = getCurrentDeviceInfoByName(actualDevice);
-        const isExponential = SessionData.getBrightnessExponential(actualDevice);
+        const isExponential = deviceInfo?.class !== "software" && SessionData.getBrightnessExponential(actualDevice);
         const minValue = brightnessMinimum(deviceInfo);
         const maxValue = brightnessMaximum(deviceInfo);
 
@@ -333,17 +331,23 @@ Singleton {
     }
 
     function internalPanelActive() {
-        return Quickshell.screens.some(s => /^(eDP|LVDS|DSI)/i.test(s.name));
+        return Quickshell.screens.some(s => isInternalPanelName(s.name));
+    }
+
+    function isInternalPanelName(name) {
+        return /^(eDP|LVDS|DSI)/i.test(name);
+    }
+
+    function internalPanelDevice() {
+        if (!internalPanelActive())
+            return null;
+        return devices.find(d => d.class === "backlight") || devices.find(d => d.class === "software" && isInternalPanelName(d.id.split(":").pop())) || null;
     }
 
     function getDefaultDevice() {
-        if (internalPanelActive()) {
-            for (const device of devices) {
-                if (device.class === "backlight") {
-                    return device.id;
-                }
-            }
-        }
+        const internal = internalPanelDevice();
+        if (internal)
+            return internal.id;
         const nonKbdDevice = devices.find(d => d.class !== "backlight" && !d.id.includes("kbd"));
         if (nonKbdDevice)
             return nonKbdDevice.id;
@@ -416,7 +420,7 @@ Singleton {
     }
 
     function brightnessMinimum(deviceInfo) {
-        if (!deviceInfo || SessionData.getBrightnessExponential(deviceInfo.id))
+        if (!deviceInfo || (deviceInfo.class !== "software" && SessionData.getBrightnessExponential(deviceInfo.id)))
             return 1;
         switch (deviceInfo.class) {
         case "backlight":
@@ -452,6 +456,7 @@ Singleton {
         switch (deviceInfo.class) {
         case "backlight":
         case "ddc":
+        case "software":
             break;
         default:
             return String(deviceInfo.name ?? "").includes("kbd") ? "keyboard" : "lightbulb";

@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/configfrag"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/luaconfig"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/windowrules"
+	"github.com/duxlabs-dev/dux-shell/core/internal/configfrag"
+	"github.com/duxlabs-dev/dux-shell/core/internal/luaconfig"
+	"github.com/duxlabs-dev/dux-shell/core/internal/utils"
+	"github.com/duxlabs-dev/dux-shell/core/internal/windowrules"
 )
 
 type HyprlandWindowRule struct {
@@ -827,7 +827,7 @@ func (p *HyprlandWritableProvider) WriteDMSRules(rules []windowrules.WindowRule)
 	}
 
 	var lines []string
-	lines = append(lines, "-- DMS Window Rules — managed by DankMaterialShell")
+	lines = append(lines, "-- DMS Window Rules — managed by Dux Shell")
 	lines = append(lines, "-- Do not edit manually; changes may be overwritten")
 	lines = append(lines, "")
 

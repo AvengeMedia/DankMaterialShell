@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
+	"github.com/duxlabs-dev/dux-shell/core/internal/distros"
 )
 
 var installCommands = map[distros.DistroFamily]string{

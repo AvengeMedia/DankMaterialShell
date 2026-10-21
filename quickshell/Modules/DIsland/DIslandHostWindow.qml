@@ -151,8 +151,6 @@ Item {
                 root.islandController?.requestCollapse();
                 mouse.accepted = true;
             }
-
-            onWheel: wheel => root.body?.scrollWheel(wheel)
         }
     }
 }

@@ -88,11 +88,11 @@ QtObject {
     readonly property real controlCenterMaxWidth: CcMetrics.sheetWidthFor(editingActivity === "controlcenter" ? controlCenterColumnCap : controlCenterColumns) + controlCenterSheetInset
     readonly property real controlCenterHeight: controlCenterHeightFor(editRoomGranted && editingActivity === "controlcenter")
 
-    readonly property bool compactDense: compactThickness < 40
-    readonly property real compactFaceThickness: BarMetrics.compactFaceThickness(compactThickness)
-    readonly property real compactIconSize: Math.max(14, Math.min(32, compactThickness - 8))
     property bool homeCompactTight: false
-    readonly property real homeCompactFaceThickness: homeCompactTight ? Math.max(16, Math.min(32, compactThickness - 8)) : compactFaceThickness
+    readonly property bool compactTight: homeCompactTight && !dotMode
+    readonly property bool compactDense: compactTight || compactThickness < 40
+    readonly property real compactFaceThickness: compactTight ? Math.max(16, Math.min(32, compactThickness - 8)) : BarMetrics.compactFaceThickness(compactThickness)
+    readonly property real compactIconSize: Math.max(14, Math.min(32, (compactTight ? compactFaceThickness : compactThickness) - 8))
 
     property int unreadNotificationCount: 0
     readonly property bool homeNotificationBadge: (root.dotMode || SettingsData.islandHomeGroupEnabled(root.barConfig, "notifications")) && unreadNotificationCount > 0
@@ -478,7 +478,7 @@ QtObject {
     function usesDotFace(activityId) {
         return root.dotMode && root.dotTransientActivities.indexOf(activityId) === -1;
     }
-    readonly property var homeCompactTarget: pillTarget(homeCompactLength, homeCompactFaceThickness)
+    readonly property var homeCompactTarget: pillTarget(homeCompactLength, compactFaceThickness)
     readonly property var mediaCompactTarget: pillTarget(mediaCompactLength, compactFaceThickness)
     readonly property var homeExpandedTarget: dashboardTargetFor("home")
     readonly property var mediaExpandedTarget: dashboardTargetFor("media")

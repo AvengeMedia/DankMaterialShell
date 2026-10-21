@@ -14,9 +14,9 @@ import (
 	"syscall"
 	"time"
 
-	serverDgop "github.com/AvengeMedia/DankMaterialShell/core/internal/server/dgop"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/drives"
-	"github.com/AvengeMedia/dankgo/ipc/params"
+	"github.com/duxlabs-dev/dux-go/ipc/params"
+	serverDgop "github.com/duxlabs-dev/dux-shell/core/internal/server/dgop"
+	"github.com/duxlabs-dev/dux-shell/core/internal/server/drives"
 	"github.com/spf13/cobra"
 )
 

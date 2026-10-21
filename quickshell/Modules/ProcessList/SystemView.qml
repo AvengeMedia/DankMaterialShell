@@ -176,7 +176,7 @@ Item {
 
     readonly property var sections: [
         {
-            "title": "DankMaterialShell",
+            "title": "Dux Shell",
             "icon": "deployed_code",
             "rows": dmsRows
         },

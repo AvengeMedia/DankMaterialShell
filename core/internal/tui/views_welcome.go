@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/site"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/duxlabs-dev/dux-shell/core/internal/distros"
+	"github.com/duxlabs-dev/dux-shell/core/internal/site"
 )
 
 func (m Model) viewWelcome() string {
@@ -18,9 +18,9 @@ func (m Model) viewWelcome() string {
 	b.WriteString(m.styles.Accent.Render(strings.Repeat("━", 58)))
 	b.WriteByte('\n')
 	b.WriteString(m.styles.TitleBox.Render(
-		m.styles.Highlight.Render("dankinstall") + m.styles.AccentItalic.Render(" // Dank Linux Installer")))
+		m.styles.Highlight.Render("dankinstall") + m.styles.AccentItalic.Render(" // Dux Labs Installer")))
 	b.WriteByte('\n')
-	b.WriteString(m.styles.SubtleItalic.Render("Quickstart for a Dank Desktop"))
+	b.WriteString(m.styles.SubtleItalic.Render("Quickstart for a Dux Desktop"))
 	b.WriteString("\n\n")
 
 	switch {
@@ -53,9 +53,11 @@ func unsupportedDistroMessage(info *distros.OSInfo) string {
 	case "debian":
 		return fmt.Sprintf("Debian %s is not supported.\n\nOnly Debian 13+ (Trixie) is supported.\n\nPlease upgrade to Debian 13 or later.", info.VersionID)
 	case "nixos":
-		return "See the NixOS documentation for installation instructions: " + site.Docs + "/dankmaterialshell/nixos."
+		return "See the NixOS documentation for installation instructions: " + site.Docs + "/dms/nixos."
+	case "rhel", "centos", "rocky", "almalinux":
+		return fmt.Sprintf("%s is not supported.\n\nOnly Enterprise Linux 10+ (RHEL, CentOS Stream, Rocky, AlmaLinux) is supported.", info.PrettyName)
 	default:
-		return fmt.Sprintf("%s is not supported.\nFeel free to request on https://github.com/AvengeMedia/DankMaterialShell", info.PrettyName)
+		return fmt.Sprintf("%s is not supported.\nFeel free to request on https://github.com/duxlabs-dev/dux-shell", info.PrettyName)
 	}
 }
 
@@ -75,7 +77,7 @@ func (m Model) writeSystemSummary(b *strings.Builder) {
 		tag  string
 		desc string
 	}{
-		{"[shell]", "dms (DankMaterialShell)"},
+		{"[shell]", "dms (Dux Shell)"},
 		{"[wm]", "niri or Hyprland"},
 		{"[term]", "Ghostty, kitty, or Alacritty"},
 		{"[style]", "All the themes, automatically."},
@@ -96,6 +98,10 @@ func (m Model) writeSystemSummary(b *strings.Builder) {
 	b.WriteByte('\n')
 	if m.isGentoo() {
 		b.WriteString(m.styles.SubtleItalic.Render("* Will set per-package USE flags and unmask testing packages as needed"))
+		b.WriteByte('\n')
+	}
+	if m.isEL() {
+		b.WriteString(m.styles.Warning.Render("* Enterprise Linux support is in testing: niri only, EPEL 10 will be enabled"))
 		b.WriteByte('\n')
 	}
 	b.WriteByte('\n')

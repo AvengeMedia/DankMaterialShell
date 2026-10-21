@@ -14,9 +14,9 @@ import (
 	"testing"
 	"time"
 
-	mocks_utils "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/utils"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
-	matcolor "github.com/AvengeMedia/dankgo/material/color"
+	matcolor "github.com/duxlabs-dev/dux-go/material/color"
+	mocks_utils "github.com/duxlabs-dev/dux-shell/core/internal/mocks/utils"
+	"github.com/duxlabs-dev/dux-shell/core/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
 

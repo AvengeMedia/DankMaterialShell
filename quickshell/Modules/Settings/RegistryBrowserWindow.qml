@@ -14,6 +14,7 @@ DFloatingWindow {
     property int selectedIndex: -1
     property bool keyboardNavigationActive: false
     property bool isLoading: false
+    property bool showLoadingSpinner: true
     property bool pendingInstallHandled: false
     property string headerTitle: title
     property string searchPlaceholder: ""
@@ -193,8 +194,6 @@ DFloatingWindow {
             Item {
                 id: browserBody
                 anchors.fill: parent
-                opacity: 1 - overlaySlot.opacity
-                visible: opacity > 0
 
                 Column {
                     id: aboveSearchSlot
@@ -243,29 +242,49 @@ DFloatingWindow {
 
                     Item {
                         anchors.fill: parent
-                        visible: root.isLoading
+                        visible: root.isLoading && root.showLoadingSpinner
 
                         DSpinner {
                             anchors.centerIn: parent
-                            running: root.isLoading
+                            running: root.isLoading && root.showLoadingSpinner
                         }
                     }
                 }
+            }
+        }
+
+        Item {
+            id: overlayLayer
+            LayoutMirroring.enabled: I18n.isRtl
+            LayoutMirroring.childrenInherit: true
+            anchors.fill: parent
+            opacity: root.overlayActive ? 1 : 0
+            visible: opacity > 0
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: Theme.expressiveDurations.expressiveEffects
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
+                }
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.scrimColor
+                opacity: Theme.scrimAlpha
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: root.handleEscape()
+                onWheel: wheel => wheel.accepted = true
             }
 
             Item {
                 id: overlaySlot
                 anchors.fill: parent
-                opacity: root.overlayActive ? 1 : 0
-                visible: opacity > 0
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.expressiveDurations.expressiveEffects
-                        easing.type: Easing.BezierSpline
-                        easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
-                    }
-                }
             }
         }
     }

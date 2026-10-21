@@ -8,11 +8,12 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
-	"github.com/AvengeMedia/dankgo/ipc"
+	"github.com/duxlabs-dev/dux-go/ipc"
+	"github.com/duxlabs-dev/dux-shell/core/internal/server"
+	"github.com/duxlabs-dev/dux-shell/core/internal/utils"
 )
 
 // maxIPCMessageSize allows room for a 50 MB clipboard entry plus JSON/base64
@@ -121,16 +122,18 @@ func getServerSocketPath() string {
 
 	entries, err := os.ReadDir(runtimeDir)
 	if err != nil {
-		return filepath.Join(runtimeDir, "danklinux.sock")
+		return server.GetSocketPath()
 	}
 
-	for _, entry := range entries {
-		name := entry.Name()
-		if name == "danklinux.sock" {
-			return filepath.Join(runtimeDir, name)
-		}
-		if len(name) > 10 && name[:10] == "danklinux-" && filepath.Ext(name) == ".sock" {
-			return filepath.Join(runtimeDir, name)
+	for _, id := range []string{"dms", "danklinux"} {
+		for _, entry := range entries {
+			name := entry.Name()
+			if filepath.Ext(name) != ".sock" {
+				continue
+			}
+			if name == id+".sock" || strings.HasPrefix(name, id+"-") {
+				return filepath.Join(runtimeDir, name)
+			}
 		}
 	}
 

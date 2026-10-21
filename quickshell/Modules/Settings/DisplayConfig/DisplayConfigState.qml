@@ -793,9 +793,40 @@ Singleton {
         return OutputModel.configEntryMatchesLiveLayout(configEntry, outputs, SettingsData.displayNameMode, CompositorService.compositor);
     }
 
-    function applyAutoConfig() {
-        if (!profilesReady || !SettingsData.displayProfileAutoSelect || manualActivation || !currentOutputSet.length)
+    function profileEnabledOutputsConnected(profile) {
+        const connected = new Set(currentOutputSet);
+        const cfg = profile.outputs || {};
+        return Object.keys(cfg).every(id => cfg[id].disabled || connected.has(id));
+    }
+
+    function profileCoversConnectedOutputs(profile) {
+        const cfg = profile.outputs || {};
+        // Hyprland adds a make/model-less FALLBACK head once the last enabled output is gone
+        return currentOutputSet.filter(id => profileOutputIsReal(id)).every(id => id in cfg);
+    }
+
+    function fallbackFromDisconnectedProfile() {
+        const activeId = SessionData.getActiveDisplayProfile(CompositorService.compositor);
+        const active = validatedProfiles[activeId];
+        if (!active?.name || profileEnabledOutputsConnected(active))
             return;
+        const fallbackId = Object.keys(validatedProfiles).find(id => {
+            const p = validatedProfiles[id];
+            return p.name && profileEnabledOutputsConnected(p) && profileCoversConnectedOutputs(p);
+        });
+        if (!fallbackId)
+            return;
+        log.info("Profile", activeId, "lost an output, falling back to", fallbackId);
+        activateProfile(fallbackId);
+    }
+
+    function applyAutoConfig() {
+        if (!profilesReady || manualActivation || !currentOutputSet.length)
+            return;
+        if (!SettingsData.displayProfileAutoSelect) {
+            fallbackFromDisconnectedProfile();
+            return;
+        }
 
         readMonitorsJson(data => {
             const match = findConfigEntryByFingerprint(data, currentOutputSet, false);

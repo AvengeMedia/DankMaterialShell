@@ -87,7 +87,7 @@ Item {
 
             SettingsRow {
                 body: StyledText {
-                    text: I18n.tr('Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.', 'app theming help text, %1 is a link to adw-gtk3').arg(`<a href="https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming" style="text-decoration:none; color:${Theme.primary};">adw-gtk3</a>`)
+                    text: I18n.tr('Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.', 'app theming help text, %1 is a link to adw-gtk3').arg(`<a href="https://duxlabs.dev/docs/dms/application-themes#gtk-applications" style="text-decoration:none; color:${Theme.primary};">adw-gtk3</a>`)
                     textFormat: Text.RichText
                     linkColor: Theme.primary
                     onLinkActivated: url => Qt.openUrlExternally(url)
@@ -413,7 +413,7 @@ Item {
                 tags: ["matugen", "neovim", "terminal", "template"]
                 settingKey: "matugenTemplateNeovim"
                 text: "neovim"
-                description: root.getTemplateDescription("nvim", I18n.tr("Required plugin: ") + "https://github.com/AvengeMedia/base46")
+                description: root.getTemplateDescription("nvim", I18n.tr("Required plugin: ") + "https://github.com/duxlabs-dev/base46")
                 descriptionColor: root.getTemplateDescriptionColor("nvim")
                 checked: SettingsData.matugenTemplateNeovim
                 onToggled: checked => SettingsData.set("matugenTemplateNeovim", checked)

@@ -571,7 +571,7 @@ Singleton {
                     "id": "updater_changelog",
                     "hidden": true,
                     "text": I18n.tr("Release notes", "settings page and card title, notes for a DMS release"),
-                    "icon": "auto_awesome",
+                    "icon": "article",
                     "tabIndex": 66,
                     "hint": I18n.tr("Summary, highlights, links", "settings sidebar hint for the release notes page")
                 },

@@ -1,12 +1,12 @@
 package tui
 
 import (
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/duxlabs-dev/dux-shell/core/internal/deps"
+	"github.com/duxlabs-dev/dux-shell/core/internal/distros"
+	"github.com/duxlabs-dev/dux-shell/core/internal/privesc"
 )
 
 type Model struct {
@@ -38,6 +38,8 @@ type Model struct {
 	selectedConfig     int
 	selectedAuthMethod int
 	reinstallItems     map[string]bool
+	detectedVariants   map[string]deps.PackageVariant
+	variantMarks       map[string]bool
 	disabledItems      map[string]bool
 	replaceConfigs     map[string]bool
 	skipGentooUseFlags bool
@@ -77,9 +79,11 @@ func NewModel(version string, logFilePath string) Model {
 		packageProgress: packageInstallProgressMsg{
 			step: "Initializing package installation",
 		},
-		reinstallItems: make(map[string]bool),
-		disabledItems:  make(map[string]bool),
-		replaceConfigs: make(map[string]bool),
+		reinstallItems:   make(map[string]bool),
+		detectedVariants: make(map[string]deps.PackageVariant),
+		variantMarks:     make(map[string]bool),
+		disabledItems:    make(map[string]bool),
+		replaceConfigs:   make(map[string]bool),
 	}
 }
 

@@ -6,19 +6,20 @@ import (
 	"os"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/gpu"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/shellembed"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
-	"github.com/AvengeMedia/dankgo/shellapp"
+	"github.com/duxlabs-dev/dux-go/shellapp"
+	"github.com/duxlabs-dev/dux-shell/core/internal/config"
+	"github.com/duxlabs-dev/dux-shell/core/internal/gpu"
+	"github.com/duxlabs-dev/dux-shell/core/internal/log"
+	"github.com/duxlabs-dev/dux-shell/core/internal/server"
+	"github.com/duxlabs-dev/dux-shell/core/internal/shellembed"
+	"github.com/duxlabs-dev/dux-shell/core/internal/utils"
 )
 
 var shellApp = shellapp.New(shellapp.Config{
-	ID:                     "danklinux",
+	ID:                     "dms",
+	LegacyIDs:              []string{"danklinux"},
 	EnvPrefix:              "DMS",
-	QSAppID:                "com.danklinux.dms",
+	QSAppID:                "dev.duxlabs.shell",
 	Version:                Version,
 	Embedded:               embeddedShell{},
 	Boot:                   bootBackend,

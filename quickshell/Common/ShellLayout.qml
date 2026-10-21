@@ -179,8 +179,8 @@ Singleton {
         };
     }
 
-    function adjacentInfo(screen, config) {
-        return Resolver.adjacentInfo(forScreen(screen), config, primaryBar);
+    function adjacentInfo(screen, config, includeAutoHide) {
+        return Resolver.adjacentInfo(forScreen(screen), config, primaryBar, includeAutoHide);
     }
 
     function barBounds(screen, thickness, position, config) {

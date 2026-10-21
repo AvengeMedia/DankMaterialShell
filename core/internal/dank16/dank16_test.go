@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/AvengeMedia/dankgo/material/color"
-	"github.com/AvengeMedia/dankgo/material/num"
+	"github.com/duxlabs-dev/dux-go/material/color"
+	"github.com/duxlabs-dev/dux-go/material/num"
 )
 
 func TestHexToRGB(t *testing.T) {

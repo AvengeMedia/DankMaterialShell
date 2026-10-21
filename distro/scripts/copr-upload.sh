@@ -25,7 +25,7 @@ fi
 # Get version from latest release if not provided
 if [ -z "$VERSION" ]; then
     echo "📦 Determining latest version..."
-    VERSION=$(curl -s https://api.github.com/repos/AvengeMedia/DankMaterialShell/releases/latest | jq -r '.tag_name' | sed 's/^v//')
+    VERSION=$(curl -s https://api.github.com/repos/duxlabs-dev/dux-shell/releases/latest | jq -r '.tag_name' | sed 's/^v//')
     if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
         echo "❌ Failed to determine version. Please specify manually."
         exit 1
@@ -42,7 +42,7 @@ cd ~/rpmbuild/SOURCES
 # Download source tarball from GitHub releases
 echo "📦 Downloading source tarball for v${VERSION}..."
 if [ ! -f ~/rpmbuild/SOURCES/dms-qml.tar.gz ]; then
-    wget -O ~/rpmbuild/SOURCES/dms-qml.tar.gz "https://github.com/AvengeMedia/DankMaterialShell/releases/download/v${VERSION}/dms-qml.tar.gz" || {
+    wget -O ~/rpmbuild/SOURCES/dms-qml.tar.gz "https://github.com/duxlabs-dev/dux-shell/releases/download/v${VERSION}/dms-qml.tar.gz" || {
         echo "❌ Failed to download dms-qml.tar.gz for v${VERSION}"
         exit 1
     }

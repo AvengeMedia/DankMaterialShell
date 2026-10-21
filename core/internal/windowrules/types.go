@@ -1,6 +1,6 @@
 package windowrules
 
-import "github.com/AvengeMedia/DankMaterialShell/core/internal/configfrag"
+import "github.com/duxlabs-dev/dux-shell/core/internal/configfrag"
 
 type MatchCriteria struct {
 	AppID              string `json:"appId,omitempty"`

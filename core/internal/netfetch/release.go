@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const latestReleaseURL = "https://api.github.com/repos/AvengeMedia/DankMaterialShell/releases/latest"
+const latestReleaseURL = "https://api.github.com/repos/duxlabs-dev/dux-shell/releases/latest"
 
 func LatestReleaseTag(ctx context.Context) (string, error) {
 	body, err := Bytes(ctx, latestReleaseURL, Options{Timeout: 10 * time.Second})

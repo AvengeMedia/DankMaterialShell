@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/AvengeMedia/dankgo/dbusutil"
+	"github.com/duxlabs-dev/dux-go/dbusutil"
 	"github.com/godbus/dbus/v5"
 )
 
@@ -380,7 +380,7 @@ func (m *Manager) acquireSleepInhibitor() error {
 		return fmt.Errorf("manager object not available")
 	}
 
-	file, err := m.inhibit("sleep", "DankMaterialShell", "Lock before suspend", "delay")
+	file, err := m.inhibit("sleep", "Dux Shell", "Lock before suspend", "delay")
 	if err != nil {
 		return err
 	}

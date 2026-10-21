@@ -23,7 +23,7 @@ jobs:
   check-updates:
     name: Check package/series updates
     runs-on: ubuntu-latest
-    if: github.repository == 'AvengeMedia/DankMaterialShell'
+    if: github.repository == 'duxlabs-dev/dux-shell'
 
     outputs:
       has_updates: ${{ steps.check.outputs.has_updates }}
@@ -100,6 +100,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version-file: ./core/go.mod
+          cache-dependency-path: core/go.sum
           cache: false
 
       - name: Install build dependencies

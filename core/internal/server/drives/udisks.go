@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/AvengeMedia/dankgo/dbusutil"
+	"github.com/duxlabs-dev/dux-go/dbusutil"
 	"github.com/godbus/dbus/v5"
 )
 

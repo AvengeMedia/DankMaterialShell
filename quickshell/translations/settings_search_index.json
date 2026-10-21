@@ -6133,6 +6133,29 @@
     ]
   },
   {
+    "section": "launcherEnterAction",
+    "label": "Default action",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "action",
+      "app drawer",
+      "app menu",
+      "applications",
+      "default",
+      "drawer",
+      "focus",
+      "instance",
+      "launch",
+      "launcher",
+      "menu",
+      "running",
+      "start",
+      "start menu",
+      "window"
+    ]
+  },
+  {
     "section": "launcherStyle",
     "label": "Default action",
     "tabIndex": 9,
@@ -6271,6 +6294,34 @@
       "start menu",
       "tab"
     ]
+  },
+  {
+    "section": "launcherKeybinds",
+    "label": "Keyboard shortcuts",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "bindings",
+      "category",
+      "drawer",
+      "hotkeys",
+      "keybind",
+      "keybinds",
+      "keyboard",
+      "keys",
+      "launcher",
+      "menu",
+      "mode",
+      "shortcut",
+      "shortcuts",
+      "start",
+      "start menu",
+      "tab"
+    ],
+    "icon": "keyboard"
   },
   {
     "section": "launchPrefix",
@@ -8767,13 +8818,13 @@
   },
   {
     "section": "softwareUpdatesShell",
-    "label": "DankMaterialShell",
+    "label": "Dux Shell",
     "tabIndex": 20,
     "category": "Software updates",
     "keywords": [
       "channel",
-      "dankmaterialshell",
       "dms",
+      "dux",
       "integrations",
       "restart",
       "shell",
@@ -16279,23 +16330,6 @@
       "m3",
       "material",
       "opacity",
-      "shadow",
-      "shadows",
-      "style"
-    ],
-    "parentLabel": "Interface style"
-  },
-  {
-    "section": "m3ElevationToggle",
-    "label": "Shadows",
-    "tabIndex": 53,
-    "category": "Shadows",
-    "keywords": [
-      "elevation",
-      "interface",
-      "lift",
-      "m3",
-      "material",
       "shadow",
       "shadows",
       "style"

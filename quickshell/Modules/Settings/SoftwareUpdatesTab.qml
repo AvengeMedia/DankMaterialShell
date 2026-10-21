@@ -7,6 +7,7 @@ import qs.DCommon.Widgets
 import qs.Modals.Common
 import qs.Modules.Settings.Widgets
 import qs.Modules.SystemUpdate
+import qs.Widgets
 import "../../Common/Format.js" as Format
 
 Item {
@@ -279,7 +280,7 @@ Item {
     SettingsPage {
         id: mainColumn
 
-        SettingsHeroCard {
+        ReleaseHero {
             M3WaveProgress {
                 width: parent.width
                 height: Theme.spacingM
@@ -293,7 +294,7 @@ Item {
 
         SettingsCard {
             width: parent.width
-            title: "DankMaterialShell"
+            title: "Dux Shell"
             iconName: "deployed_code"
             settingKey: "softwareUpdatesShell"
             tags: ["dms", "shell", "version", "channel", "restart"]
@@ -379,14 +380,14 @@ Item {
                     iconColor: Theme.primary
                     backgroundColor: SettingsMetrics.controlSurface
                     tooltipText: I18n.tr("View on GitHub", "link to the release on GitHub")
-                    onClicked: Qt.openUrlExternally("https://github.com/AvengeMedia/DankMaterialShell/commits/master")
+                    onClicked: Qt.openUrlExternally("https://github.com/duxlabs-dev/dux-shell/commits/master")
                 }
             }
 
             SettingsNavRow {
                 visible: root.notesRelease !== null
                 title: I18n.tr("Release notes", "settings page and card title, notes for a DMS release")
-                iconName: "auto_awesome"
+                iconName: "article"
                 hint: root.notesRelease?.codename ? "v" + root.notesRelease.version + " · " + root.notesRelease.codename : "v" + (root.notesRelease?.version ?? "")
                 onClicked: keyboard => root.parentModal?.navigateTo("updater_changelog", keyboard)
             }

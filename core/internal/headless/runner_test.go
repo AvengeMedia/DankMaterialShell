@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
+	"github.com/duxlabs-dev/dux-shell/core/internal/deps"
 )
 
 func TestParseWindowManager(t *testing.T) {
@@ -200,7 +200,7 @@ func TestBuildDisabledItems(t *testing.T) {
 	dependencies := []deps.Dependency{
 		{Name: "niri", Status: deps.StatusInstalled, Required: true},
 		{Name: "ghostty", Status: deps.StatusMissing, Required: true},
-		{Name: "dms (DankMaterialShell)", Status: deps.StatusInstalled, Required: true},
+		{Name: "dms (Dux Shell)", Status: deps.StatusInstalled, Required: true},
 		{Name: "dms-greeter", Status: deps.StatusMissing},
 		{Name: "danksearch", Status: deps.StatusMissing},
 		{Name: "dankcalendar", Status: deps.StatusMissing},
@@ -251,7 +251,7 @@ func TestBuildDisabledItems(t *testing.T) {
 		},
 		{
 			name:        "exclude DMS itself is forbidden",
-			excludeDeps: []string{"dms (DankMaterialShell)"},
+			excludeDeps: []string{"dms (Dux Shell)"},
 			wantErr:     true,
 			errContains: "cannot exclude required package",
 		},
@@ -383,7 +383,7 @@ func TestApplyGitVariants(t *testing.T) {
 			{Name: "niri", Status: deps.StatusInstalled, Variant: deps.VariantStable, CanToggle: true},
 			{Name: "quickshell", Status: deps.StatusMissing, Variant: deps.VariantStable, CanToggle: true},
 			{Name: "hyprland", Status: deps.StatusInstalled, Variant: deps.VariantGit, CanToggle: true},
-			{Name: "dms (DankMaterialShell)", Status: deps.StatusMissing, Variant: deps.VariantStable, CanToggle: true},
+			{Name: "dms (Dux Shell)", Status: deps.StatusMissing, Variant: deps.VariantStable, CanToggle: true},
 			{Name: "ghostty", Status: deps.StatusInstalled, Variant: deps.VariantStable, CanToggle: false},
 		}
 	}
@@ -402,19 +402,19 @@ func TestApplyGitVariants(t *testing.T) {
 		{
 			name:       "no git flags leaves variants untouched",
 			wantGit:    []string{"hyprland"},
-			wantStable: []string{"niri", "quickshell", "dms (DankMaterialShell)", "ghostty"},
+			wantStable: []string{"niri", "quickshell", "dms (Dux Shell)", "ghostty"},
 		},
 		{
 			name:          "git-deps flips only the named deps",
 			gitDeps:       []string{"niri", "quickshell"},
 			wantGit:       []string{"niri", "quickshell", "hyprland"},
-			wantStable:    []string{"dms (DankMaterialShell)", "ghostty"},
+			wantStable:    []string{"dms (Dux Shell)", "ghostty"},
 			wantReinstall: []string{"niri"},
 		},
 		{
 			name:          "git-deps matches names case-insensitively and accepts the dms alias",
 			gitDeps:       []string{"NIRI", "dms"},
-			wantGit:       []string{"niri", "dms (DankMaterialShell)", "hyprland"},
+			wantGit:       []string{"niri", "dms (Dux Shell)", "hyprland"},
 			wantStable:    []string{"quickshell", "ghostty"},
 			wantReinstall: []string{"niri"},
 		},
@@ -422,7 +422,7 @@ func TestApplyGitVariants(t *testing.T) {
 			name:       "empty and whitespace entries are skipped",
 			gitDeps:    []string{"", "  "},
 			wantGit:    []string{"hyprland"},
-			wantStable: []string{"niri", "quickshell", "dms (DankMaterialShell)", "ghostty"},
+			wantStable: []string{"niri", "quickshell", "dms (Dux Shell)", "ghostty"},
 		},
 		{
 			name:        "unknown dep errors",
@@ -439,7 +439,7 @@ func TestApplyGitVariants(t *testing.T) {
 		{
 			name:          "git flips every toggleable dep",
 			gitAll:        true,
-			wantGit:       []string{"niri", "quickshell", "hyprland", "dms (DankMaterialShell)"},
+			wantGit:       []string{"niri", "quickshell", "hyprland", "dms (Dux Shell)"},
 			wantStable:    []string{"ghostty"},
 			wantReinstall: []string{"niri"},
 		},
@@ -454,7 +454,7 @@ func TestApplyGitVariants(t *testing.T) {
 			name:          "git skips deps without a distinct git package",
 			gitAll:        true,
 			noGitVariant:  []string{"niri"},
-			wantGit:       []string{"quickshell", "hyprland", "dms (DankMaterialShell)"},
+			wantGit:       []string{"quickshell", "hyprland", "dms (Dux Shell)"},
 			wantStable:    []string{"niri", "ghostty"},
 			wantReinstall: nil,
 		},

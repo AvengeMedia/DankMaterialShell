@@ -343,6 +343,13 @@
     "comment": "duration in milliseconds, %1 is a number"
   },
   {
+    "term": "%1 not found",
+    "translation": "",
+    "context": "%1 not found",
+    "reference": "",
+    "comment": "plugin dependency missing, %1 is a program name"
+  },
+  {
     "term": "%1 notifications",
     "translation": "",
     "context": "%1 notifications",
@@ -355,6 +362,13 @@
     "context": "%1 online",
     "reference": "",
     "comment": "Number of online Tailscale peers"
+  },
+  {
+    "term": "%1 only",
+    "translation": "",
+    "context": "%1 only",
+    "reference": "",
+    "comment": "lowercase plugin badge, compositors the plugin is limited to"
   },
   {
     "term": "%1 other",
@@ -418,6 +432,13 @@
     "context": "%1 tasks",
     "reference": "",
     "comment": "task count next to a date, %1 is the number of tasks"
+  },
+  {
+    "term": "%1 uninstalled",
+    "translation": "",
+    "context": "%1 uninstalled",
+    "reference": "",
+    "comment": "plugin removed notice, %1 is the plugin name"
   },
   {
     "term": "%1 update",
@@ -609,9 +630,9 @@
     "comment": "bar settings: what the dot is"
   },
   {
-    "term": "A modern desktop shell for Wayland compositors",
+    "term": "A modern desktop shell for Wayland",
     "translation": "",
-    "context": "A modern desktop shell for Wayland compositors",
+    "context": "A modern desktop shell for Wayland",
     "reference": "",
     "comment": "greeter welcome page tagline"
   },
@@ -1183,6 +1204,13 @@
     "comment": ""
   },
   {
+    "term": "All plugins",
+    "translation": "",
+    "context": "All plugins",
+    "reference": "",
+    "comment": "plugin browser section title above the full list"
+  },
+  {
     "term": "All settings",
     "translation": "",
     "context": "All settings",
@@ -1251,6 +1279,13 @@
     "context": "Already on that session",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Already upvoted, click again to remove",
+    "translation": "",
+    "context": "Already upvoted, click again to remove",
+    "reference": "",
+    "comment": "plugin upvote toast"
   },
   {
     "term": "Also runs the templates in your matugen config.toml",
@@ -3196,7 +3231,7 @@
     "translation": "",
     "context": "Center section",
     "reference": "",
-    "comment": ""
+    "comment": "widgets settings: bar section replaced by the island"
   },
   {
     "term": "Center single column",
@@ -3232,6 +3267,13 @@
     "context": "Changes save to %1",
     "reference": "",
     "comment": "hint under the keybind and window rule editors, %1 is the config file the changes are written to"
+  },
+  {
+    "term": "Changes volume and audio devices",
+    "translation": "",
+    "context": "Changes volume and audio devices",
+    "reference": "",
+    "comment": "plugin permission"
   },
   {
     "term": "Channel",
@@ -3983,25 +4025,11 @@
     "comment": "adjective, dock style option, also notification compact mode toggle"
   },
   {
-    "term": "Compact height",
-    "translation": "",
-    "context": "Compact height",
-    "reference": "",
-    "comment": "island settings: compact pill height slider"
-  },
-  {
     "term": "Compact mode",
     "translation": "",
     "context": "Compact mode",
     "reference": "",
     "comment": ""
-  },
-  {
-    "term": "Compact width",
-    "translation": "",
-    "context": "Compact width",
-    "reference": "",
-    "comment": "island settings: compact pill width slider"
   },
   {
     "term": "Completed",
@@ -4249,6 +4277,13 @@
     "comment": ""
   },
   {
+    "term": "Connects to the internet",
+    "translation": "",
+    "context": "Connects to the internet",
+    "reference": "",
+    "comment": "plugin permission"
+  },
+  {
     "term": "Consumes the key only when a dispatcher runs",
     "translation": "",
     "context": "Consumes the key only when a dispatcher runs",
@@ -4303,6 +4338,13 @@
     "context": "Controls",
     "reference": "",
     "comment": "media widget style with play, previous and next buttons"
+  },
+  {
+    "term": "Controls media players",
+    "translation": "",
+    "context": "Controls media players",
+    "reference": "",
+    "comment": "plugin permission"
   },
   {
     "term": "Convert to DMS",
@@ -4865,11 +4907,11 @@
     "comment": ""
   },
   {
-    "term": "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.",
+    "term": "DMS is a modern, highly customizable desktop shell that looks great out of the box, without sacrificing the freedom to make it your own.<br/><br/>Built with %1 and %2, it brings together panels, widgets, system controls, and more into a cohesive desktop experience.",
     "translation": "",
-    "context": "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.",
+    "context": "DMS is a modern, highly customizable desktop shell that looks great out of the box, without sacrificing the freedom to make it your own.<br/><br/>Built with %1 and %2, it brings together panels, widgets, system controls, and more into a cohesive desktop experience.",
     "reference": "",
-    "comment": "about page blurb, %1 is a Material 3 link, %2 is a Quickshell link, %3 is a Go link"
+    "comment": "about page blurb, %1 is a Quickshell link, %2 is a Go link"
   },
   {
     "term": "DMS out of date",
@@ -4967,28 +5009,7 @@
     "translation": "",
     "context": "DankBar",
     "reference": "",
-    "comment": "greeter feature card title | greeter settings link"
-  },
-  {
-    "term": "DankCalendar",
-    "translation": "",
-    "context": "DankCalendar",
-    "reference": "",
-    "comment": "calendar backend option"
-  },
-  {
-    "term": "DankCalendar isn't installed",
-    "translation": "",
-    "context": "DankCalendar isn't installed",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "DankCalendar isn't running",
-    "translation": "",
-    "context": "DankCalendar isn't running",
-    "reference": "",
-    "comment": ""
+    "comment": "greeter settings link"
   },
   {
     "term": "Dark",
@@ -5465,6 +5486,13 @@
     "context": "Dew point %1",
     "reference": "",
     "comment": "Weather dew point temperature"
+  },
+  {
+    "term": "Did you mean",
+    "translation": "",
+    "context": "Did you mean",
+    "reference": "",
+    "comment": "plugin search, introduces plugins with a close name"
   },
   {
     "term": "Digital",
@@ -6146,6 +6174,27 @@
     "comment": ""
   },
   {
+    "term": "Dux Calendar",
+    "translation": "",
+    "context": "Dux Calendar",
+    "reference": "",
+    "comment": "calendar backend option"
+  },
+  {
+    "term": "Dux Calendar isn't installed",
+    "translation": "",
+    "context": "Dux Calendar isn't installed",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Dux Calendar isn't running",
+    "translation": "",
+    "context": "Dux Calendar isn't running",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Dwindle",
     "translation": "",
     "context": "Dwindle",
@@ -6461,13 +6510,6 @@
     "comment": ""
   },
   {
-    "term": "Enlarge on hover",
-    "translation": "",
-    "context": "Enlarge on hover",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Enter 6-digit passkey",
     "translation": "",
     "context": "Enter 6-digit passkey",
@@ -6776,11 +6818,11 @@
     "comment": "matugen color scheme option"
   },
   {
-    "term": "Extend DankMaterialShell with powerful plugins for widgets, launchers, and more",
+    "term": "Extend %1 with powerful plugins for widgets, launchers, and more",
     "translation": "",
-    "context": "Extend DankMaterialShell with powerful plugins for widgets, launchers, and more",
+    "context": "Extend %1 with powerful plugins for widgets, launchers, and more",
     "reference": "",
-    "comment": ""
+    "comment": "plugins hub description, %1 is the product name"
   },
   {
     "term": "Extend battery life",
@@ -7455,11 +7497,11 @@
     "comment": "font family dropdown label"
   },
   {
-    "term": "Features",
+    "term": "Featured plugin",
     "translation": "",
-    "context": "Features",
+    "context": "Featured plugin",
     "reference": "",
-    "comment": "greeter welcome page section header"
+    "comment": "plugin recommendation reason"
   },
   {
     "term": "Feels Like %1°",
@@ -7511,9 +7553,9 @@
     "comment": ""
   },
   {
-    "term": "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch",
+    "term": "File search requires dsearch\nInstall from github.com/duxlabs-dev/dux-search",
     "translation": "",
-    "context": "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch",
+    "context": "File search requires dsearch\nInstall from github.com/duxlabs-dev/dux-search",
     "reference": "",
     "comment": ""
   },
@@ -7691,6 +7733,13 @@
     "context": "Fits the song title instead of keeping a fixed width",
     "reference": "",
     "comment": "media widget adaptive width toggle description"
+  },
+  {
+    "term": "Fits your setup",
+    "translation": "",
+    "context": "Fits your setup",
+    "reference": "",
+    "comment": "plugin recommendation reason, same category as installed plugins"
   },
   {
     "term": "Fixed",
@@ -8034,6 +8083,13 @@
     "context": "For %1",
     "reference": "",
     "comment": "timed preset menu option, %1 is a duration such as 15 minutes"
+  },
+  {
+    "term": "For you",
+    "translation": "",
+    "context": "For you",
+    "reference": "",
+    "comment": "plugin browser shelf, plugins ranked for this user | plugin browser sort option, plugins ranked for this user"
   },
   {
     "term": "Force HDR",
@@ -8890,6 +8946,13 @@
     "comment": "plugin browser filter chip"
   },
   {
+    "term": "Hide on last display",
+    "translation": "",
+    "context": "Hide on last display",
+    "reference": "",
+    "comment": "bar display assignment option"
+  },
+  {
     "term": "Hide password",
     "translation": "",
     "context": "Hide password",
@@ -9021,6 +9084,13 @@
     "context": "History size, retention, paste behavior",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Hold Ctrl, Alt or Super and press a key. Esc cancels.",
+    "translation": "",
+    "context": "Hold Ctrl, Alt or Super and press a key. Esc cancels.",
+    "reference": "",
+    "comment": "launcher shortcut key combination capture hint"
   },
   {
     "term": "Hold duration",
@@ -9161,6 +9231,13 @@
     "context": "Hover popouts",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "How far terminal colors shift toward the wallpaper color",
+    "translation": "",
+    "context": "How far terminal colors shift toward the wallpaper color",
+    "reference": "",
+    "comment": "terminal wallpaper colors intensity description"
   },
   {
     "term": "Hue",
@@ -10626,6 +10703,13 @@
     "comment": "matugen source color option"
   },
   {
+    "term": "Like your plugins",
+    "translation": "",
+    "context": "Like your plugins",
+    "reference": "",
+    "comment": "plugin recommendation reason, similar to installed plugins"
+  },
+  {
     "term": "Limit",
     "translation": "",
     "context": "Limit",
@@ -10666,6 +10750,13 @@
     "context": "Lines: %1",
     "reference": "",
     "comment": "plural, notepad status bar line count, %1 is a count"
+  },
+  {
+    "term": "Link copied",
+    "translation": "",
+    "context": "Link copied",
+    "reference": "",
+    "comment": "plugin browser, link copied to clipboard"
   },
   {
     "term": "Link your DMS settings so the login screen follows them.",
@@ -11575,7 +11666,7 @@
     "translation": "",
     "context": "Middle section",
     "reference": "",
-    "comment": ""
+    "comment": "widgets settings: bar section replaced by the island"
   },
   {
     "term": "Min H",
@@ -12096,6 +12187,13 @@
     "comment": "island settings: satellites hug the island"
   },
   {
+    "term": "Needs",
+    "translation": "",
+    "context": "Needs",
+    "reference": "",
+    "comment": "plugin detail section, introduces the programs a plugin depends on"
+  },
+  {
     "term": "Nested chip",
     "translation": "",
     "context": "Nested chip",
@@ -12191,7 +12289,14 @@
     "translation": "",
     "context": "New",
     "reference": "",
-    "comment": "adjective, shortcut or button that creates a new session or note"
+    "comment": "adjective, shortcut or button that creates a new session or note | plugin browser shelf, recently published | plugin recommendation reason, recently published"
+  },
+  {
+    "term": "New & updated",
+    "translation": "",
+    "context": "New & updated",
+    "reference": "",
+    "comment": "plugin browser filter chip"
   },
   {
     "term": "New Session",
@@ -12283,6 +12388,13 @@
     "context": "Next Transition",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Next category",
+    "translation": "",
+    "context": "Next category",
+    "reference": "",
+    "comment": "launcher shortcut that switches to the next mode tab"
   },
   {
     "term": "Next page",
@@ -13279,6 +13391,13 @@
     "comment": "wallpaper not set label"
   },
   {
+    "term": "Not shown on this bar, so its section widgets stay hidden",
+    "translation": "",
+    "context": "Not shown on this bar, so its section widgets stay hidden",
+    "reference": "",
+    "comment": "widgets settings: island satellites are not rendered on this bar"
+  },
+  {
     "term": "Not synchronized",
     "translation": "",
     "context": "Not synchronized",
@@ -13494,6 +13613,13 @@
     "context": "Office",
     "reference": "",
     "comment": "launcher app category"
+  },
+  {
+    "term": "Official only",
+    "translation": "",
+    "context": "Official only",
+    "reference": "",
+    "comment": "plugin browser filter chip, first party plugins"
   },
   {
     "term": "Offline Report",
@@ -13725,6 +13851,20 @@
     "context": "Open with",
     "reference": "",
     "comment": "app picker title, followed by a list of apps | trash setting label, which file manager opens the trash"
+  },
+  {
+    "term": "Opening GitHub to remove the upvote",
+    "translation": "",
+    "context": "Opening GitHub to remove the upvote",
+    "reference": "",
+    "comment": "plugin upvote toast, shown when the GitHub CLI is missing or signed out"
+  },
+  {
+    "term": "Opening GitHub to upvote",
+    "translation": "",
+    "context": "Opening GitHub to upvote",
+    "reference": "",
+    "comment": "plugin upvote toast, shown when the GitHub CLI is missing or signed out"
   },
   {
     "term": "Opening terminal: ",
@@ -14455,6 +14595,20 @@
     "comment": "idle inhibitor detail subtitle shown while keep awake is off"
   },
   {
+    "term": "Pick of the day",
+    "translation": "",
+    "context": "Pick of the day",
+    "reference": "",
+    "comment": "plugin browser highlighted plugin"
+  },
+  {
+    "term": "Pick of the week",
+    "translation": "",
+    "context": "Pick of the week",
+    "reference": "",
+    "comment": "plugin browser highlighted plugin"
+  },
+  {
     "term": "Pill",
     "translation": "",
     "context": "Pill",
@@ -14700,6 +14854,13 @@
     "comment": "greeter feature card title"
   },
   {
+    "term": "Plugins by %1",
+    "translation": "",
+    "context": "Plugins by %1",
+    "reference": "",
+    "comment": "plugin browser author filter, %1 is the author"
+  },
+  {
     "term": "Plugins shown in All mode without a trigger. Drag to reorder",
     "translation": "",
     "context": "Plugins shown in All mode without a trigger. Drag to reorder",
@@ -14754,6 +14915,13 @@
     "context": "Popouts and modals use the main animation duration",
     "reference": "",
     "comment": "sync popout and modal animation toggle description"
+  },
+  {
+    "term": "Popular",
+    "translation": "",
+    "context": "Popular",
+    "reference": "",
+    "comment": "plugin browser shelf | plugin recommendation reason, many votes"
   },
   {
     "term": "Popular Plugins",
@@ -14935,7 +15103,7 @@
     "translation": "",
     "context": "Power menu",
     "reference": "",
-    "comment": ""
+    "comment": "island compact face: power menu label | island settings: route the power menu to the island"
   },
   {
     "term": "Power off",
@@ -15104,6 +15272,13 @@
     "context": "Previous",
     "reference": "",
     "comment": "button going to the previous track, page, day, month or match"
+  },
+  {
+    "term": "Previous category",
+    "translation": "",
+    "context": "Previous category",
+    "reference": "",
+    "comment": "launcher shortcut that switches to the previous mode tab"
   },
   {
     "term": "Previous page",
@@ -15568,6 +15743,48 @@
     "comment": "disk read label"
   },
   {
+    "term": "Reads audio devices and volume",
+    "translation": "",
+    "context": "Reads audio devices and volume",
+    "reference": "",
+    "comment": "plugin permission"
+  },
+  {
+    "term": "Reads its own settings",
+    "translation": "",
+    "context": "Reads its own settings",
+    "reference": "",
+    "comment": "plugin permission"
+  },
+  {
+    "term": "Reads its saved state",
+    "translation": "",
+    "context": "Reads its saved state",
+    "reference": "",
+    "comment": "plugin permission"
+  },
+  {
+    "term": "Reads the clipboard",
+    "translation": "",
+    "context": "Reads the clipboard",
+    "reference": "",
+    "comment": "plugin permission"
+  },
+  {
+    "term": "Reads the list of running programs",
+    "translation": "",
+    "context": "Reads the list of running programs",
+    "reference": "",
+    "comment": "plugin permission"
+  },
+  {
+    "term": "Reads your files",
+    "translation": "",
+    "context": "Reads your files",
+    "reference": "",
+    "comment": "plugin permission"
+  },
+  {
     "term": "Ready",
     "translation": "",
     "context": "Ready",
@@ -15587,6 +15804,13 @@
     "context": "Reboot",
     "reference": "",
     "comment": "verb, power menu action"
+  },
+  {
+    "term": "Reboot now?",
+    "translation": "",
+    "context": "Reboot now?",
+    "reference": "",
+    "comment": "confirmation dialog title, reboot to finish a system update"
   },
   {
     "term": "Reboot recommended",
@@ -15869,6 +16093,13 @@
     "comment": "button in the notification rule editor, removes this match condition"
   },
   {
+    "term": "Remove from recent colors",
+    "translation": "",
+    "context": "Remove from recent colors",
+    "reference": "",
+    "comment": "button on a recently picked color swatch"
+  },
+  {
     "term": "Remove greeter access?",
     "translation": "",
     "context": "Remove greeter access?",
@@ -15909,6 +16140,13 @@
     "context": "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.",
     "reference": "",
     "comment": "hyprland remove shortcut confirmation, %1 is the key combination"
+  },
+  {
+    "term": "Remove upvote",
+    "translation": "",
+    "context": "Remove upvote",
+    "reference": "",
+    "comment": "plugin upvote button tooltip"
   },
   {
     "term": "Removed administrator privileges",
@@ -16352,6 +16590,13 @@
     "comment": ""
   },
   {
+    "term": "Rotating Cookie",
+    "translation": "",
+    "context": "Rotating Cookie",
+    "reference": "",
+    "comment": "Album artwork shape"
+  },
+  {
     "term": "Rounded",
     "translation": "",
     "context": "Rounded",
@@ -16506,6 +16751,20 @@
     "comment": "system update confirmation, the upgrade opens a terminal window"
   },
   {
+    "term": "Runs programs on your computer",
+    "translation": "",
+    "context": "Runs programs on your computer",
+    "reference": "",
+    "comment": "plugin permission"
+  },
+  {
+    "term": "Runs shell commands",
+    "translation": "",
+    "context": "Runs shell commands",
+    "reference": "",
+    "comment": "plugin permission"
+  },
+  {
     "term": "S",
     "translation": "",
     "context": "S",
@@ -16639,6 +16898,13 @@
     "comment": ""
   },
   {
+    "term": "Save your work first. Open apps will close.",
+    "translation": "",
+    "context": "Save your work first. Open apps will close.",
+    "reference": "",
+    "comment": "reboot confirmation after a system update"
+  },
+  {
     "term": "Saved",
     "translation": "",
     "context": "Saved",
@@ -16686,6 +16952,20 @@
     "context": "Saved networks",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Saves its own settings",
+    "translation": "",
+    "context": "Saves its own settings",
+    "reference": "",
+    "comment": "plugin permission"
+  },
+  {
+    "term": "Saves its state",
+    "translation": "",
+    "context": "Saves its state",
+    "reference": "",
+    "comment": "plugin permission"
   },
   {
     "term": "Saving...",
@@ -17598,6 +17878,13 @@
     "comment": "Battery bar widget setting: show how many watts the system is drawing from the battery"
   },
   {
+    "term": "Show every author",
+    "translation": "",
+    "context": "Show every author",
+    "reference": "",
+    "comment": "plugin browser, clears the author filter"
+  },
+  {
     "term": "Show filename",
     "translation": "",
     "context": "Show filename",
@@ -18170,6 +18457,13 @@
     "context": "Soft square",
     "reference": "",
     "comment": "Album artwork shape"
+  },
+  {
+    "term": "Software dimming",
+    "translation": "",
+    "context": "Software dimming",
+    "reference": "",
+    "comment": "brightness device class label, dimmed through the gamma ramp"
   },
   {
     "term": "Software updates",
@@ -18802,6 +19096,13 @@
     "comment": ""
   },
   {
+    "term": "Switch to media when playback starts",
+    "translation": "",
+    "context": "Switch to media when playback starts",
+    "reference": "",
+    "comment": "island settings: auto-switch the compact face to media toggle"
+  },
+  {
     "term": "Switches to power saver at the low battery threshold",
     "translation": "",
     "context": "Switches to power saver at the low battery threshold",
@@ -19278,6 +19579,13 @@
     "comment": ""
   },
   {
+    "term": "The Island takes its place on this bar",
+    "translation": "",
+    "context": "The Island takes its place on this bar",
+    "reference": "",
+    "comment": "widgets settings: the island replaces the bar's center section"
+  },
+  {
     "term": "The WiFi adapter could not start access point mode.",
     "translation": "",
     "context": "The WiFi adapter could not start access point mode.",
@@ -19579,11 +19887,11 @@
     "comment": "community plugin discovery control"
   },
   {
-    "term": "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.",
+    "term": "Third-party plugins are created by the community and are not officially supported by %1.\n\nThese plugins may pose security and privacy risks - install at your own risk.",
     "translation": "",
-    "context": "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.",
+    "context": "Third-party plugins are created by the community and are not officially supported by %1.\n\nThese plugins may pose security and privacy risks - install at your own risk.",
     "reference": "",
-    "comment": ""
+    "comment": "third-party plugin warning, %1 is the product name"
   },
   {
     "term": "This bar is the Island",
@@ -19647,6 +19955,13 @@
     "context": "This output is disabled in the current profile",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "This plugin can",
+    "translation": "",
+    "context": "This plugin can",
+    "reference": "",
+    "comment": "plugin detail section, introduces the permission list"
   },
   {
     "term": "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json",
@@ -20181,6 +20496,13 @@
     "comment": ""
   },
   {
+    "term": "Trending",
+    "translation": "",
+    "context": "Trending",
+    "reference": "",
+    "comment": "plugin browser shelf, gaining votes quickly | plugin recommendation reason, gaining votes quickly"
+  },
+  {
     "term": "Trigger",
     "translation": "",
     "context": "Trigger",
@@ -20332,7 +20654,7 @@
     "translation": "",
     "context": "Undo",
     "reference": "",
-    "comment": ""
+    "comment": "reinstall the plugin that was just uninstalled"
   },
   {
     "term": "Unfocused color",
@@ -20725,6 +21047,27 @@
     "context": "Uptime",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Upvote on GitHub",
+    "translation": "",
+    "context": "Upvote on GitHub",
+    "reference": "",
+    "comment": "plugin upvote button tooltip"
+  },
+  {
+    "term": "Upvote removed",
+    "translation": "",
+    "context": "Upvote removed",
+    "reference": "",
+    "comment": "plugin upvote toast"
+  },
+  {
+    "term": "Upvoted on GitHub",
+    "translation": "",
+    "context": "Upvoted on GitHub",
+    "reference": "",
+    "comment": "plugin upvote toast"
   },
   {
     "term": "Urgent",
@@ -21399,11 +21742,11 @@
     "comment": "greeter modal window title"
   },
   {
-    "term": "Welcome to DankMaterialShell",
+    "term": "Welcome to %1",
     "translation": "",
-    "context": "Welcome to DankMaterialShell",
+    "context": "Welcome to %1",
     "reference": "",
-    "comment": "greeter welcome page title"
+    "comment": "greeter welcome page title, %1 is the product name"
   },
   {
     "term": "What changed",
@@ -21411,6 +21754,13 @@
     "context": "What changed",
     "reference": "",
     "comment": "changelog section heading listing the changes in a release"
+  },
+  {
+    "term": "What's New",
+    "translation": "",
+    "context": "What's New",
+    "reference": "",
+    "comment": "changelog window title"
   },
   {
     "term": "When locked",
@@ -21763,6 +22113,13 @@
     "comment": "create user button text while the operation runs"
   },
   {
+    "term": "Works here",
+    "translation": "",
+    "context": "Works here",
+    "reference": "",
+    "comment": "plugin browser filter chip, plugins that run on the current compositor"
+  },
+  {
     "term": "Works in every submap",
     "translation": "",
     "context": "Works in every submap",
@@ -21831,6 +22188,13 @@
     "context": "Write:",
     "reference": "",
     "comment": "disk write label"
+  },
+  {
+    "term": "Writes to your files",
+    "translation": "",
+    "context": "Writes to your files",
+    "reference": "",
+    "comment": "plugin permission"
   },
   {
     "term": "X axis",
@@ -22055,6 +22419,13 @@
     "context": "checked just now",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "copy link",
+    "translation": "",
+    "context": "copy link",
+    "reference": "",
+    "comment": "plugin detail link, copies the plugin page address"
   },
   {
     "term": "deprecated",
@@ -22323,13 +22694,6 @@
     "comment": "greeter keybinds niri description"
   },
   {
-    "term": "niri/dms Discord",
-    "translation": "",
-    "context": "niri/dms Discord",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "niri: config reloaded",
     "translation": "",
     "context": "niri: config reloaded",
@@ -22405,6 +22769,13 @@
     "context": "remote",
     "reference": "",
     "comment": "adjective, shown when a login session has no tty or seat"
+  },
+  {
+    "term": "report a problem",
+    "translation": "",
+    "context": "report a problem",
+    "reference": "",
+    "comment": "plugin detail link, opens a prefilled issue"
   },
   {
     "term": "reviewed",
