@@ -334,7 +334,16 @@ Singleton {
             }
         }
 
+        if (sameScales(displayScales, scales))
+            return;
         displayScales = scales;
+    }
+
+    function sameScales(a, b) {
+        const names = Object.keys(a);
+        if (names.length !== Object.keys(b).length)
+            return false;
+        return names.every(name => a[name] === b[name]);
     }
 
     function sortWindowsByLayout(windowList) {
