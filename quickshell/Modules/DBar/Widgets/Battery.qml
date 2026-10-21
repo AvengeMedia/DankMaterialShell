@@ -39,26 +39,20 @@ BasePill {
         return Qt.rgba(from.r + (to.r - from.r) * progress, from.g + (to.g - from.g) * progress, from.b + (to.b - from.b) * progress, from.a + (to.a - from.a) * progress);
     }
 
-    SequentialAnimation on criticalPulse {
+    property int criticalTick: 0
+
+    // Stepped on purpose: an Animation repaints the bar at the full refresh rate.
+    Timer {
+        interval: 50
+        repeat: true
         running: battery.critical && battery.surfaceLive && !SettingsData.reduceMotion
-        loops: Animation.Infinite
         onRunningChanged: {
-            if (!running)
-                battery.criticalPulse = 0;
+            battery.criticalTick = 0;
+            battery.criticalPulse = 0;
         }
-
-        NumberAnimation {
-            from: 0
-            to: 1
-            duration: 1000
-            easing.type: Easing.Linear
-        }
-
-        NumberAnimation {
-            from: 1
-            to: 0
-            duration: 1000
-            easing.type: Easing.Linear
+        onTriggered: {
+            battery.criticalTick = (battery.criticalTick + 1) % 40;
+            battery.criticalPulse = 1 - Math.abs(20 - battery.criticalTick) / 20;
         }
     }
 
