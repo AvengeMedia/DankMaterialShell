@@ -62,3 +62,8 @@ func TestIsRootHelper(t *testing.T) {
 	assert.False(t, isRootHelper([]string{"dms", "ipc", "sysmon-helper"}))
 	assert.False(t, isRootHelper([]string{"dms"}))
 }
+
+func TestTreeOrderSurvivesParentCycle(t *testing.T) {
+	parents := map[int]int{11: 12, 12: 11}
+	assert.NotPanics(t, func() { treeOrder(11, parents, func(int) string { return "" }, nil) })
+}

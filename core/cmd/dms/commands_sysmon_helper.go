@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -101,14 +102,14 @@ func sysmonHelperCall(method string, p map[string]any) (any, error) {
 			return nil, err
 		}
 		unit := params.StringOpt(p, "unit", "")
-		if !strings.HasSuffix(unit, ".service") {
+		if !strings.HasSuffix(unit, ".service") || strings.HasPrefix(unit, "-") {
 			return nil, errors.New("not a service")
 		}
-		mainPid, err := exec.Command("systemctl", "show", "-p", "MainPID", "--value", unit).Output()
+		mainPid, err := exec.Command("systemctl", "show", "-p", "MainPID", "--value", "--", unit).Output()
 		if err != nil || strings.TrimSpace(string(mainPid)) != strconv.Itoa(pid) {
 			return nil, errors.New("not the main process of " + unit)
 		}
-		return true, exec.Command("systemctl", "restart", unit).Run()
+		return true, exec.Command("systemctl", "restart", "--", unit).Run()
 	case "drives.smart":
 		return drives.FullReport(params.StringOpt(p, "device", ""))
 	}
@@ -134,20 +135,15 @@ func treeOrder(pid int, parents map[int]int, comm func(int) string, skip []strin
 		children[parent] = append(children[parent], child)
 	}
 	var out []int
+	// The parent map is a racy /proc snapshot, so a reused PID can form a cycle.
+	seen := map[int]bool{pid: true}
 	var walk func(int)
 	walk = func(p int) {
 		for _, c := range children[p] {
-			name := strings.ToLower(comm(c))
-			skipped := false
-			for _, s := range skip {
-				if name == s {
-					skipped = true
-					break
-				}
-			}
-			if skipped {
+			if seen[c] || slices.Contains(skip, strings.ToLower(comm(c))) {
 				continue
 			}
+			seen[c] = true
 			walk(c)
 			out = append(out, c)
 		}

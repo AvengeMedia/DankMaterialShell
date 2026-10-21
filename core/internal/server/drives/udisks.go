@@ -2,6 +2,7 @@ package drives
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -38,6 +39,9 @@ func List() (ListResult, error) {
 func listDrives(conn *dbus.Conn) ([]Drive, error) {
 	var objects objectMap
 	if err := call(conn, udisksPath, "org.freedesktop.DBus.ObjectManager.GetManagedObjects", &objects); err != nil {
+		if udisksAbsent(err) {
+			return nil, nil
+		}
 		return nil, fmt.Errorf("udisks2: %w", err)
 	}
 
@@ -83,8 +87,15 @@ func listDrives(conn *dbus.Conn) ([]Drive, error) {
 	return buildDrives(objects, nvmeAttrs, ataAttrs, asleep, standby.cache), nil
 }
 
+// udisksAbsent is true when udisksd isn't running; calls never start it.
+func udisksAbsent(err error) bool {
+	var busErr dbus.Error
+	return errors.As(err, &busErr) && (busErr.Name == "org.freedesktop.DBus.Error.ServiceUnknown" ||
+		busErr.Name == "org.freedesktop.DBus.Error.NameHasNoOwner")
+}
+
 func call(conn *dbus.Conn, p dbus.ObjectPath, method string, out any, args ...any) error {
 	ctx, cancel := context.WithTimeout(context.Background(), callTimeout)
 	defer cancel()
-	return conn.Object(udisksDest, p).CallWithContext(ctx, method, 0, args...).Store(out)
+	return conn.Object(udisksDest, p).CallWithContext(ctx, method, dbus.FlagNoAutoStart, args...).Store(out)
 }

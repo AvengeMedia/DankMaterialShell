@@ -1,11 +1,22 @@
 package drives
 
 import (
+	"context"
 	"errors"
+	"io"
 	"os"
 	"os/exec"
 	"regexp"
+	"sync"
+	"time"
 )
+
+const (
+	reportTimeout  = 30 * time.Second
+	reportMaxBytes = 4 << 20
+)
+
+var reportMu sync.Mutex
 
 var wholeDiskPath = regexp.MustCompile(`^/dev/[A-Za-z0-9]+$`)
 
@@ -30,7 +41,36 @@ func FullReport(device string) (*Report, error) {
 	if path == "" {
 		return nil, errors.New("smartctl not found")
 	}
-	out, err := exec.Command(path, "-x", "--json", device).Output()
+	if !reportMu.TryLock() {
+		return nil, errors.New("another report is running")
+	}
+	defer reportMu.Unlock()
+
+	ctx, cancel := context.WithTimeout(context.Background(), reportTimeout)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, path, "-x", "--json", device)
+	cmd.WaitDelay = 2 * time.Second
+	pipe, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, err
+	}
+	if err := cmd.Start(); err != nil {
+		return nil, err
+	}
+	out, readErr := io.ReadAll(io.LimitReader(pipe, reportMaxBytes+1))
+	tooBig := len(out) > reportMaxBytes
+	if tooBig {
+		cancel()
+	}
+	err = cmd.Wait()
+	switch {
+	case tooBig:
+		return nil, errors.New("report too large")
+	case ctx.Err() != nil:
+		return nil, errors.New("smartctl timed out")
+	case readErr != nil:
+		return nil, readErr
+	}
 	var exitErr *exec.ExitError
 	switch {
 	case errors.As(err, &exitErr):

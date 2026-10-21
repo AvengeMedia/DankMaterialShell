@@ -14,18 +14,22 @@ func disableMemProfilingUnlessRequested() {
 	runtime.MemProfileRate = 0
 }
 
+// firstArg returns the first non-flag argument, or "".
+func firstArg(args []string) string {
+	for _, arg := range args[1:] {
+		if !strings.HasPrefix(arg, "-") {
+			return arg
+		}
+	}
+	return ""
+}
+
 // isReadOnlyCommand returns true if the CLI args indicate a command that is
 // safe to run as root (e.g. shell completion, help).
 func isReadOnlyCommand(args []string) bool {
-	for _, arg := range args[1:] {
-		if strings.HasPrefix(arg, "-") {
-			continue
-		}
-		switch arg {
-		case "completion", "help", "__complete", "system":
-			return true
-		}
-		return false
+	switch firstArg(args) {
+	case "completion", "help", "__complete", "system":
+		return true
 	}
 	return false
 }
@@ -33,13 +37,7 @@ func isReadOnlyCommand(args []string) bool {
 // isRootHelper reports whether args run the system monitor's sysmon-helper,
 // which is meant to run as root (it is started through pkexec).
 func isRootHelper(args []string) bool {
-	for _, arg := range args[1:] {
-		if strings.HasPrefix(arg, "-") {
-			continue
-		}
-		return arg == "sysmon-helper"
-	}
-	return false
+	return firstArg(args) == "sysmon-helper"
 }
 
 func isArchPackageInstalled(packageName string) bool {
