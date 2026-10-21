@@ -375,7 +375,7 @@ BasePill {
                 }
                 property bool isOccupied: root.useNativeWorkspaces && CompositorService.workspaceOccupied(record)
                 property bool isPlaceholder: !!(record && record.placeholder)
-                property bool isHovered: mouseArea.containsMouse
+                property bool isHovered: pillHover.hovered
 
                 property bool loadedIsUrgent: false
                 property bool isUrgent: root.useNativeWorkspaces ? CompositorService.workspaceUrgent(record, loadedIsUrgent) : (modelData?.urgent ?? false)
@@ -613,6 +613,11 @@ BasePill {
                         dragAxisOffset = 0;
                         mouseArea.mousePressed = false;
                     }
+                }
+
+                HoverHandler {
+                    id: pillHover
+                    enabled: !isPlaceholder
                 }
 
                 MouseArea {
