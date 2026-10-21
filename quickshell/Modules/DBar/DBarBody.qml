@@ -745,7 +745,9 @@ Item {
     readonly property bool islandSheetOut: islandHost?.sheetOut ?? false
     readonly property real islandSatelliteShadowBuffer: isIsland && islandSatellitesEnabled && !islandSatelliteBackground ? _shadowBuffer : 0
     readonly property real hostThickness: isIsland ? Math.max(islandHost?.hostThickness ?? 0, islandStripThickness + islandSatelliteShadowBuffer) : Math.max(barSurfaceThickness, islandSheetOut ? islandHost.hostThickness : 0)
-    readonly property real hideSlideThickness: isIsland ? hostThickness : barSurfaceThickness
+    // The host reserves the expanded island's height, so sliding by it would move a compact island off-screen within a frame.
+    readonly property real islandCompactThickness: Math.max(islandStripThickness + islandSatelliteShadowBuffer, (islandHost?.outerGap ?? 0) + (islandHost?.compactThickness ?? 0) + (islandHost?.shadowPadding ?? 0))
+    readonly property real hideSlideThickness: isIsland ? islandCompactThickness : barSurfaceThickness
     readonly property real surfaceImplicitHeight: !isVertical ? hostThickness : 0
     readonly property real surfaceImplicitWidth: isVertical ? hostThickness : 0
 
