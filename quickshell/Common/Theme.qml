@@ -1876,9 +1876,9 @@ Singleton {
         }
 
         const runKey = Qt.md5(JSON.stringify(args));
-        const skipUnchanged = !_matugenRunKey && !colorsFileLoadFailed && typeof SettingsData !== "undefined" && !SettingsData.generateThemeAtStartup;
-        if (skipUnchanged && runKey === CacheData.matugenAppliedKey) {
-            log.info("Theme inputs unchanged since the last run, skipping startup generation");
+        const startupRun = !_matugenRunKey && typeof SettingsData !== "undefined" && SettingsData.generateThemeAtStartup;
+        if (!startupRun && !colorsFileLoadFailed && runKey === CacheData.matugenAppliedKey) {
+            log.info("Theme inputs unchanged since the last run, skipping generation");
             return;
         }
 
