@@ -965,6 +965,7 @@ var vscodeEditors = []vscodeEditor{
 	{"cursor", ".cursor"},
 	{"windsurf", ".windsurf"},
 	{"positron", ".positron"},
+	{"antigravity", ".antigravity-ide"},
 	{"vscode-insiders", ".vscode-insiders"},
 }
 
