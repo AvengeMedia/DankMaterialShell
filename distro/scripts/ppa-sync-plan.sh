@@ -100,7 +100,7 @@ include_package() {
     [[ "$PACKAGE_FILTER" == "all" || "$PACKAGE_FILTER" == "$package" ]]
 }
 
-CURRENT_COMMIT="$(git rev-parse --short=8 HEAD)"
+CURRENT_COMMIT="$(git rev-parse HEAD)"
 LATEST_TAG=""
 TARGETS=()
 
@@ -118,9 +118,9 @@ for pkg_info in "${PACKAGES[@]}"; do
             reason="missing from ${series}"
         elif [[ "$type" == "git" ]]; then
             ppa_commit="$(embedded_commit "$ppa_version")"
-            if [[ "$ppa_commit" != "$CURRENT_COMMIT" ]]; then
+            if [[ -z "$ppa_commit" || "${CURRENT_COMMIT:0:${#ppa_commit}}" != "$ppa_commit" ]]; then
                 needs_update=true
-                reason="commit ${ppa_commit:-none} -> ${CURRENT_COMMIT}"
+                reason="commit ${ppa_commit:-none} -> ${CURRENT_COMMIT:0:9}"
             fi
         else
             if [[ -z "$LATEST_TAG" ]]; then
