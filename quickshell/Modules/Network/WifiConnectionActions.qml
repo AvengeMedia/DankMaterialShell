@@ -24,7 +24,10 @@ Singleton {
         }
 
         if (shouldPromptForCredentials(network)) {
-            PopoutService.showWifiPasswordModal(ssid);
+            if (typeof actionOptions.promptCredentials === "function")
+                actionOptions.promptCredentials(ssid);
+            else
+                PopoutService.showWifiPasswordModal(ssid);
             return;
         }
 
