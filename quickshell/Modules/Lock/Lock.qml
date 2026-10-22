@@ -412,14 +412,20 @@ Scope {
         }
 
         function unlock() {
+            if (AdminPolicy.disableLockIpcUnlock)
+                return;
             root.unlock();
         }
 
         function forceReset() {
+            if (AdminPolicy.disableLockIpcUnlock)
+                return;
             root.forceReset();
         }
 
         function demo() {
+            if (AdminPolicy.disableLockIpcUnlock)
+                return;
             demoWindow.showDemo();
         }
 

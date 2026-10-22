@@ -1051,6 +1051,9 @@ Singleton {
     }
 
     function getDmsActions() {
-        return Actions.getDmsActions(CompositorService.isNiri, CompositorService.isHyprland);
+        const actions = Actions.getDmsActions(CompositorService.isNiri, CompositorService.isHyprland);
+        if (!AdminPolicy.disableLockIpcUnlock)
+            return actions;
+        return actions.filter(action => action.id !== "spawn dms ipc call lock demo");
     }
 }
