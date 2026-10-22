@@ -18,8 +18,9 @@ Column {
 
     property var parentModal: null
 
-    function openPage(page, id) {
+    function openPage(page, id, imported) {
         SettingsUiState.selectedConfigProfileId = id;
+        SettingsUiState.selectedConfigProfileImported = !!imported;
         SettingsUiState.selectedWidgetTitle = ConfigProfileService.find(id)?.name ?? I18n.tr("New profile");
         parentModal?.navigateTo(page);
     }

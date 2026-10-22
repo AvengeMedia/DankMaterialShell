@@ -147,11 +147,11 @@ Item {
             }
 
             SettingsNoteRow {
-                visible: root.isNew
+                visible: root.isNew || SettingsUiState.selectedConfigProfileImported
                 noteIconName: "info"
                 tint: Theme.surfaceVariantText
                 tintBackground: Theme.surfaceVariantAlpha
-                text: I18n.tr("The new profile uses your current settings for the groups selected below", "config profile editor note, shown when creating a profile")
+                text: root.isNew ? I18n.tr("The new profile uses your current settings for the groups selected below", "config profile editor note, shown when creating a profile") : I18n.tr("Pick which groups of the shared profile you want to keep", "config profile editor note, shown right after importing a profile")
             }
 
             Repeater {

@@ -20,7 +20,7 @@ Item {
     Connections {
         target: ConfigProfileService
         function onProfileImported(id) {
-            grid.openPage("profile_inspect", id);
+            grid.openPage("profile_edit", id, true);
         }
     }
 
