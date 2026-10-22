@@ -1577,7 +1577,9 @@ RegistryBrowserWindow {
                         visible: (detailPane.plugin.permissions || []).length > 0
 
                         StyledText {
-                            text: I18n.tr("This plugin can", "plugin detail section, introduces the permission list")
+                            width: parent.width
+                            text: I18n.tr("Declared by the author, not enforced", "plugin detail section, introduces the permission list the plugin declares about itself")
+                            wrapMode: Text.WordWrap
                             font.pixelSize: Theme.fontSizeSmall
                             font.weight: Theme.fontWeightMedium
                             color: Theme.surfaceVariantText
