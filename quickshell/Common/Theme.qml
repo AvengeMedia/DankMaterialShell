@@ -13,7 +13,6 @@ import Quickshell.Io
 import qs.Common
 import qs.DCommon.Common as DCommon
 import qs.Services
-import qs.Modules.Greetd
 import "StockThemes.js" as StockThemes
 import "GSettings.js" as GSettings
 
@@ -1191,13 +1190,7 @@ Singleton {
     readonly property real groupedListInnerRadius: cornerRadiusXS
     readonly property real groupedListOuterRadius: cornerRadiusL
 
-    property string fontFamily: {
-        if (typeof SettingsData === "undefined")
-            return DCommon.Fonts.sans;
-        if (SettingsData.isGreeterMode && SettingsData.lockScreenFontFamily !== "")
-            return resolvedFontFamily(SettingsData.lockScreenFontFamily);
-        return resolvedFontFamily(SettingsData.fontFamily);
-    }
+    property string fontFamily: typeof SettingsData !== "undefined" ? resolvedFontFamily(SettingsData.fontFamily) : DCommon.Fonts.sans
 
     property string monoFontFamily: typeof SettingsData !== "undefined" ? resolvedMonoFontFamily(SettingsData.monoFontFamily) : DCommon.Fonts.mono
     property string displayFontFamily: typeof SettingsData !== "undefined" ? resolvedDisplayFontFamily(SettingsData.displayFontFamily) : DCommon.Fonts.display
@@ -1422,15 +1415,12 @@ Singleton {
                 currentThemeCategory = "generic";
             }
         }
-        const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
-        if (savePrefs && typeof SettingsData !== "undefined" && !isGreeterMode) {
+        if (savePrefs && typeof SettingsData !== "undefined") {
             SettingsData.set("currentThemeCategory", currentThemeCategory);
             SettingsData.set("currentThemeName", currentTheme);
         }
 
-        if (!isGreeterMode) {
-            generateSystemThemesFromCurrentTheme();
-        }
+        generateSystemThemesFromCurrentTheme();
     }
 
     function setLightMode(light, savePrefs = true, enableTransition = false) {
@@ -1447,17 +1437,14 @@ Singleton {
             return;
         }
 
-        const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
-        if (savePrefs && typeof SessionData !== "undefined" && !isGreeterMode) {
+        if (savePrefs && typeof SessionData !== "undefined") {
             SessionData.setLightMode(light);
         }
 
-        if (!isGreeterMode) {
-            if (typeof SettingsData !== "undefined") {
-                SettingsData.updateCosmicThemeMode(light);
-            }
-            generateSystemThemesFromCurrentTheme();
+        if (typeof SettingsData !== "undefined") {
+            SettingsData.updateCosmicThemeMode(light);
         }
+        generateSystemThemesFromCurrentTheme();
     }
 
     function toggleLightMode(savePrefs = true) {
@@ -1938,8 +1925,7 @@ Singleton {
     }
 
     function generateSystemThemesFromCurrentTheme() {
-        const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
-        if (!matugenAvailable || isGreeterMode)
+        if (!matugenAvailable)
             return;
 
         _pendingGenerateParams = true;
@@ -2395,32 +2381,11 @@ Singleton {
         }
     }
 
-    readonly property string _greeterCacheDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter"
-
-    property string greeterColorsBaseDir: root._greeterCacheDir
-
-    function setGreeterColorsBaseDir(dir) {
-        const next = dir || root._greeterCacheDir;
-        if (greeterColorsBaseDir === next)
-            return;
-        greeterColorsBaseDir = next;
-        if (typeof SessionData !== "undefined" && SessionData.isGreeterMode)
-            dynamicColorsFileView.reload();
-    }
-
-    function resetGreeterColorsBaseDir() {
-        setGreeterColorsBaseDir(root._greeterCacheDir);
-    }
-
     FileView {
         id: dynamicColorsFileView
-        path: {
-            if (SessionData.isGreeterMode)
-                return root.greeterColorsBaseDir ? (root.greeterColorsBaseDir + "/colors.json") : "";
-            return stateDir + "/dms-colors.json";
-        }
+        path: stateDir + "/dms-colors.json"
         blockLoading: false
-        watchChanges: !SessionData.isGreeterMode
+        watchChanges: true
 
         function parseAndLoadColors() {
             try {
@@ -2462,9 +2427,6 @@ Singleton {
             if (currentTheme !== dynamic)
                 return;
 
-            if (SessionData.isGreeterMode)
-                return;
-
             if (workerRunning) {
                 colorsReloadRetry.restart();
                 return;
@@ -2496,7 +2458,7 @@ Singleton {
         onTriggered: dynamicColorsFileView.reload()
     }
 
-    readonly property bool publishTypography: typeof SettingsData !== "undefined" && SettingsData._hasLoaded && !SessionData.isGreeterMode
+    readonly property bool publishTypography: typeof SettingsData !== "undefined" && SettingsData._hasLoaded
     readonly property string typographyJson: JSON.stringify({
         "fontFamily": fontFamily,
         "monoFontFamily": monoFontFamily,

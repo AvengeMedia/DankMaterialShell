@@ -25,8 +25,6 @@ Singleton {
 
     readonly property int settingsConfigVersion: 42
 
-    readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
-
     enum Position {
         Top,
         Bottom,
@@ -1435,8 +1433,6 @@ Singleton {
     signal notificationPopupsInvalidated
 
     function refreshAuthAvailability() {
-        if (isGreeterMode)
-            return;
         Processes.detectAuthCapabilities();
     }
 
@@ -1506,8 +1502,6 @@ Singleton {
     }
 
     function checkIconThemeDrift() {
-        if (isGreeterMode)
-            return;
         if (resolveIconTheme() === "System Default")
             return;
         if (!SessionData.lastAppliedIconTheme)
@@ -1664,8 +1658,6 @@ Singleton {
     }
 
     function scheduleAuthApply() {
-        if (isGreeterMode)
-            return;
         Qt.callLater(() => {
             Processes.settingsRoot = root;
             Processes.scheduleAuthApply();
@@ -1673,8 +1665,6 @@ Singleton {
     }
 
     function scheduleGreeterAutoLoginSync() {
-        if (isGreeterMode)
-            return;
         Qt.callLater(() => {
             Processes.settingsRoot = root;
             Processes.scheduleGreeterAutoLoginSync();
@@ -1689,8 +1679,6 @@ Singleton {
     }
 
     function markGreeterSyncPending(who, key, oldValue) {
-        if (isGreeterMode)
-            return;
         if (!(key in SessionData.greeterSyncBaseline)) {
             var baseline = Object.assign({}, SessionData.greeterSyncBaseline);
             baseline[key] = oldValue;
@@ -1840,7 +1828,7 @@ Singleton {
         let loadedSettings = JSON.stringify(obj);
 
         const oldVersion = obj?.configVersion ?? 0;
-        if (oldVersion > settingsConfigVersion && !isGreeterMode) {
+        if (oldVersion > settingsConfigVersion) {
             newerSettingsBackup.path = `${_configDir}/dms/settings.v${oldVersion}.json`;
             newerSettingsBackup.setText(JSON.stringify(obj, null, 2));
         }
@@ -2063,16 +2051,14 @@ Singleton {
         return splitSettings;
     }
     function saveSettings() {
-        if (isGreeterMode || _loading || !_hasLoaded)
+        if (_loading || !_hasLoaded)
             return;
         unsavedUserChanges = true;
         settingsSaveDebounce.restart();
     }
     function _saveSettings(userChanges) {
         let reason = null;
-        if (isGreeterMode) {
-            reason = "running in greeter mode.";
-        } else if (_loading) {
+        if (_loading) {
             reason = "some files are being loaded";
         } else if (_parseError) {
             reason = "failed to parse settings.";
@@ -2092,7 +2078,7 @@ Singleton {
     }
 
     function savePluginSettings() {
-        if (isGreeterMode || _pluginSettingsLoading || _pluginParseError)
+        if (_pluginSettingsLoading || _pluginParseError)
             return;
         pluginSettingsFile.setText(JSON.stringify(pluginSettings, null, 2));
     }
@@ -3725,11 +3711,11 @@ Singleton {
         property FileView fileView: FileView {
             id: settingsFileView
 
-            path: isGreeterMode ? "" : filePath
+            path: filePath
             blockLoading: false
             blockWrites: true
             atomicWrites: true
-            watchChanges: !isGreeterMode
+            watchChanges: true
             onFileChanged: {
                 if (selfWrite) {
                     selfWrite = false;
@@ -3740,9 +3726,6 @@ Singleton {
                 }
             }
             onLoaded: {
-                if (isGreeterMode) {
-                    return;
-                }
                 isLoading = true;
                 _loading = true;
                 const hadParseFailed = hasParseFailed;
@@ -3776,9 +3759,6 @@ Singleton {
                 }
             }
             onLoadFailed: error => {
-                if (isGreeterMode) {
-                    return;
-                }
                 isLoading = false;
                 _loading = _anySettingsFile(file => file.isLoading);
                 if (error === FileViewError.FileNotFound) {
@@ -3922,7 +3902,7 @@ Singleton {
     }
 
     property bool _settingsFolderExists: false
-    property bool _settingsFolderChecked: isGreeterMode
+    property bool _settingsFolderChecked: false
     function _syncSettingsFilesModels() {
         if (!_settingsFolderChecked) {
             settingsFilesModelSyncDebounce.restart();
@@ -3963,7 +3943,6 @@ Singleton {
     }
     Loader {
         id: settingsFolderLoader
-        active: !isGreeterMode
         function unloadModel() {
             active = false;
         }
@@ -4012,59 +3991,6 @@ Singleton {
         }
     }
 
-    readonly property string _greeterCacheDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter"
-
-    property string greeterSettingsBaseDir: root._greeterCacheDir
-
-    function setGreeterSettingsBaseDir(dir) {
-        const next = dir || root._greeterCacheDir;
-        if (greeterSettingsBaseDir === next)
-            return;
-        greeterSettingsBaseDir = next;
-        if (isGreeterMode)
-            greeterSettingsFile.reload();
-    }
-
-    function resetGreeterSettingsBaseDir() {
-        setGreeterSettingsBaseDir(root._greeterCacheDir);
-    }
-
-    function loadGreeterSettings(txt) {
-        _loading = true;
-        _hasLoaded = false;
-        try {
-            Store.parse(root, (txt && txt.trim()) ? JSON.parse(txt) : {});
-            _parseError = false;
-        } catch (e) {
-            _parseError = true;
-            log.error("Failed to parse greeter settings.json:", e.message);
-            Store.parse(root, {});
-        } finally {
-            _loading = false;
-        }
-        _hasLoaded = true;
-        applyStoredTheme();
-    }
-
-    FileView {
-        id: greeterSettingsFile
-
-        path: isGreeterMode && root.greeterSettingsBaseDir ? (root.greeterSettingsBaseDir + "/settings.json") : ""
-        preload: isGreeterMode
-        blockLoading: false
-        blockWrites: true
-        watchChanges: false
-        printErrors: false
-        onLoaded: {
-            if (isGreeterMode)
-                loadGreeterSettings(greeterSettingsFile.text());
-        }
-        onLoadFailed: {
-            if (isGreeterMode)
-                loadGreeterSettings("");
-        }
-    }
-
     // Our first save drops the keys a newer shell wrote, so its settings are kept for going back.
     FileView {
         id: newerSettingsBackup
@@ -4078,21 +4004,17 @@ Singleton {
     FileView {
         id: pluginSettingsFile
 
-        path: isGreeterMode ? "" : pluginSettingsPath
+        path: pluginSettingsPath
         blockLoading: true
         blockWrites: true
         atomicWrites: true
         printErrors: false
-        watchChanges: !isGreeterMode
+        watchChanges: true
         onLoaded: {
-            if (isGreeterMode)
-                return;
             pluginSettingsFileExists = true;
             parsePluginSettings(pluginSettingsFile.text());
         }
         onLoadFailed: error => {
-            if (isGreeterMode)
-                return;
             const msg = String(error || "");
             const missing = _isMissingPluginSettingsError(error);
             pluginSettingsFileExists = !missing;

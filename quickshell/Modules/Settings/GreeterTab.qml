@@ -62,13 +62,11 @@ Item {
     property string greeterStatusStderr: ""
     readonly property bool greeterBinaryExists: GreeterService.binaryExists
     readonly property bool greeterEnabled: GreeterService.enabled
-    property bool embeddedGreeterConfigured: false
-    readonly property bool embeddedGreeterOnly: embeddedGreeterConfigured && !greeterBinaryExists
     readonly property bool busy: greeterSyncRunning || greeterInstallActionRunning
 
     readonly property string greeterState: {
         if (!greeterBinaryExists)
-            return embeddedGreeterOnly ? "embedded" : "missing";
+            return "missing";
         if (!greeterEnabled)
             return "inactive";
         switch (GreeterService.slotState) {
@@ -103,8 +101,6 @@ Item {
             return I18n.tr("Not active", "greeter status, greetd does not run the DMS greeter");
         case "unlinked":
             return I18n.tr("Not linked", "greeter status, no greeter slot for this user");
-        case "embedded":
-            return I18n.tr("Bundled greeter active", "greeter status");
         }
         return I18n.tr("Not installed", "greeter status");
     }
@@ -118,8 +114,6 @@ Item {
             return I18n.tr("greetd is not using the DMS greeter yet.", "greeter status");
         case "unlinked":
             return GreeterService.profileSyncSufficient ? I18n.tr("Link your DMS settings so the login screen follows them.", "greeter status") : I18n.tr("Link your DMS settings so the login screen follows them. Administrator access is required.", "greeter status");
-        case "embedded":
-            return I18n.tr("The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.", "embedded greeter status");
         }
         return I18n.tr("dms-greeter is not installed. Install the dms-greeter package to manage the greeter.", "greeter status placeholder");
     }
@@ -149,7 +143,6 @@ Item {
 
     function checkGreeterInstallState() {
         GreeterService.refresh();
-        embeddedGreeterCheckProcess.running = true;
     }
 
     function runGreeterStatus() {
@@ -202,17 +195,6 @@ Item {
             listKey: "greeterWidgetInstances"
             title: I18n.tr("Add widget")
             onWidgetAdded: ToastService.showInfo(I18n.tr("Widget added"))
-        }
-    }
-
-    Process {
-        id: embeddedGreeterCheckProcess
-        // archinstall's DMS profile points greetd at this launcher inside the packaged DMS tree
-        command: ["sh", "-c", "grep -q 'Modules/Greetd/assets/dms-greeter' /etc/greetd/config.toml 2>/dev/null"]
-        running: false
-
-        onExited: exitCode => {
-            root.embeddedGreeterConfigured = (exitCode === 0);
         }
     }
 

@@ -24,7 +24,7 @@ Singleton {
     readonly property string markerPath: currentVersion !== "" ? Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation)) + "/dms/.changelog-" + currentVersion : ""
     property bool markerChecked: false
     property bool markerSeen: false
-    readonly property bool ready: !SessionData.isGreeterMode && FirstLaunchService.checkComplete && markerChecked
+    readonly property bool ready: FirstLaunchService.checkComplete && markerChecked
 
     property bool changelogDismissed: false
     property var release: null
