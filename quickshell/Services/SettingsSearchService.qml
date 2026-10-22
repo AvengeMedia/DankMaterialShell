@@ -342,7 +342,7 @@ Singleton {
     function translateItem(item) {
         const isRuntimePlugin = item.runtimeType === "plugin";
         const label = _itemLabel(item);
-        const description = isRuntimePlugin ? (item.description || "") : I18n.tr(item.description || "");
+        const description = isRuntimePlugin ? (item.description || "") : _withArgs(I18n.tr(item.description || ""), item.descriptionArgs);
         const category = I18n.tr(item.category);
         return {
             section: item.section,
@@ -359,6 +359,12 @@ Singleton {
         };
     }
 
+    function _withArgs(text, args) {
+        if (!args)
+            return text;
+        return args.reduce((acc, arg) => acc.arg(arg), text);
+    }
+
     function _rebuildTranslationCache() {
         _cacheDirty = false;
         var cache = [];
@@ -366,7 +372,7 @@ Singleton {
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
             var t = translateItem(item);
-            var sourceDescription = item.description || "";
+            var sourceDescription = _withArgs(item.description || "", item.descriptionArgs);
             var labelLower = _lowerVariants([item.label, t.label]);
             var categoryLower = _lowerVariants([item.category, item.parentLabel, t.category]);
             var descriptionLower = item.runtimeType === "plugin" ? [] : _lowerVariants([sourceDescription, t.description]);

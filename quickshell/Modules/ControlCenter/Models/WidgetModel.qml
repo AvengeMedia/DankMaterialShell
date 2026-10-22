@@ -385,7 +385,7 @@ QtObject {
             "type": "action",
             "category": "system",
             "enabled": DgopService.dgopAvailable,
-            "warning": !DgopService.dgopAvailable ? I18n.tr("Requires 'dgop' tool") : undefined,
+            "warning": !DgopService.dgopAvailable ? I18n.tr("Requires %1", "missing program").arg("dgop") : undefined,
             "allowMultiple": true
         },
         {

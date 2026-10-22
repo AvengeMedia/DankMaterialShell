@@ -229,7 +229,7 @@ Column {
     function warnIfMissingQtTheme() {
         if (Quickshell.env("QT_QPA_PLATFORMTHEME") === "gtk3" || Quickshell.env("QT_QPA_PLATFORMTHEME") === "qt6ct" || Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") === "qt6ct" || SettingsData.qtengineActive || Quickshell.env("QT_QPA_PLATFORMTHEME") === "kde")
             return;
-        ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.", "qt theme env error body"));
+        ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("Set one of these environment variables, then restart the shell:\n%1\n\nOnly %2 requires %3 to be installed.", "qt theme env error body, %1 is a list of variable assignments, %2 and %3 are package names").arg(["QT_QPA_PLATFORMTHEME=gtk3", "QT_QPA_PLATFORMTHEME=qt6ct", "QT_QPA_PLATFORMTHEME=qtengine"].join("\n")).arg("qt6ct").arg("qt6ct-kde"));
     }
 
     SettingsCard {
@@ -648,7 +648,7 @@ Column {
 
         SettingsNoteRow {
             visible: !Theme.matugenAvailable
-            text: I18n.tr("Install matugen package for dynamic theming", "matugen installation hint")
+            text: I18n.tr("Install the %1 package for dynamic theming", "matugen installation hint, %1 is the package name").arg("matugen")
         }
 
         SettingsRow {
@@ -1086,7 +1086,7 @@ Column {
             settingKey: "blurredWallpaperLayer"
             visible: CompositorService.isNiri
             text: I18n.tr("Blur layer")
-            description: I18n.tr("Layer namespace dms:blurwallpaper, needs a niri blur rule")
+            description: I18n.tr("Layer namespace %1, needs a niri blur rule", "blur layer toggle description, %1 is the layer namespace").arg("dms:blurwallpaper")
             checked: SettingsData.blurredWallpaperLayer
             onToggled: checked => SettingsData.set("blurredWallpaperLayer", checked)
         }

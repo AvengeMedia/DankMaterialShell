@@ -335,7 +335,7 @@ Item {
     }
 
     function showHyprlandReadOnlyWarning() {
-        ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before changing these settings."), "dms setup", "hyprland-migration");
+        ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using %1. Run %2 to migrate before changing these settings.", "hyprland legacy config warning, %1 is the config file, %2 a command").arg("hyprland.conf").arg("dms setup"), "dms setup", "hyprland-migration");
     }
 
     Component.onCompleted: {

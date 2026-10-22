@@ -26,7 +26,7 @@ CcTile {
     }
     subtitle: {
         if (!DgopService.dgopAvailable)
-            return I18n.tr("DMS_SOCKET not available");
+            return I18n.tr("%1 not available", "%1 is a tool or environment variable name").arg("DMS_SOCKET");
         if (!selectedMount)
             return I18n.tr("No disk data available");
         return `${selectedMount.used} / ${selectedMount.size} (${usagePercent.toFixed(0)}%)`;

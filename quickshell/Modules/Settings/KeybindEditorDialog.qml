@@ -755,8 +755,8 @@ DDialog {
 
         SettingsRow {
             iconName: "warning"
-            title: I18n.tr("This bind is overridden by config.kdl")
-            subtitle: I18n.tr("Config action: %1", "keybind conflict notice, %1 is the action from the compositor config").arg(root.configConflict?.action ?? "") + "\n" + I18n.tr("To use this DMS bind, remove or change the keybind in your config.kdl")
+            title: I18n.tr("This bind is overridden by %1", "keybind conflict notice, %1 is the compositor config file").arg("config.kdl")
+            subtitle: I18n.tr("Config action: %1", "keybind conflict notice, %1 is the action from the compositor config").arg(root.configConflict?.action ?? "") + "\n" + I18n.tr("To use this DMS bind, remove or change the keybind in your %1", "keybind conflict hint, %1 is the compositor config file").arg("config.kdl")
         }
     }
 

@@ -278,6 +278,27 @@ def enrich_keywords(label, description, category, existing_tags, parent_label=No
     return sorted(keywords)
 
 
+def literal_args(value):
+    """Positional .arg() values after the first I18n.tr call, None where the arg is not a string literal."""
+    call_tail = value.split("I18n.tr(", 1)[-1].split("I18n.tr(", 1)[0]
+    args = []
+    for match in re.finditer(r"\.arg\(\s*(?:" + STR_DQ + "|" + STR_SQ + r")?", call_tail):
+        if match.group(1) is not None:
+            args.append(decode_string_literal(match.group(1), '"'))
+        elif match.group(2) is not None:
+            args.append(decode_string_literal(match.group(2), "'"))
+        else:
+            args.append(None)
+    return args
+
+
+def apply_args(text, args):
+    for index, arg in enumerate(args, start=1):
+        if arg is not None:
+            text = text.replace(f"%{index}", arg)
+    return text
+
+
 def extract_i18n_string(value):
     for literal, quote in ((STR_DQ, '"'), (STR_SQ, "'")):
         match = re.search(rf"I18n\.tr\(\s*{literal}", value) or re.fullmatch(literal, value.strip())
@@ -494,8 +515,10 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
 
             desc_raw = extract_property(own, "description") or extract_property(own, "summary") or defaults.get("description") or borrowed_description(block, setting_key)
             description = None
+            description_args = []
             if desc_raw and not is_status_notice(desc_raw):
                 description = extract_i18n_string(desc_raw)
+                description_args = literal_args(desc_raw)
 
             visible_raw = extract_property(own_scope(block), "visible")
             page_meta = hub_meta.get(file_page) if file_page else None
@@ -567,7 +590,7 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
                 condition_key = next((cond for start, end, cond in card_conditions if start < match.start() < end), None)
 
             category, parent_label, _ = page_meta if page_meta else tab_meta.get(tab_index, TAB_META_DEFAULT)
-            enriched_keywords = enrich_keywords(label, description, category, tags, parent_label)
+            enriched_keywords = enrich_keywords(label, apply_args(description, description_args) if description else description, category, tags, parent_label)
 
             entry = {
                 "section": setting_key,
@@ -585,6 +608,8 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
                 entry["icon"] = icon
             if description:
                 entry["description"] = description
+            if description_args and None not in description_args:
+                entry["descriptionArgs"] = description_args
             if condition_key:
                 entry["conditionKey"] = condition_key
 

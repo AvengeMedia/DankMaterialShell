@@ -49,7 +49,7 @@ Item {
         SettingsNoteRow {
             paintBackground: false
             noteIconName: "info"
-            text: I18n.tr("The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).")
+            text: I18n.tr("The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (%1 and %2).", "theme apps backup note, %1 and %2 are config paths").arg("qt5ct.conf|qt6ct.conf|qtengine/config.json").arg("~/.config/gtk-3.0|gtk-4.0")
         }
 
         SettingsCard {
@@ -184,7 +184,7 @@ Item {
                 tags: ["matugen", "user", "templates"]
                 settingKey: "runUserMatugenTemplates"
                 text: I18n.tr("Run user templates")
-                description: I18n.tr("Also runs the templates in your matugen config.toml", "run user matugen templates toggle description")
+                description: I18n.tr("Also runs the templates in your %1", "run user matugen templates toggle description, %1 is the matugen config file").arg("matugen config.toml")
                 checked: SettingsData.runUserMatugenTemplates
                 onToggled: checked => SettingsData.set("runUserMatugenTemplates", checked)
             }

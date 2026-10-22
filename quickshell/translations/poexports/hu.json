@@ -113,8 +113,14 @@
   "%1 is %2 and may use a lot of memory.": {
     "%1 is %2 and may use a lot of memory.": "A(z) %1 értéke %2, és előfordulhat, hogy sok memóriát igényel."
   },
+  "%1 is not installed. Install the package to manage the greeter.": {
+    "%1 is not installed. Install the package to manage the greeter.": ""
+  },
   "%1 is now included in config": {
     "%1 is now included in config": "A(z) %1 mostantól szerepel a konfigurációban"
+  },
+  "%1 is running and will create duplicate Bluetooth players. Disable it with: %2": {
+    "%1 is running and will create duplicate Bluetooth players. Disable it with: %2": ""
   },
   "%1 issue found": {
     "%1 issue found": "%1 hiba található"
@@ -146,8 +152,17 @@
   "%1 ms": {
     "%1 ms": "%1 ms"
   },
+  "%1 not available": {
+    "%1 not available": ""
+  },
+  "%1 not available - lock integration requires the DMS socket connection": {
+    "%1 not available - lock integration requires the DMS socket connection": ""
+  },
+  "%1 not available or disabled - cannot apply %2 colors": {
+    "%1 not available or disabled - cannot apply %2 colors": ""
+  },
   "%1 not found": {
-    "%1 not found": ""
+    "%1 not found": "%1 nem található"
   },
   "%1 notifications": {
     "%1 notifications": "%1 értesítés"
@@ -156,7 +171,7 @@
     "%1 online": "%1 online"
   },
   "%1 only": {
-    "%1 only": ""
+    "%1 only": "Csak %1"
   },
   "%1 other": {
     "%1 other": "%1 egyéb"
@@ -186,7 +201,7 @@
     "%1 tasks": "%1 feladat"
   },
   "%1 uninstalled": {
-    "%1 uninstalled": ""
+    "%1 uninstalled": "%1 eltávolítva"
   },
   "%1 update": {
     "%1 update": "%1 frissítés"
@@ -270,7 +285,7 @@
     "A floating companion that works alongside any bar layout": "Egy lebegő társ, amely bármelyik panel elrendezés mellett működik"
   },
   "A modern desktop shell for Wayland": {
-    "A modern desktop shell for Wayland": ""
+    "A modern desktop shell for Wayland": "Egy modern asztali felület Waylandhez"
   },
   "A newer dms binary is installed.": {
     "A newer dms binary is installed.": "Újabb dms bináris van telepítve."
@@ -386,8 +401,8 @@
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "Hozzáadod a(z) „%1” felhasználót a(z) %2 csoporthoz?"
   },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "Hozzáadod a(z) „%1” felhasználót a(z) %2 csoporthoz? Ki kell jelentkeznie, majd újra be kell jelentkeznie, ezután futtatnia kell a dms-greeter sync --profile parancsot a bejelentkezési képernyő témájának közzétételéhez."
+  "Add \"%1\" to the %2 group? They must log out and back in, then run %3 to publish their login-screen theme.": {
+    "Add \"%1\" to the %2 group? They must log out and back in, then run %3 to publish their login-screen theme.": ""
   },
   "Add Desktop Widget": {
     "Add Desktop Widget": "Asztali widget hozzáadása"
@@ -461,8 +476,8 @@
   "Adds concave curves where the bar meets the screen edge": {
     "Adds concave curves where the bar meets the screen edge": "A sáv és a képernyő szélének találkozásánál homorú íveket ad hozzá"
   },
-  "Adds them to the %1 group so they can run dms-greeter sync --profile": {
-    "Adds them to the %1 group so they can run dms-greeter sync --profile": "Hozzáadja őket a(z) %1 csoporthoz, így futtathatják a dms-greeter sync --profile parancsot"
+  "Adds them to the %1 group so they can run %2": {
+    "Adds them to the %1 group so they can run %2": ""
   },
   "Adds them to the %1 group so they can use sudo": {
     "Adds them to the %1 group so they can use sudo": "Hozzáadja őket a(z) %1 csoporthoz, így használhatják a sudo parancsot"
@@ -510,7 +525,7 @@
     "All displays": "Összes kijelző"
   },
   "All plugins": {
-    "All plugins": ""
+    "All plugins": "Minden bővítmény"
   },
   "All settings": {
     "All settings": "Minden beállítás"
@@ -543,10 +558,10 @@
     "Already on that session": "Már ebben a munkamenetben vagy"
   },
   "Already upvoted, click again to remove": {
-    "Already upvoted, click again to remove": ""
+    "Already upvoted, click again to remove": "Már szavaztál, kattints újra az eltávolításhoz"
   },
-  "Also runs the templates in your matugen config.toml": {
-    "Also runs the templates in your matugen config.toml": "Ezenkívül futtatja a matugen config.toml fájlban szereplő sablonokat is"
+  "Also runs the templates in your %1": {
+    "Also runs the templates in your %1": ""
   },
   "Also saves the screenshot to disk": {
     "Also saves the screenshot to disk": "A képernyőképet a lemezre is menti"
@@ -1238,9 +1253,6 @@
   "Built-in plugins": {
     "Built-in plugins": "Beépített bővítmények"
   },
-  "Bundled greeter active": {
-    "Bundled greeter active": "A csomagolt üdvözlőképernyő aktív"
-  },
   "Button areas": {
     "Button areas": "Gombterületek"
   },
@@ -1380,7 +1392,7 @@
     "Changes save to %1": "A változtatások mentése ide: %1"
   },
   "Changes volume and audio devices": {
-    "Changes volume and audio devices": ""
+    "Changes volume and audio devices": "Módosítja a hangerőt és a hangeszközöket"
   },
   "Channel": {
     "Channel": "Csatorna"
@@ -1517,8 +1529,8 @@
   "Click 'Setup' to create %1 and add include to your compositor config.": {
     "Click 'Setup' to create %1 and add include to your compositor config.": "Kattints a „Beállítás” gombra a %1 létrehozásához és az include bejegyzés hozzáadásához a kompozitor konfigurációhoz."
   },
-  "Click Import to add a .ovpn or .conf": {
-    "Click Import to add a .ovpn or .conf": "Kattints az importálás gombra .ovpn vagy .conf fájl hozzáadásához"
+  "Click Import to add a %1 or %2 file": {
+    "Click Import to add a %1 or %2 file": ""
   },
   "Click actions": {
     "Click actions": "Kattintási műveletek"
@@ -1800,7 +1812,7 @@
     "Connections and autoconnect": "Kapcsolatok és automatikus csatlakozás"
   },
   "Connects to the internet": {
-    "Connects to the internet": ""
+    "Connects to the internet": "Csatlakozik az internethez"
   },
   "Consumes the key only when a dispatcher runs": {
     "Consumes the key only when a dispatcher runs": "Csak akkor nyeli el a billentyűt, ha egy kézbesítő lefut"
@@ -1827,7 +1839,7 @@
     "Controls": "Vezérlők"
   },
   "Controls media players": {
-    "Controls media players": ""
+    "Controls media players": "Vezérli a médialejátszókat"
   },
   "Convert to DMS": {
     "Convert to DMS": "Konvertálás DMS-formátumba"
@@ -2064,13 +2076,13 @@
     "DMS chooser": "DMS-választó"
   },
   "DMS is a modern, highly customizable desktop shell that looks great out of the box, without sacrificing the freedom to make it your own.<br/><br/>Built with %1 and %2, it brings together panels, widgets, system controls, and more into a cohesive desktop experience.": {
-    "DMS is a modern, highly customizable desktop shell that looks great out of the box, without sacrificing the freedom to make it your own.<br/><br/>Built with %1 and %2, it brings together panels, widgets, system controls, and more into a cohesive desktop experience.": ""
+    "DMS is a modern, highly customizable desktop shell that looks great out of the box, without sacrificing the freedom to make it your own.<br/><br/>Built with %1 and %2, it brings together panels, widgets, system controls, and more into a cohesive desktop experience.": "A DMS egy modern, rendkívül személyre szabható asztali felület, amely alapértelmezetten is remekül néz ki, anélkül, hogy feláldozná a saját ízlésre formálás szabadságát.<br/><br/>%1 és %2 segítségével készült, és egyesíti a paneleket, modulokat, rendszervezérlőket és még sok mást egy egységes asztali élményben."
   },
   "DMS out of date": {
     "DMS out of date": "A DMS elavult"
   },
-  "DMS removes its managed block from /etc/pam.d/greetd and stops write services": {
-    "DMS removes its managed block from /etc/pam.d/greetd and stops write services": "A DMS eltávolítja a kezelt blokkját a /etc/pam.d/greetd fájlból, és leállítja az írási szolgáltatásokat"
+  "DMS removes its managed block from %1 and stops write services": {
+    "DMS removes its managed block from %1 and stops write services": ""
   },
   "DMS server is outdated (API v%1, expected v%2)": {
     "DMS server is outdated (API v%1, expected v%2)": "A DMS-szerver elavult (API v%1, várt v%2)"
@@ -2087,9 +2099,6 @@
   "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": {
     "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": "A DMS a betűkészletcsaládot, a vastagságot és a skálát használja. A pontos megjelenés, dőlés, szélesség és külön skálázott sávok eltérhetnek."
   },
-  "DMS_SOCKET not available": {
-    "DMS_SOCKET not available": "A DMS_SOCKET nem érhető el"
-  },
   "Daily": {
     "Daily": "Napi"
   },
@@ -2104,15 +2113,6 @@
   },
   "DankBar": {
     "DankBar": "DankBar"
-  },
-  "DankCalendar": {
-    "DankCalendar": "DankCalendar"
-  },
-  "DankCalendar isn't installed": {
-    "DankCalendar isn't installed": "A DankCalendar nincs telepítve"
-  },
-  "DankCalendar isn't running": {
-    "DankCalendar isn't running": "A DankCalendar nem fut"
   },
   "Dark": {
     "Dark": "Sötét"
@@ -2179,6 +2179,9 @@
   },
   "Deck": {
     "Deck": "Köteg"
+  },
+  "Declared by the author, not enforced": {
+    "Declared by the author, not enforced": ""
   },
   "Default": {
     "Default": "Alapértelmezett"
@@ -2310,7 +2313,7 @@
     "Dew point %1": "Harmatpont %1"
   },
   "Did you mean": {
-    "Did you mean": ""
+    "Did you mean": "Erre gondoltál?"
   },
   "Digital": {
     "Digital": "Digitális"
@@ -2865,7 +2868,7 @@
     "Expressive": "Expresszív"
   },
   "Extend %1 with powerful plugins for widgets, launchers, and more": {
-    "Extend %1 with powerful plugins for widgets, launchers, and more": ""
+    "Extend %1 with powerful plugins for widgets, launchers, and more": "Bővítsd ki a(z) %1 funkcióit hatékony modulokkal, indítókkal és egyéb bővítményekkel"
   },
   "Extend battery life": {
     "Extend battery life": "Akkumulátor-üzemidő növelése"
@@ -3053,8 +3056,8 @@
   "Failed to resume printer": {
     "Failed to resume printer": "Nem sikerült folytatni a nyomtatót"
   },
-  "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
-    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "Nem sikerült futtatni a 'dms-greeter status' parancsot. Győződj meg arról, hogy a dms-greeter csomag telepítve van."
+  "Failed to run '%1'. Ensure the %2 package is installed.": {
+    "Failed to run '%1'. Ensure the %2 package is installed.": ""
   },
   "Failed to save VPN credentials": {
     "Failed to save VPN credentials": "Nem sikerült menteni a VPN-hitelesítési adatokat"
@@ -3156,7 +3159,7 @@
     "Family": "Betűcsalád"
   },
   "Featured plugin": {
-    "Featured plugin": ""
+    "Featured plugin": "Kiemelt bővítmény"
   },
   "Feels Like %1°": {
     "Feels Like %1°": "Hőérzet: %1°"
@@ -3176,8 +3179,8 @@
   "File manager": {
     "File manager": "Fájlkezelő"
   },
-  "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
-    "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "A fájlkereséshez dsearch szükséges\nTelepítsd innen: github.com/AvengeMedia/danksearch"
+  "File search requires %1\nInstall from %2": {
+    "File search requires %1\nInstall from %2": ""
   },
   "File the command writes; leave empty to read stdout": {
     "File the command writes; leave empty to read stdout": "Fájl, amibe a parancs ír; hagyd üresen az stdout olvasásához"
@@ -3255,7 +3258,7 @@
     "Fits the song title instead of keeping a fixed width": "A dal címéhez igazodik, ahelyett, hogy rögzített szélességet tartana fenn"
   },
   "Fits your setup": {
-    "Fits your setup": ""
+    "Fits your setup": "Illik a rendszeredhez"
   },
   "Fixed": {
     "Fixed": "Rögzített"
@@ -3402,7 +3405,7 @@
     "For %1": "Itt: %1"
   },
   "For you": {
-    "For you": ""
+    "For you": "Neked ajánlott"
   },
   "Force HDR": {
     "Force HDR": "HDR kényszerítése"
@@ -3768,7 +3771,7 @@
     "Hide installed": "Telepítettek elrejtése"
   },
   "Hide on last display": {
-    "Hide on last display": ""
+    "Hide on last display": "Elrejtés az utolsó kijelzőn"
   },
   "Hide until typing": {
     "Hide until typing": "Elrejtés gépelésig"
@@ -3929,8 +3932,8 @@
   "IP address or hostname": {
     "IP address or hostname": "IP-cím vagy gépnév"
   },
-  "IP sharing setup failed. Check that dnsmasq is installed.": {
-    "IP sharing setup failed. Check that dnsmasq is installed.": "Az IP-megosztás beállítása sikertelen. Ellenőrizd, hogy a dnsmasq telepítve van-e."
+  "IP sharing setup failed. Check that %1 is installed.": {
+    "IP sharing setup failed. Check that %1 is installed.": ""
   },
   "ISO date": {
     "ISO date": "ISO-dátum"
@@ -4148,14 +4151,14 @@
   "Install failed: %1": {
     "Install failed: %1": "A telepítés sikertelen: %1"
   },
-  "Install matugen package for dynamic theming": {
-    "Install matugen package for dynamic theming": "Telepítsd a matugen csomagot a dinamikus témázáshoz"
-  },
   "Install plugin '%1' from the DMS registry?": {
     "Install plugin '%1' from the DMS registry?": "Telepíted a(z) „%1” bővítményt a DMS-regiszterből?"
   },
   "Install system updates?": {
     "Install system updates?": "Telepíted a rendszerfrissítéseket?"
+  },
+  "Install the %1 package for dynamic theming": {
+    "Install the %1 package for dynamic theming": ""
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "Telepíted a(z) „%1” témát a DMS-regiszterből?"
@@ -4409,8 +4412,8 @@
   "Launching": {
     "Launching": "Indítás"
   },
-  "Layer namespace dms:blurwallpaper, needs a niri blur rule": {
-    "Layer namespace dms:blurwallpaper, needs a niri blur rule": "A dms:blurwallpaper réteg névtérnek niri homályosítási szabályra van szüksége"
+  "Layer namespace %1, needs a niri blur rule": {
+    "Layer namespace %1, needs a niri blur rule": ""
   },
   "Layer outline": {
     "Layer outline": "Réteg körvonala"
@@ -4503,7 +4506,7 @@
     "Lightest": "Legvilágosabb"
   },
   "Like your plugins": {
-    "Like your plugins": ""
+    "Like your plugins": "A bővítményeihez hasonló"
   },
   "Limit": {
     "Limit": "Korlát"
@@ -4524,7 +4527,7 @@
     "Lines: %1": "%1 sor"
   },
   "Link copied": {
-    "Link copied": ""
+    "Link copied": "Hivatkozás másolva"
   },
   "Link your DMS settings so the login screen follows them.": {
     "Link your DMS settings so the login screen follows them.": "Kapcsold össze a DMS-beállításaidat, hogy a bejelentkezési képernyő kövesse azokat."
@@ -5118,7 +5121,7 @@
     "Near island": "Közeli Sziget"
   },
   "Needs": {
-    "Needs": ""
+    "Needs": "Szükséges"
   },
   "Nested chip": {
     "Nested chip": "Beágyazott chip"
@@ -5163,7 +5166,7 @@
     "New": "Új"
   },
   "New & updated": {
-    "New & updated": ""
+    "New & updated": "Új és frissített"
   },
   "New Session": {
     "New Session": "Új munkamenet"
@@ -5597,17 +5600,17 @@
   "Not available": {
     "Not available": "Nem érhető el"
   },
-  "Not available - install fprintd and pam_fprintd": {
-    "Not available - install fprintd and pam_fprintd": "Nem érhető el - telepítsd a fprintd és pam_fprintd csomagokat"
+  "Not available - install %1 and %2": {
+    "Not available - install %1 and %2": ""
   },
-  "Not available - install or configure pam_u2f": {
-    "Not available - install or configure pam_u2f": "Nem érhető el - telepítsd vagy konfiguráld a pam_u2f csomagot"
+  "Not available - install %1 and %2, or configure %3 PAM": {
+    "Not available - install %1 and %2, or configure %3 PAM": ""
   },
-  "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
-    "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": "Nem érhető el — telepítsd az fprintd és pam_fprintd csomagokat, vagy konfiguráld a greetd PAM-beállításait."
+  "Not available - install or configure %1": {
+    "Not available - install or configure %1": ""
   },
-  "Not available — install or configure pam_u2f, or configure greetd PAM.": {
-    "Not available — install or configure pam_u2f, or configure greetd PAM.": "Nem érhető el — telepítsd vagy konfiguráld a pam_u2f-et, vagy konfiguráld a greetd PAM-beállításait."
+  "Not available - install or configure %1, or configure %2 PAM": {
+    "Not available - install or configure %1, or configure %2 PAM": ""
   },
   "Not bound": {
     "Not bound": "Nincs társítva"
@@ -5712,7 +5715,7 @@
     "Occupied color": "Foglalt szín"
   },
   "Off": {
-    "Off": "Kikapcsolva"
+    "Off": "Ki"
   },
   "Off keeps the bar hidden until turned back on or shown over IPC": {
     "Off keeps the bar hidden until turned back on or shown over IPC": "A „Ki” beállítás elrejti a sávot, amíg újra be nem kapcsolják, vagy az IPC-n keresztül nem jelenik meg"
@@ -5724,7 +5727,7 @@
     "Office": "Iroda"
   },
   "Official only": {
-    "Official only": ""
+    "Official only": "Csak hivatalos"
   },
   "Offline Report": {
     "Offline Report": "Offline jelentés"
@@ -5820,10 +5823,10 @@
     "Open with": "Megnyitás ezzel"
   },
   "Opening GitHub to remove the upvote": {
-    "Opening GitHub to remove the upvote": ""
+    "Opening GitHub to remove the upvote": "GitHub megnyitása a szavazat visszavonásához"
   },
   "Opening GitHub to upvote": {
-    "Opening GitHub to upvote": ""
+    "Opening GitHub to upvote": "GitHub megnyitása a szavazáshoz"
   },
   "Opening terminal: ": {
     "Opening terminal: ": "Terminál megnyitása: "
@@ -6132,10 +6135,10 @@
     "Pick how long to stay awake": "Válaszd ki, mennyi ideig maradjon ébren"
   },
   "Pick of the day": {
-    "Pick of the day": ""
+    "Pick of the day": "A nap választása"
   },
   "Pick of the week": {
-    "Pick of the week": ""
+    "Pick of the week": "A hét választása"
   },
   "Pill": {
     "Pill": "Kapszula"
@@ -6161,8 +6164,8 @@
   "Pixelate": {
     "Pixelate": "Képpontosítás"
   },
-  "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
-    "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Helyezd ide a bővítménykönyvtárakat. Minden bővítménynek rendelkeznie kell egy plugin.json fájllal."
+  "Place plugin directories here. Each plugin should have a %1 manifest file.": {
+    "Place plugin directories here. Each plugin should have a %1 manifest file.": ""
   },
   "Placement": {
     "Placement": "Elhelyezés"
@@ -6243,7 +6246,7 @@
     "Plugins": "Bővítmények"
   },
   "Plugins by %1": {
-    "Plugins by %1": ""
+    "Plugins by %1": "%1 bővítményei"
   },
   "Plugins shown in All mode without a trigger. Drag to reorder": {
     "Plugins shown in All mode without a trigger. Drag to reorder": "Összes módban indító nélkül megjelenő bővítmények. Húzza az átrendezéshez"
@@ -6270,7 +6273,7 @@
     "Popouts and modals use the main animation duration": "A felugró ablakok és a modális ablakok a fő animáció időtartamát veszik alapul"
   },
   "Popular": {
-    "Popular": ""
+    "Popular": "Népszerű"
   },
   "Popular Plugins": {
     "Popular Plugins": "Népszerű bővítmények"
@@ -6512,8 +6515,8 @@
   "Profile not found": {
     "Profile not found": "Profil nem található"
   },
-  "Profile not found in monitors.json": {
-    "Profile not found in monitors.json": "A profil nem található a monitors.json fájlban"
+  "Profile not found in %1": {
+    "Profile not found in %1": ""
   },
   "Profile on AC": {
     "Profile on AC": "Profil hálózati tápellátáskor"
@@ -6612,22 +6615,22 @@
     "Read:": "Olvasás:"
   },
   "Reads audio devices and volume": {
-    "Reads audio devices and volume": ""
+    "Reads audio devices and volume": "Olvassa a hangeszközöket és a hangerőt"
   },
   "Reads its own settings": {
-    "Reads its own settings": ""
+    "Reads its own settings": "Olvassa a saját beállításait"
   },
   "Reads its saved state": {
-    "Reads its saved state": ""
+    "Reads its saved state": "Olvassa a mentett állapotát"
   },
   "Reads the clipboard": {
-    "Reads the clipboard": ""
+    "Reads the clipboard": "Olvassa a vágólapot"
   },
   "Reads the list of running programs": {
-    "Reads the list of running programs": ""
+    "Reads the list of running programs": "Olvassa a futó programok listáját"
   },
   "Reads your files": {
-    "Reads your files": ""
+    "Reads your files": "Olvassa a fájljaidat"
   },
   "Ready": {
     "Ready": "Kész"
@@ -6773,11 +6776,11 @@
   "Remove the shortcut %1?": {
     "Remove the shortcut %1?": "Eltávolítod a(z) %1 gyorsbillentyűt?"
   },
-  "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": {
-    "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": "Eltávolítod a(z) %1 gyorsbillentyűt? Egy feloldási bejegyzés mentésre kerül a dms/binds-user.lua fájlba, így a DMS frissítései után is törölve marad."
+  "Remove the shortcut %1? An unbind entry will be saved to %2 so it stays removed across DMS updates.": {
+    "Remove the shortcut %1? An unbind entry will be saved to %2 so it stays removed across DMS updates.": ""
   },
   "Remove upvote": {
-    "Remove upvote": ""
+    "Remove upvote": "Szavazat eltávolítása"
   },
   "Removed administrator privileges": {
     "Removed administrator privileges": "Rendszergazdai jogosultságok eltávolítva"
@@ -6830,8 +6833,8 @@
   "Requires %1": {
     "Requires %1": "%1 szükséges"
   },
-  "Requires 'dgop' tool": {
-    "Requires 'dgop' tool": "Szükséges a „dgop” eszköz"
+  "Requires %1, %2, and your user in the %3 group (plus %4 for fingerprint, %5 for security keys).": {
+    "Requires %1, %2, and your user in the %3 group (plus %4 for fingerprint, %5 for security keys).": ""
   },
   "Requires DMS %1": {
     "Requires DMS %1": "DMS %1 szükséges"
@@ -6841,9 +6844,6 @@
   },
   "Requires MangoWC compositor": {
     "Requires MangoWC compositor": "MangoWC kompozitor szükséges"
-  },
-  "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": "Szükséges hozzá a greetd, dms-greeter, és a felhasználója a greeter csoportban (plusz fprintd/pam_fprintd az ujjlenyomathoz, pam_u2f a biztonsági kulcsokhoz)."
   },
   "Requires night mode support": {
     "Requires night mode support": "Éjszakai mód támogatás szükséges"
@@ -6957,7 +6957,7 @@
     "Root Filesystem": "Gyökérkönyvtár fájlrendszer"
   },
   "Rotating Cookie": {
-    "Rotating Cookie": ""
+    "Rotating Cookie": "Forgó süti"
   },
   "Rounded": {
     "Rounded": "Lekerekített"
@@ -7001,8 +7001,8 @@
   "Run a shell command (e.g., notify-send)": {
     "Run a shell command (e.g., notify-send)": "Héjparancs futtatása (például „notify-send”)"
   },
-  "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": {
-    "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": "Külső parancs futtatása minden háttérkép-változtatáskor, és annak JSON-palettájának beolvasztása a matugenbe egy névtér alatt, így a sablonok használhatják pl. a {{name.color0}} változót. A parancs megkapja a háttérképet {image} / $DMS_WALLPAPER formátumban, a módot pedig {mode} / $DMS_MODE formátumban."
+  "Run an external command on each wallpaper change and merge its JSON palette into %1 under a namespace, so templates can use e.g. %2. The command receives the wallpaper as %3 and the mode as %4.": {
+    "Run an external command on each wallpaper change and merge its JSON palette into %1 under a namespace, so templates can use e.g. %2. The command receives the wallpaper as %3 and the mode as %4.": ""
   },
   "Run full sync": {
     "Run full sync": "Teljes szinkronizálás futtatása"
@@ -7026,10 +7026,10 @@
     "Runs in a terminal.": "Terminálban fut."
   },
   "Runs programs on your computer": {
-    "Runs programs on your computer": ""
+    "Runs programs on your computer": "Programokat futtat a számítógépén"
   },
   "Runs shell commands": {
-    "Runs shell commands": ""
+    "Runs shell commands": "Parancsértelmező parancsokat futtat"
   },
   "S": {
     "S": "D"
@@ -7104,10 +7104,10 @@
     "Saved networks": "Mentett hálózatok"
   },
   "Saves its own settings": {
-    "Saves its own settings": ""
+    "Saves its own settings": "Menti a saját beállításait"
   },
   "Saves its state": {
-    "Saves its state": ""
+    "Saves its state": "Menti az állapotát"
   },
   "Saving...": {
     "Saving...": "Mentés…"
@@ -7376,6 +7376,9 @@
   "Set notification rules": {
     "Set notification rules": "Értesítési szabályok beállítása"
   },
+  "Set one of these environment variables, then restart the shell:\n%1\n\nOnly %2 requires %3 to be installed.": {
+    "Set one of these environment variables, then restart the shell:\n%1\n\nOnly %2 requires %3 to be installed.": ""
+  },
   "Set under Theme & colors, Derived color": {
     "Set under Theme & colors, Derived color": "Beállítva a Téma és színek, Származtatott szín alatt"
   },
@@ -7497,7 +7500,7 @@
     "Show discharge rate": "Merülési sebesség megjelenítése"
   },
   "Show every author": {
-    "Show every author": ""
+    "Show every author": "Összes szerző megjelenítése"
   },
   "Show filename": {
     "Show filename": "Fájlnév megjelenítése"
@@ -7740,7 +7743,7 @@
     "Soft square": "Lágy négyzet"
   },
   "Software dimming": {
-    "Software dimming": ""
+    "Software dimming": "Szoftveres fényerőcsökkentés"
   },
   "Software updates": {
     "Software updates": "Szoftverfrissítések"
@@ -8144,11 +8147,8 @@
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "A tartalék terminál megnyitása sikertelen. Telepíts egy támogatott terminálemulátort, vagy futtasd a 'dms auth sync' parancsot."
   },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "A tartalék terminál megnyitása sikertelen. Telepítsd a támogatott terminálemulátorok egyikét, vagy futtasd a 'dms-greeter sync' parancsot."
-  },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.": "A tartalék terminál megnyitása sikertelen. Telepítsd a támogatott terminálemulátorok egyikét, vagy futtasd a 'dms-greeter unlink' parancsot."
+  "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": ""
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": "A tartalék terminál megnyitva. Végezd el ott a hitelesítést; befejezés után automatikusan bezárul."
@@ -8189,11 +8189,11 @@
   "Text style": {
     "Text style": "Szövegstílus"
   },
+  "The %1 environment variable is not set or the socket is unavailable. Automated plugin management requires it.": {
+    "The %1 environment variable is not set or the socket is unavailable. Automated plugin management requires it.": ""
+  },
   "The Aqueous operation failed.": {
     "The Aqueous operation failed.": "Az Aqueous-művelet nem sikerült."
-  },
-  "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
-    "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "A DMS_SOCKET környezeti változó nincs beállítva, vagy a socket nem érhető el. Az automatizált bővítménykezeléshez DMS_SOCKET szükséges."
   },
   "The Default action only overrides priority": {
     "The Default action only overrides priority": "Az alapértelmezett művelet csak a prioritást bírálja felül"
@@ -8210,8 +8210,8 @@
   "The arrow points in the direction the wind is blowing. The label shows where it comes from.": {
     "The arrow points in the direction the wind is blowing. The label shows where it comes from.": "A nyíl abba az irányba mutat, amerre a szél fúj. A címke azt mutatja, honnan fúj."
   },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": "Az alábbi beállítások módosítják a GTK és Qt beállításokat. Ha meg szeretnéd őrizni jelenlegi konfigurációidat, készíts róluk biztonsági mentést (qt5ct.conf|qt6ct.conf|qtengine/config.json és ~/.config/gtk-3.0|gtk-4.0)."
+  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (%1 and %2).": {
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (%1 and %2).": ""
   },
   "The compositor session changed. Discard this edit before starting a new one.": {
     "The compositor session changed. Discard this edit before starting a new one.": "A kompozitor munkamenet megváltozott. Vesd el ezt a szerkesztést, mielőtt újat kezdenél."
@@ -8227,9 +8227,6 @@
   },
   "The fill shows today's precipitation probability.": {
     "The fill shows today's precipitation probability.": "A kitöltés a mai csapadék valószínűségét mutatja."
-  },
-  "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
-    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": "A DMS-hez mellékelt bejelentkező felület aktív (archinstall-beállítás). Továbbra is működik így, de a téma és a beállítások szinkronizálásához az önálló bejelentkező felület szükséges. Telepítsd a greetd-dms-greeter-bin csomagot az AUR-ból, majd futtasd a Szinkronizálást az üdvözlőképernyő migrálásához."
   },
   "The highlighted marker shows the UV category: low, moderate, high, very high, or extreme.": {
     "The highlighted marker shows the UV category: low, moderate, high, very high, or extreme.": "A kiemelt jelző az UV kategóriát mutatja: alacsony, mérsékelt, magas, nagyon magas vagy extrém."
@@ -8318,8 +8315,8 @@
   "Themes": {
     "Themes": "Témák"
   },
-  "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": {
-    "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": "Ezek bejegyzéseket adnak hozzá az XDG automatikus indítási könyvtárhoz (~/.config/autostart/*.desktop)"
+  "These add entries to the XDG autostart directory (%1)": {
+    "These add entries to the XDG autostart directory (%1)": ""
   },
   "They load with the next update check. Release notes are also published on GitHub.": {
     "They load with the next update check. Release notes are also published on GitHub.": "A következő frissítés-ellenőrzéskor töltődnek be. A kiadási megjegyzések a GitHubon is elérhetők."
@@ -8334,13 +8331,13 @@
     "Third-party plugins": "Harmadik féltől származó bővítmények"
   },
   "Third-party plugins are created by the community and are not officially supported by %1.\n\nThese plugins may pose security and privacy risks - install at your own risk.": {
-    "Third-party plugins are created by the community and are not officially supported by %1.\n\nThese plugins may pose security and privacy risks - install at your own risk.": ""
+    "Third-party plugins are created by the community and are not officially supported by %1.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "A külső bővítményeket a közösség készíti, és a(z) %1 hivatalosan nem támogatja őket.\\n\\nEzek a bővítmények biztonsági és adatvédelmi kockázatot jelenthetnek – a telepítésük csak saját felelősségre ajánlott."
   },
   "This bar is the Island": {
     "This bar is the Island": "Ez a sáv a Sziget"
   },
-  "This bind is overridden by config.kdl": {
-    "This bind is overridden by config.kdl": "Ezt a billentyűt felülírja a config.kdl"
+  "This bind is overridden by %1": {
+    "This bind is overridden by %1": ""
   },
   "This device": {
     "This device": "Ez az eszköz"
@@ -8351,8 +8348,8 @@
   "This display does not report VRR support": {
     "This display does not report VRR support": "Ez a kijelző nem jelez VRR-támogatást"
   },
-  "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": {
-    "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": "Ez a telepítés továbbra is a hyprland.conf fájlt használja. Futtasd a dms setup parancsot a migráláshoz ezen beállítások módosítása előtt."
+  "This install is still using %1. Run %2 to migrate before changing these settings.": {
+    "This install is still using %1. Run %2 to migrate before changing these settings.": ""
   },
   "This may take a few seconds": {
     "This may take a few seconds": "Ez eltarthat néhány másodpercig"
@@ -8363,11 +8360,8 @@
   "This output is disabled in the current profile": {
     "This output is disabled in the current profile": "Ez a kimenet le van tiltva a jelenlegi profilban"
   },
-  "This plugin can": {
-    "This plugin can": ""
-  },
-  "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
-    "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Ez a bővítmény nem rendelkezik „settings_write” engedéllyel.\n\nAdd hozzá a \"permissions\": [\"settings_read\", \"settings_write\"] sort a plugin.json fájlhoz"
+  "This plugin does not have '%1' permission.\n\nAdd %2 to %3": {
+    "This plugin does not have '%1' permission.\n\nAdd %2 to %3": ""
   },
   "This system cannot link settings live. Sync again after changing them.": {
     "This system cannot link settings live. Sync again after changing them.": "Ez a rendszer nem tudja élőben összekapcsolni a beállításokat. A módosításuk után szinkronizáld újra."
@@ -8474,11 +8468,11 @@
   "To Full": {
     "To Full": "A teljes töltöttségig"
   },
-  "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": {
-    "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": "Másik felhasználóként való bejelentkezéshez jelentkezz ki, és válaszd ki a fiókot az üdvözlőképernyőről. Párhuzamos, új munkamenet létrehozásához több-munkamenetes üdvözlőképernyő szükséges (greetd-flexiserver/GDM/LightDM)."
+  "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (%1).": {
+    "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (%1).": ""
   },
-  "To use this DMS bind, remove or change the keybind in your config.kdl": {
-    "To use this DMS bind, remove or change the keybind in your config.kdl": "A DMS-billentyű használatához távolítsd el vagy módosítsd a billentyűkombinációt a config.kdl fájlban"
+  "To use this DMS bind, remove or change the keybind in your %1": {
+    "To use this DMS bind, remove or change the keybind in your %1": ""
   },
   "Toast": {
     "Toast": "Felugró értesítés"
@@ -8595,7 +8589,7 @@
     "Tray icon tint": "Tálcaikon színezése"
   },
   "Trending": {
-    "Trending": ""
+    "Trending": "Felkapott"
   },
   "Trigger": {
     "Trigger": "Indító"
@@ -8826,13 +8820,13 @@
     "Uptime": "Működési idő"
   },
   "Upvote on GitHub": {
-    "Upvote on GitHub": ""
+    "Upvote on GitHub": "Szavazás GitHubon"
   },
   "Upvote removed": {
-    "Upvote removed": ""
+    "Upvote removed": "Szavazat eltávolítva"
   },
   "Upvoted on GitHub": {
-    "Upvoted on GitHub": ""
+    "Upvoted on GitHub": "Megszavazva GitHubon"
   },
   "Urgent": {
     "Urgent": "Sürgős"
@@ -9120,13 +9114,13 @@
     "Welcome": "Üdvözlünk"
   },
   "Welcome to %1": {
-    "Welcome to %1": ""
+    "Welcome to %1": "Üdvözöl a(z) %1"
   },
   "What changed": {
     "What changed": "Változások"
   },
   "What's New": {
-    "What's New": ""
+    "What's New": "Újdonságok"
   },
   "When locked": {
     "When locked": "Zároláskor"
@@ -9279,7 +9273,7 @@
     "Working...": "Folyamatban…"
   },
   "Works here": {
-    "Works here": ""
+    "Works here": "Itt működik"
   },
   "Works in every submap": {
     "Works in every submap": "Minden altérképben működik"
@@ -9309,7 +9303,7 @@
     "Write:": "Írás:"
   },
   "Writes to your files": {
-    "Writes to your files": ""
+    "Writes to your files": "Írja a fájljaidat"
   },
   "X axis": {
     "X axis": "X tengely"
@@ -9346,9 +9340,6 @@
   },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Nem mentett változtatásaid vannak. Szeretnél menteni a folytatás előtt?"
-  },
-  "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
-    "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": "Be kell állítanod a következők egyikét:\nQT_QPA_PLATFORMTHEME=gtk3 VAGY\nQT_QPA_PLATFORMTHEME=qt6ct VAGY\nQT_QPA_PLATFORMTHEME=qtengine\nkörnyezeti változóként, majd újra kell indítanod a héjat.\n\nCsak a qt6ct igényeli a qt6ct-kde telepítését."
   },
   "You'll enter your password at the greeter after the next reboot.": {
     "You'll enter your password at the greeter after the next reboot.": "A következő újraindítás után meg kell adnod a jelszavadat az üdvözlőképernyőn."
@@ -9420,16 +9411,13 @@
     "checked just now": "ellenőrizve épp most"
   },
   "copy link": {
-    "copy link": ""
+    "copy link": "hivatkozás másolása"
   },
   "deprecated": {
     "deprecated": "elavult"
   },
   "detached": {
     "detached": "leválasztva"
-  },
-  "dgop not available": {
-    "dgop not available": "A dgop nem érhető el"
   },
   "direct": {
     "direct": "közvetlen"
@@ -9439,9 +9427,6 @@
   },
   "display rotation option": {
     "Normal": "Normál"
-  },
-  "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
-    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": "A dms-greeter nincs telepítve. Telepítsd a dms-greeter csomagot az üdvözlőképernyő kezeléséhez."
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "Például /usr/bin/my-script --flag"
@@ -9500,9 +9485,6 @@
   "loginctl integration": {
     "loginctl integration": "loginctl-integráció"
   },
-  "loginctl not available - lock integration requires DMS socket connection": {
-    "loginctl not available - lock integration requires DMS socket connection": "A loginctl nem érhető el – a zárolás integrációhoz DMS-socketkapcsolat szükséges"
-  },
   "mango: config reloaded": {
     "mango: config reloaded": "mango: konfiguráció újratöltve"
   },
@@ -9515,17 +9497,8 @@
   "mangowc GitHub": {
     "mangowc GitHub": "mangowc GitHub"
   },
-  "matugen not available or disabled - cannot apply %1 colors": {
-    "matugen not available or disabled - cannot apply %1 colors": "A matugen nem érhető el vagy le van tiltva - a %1 színei nem alkalmazhatók"
-  },
-  "matugen not found - install matugen package for dynamic theming": {
-    "matugen not found - install matugen package for dynamic theming": "matugen nem található - telepítsd a matugen csomagot a dinamikus témázásért"
-  },
   "missing program": {
     "Requires %1": "%1 szükséges hozzá"
-  },
-  "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": {
-    "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": "Az mpris-proxy fut, és duplikált Bluetooth-lejátszókat fog létrehozni. Tiltsd le ezzel a paranccsal: systemctl --user disable --now mpris-proxy.service"
   },
   "ms": {
     "ms": "ms"
@@ -9547,9 +9520,6 @@
   },
   "niri shortcuts config": {
     "niri shortcuts config": "niri gyorsbillentyűk beállítása"
-  },
-  "niri/dms Discord": {
-    "niri/dms Discord": "niri/dms Discord"
   },
   "niri: config reloaded": {
     "niri: config reloaded": "niri: konfiguráció újratöltve"
@@ -9597,7 +9567,7 @@
     "remote": "távoli"
   },
   "report a problem": {
-    "report a problem": ""
+    "report a problem": "probléma bejelentése"
   },
   "reviewed": {
     "reviewed": "ellenőrizve"

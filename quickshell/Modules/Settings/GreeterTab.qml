@@ -115,7 +115,7 @@ Item {
         case "unlinked":
             return GreeterService.profileSyncSufficient ? I18n.tr("Link your DMS settings so the login screen follows them.", "greeter status") : I18n.tr("Link your DMS settings so the login screen follows them. Administrator access is required.", "greeter status");
         }
-        return I18n.tr("dms-greeter is not installed. Install the dms-greeter package to manage the greeter.", "greeter status placeholder");
+        return I18n.tr("%1 is not installed. Install the package to manage the greeter.", "greeter status placeholder, %1 is the dms-greeter binary").arg("dms-greeter");
     }
     readonly property string greeterStateAction: {
         switch (greeterState) {
@@ -223,7 +223,7 @@ Item {
                     root.greeterStatusText = root.greeterStatusText + "\n\nstderr:\n" + err;
                 return;
             }
-            var failure = I18n.tr("Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.", "greeter status error") + " (exit " + exitCode + ")";
+            var failure = I18n.tr("Failed to run '%1'. Ensure the %2 package is installed.", "greeter status error, %1 is a command, %2 a package name").arg("dms-greeter status").arg("dms-greeter") + " (exit " + exitCode + ")";
             if (out !== "")
                 failure = failure + "\n\n" + out;
             if (err !== "")
@@ -461,7 +461,7 @@ Item {
 
             SettingsRow {
                 body: StyledText {
-                    text: I18n.tr("Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).")
+                    text: I18n.tr("Requires %1, %2, and your user in the %3 group (plus %4 for fingerprint, %5 for security keys).", "greeter requirements note, %1 and %2 are package names, %3 a group name, %4 and %5 PAM modules").arg("greetd").arg("dms-greeter").arg("greeter").arg("fprintd/pam_fprintd").arg("pam_u2f")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width

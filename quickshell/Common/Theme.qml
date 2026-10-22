@@ -2130,7 +2130,7 @@ Singleton {
     function applyGtkColors() {
         if (!matugenAvailable) {
             if (typeof ToastService !== "undefined") {
-                ToastService.showError(I18n.tr("matugen not available or disabled - cannot apply %1 colors", "error toast, %1 is GTK or Qt").arg("GTK"));
+                ToastService.showError(I18n.tr("%1 not available or disabled - cannot apply %2 colors", "error toast, %1 is matugen, %2 is GTK or Qt").arg("matugen").arg("GTK"));
             }
             return;
         }
@@ -2152,7 +2152,7 @@ Singleton {
     function applyQtColors() {
         if (!matugenAvailable) {
             if (typeof ToastService !== "undefined") {
-                ToastService.showError(I18n.tr("matugen not available or disabled - cannot apply %1 colors").arg("Qt"));
+                ToastService.showError(I18n.tr("%1 not available or disabled - cannot apply %2 colors", "error toast, %1 is matugen, %2 is GTK or Qt").arg("matugen").arg("Qt"));
             }
             return;
         }

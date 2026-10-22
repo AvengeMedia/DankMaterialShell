@@ -266,11 +266,25 @@
     "comment": "notepad large file prompt, file name then size"
   },
   {
+    "term": "%1 is not installed. Install the package to manage the greeter.",
+    "translation": "",
+    "context": "%1 is not installed. Install the package to manage the greeter.",
+    "reference": "",
+    "comment": "greeter status placeholder, %1 is the dms-greeter binary"
+  },
+  {
     "term": "%1 is now included in config",
     "translation": "",
     "context": "%1 is now included in config",
     "reference": "",
     "comment": "keybinds toast, %1 is the binds file path"
+  },
+  {
+    "term": "%1 is running and will create duplicate Bluetooth players. Disable it with: %2",
+    "translation": "",
+    "context": "%1 is running and will create duplicate Bluetooth players. Disable it with: %2",
+    "reference": "",
+    "comment": "Warning shown when the legacy BlueZ MPRIS proxy conflicts with DMS Bluetooth media controls, %1 is the service name, %2 a shell command"
   },
   {
     "term": "%1 issue found",
@@ -343,11 +357,32 @@
     "comment": "duration in milliseconds, %1 is a number"
   },
   {
+    "term": "%1 not available",
+    "translation": "",
+    "context": "%1 not available",
+    "reference": "",
+    "comment": "%1 is a tool or environment variable name"
+  },
+  {
+    "term": "%1 not available - lock integration requires the DMS socket connection",
+    "translation": "",
+    "context": "%1 not available - lock integration requires the DMS socket connection",
+    "reference": "",
+    "comment": "lock screen warning, %1 is the loginctl binary"
+  },
+  {
+    "term": "%1 not available or disabled - cannot apply %2 colors",
+    "translation": "",
+    "context": "%1 not available or disabled - cannot apply %2 colors",
+    "reference": "",
+    "comment": "error toast, %1 is matugen, %2 is GTK or Qt"
+  },
+  {
     "term": "%1 not found",
     "translation": "",
     "context": "%1 not found",
     "reference": "",
-    "comment": "plugin dependency missing, %1 is a program name"
+    "comment": "missing program, %1 is a program name | plugin dependency missing, %1 is a program name"
   },
   {
     "term": "%1 notifications",
@@ -917,11 +952,11 @@
     "comment": "confirm dialog message, %1 is the username, %2 is the group name"
   },
   {
-    "term": "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.",
+    "term": "Add \"%1\" to the %2 group? They must log out and back in, then run %3 to publish their login-screen theme.",
     "translation": "",
-    "context": "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.",
+    "context": "Add \"%1\" to the %2 group? They must log out and back in, then run %3 to publish their login-screen theme.",
     "reference": "",
-    "comment": "confirm dialog message, %1 is the username, %2 is the group name, keep the command verbatim"
+    "comment": "confirm dialog message, %1 is the username, %2 is the group name, %3 a command"
   },
   {
     "term": "Add Desktop Widget",
@@ -1092,11 +1127,11 @@
     "comment": "bar goth corners toggle description"
   },
   {
-    "term": "Adds them to the %1 group so they can run dms-greeter sync --profile",
+    "term": "Adds them to the %1 group so they can run %2",
     "translation": "",
-    "context": "Adds them to the %1 group so they can run dms-greeter sync --profile",
+    "context": "Adds them to the %1 group so they can run %2",
     "reference": "",
-    "comment": "create user greeter toggle description, %1 is a group name"
+    "comment": "create user greeter toggle description, %1 is a group name, %2 a command"
   },
   {
     "term": "Adds them to the %1 group so they can use sudo",
@@ -1288,11 +1323,11 @@
     "comment": "plugin upvote toast"
   },
   {
-    "term": "Also runs the templates in your matugen config.toml",
+    "term": "Also runs the templates in your %1",
     "translation": "",
-    "context": "Also runs the templates in your matugen config.toml",
+    "context": "Also runs the templates in your %1",
     "reference": "",
-    "comment": "run user matugen templates toggle description"
+    "comment": "run user matugen templates toggle description, %1 is the matugen config file"
   },
   {
     "term": "Also saves the screenshot to disk",
@@ -2933,13 +2968,6 @@
     "comment": ""
   },
   {
-    "term": "Bundled greeter active",
-    "translation": "",
-    "context": "Bundled greeter active",
-    "reference": "",
-    "comment": "greeter status"
-  },
-  {
     "term": "Button areas",
     "translation": "",
     "context": "Button areas",
@@ -3598,11 +3626,11 @@
     "comment": "include setup banner, %1 is the dms config file name"
   },
   {
-    "term": "Click Import to add a .ovpn or .conf",
+    "term": "Click Import to add a %1 or %2 file",
     "translation": "",
-    "context": "Click Import to add a .ovpn or .conf",
+    "context": "Click Import to add a %1 or %2 file",
     "reference": "",
-    "comment": ""
+    "comment": "VPN import hint, %1 and %2 are file extensions"
   },
   {
     "term": "Click actions",
@@ -4921,11 +4949,11 @@
     "comment": ""
   },
   {
-    "term": "DMS removes its managed block from /etc/pam.d/greetd and stops write services",
+    "term": "DMS removes its managed block from %1 and stops write services",
     "translation": "",
-    "context": "DMS removes its managed block from /etc/pam.d/greetd and stops write services",
+    "context": "DMS removes its managed block from %1 and stops write services",
     "reference": "",
-    "comment": "greeter system PAM toggle description"
+    "comment": "greeter system PAM toggle description, %1 is a PAM config path"
   },
   {
     "term": "DMS server is outdated (API v%1, expected v%2)",
@@ -4961,13 +4989,6 @@
     "context": "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.",
     "reference": "",
     "comment": "Aqueous font synchronization, describing which font settings DMS can represent"
-  },
-  {
-    "term": "DMS_SOCKET not available",
-    "translation": "",
-    "context": "DMS_SOCKET not available",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "Daily",
@@ -5164,6 +5185,13 @@
     "context": "Deck",
     "reference": "",
     "comment": "window tiling layout name in layout picker"
+  },
+  {
+    "term": "Declared by the author, not enforced",
+    "translation": "",
+    "context": "Declared by the author, not enforced",
+    "reference": "",
+    "comment": "plugin detail section, introduces the permission list the plugin declares about itself"
   },
   {
     "term": "Decrease",
@@ -7259,11 +7287,11 @@
     "comment": ""
   },
   {
-    "term": "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.",
+    "term": "Failed to run '%1'. Ensure the %2 package is installed.",
     "translation": "",
-    "context": "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.",
+    "context": "Failed to run '%1'. Ensure the %2 package is installed.",
     "reference": "",
-    "comment": "greeter status error"
+    "comment": "greeter status error, %1 is a command, %2 a package name"
   },
   {
     "term": "Failed to save VPN credentials",
@@ -7553,11 +7581,11 @@
     "comment": ""
   },
   {
-    "term": "File search requires dsearch\nInstall from github.com/duxlabs-dev/dux-search",
+    "term": "File search requires %1\nInstall from %2",
     "translation": "",
-    "context": "File search requires dsearch\nInstall from github.com/duxlabs-dev/dux-search",
+    "context": "File search requires %1\nInstall from %2",
     "reference": "",
-    "comment": ""
+    "comment": "launcher file search empty state, %1 is the dsearch binary, %2 is its repository"
   },
   {
     "term": "File the command writes; leave empty to read stdout",
@@ -9352,11 +9380,11 @@
     "comment": "Placeholder text for manual printer address input"
   },
   {
-    "term": "IP sharing setup failed. Check that dnsmasq is installed.",
+    "term": "IP sharing setup failed. Check that %1 is installed.",
     "translation": "",
-    "context": "IP sharing setup failed. Check that dnsmasq is installed.",
+    "context": "IP sharing setup failed. Check that %1 is installed.",
     "reference": "",
-    "comment": "hotspot IP configuration failure message"
+    "comment": "hotspot IP configuration failure message, %1 is a package name"
   },
   {
     "term": "ISO date",
@@ -9877,13 +9905,6 @@
     "comment": "installation error"
   },
   {
-    "term": "Install matugen package for dynamic theming",
-    "translation": "",
-    "context": "Install matugen package for dynamic theming",
-    "reference": "",
-    "comment": "matugen installation hint"
-  },
-  {
     "term": "Install plugin '%1' from the DMS registry?",
     "translation": "",
     "context": "Install plugin '%1' from the DMS registry?",
@@ -9896,6 +9917,13 @@
     "context": "Install system updates?",
     "reference": "",
     "comment": "confirmation dialog title before running the system upgrade"
+  },
+  {
+    "term": "Install the %1 package for dynamic theming",
+    "translation": "",
+    "context": "Install the %1 package for dynamic theming",
+    "reference": "",
+    "comment": "matugen installation hint, %1 is the package name"
   },
   {
     "term": "Install theme '%1' from the DMS registry?",
@@ -10486,11 +10514,11 @@
     "comment": "launcher settings card about how apps are launched"
   },
   {
-    "term": "Layer namespace dms:blurwallpaper, needs a niri blur rule",
+    "term": "Layer namespace %1, needs a niri blur rule",
     "translation": "",
-    "context": "Layer namespace dms:blurwallpaper, needs a niri blur rule",
+    "context": "Layer namespace %1, needs a niri blur rule",
     "reference": "",
-    "comment": ""
+    "comment": "blur layer toggle description, %1 is the layer namespace"
   },
   {
     "term": "Layer outline",
@@ -13314,32 +13342,32 @@
     "comment": "Tailscale service not available"
   },
   {
-    "term": "Not available - install fprintd and pam_fprintd",
+    "term": "Not available - install %1 and %2",
     "translation": "",
-    "context": "Not available - install fprintd and pam_fprintd",
+    "context": "Not available - install %1 and %2",
     "reference": "",
-    "comment": "lock screen fingerprint setting"
+    "comment": "lock screen fingerprint setting, %1 and %2 are package names"
   },
   {
-    "term": "Not available - install or configure pam_u2f",
+    "term": "Not available - install %1 and %2, or configure %3 PAM",
     "translation": "",
-    "context": "Not available - install or configure pam_u2f",
+    "context": "Not available - install %1 and %2, or configure %3 PAM",
     "reference": "",
-    "comment": "lock screen security key setting"
+    "comment": "greeter fingerprint login setting, %1 and %2 are package names, %3 is greetd"
   },
   {
-    "term": "Not available — install fprintd and pam_fprintd, or configure greetd PAM.",
+    "term": "Not available - install or configure %1",
     "translation": "",
-    "context": "Not available — install fprintd and pam_fprintd, or configure greetd PAM.",
+    "context": "Not available - install or configure %1",
     "reference": "",
-    "comment": "greeter fingerprint login setting"
+    "comment": "lock screen security key setting, %1 is a PAM module"
   },
   {
-    "term": "Not available — install or configure pam_u2f, or configure greetd PAM.",
+    "term": "Not available - install or configure %1, or configure %2 PAM",
     "translation": "",
-    "context": "Not available — install or configure pam_u2f, or configure greetd PAM.",
+    "context": "Not available - install or configure %1, or configure %2 PAM",
     "reference": "",
-    "comment": "greeter security key login setting"
+    "comment": "greeter security key login setting, %1 is a PAM module, %2 is greetd"
   },
   {
     "term": "Not bound",
@@ -14665,11 +14693,11 @@
     "comment": "wallpaper transition option"
   },
   {
-    "term": "Place plugin directories here. Each plugin should have a plugin.json manifest file.",
+    "term": "Place plugin directories here. Each plugin should have a %1 manifest file.",
     "translation": "",
-    "context": "Place plugin directories here. Each plugin should have a plugin.json manifest file.",
+    "context": "Place plugin directories here. Each plugin should have a %1 manifest file.",
     "reference": "",
-    "comment": ""
+    "comment": "plugin directory note, %1 is the manifest file name"
   },
   {
     "term": "Placement",
@@ -15512,11 +15540,11 @@
     "comment": ""
   },
   {
-    "term": "Profile not found in monitors.json",
+    "term": "Profile not found in %1",
     "translation": "",
-    "context": "Profile not found in monitors.json",
+    "context": "Profile not found in %1",
     "reference": "",
-    "comment": ""
+    "comment": "display profile error, %1 is the profiles file"
   },
   {
     "term": "Profile on AC",
@@ -16135,11 +16163,11 @@
     "comment": "remove shortcut confirmation, %1 is the key combination"
   },
   {
-    "term": "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.",
+    "term": "Remove the shortcut %1? An unbind entry will be saved to %2 so it stays removed across DMS updates.",
     "translation": "",
-    "context": "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.",
+    "context": "Remove the shortcut %1? An unbind entry will be saved to %2 so it stays removed across DMS updates.",
     "reference": "",
-    "comment": "hyprland remove shortcut confirmation, %1 is the key combination"
+    "comment": "hyprland remove shortcut confirmation, %1 is the key combination, %2 the override file"
   },
   {
     "term": "Remove upvote",
@@ -16279,7 +16307,7 @@
     "translation": "",
     "context": "Requires %1",
     "reference": "",
-    "comment": "version requirement"
+    "comment": "missing program | version requirement"
   },
   {
     "term": "Requires %1",
@@ -16289,11 +16317,11 @@
     "comment": ""
   },
   {
-    "term": "Requires 'dgop' tool",
+    "term": "Requires %1, %2, and your user in the %3 group (plus %4 for fingerprint, %5 for security keys).",
     "translation": "",
-    "context": "Requires 'dgop' tool",
+    "context": "Requires %1, %2, and your user in the %3 group (plus %4 for fingerprint, %5 for security keys).",
     "reference": "",
-    "comment": ""
+    "comment": "greeter requirements note, %1 and %2 are package names, %3 a group name, %4 and %5 PAM modules"
   },
   {
     "term": "Requires DMS %1",
@@ -16313,13 +16341,6 @@
     "term": "Requires MangoWC compositor",
     "translation": "",
     "context": "Requires MangoWC compositor",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).",
-    "translation": "",
-    "context": "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).",
     "reference": "",
     "comment": ""
   },
@@ -16695,11 +16716,11 @@
     "comment": ""
   },
   {
-    "term": "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.",
+    "term": "Run an external command on each wallpaper change and merge its JSON palette into %1 under a namespace, so templates can use e.g. %2. The command receives the wallpaper as %3 and the mode as %4.",
     "translation": "",
-    "context": "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.",
+    "context": "Run an external command on each wallpaper change and merge its JSON palette into %1 under a namespace, so templates can use e.g. %2. The command receives the wallpaper as %3 and the mode as %4.",
     "reference": "",
-    "comment": "injected palettes settings description, the placeholders in braces and the $DMS_ variables stay as is"
+    "comment": "injected palettes settings description, %1 is matugen, %2 a template placeholder, %3 and %4 placeholder and variable pairs"
   },
   {
     "term": "Run full sync",
@@ -17596,6 +17617,13 @@
     "context": "Set notification rules",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Set one of these environment variables, then restart the shell:\n%1\n\nOnly %2 requires %3 to be installed.",
+    "translation": "",
+    "context": "Set one of these environment variables, then restart the shell:\n%1\n\nOnly %2 requires %3 to be installed.",
+    "reference": "",
+    "comment": "qt theme env error body, %1 is a list of variable assignments, %2 and %3 are package names"
   },
   {
     "term": "Set under Theme & colors, Derived color",
@@ -19446,18 +19474,11 @@
     "comment": ""
   },
   {
-    "term": "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.",
+    "term": "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.",
     "translation": "",
-    "context": "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.",
+    "context": "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.",
     "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.",
-    "translation": "",
-    "context": "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.",
-    "reference": "",
-    "comment": "greeter unlink status"
+    "comment": "greeter sync status, %1 is a dms-greeter command"
   },
   {
     "term": "Terminal fallback opened. Complete authentication there; it will close automatically when done.",
@@ -19551,18 +19572,18 @@
     "comment": ""
   },
   {
+    "term": "The %1 environment variable is not set or the socket is unavailable. Automated plugin management requires it.",
+    "translation": "",
+    "context": "The %1 environment variable is not set or the socket is unavailable. Automated plugin management requires it.",
+    "reference": "",
+    "comment": "plugin manager unavailable notice, %1 is an environment variable"
+  },
+  {
     "term": "The Aqueous operation failed.",
     "translation": "",
     "context": "The Aqueous operation failed.",
     "reference": "",
     "comment": "Fallback error for an Aqueous compositor or configuration request"
-  },
-  {
-    "term": "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.",
-    "translation": "",
-    "context": "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "The Default action only overrides priority",
@@ -19600,11 +19621,11 @@
     "comment": ""
   },
   {
-    "term": "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).",
+    "term": "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (%1 and %2).",
     "translation": "",
-    "context": "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).",
+    "context": "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (%1 and %2).",
     "reference": "",
-    "comment": ""
+    "comment": "theme apps backup note, %1 and %2 are config paths"
   },
   {
     "term": "The compositor session changed. Discard this edit before starting a new one.",
@@ -19640,13 +19661,6 @@
     "context": "The fill shows today's precipitation probability.",
     "reference": "",
     "comment": ""
-  },
-  {
-    "term": "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.",
-    "translation": "",
-    "context": "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.",
-    "reference": "",
-    "comment": "embedded greeter status"
   },
   {
     "term": "The highlighted marker shows the UV category: low, moderate, high, very high, or extreme.",
@@ -19852,11 +19866,11 @@
     "comment": "greeter themes link"
   },
   {
-    "term": "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)",
+    "term": "These add entries to the XDG autostart directory (%1)",
     "translation": "",
-    "context": "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)",
+    "context": "These add entries to the XDG autostart directory (%1)",
     "reference": "",
-    "comment": ""
+    "comment": "autostart note, %1 is a path"
   },
   {
     "term": "They load with the next update check. Release notes are also published on GitHub.",
@@ -19901,11 +19915,11 @@
     "comment": "bar widget picker: island widget unavailable on an island-layout bar"
   },
   {
-    "term": "This bind is overridden by config.kdl",
+    "term": "This bind is overridden by %1",
     "translation": "",
-    "context": "This bind is overridden by config.kdl",
+    "context": "This bind is overridden by %1",
     "reference": "",
-    "comment": ""
+    "comment": "keybind conflict notice, %1 is the compositor config file"
   },
   {
     "term": "This device",
@@ -19929,11 +19943,11 @@
     "comment": ""
   },
   {
-    "term": "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.",
+    "term": "This install is still using %1. Run %2 to migrate before changing these settings.",
     "translation": "",
-    "context": "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.",
+    "context": "This install is still using %1. Run %2 to migrate before changing these settings.",
     "reference": "",
-    "comment": ""
+    "comment": "hyprland legacy config warning, %1 is the config file, %2 a command"
   },
   {
     "term": "This may take a few seconds",
@@ -19957,18 +19971,11 @@
     "comment": ""
   },
   {
-    "term": "This plugin can",
+    "term": "This plugin does not have '%1' permission.\n\nAdd %2 to %3",
     "translation": "",
-    "context": "This plugin can",
+    "context": "This plugin does not have '%1' permission.\n\nAdd %2 to %3",
     "reference": "",
-    "comment": "plugin detail section, introduces the permission list"
-  },
-  {
-    "term": "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json",
-    "translation": "",
-    "context": "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json",
-    "reference": "",
-    "comment": ""
+    "comment": "plugin settings write warning, %1 is a permission name, %2 a manifest snippet, %3 the manifest file"
   },
   {
     "term": "This system cannot link settings live. Sync again after changing them.",
@@ -20216,18 +20223,18 @@
     "comment": ""
   },
   {
-    "term": "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).",
+    "term": "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (%1).",
     "translation": "",
-    "context": "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).",
+    "context": "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (%1).",
     "reference": "",
-    "comment": ""
+    "comment": "switch user note, %1 lists multi-session greeters"
   },
   {
-    "term": "To use this DMS bind, remove or change the keybind in your config.kdl",
+    "term": "To use this DMS bind, remove or change the keybind in your %1",
     "translation": "",
-    "context": "To use this DMS bind, remove or change the keybind in your config.kdl",
+    "context": "To use this DMS bind, remove or change the keybind in your %1",
     "reference": "",
-    "comment": ""
+    "comment": "keybind conflict hint, %1 is the compositor config file"
   },
   {
     "term": "Toast",
@@ -22281,13 +22288,6 @@
     "comment": ""
   },
   {
-    "term": "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.",
-    "translation": "",
-    "context": "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.",
-    "reference": "",
-    "comment": "qt theme env error body"
-  },
-  {
     "term": "You'll enter your password at the greeter after the next reboot.",
     "translation": "",
     "context": "You'll enter your password at the greeter after the next reboot.",
@@ -22442,13 +22442,6 @@
     "comment": "multiplexer session state, no client attached"
   },
   {
-    "term": "dgop not available",
-    "translation": "",
-    "context": "dgop not available",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "direct",
     "translation": "",
     "context": "direct",
@@ -22461,13 +22454,6 @@
     "context": "discuss",
     "reference": "",
     "comment": "plugin discussion link"
-  },
-  {
-    "term": "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.",
-    "translation": "",
-    "context": "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.",
-    "reference": "",
-    "comment": "greeter status placeholder"
   },
   {
     "term": "e.g. /usr/bin/my-script --flag",
@@ -22596,13 +22582,6 @@
     "comment": ""
   },
   {
-    "term": "loginctl not available - lock integration requires DMS socket connection",
-    "translation": "",
-    "context": "loginctl not available - lock integration requires DMS socket connection",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "mango: config reloaded",
     "translation": "",
     "context": "mango: config reloaded",
@@ -22629,27 +22608,6 @@
     "context": "mangowc GitHub",
     "reference": "",
     "comment": ""
-  },
-  {
-    "term": "matugen not available or disabled - cannot apply %1 colors",
-    "translation": "",
-    "context": "matugen not available or disabled - cannot apply %1 colors",
-    "reference": "",
-    "comment": "error toast, %1 is GTK or Qt"
-  },
-  {
-    "term": "matugen not found - install matugen package for dynamic theming",
-    "translation": "",
-    "context": "matugen not found - install matugen package for dynamic theming",
-    "reference": "",
-    "comment": "matugen error"
-  },
-  {
-    "term": "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service",
-    "translation": "",
-    "context": "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service",
-    "reference": "",
-    "comment": "Warning shown when the legacy BlueZ MPRIS proxy conflicts with DMS Bluetooth media controls"
   },
   {
     "term": "ms",

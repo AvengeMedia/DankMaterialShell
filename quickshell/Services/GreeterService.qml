@@ -229,7 +229,7 @@ exit 0`]
 
         onExited: exitCode => {
             if (exitCode !== 0)
-                root.syncStatus += "\n\n" + I18n.tr("Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.", "greeter unlink status") + " (exit " + exitCode + ")";
+                root.syncStatus += "\n\n" + I18n.tr("Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.", "greeter sync status, %1 is a dms-greeter command").arg("dms-greeter unlink") + " (exit " + exitCode + ")";
             root.finishSync();
         }
     }
@@ -251,7 +251,7 @@ exit 0`]
                 root.finishSync();
                 return;
             }
-            let fallback = I18n.tr("Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.") + " (exit " + exitCode + ")";
+            let fallback = I18n.tr("Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.", "greeter sync status, %1 is a dms-greeter command").arg("dms-greeter sync") + " (exit " + exitCode + ")";
             const err = terminalFallbackErr.text.trim();
             if (err !== "")
                 fallback += "\n\nstderr:\n" + err;

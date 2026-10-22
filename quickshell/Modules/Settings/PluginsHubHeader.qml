@@ -356,7 +356,7 @@ Column {
         SettingsRow {
             iconName: "warning"
             title: I18n.tr("Plugin manager unavailable")
-            subtitle: I18n.tr("The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.")
+            subtitle: I18n.tr("The %1 environment variable is not set or the socket is unavailable. Automated plugin management requires it.", "plugin manager unavailable notice, %1 is an environment variable").arg("DMS_SOCKET")
         }
     }
 

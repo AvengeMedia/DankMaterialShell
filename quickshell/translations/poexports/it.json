@@ -113,8 +113,14 @@
   "%1 is %2 and may use a lot of memory.": {
     "%1 is %2 and may use a lot of memory.": "%1 è %2 e potrebbe usare molta memoria."
   },
+  "%1 is not installed. Install the package to manage the greeter.": {
+    "%1 is not installed. Install the package to manage the greeter.": ""
+  },
   "%1 is now included in config": {
     "%1 is now included in config": "%1 è ora incluso nella configurazione"
+  },
+  "%1 is running and will create duplicate Bluetooth players. Disable it with: %2": {
+    "%1 is running and will create duplicate Bluetooth players. Disable it with: %2": ""
   },
   "%1 issue found": {
     "%1 issue found": "%1 problema trovato"
@@ -145,6 +151,15 @@
   },
   "%1 ms": {
     "%1 ms": "%1 ms"
+  },
+  "%1 not available": {
+    "%1 not available": ""
+  },
+  "%1 not available - lock integration requires the DMS socket connection": {
+    "%1 not available - lock integration requires the DMS socket connection": ""
+  },
+  "%1 not available or disabled - cannot apply %2 colors": {
+    "%1 not available or disabled - cannot apply %2 colors": ""
   },
   "%1 not found": {
     "%1 not found": "%1 non trovato"
@@ -386,8 +401,8 @@
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "Aggiungere \"%1\" al gruppo %2?"
   },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "Aggiungere \"%1\" al gruppo %2? L'utente dovrà disconnettersi e accedere di nuovo, quindi eseguire dms-greeter sync --profile per pubblicare il tema della schermata di accesso."
+  "Add \"%1\" to the %2 group? They must log out and back in, then run %3 to publish their login-screen theme.": {
+    "Add \"%1\" to the %2 group? They must log out and back in, then run %3 to publish their login-screen theme.": ""
   },
   "Add Desktop Widget": {
     "Add Desktop Widget": "Aggiungi widget su desktop"
@@ -461,8 +476,8 @@
   "Adds concave curves where the bar meets the screen edge": {
     "Adds concave curves where the bar meets the screen edge": "Aggiunge curve concave dove la barra incontra il bordo dello schermo"
   },
-  "Adds them to the %1 group so they can run dms-greeter sync --profile": {
-    "Adds them to the %1 group so they can run dms-greeter sync --profile": "Li aggiunge al gruppo %1 così possono eseguire dms-greeter sync --profile"
+  "Adds them to the %1 group so they can run %2": {
+    "Adds them to the %1 group so they can run %2": ""
   },
   "Adds them to the %1 group so they can use sudo": {
     "Adds them to the %1 group so they can use sudo": "Li aggiunge al gruppo %1 così possono usare sudo"
@@ -545,8 +560,8 @@
   "Already upvoted, click again to remove": {
     "Already upvoted, click again to remove": "Hai già votato, fai di nuovo clic per rimuovere il voto"
   },
-  "Also runs the templates in your matugen config.toml": {
-    "Also runs the templates in your matugen config.toml": "Esegui anche i template nel tuo config.toml di matugen"
+  "Also runs the templates in your %1": {
+    "Also runs the templates in your %1": ""
   },
   "Also saves the screenshot to disk": {
     "Also saves the screenshot to disk": "Salva lo screenshot anche su disco"
@@ -1238,9 +1253,6 @@
   "Built-in plugins": {
     "Built-in plugins": "Plugin integrati"
   },
-  "Bundled greeter active": {
-    "Bundled greeter active": "Greeter incluso attivo"
-  },
   "Button areas": {
     "Button areas": "Aree dei pulsanti"
   },
@@ -1517,8 +1529,8 @@
   "Click 'Setup' to create %1 and add include to your compositor config.": {
     "Click 'Setup' to create %1 and add include to your compositor config.": "Fai clic su \"Configura\" per creare %1 e aggiungere l'inclusione al file di configurazione del compositor."
   },
-  "Click Import to add a .ovpn or .conf": {
-    "Click Import to add a .ovpn or .conf": "Fai clic su Importa per aggiungere un file .ovpn o .conf"
+  "Click Import to add a %1 or %2 file": {
+    "Click Import to add a %1 or %2 file": ""
   },
   "Click actions": {
     "Click actions": "Azioni del clic"
@@ -2069,8 +2081,8 @@
   "DMS out of date": {
     "DMS out of date": "Versione di DMS obsoleta"
   },
-  "DMS removes its managed block from /etc/pam.d/greetd and stops write services": {
-    "DMS removes its managed block from /etc/pam.d/greetd and stops write services": "DMS rimuove il blocco gestito da /etc/pam.d/greetd e interrompe i servizi di scrittura"
+  "DMS removes its managed block from %1 and stops write services": {
+    "DMS removes its managed block from %1 and stops write services": ""
   },
   "DMS server is outdated (API v%1, expected v%2)": {
     "DMS server is outdated (API v%1, expected v%2)": "Il server DMS è obsoleto (API v%1, previsto v%2)"
@@ -2087,9 +2099,6 @@
   "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": {
     "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": "DMS utilizza la famiglia, il peso e la scala del font. Il tipo esatto, l'inclinazione, la larghezza e le barre con scala separata possono differire."
   },
-  "DMS_SOCKET not available": {
-    "DMS_SOCKET not available": "DMS_SOCKET non disponibile"
-  },
   "Daily": {
     "Daily": "Previsione giornaliera"
   },
@@ -2104,15 +2113,6 @@
   },
   "DankBar": {
     "DankBar": "DankBar"
-  },
-  "DankCalendar": {
-    "DankCalendar": "DankCalendar"
-  },
-  "DankCalendar isn't installed": {
-    "DankCalendar isn't installed": "DankCalendar non è installato"
-  },
-  "DankCalendar isn't running": {
-    "DankCalendar isn't running": "DankCalendar non è in esecuzione"
   },
   "Dark": {
     "Dark": "Scuro"
@@ -2179,6 +2179,9 @@
   },
   "Deck": {
     "Deck": "Pila"
+  },
+  "Declared by the author, not enforced": {
+    "Declared by the author, not enforced": ""
   },
   "Default": {
     "Default": "Predefinito"
@@ -3053,8 +3056,8 @@
   "Failed to resume printer": {
     "Failed to resume printer": "Impossibile riprendere la stampante"
   },
-  "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
-    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "Impossibile eseguire \"dms-greeter status\". Assicurati che il pacchetto dms-greeter sia installato."
+  "Failed to run '%1'. Ensure the %2 package is installed.": {
+    "Failed to run '%1'. Ensure the %2 package is installed.": ""
   },
   "Failed to save VPN credentials": {
     "Failed to save VPN credentials": "Impossibile salvare le credenziali VPN"
@@ -3176,8 +3179,8 @@
   "File manager": {
     "File manager": "Gestore file"
   },
-  "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
-    "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "La ricerca dei file richiede dsearch\nInstallalo da github.com/AvengeMedia/danksearch"
+  "File search requires %1\nInstall from %2": {
+    "File search requires %1\nInstall from %2": ""
   },
   "File the command writes; leave empty to read stdout": {
     "File the command writes; leave empty to read stdout": "File scritto dal comando; lascia vuoto per leggere lo stdout"
@@ -3929,8 +3932,8 @@
   "IP address or hostname": {
     "IP address or hostname": "Indirizzo IP o nome host"
   },
-  "IP sharing setup failed. Check that dnsmasq is installed.": {
-    "IP sharing setup failed. Check that dnsmasq is installed.": "Configurazione della condivisione IP non riuscita. Verifica che dnsmasq sia installato."
+  "IP sharing setup failed. Check that %1 is installed.": {
+    "IP sharing setup failed. Check that %1 is installed.": ""
   },
   "ISO date": {
     "ISO date": "Data ISO"
@@ -4148,14 +4151,14 @@
   "Install failed: %1": {
     "Install failed: %1": "Installazione fallita: %1"
   },
-  "Install matugen package for dynamic theming": {
-    "Install matugen package for dynamic theming": "Installa il pacchetto matugen per i temi dinamici"
-  },
   "Install plugin '%1' from the DMS registry?": {
     "Install plugin '%1' from the DMS registry?": "Installa il plugin \"%1\" dal registro DMS?"
   },
   "Install system updates?": {
     "Install system updates?": "Installare gli aggiornamenti di sistema?"
+  },
+  "Install the %1 package for dynamic theming": {
+    "Install the %1 package for dynamic theming": ""
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "Installa il tema \"%1\" dal registro DMS?"
@@ -4409,8 +4412,8 @@
   "Launching": {
     "Launching": "Avvio in corso"
   },
-  "Layer namespace dms:blurwallpaper, needs a niri blur rule": {
-    "Layer namespace dms:blurwallpaper, needs a niri blur rule": "Namespace del livello dms:blurwallpaper, richiede una regola di blur di niri"
+  "Layer namespace %1, needs a niri blur rule": {
+    "Layer namespace %1, needs a niri blur rule": ""
   },
   "Layer outline": {
     "Layer outline": "Contorno dei livelli"
@@ -5597,17 +5600,17 @@
   "Not available": {
     "Not available": "Non disponibile"
   },
-  "Not available - install fprintd and pam_fprintd": {
-    "Not available - install fprintd and pam_fprintd": "Non disponibile - installa fprintd e pam_fprintd"
+  "Not available - install %1 and %2": {
+    "Not available - install %1 and %2": ""
   },
-  "Not available - install or configure pam_u2f": {
-    "Not available - install or configure pam_u2f": "Non disponibile - installa o configura pam_u2f"
+  "Not available - install %1 and %2, or configure %3 PAM": {
+    "Not available - install %1 and %2, or configure %3 PAM": ""
   },
-  "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
-    "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": "Non disponibile — installa fprintd e pam_fprintd, o configura il PAM di greetd."
+  "Not available - install or configure %1": {
+    "Not available - install or configure %1": ""
   },
-  "Not available — install or configure pam_u2f, or configure greetd PAM.": {
-    "Not available — install or configure pam_u2f, or configure greetd PAM.": "Non disponibile — installa o configura pam_u2f, o configura il PAM di greetd."
+  "Not available - install or configure %1, or configure %2 PAM": {
+    "Not available - install or configure %1, or configure %2 PAM": ""
   },
   "Not bound": {
     "Not bound": "Non assegnatp"
@@ -6161,8 +6164,8 @@
   "Pixelate": {
     "Pixelate": "Mosaico"
   },
-  "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
-    "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Posiziona qui le cartelle dei plugin. Ogni plugin dovrebbe contenere un file manifest plugin.json."
+  "Place plugin directories here. Each plugin should have a %1 manifest file.": {
+    "Place plugin directories here. Each plugin should have a %1 manifest file.": ""
   },
   "Placement": {
     "Placement": "Posizionamento"
@@ -6512,8 +6515,8 @@
   "Profile not found": {
     "Profile not found": "Profilo non trovato"
   },
-  "Profile not found in monitors.json": {
-    "Profile not found in monitors.json": "Profilo non trovato in monitors.json"
+  "Profile not found in %1": {
+    "Profile not found in %1": ""
   },
   "Profile on AC": {
     "Profile on AC": "Profilo con alimentazione CA"
@@ -6773,8 +6776,8 @@
   "Remove the shortcut %1?": {
     "Remove the shortcut %1?": "Rimuovere la scorciatoia %1?"
   },
-  "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": {
-    "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": "Rimuovere la scorciatoia %1? Una voce di rimozione verrà salvata in dms/binds-user.lua, in modo che resti rimossa anche dopo gli aggiornamenti di DMS."
+  "Remove the shortcut %1? An unbind entry will be saved to %2 so it stays removed across DMS updates.": {
+    "Remove the shortcut %1? An unbind entry will be saved to %2 so it stays removed across DMS updates.": ""
   },
   "Remove upvote": {
     "Remove upvote": "Rimuovi voto"
@@ -6830,8 +6833,8 @@
   "Requires %1": {
     "Requires %1": "Richiede %1"
   },
-  "Requires 'dgop' tool": {
-    "Requires 'dgop' tool": "Richiede lo strumento \"dgop\""
+  "Requires %1, %2, and your user in the %3 group (plus %4 for fingerprint, %5 for security keys).": {
+    "Requires %1, %2, and your user in the %3 group (plus %4 for fingerprint, %5 for security keys).": ""
   },
   "Requires DMS %1": {
     "Requires DMS %1": "Richiede DMS %1"
@@ -6841,9 +6844,6 @@
   },
   "Requires MangoWC compositor": {
     "Requires MangoWC compositor": "Richiede il compositor MangoWC"
-  },
-  "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": "Richiede greetd, dms-greeter e che il tuo utente appartenga al gruppo greeter (oltre a fprintd/pam_fprintd per l'impronta digitale e pam_u2f per le chiavi di sicurezza)."
   },
   "Requires night mode support": {
     "Requires night mode support": "Richiede il supporto alla modalità notturna"
@@ -6957,7 +6957,7 @@
     "Root Filesystem": "Filesystem root"
   },
   "Rotating Cookie": {
-    "Rotating Cookie": ""
+    "Rotating Cookie": "Cookie rotante"
   },
   "Rounded": {
     "Rounded": "Arrotondato"
@@ -7001,8 +7001,8 @@
   "Run a shell command (e.g., notify-send)": {
     "Run a shell command (e.g., notify-send)": "Esegui un comando della shell (es. notify-send)"
   },
-  "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": {
-    "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": "Esegue un comando esterno a ogni cambio di sfondo e unisce la sua palette JSON in matugen sotto un namespace, in modo che i template possano usare ad es. {{name.color0}}. Il comando riceve lo sfondo come {image} / $DMS_WALLPAPER e la modalità come {mode} / $DMS_MODE."
+  "Run an external command on each wallpaper change and merge its JSON palette into %1 under a namespace, so templates can use e.g. %2. The command receives the wallpaper as %3 and the mode as %4.": {
+    "Run an external command on each wallpaper change and merge its JSON palette into %1 under a namespace, so templates can use e.g. %2. The command receives the wallpaper as %3 and the mode as %4.": ""
   },
   "Run full sync": {
     "Run full sync": "Esegui sincronizzazione completa"
@@ -7375,6 +7375,9 @@
   },
   "Set notification rules": {
     "Set notification rules": "Imposta regole per le notifiche"
+  },
+  "Set one of these environment variables, then restart the shell:\n%1\n\nOnly %2 requires %3 to be installed.": {
+    "Set one of these environment variables, then restart the shell:\n%1\n\nOnly %2 requires %3 to be installed.": ""
   },
   "Set under Theme & colors, Derived color": {
     "Set under Theme & colors, Derived color": "Impostato in Tema e colori, Colore derivato"
@@ -8144,11 +8147,8 @@
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Avvio del terminale di ripiego non riuscito. Installa un emulatore di terminale supportato o esegui \"dms auth sync\" manualmente."
   },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "Avvio del terminale di ripiego non riuscito. Installa uno degli emulatori di terminale supportati o esegui manualmente \"dms-greeter sync\"."
-  },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.": "Fallback al terminale non riuscito. Installa uno degli emulatori di terminale supportati oppure esegui ‘dms-greeter unlink’ manualmente."
+  "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": ""
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": "Terminale di ripiego aperto. Completa lì l'autenticazione; si chiuderà automaticamente al termine."
@@ -8189,11 +8189,11 @@
   "Text style": {
     "Text style": "Stile del testo"
   },
+  "The %1 environment variable is not set or the socket is unavailable. Automated plugin management requires it.": {
+    "The %1 environment variable is not set or the socket is unavailable. Automated plugin management requires it.": ""
+  },
   "The Aqueous operation failed.": {
     "The Aqueous operation failed.": "L'operazione di Aqueous è fallita."
-  },
-  "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
-    "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "La variabile d'ambiente DMS_SOCKET non è impostata oppure il socket non è disponibile. La gestione automatica dei plugin richiede DMS_SOCKET."
   },
   "The Default action only overrides priority": {
     "The Default action only overrides priority": "L'azione Predefinita sostituisce solo la priorità"
@@ -8210,8 +8210,8 @@
   "The arrow points in the direction the wind is blowing. The label shows where it comes from.": {
     "The arrow points in the direction the wind is blowing. The label shows where it comes from.": "La freccia indica la direzione del vento. L'etichetta mostra da dove proviene."
   },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": "Le seguenti impostazioni modificheranno la configurazione di GTK e Qt. Se desideri conservare la configurazione attuale, esegui un backup (qt5ct.conf|qt6ct.conf|qtengine/config.json e ~/.config/gtk-3.0|gtk-4.0)."
+  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (%1 and %2).": {
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (%1 and %2).": ""
   },
   "The compositor session changed. Discard this edit before starting a new one.": {
     "The compositor session changed. Discard this edit before starting a new one.": "La sessione del compositor è cambiata. Scarta questa modifica prima di iniziarne una nuova."
@@ -8227,9 +8227,6 @@
   },
   "The fill shows today's precipitation probability.": {
     "The fill shows today's precipitation probability.": "Il riempimento mostra la probabilità di precipitazioni di oggi."
-  },
-  "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
-    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": "Il greeter incluso in DMS è attivo (configurazione archinstall). Continua a funzionare così com'è, ma per sincronizzare tema e impostazioni è necessario il greeter standalone. Installa greetd-dms-greeter-bin dall'AUR, poi esegui Sincronizza per migrare la schermata di accesso."
   },
   "The highlighted marker shows the UV category: low, moderate, high, very high, or extreme.": {
     "The highlighted marker shows the UV category: low, moderate, high, very high, or extreme.": "Il marcatore evidenziato mostra la categoria UV: bassa, moderata, alta, molto alta o estrema."
@@ -8318,8 +8315,8 @@
   "Themes": {
     "Themes": "Temi"
   },
-  "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": {
-    "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": "Aggiungono voci alla cartella di avvio automatico XDG (~/.config/autostart/*.desktop)"
+  "These add entries to the XDG autostart directory (%1)": {
+    "These add entries to the XDG autostart directory (%1)": ""
   },
   "They load with the next update check. Release notes are also published on GitHub.": {
     "They load with the next update check. Release notes are also published on GitHub.": "Verranno caricate al prossimo controllo degli aggiornamenti. Le note di rilascio sono pubblicate anche su GitHub."
@@ -8339,8 +8336,8 @@
   "This bar is the Island": {
     "This bar is the Island": "Questa barra è l’Isola"
   },
-  "This bind is overridden by config.kdl": {
-    "This bind is overridden by config.kdl": "Questa scorciatoia è sovrascritta da config.kdl"
+  "This bind is overridden by %1": {
+    "This bind is overridden by %1": ""
   },
   "This device": {
     "This device": "Questo dispositivo"
@@ -8351,8 +8348,8 @@
   "This display does not report VRR support": {
     "This display does not report VRR support": "Questo schermo non segnala il supporto VRR"
   },
-  "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": {
-    "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": "Questa installazione usa ancora hyprland.conf. Esegui dms setup per effettuare la migrazione prima di modificare queste impostazioni."
+  "This install is still using %1. Run %2 to migrate before changing these settings.": {
+    "This install is still using %1. Run %2 to migrate before changing these settings.": ""
   },
   "This may take a few seconds": {
     "This may take a few seconds": "L'operazione potrebbe richiedere alcuni secondi"
@@ -8363,11 +8360,8 @@
   "This output is disabled in the current profile": {
     "This output is disabled in the current profile": "Questo output è disabilitato nel profilo corrente"
   },
-  "This plugin can": {
-    "This plugin can": "Questo plugin può"
-  },
-  "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
-    "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Questo plugin non ha il permesso \"settings_write\".\n\nAggiungi \"permissions\": [\"settings_read\", \"settings_write\"] al plugin.json"
+  "This plugin does not have '%1' permission.\n\nAdd %2 to %3": {
+    "This plugin does not have '%1' permission.\n\nAdd %2 to %3": ""
   },
   "This system cannot link settings live. Sync again after changing them.": {
     "This system cannot link settings live. Sync again after changing them.": "Questo sistema non può collegare le impostazioni in tempo reale. Sincronizza di nuovo dopo averle modificate."
@@ -8474,11 +8468,11 @@
   "To Full": {
     "To Full": "A carica completa"
   },
-  "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": {
-    "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": "Per accedere con un utente diverso, termina la sessione e seleziona l'account dal greeter. La creazione di una nuova sessione parallela richiede un greeter multi-sessione (greetd-flexiserver / GDM / LightDM)."
+  "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (%1).": {
+    "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (%1).": ""
   },
-  "To use this DMS bind, remove or change the keybind in your config.kdl": {
-    "To use this DMS bind, remove or change the keybind in your config.kdl": "Per utilizzare questa scorciatoia DMS, rimuovi o modifica la scorciatoia nel tuo config.kdl"
+  "To use this DMS bind, remove or change the keybind in your %1": {
+    "To use this DMS bind, remove or change the keybind in your %1": ""
   },
   "Toast": {
     "Toast": "Toast"
@@ -9347,9 +9341,6 @@
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Ci sono modifiche non salvate. Vuoi salvarle prima di continuare?"
   },
-  "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
-    "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": "Devi impostare una delle seguenti variabili d'ambiente:\nQT_QPA_PLATFORMTHEME=gtk3 OPPURE\nQT_QPA_PLATFORMTHEME=qt6ct OPPURE\nQT_QPA_PLATFORMTHEME=qtengine\ne poi riavviare la shell.\n\nSolo qt6ct richiede l'installazione di qt6ct-kde."
-  },
   "You'll enter your password at the greeter after the next reboot.": {
     "You'll enter your password at the greeter after the next reboot.": "Inserirai la password nel greeter dopo il prossimo riavvio."
   },
@@ -9428,9 +9419,6 @@
   "detached": {
     "detached": "disconnesso"
   },
-  "dgop not available": {
-    "dgop not available": "dgop non disponibile"
-  },
   "direct": {
     "direct": "diretta"
   },
@@ -9439,9 +9427,6 @@
   },
   "display rotation option": {
     "Normal": "Normale"
-  },
-  "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
-    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": "dms-greeter non è installato. Installa il pacchetto dms-greeter per gestire il greeter."
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "es. /usr/bin/my-script --flag"
@@ -9500,9 +9485,6 @@
   "loginctl integration": {
     "loginctl integration": "Integrazione loginctl"
   },
-  "loginctl not available - lock integration requires DMS socket connection": {
-    "loginctl not available - lock integration requires DMS socket connection": "loginctl non disponibile - l’integrazione del blocco richiede una connessione al socket DMS"
-  },
   "mango: config reloaded": {
     "mango: config reloaded": "mango: configurazione ricaricata"
   },
@@ -9515,17 +9497,8 @@
   "mangowc GitHub": {
     "mangowc GitHub": "GitHub di mangowc"
   },
-  "matugen not available or disabled - cannot apply %1 colors": {
-    "matugen not available or disabled - cannot apply %1 colors": "matugen non è disponibile o disabilitato - Impossibile applicare i colori di %1"
-  },
-  "matugen not found - install matugen package for dynamic theming": {
-    "matugen not found - install matugen package for dynamic theming": "matugen non trovato - installa il pacchetto matugen per i temi dinamici"
-  },
   "missing program": {
     "Requires %1": "Richiede %1"
-  },
-  "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": {
-    "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": "mpris-proxy è in esecuzione e creerà lettori Bluetooth duplicati. Disattivalo con: systemctl --user disable --now mpris-proxy.service"
   },
   "ms": {
     "ms": "ms"
@@ -9547,9 +9520,6 @@
   },
   "niri shortcuts config": {
     "niri shortcuts config": "configurazione delle scorciatoie niri"
-  },
-  "niri/dms Discord": {
-    "niri/dms Discord": "Discord di niri/dms"
   },
   "niri: config reloaded": {
     "niri: config reloaded": "niri: configurazione ricaricata"

@@ -47,7 +47,7 @@ StyledRect {
             }
 
             StyledText {
-                text: root.showLegacy ? I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.") : I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg(root.include.fragmentLabel)
+                text: root.showLegacy ? I18n.tr("This install is still using %1. Run %2 to migrate before changing these settings.", "hyprland legacy config warning, %1 is the config file, %2 a command").arg("hyprland.conf").arg("dms setup") : I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg(root.include.fragmentLabel)
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceVariantText
                 wrapMode: Text.WordWrap

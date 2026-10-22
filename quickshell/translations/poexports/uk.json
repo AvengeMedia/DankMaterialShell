@@ -113,8 +113,14 @@
   "%1 is %2 and may use a lot of memory.": {
     "%1 is %2 and may use a lot of memory.": "%1 — це %2, і він може використовувати багато пам'яті"
   },
+  "%1 is not installed. Install the package to manage the greeter.": {
+    "%1 is not installed. Install the package to manage the greeter.": ""
+  },
   "%1 is now included in config": {
     "%1 is now included in config": "%1 тепер включено в конфігурацію"
+  },
+  "%1 is running and will create duplicate Bluetooth players. Disable it with: %2": {
+    "%1 is running and will create duplicate Bluetooth players. Disable it with: %2": ""
   },
   "%1 issue found": {
     "%1 issue found": "%1 проблему знайдено"
@@ -146,8 +152,17 @@
   "%1 ms": {
     "%1 ms": "%1 мс"
   },
+  "%1 not available": {
+    "%1 not available": ""
+  },
+  "%1 not available - lock integration requires the DMS socket connection": {
+    "%1 not available - lock integration requires the DMS socket connection": ""
+  },
+  "%1 not available or disabled - cannot apply %2 colors": {
+    "%1 not available or disabled - cannot apply %2 colors": ""
+  },
   "%1 not found": {
-    "%1 not found": ""
+    "%1 not found": "%1 не знайдено"
   },
   "%1 notifications": {
     "%1 notifications": "%1 сповіщень"
@@ -156,7 +171,7 @@
     "%1 online": "%1 онлайн"
   },
   "%1 only": {
-    "%1 only": ""
+    "%1 only": "лише %1"
   },
   "%1 other": {
     "%1 other": "%1 інше"
@@ -186,7 +201,7 @@
     "%1 tasks": "%1 завдань"
   },
   "%1 uninstalled": {
-    "%1 uninstalled": ""
+    "%1 uninstalled": "%1 видалено"
   },
   "%1 update": {
     "%1 update": "%1 оновлення"
@@ -270,7 +285,7 @@
     "A floating companion that works alongside any bar layout": "Плаваючий супутник, що працює разом із будь-яким макетом панелі"
   },
   "A modern desktop shell for Wayland": {
-    "A modern desktop shell for Wayland": ""
+    "A modern desktop shell for Wayland": "Сучасна оболонка стільниці для Wayland"
   },
   "A newer dms binary is installed.": {
     "A newer dms binary is installed.": "Встановлено новішу бінарну версію dms"
@@ -386,8 +401,8 @@
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "Додати «%1» до групи %2?"
   },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "Додати «%1» до групи %2? Користувач має вийти з системи та увійти знову, а потім запустити 'dms-greeter sync --profile', щоб опублікувати тему екрана входу"
+  "Add \"%1\" to the %2 group? They must log out and back in, then run %3 to publish their login-screen theme.": {
+    "Add \"%1\" to the %2 group? They must log out and back in, then run %3 to publish their login-screen theme.": ""
   },
   "Add Desktop Widget": {
     "Add Desktop Widget": "Додати пристосунок робочого столу"
@@ -461,8 +476,8 @@
   "Adds concave curves where the bar meets the screen edge": {
     "Adds concave curves where the bar meets the screen edge": "Додає вогнуті криві в місцях стикування панелі з краєм екрана"
   },
-  "Adds them to the %1 group so they can run dms-greeter sync --profile": {
-    "Adds them to the %1 group so they can run dms-greeter sync --profile": "Додає їх до групи %1, щоб вони могли запускати dms-greeter sync --profile"
+  "Adds them to the %1 group so they can run %2": {
+    "Adds them to the %1 group so they can run %2": ""
   },
   "Adds them to the %1 group so they can use sudo": {
     "Adds them to the %1 group so they can use sudo": "Додає їх до групи %1, щоб вони могли використовувати sudo"
@@ -510,7 +525,7 @@
     "All displays": "Усі дисплеї"
   },
   "All plugins": {
-    "All plugins": ""
+    "All plugins": "Всі розширення"
   },
   "All settings": {
     "All settings": "Усі налаштування"
@@ -545,8 +560,8 @@
   "Already upvoted, click again to remove": {
     "Already upvoted, click again to remove": ""
   },
-  "Also runs the templates in your matugen config.toml": {
-    "Also runs the templates in your matugen config.toml": "Також запускає шаблони з вашого конфігураційного файлу matugen config.toml"
+  "Also runs the templates in your %1": {
+    "Also runs the templates in your %1": ""
   },
   "Also saves the screenshot to disk": {
     "Also saves the screenshot to disk": "Також зберігає знімок екрану на диск"
@@ -1238,9 +1253,6 @@
   "Built-in plugins": {
     "Built-in plugins": "Вбудовані розширення"
   },
-  "Bundled greeter active": {
-    "Bundled greeter active": "Активне вбудоване привітання"
-  },
   "Button areas": {
     "Button areas": "Області кнопок"
   },
@@ -1517,8 +1529,8 @@
   "Click 'Setup' to create %1 and add include to your compositor config.": {
     "Click 'Setup' to create %1 and add include to your compositor config.": "Натисніть «Налаштувати», щоб створити %1 та додати include у конфігурацію вашого композитора"
   },
-  "Click Import to add a .ovpn or .conf": {
-    "Click Import to add a .ovpn or .conf": "Натисніть «Імпортувати», щоб додати файл .ovpn або .conf"
+  "Click Import to add a %1 or %2 file": {
+    "Click Import to add a %1 or %2 file": ""
   },
   "Click actions": {
     "Click actions": "Дії при кліку"
@@ -1827,7 +1839,7 @@
     "Controls": "Елементи керування"
   },
   "Controls media players": {
-    "Controls media players": ""
+    "Controls media players": "Контролює медіа-програвачі"
   },
   "Convert to DMS": {
     "Convert to DMS": "Конвертувати в DMS"
@@ -2064,13 +2076,13 @@
     "DMS chooser": "Вибір DMS"
   },
   "DMS is a modern, highly customizable desktop shell that looks great out of the box, without sacrificing the freedom to make it your own.<br/><br/>Built with %1 and %2, it brings together panels, widgets, system controls, and more into a cohesive desktop experience.": {
-    "DMS is a modern, highly customizable desktop shell that looks great out of the box, without sacrificing the freedom to make it your own.<br/><br/>Built with %1 and %2, it brings together panels, widgets, system controls, and more into a cohesive desktop experience.": ""
+    "DMS is a modern, highly customizable desktop shell that looks great out of the box, without sacrificing the freedom to make it your own.<br/><br/>Built with %1 and %2, it brings together panels, widgets, system controls, and more into a cohesive desktop experience.": "DMS — це сучасна оболонка робочого столу з широкими можливостями налаштування, яка чудово виглядає одразу \"з коробки\" й водночас дає повну свободу налаштувати її по-своєму.<br/><br/>Створена на основі %1 та %2, вона об'єднує панелі, пристосунки, елементи керування системою та багато іншого в цілісне робоче середовище."
   },
   "DMS out of date": {
     "DMS out of date": "Версія DMS застаріла"
   },
-  "DMS removes its managed block from /etc/pam.d/greetd and stops write services": {
-    "DMS removes its managed block from /etc/pam.d/greetd and stops write services": "DMS видаляє свій керований блок з /etc/pam.d/greetd та зупиняє служби запису"
+  "DMS removes its managed block from %1 and stops write services": {
+    "DMS removes its managed block from %1 and stops write services": ""
   },
   "DMS server is outdated (API v%1, expected v%2)": {
     "DMS server is outdated (API v%1, expected v%2)": "Сервер DMS застарів (API v%1, очікується v%2)"
@@ -2087,9 +2099,6 @@
   "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": {
     "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": "DMS використовує сімейство шрифтів, накреслення та масштаб. Точний шрифт, нахил, ширина та окремо масштабовані лінії можуть відрізнятися"
   },
-  "DMS_SOCKET not available": {
-    "DMS_SOCKET not available": "DMS_SOCKET недоступний"
-  },
   "Daily": {
     "Daily": "Щодня"
   },
@@ -2104,15 +2113,6 @@
   },
   "DankBar": {
     "DankBar": "DankBar"
-  },
-  "DankCalendar": {
-    "DankCalendar": "DankCalendar"
-  },
-  "DankCalendar isn't installed": {
-    "DankCalendar isn't installed": "DankCalendar не встановлено"
-  },
-  "DankCalendar isn't running": {
-    "DankCalendar isn't running": "DankCalendar не запущено"
   },
   "Dark": {
     "Dark": "Темний"
@@ -2179,6 +2179,9 @@
   },
   "Deck": {
     "Deck": "Колода"
+  },
+  "Declared by the author, not enforced": {
+    "Declared by the author, not enforced": ""
   },
   "Default": {
     "Default": "Типово"
@@ -2310,7 +2313,7 @@
     "Dew point %1": "Точка роси %1"
   },
   "Did you mean": {
-    "Did you mean": ""
+    "Did you mean": "Чи малось на увазі"
   },
   "Digital": {
     "Digital": "Цифровий"
@@ -3053,8 +3056,8 @@
   "Failed to resume printer": {
     "Failed to resume printer": "Не вдалося відновити роботу принтера"
   },
-  "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
-    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "Не вдалося запустити 'dms-greeter status'. Переконайтеся, що пакет dms-greeter встановлено"
+  "Failed to run '%1'. Ensure the %2 package is installed.": {
+    "Failed to run '%1'. Ensure the %2 package is installed.": ""
   },
   "Failed to save VPN credentials": {
     "Failed to save VPN credentials": "Не вдалося зберегти облікові дані VPN"
@@ -3176,8 +3179,8 @@
   "File manager": {
     "File manager": "Файловий менеджер"
   },
-  "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
-    "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "Пошук файлів потребує dsearch\nВстановіть з github.com/AvengeMedia/danksearch"
+  "File search requires %1\nInstall from %2": {
+    "File search requires %1\nInstall from %2": ""
   },
   "File the command writes; leave empty to read stdout": {
     "File the command writes; leave empty to read stdout": "Файл, у який записується команда; залиште порожнім, щоб прочитати stdout"
@@ -3402,7 +3405,7 @@
     "For %1": "Для %1"
   },
   "For you": {
-    "For you": ""
+    "For you": "Для вас"
   },
   "Force HDR": {
     "Force HDR": "Примусовий HDR"
@@ -3929,8 +3932,8 @@
   "IP address or hostname": {
     "IP address or hostname": "IP-адреса або назва хоста"
   },
-  "IP sharing setup failed. Check that dnsmasq is installed.": {
-    "IP sharing setup failed. Check that dnsmasq is installed.": "Налаштування спільного використання IP не вдалося. Перевірте, чи встановлено dnsmasq"
+  "IP sharing setup failed. Check that %1 is installed.": {
+    "IP sharing setup failed. Check that %1 is installed.": ""
   },
   "ISO date": {
     "ISO date": "ISO дата"
@@ -4148,14 +4151,14 @@
   "Install failed: %1": {
     "Install failed: %1": "Встановлення не вдалося: %1"
   },
-  "Install matugen package for dynamic theming": {
-    "Install matugen package for dynamic theming": "Встановіть пакет matugen для динамічного темизації"
-  },
   "Install plugin '%1' from the DMS registry?": {
     "Install plugin '%1' from the DMS registry?": "Встановити розширення '%1' з реєстру DMS?"
   },
   "Install system updates?": {
     "Install system updates?": "Встановити системні оновлення?"
+  },
+  "Install the %1 package for dynamic theming": {
+    "Install the %1 package for dynamic theming": ""
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "Встановити тему «%1» з реєстру DMS?"
@@ -4409,8 +4412,8 @@
   "Launching": {
     "Launching": "Запуск"
   },
-  "Layer namespace dms:blurwallpaper, needs a niri blur rule": {
-    "Layer namespace dms:blurwallpaper, needs a niri blur rule": "Простір шару dms:blurwallpaper потребує правила розмиття niri"
+  "Layer namespace %1, needs a niri blur rule": {
+    "Layer namespace %1, needs a niri blur rule": ""
   },
   "Layer outline": {
     "Layer outline": "Контур шару"
@@ -4524,7 +4527,7 @@
     "Lines: %1": "Рядків: %1"
   },
   "Link copied": {
-    "Link copied": ""
+    "Link copied": "Посилання скопійовано"
   },
   "Link your DMS settings so the login screen follows them.": {
     "Link your DMS settings so the login screen follows them.": "Прив'яжіть налаштування DMS, щоб екран входу слідував за ними"
@@ -5118,7 +5121,7 @@
     "Near island": "Поруч з островом"
   },
   "Needs": {
-    "Needs": ""
+    "Needs": "Потребує"
   },
   "Nested chip": {
     "Nested chip": "Вкладена мітка"
@@ -5163,7 +5166,7 @@
     "New": "Новий"
   },
   "New & updated": {
-    "New & updated": ""
+    "New & updated": "Нове та оновлене"
   },
   "New Session": {
     "New Session": "Нова сесія"
@@ -5597,17 +5600,17 @@
   "Not available": {
     "Not available": "Недоступно"
   },
-  "Not available - install fprintd and pam_fprintd": {
-    "Not available - install fprintd and pam_fprintd": "Недоступно — встановіть fprintd та pam_fprintd"
+  "Not available - install %1 and %2": {
+    "Not available - install %1 and %2": ""
   },
-  "Not available - install or configure pam_u2f": {
-    "Not available - install or configure pam_u2f": "Недоступно — встановіть або налаштуйте pam_u2f"
+  "Not available - install %1 and %2, or configure %3 PAM": {
+    "Not available - install %1 and %2, or configure %3 PAM": ""
   },
-  "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
-    "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": "Недоступно — встановіть fprintd та pam_fprintd або налаштуйте greetd PAM"
+  "Not available - install or configure %1": {
+    "Not available - install or configure %1": ""
   },
-  "Not available — install or configure pam_u2f, or configure greetd PAM.": {
-    "Not available — install or configure pam_u2f, or configure greetd PAM.": "Недоступно — встановіть або налаштуйте pam_u2f або налаштуйте greetd PAM"
+  "Not available - install or configure %1, or configure %2 PAM": {
+    "Not available - install or configure %1, or configure %2 PAM": ""
   },
   "Not bound": {
     "Not bound": "Не прив'язано"
@@ -5724,7 +5727,7 @@
     "Office": "Офіс"
   },
   "Official only": {
-    "Official only": ""
+    "Official only": "Лише офіційні"
   },
   "Offline Report": {
     "Offline Report": "Звіт про автономну роботу"
@@ -6132,10 +6135,10 @@
     "Pick how long to stay awake": "Виберіть, як довго залишатися в стані пробудження"
   },
   "Pick of the day": {
-    "Pick of the day": ""
+    "Pick of the day": "Вибір дня"
   },
   "Pick of the week": {
-    "Pick of the week": ""
+    "Pick of the week": "Вибір тижня"
   },
   "Pill": {
     "Pill": "Пігулка"
@@ -6161,8 +6164,8 @@
   "Pixelate": {
     "Pixelate": "Пікселізація"
   },
-  "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
-    "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Розташуйте каталоги розширень тут. Кожне розширення повинне мати файл маніфесту plugin.json"
+  "Place plugin directories here. Each plugin should have a %1 manifest file.": {
+    "Place plugin directories here. Each plugin should have a %1 manifest file.": ""
   },
   "Placement": {
     "Placement": "Розміщення"
@@ -6270,7 +6273,7 @@
     "Popouts and modals use the main animation duration": "Спливаючі та модальні вікна використовують основну тривалість анімації"
   },
   "Popular": {
-    "Popular": ""
+    "Popular": "Популярні"
   },
   "Popular Plugins": {
     "Popular Plugins": "Популярні розширення"
@@ -6512,8 +6515,8 @@
   "Profile not found": {
     "Profile not found": "Профіль не знайдено"
   },
-  "Profile not found in monitors.json": {
-    "Profile not found in monitors.json": "Профіль не знайдено в monitors.json"
+  "Profile not found in %1": {
+    "Profile not found in %1": ""
   },
   "Profile on AC": {
     "Profile on AC": "Профіль від мережі"
@@ -6612,22 +6615,22 @@
     "Read:": "Читати:"
   },
   "Reads audio devices and volume": {
-    "Reads audio devices and volume": ""
+    "Reads audio devices and volume": "Читає пристрої аудіо та гучність"
   },
   "Reads its own settings": {
-    "Reads its own settings": ""
+    "Reads its own settings": "Читає власні налаштування"
   },
   "Reads its saved state": {
-    "Reads its saved state": ""
+    "Reads its saved state": "Читає власний збережений стан"
   },
   "Reads the clipboard": {
-    "Reads the clipboard": ""
+    "Reads the clipboard": "Читає буфер обміну"
   },
   "Reads the list of running programs": {
-    "Reads the list of running programs": ""
+    "Reads the list of running programs": "Читає список запущених програм"
   },
   "Reads your files": {
-    "Reads your files": ""
+    "Reads your files": "Читає ваші файли"
   },
   "Ready": {
     "Ready": "Готово"
@@ -6773,8 +6776,8 @@
   "Remove the shortcut %1?": {
     "Remove the shortcut %1?": "Видалити ярлик %1?"
   },
-  "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": {
-    "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": "Видалити ярлик %1? Запис про розв'язку буде збережено в dms/binds-user.lua, щоб він залишався видаленим після оновлень DMS"
+  "Remove the shortcut %1? An unbind entry will be saved to %2 so it stays removed across DMS updates.": {
+    "Remove the shortcut %1? An unbind entry will be saved to %2 so it stays removed across DMS updates.": ""
   },
   "Remove upvote": {
     "Remove upvote": ""
@@ -6830,8 +6833,8 @@
   "Requires %1": {
     "Requires %1": "Потребує %1"
   },
-  "Requires 'dgop' tool": {
-    "Requires 'dgop' tool": "Потрібен інструмент 'dgop'"
+  "Requires %1, %2, and your user in the %3 group (plus %4 for fingerprint, %5 for security keys).": {
+    "Requires %1, %2, and your user in the %3 group (plus %4 for fingerprint, %5 for security keys).": ""
   },
   "Requires DMS %1": {
     "Requires DMS %1": "Потребує DMS %1"
@@ -6841,9 +6844,6 @@
   },
   "Requires MangoWC compositor": {
     "Requires MangoWC compositor": "Потребує композитора MangoWC"
-  },
-  "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": "Потрібні greetd, dms-greeter та додавання користувача до групи greeter (а також fprintd/pam_fprintd для відбитків, pam_u2f для ключів безпеки)"
   },
   "Requires night mode support": {
     "Requires night mode support": "Потребує підтримки нічного режиму"
@@ -7001,8 +7001,8 @@
   "Run a shell command (e.g., notify-send)": {
     "Run a shell command (e.g., notify-send)": "Запустити команду оболонки (наприклад, notify-send)"
   },
-  "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": {
-    "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": "Запустити зовнішню команду при кожній зміні шпалер і об'єднати її JSON-палітру в matugen під простором імен, щоб шаблони могли використовувати, наприклад, {{name.color0}}. Команда отримує шпалери як {image} / $DMS_WALLPAPER та режим як {mode} / $DMS_MODE"
+  "Run an external command on each wallpaper change and merge its JSON palette into %1 under a namespace, so templates can use e.g. %2. The command receives the wallpaper as %3 and the mode as %4.": {
+    "Run an external command on each wallpaper change and merge its JSON palette into %1 under a namespace, so templates can use e.g. %2. The command receives the wallpaper as %3 and the mode as %4.": ""
   },
   "Run full sync": {
     "Run full sync": "Запустити повну синхронізацію"
@@ -7026,10 +7026,10 @@
     "Runs in a terminal.": "Запускається в терміналі"
   },
   "Runs programs on your computer": {
-    "Runs programs on your computer": ""
+    "Runs programs on your computer": "Запускає програми на вашому комп'ютері"
   },
   "Runs shell commands": {
-    "Runs shell commands": ""
+    "Runs shell commands": "Запускає команди оболонки"
   },
   "S": {
     "S": "Пд"
@@ -7104,10 +7104,10 @@
     "Saved networks": "Збережені мережі"
   },
   "Saves its own settings": {
-    "Saves its own settings": ""
+    "Saves its own settings": "Зберігає власні налаштування"
   },
   "Saves its state": {
-    "Saves its state": ""
+    "Saves its state": "Зберігає власний стан"
   },
   "Saving...": {
     "Saving...": "Збереження..."
@@ -7375,6 +7375,9 @@
   },
   "Set notification rules": {
     "Set notification rules": "Налаштувати правила сповіщень"
+  },
+  "Set one of these environment variables, then restart the shell:\n%1\n\nOnly %2 requires %3 to be installed.": {
+    "Set one of these environment variables, then restart the shell:\n%1\n\nOnly %2 requires %3 to be installed.": ""
   },
   "Set under Theme & colors, Derived color": {
     "Set under Theme & colors, Derived color": "Встановіть у «Тема та кольори» → «Похідний колір»"
@@ -7740,7 +7743,7 @@
     "Soft square": "М'який квадрат"
   },
   "Software dimming": {
-    "Software dimming": ""
+    "Software dimming": "Програмне затемнення"
   },
   "Software updates": {
     "Software updates": "Оновлення програмного забезпечення"
@@ -8144,11 +8147,8 @@
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Резервний запуск термінала не вдався. Встановіть підтримуваний емулятор термінала або запустіть 'dms auth sync' вручну"
   },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "Невдалий запуск резервного терміналу. Встановіть один із підтримуваних емуляторів термінала або запустіть 'dms-greeter sync' вручну"
-  },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.": "Резервний термінал не спрацював. Встановіть один із підтримуваних емуляторів термінала або запустіть «dms-greeter unlink» вручну"
+  "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": ""
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": "Відкрито резервний термінал. Завершіть автентифікацію там; він закриється автоматично після завершення"
@@ -8189,11 +8189,11 @@
   "Text style": {
     "Text style": "Стиль тексту"
   },
+  "The %1 environment variable is not set or the socket is unavailable. Automated plugin management requires it.": {
+    "The %1 environment variable is not set or the socket is unavailable. Automated plugin management requires it.": ""
+  },
   "The Aqueous operation failed.": {
     "The Aqueous operation failed.": "Операція Aqueous не вдалася"
-  },
-  "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
-    "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "Змінна середовища DMS_SOCKET не встановлена або сокет недоступний. Для автоматичного керування розширеннями потрібен DMS_SOCKET"
   },
   "The Default action only overrides priority": {
     "The Default action only overrides priority": "Типова дія лише замінює пріоритет"
@@ -8210,8 +8210,8 @@
   "The arrow points in the direction the wind is blowing. The label shows where it comes from.": {
     "The arrow points in the direction the wind is blowing. The label shows where it comes from.": "Стрілка вказує напрямок вітру. Мітка показує, звідки він дме"
   },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": "Налаштування нижче змінюватимуть ваші параметри GTK та Qt. Якщо ви хочете зберегти поточні конфігурації, зробіть їхню резервну копію (qt5ct.conf|qt6ct.conf|qtengine/config.json та ~/.config/gtk-3.0|gtk-4.0)."
+  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (%1 and %2).": {
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (%1 and %2).": ""
   },
   "The compositor session changed. Discard this edit before starting a new one.": {
     "The compositor session changed. Discard this edit before starting a new one.": "Сесія композитора змінилася. Відмініть цю правку перед початком нової"
@@ -8227,9 +8227,6 @@
   },
   "The fill shows today's precipitation probability.": {
     "The fill shows today's precipitation probability.": "Заповнення показує ймовірність опадів на сьогодні"
-  },
-  "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
-    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": "Вікно входу, що постачається з DMS, є активним (налаштування archinstall). Воно продовжує працювати, але для синхронізації теми та налаштувань потрібне спеціальне. Встановіть 'greetd-dms-greeter-bin' з AUR, а потім запустіть Sync, щоб мігрувати екран входу"
   },
   "The highlighted marker shows the UV category: low, moderate, high, very high, or extreme.": {
     "The highlighted marker shows the UV category: low, moderate, high, very high, or extreme.": "Підсвічений маркер показує категорію УФ: низька, помірна, висока, дуже висока або екстремальна"
@@ -8318,8 +8315,8 @@
   "Themes": {
     "Themes": "Теми"
   },
-  "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": {
-    "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": "Це додає записи до каталогу автозапуску XDG (~/.config/autostart/*.desktop)"
+  "These add entries to the XDG autostart directory (%1)": {
+    "These add entries to the XDG autostart directory (%1)": ""
   },
   "They load with the next update check. Release notes are also published on GitHub.": {
     "They load with the next update check. Release notes are also published on GitHub.": "Вони завантажуються під час наступної перевірки оновлень. Нотатки до релізу також публікуються на GitHub"
@@ -8334,13 +8331,13 @@
     "Third-party plugins": "Сторонні розширення"
   },
   "Third-party plugins are created by the community and are not officially supported by %1.\n\nThese plugins may pose security and privacy risks - install at your own risk.": {
-    "Third-party plugins are created by the community and are not officially supported by %1.\n\nThese plugins may pose security and privacy risks - install at your own risk.": ""
+    "Third-party plugins are created by the community and are not officially supported by %1.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "Сторонні розширення створені спільнотою та не мають офіційної підтримки від %1.\n\nВони можуть нести ризик для безпеки та приватності — встановлюйте на власний розсуд."
   },
   "This bar is the Island": {
     "This bar is the Island": "Ця панель є Острівцем"
   },
-  "This bind is overridden by config.kdl": {
-    "This bind is overridden by config.kdl": "Ця прив'язка перевизначена у config.kdl"
+  "This bind is overridden by %1": {
+    "This bind is overridden by %1": ""
   },
   "This device": {
     "This device": "Цей пристрій"
@@ -8351,8 +8348,8 @@
   "This display does not report VRR support": {
     "This display does not report VRR support": "Цей дисплей не повідомляє про підтримку VRR"
   },
-  "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": {
-    "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": "Ця установка все ще використовує hyprland.conf. Запустіть 'dms setup' для міграції перед зміною цих налаштувань"
+  "This install is still using %1. Run %2 to migrate before changing these settings.": {
+    "This install is still using %1. Run %2 to migrate before changing these settings.": ""
   },
   "This may take a few seconds": {
     "This may take a few seconds": "Це може зайняти кілька секунд"
@@ -8363,11 +8360,8 @@
   "This output is disabled in the current profile": {
     "This output is disabled in the current profile": "Цей вивід вимкнено в поточному профілі"
   },
-  "This plugin can": {
-    "This plugin can": ""
-  },
-  "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
-    "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Це розширення не має дозволу 'settings_write'.\n\nДодайте \"permissions\": [\"settings_read\", \"settings_write\"] до файлу plugin.json"
+  "This plugin does not have '%1' permission.\n\nAdd %2 to %3": {
+    "This plugin does not have '%1' permission.\n\nAdd %2 to %3": ""
   },
   "This system cannot link settings live. Sync again after changing them.": {
     "This system cannot link settings live. Sync again after changing them.": "Ця система не може прив'язувати налаштування в реальному часі. Синхронізуйте знову після їх зміни"
@@ -8474,11 +8468,11 @@
   "To Full": {
     "To Full": "До повного заряду"
   },
-  "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": {
-    "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": "Щоб увійти як інший користувач, вийдіть із системи та виберіть обліковий запис у вікні входу. Для створення паралельної сесії потрібен багатосесійний greeter (greetd-flexiserver / GDM / LightDM)"
+  "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (%1).": {
+    "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (%1).": ""
   },
-  "To use this DMS bind, remove or change the keybind in your config.kdl": {
-    "To use this DMS bind, remove or change the keybind in your config.kdl": "Щоб використовувати цю прив'язку DMS, видаліть або змініть комбінацію клавіш у вашому config.kdl"
+  "To use this DMS bind, remove or change the keybind in your %1": {
+    "To use this DMS bind, remove or change the keybind in your %1": ""
   },
   "Toast": {
     "Toast": "Спливаюче повідомлення"
@@ -8595,7 +8589,7 @@
     "Tray icon tint": "Відтінок іконки трея"
   },
   "Trending": {
-    "Trending": ""
+    "Trending": "У тренді"
   },
   "Trigger": {
     "Trigger": "Тригер"
@@ -9120,13 +9114,13 @@
     "Welcome": "Вітаємо"
   },
   "Welcome to %1": {
-    "Welcome to %1": ""
+    "Welcome to %1": "Вітаємо в %1"
   },
   "What changed": {
     "What changed": "Що змінилося"
   },
   "What's New": {
-    "What's New": ""
+    "What's New": "Що нового"
   },
   "When locked": {
     "When locked": "Під час блокування"
@@ -9347,9 +9341,6 @@
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Ви маєте незбережені зміни. Зберегти їх, щоб продовжити?"
   },
-  "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
-    "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": "Вам потрібно встановити одне з:\nQT_QPA_PLATFORMTHEME=gtk3 АБО\nQT_QPA_PLATFORMTHEME=qt6ct АБО\nQT_QPA_PLATFORMTHEME=qtengine\nяк змінні середовища, а потім перезапустити оболонку\n\nЛише qt6ct потребує встановленого qt6ct-kde"
-  },
   "You'll enter your password at the greeter after the next reboot.": {
     "You'll enter your password at the greeter after the next reboot.": "Ви введете пароль у вікні входу після наступного перезавантаження"
   },
@@ -9420,16 +9411,13 @@
     "checked just now": "перевірено щойно"
   },
   "copy link": {
-    "copy link": ""
+    "copy link": "копіювати посилання"
   },
   "deprecated": {
     "deprecated": "застаріло"
   },
   "detached": {
     "detached": "від'єднано"
-  },
-  "dgop not available": {
-    "dgop not available": "dgop недоступний"
   },
   "direct": {
     "direct": "прямий"
@@ -9439,9 +9427,6 @@
   },
   "display rotation option": {
     "Normal": "Нормальний"
-  },
-  "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
-    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": "Пакет 'dms-greeter' не встановлено. Встановіть його, щоб керувати вікном входу"
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "напр. /usr/bin/my-script --flag"
@@ -9500,9 +9485,6 @@
   "loginctl integration": {
     "loginctl integration": "Інтеграція з loginctl"
   },
-  "loginctl not available - lock integration requires DMS socket connection": {
-    "loginctl not available - lock integration requires DMS socket connection": "loginctl недоступний — інтеграція блокування потребує з'єднання через DMS-сокет"
-  },
   "mango: config reloaded": {
     "mango: config reloaded": "mango: конфігурацію перезавантажено"
   },
@@ -9515,17 +9497,8 @@
   "mangowc GitHub": {
     "mangowc GitHub": "GitHub mangowc"
   },
-  "matugen not available or disabled - cannot apply %1 colors": {
-    "matugen not available or disabled - cannot apply %1 colors": "matugen недоступний або вимкнено — неможливо застосувати кольори %1"
-  },
-  "matugen not found - install matugen package for dynamic theming": {
-    "matugen not found - install matugen package for dynamic theming": "matugen не знайдено — встановіть пакет для динамічної темізації"
-  },
   "missing program": {
     "Requires %1": "Потребує %1"
-  },
-  "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": {
-    "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": "mpris-proxy запущено і він створить дублікати Bluetooth-програвачів. Вимкніть його за допомогою команди 'systemctl --user disable --now mpris-proxy.service'"
   },
   "ms": {
     "ms": "мс"
@@ -9547,9 +9520,6 @@
   },
   "niri shortcuts config": {
     "niri shortcuts config": "Конфігурація гарячих клавіш Niri"
-  },
-  "niri/dms Discord": {
-    "niri/dms Discord": "Discord Niri/DMS"
   },
   "niri: config reloaded": {
     "niri: config reloaded": "Niri: конфігурацію перезавантажено"
@@ -9624,7 +9594,7 @@
     "until %1": "до %1"
   },
   "up": {
-    "up": "вгору"
+    "up": "працює"
   },
   "updated": {
     "updated": "оновлено"

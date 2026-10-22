@@ -163,7 +163,10 @@ Item {
                                     break;
                                 case 1:
                                     if (ToastService.wallpaperErrorStatus === "matugen_missing" || ToastService.wallpaperErrorStatus === "error") {
-                                        ToastService.showError(ToastService.wallpaperErrorStatus === "matugen_missing" ? I18n.tr("matugen not found - install matugen package for dynamic theming", "matugen error") : I18n.tr("Wallpaper processing failed - check wallpaper path", "wallpaper error"));
+                                        if (ToastService.wallpaperErrorStatus === "matugen_missing")
+                                            ToastService.showError(I18n.tr("%1 not found", "missing program, %1 is a program name").arg("matugen"), I18n.tr("Install the %1 package for dynamic theming", "matugen installation hint, %1 is the package name").arg("matugen"));
+                                        else
+                                            ToastService.showError(I18n.tr("Wallpaper processing failed - check wallpaper path", "wallpaper error"));
                                         break;
                                     }
                                     Theme.switchThemeCategory("dynamic", Theme.dynamic);
@@ -284,7 +287,7 @@ Item {
                                 if (ToastService.wallpaperErrorStatus === "error")
                                     return I18n.tr("Wallpaper processing failed", "wallpaper processing error");
                                 if (ToastService.wallpaperErrorStatus === "matugen_missing")
-                                    return I18n.tr("Install matugen package for dynamic theming", "matugen installation hint");
+                                    return I18n.tr("Install the %1 package for dynamic theming", "matugen installation hint, %1 is the package name").arg("matugen");
                                 if (Theme.wallpaperPath)
                                     return Theme.wallpaperPath;
                                 return I18n.tr("Dynamic colors from wallpaper", "dynamic colors description");

@@ -106,7 +106,7 @@ Item {
         case "missing_reader":
             return I18n.tr("No fingerprint reader detected", "fingerprint setting status");
         case "missing_pam_support":
-            return I18n.tr("Not available - install fprintd and pam_fprintd", "lock screen fingerprint setting");
+            return I18n.tr("Not available - install %1 and %2", "lock screen fingerprint setting, %1 and %2 are package names").arg("fprintd").arg("pam_fprintd");
         default:
             return I18n.tr("Fingerprint availability could not be confirmed", "fingerprint setting status");
         }
@@ -119,7 +119,7 @@ Item {
         case "missing_key_registration":
             return I18n.tr("Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.", "security key setting status");
         case "missing_pam_support":
-            return I18n.tr("Not available - install or configure pam_u2f", "lock screen security key setting");
+            return I18n.tr("Not available - install or configure %1", "lock screen security key setting, %1 is a PAM module").arg("pam_u2f");
         default:
             return I18n.tr("Security-key availability could not be confirmed", "security key setting status");
         }
@@ -840,7 +840,7 @@ Item {
             SettingsRow {
                 visible: !SessionService.loginctlAvailable
                 body: StyledText {
-                    text: I18n.tr("loginctl not available - lock integration requires DMS socket connection")
+                    text: I18n.tr("%1 not available - lock integration requires the DMS socket connection", "lock screen warning, %1 is the loginctl binary").arg("loginctl")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.warning
                     width: parent.width

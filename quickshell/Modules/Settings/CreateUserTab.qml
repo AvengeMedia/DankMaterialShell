@@ -167,7 +167,7 @@ Item {
                 settingKey: "createUserGreeter"
                 tags: ["user", "greeter", "login", "sync"]
                 text: I18n.tr("Allow greeter login access")
-                description: I18n.tr("Adds them to the %1 group so they can run dms-greeter sync --profile", "create user greeter toggle description, %1 is a group name").arg(UsersService.greeterGroup)
+                description: I18n.tr("Adds them to the %1 group so they can run %2", "create user greeter toggle description, %1 is a group name, %2 a command").arg(UsersService.greeterGroup).arg("dms-greeter sync --profile")
                 checked: root.pendingGreeter
                 onToggled: checked => root.pendingGreeter = checked
             }

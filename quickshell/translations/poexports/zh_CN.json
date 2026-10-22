@@ -113,8 +113,14 @@
   "%1 is %2 and may use a lot of memory.": {
     "%1 is %2 and may use a lot of memory.": "%1 大小为 %2，打开后可能占用大量内存。"
   },
+  "%1 is not installed. Install the package to manage the greeter.": {
+    "%1 is not installed. Install the package to manage the greeter.": ""
+  },
   "%1 is now included in config": {
     "%1 is now included in config": "%1 现在已被你的合成器配置引用"
+  },
+  "%1 is running and will create duplicate Bluetooth players. Disable it with: %2": {
+    "%1 is running and will create duplicate Bluetooth players. Disable it with: %2": ""
   },
   "%1 issue found": {
     "%1 issue found": "发现 %1 个问题"
@@ -145,6 +151,15 @@
   },
   "%1 ms": {
     "%1 ms": "%1 毫秒"
+  },
+  "%1 not available": {
+    "%1 not available": ""
+  },
+  "%1 not available - lock integration requires the DMS socket connection": {
+    "%1 not available - lock integration requires the DMS socket connection": ""
+  },
+  "%1 not available or disabled - cannot apply %2 colors": {
+    "%1 not available or disabled - cannot apply %2 colors": ""
   },
   "%1 not found": {
     "%1 not found": ""
@@ -386,8 +401,8 @@
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "将“%1”添加到 %2 组吗？"
   },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "将“%1”添加到 %2 组吗？该用户需要注销并重新登录，然后运行 dms-greeter sync --profile 以发布其登录界面主题。"
+  "Add \"%1\" to the %2 group? They must log out and back in, then run %3 to publish their login-screen theme.": {
+    "Add \"%1\" to the %2 group? They must log out and back in, then run %3 to publish their login-screen theme.": ""
   },
   "Add Desktop Widget": {
     "Add Desktop Widget": "添加桌面部件"
@@ -461,8 +476,8 @@
   "Adds concave curves where the bar meets the screen edge": {
     "Adds concave curves where the bar meets the screen edge": "在状态栏与屏幕边缘的连接处添加内凹曲线"
   },
-  "Adds them to the %1 group so they can run dms-greeter sync --profile": {
-    "Adds them to the %1 group so they can run dms-greeter sync --profile": "将其添加到 %1 组，以便运行 dms-greeter sync --profile"
+  "Adds them to the %1 group so they can run %2": {
+    "Adds them to the %1 group so they can run %2": ""
   },
   "Adds them to the %1 group so they can use sudo": {
     "Adds them to the %1 group so they can use sudo": "将其添加到 %1 组，以便使用 sudo"
@@ -545,8 +560,8 @@
   "Already upvoted, click again to remove": {
     "Already upvoted, click again to remove": ""
   },
-  "Also runs the templates in your matugen config.toml": {
-    "Also runs the templates in your matugen config.toml": "同时运行 Matugen config.toml 中的模板"
+  "Also runs the templates in your %1": {
+    "Also runs the templates in your %1": ""
   },
   "Also saves the screenshot to disk": {
     "Also saves the screenshot to disk": "同时将截图保存到磁盘"
@@ -1238,9 +1253,6 @@
   "Built-in plugins": {
     "Built-in plugins": "内置插件"
   },
-  "Bundled greeter active": {
-    "Bundled greeter active": "内置 Greeter 已启用"
-  },
   "Button areas": {
     "Button areas": "按键区域"
   },
@@ -1517,8 +1529,8 @@
   "Click 'Setup' to create %1 and add include to your compositor config.": {
     "Click 'Setup' to create %1 and add include to your compositor config.": "点击“设置”以创建 %1 配置，并添加引用至合成器配置文件。"
   },
-  "Click Import to add a .ovpn or .conf": {
-    "Click Import to add a .ovpn or .conf": "点击导入添加 .ovpn 或 .conf 文件"
+  "Click Import to add a %1 or %2 file": {
+    "Click Import to add a %1 or %2 file": ""
   },
   "Click actions": {
     "Click actions": "点击操作"
@@ -2069,8 +2081,8 @@
   "DMS out of date": {
     "DMS out of date": "DMS 版本过旧"
   },
-  "DMS removes its managed block from /etc/pam.d/greetd and stops write services": {
-    "DMS removes its managed block from /etc/pam.d/greetd and stops write services": "DMS 会从 /etc/pam.d/greetd 移除其管理的区块，并停止写入服务"
+  "DMS removes its managed block from %1 and stops write services": {
+    "DMS removes its managed block from %1 and stops write services": ""
   },
   "DMS server is outdated (API v%1, expected v%2)": {
     "DMS server is outdated (API v%1, expected v%2)": "DMS 服务器版本过旧（API v%1，应为 v%2）"
@@ -2087,9 +2099,6 @@
   "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": {
     "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": "DMS 使用字体系列、字重和缩放比例。具体字形、倾斜、宽度以及单独缩放的状态栏可能有所不同。"
   },
-  "DMS_SOCKET not available": {
-    "DMS_SOCKET not available": "DMS_SOCKET 不可用"
-  },
   "Daily": {
     "Daily": "每日"
   },
@@ -2104,15 +2113,6 @@
   },
   "DankBar": {
     "DankBar": "Dank 状态栏"
-  },
-  "DankCalendar": {
-    "DankCalendar": "Dank 日历"
-  },
-  "DankCalendar isn't installed": {
-    "DankCalendar isn't installed": "Dank 日历未安装"
-  },
-  "DankCalendar isn't running": {
-    "DankCalendar isn't running": "Dank 日历未运行"
   },
   "Dark": {
     "Dark": "深色"
@@ -2179,6 +2179,9 @@
   },
   "Deck": {
     "Deck": "Deck"
+  },
+  "Declared by the author, not enforced": {
+    "Declared by the author, not enforced": ""
   },
   "Default": {
     "Default": "默认"
@@ -3053,8 +3056,8 @@
   "Failed to resume printer": {
     "Failed to resume printer": "恢复打印机失败"
   },
-  "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
-    "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "运行“dms-greeter status”失败。请确认已安装 dms-greeter 软件包。"
+  "Failed to run '%1'. Ensure the %2 package is installed.": {
+    "Failed to run '%1'. Ensure the %2 package is installed.": ""
   },
   "Failed to save VPN credentials": {
     "Failed to save VPN credentials": "保存 VPN 凭据失败"
@@ -3176,8 +3179,8 @@
   "File manager": {
     "File manager": "文件管理器"
   },
-  "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
-    "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "文件搜索需要 dsearch\n请从 github.com/AvengeMedia/danksearch 安装"
+  "File search requires %1\nInstall from %2": {
+    "File search requires %1\nInstall from %2": ""
   },
   "File the command writes; leave empty to read stdout": {
     "File the command writes; leave empty to read stdout": "命令写入的文件；留空则读取标准输出"
@@ -3929,8 +3932,8 @@
   "IP address or hostname": {
     "IP address or hostname": "IP 地址或主机名"
   },
-  "IP sharing setup failed. Check that dnsmasq is installed.": {
-    "IP sharing setup failed. Check that dnsmasq is installed.": "IP 共享设置失败。请确认已安装 dnsmasq。"
+  "IP sharing setup failed. Check that %1 is installed.": {
+    "IP sharing setup failed. Check that %1 is installed.": ""
   },
   "ISO date": {
     "ISO date": "ISO 日期"
@@ -4148,14 +4151,14 @@
   "Install failed: %1": {
     "Install failed: %1": "安装失败：%1"
   },
-  "Install matugen package for dynamic theming": {
-    "Install matugen package for dynamic theming": "安装 matugen 包以使用动态主题"
-  },
   "Install plugin '%1' from the DMS registry?": {
     "Install plugin '%1' from the DMS registry?": "要从 DMS 插件仓库安装插件 %1 吗？"
   },
   "Install system updates?": {
     "Install system updates?": "安装系统更新吗？"
+  },
+  "Install the %1 package for dynamic theming": {
+    "Install the %1 package for dynamic theming": ""
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "要从 DMS 主题仓库安装主题 %1 吗？"
@@ -4409,8 +4412,8 @@
   "Launching": {
     "Launching": "启动方式"
   },
-  "Layer namespace dms:blurwallpaper, needs a niri blur rule": {
-    "Layer namespace dms:blurwallpaper, needs a niri blur rule": "层命名空间 dms:blurwallpaper，需要 niri 模糊规则"
+  "Layer namespace %1, needs a niri blur rule": {
+    "Layer namespace %1, needs a niri blur rule": ""
   },
   "Layer outline": {
     "Layer outline": "层轮廓"
@@ -5597,17 +5600,17 @@
   "Not available": {
     "Not available": "不可用"
   },
-  "Not available - install fprintd and pam_fprintd": {
-    "Not available - install fprintd and pam_fprintd": "不可用——请安装 fprintd 和 pam_fprintd"
+  "Not available - install %1 and %2": {
+    "Not available - install %1 and %2": ""
   },
-  "Not available - install or configure pam_u2f": {
-    "Not available - install or configure pam_u2f": "不可用——请安装或配置 pam_u2f"
+  "Not available - install %1 and %2, or configure %3 PAM": {
+    "Not available - install %1 and %2, or configure %3 PAM": ""
   },
-  "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": {
-    "Not available — install fprintd and pam_fprintd, or configure greetd PAM.": "不可用 - 请安装 fprintd 和 pam_fprintd，或配置 greetd PAM。"
+  "Not available - install or configure %1": {
+    "Not available - install or configure %1": ""
   },
-  "Not available — install or configure pam_u2f, or configure greetd PAM.": {
-    "Not available — install or configure pam_u2f, or configure greetd PAM.": "不可用 - 请安装或配置 pam_u2f，或配置 greetd PAM。"
+  "Not available - install or configure %1, or configure %2 PAM": {
+    "Not available - install or configure %1, or configure %2 PAM": ""
   },
   "Not bound": {
     "Not bound": "未绑定"
@@ -6161,8 +6164,8 @@
   "Pixelate": {
     "Pixelate": "像素化"
   },
-  "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
-    "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "此处为插件目录，每个插件应带有一个 plugin.json 描述文件。"
+  "Place plugin directories here. Each plugin should have a %1 manifest file.": {
+    "Place plugin directories here. Each plugin should have a %1 manifest file.": ""
   },
   "Placement": {
     "Placement": "放置方式"
@@ -6512,8 +6515,8 @@
   "Profile not found": {
     "Profile not found": "未找到配置"
   },
-  "Profile not found in monitors.json": {
-    "Profile not found in monitors.json": "未在 monitors.json 找到配置"
+  "Profile not found in %1": {
+    "Profile not found in %1": ""
   },
   "Profile on AC": {
     "Profile on AC": "交流电源配置"
@@ -6773,8 +6776,8 @@
   "Remove the shortcut %1?": {
     "Remove the shortcut %1?": "移除快捷键 %1？"
   },
-  "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": {
-    "Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.": "移除快捷键 %1？将向 dms/binds-user.lua 保存一条解绑记录，使其在 DMS 更新后仍保持移除。"
+  "Remove the shortcut %1? An unbind entry will be saved to %2 so it stays removed across DMS updates.": {
+    "Remove the shortcut %1? An unbind entry will be saved to %2 so it stays removed across DMS updates.": ""
   },
   "Remove upvote": {
     "Remove upvote": ""
@@ -6830,8 +6833,8 @@
   "Requires %1": {
     "Requires %1": "需要 %1"
   },
-  "Requires 'dgop' tool": {
-    "Requires 'dgop' tool": "需要 dgop 工具"
+  "Requires %1, %2, and your user in the %3 group (plus %4 for fingerprint, %5 for security keys).": {
+    "Requires %1, %2, and your user in the %3 group (plus %4 for fingerprint, %5 for security keys).": ""
   },
   "Requires DMS %1": {
     "Requires DMS %1": "需要 DMS %1"
@@ -6841,9 +6844,6 @@
   },
   "Requires MangoWC compositor": {
     "Requires MangoWC compositor": "需要 MangoWC 合成器"
-  },
-  "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": "需要 greetd、dms-greeter，以及属于 greeter 组的用户（指纹认证还需要 fprintd/pam_fprintd，安全密钥还需要 pam_u2f）。"
   },
   "Requires night mode support": {
     "Requires night mode support": "需要夜间模式支持"
@@ -7001,8 +7001,8 @@
   "Run a shell command (e.g., notify-send)": {
     "Run a shell command (e.g., notify-send)": "运行 shell 命令（例如：notify-send）"
   },
-  "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": {
-    "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.": "每次更换壁纸时运行外部命令，将其 JSON 调色板按命名空间合并到 Matugen，使模板可以使用 {{name.color0}} 等变量。命令通过 {image} / $DMS_WALLPAPER 接收壁纸，通过 {mode} / $DMS_MODE 接收模式。"
+  "Run an external command on each wallpaper change and merge its JSON palette into %1 under a namespace, so templates can use e.g. %2. The command receives the wallpaper as %3 and the mode as %4.": {
+    "Run an external command on each wallpaper change and merge its JSON palette into %1 under a namespace, so templates can use e.g. %2. The command receives the wallpaper as %3 and the mode as %4.": ""
   },
   "Run full sync": {
     "Run full sync": "运行完整同步"
@@ -7375,6 +7375,9 @@
   },
   "Set notification rules": {
     "Set notification rules": "设置通知规则"
+  },
+  "Set one of these environment variables, then restart the shell:\n%1\n\nOnly %2 requires %3 to be installed.": {
+    "Set one of these environment variables, then restart the shell:\n%1\n\nOnly %2 requires %3 to be installed.": ""
   },
   "Set under Theme & colors, Derived color": {
     "Set under Theme & colors, Derived color": "在「主题与颜色 → 派生颜色」中设置"
@@ -8144,11 +8147,8 @@
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "终端回退失败。请安装受支持的终端模拟器，或手动运行 dms auth sync。"
   },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "终端备用方式失败。请安装受支持的终端模拟器之一，或手动运行 \"dms-greeter sync\"。"
-  },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter unlink' manually.": "无法打开备用终端。请安装受支持的终端模拟器，或手动运行 \"dms-greeter unlink\"。"
+  "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": {
+    "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": ""
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": "已打开终端备用方式。请在那里完成认证，完成后终端会自动关闭。"
@@ -8189,11 +8189,11 @@
   "Text style": {
     "Text style": "文本样式"
   },
+  "The %1 environment variable is not set or the socket is unavailable. Automated plugin management requires it.": {
+    "The %1 environment variable is not set or the socket is unavailable. Automated plugin management requires it.": ""
+  },
   "The Aqueous operation failed.": {
     "The Aqueous operation failed.": "Aqueous 操作失败。"
-  },
-  "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
-    "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "未设置 DMS_SOCKET 环境变量或套接字不可用，无法使用自动插件管理。"
   },
   "The Default action only overrides priority": {
     "The Default action only overrides priority": "默认操作只会覆盖优先级"
@@ -8210,8 +8210,8 @@
   "The arrow points in the direction the wind is blowing. The label shows where it comes from.": {
     "The arrow points in the direction the wind is blowing. The label shows where it comes from.": "箭头指向风吹去的方向。标签显示风的来源方向。"
   },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": "以下设置会修改 GTK 和 Qt 设置。如果希望保留当前配置，请先备份（qt5ct.conf|qt6ct.conf|qtengine/config.json 以及 ~/.config/gtk-3.0|gtk-4.0）。"
+  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (%1 and %2).": {
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (%1 and %2).": ""
   },
   "The compositor session changed. Discard this edit before starting a new one.": {
     "The compositor session changed. Discard this edit before starting a new one.": "合成器会话已更改。请放弃此编辑，然后开始新的编辑。"
@@ -8227,9 +8227,6 @@
   },
   "The fill shows today's precipitation probability.": {
     "The fill shows today's precipitation probability.": "填充部分显示今天的降水概率。"
-  },
-  "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
-    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": "DMS 内置的 Greeter 已启用（通过 archinstall 设置）。它仍可正常使用，但同步主题和设置需要独立的 Greeter。请从 AUR 安装 greetd-dms-greeter-bin，然后运行“同步”以迁移登录界面。"
   },
   "The highlighted marker shows the UV category: low, moderate, high, very high, or extreme.": {
     "The highlighted marker shows the UV category: low, moderate, high, very high, or extreme.": "高亮标记显示紫外线类别：低、中、高、很高或极高。"
@@ -8318,8 +8315,8 @@
   "Themes": {
     "Themes": "主题"
   },
-  "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": {
-    "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": "创建的自启动项会写入到 XDG 自启动目录（~/.config/autostart/*.desktop）"
+  "These add entries to the XDG autostart directory (%1)": {
+    "These add entries to the XDG autostart directory (%1)": ""
   },
   "They load with the next update check. Release notes are also published on GitHub.": {
     "They load with the next update check. Release notes are also published on GitHub.": "下次检查更新时加载，发行说明也会发布在 GitHub 上。"
@@ -8339,8 +8336,8 @@
   "This bar is the Island": {
     "This bar is the Island": "此状态栏为灵动岛"
   },
-  "This bind is overridden by config.kdl": {
-    "This bind is overridden by config.kdl": "此绑定已被 config.kdl 覆盖"
+  "This bind is overridden by %1": {
+    "This bind is overridden by %1": ""
   },
   "This device": {
     "This device": "此设备"
@@ -8351,8 +8348,8 @@
   "This display does not report VRR support": {
     "This display does not report VRR support": "此显示器未报告 VRR 支持"
   },
-  "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": {
-    "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": "此安装仍在使用 hyprland.conf。更改这些设置前，请运行 dms setup 完成迁移。"
+  "This install is still using %1. Run %2 to migrate before changing these settings.": {
+    "This install is still using %1. Run %2 to migrate before changing these settings.": ""
   },
   "This may take a few seconds": {
     "This may take a few seconds": "此操作可能会花费一些时间"
@@ -8363,11 +8360,8 @@
   "This output is disabled in the current profile": {
     "This output is disabled in the current profile": "当前配置中此输出已被禁用"
   },
-  "This plugin can": {
-    "This plugin can": ""
-  },
-  "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
-    "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "该插件没有“settings_write”权限。\n\n请在 plugin.json 中添加 \"permissions\": [\"settings_read\", \"settings_write\"]"
+  "This plugin does not have '%1' permission.\n\nAdd %2 to %3": {
+    "This plugin does not have '%1' permission.\n\nAdd %2 to %3": ""
   },
   "This system cannot link settings live. Sync again after changing them.": {
     "This system cannot link settings live. Sync again after changing them.": "此系统无法实时关联设置。修改后请再次同步。"
@@ -8474,11 +8468,11 @@
   "To Full": {
     "To Full": "充至满电"
   },
-  "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": {
-    "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (greetd-flexiserver / GDM / LightDM).": "如需以其他用户登录，请注销并在登录界面选择账户。并行创建新会话需要支持多会话的登录界面（greetd-flexiserver / GDM / LightDM）。"
+  "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (%1).": {
+    "To sign in as a different user, log out and pick the account from the greeter. Creating a fresh session in parallel needs a multi-session greeter (%1).": ""
   },
-  "To use this DMS bind, remove or change the keybind in your config.kdl": {
-    "To use this DMS bind, remove or change the keybind in your config.kdl": "要使用此 DMS 快捷键绑定，请移除或修改 config.kdl 中的快捷键绑定"
+  "To use this DMS bind, remove or change the keybind in your %1": {
+    "To use this DMS bind, remove or change the keybind in your %1": ""
   },
   "Toast": {
     "Toast": "浮动通知"
@@ -9347,9 +9341,6 @@
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "检测到未保存的更改，是否在执行此操作前保存？"
   },
-  "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
-    "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": "你需要将以下之一设置为环境变量：\nQT_QPA_PLATFORMTHEME=gtk3 或\nQT_QPA_PLATFORMTHEME=qt6ct 或\nQT_QPA_PLATFORMTHEME=qtengine\n然后重启 shell。\n\n只有 qt6ct 需要安装 qt6ct-kde。"
-  },
   "You'll enter your password at the greeter after the next reboot.": {
     "You'll enter your password at the greeter after the next reboot.": "下次重启后，你需要在登录界面输入密码。"
   },
@@ -9428,9 +9419,6 @@
   "detached": {
     "detached": "已分离"
   },
-  "dgop not available": {
-    "dgop not available": "dgop 不可用"
-  },
   "direct": {
     "direct": "直接"
   },
@@ -9439,9 +9427,6 @@
   },
   "display rotation option": {
     "Normal": "正常"
-  },
-  "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
-    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": "未安装 dms-greeter。请安装该软件包以管理 Greeter。"
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "例如：/usr/bin/my-script --flag"
@@ -9500,9 +9485,6 @@
   "loginctl integration": {
     "loginctl integration": "loginctl 集成"
   },
-  "loginctl not available - lock integration requires DMS socket connection": {
-    "loginctl not available - lock integration requires DMS socket connection": "loginctl 不可用，启用锁定集成需连接 DMS socket"
-  },
   "mango: config reloaded": {
     "mango: config reloaded": "mango：配置已重载"
   },
@@ -9515,17 +9497,8 @@
   "mangowc GitHub": {
     "mangowc GitHub": "MangoWC GitHub"
   },
-  "matugen not available or disabled - cannot apply %1 colors": {
-    "matugen not available or disabled - cannot apply %1 colors": "matugen 不可用或已禁用，无法应用 %1 配色"
-  },
-  "matugen not found - install matugen package for dynamic theming": {
-    "matugen not found - install matugen package for dynamic theming": "未找到 Matugen，请为动态主题安装 matugen 包"
-  },
   "missing program": {
     "Requires %1": "需要 %1"
-  },
-  "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": {
-    "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": "mpris-proxy 正在运行，将创建重复的蓝牙播放器。请使用：systemctl --user disable --now mpris-proxy.service 将其禁用"
   },
   "ms": {
     "ms": "毫秒"
@@ -9547,9 +9520,6 @@
   },
   "niri shortcuts config": {
     "niri shortcuts config": "Niri 快捷键设置"
-  },
-  "niri/dms Discord": {
-    "niri/dms Discord": "Niri/DMS Discord"
   },
   "niri: config reloaded": {
     "niri: config reloaded": "Niri：配置已重新加载"

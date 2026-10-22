@@ -634,7 +634,7 @@ Item {
                     switch (mode) {
                     case "files":
                         if (!DSearchService.dsearchAvailable)
-                            return I18n.tr("File search requires dsearch\nInstall from github.com/duxlabs-dev/dux-search");
+                            return I18n.tr("File search requires %1\nInstall from %2", "launcher file search empty state, %1 is the dsearch binary, %2 is its repository").arg("dsearch").arg("github.com/duxlabs-dev/dux-search");
                         if (!hasQuery)
                             return I18n.tr("Type to search files");
                         if (root.controller.searchQuery.length < 2)

@@ -766,7 +766,7 @@ Singleton {
             if (!match) {
                 profilesLoading = false;
                 manualActivation = false;
-                profileError(I18n.tr("Profile not found in monitors.json"));
+                profileError(I18n.tr("Profile not found in %1", "display profile error, %1 is the profiles file").arg("monitors.json"));
                 return;
             }
             applyConfigEntry(match.entry, profileId, match.entry.name || profileId, true);
@@ -1150,7 +1150,7 @@ Singleton {
     }
 
     function showHyprlandReadOnlyWarning() {
-        ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before changing these settings."), "dms setup", "display-config");
+        ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using %1. Run %2 to migrate before changing these settings.", "hyprland legacy config warning, %1 is the config file, %2 a command").arg("hyprland.conf").arg("dms setup"), "dms setup", "display-config");
     }
 
     function buildOutputsMap() {
