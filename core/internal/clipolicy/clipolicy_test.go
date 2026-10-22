@@ -47,6 +47,42 @@ func TestRegistriesDisabled(t *testing.T) {
 	}
 }
 
+func TestLogindUnlockDisabled(t *testing.T) {
+	tests := []struct {
+		name     string
+		packaged string
+		admin    string
+		want     bool
+		wantErr  string
+	}{
+		{name: "no policy files"},
+		{name: "admin policy", admin: `{"disable_logind_unlock": true}`, want: true},
+		{name: "admin policy overrides packaged", packaged: `{"disable_logind_unlock": true}`, admin: `{"disable_logind_unlock": false}`},
+		{name: "another key", admin: `{"disable_lock_ipc_unlock": true}`},
+		{name: "malformed admin policy", admin: "{not json", wantErr: "failed to parse " + AdminPath},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fs := afero.NewMemMapFs()
+			if tt.packaged != "" {
+				require.NoError(t, afero.WriteFile(fs, PackagedPath, []byte(tt.packaged), 0o644))
+			}
+			if tt.admin != "" {
+				require.NoError(t, afero.WriteFile(fs, AdminPath, []byte(tt.admin), 0o644))
+			}
+
+			disabled, err := LogindUnlockDisabled(fs)
+			if tt.wantErr != "" {
+				require.ErrorContains(t, err, tt.wantErr)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, disabled)
+		})
+	}
+}
+
 var shellSwitchEnv = map[string]string{
 	"disable_lock_ipc_unlock":  "DMS_POLICY_DISABLE_LOCK_IPC_UNLOCK",
 	"disable_logind_unlock":    "DMS_POLICY_DISABLE_LOGIND_UNLOCK",

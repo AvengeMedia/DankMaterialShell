@@ -94,6 +94,16 @@ func RegistriesDisabled(fs afero.Fs) (bool, error) {
 	return flag(policies, func(p *File) *bool { return p.DisableRegistries }), nil
 }
 
+// LogindUnlockDisabled reports whether a logind Unlock must leave a lock in
+// place. An explicit value in AdminPath overrides PackagedPath.
+func LogindUnlockDisabled(fs afero.Fs) (bool, error) {
+	policies, err := load(fs)
+	if err != nil {
+		return false, err
+	}
+	return flag(policies, func(p *File) *bool { return p.DisableLogindUnlock }), nil
+}
+
 // ShellEnv returns every shell switch as DMS_POLICY_<KEY>=1 or 0, so a value
 // inherited by the shell never counts. A policy file that fails to load turns
 // every switch on, and its error is returned with them.

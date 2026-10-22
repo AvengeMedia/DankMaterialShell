@@ -69,4 +69,5 @@ type Manager struct {
 	lockTimer             *time.Timer
 	sleepInhibitorEnabled atomic.Bool
 	fallbackDelay         time.Duration
+	keepLockOnUnlock      bool
 }
