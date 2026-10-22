@@ -238,6 +238,9 @@ var LOCAL_SPEC = {
     hyprlandOutputSettings: {
         def: {}
     },
+    activeConfigProfile: {
+        def: ""
+    },
     activeDisplayProfile: {
         def: {}
     },
