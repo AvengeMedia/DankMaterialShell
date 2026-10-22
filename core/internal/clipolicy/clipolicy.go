@@ -21,6 +21,7 @@ type File struct {
 	Message              *string   `json:"message"`
 	DisableRegistries    *bool     `json:"disable_registries"`
 	DisableLockIPCUnlock *bool     `json:"disable_lock_ipc_unlock"`
+	DisableLogindUnlock  *bool     `json:"disable_logind_unlock"`
 }
 
 // shellSwitches reach the shell as DMS_POLICY_<KEY> in its launch environment.
@@ -29,6 +30,7 @@ var shellSwitches = []struct {
 	value func(*File) *bool
 }{
 	{"disable_lock_ipc_unlock", func(p *File) *bool { return p.DisableLockIPCUnlock }},
+	{"disable_logind_unlock", func(p *File) *bool { return p.DisableLogindUnlock }},
 }
 
 // LoadFile returns nil without an error when the file does not exist.

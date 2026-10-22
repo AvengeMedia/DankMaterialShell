@@ -49,6 +49,7 @@ func TestRegistriesDisabled(t *testing.T) {
 
 var shellSwitchEnv = map[string]string{
 	"disable_lock_ipc_unlock": "DMS_POLICY_DISABLE_LOCK_IPC_UNLOCK",
+	"disable_logind_unlock":   "DMS_POLICY_DISABLE_LOGIND_UNLOCK",
 }
 
 func TestShellEnv(t *testing.T) {

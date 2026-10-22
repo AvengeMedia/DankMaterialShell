@@ -220,6 +220,8 @@ Scope {
 
         function onSessionUnlocked() {
             customLockerSpawned = false;
+            if (AdminPolicy.disableLogindUnlock)
+                return;
             if (pendingLock) {
                 pendingLock = false;
                 lockInitiatedLocally = false;
