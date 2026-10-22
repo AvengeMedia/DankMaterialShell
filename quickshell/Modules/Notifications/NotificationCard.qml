@@ -55,7 +55,7 @@ Rectangle {
 
     function saveDisplayImage() {
         const data = root.notificationData;
-        if (!root.persistImage || !data?.hasDisplayImage || data.persistedImagePath)
+        if (!root.persistImage || !data?.notification || !data.hasDisplayImage || data.persistedImagePath)
             return;
         const image = data.image || "";
         if (!image.startsWith("image://qsimage/") && !NotificationService.notificationIconFromImage(image).startsWith("/"))
