@@ -30,10 +30,10 @@ BasePill {
     readonly property bool showPower: BatteryService.isCharging ? showPowerCharging : showPowerDischarging
     readonly property bool critical: SettingsData.batteryCriticalAnimation && BatteryService.isCriticalBattery && !BatteryService.isCharging
     property real criticalPulse: 0
-    readonly property color criticalForeground: battery.mixColor(Theme.error, Theme.surface, criticalPulse)
+    readonly property color criticalForeground: noBackground ? battery.mixColor(Theme.error, defaultContentColor, criticalPulse) : battery.mixColor(Theme.error, Theme.surface, criticalPulse)
 
-    fillColor: critical ? battery.mixColor(defaultFillColor, Theme.error, criticalPulse) : defaultFillColor
-    contentColor: critical ? battery.mixColor(defaultContentColor, Theme.surface, criticalPulse) : defaultContentColor
+    fillColor: critical && !noBackground ? battery.mixColor(defaultFillColor, Theme.error, criticalPulse) : defaultFillColor
+    contentColor: critical ? (noBackground ? criticalForeground : battery.mixColor(defaultContentColor, Theme.surface, criticalPulse)) : defaultContentColor
 
     function mixColor(from, to, progress) {
         return Qt.rgba(from.r + (to.r - from.r) * progress, from.g + (to.g - from.g) * progress, from.b + (to.b - from.b) * progress, from.a + (to.a - from.a) * progress);
