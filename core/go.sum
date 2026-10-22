@@ -1,5 +1,7 @@
 filippo.io/edwards25519 v1.2.0 h1:crnVqOiS4jqYleHd9vaKZ+HKtHfllngJIiOpNpoJsjo=
 filippo.io/edwards25519 v1.2.0/go.mod h1:xzAOLCNug/yB62zG1bQ8uziwrIqIuxhctzJT18Q77mc=
+github.com/Conava/dux-gop v1.6.3-0.20261021091306-bc1d474b4392 h1:kjmyjSqSQk0mda7TFO5gx5528cbKMucujlRwALW8GZ0=
+github.com/Conava/dux-gop v1.6.3-0.20261021091306-bc1d474b4392/go.mod h1:IYu4GO7zR61w3+tDmjg71dQDInXe5TcP3lHQqJpZYR0=
 github.com/Microsoft/go-winio v0.6.4 h1:kJF2pamtYCWXf0xAT8sAkwKC0pMl2HYBrRPHAqyUc+g=
 github.com/Microsoft/go-winio v0.6.4/go.mod h1:1xl5JXG4ze/m74GH6Dc4Mwxfc3VL5siRVQjIAlHH07U=
 github.com/ProtonMail/go-crypto v1.5.2 h1:cucYnvqcY7UOXVD//mSyjeaPY0SSN3v5cDkYPxumINk=
@@ -99,8 +101,6 @@ github.com/dlclark/regexp2/v2 v2.9.1 h1:q6bZW/NN9VodqMjYXpuic2lZxdHPfFTzGS+MJxIJ
 github.com/dlclark/regexp2/v2 v2.9.1/go.mod h1:avUrQvPaLz2DrFNHJF0taWAFFX2C1GMSSoeiqFjcBmU=
 github.com/duxlabs-dev/dux-go v1.6.3-0.20261020163124-e2ca52bdf500 h1:y02m7QgoX4rwauY9HePIPGCRDJ/fMirBmgj78IkeUsc=
 github.com/duxlabs-dev/dux-go v1.6.3-0.20261020163124-e2ca52bdf500/go.mod h1:b+hBqIgOVAmlFKJ+33SY2pH4kJjXpifNeioPMxwC4Nk=
-github.com/duxlabs-dev/dux-gop v1.6.3-0.20261020163819-0e4888f1fcea h1:+z9uPtBmpXXBPupB6++/8avPA0weOkzAz7jBoE+yIok=
-github.com/duxlabs-dev/dux-gop v1.6.3-0.20261020163819-0e4888f1fcea/go.mod h1:IYu4GO7zR61w3+tDmjg71dQDInXe5TcP3lHQqJpZYR0=
 github.com/ebitengine/purego v0.11.2 h1:WWiTx8rD8zYdOwSj8O/NiNbsOvSAgJMTlyV1XlbUSeU=
 github.com/ebitengine/purego v0.11.2/go.mod h1:DCHPP08djqhNSoTfImcnHYQRZmd0qhakvrozqaEYhGQ=
 github.com/emirpasic/gods v1.18.1 h1:FXtiHYKDGKCW2KzwZKx0iC0PQmdlorYgdFG9jPXJ1Bc=

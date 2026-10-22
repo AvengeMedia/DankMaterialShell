@@ -150,7 +150,6 @@ Rectangle {
             StyledText {
                 text: card.extraInfo
                 font.pixelSize: Theme.fontSizeSmall
-                font.family: SettingsData.monoFontFamily
                 color: card.extraInfoColor
                 visible: card.extraInfo.length > 0
             }
@@ -167,7 +166,6 @@ Rectangle {
             elide: Text.ElideRight
             text: card.value
             font.pixelSize: Theme.fontSizeXLarge
-            font.family: SettingsData.monoFontFamily
             font.weight: Theme.fontWeightMedium
             color: Theme.surfaceText
         }
@@ -176,8 +174,8 @@ Rectangle {
             visible: !card.compact
             text: card.subtitle
             font.pixelSize: Theme.fontSizeSmall
-            font.family: SettingsData.monoFontFamily
             color: Theme.surfaceVariantText
+            wrapMode: Text.NoWrap
             elide: Text.ElideRight
             Layout.fillWidth: true
         }
