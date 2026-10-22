@@ -94,7 +94,8 @@ Singleton {
     }
 
     Component.onCompleted: {
-        userWatcher.folder = Paths.toFileUrl(root.pluginDirectory);
+        // A FolderListModel never given a folder lists the working directory.
+        userWatcher.folder = AdminPolicy.disableUserPlugins ? "" : Paths.toFileUrl(root.pluginDirectory);
         systemWatcher.folder = Paths.toFileUrl(root.systemPluginDirectory);
         Qt.callLater(resyncAll);
         Qt.callLater(checkPluginDirectoryExists);
@@ -150,7 +151,7 @@ Singleton {
     }
 
     function resyncAll() {
-        const userList = snapshotModel(userWatcher, "user");
+        const userList = AdminPolicy.disableUserPlugins ? [] : snapshotModel(userWatcher, "user");
         const sysList = snapshotModel(systemWatcher, "system");
         const seenPaths = {};
         const modifiedTimes = {};
@@ -1154,7 +1155,8 @@ Singleton {
         const userUrl = Paths.toFileUrl(root.pluginDirectory);
         const systemUrl = Paths.toFileUrl(root.systemPluginDirectory);
         userWatcher.folder = "";
-        userWatcher.folder = userUrl;
+        if (!AdminPolicy.disableUserPlugins)
+            userWatcher.folder = userUrl;
         systemWatcher.folder = "";
         systemWatcher.folder = systemUrl;
         resyncDebounce.restart();

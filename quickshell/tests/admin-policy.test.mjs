@@ -24,3 +24,36 @@ test("the lock IPC switch drops the lock demo keybind action and keeps the other
         assert.equal(ids.length, Actions.getDmsActions(false, false).length - (disableLockIpcUnlock ? 1 : 0));
     }
 });
+
+test("the user plugin switch keeps the user tree out of a scan and a resync", () => {
+    const user = "/home/user/.config/DankMaterialShell/plugins";
+    const system = "/etc/xdg/quickshell/dms-plugins";
+    const folder = dirs => ({ folder: "", count: dirs.length, get: (i, role) => role === "filePath" ? "file://" + dirs[i] : 0 });
+    for (const disableUserPlugins of [false, true]) {
+        const loaded = [];
+        const context = vm.createContext({
+            Date,
+            AdminPolicy: { disableUserPlugins },
+            Paths: { toFileUrl: path => "file://" + path },
+            pluginDirectory: user,
+            systemPluginDirectory: system,
+            userWatcher: folder([user + "/probe"]),
+            systemWatcher: folder([system + "/admitted"]),
+            resyncDebounce: { restart() {} },
+            checkPluginDirectoryExists() {},
+            knownManifests: {},
+            pathToPluginId: {},
+            directoryModifiedTimes: {},
+            loadPluginManifestFile: (path, source) => loaded.push([path, source])
+        });
+        context.root = context;
+        for (const name of ["snapshotModel", "resyncAll", "scanPlugins"])
+            vm.runInContext(functionSource("../Services/PluginService.qml", name), context);
+        context.scanPlugins();
+        assert.equal(context.userWatcher.folder, disableUserPlugins ? "" : "file://" + user);
+        assert.equal(context.systemWatcher.folder, "file://" + system);
+        context.resyncAll();
+        const userManifests = disableUserPlugins ? [] : [[user + "/probe/plugin.json", "user"]];
+        assert.deepEqual(loaded, [...userManifests, [system + "/admitted/plugin.json", "system"]]);
+    }
+});
