@@ -95,6 +95,12 @@ Singleton {
         }
     }
 
+    // Created late from the async DMSShell loader, after loaded and capabilitiesReceived may have fired.
+    Component.onCompleted: {
+        if (SessionData._hasLoaded)
+            updateCyclingState();
+    }
+
     function updateCyclingState() {
         cyclingActive = serverSchedulingAvailable && (SessionData.wallpaperCyclingEnabled || SessionData.perMonitorWallpaper);
         if (!cyclingActive && !_lastPushedEnabled)
