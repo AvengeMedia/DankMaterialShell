@@ -57,3 +57,18 @@ test("the user plugin switch keeps the user tree out of a scan and a resync", ()
         assert.deepEqual(loaded, [...userManifests, [system + "/admitted/plugin.json", "system"]]);
     }
 });
+
+test("the settings IPC switch refuses set and keeps get", () => {
+    const source = readFileSync(new URL("../DMSShellIPC.qml", import.meta.url), "utf8");
+    const block = source.slice(source.indexOf("        function get(key: string)"), source.indexOf('        target: "settings"'));
+    const handlers = [...block.matchAll(/^ {8}function \w+\([^)]*\)(?:: \w+)? \{\n[\s\S]*?^ {8}\}$/gm)].map(match => match[0].replace(/\((.*?)\)(?:: \w+)? \{/, (_, params) => "(" + params.replace(/: \w+/g, "") + ") {"));
+    for (const disableSettingsIpcSet of [false, true]) {
+        const SettingsData = { lockBeforeSuspend: false, saveSettings() {} };
+        const context = vm.createContext({ AdminPolicy: { disableSettingsIpcSet }, SettingsData, log: { warn() {} } });
+        for (const handler of handlers)
+            vm.runInContext(handler, context);
+        assert.equal(context.set("lockBeforeSuspend", "true"), disableSettingsIpcSet ? "SETTINGS_SET_DISABLED" : "SETTINGS_SET_SUCCESS");
+        assert.equal(SettingsData.lockBeforeSuspend, !disableSettingsIpcSet);
+        assert.equal(context.get("lockBeforeSuspend"), String(!disableSettingsIpcSet));
+    }
+});

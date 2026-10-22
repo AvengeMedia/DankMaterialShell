@@ -15,15 +15,16 @@ const (
 )
 
 type File struct {
-	PolicyVersion        int       `json:"policy_version"`
-	ImmutableSystem      *bool     `json:"immutable_system"`
-	BlockedCommands      *[]string `json:"blocked_commands"`
-	Message              *string   `json:"message"`
-	DisableRegistries    *bool     `json:"disable_registries"`
-	DisableLockIPCUnlock *bool     `json:"disable_lock_ipc_unlock"`
-	DisableLogindUnlock  *bool     `json:"disable_logind_unlock"`
-	DisableCustomLockPAM *bool     `json:"disable_custom_lock_pam"`
-	DisableUserPlugins   *bool     `json:"disable_user_plugins"`
+	PolicyVersion         int       `json:"policy_version"`
+	ImmutableSystem       *bool     `json:"immutable_system"`
+	BlockedCommands       *[]string `json:"blocked_commands"`
+	Message               *string   `json:"message"`
+	DisableRegistries     *bool     `json:"disable_registries"`
+	DisableLockIPCUnlock  *bool     `json:"disable_lock_ipc_unlock"`
+	DisableLogindUnlock   *bool     `json:"disable_logind_unlock"`
+	DisableCustomLockPAM  *bool     `json:"disable_custom_lock_pam"`
+	DisableUserPlugins    *bool     `json:"disable_user_plugins"`
+	DisableSettingsIPCSet *bool     `json:"disable_settings_ipc_set"`
 }
 
 // shellSwitches reach the shell as DMS_POLICY_<KEY> in its launch environment.
@@ -35,6 +36,7 @@ var shellSwitches = []struct {
 	{"disable_logind_unlock", func(p *File) *bool { return p.DisableLogindUnlock }},
 	{"disable_custom_lock_pam", func(p *File) *bool { return p.DisableCustomLockPAM }},
 	{"disable_user_plugins", func(p *File) *bool { return p.DisableUserPlugins }},
+	{"disable_settings_ipc_set", func(p *File) *bool { return p.DisableSettingsIPCSet }},
 }
 
 // LoadFile returns nil without an error when the file does not exist.

@@ -48,10 +48,11 @@ func TestRegistriesDisabled(t *testing.T) {
 }
 
 var shellSwitchEnv = map[string]string{
-	"disable_lock_ipc_unlock": "DMS_POLICY_DISABLE_LOCK_IPC_UNLOCK",
-	"disable_logind_unlock":   "DMS_POLICY_DISABLE_LOGIND_UNLOCK",
-	"disable_custom_lock_pam": "DMS_POLICY_DISABLE_CUSTOM_LOCK_PAM",
-	"disable_user_plugins":    "DMS_POLICY_DISABLE_USER_PLUGINS",
+	"disable_lock_ipc_unlock":  "DMS_POLICY_DISABLE_LOCK_IPC_UNLOCK",
+	"disable_logind_unlock":    "DMS_POLICY_DISABLE_LOGIND_UNLOCK",
+	"disable_custom_lock_pam":  "DMS_POLICY_DISABLE_CUSTOM_LOCK_PAM",
+	"disable_user_plugins":     "DMS_POLICY_DISABLE_USER_PLUGINS",
+	"disable_settings_ipc_set": "DMS_POLICY_DISABLE_SETTINGS_IPC_SET",
 }
 
 func TestShellEnv(t *testing.T) {
