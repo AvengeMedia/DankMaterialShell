@@ -191,6 +191,9 @@
   "%1 printers": {
     "%1 printers": ""
   },
+  "%1 procs": {
+    "%1 procs": ""
+  },
   "%1 second": {
     "%1 second": ""
   },
@@ -250,6 +253,9 @@
   },
   "(Unnamed)": {
     "(Unnamed)": "(Без названия)"
+  },
+  "(exit %1)": {
+    "(exit %1)": ""
   },
   "+ %1 more": {
     "+ %1 more": "+ ещё %1"
@@ -860,11 +866,11 @@
   "Authorize": {
     "Authorize": "Авторизовать"
   },
-  "Authorize pairing with ": {
-    "Authorize pairing with ": "Авторизовать сопряжение с "
+  "Authorize pairing with %1": {
+    "Authorize pairing with %1": ""
   },
-  "Authorize service for ": {
-    "Authorize service for ": "Авторизовать службу для "
+  "Authorize service for %1": {
+    "Authorize service for %1": ""
   },
   "Auto": {
     "Auto": "Авто"
@@ -1763,8 +1769,8 @@
   "Confirm Display Changes": {
     "Confirm Display Changes": "Подтвердить изменения дисплеев"
   },
-  "Confirm passkey for ": {
-    "Confirm passkey for ": "Подтвердить ключ доступа для "
+  "Confirm passkey for %1": {
+    "Confirm passkey for %1": ""
   },
   "Confirm password": {
     "Confirm password": "Подтвердите пароль"
@@ -1858,6 +1864,9 @@
   },
   "Copy": {
     "Copy": "Копировать"
+  },
+  "Copy %1": {
+    "Copy %1": ""
   },
   "Copy Full Command": {
     "Copy Full Command": "Скопировать полную команду"
@@ -2495,6 +2504,9 @@
   "Dock": {
     "Dock": "Док"
   },
+  "Dock %1": {
+    "Dock %1": ""
+  },
   "Dock margin, opacity, and border": {
     "Dock margin, opacity, and border": "Отступ, прозрачность и рамка дока"
   },
@@ -2602,6 +2614,18 @@
   },
   "Dusk (Nautical Twilight)": {
     "Dusk (Nautical Twilight)": "Сумерки (навигационные сумерки)"
+  },
+  "Dux Calendar": {
+    "Dux Calendar": ""
+  },
+  "Dux Calendar isn't installed": {
+    "Dux Calendar isn't installed": ""
+  },
+  "Dux Calendar isn't running": {
+    "Dux Calendar isn't running": ""
+  },
+  "Dux Greeter docs": {
+    "Dux Greeter docs": ""
   },
   "Dwindle": {
     "Dwindle": ""
@@ -2741,8 +2765,8 @@
   "Enter PIN": {
     "Enter PIN": "Введите пин-код"
   },
-  "Enter PIN for ": {
-    "Enter PIN for ": "Введите PIN для "
+  "Enter PIN for %1": {
+    "Enter PIN for %1": ""
   },
   "Enter a new name for session \"%1": {
     "Enter a new name for session \"%1\"": "Введите новое имя для сессии \"%1\""
@@ -2750,8 +2774,8 @@
   "Enter a new name for this workspace": {
     "Enter a new name for this workspace": "Введите новое имя для этого рабочего пространства"
   },
-  "Enter credentials for ": {
-    "Enter credentials for ": "Введите учётные данные для "
+  "Enter credentials for %1": {
+    "Enter credentials for %1": ""
   },
   "Enter custom lock screen format (e.g., dddd, MMMM d)": {
     "Enter custom lock screen format (e.g., dddd, MMMM d)": "Введите пользовательский формат экрана блокировки (например, dddd, MMMM d)"
@@ -2765,17 +2789,17 @@
   "Enter network name and password": {
     "Enter network name and password": "Введите имя сети и пароль"
   },
-  "Enter passkey for ": {
-    "Enter passkey for ": "Введите ключ доступа для "
+  "Enter passkey for %1": {
+    "Enter passkey for %1": ""
   },
-  "Enter password for ": {
-    "Enter password for ": "Введите пароль для "
+  "Enter password for %1": {
+    "Enter password for %1": ""
   },
   "Enter text to encode": {
     "Enter text to encode": "Введите текст для кодирования"
   },
-  "Enter this passkey on ": {
-    "Enter this passkey on ": "Введите этот ключ доступа на "
+  "Enter this passkey on %1": {
+    "Enter this passkey on %1": ""
   },
   "Enter to paste": {
     "Enter to paste": ""
@@ -3521,6 +3545,9 @@
   "GPU": {
     "GPU": "ГП"
   },
+  "GPU %1": {
+    "GPU %1": ""
+  },
   "GPU Monitoring": {
     "GPU Monitoring": "Мониторинг ГП"
   },
@@ -3544,6 +3571,9 @@
   },
   "Gamma": {
     "Gamma": ""
+  },
+  "Gamma %1": {
+    "Gamma %1": ""
   },
   "Gamma control": {
     "Gamma control": ""
@@ -3703,6 +3733,9 @@
   },
   "Health": {
     "Health": "Здоровье"
+  },
+  "Health %1": {
+    "Health %1": ""
   },
   "Heat shimmer": {
     "Heat shimmer": ""
@@ -4169,8 +4202,8 @@
   "Install wallpaper '%1'?": {
     "Install wallpaper '%1'?": ""
   },
-  "Installation and PAM setup are documented in the ": {
-    "Installation and PAM setup are documented in the ": "Установка и настройка PAM описаны в "
+  "Installation and PAM setup are documented in the %1.": {
+    "Installation and PAM setup are documented in the %1.": ""
   },
   "Installed": {
     "Installed": "Установлено"
@@ -4990,6 +5023,9 @@
   },
   "More": {
     "More": ""
+  },
+  "More in %1": {
+    "More in %1": ""
   },
   "More samples look smoother and cost more GPU": {
     "More samples look smoother and cost more GPU": ""
@@ -5828,8 +5864,8 @@
   "Opening GitHub to upvote": {
     "Opening GitHub to upvote": ""
   },
-  "Opening terminal: ": {
-    "Opening terminal: ": "Открытие терминала:"
+  "Opening terminal: %1": {
+    "Opening terminal: %1": ""
   },
   "Opens": {
     "Opens": ""
@@ -5974,6 +6010,9 @@
   },
   "PID": {
     "PID": ""
+  },
+  "PID %1": {
+    "PID %1": ""
   },
   "PIN": {
     "PIN": "PIN"
@@ -6182,8 +6221,8 @@
   "Playback": {
     "Playback": "Воспроизведение"
   },
-  "Playback error: ": {
-    "Playback error: ": "Ошибка воспроизведения: "
+  "Playback error: %1": {
+    "Playback error: %1": ""
   },
   "Playback position": {
     "Playback position": ""
@@ -6214,6 +6253,9 @@
   },
   "Plugin Source Code": {
     "Plugin Source Code": ""
+  },
+  "Plugin authors": {
+    "Plugin authors": ""
   },
   "Plugin dependency missing": {
     "Plugin dependency missing": "Отсутствует зависимость плагина"
@@ -6827,8 +6869,8 @@
   "Report": {
     "Report": "Отчёт"
   },
-  "Required plugin: ": {
-    "Required plugin: ": "Необходимый плагин: "
+  "Required plugin: %1": {
+    "Required plugin: %1": ""
   },
   "Requires %1": {
     "Requires %1": "Требуется %1"
@@ -8144,9 +8186,6 @@
   "Terminal additional parameters": {
     "Terminal additional parameters": "Дополнительные параметры терминала"
   },
-  "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
-    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Сбой запуска терминала. Установите один из поддерживаемых эмуляторов терминала или запустите 'dms auth sync' вручную."
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": ""
   },
@@ -9167,8 +9206,8 @@
   "Wi-Fi, Ethernet, VPN": {
     "Wi-Fi, Ethernet, VPN": ""
   },
-  "WiFi QR code for ": {
-    "WiFi QR code for ": "WiFi QR-код для "
+  "WiFi QR code for %1": {
+    "WiFi QR code for %1": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "WiFi отключен"
@@ -9547,9 +9586,6 @@
   },
   "primary network connection label": {
     "Primary": "Основное"
-  },
-  "procs": {
-    "procs": "проц."
   },
   "pt": {
     "pt": ""

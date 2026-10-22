@@ -46,7 +46,7 @@ CcTile {
                             if (enabled)
                                 click();
                         }
-                        Accessible.name: I18n.tr("Copy") + " " + modelData
+                        Accessible.name: I18n.tr("Copy %1", "%1 is a color value").arg(modelData)
                         onClicked: Quickshell.clipboardText = modelData
                     }
                 }

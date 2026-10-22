@@ -191,6 +191,9 @@
   "%1 printers": {
     "%1 printers": "%1 台打印机"
   },
+  "%1 procs": {
+    "%1 procs": ""
+  },
   "%1 second": {
     "%1 second": "%1 秒"
   },
@@ -250,6 +253,9 @@
   },
   "(Unnamed)": {
     "(Unnamed)": "（未命名）"
+  },
+  "(exit %1)": {
+    "(exit %1)": ""
   },
   "+ %1 more": {
     "+ %1 more": "+ %1 个更多"
@@ -860,11 +866,11 @@
   "Authorize": {
     "Authorize": "授权"
   },
-  "Authorize pairing with ": {
-    "Authorize pairing with ": "授权配对 "
+  "Authorize pairing with %1": {
+    "Authorize pairing with %1": ""
   },
-  "Authorize service for ": {
-    "Authorize service for ": "授权服务 "
+  "Authorize service for %1": {
+    "Authorize service for %1": ""
   },
   "Auto": {
     "Auto": "自动"
@@ -1763,8 +1769,8 @@
   "Confirm Display Changes": {
     "Confirm Display Changes": "确认显示器更改"
   },
-  "Confirm passkey for ": {
-    "Confirm passkey for ": "确认密钥 "
+  "Confirm passkey for %1": {
+    "Confirm passkey for %1": ""
   },
   "Confirm password": {
     "Confirm password": "确认密码"
@@ -1858,6 +1864,9 @@
   },
   "Copy": {
     "Copy": "复制"
+  },
+  "Copy %1": {
+    "Copy %1": ""
   },
   "Copy Full Command": {
     "Copy Full Command": "复制完整命令"
@@ -2495,6 +2504,9 @@
   "Dock": {
     "Dock": "Dock"
   },
+  "Dock %1": {
+    "Dock %1": ""
+  },
   "Dock margin, opacity, and border": {
     "Dock margin, opacity, and border": "停靠栏边距、不透明度和边框"
   },
@@ -2602,6 +2614,18 @@
   },
   "Dusk (Nautical Twilight)": {
     "Dusk (Nautical Twilight)": "黄昏（航海暮光）"
+  },
+  "Dux Calendar": {
+    "Dux Calendar": ""
+  },
+  "Dux Calendar isn't installed": {
+    "Dux Calendar isn't installed": ""
+  },
+  "Dux Calendar isn't running": {
+    "Dux Calendar isn't running": ""
+  },
+  "Dux Greeter docs": {
+    "Dux Greeter docs": ""
   },
   "Dwindle": {
     "Dwindle": "Dwindle"
@@ -2741,8 +2765,8 @@
   "Enter PIN": {
     "Enter PIN": "输入 PIN"
   },
-  "Enter PIN for ": {
-    "Enter PIN for ": "输入 PIN "
+  "Enter PIN for %1": {
+    "Enter PIN for %1": ""
   },
   "Enter a new name for session \"%1": {
     "Enter a new name for session \"%1\"": "为会话“%1”设置新名称"
@@ -2750,8 +2774,8 @@
   "Enter a new name for this workspace": {
     "Enter a new name for this workspace": "为此工作区键入新名称"
   },
-  "Enter credentials for ": {
-    "Enter credentials for ": "输入凭据 "
+  "Enter credentials for %1": {
+    "Enter credentials for %1": ""
   },
   "Enter custom lock screen format (e.g., dddd, MMMM d)": {
     "Enter custom lock screen format (e.g., dddd, MMMM d)": "输入自定义锁屏格式（例如：dddd, MMMM d）"
@@ -2765,17 +2789,17 @@
   "Enter network name and password": {
     "Enter network name and password": "输入网络名称与密码"
   },
-  "Enter passkey for ": {
-    "Enter passkey for ": "输入通行密钥 "
+  "Enter passkey for %1": {
+    "Enter passkey for %1": ""
   },
-  "Enter password for ": {
-    "Enter password for ": "输入密码"
+  "Enter password for %1": {
+    "Enter password for %1": ""
   },
   "Enter text to encode": {
     "Enter text to encode": "输入要编码的文本"
   },
-  "Enter this passkey on ": {
-    "Enter this passkey on ": "在该处输入此通行密钥 "
+  "Enter this passkey on %1": {
+    "Enter this passkey on %1": ""
   },
   "Enter to paste": {
     "Enter to paste": "按 Enter 粘贴"
@@ -3521,6 +3545,9 @@
   "GPU": {
     "GPU": "GPU"
   },
+  "GPU %1": {
+    "GPU %1": ""
+  },
   "GPU Monitoring": {
     "GPU Monitoring": "GPU 监视"
   },
@@ -3544,6 +3571,9 @@
   },
   "Gamma": {
     "Gamma": "伽马"
+  },
+  "Gamma %1": {
+    "Gamma %1": ""
   },
   "Gamma control": {
     "Gamma control": "伽马控制"
@@ -3703,6 +3733,9 @@
   },
   "Health": {
     "Health": "电池健康"
+  },
+  "Health %1": {
+    "Health %1": ""
   },
   "Heat shimmer": {
     "Heat shimmer": "热浪"
@@ -4169,8 +4202,8 @@
   "Install wallpaper '%1'?": {
     "Install wallpaper '%1'?": "要安装壁纸“%1”吗？"
   },
-  "Installation and PAM setup are documented in the ": {
-    "Installation and PAM setup are documented in the ": "安装和 PAM 设置详见 "
+  "Installation and PAM setup are documented in the %1.": {
+    "Installation and PAM setup are documented in the %1.": ""
   },
   "Installed": {
     "Installed": "已安装"
@@ -4990,6 +5023,9 @@
   },
   "More": {
     "More": "更多"
+  },
+  "More in %1": {
+    "More in %1": ""
   },
   "More samples look smoother and cost more GPU": {
     "More samples look smoother and cost more GPU": "采样数越高越平滑，GPU 开销也越大"
@@ -5828,8 +5864,8 @@
   "Opening GitHub to upvote": {
     "Opening GitHub to upvote": ""
   },
-  "Opening terminal: ": {
-    "Opening terminal: ": "正在打开终端： "
+  "Opening terminal: %1": {
+    "Opening terminal: %1": ""
   },
   "Opens": {
     "Opens": "打开"
@@ -5974,6 +6010,9 @@
   },
   "PID": {
     "PID": "PID"
+  },
+  "PID %1": {
+    "PID %1": ""
   },
   "PIN": {
     "PIN": "PIN 码"
@@ -6182,8 +6221,8 @@
   "Playback": {
     "Playback": "播放"
   },
-  "Playback error: ": {
-    "Playback error: ": "播放错误： "
+  "Playback error: %1": {
+    "Playback error: %1": ""
   },
   "Playback position": {
     "Playback position": "播放位置"
@@ -6214,6 +6253,9 @@
   },
   "Plugin Source Code": {
     "Plugin Source Code": "插件源码"
+  },
+  "Plugin authors": {
+    "Plugin authors": ""
   },
   "Plugin dependency missing": {
     "Plugin dependency missing": "缺少插件依赖"
@@ -6827,8 +6869,8 @@
   "Report": {
     "Report": "报告"
   },
-  "Required plugin: ": {
-    "Required plugin: ": "需要插件："
+  "Required plugin: %1": {
+    "Required plugin: %1": ""
   },
   "Requires %1": {
     "Requires %1": "需要 %1"
@@ -8144,9 +8186,6 @@
   "Terminal additional parameters": {
     "Terminal additional parameters": "终端附加参数"
   },
-  "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
-    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "终端回退失败。请安装受支持的终端模拟器，或手动运行 dms auth sync。"
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": ""
   },
@@ -9167,8 +9206,8 @@
   "Wi-Fi, Ethernet, VPN": {
     "Wi-Fi, Ethernet, VPN": "Wi-Fi、以太网与 VPN"
   },
-  "WiFi QR code for ": {
-    "WiFi QR code for ": "Wi-Fi 二维码 "
+  "WiFi QR code for %1": {
+    "WiFi QR code for %1": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "Wi-Fi 已停用"
@@ -9547,9 +9586,6 @@
   },
   "primary network connection label": {
     "Primary": "主要"
-  },
-  "procs": {
-    "procs": "进程"
   },
   "pt": {
     "pt": "pt"

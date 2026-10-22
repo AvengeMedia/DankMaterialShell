@@ -209,7 +209,7 @@ Popup {
         contentItem: ConfirmDialogContent {
             id: confirmationContent
             confirmTitle: confirmation.forceKill ? I18n.tr("Force Kill (SIGKILL)") : I18n.tr("Kill Process")
-            confirmMessage: (confirmation.process?.command ?? "") + " (" + I18n.tr("PID") + " " + (confirmation.process?.pid ?? 0) + ")"
+            confirmMessage: (confirmation.process?.command ?? "") + " (" + I18n.tr("PID %1", "%1 is a process id").arg(confirmation.process?.pid ?? 0) + ")"
             confirmButtonText: I18n.tr("Kill Process")
             confirmButtonColor: Theme.error
             Keys.onPressed: event => {

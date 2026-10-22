@@ -15584,6 +15584,8 @@
       "colour",
       "colours",
       "desktop",
+      "duxlabs",
+      "github",
       "hue",
       "image",
       "matugen",
@@ -15598,7 +15600,10 @@
       "wallpaper"
     ],
     "parentLabel": "Wallpaper & colors",
-    "description": "Required plugin: ",
+    "description": "Required plugin: %1",
+    "descriptionArgs": [
+      "https://github.com/duxlabs-dev/base46"
+    ],
     "conditionKey": "matugenAvailable"
   },
   {

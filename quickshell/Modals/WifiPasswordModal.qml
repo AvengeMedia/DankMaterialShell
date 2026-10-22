@@ -315,16 +315,16 @@ DModal {
         }
         supportingText: {
             if (promptReason === "pkcs11")
-                return I18n.tr("Enter PIN for ") + wifiPasswordSSID;
+                return I18n.tr("Enter PIN for %1", "%1 is the device or network name").arg(wifiPasswordSSID);
             if (isCertificatePrompt)
                 return wifiPasswordSSID;
             if (fieldsInfo.length > 0)
-                return I18n.tr("Enter credentials for ") + wifiPasswordSSID;
+                return I18n.tr("Enter credentials for %1", "%1 is the network name").arg(wifiPasswordSSID);
             if (isVpnPrompt)
-                return I18n.tr("Enter password for ") + wifiPasswordSSID;
+                return I18n.tr("Enter password for %1", "%1 is the network name").arg(wifiPasswordSSID);
             if (isHiddenNetwork)
                 return I18n.tr("Enter network name and password");
-            return (requiresEnterprise ? I18n.tr("Enter credentials for ") : I18n.tr("Enter password for ")) + wifiPasswordSSID;
+            return (requiresEnterprise ? I18n.tr("Enter credentials for %1", "%1 is the network name") : I18n.tr("Enter password for %1", "%1 is the network name")).arg(wifiPasswordSSID);
         }
 
         Rectangle {

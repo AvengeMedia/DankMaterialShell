@@ -191,6 +191,9 @@
   "%1 printers": {
     "%1 printers": "%1 máy in"
   },
+  "%1 procs": {
+    "%1 procs": ""
+  },
   "%1 second": {
     "%1 second": "%1 giây"
   },
@@ -250,6 +253,9 @@
   },
   "(Unnamed)": {
     "(Unnamed)": "(Chưa có tên)"
+  },
+  "(exit %1)": {
+    "(exit %1)": ""
   },
   "+ %1 more": {
     "+ %1 more": "+ %1 thêm"
@@ -860,11 +866,11 @@
   "Authorize": {
     "Authorize": "Ủy quyền"
   },
-  "Authorize pairing with ": {
-    "Authorize pairing with ": "Uỷ quyền ghép nối với "
+  "Authorize pairing with %1": {
+    "Authorize pairing with %1": ""
   },
-  "Authorize service for ": {
-    "Authorize service for ": "Dịch vụ ủy quyền cho "
+  "Authorize service for %1": {
+    "Authorize service for %1": ""
   },
   "Auto": {
     "Auto": "Tự động"
@@ -1763,8 +1769,8 @@
   "Confirm Display Changes": {
     "Confirm Display Changes": "Xác nhận thay đổi hiển thị"
   },
-  "Confirm passkey for ": {
-    "Confirm passkey for ": "Xác nhận mật mã cho "
+  "Confirm passkey for %1": {
+    "Confirm passkey for %1": ""
   },
   "Confirm password": {
     "Confirm password": "Xác nhận mật khẩu"
@@ -1858,6 +1864,9 @@
   },
   "Copy": {
     "Copy": "Sao chép"
+  },
+  "Copy %1": {
+    "Copy %1": ""
   },
   "Copy Full Command": {
     "Copy Full Command": "Sao chép lệnh đầy đủ"
@@ -2495,6 +2504,9 @@
   "Dock": {
     "Dock": "Thanh dock"
   },
+  "Dock %1": {
+    "Dock %1": ""
+  },
   "Dock margin, opacity, and border": {
     "Dock margin, opacity, and border": "Căn lề, độ mờ và viền thanh Dock"
   },
@@ -2602,6 +2614,18 @@
   },
   "Dusk (Nautical Twilight)": {
     "Dusk (Nautical Twilight)": "Hoàng hôn (Hàng hải)"
+  },
+  "Dux Calendar": {
+    "Dux Calendar": ""
+  },
+  "Dux Calendar isn't installed": {
+    "Dux Calendar isn't installed": ""
+  },
+  "Dux Calendar isn't running": {
+    "Dux Calendar isn't running": ""
+  },
+  "Dux Greeter docs": {
+    "Dux Greeter docs": ""
   },
   "Dwindle": {
     "Dwindle": "Giảm dần"
@@ -2741,8 +2765,8 @@
   "Enter PIN": {
     "Enter PIN": "Nhập mã PIN"
   },
-  "Enter PIN for ": {
-    "Enter PIN for ": "Nhập PIN cho "
+  "Enter PIN for %1": {
+    "Enter PIN for %1": ""
   },
   "Enter a new name for session \"%1": {
     "Enter a new name for session \"%1\"": "Nhập tên mới cho phiên \"%1\""
@@ -2750,8 +2774,8 @@
   "Enter a new name for this workspace": {
     "Enter a new name for this workspace": "Nhập tên mới cho không gian làm việc này"
   },
-  "Enter credentials for ": {
-    "Enter credentials for ": "Nhập thông tin xác thực cho "
+  "Enter credentials for %1": {
+    "Enter credentials for %1": ""
   },
   "Enter custom lock screen format (e.g., dddd, MMMM d)": {
     "Enter custom lock screen format (e.g., dddd, MMMM d)": "Nhập định dạng màn hình khóa (vd: dddd, MMMM d)"
@@ -2765,17 +2789,17 @@
   "Enter network name and password": {
     "Enter network name and password": "Nhập tên và mk mạng ẩn"
   },
-  "Enter passkey for ": {
-    "Enter passkey for ": "Nhập mật mã cho "
+  "Enter passkey for %1": {
+    "Enter passkey for %1": ""
   },
-  "Enter password for ": {
-    "Enter password for ": "Nhập mật khẩu cho "
+  "Enter password for %1": {
+    "Enter password for %1": ""
   },
   "Enter text to encode": {
     "Enter text to encode": "Nhập văn bản để mã hóa"
   },
-  "Enter this passkey on ": {
-    "Enter this passkey on ": "Nhập mã xác nhận này trên "
+  "Enter this passkey on %1": {
+    "Enter this passkey on %1": ""
   },
   "Enter to paste": {
     "Enter to paste": "Nhấn Enter để dán"
@@ -3521,6 +3545,9 @@
   "GPU": {
     "GPU": "GPU"
   },
+  "GPU %1": {
+    "GPU %1": ""
+  },
   "GPU Monitoring": {
     "GPU Monitoring": "Giám sát GPU"
   },
@@ -3544,6 +3571,9 @@
   },
   "Gamma": {
     "Gamma": "Gamma"
+  },
+  "Gamma %1": {
+    "Gamma %1": ""
   },
   "Gamma control": {
     "Gamma control": "Điều chỉnh gamma"
@@ -3703,6 +3733,9 @@
   },
   "Health": {
     "Health": "Sức khỏe"
+  },
+  "Health %1": {
+    "Health %1": ""
   },
   "Heat shimmer": {
     "Heat shimmer": ""
@@ -4169,8 +4202,8 @@
   "Install wallpaper '%1'?": {
     "Install wallpaper '%1'?": ""
   },
-  "Installation and PAM setup are documented in the ": {
-    "Installation and PAM setup are documented in the ": "Cài đặt và thiết lập PAM được ghi lại trong README dms-greeter."
+  "Installation and PAM setup are documented in the %1.": {
+    "Installation and PAM setup are documented in the %1.": ""
   },
   "Installed": {
     "Installed": "Đã cài đặt"
@@ -4990,6 +5023,9 @@
   },
   "More": {
     "More": "Hơn"
+  },
+  "More in %1": {
+    "More in %1": ""
   },
   "More samples look smoother and cost more GPU": {
     "More samples look smoother and cost more GPU": ""
@@ -5828,8 +5864,8 @@
   "Opening GitHub to upvote": {
     "Opening GitHub to upvote": ""
   },
-  "Opening terminal: ": {
-    "Opening terminal: ": "Đang mở cửa sổ dòng lệnh: "
+  "Opening terminal: %1": {
+    "Opening terminal: %1": ""
   },
   "Opens": {
     "Opens": "Mở ra"
@@ -5974,6 +6010,9 @@
   },
   "PID": {
     "PID": "PID"
+  },
+  "PID %1": {
+    "PID %1": ""
   },
   "PIN": {
     "PIN": "PIN"
@@ -6182,8 +6221,8 @@
   "Playback": {
     "Playback": "Phát lại"
   },
-  "Playback error: ": {
-    "Playback error: ": "Lỗi phát lại: "
+  "Playback error: %1": {
+    "Playback error: %1": ""
   },
   "Playback position": {
     "Playback position": "Vị trí phát lại"
@@ -6214,6 +6253,9 @@
   },
   "Plugin Source Code": {
     "Plugin Source Code": ""
+  },
+  "Plugin authors": {
+    "Plugin authors": ""
   },
   "Plugin dependency missing": {
     "Plugin dependency missing": "Thiếu phụ thuộc plugin"
@@ -6827,8 +6869,8 @@
   "Report": {
     "Report": "Báo cáo"
   },
-  "Required plugin: ": {
-    "Required plugin: ": "Plugin yêu cầu: "
+  "Required plugin: %1": {
+    "Required plugin: %1": ""
   },
   "Requires %1": {
     "Requires %1": "Yêu cầu %1"
@@ -8144,9 +8186,6 @@
   "Terminal additional parameters": {
     "Terminal additional parameters": "Các tham số bổ sung cho cửa sổ dòng lệnh"
   },
-  "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
-    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Chế độ dự phòng dòng lệnh thất bại. Hãy cài đặt một trình giả lập dòng lệnh được hỗ trợ hoặc chạy 'dms auth sync' thủ công."
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": ""
   },
@@ -9167,8 +9206,8 @@
   "Wi-Fi, Ethernet, VPN": {
     "Wi-Fi, Ethernet, VPN": ""
   },
-  "WiFi QR code for ": {
-    "WiFi QR code for ": "QR WiFi cho "
+  "WiFi QR code for %1": {
+    "WiFi QR code for %1": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "Đã tắt WiFi"
@@ -9547,9 +9586,6 @@
   },
   "primary network connection label": {
     "Primary": "Chính"
-  },
-  "procs": {
-    "procs": "tiến trình"
   },
   "pt": {
     "pt": "điểm"

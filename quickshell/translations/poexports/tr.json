@@ -191,6 +191,9 @@
   "%1 printers": {
     "%1 printers": ""
   },
+  "%1 procs": {
+    "%1 procs": ""
+  },
   "%1 second": {
     "%1 second": ""
   },
@@ -250,6 +253,9 @@
   },
   "(Unnamed)": {
     "(Unnamed)": "(İsimsiz)"
+  },
+  "(exit %1)": {
+    "(exit %1)": ""
   },
   "+ %1 more": {
     "+ %1 more": "+ %1 daha fazla"
@@ -860,11 +866,11 @@
   "Authorize": {
     "Authorize": "Yetkilendir"
   },
-  "Authorize pairing with ": {
-    "Authorize pairing with ": "Şununla eşleşmeyi yetkilendir: "
+  "Authorize pairing with %1": {
+    "Authorize pairing with %1": ""
   },
-  "Authorize service for ": {
-    "Authorize service for ": "Şunun için servisi yetkilendir: "
+  "Authorize service for %1": {
+    "Authorize service for %1": ""
   },
   "Auto": {
     "Auto": "Oto"
@@ -1763,8 +1769,8 @@
   "Confirm Display Changes": {
     "Confirm Display Changes": "Ekran Değişikliklerini Onaylayın"
   },
-  "Confirm passkey for ": {
-    "Confirm passkey for ": "Şunun için şifreyi onayla: "
+  "Confirm passkey for %1": {
+    "Confirm passkey for %1": ""
   },
   "Confirm password": {
     "Confirm password": ""
@@ -1858,6 +1864,9 @@
   },
   "Copy": {
     "Copy": "Kopyala"
+  },
+  "Copy %1": {
+    "Copy %1": ""
   },
   "Copy Full Command": {
     "Copy Full Command": "Tam Komutu Kopyala"
@@ -2495,6 +2504,9 @@
   "Dock": {
     "Dock": "Dock"
   },
+  "Dock %1": {
+    "Dock %1": ""
+  },
   "Dock margin, opacity, and border": {
     "Dock margin, opacity, and border": ""
   },
@@ -2568,7 +2580,7 @@
     "Driver": "Sürücü"
   },
   "Drizzle": {
-    "Drizzle": ""
+    "Drizzle": "Çişenti"
   },
   "Drop here": {
     "Drop here": ""
@@ -2602,6 +2614,18 @@
   },
   "Dusk (Nautical Twilight)": {
     "Dusk (Nautical Twilight)": "Alacakaranlık (Denizci Alacakaranlığı)"
+  },
+  "Dux Calendar": {
+    "Dux Calendar": ""
+  },
+  "Dux Calendar isn't installed": {
+    "Dux Calendar isn't installed": ""
+  },
+  "Dux Calendar isn't running": {
+    "Dux Calendar isn't running": ""
+  },
+  "Dux Greeter docs": {
+    "Dux Greeter docs": ""
   },
   "Dwindle": {
     "Dwindle": ""
@@ -2741,8 +2765,8 @@
   "Enter PIN": {
     "Enter PIN": "PIN gir"
   },
-  "Enter PIN for ": {
-    "Enter PIN for ": "Şunun için PIN gir: "
+  "Enter PIN for %1": {
+    "Enter PIN for %1": ""
   },
   "Enter a new name for session \"%1": {
     "Enter a new name for session \"%1\"": ""
@@ -2750,8 +2774,8 @@
   "Enter a new name for this workspace": {
     "Enter a new name for this workspace": "Bu çalışma alanı için yeni bir isim gir"
   },
-  "Enter credentials for ": {
-    "Enter credentials for ": "Kimlik bilgilerini girin "
+  "Enter credentials for %1": {
+    "Enter credentials for %1": ""
   },
   "Enter custom lock screen format (e.g., dddd, MMMM d)": {
     "Enter custom lock screen format (e.g., dddd, MMMM d)": "Özel kilit ekranı biçimini girin (örneğin, dddd, MMMM d)"
@@ -2765,17 +2789,17 @@
   "Enter network name and password": {
     "Enter network name and password": "Ağ adını ve şifresini gir"
   },
-  "Enter passkey for ": {
-    "Enter passkey for ": "Şunun için şifre gir: "
+  "Enter passkey for %1": {
+    "Enter passkey for %1": ""
   },
-  "Enter password for ": {
-    "Enter password for ": "Parolayı girin "
+  "Enter password for %1": {
+    "Enter password for %1": ""
   },
   "Enter text to encode": {
     "Enter text to encode": ""
   },
-  "Enter this passkey on ": {
-    "Enter this passkey on ": "Bu şifreyi şuraya gir: "
+  "Enter this passkey on %1": {
+    "Enter this passkey on %1": ""
   },
   "Enter to paste": {
     "Enter to paste": ""
@@ -3363,7 +3387,7 @@
     "Folder, interval, daily time": ""
   },
   "Folders": {
-    "Folders": ""
+    "Folders": "Klasörler"
   },
   "Follow DMS background color": {
     "Follow DMS background color": ""
@@ -3471,7 +3495,7 @@
     "Frees the launcher when closed and rebuilds it on open": ""
   },
   "Freezing Drizzle": {
-    "Freezing Drizzle": ""
+    "Freezing Drizzle": "Donan Cişenti"
   },
   "Frequency": {
     "Frequency": "Frekans"
@@ -3521,6 +3545,9 @@
   "GPU": {
     "GPU": "GPU"
   },
+  "GPU %1": {
+    "GPU %1": ""
+  },
   "GPU Monitoring": {
     "GPU Monitoring": "GPU İzleme"
   },
@@ -3544,6 +3571,9 @@
   },
   "Gamma": {
     "Gamma": ""
+  },
+  "Gamma %1": {
+    "Gamma %1": ""
   },
   "Gamma control": {
     "Gamma control": ""
@@ -3703,6 +3733,9 @@
   },
   "Health": {
     "Health": "Sağlık"
+  },
+  "Health %1": {
+    "Health %1": ""
   },
   "Heat shimmer": {
     "Heat shimmer": ""
@@ -4169,8 +4202,8 @@
   "Install wallpaper '%1'?": {
     "Install wallpaper '%1'?": ""
   },
-  "Installation and PAM setup are documented in the ": {
-    "Installation and PAM setup are documented in the ": ""
+  "Installation and PAM setup are documented in the %1.": {
+    "Installation and PAM setup are documented in the %1.": ""
   },
   "Installed": {
     "Installed": "Yüklendi"
@@ -4926,7 +4959,7 @@
     "Mirror display": ""
   },
   "Missing Environment Variables": {
-    "Missing Environment Variables": ""
+    "Missing Environment Variables": "Eksik Çevre Değişkenleri"
   },
   "Mix all stereo content into a single channel": {
     "Mix all stereo content into a single channel": ""
@@ -4990,6 +5023,9 @@
   },
   "More": {
     "More": ""
+  },
+  "More in %1": {
+    "More in %1": ""
   },
   "More samples look smoother and cost more GPU": {
     "More samples look smoother and cost more GPU": ""
@@ -5376,7 +5412,7 @@
     "No focus": ""
   },
   "No folders found": {
-    "No folders found": ""
+    "No folders found": "Klasör bulunamadı"
   },
   "No glow": {
     "No glow": ""
@@ -5430,7 +5466,7 @@
     "No media found.": ""
   },
   "No monitors": {
-    "No monitors": ""
+    "No monitors": "Monitör yok"
   },
   "No mount points found": {
     "No mount points found": "Bağlama noktası bulunamadı"
@@ -5631,7 +5667,7 @@
     "Not linked": ""
   },
   "Not set": {
-    "Not set": ""
+    "Not set": "Ayarlanmadı"
   },
   "Not shown on this bar, so its section widgets stay hidden": {
     "Not shown on this bar, so its section widgets stay hidden": ""
@@ -5802,7 +5838,7 @@
     "Open folder": "Klasör aç"
   },
   "Open in terminal": {
-    "Open in terminal": ""
+    "Open in terminal": "Uçbirimde aç"
   },
   "Open in the Island": {
     "Open in the Island": ""
@@ -5828,8 +5864,8 @@
   "Opening GitHub to upvote": {
     "Opening GitHub to upvote": ""
   },
-  "Opening terminal: ": {
-    "Opening terminal: ": ""
+  "Opening terminal: %1": {
+    "Opening terminal: %1": ""
   },
   "Opens": {
     "Opens": ""
@@ -5925,7 +5961,7 @@
     "Over fullscreen": ""
   },
   "Overcast": {
-    "Overcast": ""
+    "Overcast": "Bulutlu"
   },
   "Overflow": {
     "Overflow": "Taşma"
@@ -5974,6 +6010,9 @@
   },
   "PID": {
     "PID": ""
+  },
+  "PID %1": {
+    "PID %1": ""
   },
   "PIN": {
     "PIN": "PİN"
@@ -6182,8 +6221,8 @@
   "Playback": {
     "Playback": "Oynatma"
   },
-  "Playback error: ": {
-    "Playback error: ": ""
+  "Playback error: %1": {
+    "Playback error: %1": ""
   },
   "Playback position": {
     "Playback position": ""
@@ -6214,6 +6253,9 @@
   },
   "Plugin Source Code": {
     "Plugin Source Code": ""
+  },
+  "Plugin authors": {
+    "Plugin authors": ""
   },
   "Plugin dependency missing": {
     "Plugin dependency missing": ""
@@ -6827,8 +6869,8 @@
   "Report": {
     "Report": "Rapor"
   },
-  "Required plugin: ": {
-    "Required plugin: ": ""
+  "Required plugin: %1": {
+    "Required plugin: %1": ""
   },
   "Requires %1": {
     "Requires %1": "%1'i gerektirir"
@@ -7068,7 +7110,7 @@
     "Save Notepad File": "Not Defteri Dosyasını Kaydet"
   },
   "Save QR Code": {
-    "Save QR Code": ""
+    "Save QR Code": "Karekodu kaydet"
   },
   "Save and close": {
     "Save and close": ""
@@ -7131,7 +7173,7 @@
     "Science": "Bilim"
   },
   "Score": {
-    "Score": ""
+    "Score": "Skor"
   },
   "Screen sharing": {
     "Screen sharing": "Ekran paylaşımı"
@@ -8144,9 +8186,6 @@
   "Terminal additional parameters": {
     "Terminal additional parameters": ""
   },
-  "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
-    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": ""
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": ""
   },
@@ -8610,7 +8649,7 @@
     "Triggers when the key is released": ""
   },
   "Trust": {
-    "Trust": ""
+    "Trust": "Güven"
   },
   "Try a different search": {
     "Try a different search": "Farklı bir arama dene"
@@ -8769,7 +8808,7 @@
     "Untitled": "Başlıksız"
   },
   "Untrust": {
-    "Untrust": ""
+    "Untrust": "Güvenme"
   },
   "Untrusted VPN certificate": {
     "Untrusted VPN certificate": ""
@@ -9167,8 +9206,8 @@
   "Wi-Fi, Ethernet, VPN": {
     "Wi-Fi, Ethernet, VPN": ""
   },
-  "WiFi QR code for ": {
-    "WiFi QR code for ": ""
+  "WiFi QR code for %1": {
+    "WiFi QR code for %1": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "WiFi devre dışı"
@@ -9547,9 +9586,6 @@
   },
   "primary network connection label": {
     "Primary": ""
-  },
-  "procs": {
-    "procs": "süreçler"
   },
   "pt": {
     "pt": ""

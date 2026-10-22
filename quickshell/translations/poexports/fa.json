@@ -191,6 +191,9 @@
   "%1 printers": {
     "%1 printers": ""
   },
+  "%1 procs": {
+    "%1 procs": ""
+  },
   "%1 second": {
     "%1 second": ""
   },
@@ -250,6 +253,9 @@
   },
   "(Unnamed)": {
     "(Unnamed)": "(بدون نام)"
+  },
+  "(exit %1)": {
+    "(exit %1)": ""
   },
   "+ %1 more": {
     "+ %1 more": "+ %1 بیشتر"
@@ -860,11 +866,11 @@
   "Authorize": {
     "Authorize": "اجازه دادن"
   },
-  "Authorize pairing with ": {
-    "Authorize pairing with ": "اجازه جفت‌سازی با "
+  "Authorize pairing with %1": {
+    "Authorize pairing with %1": ""
   },
-  "Authorize service for ": {
-    "Authorize service for ": "اجازه سرویس برای "
+  "Authorize service for %1": {
+    "Authorize service for %1": ""
   },
   "Auto": {
     "Auto": "خودکار"
@@ -1763,8 +1769,8 @@
   "Confirm Display Changes": {
     "Confirm Display Changes": "تأیید تغییرات نمایشگر"
   },
-  "Confirm passkey for ": {
-    "Confirm passkey for ": "تأیید کلید عبور برای "
+  "Confirm passkey for %1": {
+    "Confirm passkey for %1": ""
   },
   "Confirm password": {
     "Confirm password": "تأیید گذرواژه"
@@ -1858,6 +1864,9 @@
   },
   "Copy": {
     "Copy": "کپی"
+  },
+  "Copy %1": {
+    "Copy %1": ""
   },
   "Copy Full Command": {
     "Copy Full Command": "کپی دستور کامل"
@@ -2495,6 +2504,9 @@
   "Dock": {
     "Dock": "داک"
   },
+  "Dock %1": {
+    "Dock %1": ""
+  },
   "Dock margin, opacity, and border": {
     "Dock margin, opacity, and border": "فاصله بیرونی، شفافیت و حاشیه داک"
   },
@@ -2602,6 +2614,18 @@
   },
   "Dusk (Nautical Twilight)": {
     "Dusk (Nautical Twilight)": "غروب (گرگ و میش دریایی)"
+  },
+  "Dux Calendar": {
+    "Dux Calendar": ""
+  },
+  "Dux Calendar isn't installed": {
+    "Dux Calendar isn't installed": ""
+  },
+  "Dux Calendar isn't running": {
+    "Dux Calendar isn't running": ""
+  },
+  "Dux Greeter docs": {
+    "Dux Greeter docs": ""
   },
   "Dwindle": {
     "Dwindle": ""
@@ -2741,8 +2765,8 @@
   "Enter PIN": {
     "Enter PIN": "PIN را وارد کنید"
   },
-  "Enter PIN for ": {
-    "Enter PIN for ": "ورود PIN برای "
+  "Enter PIN for %1": {
+    "Enter PIN for %1": ""
   },
   "Enter a new name for session \"%1": {
     "Enter a new name for session \"%1\"": "یک نام جدید برای نشست «%1» وارد کنید"
@@ -2750,8 +2774,8 @@
   "Enter a new name for this workspace": {
     "Enter a new name for this workspace": "نام جدید برای این محیط‌کار وارد کنید"
   },
-  "Enter credentials for ": {
-    "Enter credentials for ": "ورود اعتبارنامه‌ها برای "
+  "Enter credentials for %1": {
+    "Enter credentials for %1": ""
   },
   "Enter custom lock screen format (e.g., dddd, MMMM d)": {
     "Enter custom lock screen format (e.g., dddd, MMMM d)": "قالب سفارشی صفحه قفل را وارد کنید (مانند dddd, MMMM d)"
@@ -2765,17 +2789,17 @@
   "Enter network name and password": {
     "Enter network name and password": "نام شبکه و گذرواژه را وارد کنید"
   },
-  "Enter passkey for ": {
-    "Enter passkey for ": "ورود کلید عبور برای "
+  "Enter passkey for %1": {
+    "Enter passkey for %1": ""
   },
-  "Enter password for ": {
-    "Enter password for ": "ورود گذرواژه برای "
+  "Enter password for %1": {
+    "Enter password for %1": ""
   },
   "Enter text to encode": {
     "Enter text to encode": ""
   },
-  "Enter this passkey on ": {
-    "Enter this passkey on ": "ورود این کلید عبور در "
+  "Enter this passkey on %1": {
+    "Enter this passkey on %1": ""
   },
   "Enter to paste": {
     "Enter to paste": ""
@@ -3521,6 +3545,9 @@
   "GPU": {
     "GPU": "GPU"
   },
+  "GPU %1": {
+    "GPU %1": ""
+  },
   "GPU Monitoring": {
     "GPU Monitoring": "نظارت بر GPU"
   },
@@ -3544,6 +3571,9 @@
   },
   "Gamma": {
     "Gamma": ""
+  },
+  "Gamma %1": {
+    "Gamma %1": ""
   },
   "Gamma control": {
     "Gamma control": ""
@@ -3703,6 +3733,9 @@
   },
   "Health": {
     "Health": "سلامت"
+  },
+  "Health %1": {
+    "Health %1": ""
   },
   "Heat shimmer": {
     "Heat shimmer": ""
@@ -4169,8 +4202,8 @@
   "Install wallpaper '%1'?": {
     "Install wallpaper '%1'?": ""
   },
-  "Installation and PAM setup are documented in the ": {
-    "Installation and PAM setup are documented in the ": ""
+  "Installation and PAM setup are documented in the %1.": {
+    "Installation and PAM setup are documented in the %1.": ""
   },
   "Installed": {
     "Installed": "نصب شده"
@@ -4990,6 +5023,9 @@
   },
   "More": {
     "More": ""
+  },
+  "More in %1": {
+    "More in %1": ""
   },
   "More samples look smoother and cost more GPU": {
     "More samples look smoother and cost more GPU": ""
@@ -5828,8 +5864,8 @@
   "Opening GitHub to upvote": {
     "Opening GitHub to upvote": ""
   },
-  "Opening terminal: ": {
-    "Opening terminal: ": "باز کردن ترمینال: "
+  "Opening terminal: %1": {
+    "Opening terminal: %1": ""
   },
   "Opens": {
     "Opens": ""
@@ -5974,6 +6010,9 @@
   },
   "PID": {
     "PID": ""
+  },
+  "PID %1": {
+    "PID %1": ""
   },
   "PIN": {
     "PIN": "PIN"
@@ -6182,8 +6221,8 @@
   "Playback": {
     "Playback": "پخش"
   },
-  "Playback error: ": {
-    "Playback error: ": "خطای پخش: "
+  "Playback error: %1": {
+    "Playback error: %1": ""
   },
   "Playback position": {
     "Playback position": ""
@@ -6214,6 +6253,9 @@
   },
   "Plugin Source Code": {
     "Plugin Source Code": ""
+  },
+  "Plugin authors": {
+    "Plugin authors": ""
   },
   "Plugin dependency missing": {
     "Plugin dependency missing": ""
@@ -6827,8 +6869,8 @@
   "Report": {
     "Report": "گزارش"
   },
-  "Required plugin: ": {
-    "Required plugin: ": "افزونه مورد نیاز: "
+  "Required plugin: %1": {
+    "Required plugin: %1": ""
   },
   "Requires %1": {
     "Requires %1": "به %1 نیاز دارد"
@@ -8144,9 +8186,6 @@
   "Terminal additional parameters": {
     "Terminal additional parameters": "پارامتر‌های اضافی ترمینال"
   },
-  "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
-    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "اجرای ترمینال جایگزین ناموفق بود. یک شبیه‌ساز ترمینال پشتیبانی‌شده نصب کنید یا دستور «dms auth sync» را دستی اجرا کنید."
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": ""
   },
@@ -9167,8 +9206,8 @@
   "Wi-Fi, Ethernet, VPN": {
     "Wi-Fi, Ethernet, VPN": ""
   },
-  "WiFi QR code for ": {
-    "WiFi QR code for ": "کد QR وای‌فای برای "
+  "WiFi QR code for %1": {
+    "WiFi QR code for %1": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "وای‌فای غیرفعال"
@@ -9547,9 +9586,6 @@
   },
   "primary network connection label": {
     "Primary": ""
-  },
-  "procs": {
-    "procs": "فرایند"
   },
   "pt": {
     "pt": ""

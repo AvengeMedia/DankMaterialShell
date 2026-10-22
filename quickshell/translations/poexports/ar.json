@@ -114,7 +114,7 @@
     "%1 is %2 and may use a lot of memory.": "%1 هو %2 وقد يستهلك الكثير من الذاكرة."
   },
   "%1 is not installed. Install the package to manage the greeter.": {
-    "%1 is not installed. Install the package to manage the greeter.": "%1 ليس مثبتاً. ثبت الحزمة لكي تتحكم ال"
+    "%1 is not installed. Install the package to manage the greeter.": ""
   },
   "%1 is now included in config": {
     "%1 is now included in config": "تم تضمين %1 في الإعدادات الآن"
@@ -153,13 +153,13 @@
     "%1 ms": "%1 مللي ثانية"
   },
   "%1 not available": {
-    "%1 not available": ""
+    "%1 not available": "%1 غير متوفر"
   },
   "%1 not available - lock integration requires the DMS socket connection": {
     "%1 not available - lock integration requires the DMS socket connection": ""
   },
   "%1 not available or disabled - cannot apply %2 colors": {
-    "%1 not available or disabled - cannot apply %2 colors": ""
+    "%1 not available or disabled - cannot apply %2 colors": "%1 ليس متوفراً أو معطل - لا يمكن تطبيق ألوان %2"
   },
   "%1 not found": {
     "%1 not found": "%1 غير موجود"
@@ -190,6 +190,9 @@
   },
   "%1 printers": {
     "%1 printers": "%1 طابعات"
+  },
+  "%1 procs": {
+    "%1 procs": ""
   },
   "%1 second": {
     "%1 second": "ثانية %1"
@@ -250,6 +253,9 @@
   },
   "(Unnamed)": {
     "(Unnamed)": "(غير مسمى)"
+  },
+  "(exit %1)": {
+    "(exit %1)": ""
   },
   "+ %1 more": {
     "+ %1 more": "+ %1 المزيد"
@@ -860,11 +866,11 @@
   "Authorize": {
     "Authorize": "منح الإذن"
   },
-  "Authorize pairing with ": {
-    "Authorize pairing with ": "سماح بالاقتران ل "
+  "Authorize pairing with %1": {
+    "Authorize pairing with %1": ""
   },
-  "Authorize service for ": {
-    "Authorize service for ": "منح إذن الخدمة ل "
+  "Authorize service for %1": {
+    "Authorize service for %1": ""
   },
   "Auto": {
     "Auto": "تلقائي"
@@ -1763,8 +1769,8 @@
   "Confirm Display Changes": {
     "Confirm Display Changes": "تأكيد تغييرات العرض"
   },
-  "Confirm passkey for ": {
-    "Confirm passkey for ": "تأكيد مفتاح المرور لـ "
+  "Confirm passkey for %1": {
+    "Confirm passkey for %1": ""
   },
   "Confirm password": {
     "Confirm password": "تأكيد كلمة المرور"
@@ -1858,6 +1864,9 @@
   },
   "Copy": {
     "Copy": "نسخ"
+  },
+  "Copy %1": {
+    "Copy %1": ""
   },
   "Copy Full Command": {
     "Copy Full Command": "نسخ الأمر الكامل"
@@ -2495,6 +2504,9 @@
   "Dock": {
     "Dock": "شريط التطبيقات"
   },
+  "Dock %1": {
+    "Dock %1": ""
+  },
   "Dock margin, opacity, and border": {
     "Dock margin, opacity, and border": "هامش شريط التطبيقات والعتامة والحدود"
   },
@@ -2602,6 +2614,18 @@
   },
   "Dusk (Nautical Twilight)": {
     "Dusk (Nautical Twilight)": "الغسق (الغسق البحري)"
+  },
+  "Dux Calendar": {
+    "Dux Calendar": ""
+  },
+  "Dux Calendar isn't installed": {
+    "Dux Calendar isn't installed": ""
+  },
+  "Dux Calendar isn't running": {
+    "Dux Calendar isn't running": ""
+  },
+  "Dux Greeter docs": {
+    "Dux Greeter docs": ""
   },
   "Dwindle": {
     "Dwindle": "تضاؤل"
@@ -2741,8 +2765,8 @@
   "Enter PIN": {
     "Enter PIN": "أدخل رمز PIN"
   },
-  "Enter PIN for ": {
-    "Enter PIN for ": "أدخل رمز PIN لـ "
+  "Enter PIN for %1": {
+    "Enter PIN for %1": ""
   },
   "Enter a new name for session \"%1": {
     "Enter a new name for session \"%1\"": "أدخل اسمًا جديدًا للجلسة \"%1\""
@@ -2750,8 +2774,8 @@
   "Enter a new name for this workspace": {
     "Enter a new name for this workspace": "أدخل اسماً جديداً لسطح المكتب هذه"
   },
-  "Enter credentials for ": {
-    "Enter credentials for ": "تسجيل الدخول لـ "
+  "Enter credentials for %1": {
+    "Enter credentials for %1": ""
   },
   "Enter custom lock screen format (e.g., dddd, MMMM d)": {
     "Enter custom lock screen format (e.g., dddd, MMMM d)": "أدخل صيغة مخصصة لشاشة القفل (مثال. dddd. MMMM d)"
@@ -2765,17 +2789,17 @@
   "Enter network name and password": {
     "Enter network name and password": "أدخل اسم الشبكة وكلمة المرور"
   },
-  "Enter passkey for ": {
-    "Enter passkey for ": "أدخل مفتاح المرور لـ "
+  "Enter passkey for %1": {
+    "Enter passkey for %1": ""
   },
-  "Enter password for ": {
-    "Enter password for ": "ادخال كلمة المرور ل "
+  "Enter password for %1": {
+    "Enter password for %1": ""
   },
   "Enter text to encode": {
     "Enter text to encode": "أدخل نصًا للترميز"
   },
-  "Enter this passkey on ": {
-    "Enter this passkey on ": "أدخل مفتاح المرور هذا في "
+  "Enter this passkey on %1": {
+    "Enter this passkey on %1": ""
   },
   "Enter to paste": {
     "Enter to paste": "اضغط Enter للصق"
@@ -3521,6 +3545,9 @@
   "GPU": {
     "GPU": "معالج الرسوميات"
   },
+  "GPU %1": {
+    "GPU %1": ""
+  },
   "GPU Monitoring": {
     "GPU Monitoring": "مراقبة وحدة معالجة الرسومات (GPU)"
   },
@@ -3544,6 +3571,9 @@
   },
   "Gamma": {
     "Gamma": "حرارة الالوان"
+  },
+  "Gamma %1": {
+    "Gamma %1": ""
   },
   "Gamma control": {
     "Gamma control": "التحكم في غاما"
@@ -3703,6 +3733,9 @@
   },
   "Health": {
     "Health": "صحة البطارية"
+  },
+  "Health %1": {
+    "Health %1": ""
   },
   "Heat shimmer": {
     "Heat shimmer": "تذبذب الحرارة"
@@ -4169,8 +4202,8 @@
   "Install wallpaper '%1'?": {
     "Install wallpaper '%1'?": "تثبيت خلفية '%1'؟"
   },
-  "Installation and PAM setup are documented in the ": {
-    "Installation and PAM setup are documented in the ": "تجدون توثيق التثبيت وإعدادات الـ PAM في "
+  "Installation and PAM setup are documented in the %1.": {
+    "Installation and PAM setup are documented in the %1.": ""
   },
   "Installed": {
     "Installed": "مثبت"
@@ -4991,6 +5024,9 @@
   "More": {
     "More": "المزيد"
   },
+  "More in %1": {
+    "More in %1": ""
+  },
   "More samples look smoother and cost more GPU": {
     "More samples look smoother and cost more GPU": "المزيد من العينات تبدو أكثر سلاسة وتستهلك المزيد من طاقة وحدة معالجة الرسومات"
   },
@@ -5601,7 +5637,7 @@
     "Not available": "غير متاح"
   },
   "Not available - install %1 and %2": {
-    "Not available - install %1 and %2": ""
+    "Not available - install %1 and %2": "غير متوفر - ثبت %1 و%2"
   },
   "Not available - install %1 and %2, or configure %3 PAM": {
     "Not available - install %1 and %2, or configure %3 PAM": ""
@@ -5828,8 +5864,8 @@
   "Opening GitHub to upvote": {
     "Opening GitHub to upvote": "فتح GitHub للتصويت"
   },
-  "Opening terminal: ": {
-    "Opening terminal: ": "فتح الطرفيّة: "
+  "Opening terminal: %1": {
+    "Opening terminal: %1": ""
   },
   "Opens": {
     "Opens": "يفتح"
@@ -5974,6 +6010,9 @@
   },
   "PID": {
     "PID": "معرف العملية (PID)"
+  },
+  "PID %1": {
+    "PID %1": ""
   },
   "PIN": {
     "PIN": "PIN"
@@ -6182,8 +6221,8 @@
   "Playback": {
     "Playback": "أجهزة التشغيل"
   },
-  "Playback error: ": {
-    "Playback error: ": "خطأ في التشغيل: "
+  "Playback error: %1": {
+    "Playback error: %1": ""
   },
   "Playback position": {
     "Playback position": "موضع التشغيل"
@@ -6214,6 +6253,9 @@
   },
   "Plugin Source Code": {
     "Plugin Source Code": "الكود المصدري للملحق"
+  },
+  "Plugin authors": {
+    "Plugin authors": ""
   },
   "Plugin dependency missing": {
     "Plugin dependency missing": "تعذر العثور على تبعية الملحق"
@@ -6827,8 +6869,8 @@
   "Report": {
     "Report": "تقرير"
   },
-  "Required plugin: ": {
-    "Required plugin: ": "الملحقات المطلوبة: "
+  "Required plugin: %1": {
+    "Required plugin: %1": ""
   },
   "Requires %1": {
     "Requires %1": "يتطلب %1"
@@ -8144,9 +8186,6 @@
   "Terminal additional parameters": {
     "Terminal additional parameters": "معلمات الجهاز الإضافية"
   },
-  "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
-    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "فشل وضع بديل المحطة الطرفية. قم بتثبيت محاكي محطة طرفية مدعوم أو قم بتشغيل 'dms auth sync' يدوياً."
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": ""
   },
@@ -9167,8 +9206,8 @@
   "Wi-Fi, Ethernet, VPN": {
     "Wi-Fi, Ethernet, VPN": "واي فاي، إيثرنت، VPN"
   },
-  "WiFi QR code for ": {
-    "WiFi QR code for ": "رمز QR لشبكة WiFi لـ "
+  "WiFi QR code for %1": {
+    "WiFi QR code for %1": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "الWi-Fi غير مفعل"
@@ -9547,9 +9586,6 @@
   },
   "primary network connection label": {
     "Primary": "أساسي"
-  },
-  "procs": {
-    "procs": "عمليات"
   },
   "pt": {
     "pt": "pt"

@@ -413,7 +413,7 @@ Item {
                 tags: ["matugen", "neovim", "terminal", "template"]
                 settingKey: "matugenTemplateNeovim"
                 text: "neovim"
-                description: root.getTemplateDescription("nvim", I18n.tr("Required plugin: ") + "https://github.com/duxlabs-dev/base46")
+                description: root.getTemplateDescription("nvim", I18n.tr("Required plugin: %1", "%1 is a repository URL").arg("https://github.com/duxlabs-dev/base46"))
                 descriptionColor: root.getTemplateDescriptionColor("nvim")
                 checked: SettingsData.matugenTemplateNeovim
                 onToggled: checked => SettingsData.set("matugenTemplateNeovim", checked)

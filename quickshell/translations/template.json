@@ -448,6 +448,13 @@
     "comment": "plural, %1 is a count of printers"
   },
   {
+    "term": "%1 procs",
+    "translation": "",
+    "context": "%1 procs",
+    "reference": "",
+    "comment": "short for processes, %1 is a count"
+  },
+  {
     "term": "%1 second",
     "translation": "",
     "context": "%1 second",
@@ -586,6 +593,13 @@
     "context": "(Unnamed)",
     "reference": "",
     "comment": "dock menu fallback for a window without a title"
+  },
+  {
+    "term": "(exit %1)",
+    "translation": "",
+    "context": "(exit %1)",
+    "reference": "",
+    "comment": "process exit code"
   },
   {
     "term": "+ %1 more",
@@ -2044,18 +2058,18 @@
     "comment": "verb, bluetooth pairing dialog confirm button"
   },
   {
-    "term": "Authorize pairing with ",
+    "term": "Authorize pairing with %1",
     "translation": "",
-    "context": "Authorize pairing with ",
+    "context": "Authorize pairing with %1",
     "reference": "",
-    "comment": ""
+    "comment": "%1 is the device name"
   },
   {
-    "term": "Authorize service for ",
+    "term": "Authorize service for %1",
     "translation": "",
-    "context": "Authorize service for ",
+    "context": "Authorize service for %1",
     "reference": "",
-    "comment": ""
+    "comment": "%1 is the device name"
   },
   {
     "term": "Auto",
@@ -4193,11 +4207,11 @@
     "comment": ""
   },
   {
-    "term": "Confirm passkey for ",
+    "term": "Confirm passkey for %1",
     "translation": "",
-    "context": "Confirm passkey for ",
+    "context": "Confirm passkey for %1",
     "reference": "",
-    "comment": ""
+    "comment": "%1 is the device name"
   },
   {
     "term": "Confirm password",
@@ -4415,6 +4429,13 @@
     "context": "Copy",
     "reference": "",
     "comment": "Copy to clipboard"
+  },
+  {
+    "term": "Copy %1",
+    "translation": "",
+    "context": "Copy %1",
+    "reference": "",
+    "comment": "%1 is a color value"
   },
   {
     "term": "Copy Full Command",
@@ -5943,6 +5964,13 @@
     "comment": "greeter settings link"
   },
   {
+    "term": "Dock %1",
+    "translation": "",
+    "context": "Dock %1",
+    "reference": "",
+    "comment": "generated dock name, %1 is a number"
+  },
+  {
     "term": "Dock margin, opacity, and border",
     "translation": "",
     "context": "Dock margin, opacity, and border",
@@ -6221,6 +6249,13 @@
     "context": "Dux Calendar isn't running",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Dux Greeter docs",
+    "translation": "",
+    "context": "Dux Greeter docs",
+    "reference": "",
+    "comment": "link text"
   },
   {
     "term": "Dwindle",
@@ -6552,11 +6587,11 @@
     "comment": ""
   },
   {
-    "term": "Enter PIN for ",
+    "term": "Enter PIN for %1",
     "translation": "",
-    "context": "Enter PIN for ",
+    "context": "Enter PIN for %1",
     "reference": "",
-    "comment": ""
+    "comment": "%1 is the device or network name"
   },
   {
     "term": "Enter a new name for session \"%1\"",
@@ -6573,11 +6608,11 @@
     "comment": ""
   },
   {
-    "term": "Enter credentials for ",
+    "term": "Enter credentials for %1",
     "translation": "",
-    "context": "Enter credentials for ",
+    "context": "Enter credentials for %1",
     "reference": "",
-    "comment": ""
+    "comment": "%1 is the network name"
   },
   {
     "term": "Enter custom lock screen format (e.g., dddd, MMMM d)",
@@ -6608,18 +6643,18 @@
     "comment": ""
   },
   {
-    "term": "Enter passkey for ",
+    "term": "Enter passkey for %1",
     "translation": "",
-    "context": "Enter passkey for ",
+    "context": "Enter passkey for %1",
     "reference": "",
-    "comment": ""
+    "comment": "%1 is the device name"
   },
   {
-    "term": "Enter password for ",
+    "term": "Enter password for %1",
     "translation": "",
-    "context": "Enter password for ",
+    "context": "Enter password for %1",
     "reference": "",
-    "comment": ""
+    "comment": "%1 is the network name"
   },
   {
     "term": "Enter text to encode",
@@ -6629,11 +6664,11 @@
     "comment": ""
   },
   {
-    "term": "Enter this passkey on ",
+    "term": "Enter this passkey on %1",
     "translation": "",
-    "context": "Enter this passkey on ",
+    "context": "Enter this passkey on %1",
     "reference": "",
-    "comment": ""
+    "comment": "%1 is the device name"
   },
   {
     "term": "Enter to paste",
@@ -8386,6 +8421,13 @@
     "comment": ""
   },
   {
+    "term": "GPU %1",
+    "translation": "",
+    "context": "GPU %1",
+    "reference": "",
+    "comment": "%1 is a temperature"
+  },
+  {
     "term": "GPU Monitoring",
     "translation": "",
     "context": "GPU Monitoring",
@@ -8439,7 +8481,14 @@
     "translation": "",
     "context": "Gamma",
     "reference": "",
-    "comment": "Gamma"
+    "comment": ""
+  },
+  {
+    "term": "Gamma %1",
+    "translation": "",
+    "context": "Gamma %1",
+    "reference": "",
+    "comment": "%1 is a gamma value"
   },
   {
     "term": "Gamma control",
@@ -8811,6 +8860,13 @@
     "context": "Health",
     "reference": "",
     "comment": "noun, battery health percentage label"
+  },
+  {
+    "term": "Health %1",
+    "translation": "",
+    "context": "Health %1",
+    "reference": "",
+    "comment": "battery health, %1 is a percentage"
   },
   {
     "term": "Heat shimmer",
@@ -9947,11 +10003,11 @@
     "comment": "material wallpaper install confirmation"
   },
   {
-    "term": "Installation and PAM setup are documented in the ",
+    "term": "Installation and PAM setup are documented in the %1.",
     "translation": "",
-    "context": "Installation and PAM setup are documented in the ",
+    "context": "Installation and PAM setup are documented in the %1.",
     "reference": "",
-    "comment": ""
+    "comment": "%1 is a link to the greeter docs"
   },
   {
     "term": "Installed",
@@ -11905,6 +11961,13 @@
     "context": "More",
     "reference": "",
     "comment": "hub group of rarely used pages"
+  },
+  {
+    "term": "More in %1",
+    "translation": "",
+    "context": "More in %1",
+    "reference": "",
+    "comment": "changelog card title, %1 is a version"
   },
   {
     "term": "More samples look smoother and cost more GPU",
@@ -13895,11 +13958,11 @@
     "comment": "plugin upvote toast, shown when the GitHub CLI is missing or signed out"
   },
   {
-    "term": "Opening terminal: ",
+    "term": "Opening terminal: %1",
     "translation": "",
-    "context": "Opening terminal: ",
+    "context": "Opening terminal: %1",
     "reference": "",
-    "comment": ""
+    "comment": "%1 is the action name"
   },
   {
     "term": "Opens",
@@ -14243,6 +14306,13 @@
     "context": "PID",
     "reference": "",
     "comment": "Label for the process ID row in the focused window popout"
+  },
+  {
+    "term": "PID %1",
+    "translation": "",
+    "context": "PID %1",
+    "reference": "",
+    "comment": "%1 is a process id"
   },
   {
     "term": "PIN",
@@ -14735,11 +14805,11 @@
     "comment": "section label above per-app audio playback streams"
   },
   {
-    "term": "Playback error: ",
+    "term": "Playback error: %1",
     "translation": "",
-    "context": "Playback error: ",
+    "context": "Playback error: %1",
     "reference": "",
-    "comment": ""
+    "comment": "%1 is the player error text"
   },
   {
     "term": "Playback position",
@@ -14810,6 +14880,13 @@
     "context": "Plugin Source Code",
     "reference": "",
     "comment": "plugin settings page, plugin details"
+  },
+  {
+    "term": "Plugin authors",
+    "translation": "",
+    "context": "Plugin authors",
+    "reference": "",
+    "comment": "changelog section heading"
   },
   {
     "term": "Plugin dependency missing",
@@ -16296,11 +16373,11 @@
     "comment": "noun, printer state reason severity"
   },
   {
-    "term": "Required plugin: ",
+    "term": "Required plugin: %1",
     "translation": "",
-    "context": "Required plugin: ",
+    "context": "Required plugin: %1",
     "reference": "",
-    "comment": ""
+    "comment": "%1 is a repository URL"
   },
   {
     "term": "Requires %1",
@@ -19467,18 +19544,11 @@
     "comment": ""
   },
   {
-    "term": "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.",
-    "translation": "",
-    "context": "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.",
     "translation": "",
     "context": "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.",
     "reference": "",
-    "comment": "greeter sync status, %1 is a dms-greeter command"
+    "comment": "terminal fallback status, %1 is a command"
   },
   {
     "term": "Terminal fallback opened. Complete authentication there; it will close automatically when done.",
@@ -21875,11 +21945,11 @@
     "comment": "settings sidebar hint for the network page"
   },
   {
-    "term": "WiFi QR code for ",
+    "term": "WiFi QR code for %1",
     "translation": "",
-    "context": "WiFi QR code for ",
+    "context": "WiFi QR code for %1",
     "reference": "",
-    "comment": ""
+    "comment": "%1 is the network name"
   },
   {
     "term": "WiFi disabled",
@@ -22685,13 +22755,6 @@
     "context": "power-profiles-daemon not available",
     "reference": "",
     "comment": ""
-  },
-  {
-    "term": "procs",
-    "translation": "",
-    "context": "procs",
-    "reference": "",
-    "comment": "short for processes"
   },
   {
     "term": "pt",

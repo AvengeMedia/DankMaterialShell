@@ -65,7 +65,7 @@
   {
     "term": "%1 Startup Failed",
     "context": "%1 Startup Failed",
-    "reference": "Services/PluginService.qml:945",
+    "reference": "Services/PluginService.qml:946",
     "comment": "plugin error title, %1 is the plugin name",
     "tags": [
       "shell"
@@ -576,6 +576,15 @@
     ]
   },
   {
+    "term": "%1 procs",
+    "context": "%1 procs",
+    "reference": "Modules/ProcessList/ProcessSystemHeader.qml:18",
+    "comment": "short for processes, %1 is a count",
+    "tags": [
+      "shell"
+    ]
+  },
+  {
     "term": "%1 second",
     "context": "%1 second",
     "reference": "Common/I18n.qml:279",
@@ -758,6 +767,16 @@
     ]
   },
   {
+    "term": "(exit %1)",
+    "context": "(exit %1)",
+    "reference": "Services/GreeterService.qml:138, Services/GreeterService.qml:188, Services/GreeterService.qml:232, Services/GreeterService.qml:254, Common/settings/Processes.qml:536, Modules/Settings/GreeterTab.qml:226, Modules/Settings/GreeterTab.qml:252",
+    "comment": "process exit code",
+    "tags": [
+      "settings",
+      "shell"
+    ]
+  },
+  {
     "term": "+ %1 more",
     "context": "+ %1 more",
     "reference": "Modules/Lock/Widgets/LockNotificationsWidget.qml:124, Modules/Lock/Widgets/LockNotificationsWidget.qml:214, Modules/Lock/Widgets/LockNotificationsWidget.qml:317",
@@ -814,7 +833,7 @@
   {
     "term": "3rd party",
     "context": "3rd party",
-    "reference": "Services/PluginService.qml:1373",
+    "reference": "Services/PluginService.qml:1375",
     "comment": "",
     "tags": [
       "shell"
@@ -1707,7 +1726,7 @@
   {
     "term": "Already upvoted, click again to remove",
     "context": "Already upvoted, click again to remove",
-    "reference": "Services/PluginService.qml:1503",
+    "reference": "Services/PluginService.qml:1505",
     "comment": "plugin upvote toast",
     "tags": [
       "shell"
@@ -2650,19 +2669,19 @@
     ]
   },
   {
-    "term": "Authorize pairing with ",
-    "context": "Authorize pairing with ",
+    "term": "Authorize pairing with %1",
+    "context": "Authorize pairing with %1",
     "reference": "Modals/BluetoothPairingModal.qml:130",
-    "comment": "",
+    "comment": "%1 is the device name",
     "tags": [
       "shell"
     ]
   },
   {
-    "term": "Authorize service for ",
-    "context": "Authorize service for ",
+    "term": "Authorize service for %1",
+    "context": "Authorize service for %1",
     "reference": "Modals/BluetoothPairingModal.qml:137",
-    "comment": "",
+    "comment": "%1 is the device name",
     "tags": [
       "shell"
     ]
@@ -5457,10 +5476,10 @@
     ]
   },
   {
-    "term": "Confirm passkey for ",
-    "context": "Confirm passkey for ",
+    "term": "Confirm passkey for %1",
+    "context": "Confirm passkey for %1",
     "reference": "Modals/BluetoothPairingModal.qml:126",
-    "comment": "",
+    "comment": "%1 is the device name",
     "tags": [
       "shell"
     ]
@@ -5745,10 +5764,19 @@
   {
     "term": "Copy",
     "context": "Copy",
-    "reference": "Modules/Toast.qml:309, Modals/QRGeneratorModal.qml:251, Modals/DLauncherV2/Controller.qml:1893, Modals/Clipboard/ClipboardKeyboardHints.qml:41, Modals/Clipboard/ClipboardEntry.qml:84, Modals/Clipboard/ClipboardContextMenu.qml:25, Modules/ColorPicker/ColorPickerContent.qml:251, Modules/ColorPicker/ColorPickerContent.qml:325, Modules/ColorPicker/ColorPickerContent.qml:338, Modules/Notifications/NotificationActions.qml:70, Modules/Settings/DesktopWidgetTab.qml:160, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:228, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:257, Modules/ControlCenter/Widgets/ColorPickerTile.qml:49",
+    "reference": "Modules/Toast.qml:309, Modals/QRGeneratorModal.qml:251, Modals/DLauncherV2/Controller.qml:1893, Modals/Clipboard/ClipboardKeyboardHints.qml:41, Modals/Clipboard/ClipboardEntry.qml:84, Modals/Clipboard/ClipboardContextMenu.qml:25, Modules/ColorPicker/ColorPickerContent.qml:251, Modules/ColorPicker/ColorPickerContent.qml:325, Modules/ColorPicker/ColorPickerContent.qml:338, Modules/Notifications/NotificationActions.qml:70, Modules/Settings/DesktopWidgetTab.qml:160, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:228, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:257",
     "comment": "Copy to clipboard",
     "tags": [
       "settings",
+      "shell"
+    ]
+  },
+  {
+    "term": "Copy %1",
+    "context": "Copy %1",
+    "reference": "Modules/ControlCenter/Widgets/ColorPickerTile.qml:49",
+    "comment": "%1 is a color value",
+    "tags": [
       "shell"
     ]
   },
@@ -7738,8 +7766,17 @@
   {
     "term": "Dock",
     "context": "Dock",
-    "reference": "Common/SettingsData.qml:2388, Common/SettingsData.qml:2391, Common/SettingsTabs.qml:155, Modals/Greeter/GreeterCompletePage.qml:436, Modules/Notepad/NotepadTextEditor.qml:920",
+    "reference": "Common/SettingsData.qml:2388, Common/SettingsTabs.qml:155, Modals/Greeter/GreeterCompletePage.qml:436, Modules/Notepad/NotepadTextEditor.qml:920",
     "comment": "greeter settings link",
+    "tags": [
+      "shell"
+    ]
+  },
+  {
+    "term": "Dock %1",
+    "context": "Dock %1",
+    "reference": "Common/SettingsData.qml:2391",
+    "comment": "generated dock name, %1 is a number",
     "tags": [
       "shell"
     ]
@@ -8106,6 +8143,15 @@
     "comment": "",
     "tags": [
       "shell"
+    ]
+  },
+  {
+    "term": "Dux Greeter docs",
+    "context": "Dux Greeter docs",
+    "reference": "Modules/Settings/GreeterTab.qml:475",
+    "comment": "link text",
+    "tags": [
+      "settings"
     ]
   },
   {
@@ -8539,10 +8585,10 @@
     ]
   },
   {
-    "term": "Enter PIN for ",
-    "context": "Enter PIN for ",
+    "term": "Enter PIN for %1",
+    "context": "Enter PIN for %1",
     "reference": "Modals/BluetoothPairingModal.qml:132, Modals/WifiPasswordModal.qml:318",
-    "comment": "",
+    "comment": "%1 is the device or network name",
     "tags": [
       "shell"
     ]
@@ -8566,10 +8612,10 @@
     ]
   },
   {
-    "term": "Enter credentials for ",
-    "context": "Enter credentials for ",
+    "term": "Enter credentials for %1",
+    "context": "Enter credentials for %1",
     "reference": "Modals/WifiPasswordModal.qml:322, Modals/WifiPasswordModal.qml:327",
-    "comment": "",
+    "comment": "%1 is the network name",
     "tags": [
       "shell"
     ]
@@ -8611,19 +8657,19 @@
     ]
   },
   {
-    "term": "Enter passkey for ",
-    "context": "Enter passkey for ",
+    "term": "Enter passkey for %1",
+    "context": "Enter passkey for %1",
     "reference": "Modals/BluetoothPairingModal.qml:134",
-    "comment": "",
+    "comment": "%1 is the device name",
     "tags": [
       "shell"
     ]
   },
   {
-    "term": "Enter password for ",
-    "context": "Enter password for ",
+    "term": "Enter password for %1",
+    "context": "Enter password for %1",
     "reference": "Modals/WifiPasswordModal.qml:324, Modals/WifiPasswordModal.qml:327",
-    "comment": "",
+    "comment": "%1 is the network name",
     "tags": [
       "shell"
     ]
@@ -8638,10 +8684,10 @@
     ]
   },
   {
-    "term": "Enter this passkey on ",
-    "context": "Enter this passkey on ",
+    "term": "Enter this passkey on %1",
+    "context": "Enter this passkey on %1",
     "reference": "Modals/BluetoothPairingModal.qml:128",
-    "comment": "",
+    "comment": "%1 is the device name",
     "tags": [
       "shell"
     ]
@@ -9265,7 +9311,7 @@
   {
     "term": "Failed to enable plugin: %1",
     "context": "Failed to enable plugin: %1",
-    "reference": "Services/PluginService.qml:1523, Modules/Settings/PluginSettingsPage.qml:81, Modules/Settings/PluginsHubHeader.qml:282",
+    "reference": "Services/PluginService.qml:1525, Modules/Settings/PluginSettingsPage.qml:81, Modules/Settings/PluginsHubHeader.qml:282",
     "comment": "plugin error message, %1 is the plugin name or id",
     "tags": [
       "settings",
@@ -10902,10 +10948,18 @@
   {
     "term": "GPU",
     "context": "GPU",
-    "reference": "Modules/ProcessList/ProcessSystemHeader.qml:28, Modules/ProcessList/ProcessSystemHeader.qml:29, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:63, Modules/Settings/BarWidgetOptions/SystemMonitorOptions.qml:50",
+    "reference": "Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:63, Modules/Settings/BarWidgetOptions/SystemMonitorOptions.qml:50",
     "comment": "",
     "tags": [
-      "settings",
+      "settings"
+    ]
+  },
+  {
+    "term": "GPU %1",
+    "context": "GPU %1",
+    "reference": "Modules/ProcessList/ProcessSystemHeader.qml:28, Modules/ProcessList/ProcessSystemHeader.qml:29",
+    "comment": "%1 is a temperature",
+    "tags": [
       "shell"
     ]
   },
@@ -10976,8 +11030,17 @@
   {
     "term": "Gamma",
     "context": "Gamma",
-    "reference": "Modules/Settings/GammaControlTab.qml:80, Modules/Settings/DisplayConfig/ICCProfileInfoModal.qml:27",
-    "comment": "Gamma",
+    "reference": "Modules/Settings/GammaControlTab.qml:80",
+    "comment": "",
+    "tags": [
+      "settings"
+    ]
+  },
+  {
+    "term": "Gamma %1",
+    "context": "Gamma %1",
+    "reference": "Modules/Settings/DisplayConfig/ICCProfileInfoModal.qml:27",
+    "comment": "%1 is a gamma value",
     "tags": [
       "settings"
     ]
@@ -11456,10 +11519,19 @@
   {
     "term": "Health",
     "context": "Health",
-    "reference": "Modules/Settings/BatteryTab.qml:200, Modules/DBar/Popouts/BatteryPopoutContent.qml:25, Modules/DBar/Popouts/BatteryPopoutContent.qml:133, Modules/DDash/Overview/BatteryCard.qml:19",
+    "reference": "Modules/Settings/BatteryTab.qml:200, Modules/DBar/Popouts/BatteryPopoutContent.qml:25, Modules/DBar/Popouts/BatteryPopoutContent.qml:133",
     "comment": "noun, battery health percentage label",
     "tags": [
       "settings",
+      "shell"
+    ]
+  },
+  {
+    "term": "Health %1",
+    "context": "Health %1",
+    "reference": "Modules/DDash/Overview/BatteryCard.qml:19",
+    "comment": "battery health, %1 is a percentage",
+    "tags": [
       "shell"
     ]
   },
@@ -12877,7 +12949,7 @@
   {
     "term": "Install failed: %1",
     "context": "Install failed: %1",
-    "reference": "Services/PluginService.qml:1573, Modules/Settings/ThemeBrowser.qml:159",
+    "reference": "Services/PluginService.qml:1575, Modules/Settings/ThemeBrowser.qml:159",
     "comment": "installation error",
     "tags": [
       "settings",
@@ -12939,10 +13011,10 @@
     ]
   },
   {
-    "term": "Installation and PAM setup are documented in the ",
-    "context": "Installation and PAM setup are documented in the ",
+    "term": "Installation and PAM setup are documented in the %1.",
+    "context": "Installation and PAM setup are documented in the %1.",
     "reference": "Modules/Settings/GreeterTab.qml:475",
-    "comment": "",
+    "comment": "%1 is a link to the greeter docs",
     "tags": [
       "settings"
     ]
@@ -12977,7 +13049,7 @@
   {
     "term": "Installed plugin could not be loaded: %1",
     "context": "Installed plugin could not be loaded: %1",
-    "reference": "Services/PluginService.qml:1539",
+    "reference": "Services/PluginService.qml:1541",
     "comment": "plugin manifest unavailable after installation",
     "tags": [
       "shell"
@@ -15485,6 +15557,15 @@
     "comment": "hub group of rarely used pages",
     "tags": [
       "settings",
+      "shell"
+    ]
+  },
+  {
+    "term": "More in %1",
+    "context": "More in %1",
+    "reference": "Modals/Changelog/ChangelogContent.qml:191",
+    "comment": "changelog card title, %1 is a version",
+    "tags": [
       "shell"
     ]
   },
@@ -18065,7 +18146,7 @@
   {
     "term": "Opening GitHub to remove the upvote",
     "context": "Opening GitHub to remove the upvote",
-    "reference": "Services/PluginService.qml:1483",
+    "reference": "Services/PluginService.qml:1485",
     "comment": "plugin upvote toast, shown when the GitHub CLI is missing or signed out",
     "tags": [
       "shell"
@@ -18074,17 +18155,17 @@
   {
     "term": "Opening GitHub to upvote",
     "context": "Opening GitHub to upvote",
-    "reference": "Services/PluginService.qml:1497",
+    "reference": "Services/PluginService.qml:1499",
     "comment": "plugin upvote toast, shown when the GitHub CLI is missing or signed out",
     "tags": [
       "shell"
     ]
   },
   {
-    "term": "Opening terminal: ",
-    "context": "Opening terminal: ",
+    "term": "Opening terminal: %1",
+    "context": "Opening terminal: %1",
     "reference": "Modules/Settings/GreeterTab.qml:157",
-    "comment": "",
+    "comment": "%1 is the action name",
     "tags": [
       "settings"
     ]
@@ -18528,8 +18609,17 @@
   {
     "term": "PID",
     "context": "PID",
-    "reference": "Modules/ProcessList/ProcessesView.qml:309, Modules/ProcessList/ProcessContextMenu.qml:212, Modules/DBar/Widgets/FocusedWindowContextMenu.qml:198",
+    "reference": "Modules/ProcessList/ProcessesView.qml:309, Modules/DBar/Widgets/FocusedWindowContextMenu.qml:198",
     "comment": "Label for the process ID row in the focused window popout",
+    "tags": [
+      "shell"
+    ]
+  },
+  {
+    "term": "PID %1",
+    "context": "PID %1",
+    "reference": "Modules/ProcessList/ProcessContextMenu.qml:212",
+    "comment": "%1 is a process id",
     "tags": [
       "shell"
     ]
@@ -19171,10 +19261,10 @@
     ]
   },
   {
-    "term": "Playback error: ",
-    "context": "Playback error: ",
+    "term": "Playback error: %1",
+    "context": "Playback error: %1",
     "reference": "Modules/Lock/VideoScreensaver.qml:39",
-    "comment": "",
+    "comment": "%1 is the player error text",
     "tags": [
       "shell"
     ]
@@ -19272,9 +19362,18 @@
     ]
   },
   {
+    "term": "Plugin authors",
+    "context": "Plugin authors",
+    "reference": "Modals/Changelog/ChangelogContent.qml:261",
+    "comment": "changelog section heading",
+    "tags": [
+      "shell"
+    ]
+  },
+  {
     "term": "Plugin dependency missing",
     "context": "Plugin dependency missing",
-    "reference": "Services/PluginService.qml:907",
+    "reference": "Services/PluginService.qml:908",
     "comment": "",
     "tags": [
       "shell"
@@ -21198,10 +21297,10 @@
     ]
   },
   {
-    "term": "Required plugin: ",
-    "context": "Required plugin: ",
+    "term": "Required plugin: %1",
+    "context": "Required plugin: %1",
     "reference": "Modules/Settings/ThemeAppsTab.qml:416",
-    "comment": "",
+    "comment": "%1 is a repository URL",
     "tags": [
       "settings"
     ]
@@ -21237,7 +21336,7 @@
   {
     "term": "Requires DMS %1",
     "context": "Requires DMS %1",
-    "reference": "Services/PluginService.qml:486, Modules/Settings/PluginSettingsPage.qml:178, Modules/Settings/PluginUpdatesDialog.qml:115",
+    "reference": "Services/PluginService.qml:487, Modules/Settings/PluginSettingsPage.qml:178, Modules/Settings/PluginUpdatesDialog.qml:115",
     "comment": "plugin incompatibility notice, %1 is the required DMS version",
     "tags": [
       "settings",
@@ -25336,19 +25435,10 @@
     ]
   },
   {
-    "term": "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.",
-    "context": "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.",
-    "reference": "Common/settings/Processes.qml:536",
-    "comment": "",
-    "tags": [
-      "shell"
-    ]
-  },
-  {
     "term": "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.",
     "context": "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.",
-    "reference": "Services/GreeterService.qml:232, Services/GreeterService.qml:254",
-    "comment": "greeter sync status, %1 is a dms-greeter command",
+    "reference": "Services/GreeterService.qml:232, Services/GreeterService.qml:254, Common/settings/Processes.qml:536",
+    "comment": "terminal fallback status, %1 is a command",
     "tags": [
       "shell"
     ]
@@ -27415,7 +27505,7 @@
   {
     "term": "Upvote removed",
     "context": "Upvote removed",
-    "reference": "Services/PluginService.qml:1488",
+    "reference": "Services/PluginService.qml:1490",
     "comment": "plugin upvote toast",
     "tags": [
       "shell"
@@ -27424,7 +27514,7 @@
   {
     "term": "Upvoted on GitHub",
     "context": "Upvoted on GitHub",
-    "reference": "Services/PluginService.qml:1503",
+    "reference": "Services/PluginService.qml:1505",
     "comment": "plugin upvote toast",
     "tags": [
       "shell"
@@ -28475,10 +28565,10 @@
     ]
   },
   {
-    "term": "WiFi QR code for ",
-    "context": "WiFi QR code for ",
+    "term": "WiFi QR code for %1",
+    "context": "WiFi QR code for %1",
     "reference": "Modals/WifiQRCodeModal.qml:107",
-    "comment": "",
+    "comment": "%1 is the network name",
     "tags": [
       "shell"
     ]
@@ -29128,7 +29218,7 @@
   {
     "term": "broken",
     "context": "broken",
-    "reference": "Services/PluginService.qml:1326",
+    "reference": "Services/PluginService.qml:1328",
     "comment": "plugin status",
     "tags": [
       "shell"
@@ -29195,7 +29285,7 @@
   {
     "term": "deprecated",
     "context": "deprecated",
-    "reference": "Services/PluginService.qml:1330",
+    "reference": "Services/PluginService.qml:1332",
     "comment": "plugin status",
     "tags": [
       "shell"
@@ -29330,7 +29420,7 @@
   {
     "term": "featured",
     "context": "featured",
-    "reference": "Services/PluginService.qml:1361, Modules/Settings/DesktopWidgetBrowser.qml:86",
+    "reference": "Services/PluginService.qml:1363, Modules/Settings/DesktopWidgetBrowser.qml:86",
     "comment": "adjective, lowercase plugin badge",
     "tags": [
       "settings",
@@ -29448,7 +29538,7 @@
   {
     "term": "new",
     "context": "new",
-    "reference": "Services/PluginService.qml:1380",
+    "reference": "Services/PluginService.qml:1382",
     "comment": "adjective, lowercase plugin badge, recently added",
     "tags": [
       "shell"
@@ -29511,7 +29601,7 @@
   {
     "term": "official",
     "context": "official",
-    "reference": "Services/PluginService.qml:1367, Modules/Settings/PluginsManageTab.qml:146",
+    "reference": "Services/PluginService.qml:1369, Modules/Settings/PluginsManageTab.qml:146",
     "comment": "adjective, lowercase first party plugin or registry badge",
     "tags": [
       "settings",
@@ -29523,15 +29613,6 @@
     "context": "power-profiles-daemon not available",
     "reference": "Modals/PowerProfileModal.qml:122, Modules/DBar/Popouts/BatteryPopoutContent.qml:61, Modules/DBar/Popouts/BatteryPopoutContent.qml:102, Modules/DBar/Widgets/Battery.qml:304",
     "comment": "",
-    "tags": [
-      "shell"
-    ]
-  },
-  {
-    "term": "procs",
-    "context": "procs",
-    "reference": "Modules/ProcessList/ProcessSystemHeader.qml:18",
-    "comment": "short for processes",
     "tags": [
       "shell"
     ]
@@ -29593,7 +29674,7 @@
   {
     "term": "reviewed",
     "context": "reviewed",
-    "reference": "Services/PluginService.qml:1332",
+    "reference": "Services/PluginService.qml:1334",
     "comment": "plugin status",
     "tags": [
       "shell"
@@ -29647,7 +29728,7 @@
   {
     "term": "unmaintained",
     "context": "unmaintained",
-    "reference": "Services/PluginService.qml:1328",
+    "reference": "Services/PluginService.qml:1330",
     "comment": "plugin status",
     "tags": [
       "shell"
@@ -29674,7 +29755,7 @@
   {
     "term": "updated",
     "context": "updated",
-    "reference": "Services/PluginService.qml:1380",
+    "reference": "Services/PluginService.qml:1382",
     "comment": "adjective, lowercase plugin badge, recently updated",
     "tags": [
       "shell"

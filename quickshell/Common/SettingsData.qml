@@ -2389,7 +2389,7 @@ Singleton {
         let name = I18n.tr("Dock");
         let number = 2;
         while (dockConfigs.some(config => config.name === name))
-            name = I18n.tr("Dock") + " " + number++;
+            name = I18n.tr("Dock %1", "generated dock name, %1 is a number").arg(number++);
         const config = DockConfig.create(id, name);
         const edge = firstFreeDockEdge(id, config.screenPreferences);
         config.enabled = edge >= 0;

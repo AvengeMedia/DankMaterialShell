@@ -191,6 +191,9 @@
   "%1 printers": {
     "%1 printers": "%1 프린터"
   },
+  "%1 procs": {
+    "%1 procs": ""
+  },
   "%1 second": {
     "%1 second": "%1초"
   },
@@ -250,6 +253,9 @@
   },
   "(Unnamed)": {
     "(Unnamed)": "(이름 없음)"
+  },
+  "(exit %1)": {
+    "(exit %1)": ""
   },
   "+ %1 more": {
     "+ %1 more": "+ %1개 더"
@@ -860,11 +866,11 @@
   "Authorize": {
     "Authorize": "권한 부여"
   },
-  "Authorize pairing with ": {
-    "Authorize pairing with ": "페어링 권한 부여:"
+  "Authorize pairing with %1": {
+    "Authorize pairing with %1": ""
   },
-  "Authorize service for ": {
-    "Authorize service for ": "서비스 권한 부여:"
+  "Authorize service for %1": {
+    "Authorize service for %1": ""
   },
   "Auto": {
     "Auto": "자동"
@@ -1763,8 +1769,8 @@
   "Confirm Display Changes": {
     "Confirm Display Changes": "디스플레이 변경 사항 확인"
   },
-  "Confirm passkey for ": {
-    "Confirm passkey for ": "패스키 확인 대상:"
+  "Confirm passkey for %1": {
+    "Confirm passkey for %1": ""
   },
   "Confirm password": {
     "Confirm password": "비밀번호 확인"
@@ -1858,6 +1864,9 @@
   },
   "Copy": {
     "Copy": "복사"
+  },
+  "Copy %1": {
+    "Copy %1": ""
   },
   "Copy Full Command": {
     "Copy Full Command": "전체 명령어 복사"
@@ -2495,6 +2504,9 @@
   "Dock": {
     "Dock": "독"
   },
+  "Dock %1": {
+    "Dock %1": ""
+  },
   "Dock margin, opacity, and border": {
     "Dock margin, opacity, and border": "독 여백, 불투명도 및 테두리"
   },
@@ -2602,6 +2614,18 @@
   },
   "Dusk (Nautical Twilight)": {
     "Dusk (Nautical Twilight)": "해 질 녘 (항해 박명)"
+  },
+  "Dux Calendar": {
+    "Dux Calendar": ""
+  },
+  "Dux Calendar isn't installed": {
+    "Dux Calendar isn't installed": ""
+  },
+  "Dux Calendar isn't running": {
+    "Dux Calendar isn't running": ""
+  },
+  "Dux Greeter docs": {
+    "Dux Greeter docs": ""
   },
   "Dwindle": {
     "Dwindle": "드윈들"
@@ -2741,8 +2765,8 @@
   "Enter PIN": {
     "Enter PIN": "PIN 입력"
   },
-  "Enter PIN for ": {
-    "Enter PIN for ": "PIN 입력:"
+  "Enter PIN for %1": {
+    "Enter PIN for %1": ""
   },
   "Enter a new name for session \"%1": {
     "Enter a new name for session \"%1\"": "세션 \"%1\"의 새 이름을 입력하세요"
@@ -2750,8 +2774,8 @@
   "Enter a new name for this workspace": {
     "Enter a new name for this workspace": "이 작업 공간의 새 이름 입력"
   },
-  "Enter credentials for ": {
-    "Enter credentials for ": "자격 증명 입력:"
+  "Enter credentials for %1": {
+    "Enter credentials for %1": ""
   },
   "Enter custom lock screen format (e.g., dddd, MMMM d)": {
     "Enter custom lock screen format (e.g., dddd, MMMM d)": "사용자 지정 잠금 화면 형식 입력 (예: dddd, MMMM d)"
@@ -2765,17 +2789,17 @@
   "Enter network name and password": {
     "Enter network name and password": "네트워크 이름 및 비밀번호 입력"
   },
-  "Enter passkey for ": {
-    "Enter passkey for ": "패스키 입력:"
+  "Enter passkey for %1": {
+    "Enter passkey for %1": ""
   },
-  "Enter password for ": {
-    "Enter password for ": "비밀번호 입력:"
+  "Enter password for %1": {
+    "Enter password for %1": ""
   },
   "Enter text to encode": {
     "Enter text to encode": "인코딩할 텍스트를 입력하세요"
   },
-  "Enter this passkey on ": {
-    "Enter this passkey on ": "이 패스키를 입력할 곳:"
+  "Enter this passkey on %1": {
+    "Enter this passkey on %1": ""
   },
   "Enter to paste": {
     "Enter to paste": "Enter 키로 붙여넣기"
@@ -3521,6 +3545,9 @@
   "GPU": {
     "GPU": "GPU"
   },
+  "GPU %1": {
+    "GPU %1": ""
+  },
   "GPU Monitoring": {
     "GPU Monitoring": "GPU 모니터링"
   },
@@ -3544,6 +3571,9 @@
   },
   "Gamma": {
     "Gamma": "감마"
+  },
+  "Gamma %1": {
+    "Gamma %1": ""
   },
   "Gamma control": {
     "Gamma control": "감마 제어"
@@ -3703,6 +3733,9 @@
   },
   "Health": {
     "Health": "수명"
+  },
+  "Health %1": {
+    "Health %1": ""
   },
   "Heat shimmer": {
     "Heat shimmer": ""
@@ -4169,8 +4202,8 @@
   "Install wallpaper '%1'?": {
     "Install wallpaper '%1'?": ""
   },
-  "Installation and PAM setup are documented in the ": {
-    "Installation and PAM setup are documented in the ": "설치 및 PAM 설정은 다음 문서에서 확인할 수 있습니다: "
+  "Installation and PAM setup are documented in the %1.": {
+    "Installation and PAM setup are documented in the %1.": ""
   },
   "Installed": {
     "Installed": "설치됨"
@@ -4990,6 +5023,9 @@
   },
   "More": {
     "More": "더 보기"
+  },
+  "More in %1": {
+    "More in %1": ""
   },
   "More samples look smoother and cost more GPU": {
     "More samples look smoother and cost more GPU": ""
@@ -5828,8 +5864,8 @@
   "Opening GitHub to upvote": {
     "Opening GitHub to upvote": ""
   },
-  "Opening terminal: ": {
-    "Opening terminal: ": "터미널 여는 중:"
+  "Opening terminal: %1": {
+    "Opening terminal: %1": ""
   },
   "Opens": {
     "Opens": "열기 방식"
@@ -5974,6 +6010,9 @@
   },
   "PID": {
     "PID": "PID"
+  },
+  "PID %1": {
+    "PID %1": ""
   },
   "PIN": {
     "PIN": "PIN"
@@ -6182,8 +6221,8 @@
   "Playback": {
     "Playback": "재생"
   },
-  "Playback error: ": {
-    "Playback error: ": "재생 오류:"
+  "Playback error: %1": {
+    "Playback error: %1": ""
   },
   "Playback position": {
     "Playback position": "재생 위치"
@@ -6214,6 +6253,9 @@
   },
   "Plugin Source Code": {
     "Plugin Source Code": ""
+  },
+  "Plugin authors": {
+    "Plugin authors": ""
   },
   "Plugin dependency missing": {
     "Plugin dependency missing": "플러그인 종속성 누락됨"
@@ -6827,8 +6869,8 @@
   "Report": {
     "Report": "보고서"
   },
-  "Required plugin: ": {
-    "Required plugin: ": "필수 플러그인:"
+  "Required plugin: %1": {
+    "Required plugin: %1": ""
   },
   "Requires %1": {
     "Requires %1": "%1 필요"
@@ -8144,9 +8186,6 @@
   "Terminal additional parameters": {
     "Terminal additional parameters": "터미널 추가 매개변수"
   },
-  "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
-    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "터미널 대체를 실패했습니다. 지원되는 터미널 에뮬레이터를 설치하거나 'dms auth sync'를 수동으로 실행하세요."
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run '%1' manually.": ""
   },
@@ -9167,8 +9206,8 @@
   "Wi-Fi, Ethernet, VPN": {
     "Wi-Fi, Ethernet, VPN": ""
   },
-  "WiFi QR code for ": {
-    "WiFi QR code for ": "WiFi QR 코드:"
+  "WiFi QR code for %1": {
+    "WiFi QR code for %1": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "WiFi 비활성화됨"
@@ -9547,9 +9586,6 @@
   },
   "primary network connection label": {
     "Primary": "기본"
-  },
-  "procs": {
-    "procs": "프로세스"
   },
   "pt": {
     "pt": "pt"

@@ -188,7 +188,7 @@ Column {
     }
 
     SettingsCard {
-        title: "More in " + ChangelogService.currentVersion
+        title: I18n.tr("More in %1", "changelog card title, %1 is a version").arg(ChangelogService.currentVersion)
 
         Repeater {
             model: root.additions
@@ -258,7 +258,7 @@ Column {
 
                 StyledText {
                     width: parent.width
-                    text: "Plugin authors"
+                    text: I18n.tr("Plugin authors", "changelog section heading")
                     font.pixelSize: Theme.fontSizeLarge
                     font.weight: Theme.fontWeightBold
                     color: Theme.onTertiaryContainer

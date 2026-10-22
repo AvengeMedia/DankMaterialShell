@@ -154,7 +154,7 @@ Item {
     }
 
     function runGreeterInstallAction() {
-        greeterStatusText = I18n.tr("Opening terminal: ") + I18n.tr("Activate") + "...";
+        greeterStatusText = I18n.tr("Opening terminal: %1", "%1 is the action name").arg(I18n.tr("Activate")) + "...";
         greeterInstallActionRunning = true;
         greeterInstallActionProcess.running = true;
     }
@@ -223,7 +223,7 @@ Item {
                     root.greeterStatusText = root.greeterStatusText + "\n\nstderr:\n" + err;
                 return;
             }
-            var failure = I18n.tr("Failed to run '%1'. Ensure the %2 package is installed.", "greeter status error, %1 is a command, %2 a package name").arg("dms-greeter status").arg("dms-greeter") + " (exit " + exitCode + ")";
+            var failure = I18n.tr("Failed to run '%1'. Ensure the %2 package is installed.", "greeter status error, %1 is a command, %2 a package name").arg("dms-greeter status").arg("dms-greeter") + " " + I18n.tr("(exit %1)", "process exit code").arg(exitCode);
             if (out !== "")
                 failure = failure + "\n\n" + out;
             if (err !== "")
@@ -249,7 +249,7 @@ Item {
             root.greeterInstallActionRunning = false;
             root.checkGreeterInstallState();
             if (exitCode !== 0) {
-                root.greeterStatusText = I18n.tr("Action failed or terminal was closed.") + " (exit " + exitCode + ")";
+                root.greeterStatusText = I18n.tr("Action failed or terminal was closed.") + " " + I18n.tr("(exit %1)", "process exit code").arg(exitCode);
                 return;
             }
             root.greeterStatusText = I18n.tr("Greeter activated. greetd is now enabled.");
@@ -472,7 +472,7 @@ Item {
 
             SettingsRow {
                 body: StyledText {
-                    text: I18n.tr("Installation and PAM setup are documented in the ") + "<a href=\"" + Site.docs + "/dms-greeter/installation\" style=\"text-decoration:none; color:" + Theme.primary + ";\">Dux Greeter docs.</a> "
+                    text: I18n.tr("Installation and PAM setup are documented in the %1.", "%1 is a link to the greeter docs").arg("<a href=\"" + Site.docs + "/dms-greeter/installation\" style=\"text-decoration:none; color:" + Theme.primary + ";\">" + I18n.tr("Dux Greeter docs", "link text") + "</a>")
                     textFormat: Text.RichText
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
