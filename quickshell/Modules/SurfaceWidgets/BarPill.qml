@@ -342,7 +342,7 @@ Item {
     }
 
     property var _blurRegisteredWindow: null
-    readonly property var _blurTargetWindow: BlurService.enabled && !!blurBarWindow && !!blurBarWindow.registerBlurWidget && !root.noBackground && root.visible && root.width > 0 ? blurBarWindow : null
+    readonly property var _blurTargetWindow: BlurService.enabled && !!blurBarWindow && !!blurBarWindow.registerBlurWidget && !root.noBackground && root.visible && root.width > 0 && root.height > 0 ? blurBarWindow : null
 
     on_BlurTargetWindowChanged: _updateBlurRegistration()
 
