@@ -11,6 +11,7 @@ import (
 
 	"github.com/duxlabs-dev/dux-go/ipc"
 	"github.com/duxlabs-dev/dux-go/syncmap"
+	"github.com/duxlabs-dev/dux-shell/core/internal/clipolicy"
 	"github.com/duxlabs-dev/dux-shell/core/internal/geolocation"
 	"github.com/duxlabs-dev/dux-shell/core/internal/log"
 	"github.com/duxlabs-dev/dux-shell/core/internal/matugen"
@@ -37,6 +38,7 @@ import (
 	"github.com/duxlabs-dev/dux-shell/core/internal/server/wlroutput"
 	"github.com/duxlabs-dev/dux-shell/core/internal/systemd"
 	"github.com/duxlabs-dev/dux-shell/core/internal/utils"
+	"github.com/spf13/afero"
 )
 
 const APIVersion = 38
@@ -108,7 +110,12 @@ func InitializeNetworkManager() error {
 }
 
 func InitializeLoginctlManager() error {
-	manager, err := loginctl.NewManager()
+	keepLockOnUnlock, err := clipolicy.LogindUnlockDisabled(afero.NewOsFs())
+	if err != nil {
+		log.Errorf("CLI policy unreadable, keeping locks through logind Unlock: %v", err)
+		keepLockOnUnlock = true
+	}
+	manager, err := loginctl.NewManager(keepLockOnUnlock)
 	if err != nil {
 		log.Warnf("Failed to initialize loginctl manager: %v", err)
 		return err

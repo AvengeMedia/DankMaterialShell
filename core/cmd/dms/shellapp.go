@@ -9,12 +9,14 @@ import (
 	"strings"
 
 	"github.com/duxlabs-dev/dux-go/shellapp"
+	"github.com/duxlabs-dev/dux-shell/core/internal/clipolicy"
 	"github.com/duxlabs-dev/dux-shell/core/internal/config"
 	"github.com/duxlabs-dev/dux-shell/core/internal/gpu"
 	"github.com/duxlabs-dev/dux-shell/core/internal/log"
 	"github.com/duxlabs-dev/dux-shell/core/internal/server"
 	"github.com/duxlabs-dev/dux-shell/core/internal/shellembed"
 	"github.com/duxlabs-dev/dux-shell/core/internal/utils"
+	"github.com/spf13/afero"
 )
 
 var shellApp = shellapp.New(shellapp.Config{
@@ -121,6 +123,11 @@ func dmsExtraEnv(string) []string {
 		env = append(env, "MALLOC_CONF=thp:never,narenas:4,dirty_decay_ms:3000")
 	}
 	env = append(env, gpu.EGLVendorEnv()...)
+	policyEnv, err := clipolicy.ShellEnv(afero.NewOsFs())
+	if err != nil {
+		log.Errorf("CLI policy unreadable, enforcing every shell switch: %v", err)
+	}
+	env = append(env, policyEnv...)
 	// systemd user services miss the login shell PATH, so tools in ~/.local/bin
 	// (herdr, pip/cargo installs) would be invisible to the shell and its children.
 	for _, entry := range utils.EnvWithUserBinPath(nil) {

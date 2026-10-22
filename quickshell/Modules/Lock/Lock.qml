@@ -220,6 +220,8 @@ Scope {
 
         function onSessionUnlocked() {
             customLockerSpawned = false;
+            if (AdminPolicy.disableLogindUnlock)
+                return;
             if (pendingLock) {
                 pendingLock = false;
                 lockInitiatedLocally = false;
@@ -412,14 +414,20 @@ Scope {
         }
 
         function unlock() {
+            if (AdminPolicy.disableLockIpcUnlock)
+                return;
             root.unlock();
         }
 
         function forceReset() {
+            if (AdminPolicy.disableLockIpcUnlock)
+                return;
             root.forceReset();
         }
 
         function demo() {
+            if (AdminPolicy.disableLockIpcUnlock)
+                return;
             demoWindow.showDemo();
         }
 

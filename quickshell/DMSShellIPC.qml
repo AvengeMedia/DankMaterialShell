@@ -1102,6 +1102,8 @@ Item {
         }
 
         function set(key: string, value: string): string {
+            if (AdminPolicy.disableSettingsIpcSet)
+                return "SETTINGS_SET_DISABLED";
             if (!(key in SettingsData)) {
                 log.warn("Cannot set property, not found:", key);
                 return "SETTINGS_INVALID_KEY";
