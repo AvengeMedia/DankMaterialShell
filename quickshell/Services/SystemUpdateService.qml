@@ -89,7 +89,7 @@ Singleton {
         if (!pkg)
             return false;
         if (pkgManager === "shelly")
-            return pkg.repo === "flatpak";
+            return pkg.repo === "flatpak" || pkg.repo === "homebrew";
         return systemHoldsAllowed || pkg.repo !== "system";
     }
 
@@ -125,6 +125,9 @@ Singleton {
             root._refilter();
         }
         function onUpdaterIncludeFlatpakChanged() {
+            root._refilter();
+        }
+        function onUpdaterIncludeHomebrewChanged() {
             root._refilter();
         }
         function onUpdaterIgnoredPackagesChanged() {
@@ -279,6 +282,8 @@ Singleton {
             if (!SettingsData.updaterAllowAUR && p.repo === "aur")
                 return false;
             if (!SettingsData.updaterIncludeFlatpak && p.repo === "flatpak")
+                return false;
+            if (!SettingsData.updaterIncludeHomebrew && p.repo === "homebrew")
                 return false;
             if (!canIgnorePackage(p))
                 return true;
