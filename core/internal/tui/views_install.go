@@ -197,7 +197,7 @@ func (m Model) troubleshootingHints() (autostart, logs string) {
 		case deps.WindowManagerHyprland:
 			autostart = `remove hl.exec_cmd("dms run") from ~/.config/hypr/hyprland.lua`
 		default:
-			autostart = "remove '" + mangoconf.Detect().Key("exec_once") + "=dms run' from ~/.config/mango/config.conf"
+			autostart = "remove 'exec_once=dms run' from ~/.config/mango/config.conf"
 		}
 		return autostart, logs
 	}
@@ -206,7 +206,7 @@ func (m Model) troubleshootingHints() (autostart, logs string) {
 		if mangoconf.SessionTargetInstalled() {
 			return "rm ~/.config/systemd/user/mango-session.target.wants/dms.service", "journalctl --user -u dms"
 		}
-		return "remove '" + mangoconf.Detect().Key("exec_once") + "=dms run' from ~/.config/mango/config.conf", "qs -p ~/.config/quickshell/dms log"
+		return "remove 'exec_once=dms run' from ~/.config/mango/config.conf", "qs -p ~/.config/quickshell/dms log"
 	}
 	return "systemctl --user disable dms", "journalctl --user -u dms"
 }

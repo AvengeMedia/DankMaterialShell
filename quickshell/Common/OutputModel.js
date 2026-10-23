@@ -420,7 +420,7 @@ function parseMangoOutputs(content) {
     const result = {};
     for (const line of content.split("\n")) {
         const trimmed = line.trim();
-        const match = trimmed.match(/^(?:monitorrule|monitor_rule)\s*=\s*(.*)$/);
+        const match = trimmed.match(/^monitor_rule\s*=\s*(.*)$/);
         if (!match)
             continue;
         const entry = parseMangoRule(match[1]);
@@ -445,10 +445,10 @@ function mangoRuleFields(rule) {
 
 // Mango applies only the first matching monitor rule and resets hdr/icc/disable a rule omits,
 // so unmodeled fields of every existing rule for an output are carried into DMS's rule, first one winning.
-function mangoMonitorRuleLines(outputsData, existingText, snakeKeys) {
+function mangoMonitorRuleLines(outputsData, existingText) {
     const carried = {};
     for (const line of (existingText || "").split("\n")) {
-        const match = line.trim().match(/^(?:monitorrule|monitor_rule)\s*=\s*(.*)$/);
+        const match = line.trim().match(/^monitor_rule\s*=\s*(.*)$/);
         if (!match)
             continue;
         const fields = mangoRuleFields(match[1]);
@@ -496,7 +496,7 @@ function mangoMonitorRuleLines(outputsData, existingText, snakeKeys) {
         }
         if (output.enabled === false)
             fields.push("disable:1");
-        lines.push((snakeKeys ? "monitor_rule=" : "monitorrule=") + fields.join(","));
+        lines.push("monitor_rule=" + fields.join(","));
     }
     return lines;
 }

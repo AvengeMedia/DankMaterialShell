@@ -858,6 +858,14 @@ func checkWindowManagers() []checkResult {
 		if c.name == "Hyprland" {
 			results = append(results, checkHyprlandConfigFormat(filepath.Join(utils.XDGConfigHome(), "hypr"))...)
 		}
+		if c.name == "mangowc" && mangoLacksSnakeCase(ver) {
+			results = append(results, checkResult{
+				catCompositor, "Mango config format", statusError,
+				fmt.Sprintf("Mango %s is older than 0.18", ver),
+				"DMS writes Mango config with the snake_case keys of Mango 0.18 and later, which this release rejects; upgrade Mango",
+				doctorDocsURL + "#compositor-checks",
+			})
+		}
 	}
 
 	if !foundAny {
@@ -878,7 +886,7 @@ func checkWindowManagers() []checkResult {
 	}
 
 	if os.Getenv("MANGO_INSTANCE_SIGNATURE") != "" {
-		results = append(results, checkMangoConfig(mangoconf.Dir(), mangoconf.Detect())...)
+		results = append(results, checkMangoConfig(mangoconf.Dir())...)
 	}
 
 	results = append(results, checkCompositorBlurSupport())
@@ -886,32 +894,69 @@ func checkWindowManagers() []checkResult {
 	return results
 }
 
-var mangoLegacyOverviewBinds = regexp.MustCompile(`(?im)^\s*mousebind\s*=\s*none\s*,\s*(btn_left\s*,\s*toggleoverview\s*,\s*1|btn_right\s*,\s*killclient\s*,\s*0)\s*$`)
+var (
+	mangoLegacyOverviewBinds = regexp.MustCompile(`(?im)^\s*mousebind\s*=\s*none\s*,\s*(btn_left\s*,\s*toggleoverview\s*,\s*1|btn_right\s*,\s*killclient\s*,\s*0)\s*$`)
+	mangoUnknownKeyword      = regexp.MustCompile(`Unknown keyword:\s*(\S+)`)
+	ansiEscape               = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+)
 
-func checkMangoConfig(mangoDir string, dialect mangoconf.Dialect) []checkResult {
+// Mango's parser follows source= and always exits 0; only its output tells.
+var mangoParseConfig = func(path string) (string, error) {
+	if _, err := exec.LookPath("mango"); err != nil {
+		return "", err
+	}
+	out, _ := exec.Command("mango", "-p", "-c", path).CombinedOutput()
+	return string(out), nil
+}
+
+// Each "Unknown keyword" line is followed by a location line naming the file.
+func mangoUnknownKeywords(output string) []string {
+	var found []string
+	seen := map[string]bool{}
+	key := ""
+	for line := range strings.SplitSeq(ansiEscape.ReplaceAllString(output, ""), "\n") {
+		if m := mangoUnknownKeyword.FindStringSubmatch(line); m != nil {
+			key = m[1]
+			continue
+		}
+		slash := strings.LastIndex(line, "/")
+		if key == "" || slash < 0 {
+			continue
+		}
+		file, _, _ := strings.Cut(line[slash+1:], ":")
+		entry := key + " (" + file + ")"
+		if !seen[entry] {
+			seen[entry] = true
+			found = append(found, entry)
+		}
+		key = ""
+	}
+	return found
+}
+
+func checkMangoConfig(mangoDir string) []checkResult {
 	url := doctorDocsURL + "#compositor-checks"
-	paths, _ := filepath.Glob(filepath.Join(mangoDir, "dms", "*.conf"))
-	paths = append([]string{filepath.Join(mangoDir, "config.conf")}, paths...)
+	mainPath := filepath.Join(mangoDir, "config.conf")
+	var results []checkResult
+	if output, err := mangoParseConfig(mainPath); err == nil {
+		if unknown := mangoUnknownKeywords(output); len(unknown) > 0 {
+			results = append(results, checkResult{catCompositor, "Mango config keys", statusError,
+				"Unknown keys: " + strings.Join(unknown, ", "),
+				"Mango 0.18 renamed its config keys to snake_case. Run migrate-config-keys.sh from Mango's 0.18.0 release over ~/.config/mango, or rename the keys by hand.", url})
+		}
+	}
 
-	var stale, overviewBinds []string
+	paths, _ := filepath.Glob(filepath.Join(mangoDir, "dms", "*.conf"))
+	paths = append([]string{mainPath}, paths...)
+	var overviewBinds []string
 	for _, path := range paths {
 		data, err := os.ReadFile(path)
 		if err != nil {
 			continue
 		}
-		if dialect.Translate(string(data)) != string(data) {
-			stale = append(stale, filepath.Base(path))
-		}
 		if mangoLegacyOverviewBinds.Match(data) {
 			overviewBinds = append(overviewBinds, filepath.Base(path))
 		}
-	}
-
-	var results []checkResult
-	if len(stale) > 0 {
-		results = append(results, checkResult{catCompositor, "Mango config keys", statusError,
-			fmt.Sprintf("Not %s keys: %s", dialect, strings.Join(stale, ", ")),
-			"This Mango rejects those lines as unknown keywords. Run `dms config mango-migrate --main` (config.conf is backed up).", url})
 	}
 	if len(overviewBinds) > 0 {
 		results = append(results, checkResult{catCompositor, "Mango mouse binds", statusWarn,
@@ -965,6 +1010,10 @@ func checkHyprlandConfigFormat(hyprDir string) []checkResult {
 
 func hyprlandLacksLua(ver string) bool {
 	return ver != "" && version.CompareVersions(ver, "0.55.0") < 0
+}
+
+func mangoLacksSnakeCase(ver string) bool {
+	return ver != "" && version.CompareVersions(ver, "0.18.0") < 0
 }
 
 func firstSubmatch(re *regexp.Regexp) func(string) string {

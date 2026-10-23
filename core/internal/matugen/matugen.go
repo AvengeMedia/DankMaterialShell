@@ -20,7 +20,6 @@ import (
 
 	"github.com/duxlabs-dev/dux-shell/core/internal/dank16"
 	"github.com/duxlabs-dev/dux-shell/core/internal/log"
-	"github.com/duxlabs-dev/dux-shell/core/internal/mangoconf"
 	"github.com/duxlabs-dev/dux-shell/core/internal/utils"
 	"github.com/godbus/dbus/v5"
 	"github.com/lucasb-eyer/go-colorful"
@@ -44,7 +43,6 @@ const (
 	TemplateKindGTK
 	TemplateKindVSCode
 	TemplateKindEmacs
-	TemplateKindMango
 )
 
 type TemplateDef struct {
@@ -63,7 +61,7 @@ var templateRegistry = []TemplateDef{
 	{ID: "gtk", Kind: TemplateKindGTK, RunUnconditionally: true},
 	{ID: "niri", Commands: []string{"niri"}, ConfigFile: "niri.toml"},
 	{ID: "hyprland", Commands: []string{"Hyprland"}, ConfigFile: "hyprland.toml"},
-	{ID: "mangowc", Commands: []string{"mango"}, ConfigFile: "mangowc.toml", RequiredEnv: "MANGO_INSTANCE_SIGNATURE", Kind: TemplateKindMango},
+	{ID: "mangowc", Commands: []string{"mango"}, ConfigFile: "mangowc.toml", RequiredEnv: "MANGO_INSTANCE_SIGNATURE"},
 	{ID: "qt5ct", Commands: []string{"qt5ct"}, ConfigFile: "qt5ct.toml"},
 	{ID: "qt6ct", Commands: []string{"qt6ct"}, ConfigFile: "qt6ct.toml"},
 	{ID: "fcitx5", Commands: []string{"fcitx5"}, ConfigDirs: []string{"fcitx5"}, ConfigFile: "fcitx5.toml"},
@@ -725,12 +723,6 @@ output_path = '%s'
 			for _, editor := range vscodeEditors {
 				appendVSCodeConfig(cfgFile, editor.name, editor.extensionsDir(homeDir), opts.ShellDir)
 			}
-		case TemplateKindMango:
-			configFile := tmpl.ConfigFile
-			if mangoconf.Detect() == mangoconf.Snake {
-				configFile = "mangowc-snake.toml"
-			}
-			appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigDirs, configFile)
 		case TemplateKindEmacs:
 			if utils.EmacsConfigDir() != "" {
 				appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigDirs, tmpl.ConfigFile)

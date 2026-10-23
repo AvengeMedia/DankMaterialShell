@@ -739,7 +739,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
             }
 
             SettingsSliderRow {
-                tags: ["mangowc", "mango", "gaps", "override", "inner", "gappih", "gappiv"]
+                tags: ["mangowc", "mango", "gaps", "override", "inner", "gap_inner_horizontal", "gap_inner_vertical", "gappih", "gappiv"]
                 settingKey: "mangoLayoutGapsOverride"
                 resetKeys: []
                 text: I18n.tr("Inner gaps")
@@ -752,7 +752,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
             }
 
             SettingsSliderRow {
-                tags: ["mangowc", "mango", "gaps", "override", "outer", "edge", "gappoh", "gappov"]
+                tags: ["mangowc", "mango", "gaps", "override", "outer", "edge", "gap_outer_horizontal", "gap_outer_vertical", "gappoh", "gappov"]
                 settingKey: "mangoLayoutGapsOutOverride"
                 text: I18n.tr("Outer gaps")
                 visible: SettingsData.mangoLayoutGapsOverride >= 0
@@ -772,7 +772,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
             }
 
             SettingsToggleSliderRow {
-                tags: ["mangowc", "mango", "border", "override", "borderpx"]
+                tags: ["mangowc", "mango", "border", "override", "border_px", "borderpx"]
                 settingKey: "mangoLayoutBorderSizeEnabled"
                 text: I18n.tr("Override border size")
                 checked: SettingsData.mangoLayoutBorderSize >= 0

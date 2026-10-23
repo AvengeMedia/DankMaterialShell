@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-
-	"github.com/duxlabs-dev/dux-shell/core/internal/mangoconf"
 )
 
 func TestQuickshellVersionFailureDetails(t *testing.T) {
@@ -385,19 +383,41 @@ func TestCheckXDGMenuFile(t *testing.T) {
 	}
 }
 
-func TestCheckMangoConfigFlagsWrongDialectAndOverviewBinds(t *testing.T) {
+func TestCheckMangoConfigReportsUnknownKeysAndOverviewBinds(t *testing.T) {
 	dir := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(dir, "dms"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	_ = os.WriteFile(filepath.Join(dir, "config.conf"), []byte("exec-once=dms run\nmousebind=NONE,btn_left,toggleoverview,1\n"), 0o644)
-	_ = os.WriteFile(filepath.Join(dir, "dms", "layout.conf"), []byte("border_px=2\n"), 0o644)
+	// Shape of `mango -p` 0.18.2 output, colours included; the same key twice collapses.
+	parsed := "\x1b[1m\x1b[31m[ERROR]:\x1b[0m Unknown keyword: \x1b[1m\x1b[31mexec-once\x1b[0m\n" +
+		"\x1b[1;31m╰─\x1b[1;33m[Index]\x1b[0m \x1b[1;36m" + dir + "/config.conf\x1b[0m:\x1b[1;35m1\x1b[0m\n   ╰─exec-once=dms run\n\n" +
+		"[ERROR]: Unknown keyword: overviewgappo\n╰─[Index] " + dir + "/dms/layout.conf:10\n   ╰─overviewgappo=30\n" +
+		"[ERROR]: Unknown keyword: overviewgappo\n╰─[Index] " + dir + "/dms/layout.conf:12\n"
+	prev := mangoParseConfig
+	mangoParseConfig = func(string) (string, error) { return parsed, nil }
+	t.Cleanup(func() { mangoParseConfig = prev })
 
-	if got := checkMangoConfig(dir, mangoconf.Legacy); len(got) != 2 || got[0].message != "Not legacy keys: layout.conf" {
-		t.Fatalf("legacy: %+v", got)
+	got := checkMangoConfig(dir)
+	if len(got) != 2 || got[0].message != "Unknown keys: exec-once (config.conf), overviewgappo (layout.conf)" || got[1].name != "Mango mouse binds" {
+		t.Fatalf("got %+v", got)
 	}
-	if got := checkMangoConfig(dir, mangoconf.Snake); len(got) != 2 || got[0].message != "Not snake keys: config.conf" {
-		t.Fatalf("snake: %+v", got)
+	mangoParseConfig = func(string) (string, error) { return "", os.ErrNotExist }
+	if got := checkMangoConfig(dir); len(got) != 1 {
+		t.Fatalf("without mango on PATH only the bind check should run, got %+v", got)
+	}
+}
+
+func TestMangoLacksSnakeCase(t *testing.T) {
+	for ver, want := range map[string]bool{
+		"0.17.5": true,
+		"0.18.0": false,
+		"0.18.2": false,
+		"":       false,
+	} {
+		if got := mangoLacksSnakeCase(ver); got != want {
+			t.Errorf("mangoLacksSnakeCase(%q) = %v, want %v", ver, got, want)
+		}
 	}
 }
 

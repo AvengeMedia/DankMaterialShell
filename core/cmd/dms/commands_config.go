@@ -55,32 +55,8 @@ var resolveIncludeCmd = &cobra.Command{
 	Run: runResolveInclude,
 }
 
-var mangoMigrateMain bool
-
-var mangoMigrateCmd = &cobra.Command{
-	Use:   "mango-migrate",
-	Short: "Respell Mango config keys for the installed Mango",
-	Long:  "Detects whether the installed Mango uses legacy or snake_case config keys, rewrites the DMS fragments in mango/dms to match, and prints the dialect on the last line. --main also rewrites config.conf after a backup.",
-	Args:  cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
-		dialect := mangoconf.Detect()
-		changed, err := dialect.Migrate(mangoconf.Dir(), mangoMigrateMain)
-		for _, path := range changed {
-			fmt.Fprintf(os.Stderr, "migrated %s\n", path)
-		}
-		// Printed before any error: the shell needs the dialect even when a fragment failed.
-		fmt.Println(dialect)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			os.Exit(1)
-		}
-	},
-}
-
 func init() {
 	configCmd.AddCommand(resolveIncludeCmd)
-	mangoMigrateCmd.Flags().BoolVar(&mangoMigrateMain, "main", false, "also rewrite config.conf (a backup is kept)")
-	configCmd.AddCommand(mangoMigrateCmd)
 }
 
 type IncludeResult struct {

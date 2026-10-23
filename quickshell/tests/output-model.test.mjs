@@ -79,7 +79,7 @@ test("hyprland lua parser: quoted and long-bracket strings, hdr fields, mode-les
     assert.equal(model.parseHyprlandLuaMonitorLine("hl.monitor({ scale = 1 })"), null);
 });
 
-test("mango parser: both key spellings, anchors stripped, defaults filled, nameless rule skipped, out-of-range rotation is Normal", () => {
+test("mango parser: anchors stripped, defaults filled, nameless rule skipped, out-of-range rotation is Normal", () => {
     const parsed = plain(model.parseMangoOutputs(text("mango-monitors.conf")));
     assert.deepEqual(Object.keys(parsed), ["DP-1", "eDP-1", "HDMI-A-1", "DP-2", "DP-3"]);
     assert.deepEqual(parsed["DP-1"], { name: "DP-1", logical: { x: 0, y: 0, scale: 1.25, transform: "90" }, modes: [{ width: 2560, height: 1440, refresh_rate: 143998 }], current_mode: 0, vrr_enabled: true, vrr_supported: true });
@@ -306,21 +306,20 @@ test("modeAlreadyCurrent tolerates the refresh tolerance, restoreModeValue keeps
     assert.equal(model.niriCurrentMode({ current_mode: 0 }), null);
 });
 
-test("mango rule writer carries hdr/icc/disable from existing rules, keeps fractional refresh, honours the dialect", () => {
+test("mango rule writer carries hdr/icc/disable from existing rules, keeps fractional refresh, writes snake_case", () => {
     const outputs = {
         "DP-1": { configured_mode: "2560x1440@59.951", logical: { x: 0, y: 0, scale: 1, transform: "Normal" }, vrr_enabled: true, enabled: true },
         "HDMI-A-1": { modes: [{ width: 1920, height: 1080, refresh_rate: 60000 }], current_mode: 0, logical: { x: 2560, y: 0, scale: 1, transform: "90" }, enabled: false }
     };
     const existing = [
-        "monitorrule=name:^DP-1$,width:2560,height:1440,refresh:60,x:0,y:0,scale:1,rr:0,vrr:0,icc:/p.icc,disable:1",
+        "monitor_rule=name:^DP-1$,width:2560,height:1440,refresh:60,x:0,y:0,scale:1,rr:0,vrr:0,icc:/p.icc,disable:1",
         "monitor_rule=name:DP-1,hdr:1,icc:/ignored.icc",
-        "monitorrule=name:^HDMI-A-1$,primary:1"
+        "monitor_rule=name:^HDMI-A-1$,primary:1"
     ].join("\n");
-    assert.deepEqual(model.mangoMonitorRuleLines(outputs, existing, false), [
-        "monitorrule=name:^DP-1$,width:2560,height:1440,refresh:59.951,x:0,y:0,scale:1,rr:0,vrr:1,icc:/p.icc,hdr:1",
-        "monitorrule=name:^HDMI-A-1$,width:1920,height:1080,refresh:60,x:2560,y:0,scale:1,rr:1,vrr:0,primary:1,disable:1"
+    assert.deepEqual(model.mangoMonitorRuleLines(outputs, existing), [
+        "monitor_rule=name:^DP-1$,width:2560,height:1440,refresh:59.951,x:0,y:0,scale:1,rr:0,vrr:1,icc:/p.icc,hdr:1",
+        "monitor_rule=name:^HDMI-A-1$,width:1920,height:1080,refresh:60,x:2560,y:0,scale:1,rr:1,vrr:0,primary:1,disable:1"
     ]);
-    assert.ok(model.mangoMonitorRuleLines(outputs, "", true).every(line => line.startsWith("monitor_rule=")));
 });
 
 test("hyprland hardwareDetails gate vrr and color modes like Hyprland does, and gate nothing when absent", () => {

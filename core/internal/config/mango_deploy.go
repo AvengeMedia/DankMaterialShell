@@ -41,14 +41,13 @@ func nonEmptyFile(path string) (string, bool) {
 }
 
 var (
-	mangoBindLine    = regexp.MustCompile(`^\s*(bind[a-z]*|mousebind|axisbind|gesturebind|switchbind|keymode|key_mode)\s*=`)
-	mangoMonitorLine = regexp.MustCompile(`^\s*(monitorrule|monitor_rule)\s*=`)
-	mangoWindowLine  = regexp.MustCompile(`^\s*(windowrule|window_rule|windowrule-once|window_rule_once)\s*=`)
-	mangoExecOnceDMS = regexp.MustCompile(`(?m)^# Starts the shell when DMS.*\n#.*\n(exec-once|exec_once)=dms run\n`)
+	mangoBindLine    = regexp.MustCompile(`^\s*(bind[a-z]*|mousebind|axisbind|gesturebind|switchbind|key_mode)\s*=`)
+	mangoMonitorLine = regexp.MustCompile(`^\s*monitor_rule\s*=`)
+	mangoWindowLine  = regexp.MustCompile(`^\s*window_rule(_once)?\s*=`)
+	mangoExecOnceDMS = regexp.MustCompile(`(?m)^# Starts the shell when DMS.*\n#.*\nexec_once=dms run\n`)
 )
 
 var (
-	mangoDialect                = mangoconf.Detect
 	mangoSessionTargetInstalled = mangoconf.SessionTargetInstalled
 )
 
@@ -110,17 +109,16 @@ func (cd *ConfigDeployer) deployMangoConfig(terminalCommand string, useSystemd b
 		cd.log(fmt.Sprintf("Backed up existing config to %s", result.BackupPath))
 	}
 
-	dialect := mangoDialect()
 	newConfig := strings.ReplaceAll(MangoConfig, "{{TERMINAL_COMMAND}}", terminalCommand)
 	if cd.systemdAutostart(deps.WindowManagerMango, useSystemd) {
 		newConfig = mangoExecOnceDMS.ReplaceAllString(newConfig, "")
 	}
-	if err := os.WriteFile(result.Path, []byte(dialect.Translate(newConfig)), 0o644); err != nil {
+	if err := os.WriteFile(result.Path, []byte(newConfig), 0o644); err != nil {
 		result.Error = fmt.Errorf("failed to write config: %w", err)
 		return result, result.Error
 	}
 
-	if err := cd.deployMangoDmsConfigs(dmsDir, terminalCommand, dialect, existing, timestamp); err != nil {
+	if err := cd.deployMangoDmsConfigs(dmsDir, terminalCommand, existing, timestamp); err != nil {
 		result.Error = fmt.Errorf("failed to deploy dms configs: %w", err)
 		return result, result.Error
 	}
@@ -132,7 +130,7 @@ func (cd *ConfigDeployer) deployMangoConfig(terminalCommand string, useSystemd b
 
 // Like niri, fragments the user or the shell already filled are left alone; the
 // replaced config.conf hands its binds, monitor and window rules to empty ones.
-func (cd *ConfigDeployer) deployMangoDmsConfigs(dmsDir, terminalCommand string, dialect mangoconf.Dialect, oldMain, timestamp string) error {
+func (cd *ConfigDeployer) deployMangoDmsConfigs(dmsDir, terminalCommand, oldMain, timestamp string) error {
 	stockBinds := strings.ReplaceAll(MangoBindsConfig, "{{TERMINAL_COMMAND}}", terminalCommand)
 	bindsPath := filepath.Join(dmsDir, "binds.conf")
 	if data, err := os.ReadFile(bindsPath); err == nil && len(data) > 0 {
@@ -142,7 +140,7 @@ func (cd *ConfigDeployer) deployMangoDmsConfigs(dmsDir, terminalCommand string, 
 		}
 		cd.log(fmt.Sprintf("Backed up existing binds to %s", backup))
 		if cd.replaceBinds {
-			if err := os.WriteFile(bindsPath, []byte(dialect.Translate(stockBinds)), 0o644); err != nil {
+			if err := os.WriteFile(bindsPath, []byte(stockBinds), 0o644); err != nil {
 				return fmt.Errorf("failed to write binds.conf: %w", err)
 			}
 			cd.log("Deployed DMS stock binds.conf")
@@ -160,7 +158,7 @@ func (cd *ConfigDeployer) deployMangoDmsConfigs(dmsDir, terminalCommand string, 
 			binds = mangoconf.BindsMovedHeader + "\n" + old
 			cd.log("Moved existing binds from config.conf to binds.conf")
 		}
-		if err := os.WriteFile(bindsPath, []byte(dialect.Translate(binds)), 0o644); err != nil {
+		if err := os.WriteFile(bindsPath, []byte(binds), 0o644); err != nil {
 			return fmt.Errorf("failed to write binds.conf: %w", err)
 		}
 	}
@@ -182,7 +180,7 @@ func (cd *ConfigDeployer) deployMangoDmsConfigs(dmsDir, terminalCommand string, 
 			cd.log(fmt.Sprintf("Skipping %s (already exists)", cfg.name))
 			continue
 		}
-		if err := os.WriteFile(path, []byte(dialect.Translate(cfg.content)), 0o644); err != nil {
+		if err := os.WriteFile(path, []byte(cfg.content), 0o644); err != nil {
 			return fmt.Errorf("failed to write %s: %w", cfg.name, err)
 		}
 		cd.log(fmt.Sprintf("Deployed %s", cfg.name))

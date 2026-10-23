@@ -179,7 +179,7 @@ func (m Model) configReplacementNote() string {
 		if m.useSystemdConfig() && mangoconf.SessionTargetInstalled() {
 			return "Replacing Mango writes the DMS Mango template and starts the user systemd dms service with mango-session.target. Existing binds, monitor and window rules move into the dms/ files."
 		}
-		return "Replacing Mango writes the DMS Mango template and starts DMS from Mango with " + mangoconf.Detect().Key("exec_once") + "=dms run. Existing binds, monitor and window rules move into the dms/ files."
+		return "Replacing Mango writes the DMS Mango template and starts DMS from Mango with exec_once=dms run. Existing binds, monitor and window rules move into the dms/ files."
 	case config.BindsConfigType:
 		return "Keep uses your binds as they are; replace starts from the DMS stock binds. A timestamped backup is kept either way."
 	case "Ghostty":
