@@ -58,12 +58,16 @@ test("the user plugin switch keeps the user tree out of a scan and a resync", ()
     }
 });
 
-test("the settings IPC switch refuses set and keeps get", () => {
+function settingsIpcHandlers() {
     const source = readFileSync(new URL("../DMSShellIPC.qml", import.meta.url), "utf8");
     const block = source.slice(source.indexOf("        function get(key: string)"), source.indexOf('        target: "settings"'));
-    const handlers = [...block.matchAll(/^ {8}function \w+\([^)]*\)(?:: \w+)? \{\n[\s\S]*?^ {8}\}$/gm)].map(match => match[0].replace(/\((.*?)\)(?:: \w+)? \{/, (_, params) => "(" + params.replace(/: \w+/g, "") + ") {"));
+    return [...block.matchAll(/^ {8}function \w+\([^)]*\)(?:: \w+)? \{\n[\s\S]*?^ {8}\}$/gm)].map(match => match[0].replace(/\((.*?)\)(?:: \w+)? \{/, (_, params) => "(" + params.replace(/: \w+/g, "") + ") {"));
+}
+
+test("the settings IPC switch refuses set and keeps get", () => {
+    const handlers = settingsIpcHandlers();
     for (const disableSettingsIpcSet of [false, true]) {
-        const SettingsData = { lockBeforeSuspend: false, saveSettings() {} };
+        const SettingsData = { lockBeforeSuspend: false, saveSettings() {}, isManaged: () => false };
         const context = vm.createContext({ AdminPolicy: { disableSettingsIpcSet }, SettingsData, log: { warn() {} } });
         for (const handler of handlers)
             vm.runInContext(handler, context);
@@ -166,4 +170,19 @@ test("set and reset refuse managed keys and change the others", () => {
     context.resetToDefault(["lockBeforeSuspend", "acLockTimeout"]);
     assert.deepEqual(changes, [["lockAtStartup", true], ["acLockTimeout", null]]);
     assert.deepEqual(warnings, ["lockBeforeSuspend"]);
+});
+
+test("settings IPC set refuses a managed key, also with the settings IPC switch off", () => {
+    const handlers = settingsIpcHandlers();
+    const managed = new Set(["lockBeforeSuspend"]);
+    for (const disableSettingsIpcSet of [false, true]) {
+        const SettingsData = { lockBeforeSuspend: true, lockAtStartup: false, saveSettings() {}, isManaged: key => managed.has(key) };
+        const context = vm.createContext({ AdminPolicy: { disableSettingsIpcSet }, SettingsData, log: { warn() {} } });
+        for (const handler of handlers)
+            vm.runInContext(handler, context);
+        assert.equal(context.set("lockBeforeSuspend", "false"), disableSettingsIpcSet ? "SETTINGS_SET_DISABLED" : "SETTINGS_SET_MANAGED");
+        assert.equal(SettingsData.lockBeforeSuspend, true);
+        assert.equal(context.set("lockAtStartup", "true"), disableSettingsIpcSet ? "SETTINGS_SET_DISABLED" : "SETTINGS_SET_SUCCESS");
+        assert.equal(SettingsData.lockAtStartup, !disableSettingsIpcSet);
+    }
 });
