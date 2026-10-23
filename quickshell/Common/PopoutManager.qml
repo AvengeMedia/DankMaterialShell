@@ -341,6 +341,57 @@ Singleton {
     function getActiveSurfaces() {
         const results = [];
 
+        // The host registry covers embedded, standalone, and free Islands with their live visual bounds.
+        for (const key of Object.keys(IslandHostRegistry.hosts || {})) {
+            const host = IslandHostRegistry.hosts[key];
+            const screen = host?.screen;
+            const controller = host?.islandController;
+            const snapVisible = controller?.expanded || (!host?.embedded && host?.motionRunning);
+            if (!screen?.name || !snapVisible || host.surfaceOpacity <= 0)
+                continue;
+            const rect = host.surfaceBodyRect?.();
+            if (!rect || rect.width <= 0 || rect.height <= 0)
+                continue;
+            let x = rect.x;
+            let y = rect.y;
+            let width = rect.width;
+            let height = rect.height;
+            if (host.embedded) {
+                // The embedded surface bounds overlap the bar; exclude the full bar band from snapping.
+                const inset = Math.min(host.bandThickness ?? 0, host.edge === "left" || host.edge === "right" ? width - 1 : height - 1);
+                switch (host.edge) {
+                case "top":
+                    y += inset;
+                    height -= inset;
+                    break;
+                case "bottom":
+                    height -= inset;
+                    break;
+                case "left":
+                    x += inset;
+                    width -= inset;
+                    break;
+                case "right":
+                    width -= inset;
+                    break;
+                }
+            }
+            const left = Math.max(0, x);
+            const top = Math.max(0, y);
+            const right = Math.min(screen.width, x + width);
+            const bottom = Math.min(screen.height, y + height);
+            if (right <= left || bottom <= top)
+                continue;
+            results.push({
+                "name": "dms:dankisland-surface",
+                "type": "island",
+                "x": Math.round((screen.x ?? 0) + left),
+                "y": Math.round((screen.y ?? 0) + top),
+                "width": Math.round(right - left),
+                "height": Math.round(bottom - top)
+            });
+        }
+
         for (const screenName in currentPopoutsByScreen) {
             const popout = currentPopoutsByScreen[screenName];
             if (!popout || !popout.shouldBeVisible)
