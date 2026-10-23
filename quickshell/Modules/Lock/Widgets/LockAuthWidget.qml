@@ -801,7 +801,8 @@ Item {
                             height: 1
                             opacity: 0
                             cursorDelegate: Item {}
-                            echoMode: TextInput.Password
+                            // Password echo strips ImhHiddenText (QTBUG-88367); NoEcho keeps it so the input method sees a password field
+                            echoMode: TextInput.NoEcho
                             inputMethodHints: Qt.ImhHiddenText | Qt.ImhSensitiveData | Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
                             KeyNavigation.tab: passwordField.KeyNavigation.tab
                             KeyNavigation.backtab: passwordField.KeyNavigation.backtab
