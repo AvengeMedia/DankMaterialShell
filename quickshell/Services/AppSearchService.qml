@@ -361,6 +361,7 @@ Singleton {
             hibernate: ["hibernate"],
             reboot: ["reboot", "restart"],
             softreboot: ["soft reboot"],
+            firmwaresetup: ["firmware", "bios", "uefi"],
             poweroff: ["poweroff", "shutdown", "halt"],
             restart: ["restart", "shell", "reload"]
         })

@@ -278,13 +278,23 @@ Item {
         SettingsCard {
             width: parent.width
             iconName: "restart_alt"
-            title: I18n.tr("Reboot to another OS", "settings card title, lists EFI boot entries the power menu can reboot into")
+            title: I18n.tr("Reboot targets", "settings card title, firmware setup and EFI boot entries the power menu can reboot into once")
             settingKey: "powerMenuBootEntries"
-            tags: ["power", "menu", "reboot", "boot", "efi", "uefi", "windows", "dual boot", "bootnext"]
+            tags: ["power", "menu", "reboot", "boot", "efi", "uefi", "bios", "firmware", "windows", "dual boot", "bootnext"]
             // Saved entries stay listed wherever this config lands, so they can always be removed
-            visible: SettingsData.powerMenuBootEntries.length > 0 || (BootEntryService.status !== "unknown" && BootEntryService.status !== "noEfi")
+            visible: SessionService.firmwareSetupSupported || SettingsData.powerMenuBootEntries.length > 0 || (BootEntryService.status !== "unknown" && BootEntryService.status !== "noEfi")
 
             Component.onCompleted: BootEntryService.refresh()
+
+            SettingsToggleRow {
+                settingKey: "powerMenuFirmwareSetup"
+                tags: ["power", "menu", "reboot", "firmware", "setup", "bios", "uefi"]
+                visible: SessionService.firmwareSetupSupported
+                iconName: "developer_board"
+                text: I18n.tr("Firmware setup", "settings toggle, adds a power menu action that reboots into the UEFI/BIOS settings screen")
+                checked: SettingsData.powerMenuFirmwareSetup
+                onToggled: checked => SettingsData.set("powerMenuFirmwareSetup", checked)
+            }
 
             SettingsRow {
                 visible: BootEntryService.unavailableReason !== ""

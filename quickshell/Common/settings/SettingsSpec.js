@@ -1445,6 +1445,9 @@ var LOCAL_SPEC = {
     powerMenuBootEntries: {
         def: []
     },
+    powerMenuFirmwareSetup: {
+        def: false
+    },
     updaterCheckOnStart: {
         def: false
     },
