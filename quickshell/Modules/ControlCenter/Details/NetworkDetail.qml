@@ -602,10 +602,11 @@ Item {
             subtitleColor: isConnecting ? Theme.warning : Theme.surfaceVariantText
             clickable: true
             onClicked: {
-                if (isConnected || NetworkService.isWifiConnecting)
+                if (NetworkService.isWifiConnecting)
                     return;
                 WifiConnectionActions.connectToNetwork(modelData, {
-                    connected: isConnected
+                    connected: isConnected,
+                    disconnectWhenConnected: true
                 });
             }
 
