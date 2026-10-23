@@ -17,6 +17,8 @@ Item {
     property real columns: 4
     property real rows: 1
     property bool compact: columns <= 2 && rows === 1
+    property bool small: false
+    readonly property real bodyInset: small ? Math.max(0, (height - CcMetrics.smallRowHeight) / 2) : 0
     property string iconName: ""
     property string iconLabel: ""
     property string iconTooltip: ""
@@ -135,13 +137,13 @@ Item {
                 onSliderValueChanged: newValue => root.sliderValueChanged(newValue)
 
                 Binding on trackHeight {
-                    when: !root.tall
+                    when: !root.tall && !root.small
                     value: CcMetrics.stripTrackHeight
                     restoreMode: Binding.RestoreBinding
                 }
 
                 Binding on handleHeight {
-                    when: !root.tall
+                    when: !root.tall && !root.small
                     value: CcMetrics.stripHandleHeight
                     restoreMode: Binding.RestoreBinding
                 }
