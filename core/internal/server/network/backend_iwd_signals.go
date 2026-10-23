@@ -428,6 +428,7 @@ func (b *IWDBackend) signalHandler(sigChan chan *dbus.Signal) {
 
 								b.stateMutex.Lock()
 								b.state.WiFiConnected = false
+								b.state.WiFiSSID = ""
 								if state == "disconnected" {
 									b.state.NetworkStatus = StatusDisconnected
 								}
