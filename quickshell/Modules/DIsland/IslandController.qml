@@ -659,6 +659,15 @@ QtObject {
         return requestCollapse();
     }
 
+    function promoteHoverToActive() {
+        if (!hoverExpanded || !expanded)
+            return false;
+        hoverExpanded = false;
+        keyboardDismissRequested = true;
+        hoverCloseTimer.stop();
+        return true;
+    }
+
     function requestExpand(requestKeyboardFocus) {
         if (inputSuspended)
             return false;
@@ -974,6 +983,8 @@ QtObject {
     function requestToggle(requestKeyboardFocus) {
         if (notificationActive && hoverExpanded && expanded)
             return requestNotificationCenter(false);
+        if (hoverExpanded && expanded)
+            return promoteHoverToActive();
         if (expanded)
             return requestCollapse();
         return requestExpand(requestKeyboardFocus);
