@@ -186,3 +186,12 @@ test("settings IPC set refuses a managed key, also with the settings IPC switch 
         assert.equal(SettingsData.lockAtStartup, !disableSettingsIpcSet);
     }
 });
+
+test("the legacy session migration leaves managed lock settings alone", () => {
+    const managed = new Set(["acLockTimeout", "lockBeforeSuspend"]);
+    const changes = [];
+    const context = vm.createContext({ SettingsData: { isManaged: key => managed.has(key), set: (key, value) => changes.push([key, value]) } });
+    vm.runInContext(functionSource("../Common/SessionData.qml", "migrateFromUndefinedToV1"), context);
+    context.migrateFromUndefinedToV1({ acMonitorTimeout: 30, acLockTimeout: 60, lockBeforeSuspend: false, loginctlLockIntegration: false, launchPrefix: "uwsm app --" });
+    assert.deepEqual(changes, [["acMonitorTimeout", 30], ["loginctlLockIntegration", false], ["launchPrefix", "uwsm app --"]]);
+});
