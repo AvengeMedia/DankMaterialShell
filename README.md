@@ -13,8 +13,8 @@ Built with [Quickshell](https://quickshell.org/) and [Go](https://go.dev/)
 [![GitHub stars](https://img.shields.io/github/stars/duxlabs-dev/dux-shell?style=for-the-badge&labelColor=101418&color=ffd700)](https://github.com/duxlabs-dev/dux-shell/stargazers)
 [![GitHub License](https://img.shields.io/github/license/duxlabs-dev/dux-shell?style=for-the-badge&labelColor=101418&color=b9c8da)](https://github.com/duxlabs-dev/dux-shell/blob/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/duxlabs-dev/dux-shell?style=for-the-badge&labelColor=101418&color=9ccbfb)](https://github.com/duxlabs-dev/dux-shell/releases)
-[![Arch version](https://img.shields.io/archlinux/v/extra/x86_64/dms-shell?style=for-the-badge&labelColor=101418&color=9ccbfb)](https://archlinux.org/packages/extra/x86_64/dms-shell/)
-[![AUR version (git)](<https://img.shields.io/aur/version/dms-shell-git?style=for-the-badge&labelColor=101418&color=9ccbfb&label=AUR%20(git)>)](https://aur.archlinux.org/packages/dms-shell-git)
+[![Arch version](https://img.shields.io/archlinux/v/extra/x86_64/dux-shell?style=for-the-badge&labelColor=101418&color=9ccbfb)](https://archlinux.org/packages/extra/x86_64/dux-shell/)
+[![AUR version (git)](<https://img.shields.io/aur/version/dux-shell-git?style=for-the-badge&labelColor=101418&color=9ccbfb&label=AUR%20(git)>)](https://aur.archlinux.org/packages/dux-shell-git)
 [![Ko-Fi donate](https://img.shields.io/badge/donate-kofi?style=for-the-badge&logo=ko-fi&logoColor=ffffff&label=ko-fi&labelColor=101418&color=f16061&link=https%3A%2F%2Fko-fi.com%2Fduxlabs)](https://ko-fi.com/duxlabs)
 
 </div>
