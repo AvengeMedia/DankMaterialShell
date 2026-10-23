@@ -9303,6 +9303,32 @@
     "description": "Fades the screen out first. Input during the fade cancels it"
   },
   {
+    "section": "powerMenuFirmwareSetup",
+    "label": "Firmware setup",
+    "tabIndex": 21,
+    "category": "Power & sleep",
+    "keywords": [
+      "battery",
+      "bios",
+      "charge",
+      "charging",
+      "energy",
+      "firmware",
+      "hibernate",
+      "menu",
+      "power",
+      "reboot",
+      "restart",
+      "setup",
+      "shutdown",
+      "sleep",
+      "suspend",
+      "uefi"
+    ],
+    "parentLabel": "Power & battery",
+    "icon": "developer_board"
+  },
+  {
     "section": "powerMenuGridLayout",
     "label": "Grid layout",
     "tabIndex": 21,
@@ -9486,12 +9512,12 @@
   },
   {
     "section": "powerMenuBootEntries",
-    "label": "Reboot to another OS",
+    "label": "Reboot targets",
     "tabIndex": 21,
     "category": "Power & sleep",
     "keywords": [
-      "another",
       "battery",
+      "bios",
       "boot",
       "bootnext",
       "charge",
@@ -9499,6 +9525,7 @@
       "dual boot",
       "efi",
       "energy",
+      "firmware",
       "hibernate",
       "menu",
       "power",
@@ -9507,6 +9534,7 @@
       "shutdown",
       "sleep",
       "suspend",
+      "targets",
       "uefi",
       "windows"
     ],
