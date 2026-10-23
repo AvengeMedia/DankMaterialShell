@@ -2845,6 +2845,9 @@ Singleton {
             id: "dot" + Date.now(),
             name: I18n.tr("Dot", "bar layout: free-floating dot that opens island activities"),
             enabled: true,
+            // A hidden or auto-hiding base bar would switch off the dot's OSD and notifications, and bar IPC refuses dot configs.
+            visible: true,
+            autoHide: false,
             island: false,
             dot: true,
             screenPreferences: ["all"],

@@ -17420,6 +17420,29 @@
     "conditionKey": "dotEnabled"
   },
   {
+    "section": "dotIconColor",
+    "label": "Color override",
+    "tabIndex": 65,
+    "category": "Dot",
+    "keywords": [
+      "bar",
+      "color",
+      "colour",
+      "dot",
+      "hue",
+      "icon",
+      "logo",
+      "override",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "tint",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "dotEnabled"
+  },
+  {
     "section": "dotRouteControlCenter",
     "label": "Control Center",
     "tabIndex": 65,
@@ -17439,6 +17462,28 @@
       "topbar"
     ],
     "parentLabel": "Bar",
+    "conditionKey": "dotEnabled"
+  },
+  {
+    "section": "dotIconImage",
+    "label": "Custom",
+    "tabIndex": 65,
+    "category": "Dot",
+    "keywords": [
+      "bar",
+      "custom",
+      "dot",
+      "file",
+      "icon",
+      "image",
+      "logo",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "icon": "folder_open",
     "conditionKey": "dotEnabled"
   },
   {
@@ -17510,6 +17555,25 @@
     "description": "A floating companion that works alongside any bar layout"
   },
   {
+    "section": "dotEdgeMargin",
+    "label": "Edge margin",
+    "tabIndex": 65,
+    "category": "Dot",
+    "keywords": [
+      "bar",
+      "dot",
+      "edge",
+      "gap",
+      "margin",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "dotEnabled"
+  },
+  {
     "section": "dotNotificationExpand",
     "label": "Expand by default",
     "tabIndex": 65,
@@ -17568,6 +17632,26 @@
       "outline",
       "panel",
       "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "dotEnabled"
+  },
+  {
+    "section": "dotIcon",
+    "label": "Icon",
+    "tabIndex": 65,
+    "category": "Dot",
+    "keywords": [
+      "bar",
+      "dot",
+      "face",
+      "icon",
+      "logo",
+      "panel",
+      "statusbar",
+      "symbol",
       "taskbar",
       "topbar"
     ],
@@ -17860,6 +17944,27 @@
     "conditionKey": "dotEnabled"
   },
   {
+    "section": "dotResetPosition",
+    "label": "Reset Position",
+    "tabIndex": 65,
+    "category": "Dot",
+    "keywords": [
+      "bar",
+      "center",
+      "dot",
+      "move",
+      "panel",
+      "position",
+      "reset",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "icon": "drag_pan",
+    "conditionKey": "dotEnabled"
+  },
+  {
     "section": "dotSharedRouting",
     "label": "Shared shortcuts",
     "tabIndex": 65,
@@ -17999,6 +18104,25 @@
     ],
     "parentLabel": "Bar",
     "icon": "palette",
+    "conditionKey": "dotEnabled"
+  },
+  {
+    "section": "dotIconSymbol",
+    "label": "Symbol",
+    "tabIndex": 65,
+    "category": "Dot",
+    "keywords": [
+      "bar",
+      "dot",
+      "glyph",
+      "icon",
+      "panel",
+      "statusbar",
+      "symbol",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
     "conditionKey": "dotEnabled"
   },
   {

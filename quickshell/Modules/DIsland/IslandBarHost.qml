@@ -39,8 +39,7 @@ Item {
     property var centerSectionRect: null
     property var trailingSectionRect: null
     readonly property int hostLayer: root.hostWindow?.dBarLayer ?? WlrLayer.Top
-    property real anchorX: 0
-    property real anchorY: 0
+    property point anchor
     property bool anchorSnaps: false
     property real freeScale: 1
     property real freeOpacity: 1
@@ -60,6 +59,7 @@ Item {
     readonly property real currentVisualY: surface.currentVisualY
     readonly property real currentVisualWidth: surface.currentVisualWidth
     readonly property real currentVisualHeight: surface.currentVisualHeight
+    readonly property real currentSurfaceRadius: surface.currentSurfaceRadius
     readonly property color surfaceColor: surface.surfaceColor
     readonly property real surfaceOpacity: surface.surfaceOpacity
     readonly property bool inputSuspended: controller.inputSuspended
@@ -68,7 +68,9 @@ Item {
     // Held from expand until the collapse spring settles, so compact-to-compact morphs never resize the bar window.
     property bool sheetOut: false
     readonly property bool surfaceFits: (root.isVertical ? root.windowWidth : root.windowHeight) >= root.hostThickness - 1
-    readonly property bool hostReady: !root.embedded || root.frameHosted || root.surfaceFits
+    // A free host lifts to the whole output for the sheet; the expand waits for that size so no frame of the morph is clipped.
+    property bool hostLifted: true
+    readonly property bool hostReady: root.freeMode ? root.hostLifted : (!root.embedded || root.frameHosted || root.surfaceFits)
     // Layer surfaces glitch when they resize under a moving sheet: edit room waits for a frame at the grown size, and the grown size outlives the shrink spring.
     readonly property bool surfaceResizes: !root.freeMode && !root.frameHosted
     readonly property int editSurfaceHeight: controller.editSurfaceHeight
@@ -433,7 +435,8 @@ Item {
         homeBrightnessDisplay: SettingsData.islandLevelDisplay(root.barConfig, "islandHomeBrightnessDisplay")
         batteryStyle: root.setting("islandBatteryStyle")
         mediaClockVisible: root.setting("islandMediaClockVisible")
-        mediaAutoSwitch: root.setting("islandMediaAutoSwitch")
+        // Home and media share the dot face; see mediaFaceToggleAvailable.
+        mediaAutoSwitch: !root.dotMode && root.setting("islandMediaAutoSwitch")
         launcherCycleEnabled: SettingsData.launcherStyle === "island"
         dashboardAvailableWidth: Math.max(0, (root.screen?.width ?? root.referenceScreenWidth) - (root.isVertical ? root.crossInsetStart + root.crossInsetEnd + root.outerGap + root.nearInset : root.alongInset) - Theme.spacingL * 2)
         dashboardAvailableHeight: Math.max(0, (root.screen?.height ?? root.referenceScreenHeight) - (root.isVertical ? root.alongInset : root.crossInsetStart + root.crossInsetEnd + root.outerGap + root.nearInset) - Theme.spacingL * 2)
@@ -493,8 +496,7 @@ Item {
         hostOriginX: root.hostOriginX
         hostOriginY: root.hostOriginY
         freeMode: root.freeMode
-        anchorX: root.anchorX
-        anchorY: root.anchorY
+        anchor: root.anchor
         anchorSnaps: root.anchorSnaps
         anchorAlong: root.anchorAlong
         nearInset: root.nearInset
@@ -534,6 +536,9 @@ Item {
         DotCompact {
             controller: controller
             iconName: root.setting("islandFreeIcon")
+            iconMode: root.setting("islandFreeIconMode")
+            iconPath: root.setting("islandFreeIconPath")
+            iconColor: root.setting("islandFreeIconColor")
         }
     }
 

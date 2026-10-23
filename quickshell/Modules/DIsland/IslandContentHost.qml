@@ -189,10 +189,11 @@ Item {
     component CompactFace: Loader {
         required property string activity
         required property Component face
-        readonly property var target: root.resolveTarget(root.controller.compactTargetFor(activity))
+        // A free face only centres in the island, so it skips the anchor-resolved slot every drag event would rebuild.
+        readonly property var target: root.freeMode ? root.controller.compactTargetFor(activity) : root.resolveTarget(root.controller.compactTargetFor(activity))
         readonly property bool isVertical: root.controller.isVertical
-        readonly property real alongPos: !active ? 0 : Math.round(root.slotAlong(target)) - Math.round(isVertical ? root.islandY : root.islandX)
-        readonly property real crossPos: !active ? 0 : Math.round(root.slotCross(target)) - Math.round(isVertical ? root.islandX : root.islandY)
+        readonly property real alongPos: !active || root.freeMode ? 0 : Math.round(root.slotAlong(target)) - Math.round(isVertical ? root.islandY : root.islandX)
+        readonly property real crossPos: !active || root.freeMode ? 0 : Math.round(root.slotCross(target)) - Math.round(isVertical ? root.islandX : root.islandY)
 
         x: root.freeMode ? Math.round((parent.width - width) / 2) : (isVertical ? crossPos : alongPos)
         y: root.freeMode ? Math.round((parent.height - height) / 2) : (isVertical ? alongPos : crossPos)
@@ -209,11 +210,13 @@ Item {
     component ExpandedFace: Loader {
         required property string activity
         readonly property var target: root.controller.expandedTargetFor(activity)
-        readonly property var slot: root.resolveTarget(target)
+        // A hidden face stays put, so a kept-alive sheet is not re-laid out on every move of the pill.
+        readonly property bool placed: active && visible
+        readonly property var slot: placed ? root.resolveTarget(target) : target
         readonly property bool isVertical: root.controller.isVertical
         readonly property real inset: root.controller.farEdge ? 0 : root.expandedInset
-        readonly property real alongPos: !active ? 0 : Math.round(root.slotAlong(slot)) - Math.round(isVertical ? root.islandY : root.islandX)
-        readonly property real crossPos: !active ? 0 : Math.round(root.slotCross(slot)) - Math.round(isVertical ? root.islandX : root.islandY) + inset
+        readonly property real alongPos: !placed ? 0 : Math.round(root.slotAlong(slot)) - Math.round(isVertical ? root.islandY : root.islandX)
+        readonly property real crossPos: !placed ? 0 : Math.round(root.slotCross(slot)) - Math.round(isVertical ? root.islandX : root.islandY) + inset
 
         x: isVertical ? crossPos : alongPos
         y: isVertical ? alongPos : crossPos

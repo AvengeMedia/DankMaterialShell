@@ -156,7 +156,7 @@ SettingsCard {
         step: 10
         value: root.store.setting("islandHoverOpenDelay")
         visible: root.docked && root.store.setting("islandInteractionMode") !== "click"
-        onSliderValueChanged: value => root.store.apply("islandHoverOpenDelay", value)
+        onSliderDragFinished: value => root.store.apply("islandHoverOpenDelay", value)
     }
 
     SettingsSliderRow {
@@ -171,7 +171,7 @@ SettingsCard {
         step: 10
         value: root.store.setting("islandHoverCloseDelay")
         visible: root.docked && root.store.setting("islandInteractionMode") !== "click"
-        onSliderValueChanged: value => root.store.apply("islandHoverCloseDelay", value)
+        onSliderDragFinished: value => root.store.apply("islandHoverCloseDelay", value)
     }
 
     SettingsToggleRow {

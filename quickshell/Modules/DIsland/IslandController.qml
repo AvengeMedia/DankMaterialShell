@@ -618,7 +618,8 @@ QtObject {
         return mediaAvailable && mediaPreferred ? "media" : "home";
     }
 
-    readonly property bool mediaFaceToggleAvailable: !expanded && mediaAvailable && (activeActivity === "home" || activeActivity === "media")
+    // A dot draws the same face for home and media, so a toggle would only change what the next click opens.
+    readonly property bool mediaFaceToggleAvailable: !dotMode && !expanded && mediaAvailable && (activeActivity === "home" || activeActivity === "media")
 
     function toggleMediaFace() {
         if (!mediaFaceToggleAvailable)
