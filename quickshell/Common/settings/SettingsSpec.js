@@ -1340,6 +1340,9 @@ var LOCAL_SPEC = {
     notificationDedupeEnabled: {
         def: true
     },
+    notificationServerEnabled: {
+        def: true
+    },
     notificationPopupPosition: {
         def: 0
     },
