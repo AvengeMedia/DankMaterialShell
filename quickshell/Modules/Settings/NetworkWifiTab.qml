@@ -340,7 +340,7 @@ Item {
                     required property var modelData
                     required property int index
 
-                    readonly property bool isConnected: modelData.ssid === NetworkService.currentWifiSSID
+                    readonly property bool isConnected: NetworkService.wifiConnected && modelData.ssid === NetworkService.currentWifiSSID
                     readonly property bool isConnecting: NetworkService.isWifiConnecting && NetworkService.connectingSSID === modelData.ssid
                     readonly property bool isPinned: root.getPinnedWifiNetworks().includes(modelData.ssid)
                     readonly property bool isExpanded: root.expandedWifiSsid === modelData.ssid
@@ -517,7 +517,7 @@ Item {
                     required property var modelData
                     required property int index
 
-                    readonly property bool isConnected: modelData.ssid === NetworkService.currentWifiSSID
+                    readonly property bool isConnected: NetworkService.wifiConnected && modelData.ssid === NetworkService.currentWifiSSID
                     readonly property bool isConnecting: NetworkService.isWifiConnecting && NetworkService.connectingSSID === modelData.ssid
                     readonly property bool isPinned: root.getPinnedWifiNetworks().includes(modelData.ssid)
                     readonly property bool isOutOfRange: modelData.outOfRange || false
