@@ -833,6 +833,16 @@ function physicalSize(output) {
     };
 }
 
+function roundLogical(value, compositor) {
+    switch (compositor) {
+    case "niri":
+        // niri rounds the placed output, smithay's Space ceils mapped ones, only ceil never overlaps in either order (#3875)
+        return Math.ceil(value);
+    default:
+        return Math.round(value);
+    }
+}
+
 function logicalSize(output, compositor) {
     if (!output)
         return {
@@ -841,19 +851,10 @@ function logicalSize(output, compositor) {
         };
     const phys = physicalSize(output);
     const scale = output.logical?.scale || 1.0;
-    switch (compositor) {
-    case "niri":
-        // niri floors logical sizes, rounding up by one leaves a dead seam at snapped edges (#2526)
-        return {
-            "w": Math.floor(phys.w / scale),
-            "h": Math.floor(phys.h / scale)
-        };
-    default:
-        return {
-            "w": Math.round(phys.w / scale),
-            "h": Math.round(phys.h / scale)
-        };
-    }
+    return {
+        "w": roundLogical(phys.w / scale, compositor),
+        "h": roundLogical(phys.h / scale, compositor)
+    };
 }
 
 function defaultBounds() {
@@ -991,8 +992,8 @@ function recalculateAdjacentPositions(outputs, pendingChanges, changedOutput, ne
     if (!output?.logical)
         return [];
     const oldPhys = physicalSize(output);
-    const oldLogicalW = Math.round(oldPhys.w / (output.logical.scale || 1.0));
-    const newLogicalW = Math.round(oldPhys.w / newScale);
+    const oldLogicalW = roundLogical(oldPhys.w / (output.logical.scale || 1.0), compositor);
+    const newLogicalW = roundLogical(oldPhys.w / newScale, compositor);
     const changedX = pendingChanges[changedOutput]?.position?.x ?? output.logical.x;
     const changedY = pendingChanges[changedOutput]?.position?.y ?? output.logical.y;
     const moves = [];
