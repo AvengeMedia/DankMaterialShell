@@ -887,6 +887,24 @@ func TestOpenDB_HealsGarbageFile(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestOpenDB_LockedByAnotherProcessKeepsHistory(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "db")
+	holder, err := openDB(path)
+	require.NoError(t, err)
+	m := &Manager{config: DefaultConfig(), db: holder, dbPath: path}
+	require.NoError(t, m.storeEntry(Entry{Data: []byte("x"), MimeType: "text/plain"}))
+
+	_, err = openDB(path)
+	require.Error(t, err)
+	require.NoError(t, holder.Close())
+
+	reopened, err := openDB(path)
+	require.NoError(t, err)
+	defer reopened.Close()
+	m = &Manager{config: DefaultConfig(), db: reopened, dbPath: path}
+	assert.Len(t, m.GetHistory(), 1)
+}
+
 func TestStoreEntry_CorruptDBReturnsErrorNotPanic(t *testing.T) {
 	for _, tt := range corruptDBCases {
 		t.Run(tt.name, func(t *testing.T) {

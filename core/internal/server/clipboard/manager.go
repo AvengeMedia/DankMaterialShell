@@ -29,6 +29,7 @@ import (
 	_ "golang.org/x/image/webp"
 
 	bolt "go.etcd.io/bbolt"
+	berrors "go.etcd.io/bbolt/errors"
 
 	wlclient "github.com/duxlabs-dev/dux-go/wayland/client"
 	"github.com/duxlabs-dev/dux-go/wayland/ext_data_control"
@@ -55,8 +56,14 @@ func NewManager(wlCtx wlcontext.WaylandContext, config Config) (*Manager, error)
 
 	configPath, _ := getConfigPath()
 
+	db, err := openDB(dbPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open db: %w", err)
+	}
+
 	m := &Manager{
 		config:         config,
+		db:             db,
 		configPath:     configPath,
 		display:        display,
 		wlCtx:          wlCtx,
@@ -69,6 +76,7 @@ func NewManager(wlCtx wlcontext.WaylandContext, config Config) (*Manager, error)
 
 	if !config.Disabled {
 		if err := m.setupRegistry(); err != nil {
+			db.Close()
 			return nil, err
 		}
 	}
@@ -77,12 +85,6 @@ func NewManager(wlCtx wlcontext.WaylandContext, config Config) (*Manager, error)
 	go m.notifier()
 
 	go m.watchConfig()
-
-	db, err := openDB(dbPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open db: %w", err)
-	}
-	m.db = db
 
 	if err := m.migrateHashes(); err != nil {
 		log.Errorf("Failed to migrate hashes: %v", err)
@@ -116,6 +118,9 @@ func openDB(path string) (*bolt.DB, error) {
 	db, err := tryOpenDB(path)
 	if err == nil {
 		return db, nil
+	}
+	if errors.Is(err, berrors.ErrTimeout) {
+		return nil, err
 	}
 
 	log.Errorf("Clipboard db corrupted, salvaging readable entries: %v", err)
