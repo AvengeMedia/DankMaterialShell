@@ -338,6 +338,41 @@ Singleton {
         _requestPopout(popout, tabIndex, triggerSource, true);
     }
 
+    function _islandBarBand(host, screen) {
+        const vertical = host.edge === "left" || host.edge === "right";
+        if (host.embedded) {
+            const start = vertical ? host.hostOriginX : host.hostOriginY;
+            return {
+                "start": start,
+                "end": start + host.bandThickness
+            };
+        }
+        if (host.freeMode)
+            return null;
+
+        const extent = vertical ? screen.width : screen.height;
+        const instances = ShellLayout.forScreen(screen)?.instances ?? [];
+        let start = Infinity;
+        let end = -Infinity;
+        for (const instance of instances) {
+            if (instance.edge !== host.edge || instance.barId === host.barId || (instance.kind !== "bar" && instance.kind !== "frame") || instance.rowThickness <= 0)
+                continue;
+            const config = SettingsData.getBarConfig(instance.barId);
+            if (!config || config.enabled === false || config.visible === false)
+                continue;
+            const near = instance.rowOffset ?? 0;
+            const far = near + instance.rowThickness;
+            const bandStart = host.edge === "top" || host.edge === "left" ? near : extent - far;
+            const bandEnd = host.edge === "top" || host.edge === "left" ? far : extent - near;
+            start = Math.min(start, bandStart);
+            end = Math.max(end, bandEnd);
+        }
+        return end > start ? {
+            "start": start,
+            "end": end
+        } : null;
+    }
+
     function getActiveSurfaces() {
         const results = [];
 
@@ -356,23 +391,30 @@ Singleton {
             let y = rect.y;
             let width = rect.width;
             let height = rect.height;
-            if (host.embedded) {
-                // The embedded surface bounds overlap the bar; exclude the full bar band from snapping.
-                const inset = Math.min(host.bandThickness ?? 0, host.edge === "left" || host.edge === "right" ? width - 1 : height - 1);
+            const barBand = _islandBarBand(host, screen);
+            if (barBand) {
                 switch (host.edge) {
                 case "top":
-                    y += inset;
-                    height -= inset;
+                    if (y < barBand.end && y + height > barBand.start) {
+                        const inset = Math.max(0, Math.min(height, barBand.end - y));
+                        y += inset;
+                        height -= inset;
+                    }
                     break;
                 case "bottom":
-                    height -= inset;
+                    if (y + height > barBand.start && y < barBand.end)
+                        height = Math.max(0, barBand.start - y);
                     break;
                 case "left":
-                    x += inset;
-                    width -= inset;
+                    if (x < barBand.end && x + width > barBand.start) {
+                        const inset = Math.max(0, Math.min(width, barBand.end - x));
+                        x += inset;
+                        width -= inset;
+                    }
                     break;
                 case "right":
-                    width -= inset;
+                    if (x + width > barBand.start && x < barBand.end)
+                        width = Math.max(0, barBand.start - x);
                     break;
                 }
             }
