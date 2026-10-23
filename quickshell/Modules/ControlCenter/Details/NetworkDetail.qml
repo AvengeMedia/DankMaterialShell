@@ -1124,7 +1124,7 @@ Rectangle {
             required property var modelData
             required property int index
 
-            readonly property bool isConnected: modelData.ssid === NetworkService.currentWifiSSID
+            readonly property bool isConnected: NetworkService.wifiConnected && modelData.ssid === NetworkService.currentWifiSSID
             readonly property bool isConnecting: NetworkService.isWifiConnecting && NetworkService.connectingSSID === modelData.ssid
             readonly property bool isPinned: root.getPinnedNetworks().includes(modelData.ssid)
             readonly property string networkName: modelData.ssid || I18n.tr("Unknown Network")
@@ -1319,12 +1319,9 @@ Rectangle {
                 cursorShape: enabled ? Qt.PointingHandCursor : Qt.BusyCursor
                 onPressed: mouse => wifiRipple.trigger(mouse.x, mouse.y)
                 onClicked: function (event) {
-                    if (wifiDelegate.isConnected) {
-                        event.accepted = true;
-                        return;
-                    }
                     WifiConnectionActions.connectToNetwork(modelData, {
-                        connected: wifiDelegate.isConnected
+                        connected: wifiDelegate.isConnected,
+                        disconnectWhenConnected: true
                     });
                     event.accepted = true;
                 }
