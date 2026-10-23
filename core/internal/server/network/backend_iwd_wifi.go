@@ -41,6 +41,7 @@ func (b *IWDBackend) updateState() error {
 				b.state.NetworkStatus = StatusWiFi
 			} else {
 				b.state.NetworkStatus = StatusDisconnected
+				b.state.WiFiSSID = ""
 			}
 			b.stateMutex.Unlock()
 		}
@@ -55,7 +56,11 @@ func (b *IWDBackend) updateState() error {
 			if err == nil {
 				if name, ok := nameVar.Value().(string); ok {
 					b.stateMutex.Lock()
-					b.state.WiFiSSID = name
+					if b.state.WiFiConnected {
+						b.state.WiFiSSID = name
+					} else {
+						b.state.WiFiSSID = ""
+					}
 					b.stateMutex.Unlock()
 				}
 			}
@@ -417,6 +422,9 @@ func (b *IWDBackend) setConnectError(code string) {
 	b.state.IsConnecting = false
 	b.state.ConnectingSSID = ""
 	b.state.LastError = code
+	if !b.state.WiFiConnected {
+		b.state.WiFiSSID = ""
+	}
 	b.stateMutex.Unlock()
 }
 
@@ -471,6 +479,9 @@ func (b *IWDBackend) finalizeAttempt(att *connectAttempt, code string) {
 	b.state.IsConnecting = false
 	b.state.ConnectingSSID = ""
 	b.state.LastError = code
+	if !b.state.WiFiConnected {
+		b.state.WiFiSSID = ""
+	}
 	b.stateMutex.Unlock()
 
 	b.updateState()
@@ -734,6 +745,12 @@ func (b *IWDBackend) DisconnectWiFi() error {
 	if call.Err != nil {
 		return fmt.Errorf("failed to disconnect: %w", call.Err)
 	}
+
+	b.stateMutex.Lock()
+	b.state.WiFiConnected = false
+	b.state.WiFiSSID = ""
+	b.state.NetworkStatus = StatusDisconnected
+	b.stateMutex.Unlock()
 
 	b.updateState()
 

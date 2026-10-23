@@ -569,7 +569,7 @@ Item {
             required property var modelData
             required property int index
 
-            readonly property bool isConnected: modelData.ssid === NetworkService.currentWifiSSID
+            readonly property bool isConnected: NetworkService.wifiConnected && modelData.ssid === NetworkService.currentWifiSSID
             readonly property bool isConnecting: NetworkService.isWifiConnecting && NetworkService.connectingSSID === modelData.ssid
             readonly property int signalStrength: modelData.signal || 0
             readonly property bool sharesQrCode: modelData.secured && modelData.saved && !(modelData.enterprise || false)
@@ -602,10 +602,11 @@ Item {
             subtitleColor: isConnecting ? Theme.warning : Theme.surfaceVariantText
             clickable: true
             onClicked: {
-                if (isConnected || NetworkService.isWifiConnecting)
+                if (NetworkService.isWifiConnecting)
                     return;
                 WifiConnectionActions.connectToNetwork(modelData, {
-                    connected: isConnected
+                    connected: isConnected,
+                    disconnectWhenConnected: true
                 });
             }
 
