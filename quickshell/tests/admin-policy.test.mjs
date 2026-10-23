@@ -72,3 +72,98 @@ test("the settings IPC switch refuses set and keeps get", () => {
         assert.equal(context.get("lockBeforeSuspend"), String(!disableSettingsIpcSet));
     }
 });
+
+const ManagedSettings = loadScript(new URL("../Common/settings/ManagedSettings.js", import.meta.url));
+const SettingsStore = loadScript(new URL("../Common/settings/SettingsStore.js", import.meta.url));
+const SPEC = loadScript(new URL("../Common/settings/SettingsSpec.js", import.meta.url)).SPEC;
+
+function settingsDataContext(globals, names) {
+    const context = vm.createContext(globals);
+    context.root = context;
+    for (const name of names)
+        vm.runInContext(functionSource("../Common/SettingsData.qml", name), context);
+    return context;
+}
+
+test("managed lock settings keep only values of the default's type", () => {
+    const warnings = [];
+    const settings = ManagedSettings.parse(JSON.stringify({
+        lockBeforeSuspend: true,
+        customPowerActionLock: "",
+        acLockTimeout: 300,
+        u2fMode: null,
+        enableFprint: "yes",
+        maxFprintTries: [3],
+        notASetting: true
+    }), (...args) => warnings.push(args[1]));
+    assert.deepEqual({ ...settings }, { lockBeforeSuspend: true, customPowerActionLock: "", acLockTimeout: 300 });
+    assert.deepEqual(warnings.sort(), ["enableFprint", "maxFprintTries", "notASetting", "u2fMode"]);
+    assert.deepEqual({ ...ManagedSettings.parse("", () => assert.fail("no policy, no warning")) }, {});
+});
+
+test("managed settings win over every settings file, on the first load and on each reload", () => {
+    const version = Number(readFileSync(new URL("../Common/SettingsData.qml", import.meta.url), "utf8").match(/settingsConfigVersion: (\d+)/)[1]);
+    let files = { configVersion: version, lockBeforeSuspend: false, customPowerActionLock: "true", acLockTimeout: 60 };
+    const context = settingsDataContext({
+        AdminPolicy: { lockSettings: { lockBeforeSuspend: true, customPowerActionLock: "" } },
+        SettingsData: { Stage: { Partial: 2, Ready: 3 } },
+        Store: SettingsStore,
+        settingsConfigVersion: version,
+        _hasLoaded: false,
+        _settingsStage: 3,
+        _parseError: false,
+        frameEnabled: false,
+        frameMode: "",
+        _getSettingsObjectFromFiles: () => JSON.parse(JSON.stringify(files)),
+        _mergeSessionState() {},
+        Qt: { callLater() {} },
+        checkIconThemeDrift() {},
+        applyStoredTheme() {},
+        updateCompositorCursor() {},
+        updateFrameCompositorLayout() {},
+        loadPluginSettings() {},
+        clearIslandBars() {}
+    }, ["_loadSettings"]);
+    for (const userValue of [false, true]) {
+        files = Object.assign({}, files, { lockBeforeSuspend: userValue, acLockTimeout: files.acLockTimeout * 2 });
+        assert.equal(context._loadSettings(), false, "managed values are no unsaved change");
+        assert.equal(context.lockBeforeSuspend, true);
+        assert.equal(context.customPowerActionLock, "");
+        assert.equal(context.acLockTimeout, files.acLockTimeout);
+    }
+});
+
+test("a save leaves managed keys out of the settings files, and a user's own value in place", () => {
+    const main = "/home/u/.config/dms/settings.json";
+    const overlay = "/home/u/.config/dms/config.d/lock.json";
+    const fileSettings = { [main]: { lockBeforeSuspend: false, acLockTimeout: 60 }, [overlay]: { customPowerActionLock: "true", fadeToLockEnabled: false } };
+    const context = settingsDataContext({
+        AdminPolicy: { lockSettings: { lockBeforeSuspend: true, customPowerActionLock: "", batteryLockTimeout: 300 } },
+        _settingsFilesPaths: [main, overlay],
+        _settingsFiles: new Map(Object.keys(fileSettings).map(path => [path, { getSettings: () => Object.assign({}, fileSettings[path]) }])),
+        defaultSettingsFile: { filePath: main }
+    }, ["isManaged", "_splitSettingsByFile"]);
+    const split = context._splitSettingsByFile({ configVersion: 42, lockBeforeSuspend: true, customPowerActionLock: "", batteryLockTimeout: 300, acLockTimeout: 120, fadeToLockEnabled: true, lockAtStartup: true });
+    assert.deepEqual(JSON.parse(JSON.stringify(split)), {
+        [main]: { lockBeforeSuspend: false, acLockTimeout: 120, configVersion: 42, lockAtStartup: true },
+        [overlay]: { customPowerActionLock: "true", fadeToLockEnabled: true }
+    });
+});
+
+test("set and reset refuse managed keys and change the others", () => {
+    const changes = [];
+    const warnings = [];
+    const context = settingsDataContext({
+        AdminPolicy: { lockSettings: { lockBeforeSuspend: true } },
+        Spec: { SPEC, set: (root, key, value) => changes.push([key, value]) },
+        log: { warn: (...args) => warnings.push(args.at(-1)) },
+        saveSettings() {},
+        _hooks: {},
+        lockBeforeSuspend: true
+    }, ["isManaged", "set", "resetToDefault"]);
+    context.set("lockBeforeSuspend", false);
+    context.set("lockAtStartup", true);
+    context.resetToDefault(["lockBeforeSuspend", "acLockTimeout"]);
+    assert.deepEqual(changes, [["lockAtStartup", true], ["acLockTimeout", null]]);
+    assert.deepEqual(warnings, ["lockBeforeSuspend"]);
+});
