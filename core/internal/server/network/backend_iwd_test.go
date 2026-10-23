@@ -342,6 +342,48 @@ func TestIWDBackend_PendingPSK(t *testing.T) {
 	assert.False(t, ok, "expired pending PSK should not be returned")
 }
 
+func TestIWDBackend_SetConnectError_ClearsSSIDWhenDisconnected(t *testing.T) {
+	backend, _ := NewIWDBackend()
+	backend.state = &BackendState{
+		WiFiConnected:  false,
+		WiFiSSID:       "StaleNetwork",
+		IsConnecting:   true,
+		ConnectingSSID: "StaleNetwork",
+	}
+
+	backend.setConnectError("bad-credentials")
+
+	assert.False(t, backend.state.IsConnecting)
+	assert.Empty(t, backend.state.ConnectingSSID)
+	assert.Empty(t, backend.state.WiFiSSID)
+	assert.Equal(t, "bad-credentials", backend.state.LastError)
+}
+
+func TestIWDBackend_FinalizeAttempt_ClearsSSIDWhenDisconnected(t *testing.T) {
+	backend, _ := NewIWDBackend()
+	backend.state = &BackendState{
+		WiFiConnected:  false,
+		WiFiSSID:       "StaleNetwork",
+		IsConnecting:   true,
+		ConnectingSSID: "StaleNetwork",
+	}
+
+	att := &connectAttempt{
+		ssid:     "StaleNetwork",
+		netPath:  "/test",
+		saved:    false,
+		start:    time.Now(),
+		deadline: time.Now().Add(15 * time.Second),
+	}
+
+	backend.finalizeAttempt(att, "bad-credentials")
+
+	assert.False(t, backend.state.IsConnecting)
+	assert.Empty(t, backend.state.ConnectingSSID)
+	assert.Empty(t, backend.state.WiFiSSID)
+	assert.Equal(t, "bad-credentials", backend.state.LastError)
+}
+
 type fakePromptBroker struct {
 	asked    chan PromptRequest
 	reply    PromptReply

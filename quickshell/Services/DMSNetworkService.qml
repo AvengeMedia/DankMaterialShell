@@ -902,6 +902,21 @@ Singleton {
         onTriggered: root.scanWifi()
     }
 
+    Timer {
+        interval: 20000
+        repeat: true
+        running: root.isConnecting
+        onTriggered: {
+            if (Date.now() - root.pendingConnectionStartTime > 16000) {
+                root.isConnecting = false;
+                root.connectingSSID = "";
+                root.connectionStatus = "failed";
+                root.connectionError = "timeout";
+                root.pendingConnectionSSID = "";
+            }
+        }
+    }
+
     function fetchWiredNetworkInfo(uuid) {
         if (!networkAvailable)
             return;
