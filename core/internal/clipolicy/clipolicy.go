@@ -150,6 +150,16 @@ func LockSettings(fs afero.Fs) (map[string]json.RawMessage, error) {
 	return lockSettings(policies), err
 }
 
+// LockSettingBool returns a managed boolean lock setting, or nil when it is
+// not managed or not a boolean, which the shell ignores too.
+func LockSettingBool(settings map[string]json.RawMessage, key string) *bool {
+	var value *bool
+	if err := json.Unmarshal(settings[key], &value); err != nil {
+		return nil
+	}
+	return value
+}
+
 // ShellEnv returns every shell switch as DMS_POLICY_<KEY>=1 or 0 and the
 // managed lock settings as DMS_POLICY_LOCK_SETTINGS=<JSON object>, so a value
 // inherited by the shell never counts. A policy file that fails to load turns

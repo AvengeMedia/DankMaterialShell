@@ -206,3 +206,26 @@ func TestShellEnvLockSettings(t *testing.T) {
 	require.NoError(t, err)
 	assert.Contains(t, env, `DMS_POLICY_LOCK_SETTINGS={"acLockTimeout":300,"customPowerActionLock":"","lockBeforeSuspend":true}`)
 }
+
+func TestLockSettingBool(t *testing.T) {
+	on, off := true, false
+	tests := []struct {
+		name     string
+		settings string
+		want     *bool
+	}{
+		{name: "not managed", settings: `{"lockAtStartup": true}`},
+		{name: "managed on", settings: `{"lockBeforeSuspend": true}`, want: &on},
+		{name: "managed off", settings: `{"lockBeforeSuspend": false}`, want: &off},
+		{name: "null", settings: `{"lockBeforeSuspend": null}`},
+		{name: "not a boolean", settings: `{"lockBeforeSuspend": "true"}`},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var settings map[string]json.RawMessage
+			require.NoError(t, json.Unmarshal([]byte(tt.settings), &settings))
+			assert.Equal(t, tt.want, LockSettingBool(settings, "lockBeforeSuspend"))
+		})
+	}
+}
