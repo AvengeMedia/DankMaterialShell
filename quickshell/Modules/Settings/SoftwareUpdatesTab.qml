@@ -61,7 +61,7 @@ Item {
     readonly property bool busy: SystemUpdateService.isChecking || SystemUpdateService.isUpgrading
     // A refresh clears the log, so a log next to an error means the upgrade itself failed.
     readonly property bool upgradeFailed: SystemUpdateService.hasError && !busy && (SystemUpdateService.recentLog || []).length > 0
-    readonly property var installablePackages: SystemUpdateService.availableUpdates.filter(p => SettingsData.updaterIncludeFlatpak || p.repo !== "flatpak")
+    readonly property var installablePackages: SystemUpdateService.availableUpdates
     readonly property bool anythingToInstall: installablePackages.length > 0 && SystemUpdateService.helperAvailable
     readonly property var notesRelease: SystemUpdateService.notesRelease
     readonly property int serviceLastCheckUnix: SystemUpdateService.lastCheckUnix

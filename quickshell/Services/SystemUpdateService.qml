@@ -124,6 +124,9 @@ Singleton {
         function onUpdaterAllowAURChanged() {
             root._refilter();
         }
+        function onUpdaterIncludeFlatpakChanged() {
+            root._refilter();
+        }
         function onUpdaterIgnoredPackagesChanged() {
             root._refilter();
         }
@@ -274,6 +277,8 @@ Singleton {
     function _filterUpdates(pkgs) {
         return (pkgs || []).filter(p => {
             if (!SettingsData.updaterAllowAUR && p.repo === "aur")
+                return false;
+            if (!SettingsData.updaterIncludeFlatpak && p.repo === "flatpak")
                 return false;
             if (!canIgnorePackage(p))
                 return true;
