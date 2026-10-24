@@ -2004,6 +2004,34 @@
     "description": "Popups hide the message until expanded"
   },
   {
+    "section": "configProfiles",
+    "label": "Profiles",
+    "tabIndex": -1,
+    "category": "Wallpaper & colors",
+    "keywords": [
+      "background",
+      "bg",
+      "colors",
+      "colour",
+      "colours",
+      "desktop",
+      "hue",
+      "image",
+      "palette",
+      "picture",
+      "preset",
+      "profile",
+      "profiles",
+      "setup",
+      "snapshot",
+      "switch",
+      "tint",
+      "wallpaper"
+    ],
+    "page": "personalization",
+    "icon": "style"
+  },
+  {
     "section": "radiusStrength",
     "label": "Radius strength",
     "tabIndex": -1,
@@ -2661,6 +2689,7 @@
       "colors",
       "colour",
       "colours",
+      "compare",
       "cycling",
       "dark",
       "dark mode",
@@ -2674,6 +2703,8 @@
       "palette",
       "palettes",
       "picture",
+      "profile",
+      "profiles",
       "style",
       "theme",
       "theming",
@@ -18427,5 +18458,31 @@
       "wellbeing"
     ],
     "icon": "show_chart"
+  },
+  {
+    "section": "_tab_72",
+    "label": "Profiles",
+    "tabIndex": 72,
+    "category": "Profiles",
+    "keywords": [
+      "background",
+      "bg",
+      "colors",
+      "colour",
+      "colours",
+      "desktop",
+      "hue",
+      "image",
+      "palette",
+      "picture",
+      "preset",
+      "profiles",
+      "setup",
+      "snapshot",
+      "tint",
+      "wallpaper"
+    ],
+    "icon": "style",
+    "parentLabel": "Wallpaper & colors"
   }
 ]
