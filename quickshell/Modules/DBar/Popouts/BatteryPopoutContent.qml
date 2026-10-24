@@ -307,7 +307,7 @@ Item {
                         enabled: PowerProfileWatcher.available
                         model: profiles.map(profile => ({
                                     text: Theme.getPowerProfileLabel(profile),
-                                    icon: ["eco", "bolt", "speed"][profile]
+                                    icon: ["eco", "speed", "bolt"][profile]
                                 }))
                         currentIndex: profiles.indexOf(PowerProfileWatcher.currentProfile)
                         onSelectionChanged: (index, selected) => {
