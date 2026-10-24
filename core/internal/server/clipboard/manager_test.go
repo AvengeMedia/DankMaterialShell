@@ -18,6 +18,7 @@ import (
 	bolt "go.etcd.io/bbolt"
 
 	"github.com/duxlabs-dev/dux-go/ipc"
+	wlclient "github.com/duxlabs-dev/dux-go/wayland/client"
 	"github.com/duxlabs-dev/dux-go/wayland/ext_data_control"
 	mocks_wlcontext "github.com/duxlabs-dev/dux-shell/core/internal/mocks/wlcontext"
 	"github.com/duxlabs-dev/dux-shell/core/internal/server/models"
@@ -51,13 +52,15 @@ func newTestManagerWithDB(t *testing.T) *Manager {
 	mockCtx := mocks_wlcontext.NewMockWaylandContext(t)
 	mockCtx.EXPECT().Post(mock.AnythingOfType("func()")).Return().Maybe()
 
-	return &Manager{
+	m := &Manager{
 		config:         DefaultConfig(),
 		db:             db,
 		wlCtx:          mockCtx,
 		dataControlMgr: &ext_data_control.ExtDataControlManagerV1{},
 		dataDevice:     &ext_data_control.ExtDataControlDeviceV1{},
 	}
+	m.deviceBound.Store(true)
+	return m
 }
 
 func TestEncodeDecodeEntry_Roundtrip(t *testing.T) {
@@ -1056,5 +1059,32 @@ func TestCopyFile_DisabledTrackingRefusesCopy(t *testing.T) {
 	require.NoError(t, os.WriteFile(path, []byte("png-bytes"), 0o644))
 
 	require.ErrorIs(t, m.CopyFile(path), errSelectionUnavailable)
+	assert.Empty(t, m.GetHistory())
+}
+
+func TestApplyConfigChange_DisableReleasesDataDevice(t *testing.T) {
+	sock := filepath.Join(t.TempDir(), "wayland-test")
+	ln, err := net.Listen("unix", sock)
+	require.NoError(t, err)
+	t.Cleanup(func() { ln.Close() })
+
+	display, err := wlclient.Connect(sock)
+	require.NoError(t, err)
+	t.Cleanup(func() { display.Context().Close() })
+
+	m := newTestManagerWithDB(t)
+	mockCtx := mocks_wlcontext.NewMockWaylandContext(t)
+	mockCtx.EXPECT().Post(mock.AnythingOfType("func()")).Run(func(fn func()) { fn() })
+	m.wlCtx = mockCtx
+	device := ext_data_control.NewExtDataControlDeviceV1(display.Context())
+	m.dataDevice = device
+
+	cfg := DefaultConfig()
+	cfg.Disabled = true
+	m.applyConfigChange(cfg)
+
+	assert.True(t, device.IsZombie())
+	assert.Nil(t, m.dataDevice)
+	require.ErrorIs(t, m.CopyText("secret"), errSelectionUnavailable)
 	assert.Empty(t, m.GetHistory())
 }

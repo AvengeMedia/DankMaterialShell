@@ -1126,7 +1126,7 @@ func (s *Server) Serve(printDocs bool) error {
 		log.Info(" clipboard.paste                       - Get current clipboard text")
 		log.Info(" clipboard.search                      - Search history (params: query?, mimeType?, isImage?, limit?, offset?, before?, after?)")
 		log.Info(" clipboard.getConfig                   - Get clipboard configuration")
-		log.Info(" clipboard.setConfig                   - Set configuration (params: maxHistory?, maxEntrySize?, autoClearDays?, clearAtStartup?)")
+		log.Info(" clipboard.setConfig                   - Set configuration (params: maxHistory?, maxEntrySize?, autoClearDays?, clearAtStartup?, disabled?, maxPinned?)")
 		log.Info(" clipboard.subscribe                   - Subscribe to clipboard state changes (streaming)")
 		log.Info("Notify:")
 		log.Info(" notify.watchAction                    - Open a file when a notification action fires (params: id, path)")

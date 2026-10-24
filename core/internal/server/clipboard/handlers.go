@@ -40,10 +40,6 @@ func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 		handleSubscribe(conn, req, m)
 	case "clipboard.search":
 		handleSearch(conn, req, m)
-	case "clipboard.getConfig":
-		handleGetConfig(conn, req, m)
-	case "clipboard.setConfig":
-		handleSetConfig(conn, req, m)
 	case "clipboard.store":
 		handleStore(conn, req, m)
 	case "clipboard.pinEntry":
@@ -318,40 +314,6 @@ func handleSearch(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	}
 
 	conn.Respond(req.ID, m.Search(p))
-}
-
-func handleGetConfig(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
-	conn.Respond(req.ID, m.GetConfig())
-}
-
-func handleSetConfig(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
-	cfg := m.GetConfig()
-
-	if v, ok := req.Get[float64]("maxHistory"); ok {
-		cfg.MaxHistory = int(v)
-	}
-	if v, ok := req.Get[float64]("maxEntrySize"); ok {
-		cfg.MaxEntrySize = int64(v)
-	}
-	if v, ok := req.Get[float64]("autoClearDays"); ok {
-		cfg.AutoClearDays = int(v)
-	}
-	if v, ok := req.Get[bool]("clearAtStartup"); ok {
-		cfg.ClearAtStartup = v
-	}
-	if v, ok := req.Get[bool]("disabled"); ok {
-		cfg.Disabled = v
-	}
-	if v, ok := req.Get[float64]("maxPinned"); ok {
-		cfg.MaxPinned = int(v)
-	}
-
-	if err := m.SetConfig(cfg); err != nil {
-		conn.RespondError(req.ID, err.Error())
-		return
-	}
-
-	conn.Respond(req.ID, models.SuccessResult{Success: true, Message: "config updated"})
 }
 
 func handleStore(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {

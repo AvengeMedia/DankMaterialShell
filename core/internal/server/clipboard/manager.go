@@ -277,17 +277,65 @@ func (m *Manager) setupRegistry() error {
 }
 
 func (m *Manager) setupDataDeviceSync() {
-	if m.dataControlMgr == nil || m.seat == nil {
+	if !m.bindDataDevice() {
 		return
 	}
 
-	ctx := m.display.Context()
+	if err := m.display.Context().Dispatch(); err != nil {
+		log.Errorf("Failed to dispatch initial events: %v", err)
+		return
+	}
+
+	log.Info("Data device setup complete")
+}
+
+// Runs on the dispatcher goroutine; a disabled manager must hold no device so it receives no offers.
+func (m *Manager) syncTracking() {
+	if m.getConfig().Disabled {
+		m.releaseDataDevice()
+		return
+	}
+	if m.dataDevice != nil {
+		return
+	}
+	if m.registry == nil {
+		if err := m.setupRegistry(); err != nil {
+			log.Errorf("Failed to enable clipboard tracking: %v", err)
+			return
+		}
+	}
+	if m.bindDataDevice() {
+		log.Info("Data device setup complete")
+	}
+}
+
+func (m *Manager) releaseDataDevice() {
+	m.deviceBound.Store(false)
+
+	if m.currentOffer != nil {
+		m.releaseOffer(m.currentOffer)
+		m.currentOffer = nil
+	}
+
+	if m.dataDevice == nil {
+		return
+	}
+	m.dataDevice.(*ext_data_control.ExtDataControlDeviceV1).Destroy()
+	m.dataDevice = nil
+	m.mimeTypes = nil
+}
+
+func (m *Manager) bindDataDevice() bool {
+	if m.dataControlMgr == nil || m.seat == nil {
+		return false
+	}
+
 	dataMgr := m.dataControlMgr.(*ext_data_control.ExtDataControlManagerV1)
 
 	dataDevice, err := dataMgr.GetDataDevice(m.seat)
 	if err != nil {
 		log.Errorf("Failed to send get_data_device request: %v", err)
-		return
+		return false
 	}
 
 	dataDevice.SetDataOfferHandler(func(e ext_data_control.ExtDataControlDeviceV1DataOfferEvent) {
@@ -307,8 +355,12 @@ func (m *Manager) setupDataDeviceSync() {
 	})
 
 	dataDevice.SetSelectionHandler(func(e ext_data_control.ExtDataControlDeviceV1SelectionEvent) {
+		// The first event replays the selection that existed before binding.
 		if !m.initialized {
 			m.initialized = true
+			if e.Id != nil {
+				m.releaseOffer(e.Id)
+			}
 			return
 		}
 
@@ -333,6 +385,11 @@ func (m *Manager) setupDataDeviceSync() {
 		}
 
 		if offer == nil {
+			return
+		}
+
+		// An event can land between a runtime disable and the posted release.
+		if m.getConfig().Disabled {
 			return
 		}
 
@@ -394,14 +451,10 @@ func (m *Manager) setupDataDeviceSync() {
 		go m.readAndStore(r, preferredMime, altR, altMime)
 	})
 
+	m.initialized = false
 	m.dataDevice = dataDevice
-
-	if err := ctx.Dispatch(); err != nil {
-		log.Errorf("Failed to dispatch initial events: %v", err)
-		return
-	}
-
-	log.Info("Data device setup complete")
+	m.deviceBound.Store(true)
+	return true
 }
 
 func (m *Manager) releaseOffer(offer any) {
@@ -520,6 +573,9 @@ func (m *Manager) storeClipboardEntry(data []byte, mimeType string, altData []by
 }
 
 func (m *Manager) storeEntry(entry Entry) error {
+	if m.getConfig().Disabled {
+		return errTrackingDisabled
+	}
 	if m.db == nil {
 		return fmt.Errorf("database not available")
 	}
@@ -574,7 +630,8 @@ func (m *Manager) deduplicateInTx(b *bolt.Bucket, hash uint64) error {
 }
 
 func (m *Manager) trimLengthInTx(b *bolt.Bucket) error {
-	if m.config.MaxHistory < 0 {
+	maxHistory := m.getConfig().MaxHistory
+	if maxHistory < 0 {
 		return nil
 	}
 	c := b.Cursor()
@@ -584,7 +641,7 @@ func (m *Manager) trimLengthInTx(b *bolt.Bucket) error {
 		if err == nil && entry.Pinned {
 			continue
 		}
-		if count < m.config.MaxHistory {
+		if count < maxHistory {
 			count++
 			continue
 		}
@@ -1341,19 +1398,22 @@ func (m *Manager) reopenDB() {
 	m.db = db
 }
 
-var errSelectionUnavailable = errors.New("clipboard selection unavailable: tracking disabled or no data control protocol")
+var (
+	errSelectionUnavailable = errors.New("clipboard selection unavailable: tracking disabled or no data control protocol")
+	errTrackingDisabled     = errors.New("clipboard tracking disabled")
+)
 
-// Both are bound once in NewManager; a disabled manager never binds them but
-// still serves copy requests, so callers must fail before touching history.
+// A disabled manager still serves copy requests; failing here lets callers
+// such as dms screenshot fall back to their own copy.
 func (m *Manager) canTakeSelection() bool {
-	return m.dataControlMgr != nil && m.dataDevice != nil
+	return m.deviceBound.Load() && !m.getConfig().Disabled
 }
 
 func (m *Manager) SetClipboard(data []byte, mimeType string) error {
 	if !m.canTakeSelection() {
 		return errSelectionUnavailable
 	}
-	if int64(len(data)) > m.config.MaxEntrySize {
+	if int64(len(data)) > m.getConfig().MaxEntrySize {
 		return fmt.Errorf("data too large")
 	}
 
@@ -1371,7 +1431,7 @@ func (m *Manager) SetClipboardEntry(entry *Entry) error {
 	if !m.canTakeSelection() {
 		return errSelectionUnavailable
 	}
-	if int64(len(entry.Data)) > m.config.MaxEntrySize {
+	if int64(len(entry.Data)) > m.getConfig().MaxEntrySize {
 		return fmt.Errorf("data too large")
 	}
 
@@ -1520,16 +1580,7 @@ func (m *Manager) Close() {
 	m.subMutex.Unlock()
 
 	m.releaseCurrentSource()
-
-	if m.currentOffer != nil {
-		m.releaseOffer(m.currentOffer)
-		m.currentOffer = nil
-	}
-
-	if m.dataDevice != nil {
-		device := m.dataDevice.(*ext_data_control.ExtDataControlDeviceV1)
-		device.Destroy()
-	}
+	m.releaseDataDevice()
 
 	if m.dataControlMgr != nil {
 		mgr := m.dataControlMgr.(*ext_data_control.ExtDataControlManagerV1)
@@ -1729,19 +1780,12 @@ func (m *Manager) Search(params SearchParams) SearchResult {
 	}
 }
 
-func (m *Manager) GetConfig() Config {
-	return m.config
-}
-
 func (m *Manager) SetConfig(cfg Config) error {
-	m.configMutex.Lock()
-	m.config = cfg
-	m.configMutex.Unlock()
-
-	m.updateState()
-	m.notifySubscribers()
-
-	return SaveConfig(cfg)
+	if err := SaveConfig(cfg); err != nil {
+		return err
+	}
+	m.applyConfigChange(cfg)
+	return nil
 }
 
 func (m *Manager) getConfig() Config {
@@ -1782,7 +1826,12 @@ func (m *Manager) watchConfig() {
 			if event.Op&(fsnotify.Write|fsnotify.Create) == 0 {
 				continue
 			}
-			newCfg := LoadConfig()
+			// os.WriteFile truncates first; parsing that empty read would
+			// briefly reset every setting to its default.
+			newCfg, err := readConfig()
+			if err != nil {
+				continue
+			}
 			m.applyConfigChange(newCfg)
 		case err, ok := <-watcher.Errors:
 			if !ok {
@@ -1799,11 +1848,9 @@ func (m *Manager) applyConfigChange(newCfg Config) {
 	m.config = newCfg
 	m.configMutex.Unlock()
 
-	switch {
-	case newCfg.Disabled && !oldCfg.Disabled:
-		log.Info("Clipboard tracking disabled")
-	case !newCfg.Disabled && oldCfg.Disabled:
-		log.Info("Clipboard tracking enabled")
+	if newCfg.Disabled != oldCfg.Disabled {
+		log.Infof("Clipboard tracking disabled=%v", newCfg.Disabled)
+		m.post(m.syncTracking)
 	}
 
 	m.updateState()
@@ -1814,7 +1861,7 @@ func (m *Manager) StoreData(data []byte, mimeType string) error {
 	cfg := m.getConfig()
 
 	if cfg.Disabled {
-		return fmt.Errorf("clipboard tracking disabled")
+		return errTrackingDisabled
 	}
 
 	if m.db == nil {

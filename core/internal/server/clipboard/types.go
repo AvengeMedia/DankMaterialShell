@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/godbus/dbus/v5"
@@ -44,22 +45,30 @@ func getConfigPath() (string, error) {
 }
 
 func LoadConfig() Config {
+	cfg, err := readConfig()
+	if err != nil {
+		return DefaultConfig()
+	}
+	return cfg
+}
+
+func readConfig() (Config, error) {
 	cfg := DefaultConfig()
 
 	path, err := getConfigPath()
 	if err != nil {
-		return cfg
+		return cfg, err
 	}
 
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return cfg
+		return cfg, err
 	}
 
 	if err := json.Unmarshal(data, &cfg); err != nil {
-		return DefaultConfig()
+		return DefaultConfig(), err
 	}
-	return cfg
+	return cfg, nil
 }
 
 func SaveConfig(cfg Config) error {
@@ -140,6 +149,7 @@ type Manager struct {
 	pasteSupported bool
 
 	initialized bool
+	deviceBound atomic.Bool
 
 	alive    bool
 	stopChan chan struct{}

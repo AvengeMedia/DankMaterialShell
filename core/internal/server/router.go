@@ -279,7 +279,11 @@ func handleClipboardSetConfig(conn *ipc.ConnWriter, req ipc.Request) {
 		cfg.MaxPinned = int(v)
 	}
 
-	if err := clipboard.SaveConfig(cfg); err != nil {
+	save := clipboard.SaveConfig
+	if clipboardManager != nil {
+		save = clipboardManager.SetConfig
+	}
+	if err := save(cfg); err != nil {
 		conn.RespondError(req.ID, err.Error())
 		return
 	}
