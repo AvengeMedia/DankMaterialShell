@@ -477,6 +477,14 @@ Item {
 
             onHoveredChanged: root.updateFittsPointerInside()
         }
+
+        PointHandler {
+            target: null
+            onActiveChanged: {
+                if (active && root.controller.hoverExpanded && root.controller.expanded)
+                    root.controller.promoteHoverToActive();
+            }
+        }
     }
 
     function updateFittsPointerInside() {

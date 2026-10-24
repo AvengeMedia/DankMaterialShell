@@ -367,11 +367,24 @@ Item {
         }
     }
 
+    Connections {
+        target: surface.Window.window
+
+        function onActiveFocusItemChanged() {
+            const item = surface.Window.window?.activeFocusItem;
+            if (item && item !== islandFocus && controller.hoverExpanded && controller.expanded)
+                controller.promoteHoverToActive();
+        }
+    }
+
     Timer {
         id: keyboardActivationTimer
 
         interval: 60
         onTriggered: {
+            const activeItem = surface.Window.window?.activeFocusItem;
+            if (activeItem && activeItem !== islandFocus)
+                return;
             if (controller.keyboardDismissRequested && !surface.requestActivityFocus())
                 islandFocus.forceActiveFocus(Qt.PopupFocusReason);
         }
